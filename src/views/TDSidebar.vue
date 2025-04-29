@@ -54,7 +54,9 @@ export default {
 </script>
 <style lang="scss" scoped>
 .td-sidebar {
-  width: 300px;
+  width: 250px;
+  min-width: 250px;
+  max-width: 250px;
   height: 100%;
   background-color: var(--bg-sub-color);
   display: flex;

@@ -1,31 +1,33 @@
 <template>
-  <div class="container">
+  <div class="container flex flex-col">
     <h1>💖 Image To base 64 tool!</h1>
-    <div
-      ref="drop-zone"
-      class="drop-zone"
-      @dragover="handleDragOver"
-      @dragleave="handleDragLeave"
-      @drop="handleDrop"
-    >
-      <p>Paste image here (Ctrl+V) or drag & drop</p>
-      <img v-if="srcImg" :src="srcImg" class="preview" ref="preview" />
+    <div class="flex paste-box">
+      <div
+        ref="drop-zone"
+        class="drop-zone"
+        @dragover="handleDragOver"
+        @dragleave="handleDragLeave"
+        @drop="handleDrop"
+      >
+        <p v-if="!srcImg">Paste image here (Ctrl+V) or drag & drop</p>
+        <img :src="srcImg" class="preview" ref="preview" />
+      </div>
+      <div class="result-container">
+        <TDTextarea
+          ref="base64-output"
+          placeHolder="Base64 output will appear here"
+          v-model="base64Result"
+          :readOnly="true"
+          height="300px"
+          width="300px"
+        ></TDTextarea>
+      </div>
     </div>
-    <div class="result-container">
-      <TDTextarea
-        ref="base64-output"
-        placeHolder="Base64 output will appear here"
-        v-model="base64Result"
-        :readOnly="true"
-        height="200px"
-        width="300px"
-      ></TDTextarea>
-      <TDButton
-        ref="copy-btn"
-        @click="haddleCopyEvent"
-        label="Copy Base64"
-      ></TDButton>
-    </div>
+    <TDButton
+      ref="copy-btn"
+      @click="haddleCopyEvent"
+      label="Copy Base64"
+    ></TDButton>
   </div>
 </template>
 
@@ -103,18 +105,17 @@ export default {
 
 <style scoped>
 .container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   width: 100%;
   height: 100%;
   padding: 2rem;
   border-radius: 0;
-  width: 100%;
   min-height: 100vh;
   box-shadow: none;
   overflow: auto;
+}
+.paste-box {
+  column-gap: 20px;
+  padding: var(--padding);
 }
 
 h1 {
@@ -124,21 +125,18 @@ h1 {
   font-size: 1.5rem;
 }
 
-/* Common styles */
-.drop-zone,
-.input-container {
+.drop-zone {
+  min-width: 300px;
+  max-width: 300px;
+  min-height: 300px;
+  max-height: 300px;
   border: 2px dashed #ddd;
   padding: 1.5rem;
   text-align: center;
-  margin-bottom: 1.5rem;
   border-radius: 8px;
   transition: all 0.2s ease;
   background-color: #f8f8f8;
-}
-
-.drop-zone {
   cursor: pointer;
-  overflow: auto;
 }
 
 .drop-zone:hover {
@@ -146,28 +144,25 @@ h1 {
   background-color: #f8f1f7;
 }
 
-.drop-zone p,
-.input-container p {
+.drop-zone p {
   color: #666;
-  margin-bottom: 1rem;
   font-size: 0.9rem;
 }
 
 .preview {
-  max-width: 300px;
+  max-width: 100%;
   margin-top: 1rem;
   border-radius: 8px;
   border: 1px solid #ddd;
 }
 
 .preview img {
-  max-width: 300px;
-  max-height: 300px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
 .result-container {
-  margin-top: 1.5rem;
   display: flex;
 }
 </style>

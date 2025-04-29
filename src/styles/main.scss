@@ -11,6 +11,19 @@
   --border-radius: 8px;
 }
 
+.flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+.flex-row {
+  flex-direction: row;
+}
+
 body[data-theme="light"] {
   --bg-main-color: rgb(246, 246, 246);
   --bg-sub-color: rgb(224, 223, 223);
@@ -77,6 +90,17 @@ a {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+::selection {
+  color: white; /* Text color */
+  background-color: #df799f; /* Background color */
+}
+
+/* For Firefox support */
+::-moz-selection {
+  color: white;
+  background-color: #df799f;
 }
 
 html,
