@@ -111,7 +111,6 @@ export default {
   border-radius: 0;
   min-height: 100vh;
   box-shadow: none;
-  overflow: auto;
 }
 .paste-box {
   column-gap: 20px;
