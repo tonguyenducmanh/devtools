@@ -1,5 +1,6 @@
 <template>
   <div class="td-input">
+    <div v-if="label">{{ label }}</div>
     <input
       :placeholder="placeHolder"
       :value="modelValue"
@@ -29,6 +30,10 @@ export default {
     readOnly: {
       type: Boolean,
       default: false,
+    },
+    label: {
+      type: String,
+      default: null,
     },
   },
   data() {
