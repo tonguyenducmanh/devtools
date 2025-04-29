@@ -1,13 +1,13 @@
 <template>
-  <div class="td-textarea">
+  <div class="td-textarea" :style="styleComputed">
     <div v-if="label">{{ label }}</div>
     <textarea
       :placeholder="placeHolder"
       :value="modelValue"
       :disabled="readOnly"
       @input="changeInputValue"
-      @dragover.prevent="isDragOver = true"
-      @dragleave="isDragOver = false"
+      @dragover="handleDragOver"
+      @dragleave="handleDragLeave"
       @drop="handleDrop"
       :class="{ 'drag-over': isDragOver }"
     />
@@ -22,6 +22,19 @@ export default {
   created() {},
   mounted() {},
   methods: {},
+  computed: {
+    styleComputed() {
+      let style = "";
+      let me = this;
+      if (me.width) {
+        style += `width: ${me.width} !important; `;
+      }
+      if (me.height) {
+        style += `height: ${me.height} !important; `;
+      }
+      return style;
+    },
+  },
   props: {
     placeHolder: {
       type: String,
@@ -39,6 +52,14 @@ export default {
       type: String,
       default: null,
     },
+    width: {
+      type: String,
+      default: null,
+    },
+    height: {
+      type: String,
+      default: null,
+    },
   },
   data() {
     return {
@@ -53,9 +74,23 @@ export default {
       me.$emit("update:modelValue", e.target.value);
     }, 500),
 
-    handleDrop(event) {
-      this.isDragOver = false;
-      // handle drop logic here
+    handleDragOver(e) {
+      let me = this;
+      e.preventDefault();
+      me.isDragOver = true;
+    },
+
+    handleDragLeave(e) {
+      let me = this;
+      e.preventDefault();
+      me.isDragOver = false;
+    },
+
+    handleDrop(e) {
+      let me = this;
+      e.preventDefault();
+      me.isDragOver = false;
+      me.$emit("dropValue", e);
     },
   },
 };
@@ -68,6 +103,7 @@ export default {
   textarea {
     border: 2px solid var(--border-color);
     width: 100%;
+    height: 100%;
     padding: var(--padding);
     border-radius: var(--border-radius);
   }
@@ -75,14 +111,6 @@ export default {
   textarea:focus {
     outline: none;
     border: 2px solid var(--focus-color);
-  }
-
-  .drop-zone {
-    background-color: #eee;
-    padding: 20px;
-    border: 2px solid transparent;
-    min-height: 100px;
-    transition: background-color 0.3s, outline 0.3s;
   }
 
   .drag-over {

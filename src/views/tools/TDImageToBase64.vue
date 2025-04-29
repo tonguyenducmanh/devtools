@@ -1,17 +1,30 @@
 <template>
   <div class="container">
     <h1>💖 Image To base 64 tool!</h1>
-    <div ref="drop-zone" class="drop-zone">
+    <div
+      ref="drop-zone"
+      class="drop-zone"
+      @dragover="handleDragOver"
+      @dragleave="handleDragLeave"
+      @drop="handleDrop"
+    >
       <p>Paste image here (Ctrl+V) or drag & drop</p>
-      <img v-if="srcImg" :src="srcImg" ref="preview"></img>
+      <img v-if="srcImg" :src="srcImg" class="preview" ref="preview" />
     </div>
     <div class="result-container">
       <TDTextarea
         ref="base64-output"
         placeHolder="Base64 output will appear here"
         v-model="base64Result"
+        :readOnly="true"
+        height="200px"
+        width="300px"
       ></TDTextarea>
-      <TDButton ref="copy-btn" @click="haddleCopyEvent" label="Copy Base64"></TDButton>
+      <TDButton
+        ref="copy-btn"
+        @click="haddleCopyEvent"
+        label="Copy Base64"
+      ></TDButton>
     </div>
   </div>
 </template>
@@ -23,11 +36,11 @@ export default {
   name: "TDImageToBase64",
   created() {
     let me = this;
-    document.addEventListener('paste', me.handlePasteEvent);
+    document.addEventListener("paste", me.handlePasteEvent);
   },
   beforeUnmount() {
     let me = this;
-    document.removeEventListener('paste', me.handlePasteEvent);
+    document.removeEventListener("paste", me.handlePasteEvent);
   },
   mounted() {},
   methods: {
@@ -48,6 +61,25 @@ export default {
         }
       }
     },
+    handleDragOver(e) {
+      let me = this;
+      e.preventDefault();
+      me.isDragOver = true;
+    },
+
+    handleDragLeave(e) {
+      let me = this;
+      e.preventDefault();
+      me.isDragOver = false;
+    },
+    handleDrop(e) {
+      e.preventDefault();
+      let me = this;
+      const files = e.dataTransfer.files;
+      if (files[0] && files[0].type.includes("image")) {
+        me.handleImageToBase64(files[0]);
+      }
+    },
     handleImageToBase64(blob) {
       let me = this;
       me.srcImg = URL.createObjectURL(blob);
@@ -63,7 +95,7 @@ export default {
   data() {
     return {
       base64Result: null,
-      srcImg:null,
+      srcImg: null,
     };
   },
 };
@@ -78,100 +110,64 @@ export default {
   width: 100%;
   height: 100%;
   padding: 2rem;
-    border-radius: 0;
-    width: 100%;
-    min-height: 100vh;
-    box-shadow: none;
+  border-radius: 0;
+  width: 100%;
+  min-height: 100vh;
+  box-shadow: none;
+  overflow: auto;
 }
 
-
 h1 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 2rem;
-    font-size: 1.5rem;
+  text-align: center;
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 1.5rem;
 }
 
 /* Common styles */
-.drop-zone, .input-container {
-    border: 2px dashed #ddd;
-    padding: 1.5rem;
-    text-align: center;
-    margin-bottom: 1.5rem;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    background-color: #f8f8f8;
+.drop-zone,
+.input-container {
+  border: 2px dashed #ddd;
+  padding: 1.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  background-color: #f8f8f8;
 }
 
 .drop-zone {
-    cursor: pointer;
+  cursor: pointer;
+  overflow: auto;
 }
 
 .drop-zone:hover {
-    border-color: var(--focus-color);
-    background-color: #f8f1f7;
+  border-color: var(--focus-color);
+  background-color: #f8f1f7;
 }
 
-.drop-zone p, .input-container p {
-    color: #666;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
+.drop-zone p,
+.input-container p {
+  color: #666;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
 }
 
-#preview, #image-preview {
-    max-width: 100%;
-    margin-top: 1rem;
-    background-color: white;
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid #ddd;
+.preview {
+  max-width: 300px;
+  margin-top: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
 }
 
-#preview img, #image-preview img {
-    max-width: 100%;
-    max-height: 300px;
-    object-fit: contain;
+.preview img {
+  max-width: 300px;
+  max-height: 300px;
+  object-fit: contain;
 }
 
 .result-container {
-    margin-top: 1.5rem;
+  margin-top: 1.5rem;
+  display: flex;
 }
-
-/* Base64 to Image specific styles */
-.image-preview {
-    min-height: 100px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #f8f8f8;
-    padding: 1rem;
-}
-
-.image-preview:empty::before {
-    content: 'Image preview will appear here';
-    color: #666;
-    font-size: 0.9rem;
-}
-
-/* Responsive design */
-@media screen and (min-width: 768px) {
-    .container {
-        padding: 3rem;
-    }
-
-    h1 {
-        font-size: 2rem;
-    }
-}
-
-@media screen and (min-width: 1024px) {
-    .container {
-        padding: 4rem;
-        max-width: 1200px;
-    }
-}
-
 </style>
