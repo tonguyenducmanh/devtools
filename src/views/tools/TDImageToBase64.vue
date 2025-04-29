@@ -119,7 +119,6 @@ export default {
 
 h1 {
   text-align: center;
-  color: #333;
   margin-bottom: 2rem;
   font-size: 1.5rem;
 }
@@ -129,18 +128,17 @@ h1 {
   max-width: 300px;
   min-height: 300px;
   max-height: 300px;
-  border: 2px dashed #ddd;
+  border: 2px dashed var(--bg-active-color);
   padding: 1.5rem;
   text-align: center;
   border-radius: 8px;
   transition: all 0.2s ease;
-  background-color: #f8f8f8;
   cursor: pointer;
 }
 
 .drop-zone:hover {
   border-color: var(--focus-color);
-  background-color: #f8f1f7;
+  background-color: var(--bg-hover-color);
 }
 
 .drop-zone p {
@@ -152,7 +150,6 @@ h1 {
   max-width: 100%;
   margin-top: 1rem;
   border-radius: 8px;
-  border: 1px solid #ddd;
 }
 
 .preview img {
