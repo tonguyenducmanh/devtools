@@ -78,6 +78,7 @@ export default {
     width: 100%;
     padding: var(--padding);
     border-radius: var(--border-radius);
+    background-color: var(--bg-sub-color);
   }
 
   input:focus {

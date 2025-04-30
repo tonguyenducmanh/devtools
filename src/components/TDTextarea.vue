@@ -125,6 +125,7 @@ export default {
     height: 100%;
     padding: var(--padding);
     border-radius: var(--border-radius);
+    background-color: var(--bg-sub-color);
   }
 
   textarea:focus {
