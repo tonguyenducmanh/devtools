@@ -42,7 +42,7 @@ export default {
         },
         {
           path: "/textoqrcode",
-          title: "Text to QR code",
+          title: "Text to QRCode",
         },
       ],
     };

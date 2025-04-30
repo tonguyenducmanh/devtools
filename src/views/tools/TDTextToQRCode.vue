@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">💖 Text To QR Code tool!</div>
+    <div class="title">💖 Text To QRCode tool!</div>
   </div>
 </template>
 
