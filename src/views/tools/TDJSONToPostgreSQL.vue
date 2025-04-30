@@ -13,30 +13,26 @@
       </div>
     </div>
 
-    <div class="flex flex-col-gap io-section">
-      <div class="io-textbox">
-        <TDTextarea
-          isLabelTop
-          label="Nhập JSON"
-          id="jsonInput"
-          placeholder="Nhập JSON ở đây..."
-          height="300px"
-          width="300px"
-          v-model="inputJSON"
-        ></TDTextarea>
-      </div>
-      <div class="io-textbox">
-        <TDTextarea
-          isLabelTop
-          label="Kết quả SQL"
-          id="sqlOutput"
-          :readOnly="true"
-          placeholder="SQL sẽ xuất hiện ở đây..."
-          height="300px"
-          width="300px"
-          v-model="outputSQL"
-        ></TDTextarea>
-      </div>
+    <div class="flex io-section">
+      <TDTextarea
+        isLabelTop
+        label="Nhập JSON"
+        id="jsonInput"
+        placeholder="Nhập JSON ở đây..."
+        height="300px"
+        width="300px"
+        v-model="inputJSON"
+      ></TDTextarea>
+      <TDTextarea
+        isLabelTop
+        label="Kết quả SQL"
+        id="sqlOutput"
+        :readOnly="true"
+        placeholder="SQL sẽ xuất hiện ở đây..."
+        height="300px"
+        width="300px"
+        v-model="outputSQL"
+      ></TDTextarea>
     </div>
 
     <div class="flex">
@@ -272,5 +268,8 @@ export default {
   justify-content: center;
   width: 100%;
   height: 100%;
+}
+.io-section {
+  column-gap: 20px;
 }
 </style>
