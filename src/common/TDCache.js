@@ -6,7 +6,12 @@ class TDCache {
   }
 
   get(keyCache) {
-    return localStorage.getItem(keyCache);
+    let cacheValue = localStorage.getItem(keyCache);
+    try {
+      return JSON.parse(cacheValue);
+    } catch (error) {
+      return cacheValue;
+    }
   }
   remove(keyCache) {
     localStorage.removeItem(keyCache);

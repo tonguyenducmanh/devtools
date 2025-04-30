@@ -1,8 +1,8 @@
 <template>
   <div class="td-container">
-    <TDSidebar />
+    <TDSidebar v-if="isShowSidebar" />
     <div class="td-main">
-      <!-- <TDHeader></TDHeader> -->
+      <div class="td-menu" @click="toggleSidebar">click me</div>
       <RouterView />
     </div>
   </div>
@@ -10,16 +10,20 @@
 
 <script>
 import TDSidebar from "@/views/TDSidebar.vue";
-import TDHeader from "@/views/TDHeader.vue";
 import "@/common/TDPrototype.js";
 import _ from "@/common/TDUtility.js";
 
 export default {
-  components: { TDSidebar, TDHeader },
+  components: { TDSidebar },
   created() {
     let me = this;
     console.log("App is running success: " + _.formatDate(new Date()));
     me.processWhenRunApp();
+  },
+  data() {
+    return {
+      isShowSidebar: true,
+    };
   },
   methods: {
     /**
@@ -33,6 +37,19 @@ export default {
         me.$tdCache.set(me.$tdEnum.cacheConfig.theme, currentTheme);
       }
       document.body.setAttribute("data-theme", currentTheme);
+      let toggleSidebarState = me.$tdCache.get(
+        me.$tdEnum.cacheConfig.isShowSidebar
+      );
+      if (toggleSidebarState) {
+        me.isShowSidebar = toggleSidebarState.value;
+      }
+    },
+    toggleSidebar() {
+      let me = this;
+      me.isShowSidebar = !me.isShowSidebar;
+      me.$tdCache.set(me.$tdEnum.cacheConfig.isShowSidebar, {
+        value: me.isShowSidebar,
+      });
     },
   },
 };
@@ -49,6 +66,11 @@ export default {
     width: 100%;
     height: 100%;
     overflow: auto;
+    position: relative;
+    .td-menu {
+      position: absolute;
+      cursor: pointer;
+    }
   }
 }
 </style>

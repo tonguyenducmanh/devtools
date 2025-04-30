@@ -6,6 +6,8 @@ class TDEnum {
   };
   cacheConfig = {
     theme: "theme",
+    qrHistory: "qrHistory",
+    isShowSidebar: "isShowSidebar",
   };
 }
 
