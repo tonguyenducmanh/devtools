@@ -35,7 +35,7 @@
         <label for="remove-empty-checkbox">Xóa ký tự xuống dòng</label>
       </div>
       <div class="button-generate">
-        <TDButton @click="generateQRCode" label="Tạo QR Code"></TDButton>
+        <TDButton :readOnly="!textGenQR" @click="generateQRCode" label="Tạo QR Code"></TDButton>
       </div>
     </div>
     <div v-if="textGenQR" class="qrcode-box">
@@ -256,12 +256,10 @@ export default {
 }
 
 .history-section {
-  width: 100%;
   padding: var(--padding);
   margin: var(--padding);
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
-  margin-bottom: 2rem;
 }
 
 .history-header {
@@ -287,7 +285,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 1rem;
+  padding: var(--padding);
   background-color: var(--bg-sub-color);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
@@ -346,11 +344,9 @@ export default {
 }
 
 .input-area {
-  width: 100%;
   min-height: 100px;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
-  border: 1px solid #ddd;
   border-radius: 5px;
   resize: vertical;
 }
@@ -378,6 +374,7 @@ export default {
   margin-bottom: var(--padding);
 }
 .qrcode-box {
+  margin: var(--padding);
   display: grid;
   gap: 3rem;
   justify-content: center;
@@ -417,7 +414,7 @@ export default {
   align-items: center;
   padding: 1rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
 }
 
 .qr-container canvas,
