@@ -169,6 +169,7 @@ export default {
       try {
         let me = this;
         let history = me.getHistory();
+        history = history.filter((x) => x.title != text);
         history.push(me.buildHistoryItem(text));
         // Giới hạn số lượng lịch sử lưu trữ
         if (history.length > window.__env.textToQRConfig.maxHistoryLength) {
