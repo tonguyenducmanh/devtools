@@ -1,6 +1,12 @@
 <template>
-  <div class="td-textarea" :style="styleComputed">
-    <div v-if="label">{{ label }}</div>
+  <div
+    class="td-textarea"
+    :class="{ 'flex-col': isLabelTop }"
+    :style="styleComputed"
+  >
+    <div class="td-label" :class="{ 'td-label-top': isLabelTop }" v-if="label">
+      {{ label }}
+    </div>
     <textarea
       :placeholder="placeHolder"
       :value="modelValue"
@@ -60,6 +66,10 @@ export default {
       type: String,
       default: null,
     },
+    isLabelTop: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -100,6 +110,15 @@ export default {
   display: flex;
   height: 100%;
   width: 100%;
+  .td-label {
+    overflow-wrap: normal; /* Allows breaking long words */
+    word-break: keep-all; /* For wider browser support */
+    white-space: nowrap; /* Ensure wrapping is enabled */
+    padding-right: var(--padding);
+  }
+  .td-label-top {
+    padding-bottom: var(--padding);
+  }
   textarea {
     border: 2px solid var(--border-color);
     width: 100%;

@@ -12,11 +12,13 @@
 import TDSidebar from "@/views/TDSidebar.vue";
 import TDHeader from "@/views/TDHeader.vue";
 import "@/common/TDPrototype.js";
+import _ from "@/common/TDUtility.js";
+
 export default {
   components: { TDSidebar, TDHeader },
   created() {
     let me = this;
-    console.log("App is running success: " + new Date());
+    console.log("App is running success: " + _.formatDate(new Date()));
     me.processWhenRunApp();
   },
   methods: {
