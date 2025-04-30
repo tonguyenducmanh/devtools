@@ -20,7 +20,7 @@
         </template>
       </div>
     </div>
-    <div class="input-section">
+    <div class="flex flex-col input-section">
       <TDTextarea
         class="input-area"
         placeHolder="Nhập văn bản để tạo mã QR code..."
@@ -341,7 +341,6 @@ export default {
 
 .input-section {
   width: 100%;
-  margin-bottom: 2rem;
 }
 
 .input-area {
@@ -374,7 +373,7 @@ export default {
   font-size: 0.9rem;
 }
 .button-generate {
-  margin-bottom: 2rem;
+  margin-bottom: var(--padding);
 }
 .qrcode-box {
   margin-top: 2rem;
