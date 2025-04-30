@@ -2,6 +2,12 @@
 
 có 2 phiên bản được support: phiên bản web (vue + vite) và phiên bản app (electron + vue + vite)
 
+![demo](img/imagetobase64.png)
+
+![demo](img/jsontopostgresql.png)
+
+![demo](img/texttoqr.png)
+
 để chạy ở phiên bản web máy dev
 
 ```
