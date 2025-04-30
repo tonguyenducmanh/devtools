@@ -26,7 +26,7 @@
         placeHolder="Nhập văn bản để tạo mã QR code..."
         v-model="textGenQR"
       ></TDTextarea>
-      <div class="checkbox-wrapper noselect">
+      <div class="checkbox-wrapper">
         <input
           type="checkbox"
           id="remove-empty-checkbox"
@@ -34,7 +34,9 @@
         />
         <label for="remove-empty-checkbox">Xóa ký tự xuống dòng</label>
       </div>
-      <TDButton @click="generateQRCode" label="Tạo QR Code"></TDButton>
+      <div class="button-generate">
+        <TDButton @click="generateQRCode" label="Tạo QR Code"></TDButton>
+      </div>
     </div>
     <div v-if="textGenQR" class="qrcode-box">
       <template v-for="(item, index) in qrCodeItems">
@@ -248,8 +250,6 @@ export default {
 .container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   width: 100%;
   height: 100%;
   overflow: auto;
@@ -257,10 +257,10 @@ export default {
 
 .history-section {
   width: 100%;
-  background-color: #f8f8f8;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #ddd;
+  padding: var(--padding);
+  margin: var(--padding);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
   margin-bottom: 2rem;
 }
 
@@ -272,28 +272,9 @@ export default {
 }
 
 .history-header h3 {
-  color: #333;
+  color: var(--text-primary-color);
   font-size: 1.1rem;
   margin: 0;
-}
-
-.clear-all-btn {
-  background-color: transparent;
-  color: #4caf50;
-  border: 1px solid #4caf50;
-  padding: 0.3rem 0.8rem;
-  font-size: 0.85rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  width: auto;
-  display: inline-block;
-}
-
-.clear-all-btn:hover {
-  background-color: #4caf50;
-  color: white;
-  transform: scale(1.05);
 }
 
 .history-list {
@@ -307,9 +288,9 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1rem;
-  background-color: white;
-  border: 1px solid #eee;
-  border-radius: 20px;
+  background-color: var(--bg-sub-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
   transition: all 0.2s ease;
   font-size: 0.9rem;
   color: #444;
@@ -325,15 +306,15 @@ export default {
 }
 
 .history-item:hover {
-  background-color: #f1f8f1;
-  border-color: #4caf50;
+  background-color: var(--bg-hover-color);
+  border: 1px solid var(--focus-color);
   box-shadow: 0 2px 4px rgba(76, 175, 80, 0.1);
 }
 
 .history-item .delete-btn {
   background: none;
   border: none;
-  color: #4caf50;
+  color: var(--text-primary-color);
   cursor: pointer;
   padding: 0;
   width: 24px;
@@ -348,13 +329,13 @@ export default {
 }
 
 .history-item .delete-btn:hover {
-  background-color: #e8f5e9;
-  color: #2d592e;
+  background-color: var(--bg-sub-color);
+  color: var(--focus-color);
   transform: scale(1.1);
 }
 
 .history-item span:hover {
-  color: #4caf50;
+  color: var(--focus-color);
   text-decoration: underline;
 }
 
@@ -382,15 +363,6 @@ export default {
   align-items: center;
   gap: 0.5rem;
 }
-.noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Old versions of Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none; /* Non-prefixed version, currently
-  supported by Chrome, Edge, Opera and Firefox */
-}
 .checkbox-wrapper input[type="checkbox"] {
   width: 16px;
   height: 16px;
@@ -401,20 +373,8 @@ export default {
   cursor: pointer;
   font-size: 0.9rem;
 }
-button {
-  display: block;
-  width: 100%;
-  padding: 0.8rem;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s;
-}
-button:hover {
-  background-color: #45a049;
+.button-generate {
+  margin-bottom: 2rem;
 }
 .qrcode-box {
   margin-top: 2rem;
