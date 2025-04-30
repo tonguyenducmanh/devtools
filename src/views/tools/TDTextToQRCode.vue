@@ -341,6 +341,8 @@ export default {
 
 .input-section {
   width: 100%;
+  justify-content: flex-start;
+  align-items: flex-start;
 }
 
 .input-area {
@@ -357,7 +359,7 @@ export default {
   border: 2px solid #4caf50;
 }
 .checkbox-wrapper {
-  margin-bottom: 1rem;
+  margin: var(--padding);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -376,7 +378,6 @@ export default {
   margin-bottom: var(--padding);
 }
 .qrcode-box {
-  margin-top: 2rem;
   display: grid;
   gap: 3rem;
   justify-content: center;
