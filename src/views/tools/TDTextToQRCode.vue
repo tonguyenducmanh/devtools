@@ -35,7 +35,11 @@
         <label for="remove-empty-checkbox">Xóa ký tự xuống dòng</label>
       </div>
       <div class="button-generate">
-        <TDButton :readOnly="!textGenQR" @click="generateQRCode" label="Tạo QR Code"></TDButton>
+        <TDButton
+          :readOnly="!textGenQR"
+          @click="generateQRCode"
+          label="Tạo QR Code"
+        ></TDButton>
       </div>
     </div>
     <div v-if="textGenQR" class="qrcode-box">
@@ -327,9 +331,7 @@ export default {
 }
 
 .history-item .delete-btn:hover {
-  background-color: var(--bg-sub-color);
   color: var(--focus-color);
-  transform: scale(1.1);
 }
 
 .history-item span:hover {
@@ -349,10 +351,6 @@ export default {
   margin-bottom: 0.5rem;
   border-radius: 5px;
   resize: vertical;
-}
-.input-area:focus {
-  outline: none;
-  border: 2px solid #4caf50;
 }
 .checkbox-wrapper {
   margin: var(--padding);
@@ -421,14 +419,5 @@ export default {
 .qr-container img {
   max-width: 100%;
   height: auto;
-}
-#download-section {
-  margin-top: 1rem;
-}
-#download-btn {
-  background-color: #4caf50;
-}
-#download-btn:hover {
-  background-color: #45a049;
 }
 </style>
