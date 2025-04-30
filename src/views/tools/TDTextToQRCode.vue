@@ -134,13 +134,14 @@ export default {
       let me = this;
       let opts = {
         errorCorrectionLevel: "L",
-        type: "image/jpeg",
-        quality: 0.3,
+        type: "image/png",
+        quality: 1,
         margin: 1,
         color: {
           dark: "#000000",
           light: "#ffffff",
         },
+        width: 1000,
       };
       let result = {};
       QRCode.toDataURL(textBuild, opts, function (err, url) {
@@ -420,6 +421,7 @@ export default {
 
 .qr-container canvas,
 .qr-container img {
+  min-width: 100%;
   max-width: 100%;
   height: auto;
 }
