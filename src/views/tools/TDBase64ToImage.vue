@@ -1,6 +1,6 @@
 <template>
   <div class="container flex flex-col">
-    <div class="title">💖 Base 64 to Image tool!</div>
+    <div class="title">💖 Base64 to Image tool!</div>
     <div class="flex paste-box">
       <div class="result-container">
         <TDTextarea

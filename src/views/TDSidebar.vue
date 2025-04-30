@@ -30,11 +30,11 @@ export default {
         },
         {
           path: "/imagetobase64",
-          title: "Image to base 64",
+          title: "Image to base64",
         },
         {
           path: "/base64toimage",
-          title: "Base 64 to Image",
+          title: "Base64 to image",
         },
         {
           path: "/jsontopostgresql",
