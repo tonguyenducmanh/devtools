@@ -34,21 +34,21 @@ body[data-theme="light"] {
   --text-secondary-color: rgb(33, 33, 33);
   --text-tertiary-color: rgb(44, 34, 34);
   --border-color: #a9a8a8;
-  --focus-color: #dc6262;
+  --focus-color: #5d5d5d;
   --btn-color: #e37b7b;
 }
 
 body[data-theme="dark"] {
   --bg-main-color: rgb(10, 10, 10);
   --bg-sub-color: rgb(40, 40, 40);
-  --bg-active-color: rgb(80, 70, 70);
-  --bg-focus-color: #71606e;
-  --bg-hover-color: #785f74;
+  --bg-active-color: rgb(197, 188, 188);
+  --bg-focus-color: #928990;
+  --bg-hover-color: #a2a2a2;
   --text-primary-color: rgb(255, 255, 255);
-  --text-secondary-color: rgb(163, 163, 163);
-  --text-tertiary-color: rgb(115, 115, 115);
-  --border-color: #ffffff1a;
-  --focus-color: #780000;
+  --text-secondary-color: rgb(220, 220, 220);
+  --text-tertiary-color: rgb(217, 217, 217);
+  --border-color: #f0f0f0ab;
+  --focus-color: #b0d9c1;
   --btn-color: #e37b7b;
 }
 

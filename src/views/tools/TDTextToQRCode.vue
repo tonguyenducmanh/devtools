@@ -314,6 +314,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
+  color: var(--text-primary-color);
 }
 
 .history-item:hover {
