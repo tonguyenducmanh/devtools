@@ -6,7 +6,7 @@ const router = createRouter({
       /**
        * trang chủ
        */
-      path: "/",
+      path: "/:pathMatch(.*)*",
       name: "home",
       component: () => import("@/views/TDWelcome.vue"),
     },
