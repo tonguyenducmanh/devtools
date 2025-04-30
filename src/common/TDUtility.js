@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 /**
  * các method TDutility dùng cho toàn bộ frontend
  * Created by tdmanh1 19.09.2024
@@ -71,6 +73,10 @@ class TDUtility {
   copyToClipboard(value) {
     let me = this;
     navigator.clipboard.writeText(value);
+  }
+
+  newGuid() {
+    return uuidv4();
   }
 }
 

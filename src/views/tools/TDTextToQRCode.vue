@@ -8,11 +8,11 @@
       </div>
       <div ref="history-list" class="history-list">
         <template v-for="(item, index) in historyItems">
-          <div class="history-item" @click="applyHistoryText(index)">
+          <div class="history-item" @click="applyHistoryText(item.historyId)">
             <span>{{ item.textContent }}</span>
             <button
               class="delete-btn"
-              @click.stop.prevent="deleteHistoryItem(index)"
+              @click.stop.prevent="deleteHistoryItem(item.historyId)"
             >
               x
             </button>
@@ -169,32 +169,32 @@ export default {
       try {
         let me = this;
         let history = me.getHistory();
-        let lastItem = history ? history[history.length - 1] : null;
-
-        // Chỉ lưu nếu text khác với lần lưu trước
-        if (text !== lastItem) {
-          history.push(text);
-          // Giới hạn số lượng lịch sử lưu trữ
-          if (history.length > window.__env.textToQRConfig.maxHistoryLength) {
-            history.shift(); // Xóa item cũ nhất
-          }
-          me.$tdCache.set("qrHistory", JSON.stringify(history));
-          me.updateHistoryDisplay();
+        history.push(me.buildHistoryItem(text));
+        // Giới hạn số lượng lịch sử lưu trữ
+        if (history.length > window.__env.textToQRConfig.maxHistoryLength) {
+          history.shift(); // Xóa item cũ nhất
         }
+        me.$tdCache.set("qrHistory", history);
+        me.updateHistoryDisplay();
       } catch (error) {
         console.error("Lỗi khi lưu vào history:", error);
         // Lỗi sẽ được bỏ qua để không ảnh hưởng tới luồng chính
       }
     },
-
+    buildHistoryItem(text) {
+      return {
+        title: text,
+        historyId: _.newGuid(),
+      };
+    },
     /**
      * Xóa một item khỏi lịch sử
      * @param {number} index - Vị trí của item cần xóa
      */
-    deleteHistoryItem(index) {
+    deleteHistoryItem(historyId) {
       let me = this;
       let history = me.getHistory();
-      history.splice(index, 1);
+      history = history.filter((x) => x.historyId != historyId);
       me.$tdCache.set("qrHistory", JSON.stringify(history));
       me.updateHistoryDisplay();
     },
@@ -212,15 +212,14 @@ export default {
      * Áp dụng text từ lịch sử
      * @param {string} text - Text cần áp dụng
      */
-    applyHistoryText(index) {
+    applyHistoryText(historyId) {
       let me = this;
-      if (
-        me.historyItems &&
-        me.historyItems.length > 0 &&
-        me.historyItems[index]
-      ) {
-        me.textGenQR = me.historyItems[index].title;
-        me.generateQRCode();
+      if (me.historyItems && me.historyItems.length > 0 && historyId) {
+        let currentItem = me.historyItems.find((x) => x.historyId == historyId);
+        if (currentItem) {
+          me.textGenQR = currentItem.title;
+          me.generateQRCode();
+        }
       }
     },
 
@@ -232,7 +231,8 @@ export default {
       let history = me.getHistory();
       let titleLength = window.__env.textToQRConfig.maxTitleLength;
       me.historyItems = [];
-      [...history].reverse().forEach((text, index) => {
+      [...history].reverse().forEach((historyItem, index) => {
+        let text = historyItem.title;
         let item = {};
         let displayText =
           text && text.length > titleLength
@@ -240,6 +240,7 @@ export default {
             : text;
         item.textContent = displayText;
         item.title = text;
+        item.historyId = historyItem.historyId;
         me.historyItems.push(item);
       });
     },
