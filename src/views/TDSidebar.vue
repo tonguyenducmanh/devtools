@@ -13,8 +13,6 @@
 </template>
 
 <script>
-import { RouterLink } from "vue-router";
-
 export default {
   name: "TDSidebar",
   components: {},
@@ -28,7 +26,7 @@ export default {
       routerLink: [
         {
           path: "/",
-          title: "Trang chủ",
+          title: "Welcome",
         },
         {
           path: "/imagetobase64",

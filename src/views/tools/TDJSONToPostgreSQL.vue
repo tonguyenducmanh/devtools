@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>💖 JSON to PostgreSQL tool!</h1>
+    <div class="title">💖 JSON to PostgreSQL tool!</div>
   </div>
 </template>
 

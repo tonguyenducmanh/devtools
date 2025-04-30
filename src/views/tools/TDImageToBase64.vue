@@ -1,6 +1,6 @@
 <template>
   <div class="container flex flex-col">
-    <h1>💖 Image To base 64 tool!</h1>
+    <div class="title">💖 Image To base 64 tool!</div>
     <div class="flex paste-box">
       <div
         ref="drop-zone"
@@ -115,12 +115,6 @@ export default {
 .paste-box {
   column-gap: 20px;
   padding: var(--padding);
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 2rem;
-  font-size: 1.5rem;
 }
 
 .drop-zone {

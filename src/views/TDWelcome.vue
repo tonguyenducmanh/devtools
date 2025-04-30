@@ -2,6 +2,7 @@
   <div class="container">
     <h1>💖 Hello World!</h1>
     <p>Welcome to your best utility tools.</p>
+    <p>Created by tdmanh with luv.</p>
   </div>
 </template>
 
