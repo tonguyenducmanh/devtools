@@ -6,16 +6,16 @@
         <h3>Lịch sử</h3>
         <TDButton @click="clearAllHistory" label="Xóa tất cả"></TDButton>
       </div>
-      <div ref="history-list" class="flex history-list">
+      <div ref="history-list" class="history-list">
         <template v-for="(item, index) in historyItems">
           <div class="history-item" @click="applyHistoryText(index)">
-            {{ item.textContent }}
-            <div
+            <span>{{ item.textContent }}</span>
+            <button
               class="delete-btn"
               @click.stop.prevent="deleteHistoryItem(index)"
             >
               x
-            </div>
+            </button>
           </div>
         </template>
       </div>
@@ -296,7 +296,7 @@ export default {
   transform: scale(1.05);
 }
 
-#history-list {
+.history-list {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
