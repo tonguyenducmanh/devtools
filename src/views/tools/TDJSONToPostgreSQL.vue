@@ -3,25 +3,13 @@
     <div class="title">💖 JSON to PostgreSQL tool!</div>
     <div class="metadata-inputs">
       <div>
-        <TDInput
-          label="Tên bảng"
-          type="text"
-          v-model="tableName"
-        />
+        <TDInput label="Tên schema" type="text" v-model="schemaName" />
       </div>
       <div>
-        <TDInput
-          label="Tên schema"
-          type="text"
-          v-model="schemaName"
-        />
+        <TDInput label="Tên bảng" type="text" v-model="tableName" />
       </div>
       <div>
-        <TDInput
-          label="Cột khóa chính"
-          type="text"
-          v-model="primaryKeyField"
-        />
+        <TDInput label="Cột khóa chính" type="text" v-model="primaryKeyField" />
       </div>
     </div>
 
@@ -51,7 +39,10 @@
       </div>
     </div>
 
-    <TDButton label="Chuyển đổi" @click="convertToPostgresSQL"></TDButton>
+    <div class="flex">
+      <TDButton label="Chuyển đổi" @click="convertToPostgresSQL"></TDButton>
+      <TDButton @click="haddleCopyEvent" label="Copy"></TDButton>
+    </div>
   </div>
 </template>
 <script>
@@ -88,11 +79,15 @@ export default {
         console.error("Error in convertToPostgresSQL:", error);
       }
     },
+    haddleCopyEvent() {
+      let me = this;
+      _.copyToClipboard(me.outputSQL);
+    },
     /**
      * build ra script insert dữ liệu
      * @param {array} source input cần build script
      */
-    buildCreateTableScript(source) {
+    buildCreateTableScript(source, config) {
       let me = this;
       let createTableScript = "";
       if (source && Array.isArray(source) && config?.tableName) {
@@ -148,9 +143,11 @@ export default {
       let config = currenConfig;
       if (source && Array.isArray(source)) {
         let createTableScript = config.enableCreateTable
-          ? me.buildCreateTableScript(source)
+          ? me.buildCreateTableScript(source, config)
           : "";
-        let deleteScript = me.buildDeleteAllScript(source, config);
+        let deleteScript = config.enableDeleteScript
+          ? me.buildDeleteAllScript(source, config)
+          : null;
         let insertScripts = me.buildInsertAllScript(source, config);
         if (deleteScript && insertScripts && Array.isArray(insertScripts)) {
           let arrayScript = [];

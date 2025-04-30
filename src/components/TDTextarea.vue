@@ -79,10 +79,10 @@ export default {
   },
   watch: {},
   methods: {
-    changeInputValue: _.debounce(function (e) {
+    changeInputValue(e) {
       let me = this;
       me.$emit("update:modelValue", e.target.value);
-    }, 500),
+    },
 
     handleDragOver(e) {
       let me = this;

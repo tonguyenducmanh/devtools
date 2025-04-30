@@ -48,7 +48,7 @@ export default {
   methods: {
     haddleCopyEvent() {
       let me = this;
-      navigator.clipboard.writeText(me.base64Result);
+      _.copyToClipboard(me.base64Result);
     },
     handlePasteEvent(e) {
       let me = this;

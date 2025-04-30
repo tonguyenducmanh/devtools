@@ -67,6 +67,11 @@ class TDUtility {
   cloneDeep(obj) {
     return structuredClone(obj);
   }
+
+  copyToClipboard(value) {
+    let me = this;
+    navigator.clipboard.writeText(value);
+  }
 }
 
 export default new TDUtility();
