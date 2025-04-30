@@ -38,7 +38,7 @@ export default {
 };
 </script>
 <style lang="scss">
-@import "@/styles/main.scss";
+@use "@/styles/main.scss";
 .td-container {
   display: flex;
   width: 100%;
