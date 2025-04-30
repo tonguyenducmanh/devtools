@@ -71,7 +71,7 @@ export default {
      */
     generateQRCode() {
       let me = this;
-      let maxTextOneChunk = 1000;
+      let maxTextOneChunk = window.__env.textToQRConfig.maxTextOneChunk;
 
       // Lấy giá trị từ các input
       let text = me.getUserInput();
@@ -84,7 +84,7 @@ export default {
       // Nếu độ dài text lớn hơn 1000, chia thành nhiều phần
       let chunks = me.splitTextIntoChunks(textBuild, maxTextOneChunk);
       // Tạo QR code cho từng phần
-      chunks.forEach((chunk, index) => {
+      chunks.forEach((chunk) => {
         me.generateQRCodeJS(chunk);
       });
     },
@@ -174,7 +174,7 @@ export default {
         if (text !== lastItem) {
           history.push(text);
           // Giới hạn số lượng lịch sử lưu trữ
-          if (history.length > 10) {
+          if (history.length > window.__env.textToQRConfig.maxHistoryLength) {
             history.shift(); // Xóa item cũ nhất
           }
           me.$tdCache.set("qrHistory", JSON.stringify(history));
@@ -229,11 +229,14 @@ export default {
     updateHistoryDisplay() {
       let me = this;
       let history = me.getHistory();
+      let titleLength = window.__env.textToQRConfig.maxTitleLength;
       me.historyItems = [];
       [...history].reverse().forEach((text, index) => {
         let item = {};
         let displayText =
-          text && text.length > 50 ? text.slice(0, 50) + "..." : text;
+          text && text.length > titleLength
+            ? text.slice(0, titleLength) + "..."
+            : text;
         item.textContent = displayText;
         item.title = text;
         me.historyItems.push(item);

@@ -15,4 +15,9 @@
     // có muốn tạo script delete không
     enableDeleteScript: true,
   };
+  window.__env.textToQRConfig = {
+    maxTextOneChunk: 1000,
+    maxHistoryLength: 10,
+    maxTitleLength: 50,
+  };
 })(this);
