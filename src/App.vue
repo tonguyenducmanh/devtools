@@ -94,10 +94,10 @@ export default {
       right: 0;
       top: 0;
       cursor: pointer;
-      background-position: -20px 0px;
+      background-position: -26px 0px;
     }
     .td-theme-toggle-dark {
-      background-position: -40px 0px;
+      background-position: -48px 0px;
     }
   }
 }

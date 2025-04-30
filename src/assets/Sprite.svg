@@ -1,0 +1,28 @@
+<svg width="72" height="20" viewBox="0 0 72 20" xmlns="http://www.w3.org/2000/svg" fill="#e37b7b">
+  <!-- Menu Icon -->
+  <g transform="translate(0, 2)">
+    <rect x="0" y="0" width="20" height="2" rx="1"/>
+    <rect x="0" y="6" width="20" height="2" rx="1"/>
+    <rect x="0" y="12" width="20" height="2" rx="1"/>
+  </g>
+
+  <!-- Sun Icon -->
+  <g transform="translate(26, 0)">
+    <circle cx="10" cy="10" r="4"/>
+    <line x1="10" y1="0" x2="10" y2="4" stroke="#e37b7b" stroke-width="2"/>
+    <line x1="10" y1="16" x2="10" y2="20" stroke="#e37b7b" stroke-width="2"/>
+    <line x1="0" y1="10" x2="4" y2="10" stroke="#e37b7b" stroke-width="2"/>
+    <line x1="16" y1="10" x2="20" y2="10" stroke="#e37b7b" stroke-width="2"/>
+    <line x1="3" y1="3" x2="6" y2="6" stroke="#e37b7b" stroke-width="2"/>
+    <line x1="14" y1="14" x2="17" y2="17" stroke="#e37b7b" stroke-width="2"/>
+    <line x1="3" y1="17" x2="6" y2="14" stroke="#e37b7b" stroke-width="2"/>
+    <line x1="14" y1="6" x2="17" y2="3" stroke="#e37b7b" stroke-width="2"/>
+  </g>
+
+  <!-- Sleep Icon (Zzz) -->
+  <g transform="translate(52, 0)">
+    <text x="2" y="8" font-size="6" font-family="Arial" fill="#e37b7b">Z</text>
+    <text x="6" y="12" font-size="6" font-family="Arial" fill="#e37b7b">Z</text>
+    <text x="10" y="16" font-size="6" font-family="Arial" fill="#e37b7b">Z</text>
+  </g>
+</svg>
