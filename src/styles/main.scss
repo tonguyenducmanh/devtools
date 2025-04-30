@@ -25,7 +25,7 @@
 }
 
 body[data-theme="light"] {
-  --bg-main-color: rgb(246, 246, 246);
+  --bg-main-color: #f6f6f6;
   --bg-sub-color: rgb(224, 223, 223);
   --bg-active-color: rgb(212, 202, 202);
   --bg-focus-color: #f8f1f7;
@@ -133,4 +133,10 @@ html[data-theme="dark"] {
   width: 100%;
   height: 100%;
   flex-direction: column;
+}
+
+.td-icon {
+  width: 24px;
+  height: 24px;
+  background: url("Sprite.png") no-repeat;
 }

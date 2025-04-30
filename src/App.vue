@@ -2,7 +2,7 @@
   <div class="td-container">
     <TDSidebar v-if="isShowSidebar" />
     <div class="td-main">
-      <div class="td-menu" @click="toggleSidebar">click me</div>
+      <div class="td-icon td-menu" @click="toggleSidebar"></div>
       <RouterView />
     </div>
   </div>
@@ -70,6 +70,8 @@ export default {
     .td-menu {
       position: absolute;
       cursor: pointer;
+      background-position: 0px 0px;
+      fill: red;
     }
   }
 }
