@@ -17,7 +17,6 @@
       <TDTextarea
         isLabelTop
         label="Nhập JSON"
-        id="jsonInput"
         placeHolder="Nhập JSON ở đây..."
         height="300px"
         width="300px"
@@ -26,7 +25,6 @@
       <TDTextarea
         isLabelTop
         label="Kết quả SQL"
-        id="sqlOutput"
         :readOnly="true"
         placeHolder="SQL sẽ xuất hiện ở đây..."
         height="300px"

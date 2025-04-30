@@ -7,5 +7,8 @@ class TDCache {
   get(keyCache) {
     return localStorage.getItem(keyCache);
   }
+  remove(keyCache) {
+    localStorage.removeItem(keyCache);
+  }
 }
 export default new TDCache();

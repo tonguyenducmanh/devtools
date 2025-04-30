@@ -1,9 +1,249 @@
 <template>
   <div class="container">
     <div class="title">💖 Text To QRCode tool!</div>
+    <div class="history-section">
+      <div class="history-header">
+        <h3>Lịch sử</h3>
+        <TDButton @click="clearAllHistory" label="Xóa tất cả"></TDButton>
+      </div>
+      <div ref="history-list" class="flex history-list">
+        <template v-for="(item, index) in historyItems">
+          <div class="history-item" @click="applyHistoryText(index)">
+            {{ item.textContent }}
+            <div
+              class="delete-btn"
+              @click.stop.prevent="deleteHistoryItem(index)"
+            >
+              x
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+    <div class="input-section">
+      <TDTextarea
+        class="input-area"
+        placeHolder="Nhập văn bản để tạo mã QR code..."
+        v-model="textGenQR"
+      ></TDTextarea>
+      <div class="checkbox-wrapper noselect">
+        <input
+          type="checkbox"
+          id="remove-empty-checkbox"
+          v-model="isRemoveEmpty"
+        />
+        <label for="remove-empty-checkbox">Xóa ký tự xuống dòng</label>
+      </div>
+      <TDButton @click="generateQRCode" label="Tạo QR Code"></TDButton>
+    </div>
+    <div v-if="textGenQR" class="qrcode-box">
+      <template v-for="(item, index) in qrCodeItems">
+        <div class="qr-container">
+          <div>{{ `Phần ${index + 1}/${qrCodeItems.length}` }}</div>
+          <img :src="item.src" />
+        </div>
+      </template>
+    </div>
   </div>
 </template>
+<script>
+import _ from "@/common/TDUtility.js";
+import QRCode from "qrcode";
+export default {
+  name: "TDTextToQRCode",
+  created() {
+    let me = this;
+    me.updateHistoryDisplay();
+  },
+  beforeUnmount() {
+    let me = this;
+  },
+  mounted() {},
+  methods: {
+    /**
+     * Tạo QR code từ text
+     */
+    generateQRCode() {
+      let me = this;
+      let maxTextOneChunk = 1000;
 
+      // Lấy giá trị từ các input
+      let text = me.getUserInput();
+      let textBuild = me.buildTextBeforeGenQR(text);
+
+      // Lưu text vào lịch sử nếu khác với lần lưu trước
+      me.saveToHistory(text);
+      // reset
+      me.qrCodeItems = [];
+      // Nếu độ dài text lớn hơn 1000, chia thành nhiều phần
+      let chunks = me.splitTextIntoChunks(textBuild, maxTextOneChunk);
+      // Tạo QR code cho từng phần
+      chunks.forEach((chunk, index) => {
+        me.generateQRCodeJS(chunk);
+      });
+    },
+
+    /**
+     * Chia text thành các phần nhỏ hơn với độ dài cho trước
+     * @param {string} text - Text cần chia
+     * @param {number} maxLength - Độ dài tối đa của mỗi phần
+     * @returns {string[]} Mảng các phần text đã chia
+     */
+    splitTextIntoChunks(text, maxLength) {
+      let chunks = [];
+      for (let i = 0; i < text.length; i += maxLength) {
+        chunks.push(text.slice(i, i + maxLength));
+      }
+      return chunks;
+    },
+
+    /**
+     * Tiền xử lý text trước khi tạo QR code
+     */
+    buildTextBeforeGenQR(text) {
+      let me = this;
+      // Nếu có thì xóa ký tự trắng trong text
+      let simpleText = me.isRemoveEmpty
+        ? text.replace(/(\r\n|\n|\r)/gm, "")
+        : text;
+
+      return simpleText;
+    },
+
+    /**
+     * lấy giá trị từ input text
+     * @returns {string} giá trị text từ input
+     */
+    getUserInput() {
+      let me = this;
+      let inputElement = me.textGenQR.toString();
+      let text = inputElement ? inputElement.trim() : null;
+      return text;
+    },
+
+    /**
+     * Tạo QR code bằng thư viện qrcode.js
+     */
+    generateQRCodeJS(textBuild) {
+      let me = this;
+      let opts = {
+        errorCorrectionLevel: "L",
+        type: "image/jpeg",
+        quality: 0.3,
+        margin: 1,
+        color: {
+          dark: "#000000",
+          light: "#ffffff",
+        },
+      };
+      let result = {};
+      QRCode.toDataURL(textBuild, opts, function (err, url) {
+        if (err) throw err;
+        result.src = url;
+      });
+      me.qrCodeItems.push(result);
+    },
+
+    /**
+     * Lấy lịch sử text từ localStorage
+     * @returns {Array} Mảng các text đã lưu
+     */
+    getHistory() {
+      let me = this;
+      let history = me.$tdCache.get("qrHistory");
+      return history ? JSON.parse(history) : [];
+    },
+
+    /**
+     * Lưu text vào lịch sử nếu khác với lần lưu trước
+     * @param {string} text - Text cần lưu
+     */
+    saveToHistory(text) {
+      try {
+        let me = this;
+        let history = me.getHistory();
+        let lastItem = history ? history[history.length - 1] : null;
+
+        // Chỉ lưu nếu text khác với lần lưu trước
+        if (text !== lastItem) {
+          history.push(text);
+          // Giới hạn số lượng lịch sử lưu trữ
+          if (history.length > 10) {
+            history.shift(); // Xóa item cũ nhất
+          }
+          me.$tdCache.set("qrHistory", JSON.stringify(history));
+          me.updateHistoryDisplay();
+        }
+      } catch (error) {
+        console.error("Lỗi khi lưu vào history:", error);
+        // Lỗi sẽ được bỏ qua để không ảnh hưởng tới luồng chính
+      }
+    },
+
+    /**
+     * Xóa một item khỏi lịch sử
+     * @param {number} index - Vị trí của item cần xóa
+     */
+    deleteHistoryItem(index) {
+      let me = this;
+      let history = me.getHistory();
+      history.splice(index, 1);
+      me.$tdCache.set("qrHistory", JSON.stringify(history));
+      me.updateHistoryDisplay();
+    },
+
+    /**
+     * Xóa tất cả lịch sử
+     */
+    clearAllHistory() {
+      let me = this;
+      me.$tdCache.remove("qrHistory");
+      me.historyItems = [];
+    },
+
+    /**
+     * Áp dụng text từ lịch sử
+     * @param {string} text - Text cần áp dụng
+     */
+    applyHistoryText(index) {
+      let me = this;
+      if (
+        me.historyItems &&
+        me.historyItems.length > 0 &&
+        me.historyItems[index]
+      ) {
+        me.textGenQR = me.historyItems[index].title;
+        me.generateQRCode();
+      }
+    },
+
+    /**
+     * Cập nhật hiển thị lịch sử
+     */
+    updateHistoryDisplay() {
+      let me = this;
+      let history = me.getHistory();
+      me.historyItems = [];
+      [...history].reverse().forEach((text, index) => {
+        let item = {};
+        let displayText =
+          text && text.length > 50 ? text.slice(0, 50) + "..." : text;
+        item.textContent = displayText;
+        item.title = text;
+        me.historyItems.push(item);
+      });
+    },
+  },
+  data() {
+    return {
+      textGenQR: null,
+      isRemoveEmpty: false,
+      historyItems: [],
+      qrCodeItems: [],
+    };
+  },
+};
+</script>
 <style scoped>
 .container {
   display: flex;
@@ -12,5 +252,227 @@
   justify-content: center;
   width: 100%;
   height: 100%;
+  overflow: auto;
+}
+
+.history-section {
+  width: 100%;
+  background-color: #f8f8f8;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 2rem;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.history-header h3 {
+  color: #333;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.clear-all-btn {
+  background-color: transparent;
+  color: #4caf50;
+  border: 1px solid #4caf50;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: auto;
+  display: inline-block;
+}
+
+.clear-all-btn:hover {
+  background-color: #4caf50;
+  color: white;
+  transform: scale(1.05);
+}
+
+#history-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background-color: white;
+  border: 1px solid #eee;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: #444;
+  max-width: 300px;
+  gap: 0.5rem;
+}
+
+.history-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.history-item:hover {
+  background-color: #f1f8f1;
+  border-color: #4caf50;
+  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.1);
+}
+
+.history-item .delete-btn {
+  background: none;
+  border: none;
+  color: #4caf50;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  margin-left: 4px;
+}
+
+.history-item .delete-btn:hover {
+  background-color: #e8f5e9;
+  color: #2d592e;
+  transform: scale(1.1);
+}
+
+.history-item span:hover {
+  color: #4caf50;
+  text-decoration: underline;
+}
+
+.input-section {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.input-area {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  resize: vertical;
+}
+.input-area:focus {
+  outline: none;
+  border: 2px solid #4caf50;
+}
+.checkbox-wrapper {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+  supported by Chrome, Edge, Opera and Firefox */
+}
+.checkbox-wrapper input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+.checkbox-wrapper label {
+  color: #333;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+button {
+  display: block;
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+button:hover {
+  background-color: #45a049;
+}
+.qrcode-box {
+  margin-top: 2rem;
+  display: grid;
+  gap: 3rem;
+  justify-content: center;
+  align-items: start;
+}
+
+/* Grid responsive cho các mã QR */
+@media screen and (max-width: 900px) {
+  .qrcode-box {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+  }
+}
+
+@media screen and (min-width: 901px) and (max-width: 1400px) {
+  .qrcode-box {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (min-width: 1401px) and (max-width: 2100px) {
+  .qrcode-box {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media screen and (min-width: 2101px) {
+  .qrcode-box {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Style cho container của từng mã QR */
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.qr-container canvas,
+.qr-container img {
+  max-width: 100%;
+  height: auto;
+}
+#download-section {
+  margin-top: 1rem;
+}
+#download-btn {
+  background-color: #4caf50;
+}
+#download-btn:hover {
+  background-color: #45a049;
 }
 </style>
