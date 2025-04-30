@@ -158,7 +158,7 @@ export default {
     getHistory() {
       let me = this;
       let history = me.$tdCache.get(me.$tdEnum.cacheConfig.qrHistory);
-      return history ? JSON.parse(history) : [];
+      return history ? history : [];
     },
 
     /**
@@ -196,7 +196,10 @@ export default {
       let me = this;
       let history = me.getHistory();
       history = history.filter((x) => x.historyId != historyId);
-      me.$tdCache.set(me.$tdEnum.cacheConfig.qrHistory, JSON.stringify(history));
+      me.$tdCache.set(
+        me.$tdEnum.cacheConfig.qrHistory,
+        JSON.stringify(history)
+      );
       me.updateHistoryDisplay();
     },
 
