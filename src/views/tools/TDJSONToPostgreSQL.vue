@@ -18,7 +18,7 @@
         isLabelTop
         label="Nhập JSON"
         id="jsonInput"
-        placeholder="Nhập JSON ở đây..."
+        placeHolder="Nhập JSON ở đây..."
         height="300px"
         width="300px"
         v-model="inputJSON"
@@ -28,7 +28,7 @@
         label="Kết quả SQL"
         id="sqlOutput"
         :readOnly="true"
-        placeholder="SQL sẽ xuất hiện ở đây..."
+        placeHolder="SQL sẽ xuất hiện ở đây..."
         height="300px"
         width="300px"
         v-model="outputSQL"
