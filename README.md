@@ -2,9 +2,15 @@
 
 có 2 phiên bản được support: phiên bản web (vue + vite) và phiên bản app (electron + vue + vite)
 
+demo tính năng convert ảnh sang base 64
+
 ![demo](img/imagetobase64.png)
 
+demo convert json sang câu lệnh insert postgressql
+
 ![demo](img/jsontopostgresql.png)
+
+demo tính năng convert text sang nhiều mã qr
 
 ![demo](img/texttoqr.png)
 
