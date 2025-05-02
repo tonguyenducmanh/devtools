@@ -3,7 +3,7 @@ import App from "@/App.vue";
 import cache from "@/common/TDCache.js";
 import enumeration from "@/common/TDEnum.js";
 import utility from "@/common/TDUtility.js";
-import router from "./router";
+import router from "@/router/router.js";
 import TDButton from "@/components/TDButton.vue";
 import TDTextarea from "@/components/TDTextarea.vue";
 import TDInput from "@/components/TDInput.vue";

@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { routerConfig } from "@/router/index.js";
+import { routerConfig } from "@/router/router.js";
 import _ from "@/common/TDUtility.js";
 
 export default {
