@@ -1,5 +1,8 @@
 <template>
-  <div class="td-input" :class="{ 'flex-col': isLabelTop }">
+  <div
+    class="td-input"
+    :class="{ 'flex-col': isLabelTop, 'td-input-read-only': readOnly }"
+  >
     <div class="td-label" :class="{ 'td-label-top': isLabelTop }" v-if="label">
       {{ label }}
     </div>
@@ -78,7 +81,7 @@ export default {
     width: 100%;
     padding: var(--padding);
     border-radius: var(--border-radius);
-    background-color: var(--bg-sub-color);
+    background-color: var(--bg-main-color);
     color: var(--text-primary-color);
   }
 
@@ -86,5 +89,8 @@ export default {
     outline: none;
     border: 2px solid var(--focus-color);
   }
+}
+.td-input-read-only input {
+  background-color: var(--bg-sub-color);
 }
 </style>

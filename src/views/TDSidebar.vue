@@ -44,6 +44,10 @@ export default {
           path: "/textoqrcode",
           title: "Text to QRCode",
         },
+        {
+          path: "/mappingjson",
+          title: "Mapping JSON",
+        },
       ],
     };
   },

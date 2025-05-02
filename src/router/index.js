@@ -42,6 +42,14 @@ const router = createRouter({
       name: "textoqrcode",
       component: () => import("@/views/tools/TDTextToQRCode.vue"),
     },
+    {
+      /**
+       * chuyển đổi văn bản thành mã QR
+       */
+      path: "/mappingjson",
+      name: "mappingjson",
+      component: () => import("@/views/tools/TDMappingJSON.vue"),
+    },
   ],
 });
 
