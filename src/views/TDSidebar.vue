@@ -1,14 +1,16 @@
 <template>
   <div class="td-sidebar">
-    <template v-for="(item, index) in routerLink">
-      <RouterLink
-        class="td-sidebar-item"
-        activeClass="td-item-active"
-        :id="index"
-        :to="item.pathVisible ?? item.path"
-        >{{ item.title }}</RouterLink
-      >
-    </template>
+    <div class="td-tool-group">
+      <template v-for="(item, index) in routerLink">
+        <RouterLink
+          class="td-sidebar-item"
+          activeClass="td-item-active"
+          :id="index"
+          :to="item.pathVisible ?? item.path"
+          >{{ item.title }}</RouterLink
+        >
+      </template>
+    </div>
     <div class="td-sidebar-bottom">
       <div
         class="td-icon td-theme-toggle"
@@ -85,12 +87,14 @@ export default {
   .td-item-active {
     background-color: var(--bg-active-color);
   }
+  .td-tool-group {
+    flex: 1;
+    overflow: auto;
+  }
   .td-sidebar-bottom {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    position: relative;
     display: flex;
+    width: 100%;
     align-items: center;
     justify-content: center;
     padding: var(--padding);
