@@ -50,7 +50,6 @@
   </div>
 </template>
 <script>
-
 export default {
   name: "TDMappingJSON",
   created() {
@@ -126,19 +125,138 @@ export default {
      * @param value dữ liệu sẽ parse sang object
      */
     parseJSONNotSafeObject(value) {
+      let me = this;
       let result = {};
       if (value && typeof value == "string") {
         try {
           result = JSON.parse(value);
         } catch (error) {
-          console.log("Không thể JSON parse, bắt đầu thử cách khác" + error);
-          let tempScript = `result = ${value}`;
-          eval(tempScript);
+          result = me.parseNonStandardJSONObject(value);
         }
       }
       return result;
     },
+    parseNonStandardJSONObject(value) {
+      let me = this;
+      if (!value || typeof value !== "string") {
+        return {};
+      }
 
+      try {
+        console.log(
+          "Không phải JSON chuẩn, thử xử lý đặc biệt (có hỗ trợ đệ quy):"
+        );
+        const trimmedValue = value.trim();
+        if (!trimmedValue.startsWith("{") || !trimmedValue.endsWith("}")) {
+          console.warn(
+            "Không phải là object JSON hợp lệ (thiếu dấu ngoặc nhọn)."
+          );
+          return {};
+        }
+
+        const content = trimmedValue.slice(1, -1).trim();
+        const result = {};
+        let key = "";
+        let val = "";
+        let inString = null; // null, single quote, double quote, backtick
+        let braceCount = 0;
+
+        for (let i = 0; i < content.length; i++) {
+          const char = content[i];
+
+          if (inString) {
+            val += char;
+            if (char === inString && content[i - 1] !== "\\") {
+              // Check for closing quote (ignore escaped quotes)
+              inString = null;
+            }
+            continue;
+          }
+
+          if (char === "'" || char === '"' || char === "`") {
+            inString = char;
+            val += char;
+            continue;
+          }
+
+          if (char === "{") {
+            braceCount++;
+            val += char;
+            continue;
+          }
+
+          if (char === "}") {
+            braceCount--;
+            val += char;
+            continue;
+          }
+
+          if (char === ":" && braceCount === 0) {
+            key = val.trim();
+            val = "";
+            continue;
+          }
+
+          if (char === "," && braceCount === 0) {
+            const processedKey = me.unquote(key);
+            const processedVal = me.unquoteAndCast(val.trim());
+            result[processedKey] =
+              typeof processedVal === "string" &&
+              processedVal.startsWith("{") &&
+              processedVal.endsWith("}")
+                ? me.parseNonStandardJSONObject(processedVal)
+                : processedVal;
+            key = "";
+            val = "";
+            continue;
+          }
+
+          val += char;
+        }
+
+        // Xử lý cặp key-value cuối cùng
+        if (key) {
+          const processedKey = me.unquote(key);
+          const processedVal = me.unquoteAndCast(val.trim());
+          result[processedKey] =
+            typeof processedVal === "string" &&
+            processedVal.startsWith("{") &&
+            processedVal.endsWith("}")
+              ? me.parseNonStandardJSONObject(processedVal)
+              : processedVal;
+        }
+
+        return result;
+      } catch (ex) {
+        console.log(ex);
+      }
+    },
+    unquote(str) {
+      let me = this;
+      const trimmed = str.trim();
+      if (
+        (trimmed.startsWith("'") && trimmed.endsWith("'")) ||
+        (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+        (trimmed.startsWith("`") && trimmed.endsWith("`"))
+      ) {
+        return trimmed.slice(1, -1);
+      }
+      return trimmed;
+    },
+    unquoteAndCast(str) {
+      let me = this;
+      const unquoted = me.unquote(str);
+      if (!isNaN(Number(unquoted))) {
+        return Number(unquoted);
+      }
+      if (unquoted === "true") {
+        return true;
+      }
+      if (unquoted === "false") {
+        return false;
+      }
+      return unquoted;
+    },
     /**
      * Thực hiện mapping key value đệ quy
      */
