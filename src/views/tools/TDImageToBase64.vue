@@ -32,7 +32,6 @@
 </template>
 
 <script>
-import _ from "@/common/TDUtility.js";
 
 export default {
   name: "TDImageToBase64",

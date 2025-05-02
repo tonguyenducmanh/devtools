@@ -65,6 +65,15 @@ const routerConfig = [
     component: () => import("@/views/tools/TDDownloadVSCodeExt.vue"),
     title: "Download VSCode Extension",
   },
+  {
+    /**
+     * uuid v4 generator
+     */
+    path: "/uuidv4generator",
+    name: "uuidv4generator",
+    component: () => import("@/views/tools/TDUUIDv4Generator.vue"),
+    title: "UUIDv4 generator",
+  },
 ];
 
 const router = createRouter({

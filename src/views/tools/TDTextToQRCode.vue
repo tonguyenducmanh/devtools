@@ -53,7 +53,6 @@
   </div>
 </template>
 <script>
-import _ from "@/common/TDUtility.js";
 import QRCode from "qrcode";
 export default {
   name: "TDTextToQRCode",

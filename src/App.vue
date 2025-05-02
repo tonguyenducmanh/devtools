@@ -12,7 +12,6 @@
 <script>
 import TDSidebar from "@/views/TDSidebar.vue";
 import "@/common/TDPrototype.js";
-import _ from "@/common/TDUtility.js";
 
 export default {
   components: { TDSidebar },
