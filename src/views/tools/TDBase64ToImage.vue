@@ -7,8 +7,8 @@
           ref="base64-output"
           placeHolder="Paste your Base64 string here"
           v-model="base64Result"
-          height="300px"
-          width="300px"
+          height="400px"
+          width="500px"
         ></TDTextarea>
       </div>
       <div
@@ -94,10 +94,10 @@ h1 {
 }
 
 .drop-zone {
-  min-width: 300px;
-  max-width: 300px;
-  min-height: 300px;
-  max-height: 300px;
+  min-width: 500px;
+  max-width: 500px;
+  min-height: 400px;
+  max-height: 400px;
   border: 2px dashed var(--bg-active-color);
   padding: 1.5rem;
   text-align: center;

@@ -18,8 +18,8 @@
         isLabelTop
         label="Nhập JSON"
         placeHolder="Nhập JSON ở đây..."
-        height="300px"
-        width="300px"
+        height="400px"
+        width="500px"
         v-model="inputJSON"
       ></TDTextarea>
       <TDTextarea
@@ -27,8 +27,8 @@
         label="Kết quả SQL"
         :readOnly="true"
         placeHolder="SQL sẽ xuất hiện ở đây..."
-        height="300px"
-        width="300px"
+        height="400px"
+        width="500px"
         v-model="outputSQL"
       ></TDTextarea>
     </div>

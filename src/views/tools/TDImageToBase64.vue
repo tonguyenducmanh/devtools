@@ -18,8 +18,8 @@
           placeHolder="Base64 output will appear here"
           v-model="base64Result"
           :readOnly="true"
-          height="300px"
-          width="300px"
+          height="400px"
+          width="500px"
         ></TDTextarea>
       </div>
     </div>
@@ -118,10 +118,10 @@ export default {
 }
 
 .drop-zone {
-  min-width: 300px;
-  max-width: 300px;
-  min-height: 300px;
-  max-height: 300px;
+  min-width: 500px;
+  max-width: 500px;
+  min-height: 400px;
+  max-height: 400px;
   border: 2px dashed var(--bg-active-color);
   padding: 1.5rem;
   text-align: center;

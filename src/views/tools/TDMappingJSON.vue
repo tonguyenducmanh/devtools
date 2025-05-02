@@ -9,13 +9,13 @@
           placeHolder="Object need mapping value"
           v-model="originalObjectText"
           height="300px"
-          width="300px"
+          width="500px"
         ></TDTextarea>
         <TDTextarea
           placeHolder="Object copy value"
           v-model="targetObjectText"
           height="300px"
-          width="300px"
+          width="500px"
         ></TDTextarea>
       </div>
       <div class="flex td-mapping-group">
@@ -24,14 +24,14 @@
           v-model="replacedObjectText"
           height="300px"
           :readOnly="true"
-          width="300px"
+          width="500px"
         ></TDTextarea>
         <TDTextarea
           placeHolder="Key value mapping error"
           v-model="errorListText"
           height="300px"
           :readOnly="true"
-          width="300px"
+          width="500px"
         ></TDTextarea>
       </div>
       <div class="flex">
