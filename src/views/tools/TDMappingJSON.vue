@@ -36,6 +36,7 @@
       </div>
       <div class="flex">
         <TDButton @click="mappingNow" label="Mapping now"></TDButton>
+        <TDButton @click="formatResult" label="Format result"></TDButton>
         <TDButton
           @click="haddleCopyEvent(replacedObjectText)"
           label="Copy result"
@@ -104,6 +105,11 @@ export default {
         me.replacedObjectText = JSON.stringify(me.replacedObject);
         me.errorListText = JSON.stringify(me.errorList);
       }
+    },
+    formatResult() {
+      let me = this;
+      me.replacedObjectText = JSON.stringify(me.replacedObject, null, " ");
+      me.errorListText = JSON.stringify(me.errorList, null, " ");
     },
     /**
      * chuẩn bị dữ liệu
