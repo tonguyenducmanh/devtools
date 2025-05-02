@@ -5,7 +5,7 @@
       <div>For legacy download that microsoft is removed.</div>
     </div>
     <div class="flex flex-col">
-      <img src="../../assets/vscodeext.png" />
+      <img src="@/assets/vscodeext.png" />
       <TDInput label="Item name" type="text" v-model="itemName" />
       <TDInput label="Version" type="text" v-model="version" />
       <TDInput
