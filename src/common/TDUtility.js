@@ -78,6 +78,10 @@ class TDUtility {
   newGuid() {
     return uuidv4();
   }
+
+  setTheme(currentTheme) {
+    document.body.setAttribute("data-theme", currentTheme);
+  }
 }
 
 export default new TDUtility();

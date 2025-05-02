@@ -3,11 +3,7 @@
     <TDSidebar v-if="isShowSidebar" />
     <div class="td-main">
       <div class="td-icon td-menu" @click="toggleSidebar"></div>
-      <div
-        class="td-icon td-theme-toggle"
-        :class="{ 'td-theme-toggle-dark': isDarkTheme }"
-        @click="toggleTheme"
-      ></div>
+
       <RouterView />
     </div>
   </div>
@@ -28,7 +24,6 @@ export default {
   data() {
     return {
       isShowSidebar: true,
-      isDarkTheme: false,
     };
   },
   methods: {
@@ -42,8 +37,8 @@ export default {
         currentTheme = window.__env.defaultValue.theme;
         me.$tdCache.set(me.$tdEnum.cacheConfig.theme, currentTheme);
       }
-      me.isDarkTheme = currentTheme == me.$tdEnum.theme.dark;
-      me.$tdCache.set(me.$tdEnum.cacheConfig.theme, currentTheme);
+      _.setTheme(currentTheme);
+
       document.body.setAttribute("data-theme", currentTheme);
       let toggleSidebarState = me.$tdCache.get(
         me.$tdEnum.cacheConfig.isShowSidebar
@@ -58,15 +53,6 @@ export default {
       me.$tdCache.set(me.$tdEnum.cacheConfig.isShowSidebar, {
         value: me.isShowSidebar,
       });
-    },
-    toggleTheme() {
-      let me = this;
-      me.isDarkTheme = !me.isDarkTheme;
-      let currentTheme = me.isDarkTheme
-        ? me.$tdEnum.theme.dark
-        : me.$tdEnum.theme.light;
-      me.$tdCache.set(me.$tdEnum.cacheConfig.theme, currentTheme);
-      document.body.setAttribute("data-theme", currentTheme);
     },
   },
 };
@@ -88,16 +74,6 @@ export default {
       position: absolute;
       cursor: pointer;
       background-position: 0px 0px;
-    }
-    .td-theme-toggle {
-      position: absolute;
-      right: 0;
-      top: 0;
-      cursor: pointer;
-      background-position: -26px 0px;
-    }
-    .td-theme-toggle-dark {
-      background-position: -48px 0px;
     }
   }
 }
