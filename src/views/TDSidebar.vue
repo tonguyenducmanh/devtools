@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import { routerConfig } from "@/router/index.js";
 export default {
   name: "TDSidebar",
   components: {},
@@ -23,32 +24,7 @@ export default {
   props: {},
   data() {
     return {
-      routerLink: [
-        {
-          path: "/",
-          title: "Welcome",
-        },
-        {
-          path: "/imagetobase64",
-          title: "Image to base64",
-        },
-        {
-          path: "/base64toimage",
-          title: "Base64 to image",
-        },
-        {
-          path: "/jsontopostgresql",
-          title: "Json to postgre sql",
-        },
-        {
-          path: "/textoqrcode",
-          title: "Text to QRCode",
-        },
-        {
-          path: "/mappingjson",
-          title: "Mapping JSON",
-        },
-      ],
+      routerLink: routerConfig,
     };
   },
   methods: {},
