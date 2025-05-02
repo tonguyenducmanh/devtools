@@ -63,7 +63,7 @@ export default {
     },
     handleCopyDownloadLink() {
       let me = this;
-      _.copyToClipboard(me.downloadLink);
+      me.$tdUtility.copyToClipboard(me.downloadLink);
     },
   },
 };

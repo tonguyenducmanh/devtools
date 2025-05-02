@@ -18,7 +18,9 @@ export default {
   components: { TDSidebar },
   created() {
     let me = this;
-    console.log("App is running success: " + _.formatDate(new Date()));
+    console.log(
+      "App is running success: " + me.$tdUtility.formatDate(new Date())
+    );
     me.processWhenRunApp();
   },
   data() {
@@ -37,7 +39,7 @@ export default {
         currentTheme = window.__env.defaultValue.theme;
         me.$tdCache.set(me.$tdEnum.cacheConfig.theme, currentTheme);
       }
-      _.setTheme(currentTheme);
+      me.$tdUtility.setTheme(currentTheme);
 
       document.body.setAttribute("data-theme", currentTheme);
       let toggleSidebarState = me.$tdCache.get(

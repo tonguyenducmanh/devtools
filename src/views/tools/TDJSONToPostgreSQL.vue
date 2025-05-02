@@ -63,7 +63,9 @@ export default {
           } else {
             input = source;
           }
-          let config = _.cloneDeep(window.__env.jsonToPostgreSQLConfig);
+          let config = me.$tdUtility.cloneDeep(
+            window.__env.jsonToPostgreSQLConfig
+          );
           config.tableName = me.tableName;
           config.schemaName = me.schemaName;
           config.primaryKeyField = me.primaryKeyField;
@@ -75,7 +77,7 @@ export default {
     },
     haddleCopyEvent() {
       let me = this;
-      _.copyToClipboard(me.outputSQL);
+      me.$tdUtility.copyToClipboard(me.outputSQL);
     },
     /**
      * build ra script insert dữ liệu

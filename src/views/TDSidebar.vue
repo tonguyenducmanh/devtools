@@ -53,7 +53,7 @@ export default {
         ? me.$tdEnum.theme.dark
         : me.$tdEnum.theme.light;
       me.$tdCache.set(me.$tdEnum.cacheConfig.theme, currentTheme);
-      _.setTheme(currentTheme);
+      me.$tdUtility.setTheme(currentTheme);
     },
   },
 };

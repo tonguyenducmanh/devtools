@@ -183,9 +183,10 @@ export default {
       }
     },
     buildHistoryItem(text) {
+      let me = this;
       return {
         title: text,
-        historyId: _.newGuid(),
+        historyId: me.$tdUtility.newGuid(),
       };
     },
     /**

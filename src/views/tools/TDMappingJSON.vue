@@ -83,7 +83,7 @@ export default {
   methods: {
     haddleCopyEvent(value) {
       let me = this;
-      _.copyToClipboard(value);
+      me.$tdUtility.copyToClipboard(value);
     },
     // region xử lý file
     mappingNow() {

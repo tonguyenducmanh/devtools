@@ -48,7 +48,7 @@ export default {
   methods: {
     haddleCopyEvent() {
       let me = this;
-      _.copyToClipboard(me.base64Result);
+      me.$tdUtility.copyToClipboard(me.base64Result);
     },
     handlePasteEvent(e) {
       let me = this;
