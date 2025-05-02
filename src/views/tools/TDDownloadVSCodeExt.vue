@@ -58,6 +58,7 @@ export default {
             extension.trim(),
             me.version.trim()
           );
+        window.open(me.downloadLink, "_blank").focus();
       }
     },
     handleCopyDownloadLink() {
