@@ -6,7 +6,7 @@
     <div class="td-mapping-container">
       <div class="flex td-mapping-group">
         <TDTextarea
-          placeHolder="Object mapping value"
+          placeHolder="Object need mapping value"
           v-model="originalObjectText"
           height="300px"
           width="300px"
@@ -37,11 +37,11 @@
       <div class="flex">
         <TDButton @click="mappingNow" label="Mapping now"></TDButton>
         <TDButton
-          @click="haddleCopyEvent(targetObject)"
+          @click="haddleCopyEvent(replacedObjectText)"
           label="Copy result"
         ></TDButton>
         <TDButton
-          @click="haddleCopyEvent(errorList)"
+          @click="haddleCopyEvent(errorListText)"
           label="Copy error"
         ></TDButton>
       </div>
@@ -89,14 +89,10 @@ export default {
       let me = this;
       //reset error
       me.errorList = {};
-      // lấy ra các object đầu vào
-      me.originalObject = JSON.parse(me.originalObjectText);
-      me.targetObject = JSON.parse(me.targetObjectText);
-      me.customObject = JSON.parse(me.customObjectText);
-
+      me.prepareData();
       if (me.originalObject && me.targetObject && me.customObject) {
         // thay thế các value của object B bằng value của object A
-        let replaceLanguageText = me.replaceLanguage(
+        let replaceLanguageText = me.doMappingKeyValuePairRecusive(
           me.originalObject,
           me.targetObject,
           me.customObject
@@ -109,8 +105,39 @@ export default {
         me.errorListText = JSON.stringify(me.errorList);
       }
     },
+    /**
+     * chuẩn bị dữ liệu
+     */
+    prepareData() {
+      let me = this;
+      // lấy ra các object đầu vào
+      me.originalObject = me.parseJSONNotSafeObject(me.originalObjectText);
+      me.targetObject = me.parseJSONNotSafeObject(me.targetObjectText);
+      me.customObject = me.parseJSONNotSafeObject(me.customObjectText);
+    },
 
-    replaceLanguage(originalObject, targetObject, customObject) {
+    /**
+     *
+     * @param value dữ liệu sẽ parse sang object
+     */
+    parseJSONNotSafeObject(value) {
+      let result = {};
+      if (value && typeof value == "string") {
+        try {
+          result = JSON.parse(value);
+        } catch (error) {
+          console.log("Không thể JSON parse, bắt đầu thử cách khác" + error);
+          let tempScript = `result = ${value}`;
+          eval(tempScript);
+        }
+      }
+      return result;
+    },
+
+    /**
+     * Thực hiện mapping key value đệ quy
+     */
+    doMappingKeyValuePairRecusive(originalObject, targetObject, customObject) {
       let me = this;
       let result = originalObject;
 
@@ -149,7 +176,7 @@ export default {
             ) {
               targetLang = targetObject[key];
             }
-            result[key] = me.replaceLanguage(
+            result[key] = me.doMappingKeyValuePairRecusive(
               result[key],
               targetLang,
               customObject

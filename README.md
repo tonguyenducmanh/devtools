@@ -14,6 +14,10 @@ demo tính năng convert text sang nhiều mã qr
 
 ![demo](img/texttoqr.png)
 
+demo tính năng mapping value theo key của 2 object với nhau ( có xử lý đệ quy nếu là object lồng object )
+
+![demo](img/mappingjson.png)
+
 để chạy ở phiên bản web máy dev
 
 ```
