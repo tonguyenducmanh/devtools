@@ -55,6 +55,15 @@ const routerConfig = [
     component: () => import("@/views/tools/TDMappingJSON.vue"),
     title: "Mapping JSON",
   },
+  {
+    /**
+     * download vscode extension
+     */
+    path: "/downloadvscodeext",
+    name: "downloadvscodeext",
+    component: () => import("@/views/tools/TDDownloadVSCodeExt.vue"),
+    title: "Download VSCode Extension",
+  },
 ];
 
 const router = createRouter({
