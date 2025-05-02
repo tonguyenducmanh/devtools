@@ -6,6 +6,7 @@ const routerConfig = [
      * trang chủ
      */
     path: "/:pathMatch(.*)*",
+    pathVisible:"/",
     name: "home",
     component: () => import("@/views/TDWelcome.vue"),
     title: "Welcome",

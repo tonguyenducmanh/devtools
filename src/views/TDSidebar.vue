@@ -5,7 +5,7 @@
         class="td-sidebar-item"
         activeClass="td-item-active"
         :id="index"
-        :to="item.path"
+        :to="item.pathVisible ?? item.path"
         >{{ item.title }}</RouterLink
       >
     </template>
