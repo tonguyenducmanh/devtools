@@ -1,6 +1,6 @@
 <template>
-  <div class="container flex flex-col">
-    <div class="title">💖 Base64 to Image tool!</div>
+  <div class="container">
+    <div class="title">💖 Compare two file (diff changes) !</div>
     <div class="flex td-compare-box">
       <TDTextarea
         placeHolder="Fist code file to compare"
