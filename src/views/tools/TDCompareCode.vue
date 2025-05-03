@@ -1,30 +1,33 @@
 <template>
-  <div class="container">
-    <div class="title">💖 Compare two file (diff changes) !</div>
-    <div class="flex td-compare-box">
-      <TDTextarea
-        placeHolder="Fist code file to compare"
-        v-model="firstCodeFile"
-        :label="oldTitle"
-        isLabelTop
-        height="400px"
-        width="500px"
-      ></TDTextarea>
-      <TDTextarea
-        placeHolder="Second code file to compare"
-        v-model="secondCodeFile"
-        :label="newTitle"
-        isLabelTop
-        height="400px"
-        width="500px"
-      ></TDTextarea>
+  <div>
+    <div class="flex flex-col container">
+      <div class="title">💖 Compare two file (diff changes) !</div>
+      <div class="flex td-compare-box">
+        <TDTextarea
+          placeHolder="Fist code file to compare"
+          v-model="firstCodeFile"
+          :label="oldTitle"
+          isLabelTop
+          height="400px"
+          width="500px"
+        ></TDTextarea>
+        <TDTextarea
+          placeHolder="Second code file to compare"
+          v-model="secondCodeFile"
+          :label="newTitle"
+          isLabelTop
+          height="400px"
+          width="500px"
+        ></TDTextarea>
+      </div>
+      <TDCheckbox
+        v-model="isCompareSideBySide"
+        label="compare style (true is side by side, false is line by line)"
+        @input="compare"
+        class="td-checkbox-sibe-by-side"
+      ></TDCheckbox>
+      <TDButton @click="compare" label="Compare diff changes"></TDButton>
     </div>
-    <TDCheckbox
-      v-model="isCompareSideBySide"
-      label="compare style (true is side by side, false is line by line)"
-      @input="compare"
-    ></TDCheckbox>
-    <TDButton @click="compare" label="Compare diff changes"></TDButton>
     <div class="diff-output" v-html="diffOutputHtml"></div>
   </div>
 </template>
@@ -77,11 +80,14 @@ export default {
 <style scoped>
 .container {
   width: 100%;
-  height: 100%;
   padding: 2rem;
   border-radius: 0;
-  min-height: 100vh;
   box-shadow: none;
+}
+.td-checkbox-sibe-by-side{
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .td-compare-box {
   column-gap: var(--padding);
