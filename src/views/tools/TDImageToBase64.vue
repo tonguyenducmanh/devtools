@@ -10,7 +10,7 @@
         @drop="handleDrop"
       >
         <p v-if="!srcImg">Paste image here (Ctrl+V) or drag & drop</p>
-        <img :src="srcImg" class="preview" ref="preview" />
+        <img v-if="srcImg" :src="srcImg" class="preview" ref="preview" />
       </div>
       <div class="result-container">
         <TDTextarea
@@ -32,7 +32,6 @@
 </template>
 
 <script>
-
 export default {
   name: "TDImageToBase64",
   created() {
@@ -127,6 +126,9 @@ export default {
   border-radius: 8px;
   transition: all 0.2s ease;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .drop-zone:hover {
@@ -140,15 +142,9 @@ export default {
 }
 
 .preview {
-  max-width: 100%;
-  margin-top: 1rem;
-  border-radius: 8px;
-}
-
-.preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  width: 500px;
+  height: auto;
+  padding: var(--padding);
 }
 
 .result-container {

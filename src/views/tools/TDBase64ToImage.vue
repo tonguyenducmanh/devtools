@@ -19,15 +19,18 @@
         @drop="handleDrop"
       >
         <p v-if="!srcImg">Result convert</p>
-        <img :src="srcImg" class="preview" ref="preview" />
+        <img v-if="srcImg" :src="srcImg" class="preview" ref="preview" />
       </div>
     </div>
-
-    <TDButton @click="handleConvert" label="Convert to Image"></TDButton>
-    <TDButton @click="handleDownloadImage" label="Download Image"></TDButton>
+    <div class="flex">
+      <TDButton @click="applyMock" label="Example"></TDButton>
+      <TDButton @click="handleConvert" label="Convert to Image"></TDButton>
+      <TDButton @click="handleDownloadImage" label="Download Image"></TDButton>
+    </div>
   </div>
 </template>
 <script>
+import { base64ToImageMock } from "@/mock/mock.js";
 
 export default {
   name: "TDBase64ToImage",
@@ -39,6 +42,10 @@ export default {
   },
   mounted() {},
   methods: {
+    applyMock() {
+      let me = this;
+      me.$tdUtility.applyMock(me, base64ToImageMock);
+    },
     handleConvert() {
       let me = this;
       try {
@@ -103,6 +110,9 @@ h1 {
   border-radius: 8px;
   transition: all 0.2s ease;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .drop-zone:hover {
@@ -116,9 +126,9 @@ h1 {
 }
 
 .preview {
-  max-width: 100%;
-  margin-top: 1rem;
-  border-radius: 8px;
+  width: 500px;
+  height: auto;
+  padding: var(--padding);
 }
 
 .preview img {
