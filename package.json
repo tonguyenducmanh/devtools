@@ -7,8 +7,8 @@
   "scripts": {
     "web:dev": "vite",
     "web:build": "vite build",
-    "electron:start": "electron-forge start",
-    "electron:package": "electron-forge package",
+    "electron:dev": "electron-forge start",
+    "electron:build": "electron-forge package",
     "electron:make": "electron-forge make",
     "electron:publish": "electron-forge publish",
     "lint": "echo \"No linting configured\""
