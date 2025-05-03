@@ -23,6 +23,7 @@
           :class="{ 'td-theme-toggle-dark': isDarkTheme }"
           @click="toggleTheme"
         ></div>
+        <div class="td-icon tg-github" @click="goToSource"></div>
       </div>
     </div>
   </div>
@@ -77,6 +78,12 @@ export default {
         value: me.isShowSidebar,
       });
     },
+    goToSource() {
+      let me = this;
+      if (window.__env.githubSource && window.__env.githubSource.url) {
+        window.open(window.__env.githubSource.url, "_blank").focus();
+      }
+    },
   },
 };
 </script>
@@ -118,6 +125,7 @@ export default {
   .td-sidebar-bottom {
     position: relative;
     display: flex;
+    column-gap: var(--padding);
     width: 100%;
     align-items: center;
     justify-content: center;
@@ -128,6 +136,10 @@ export default {
     }
     .td-theme-toggle-dark {
       background-position: -48px 0px;
+    }
+    .tg-github {
+      cursor: pointer;
+      background-position: -76px 0px;
     }
   }
 }

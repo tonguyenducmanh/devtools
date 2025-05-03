@@ -14,4 +14,7 @@
     maxHistoryLength: 10,
     maxTitleLength: 50,
   };
+  window.__env.githubSource = {
+    url: "https://github.com/tonguyenducmanh/utility-for-dev",
+  };
 })(this);
