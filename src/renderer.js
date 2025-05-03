@@ -7,6 +7,7 @@ import router from "@/router/router.js";
 import TDButton from "@/components/TDButton.vue";
 import TDTextarea from "@/components/TDTextarea.vue";
 import TDInput from "@/components/TDInput.vue";
+import TDCheckbox from "@/components/TDCheckbox.vue";
 
 const currentApp = createApp(App);
 
@@ -19,6 +20,7 @@ currentApp.config.globalProperties.$tdUtility = utility;
 currentApp.component("TDButton", TDButton);
 currentApp.component("TDTextarea", TDTextarea);
 currentApp.component("TDInput", TDInput);
+currentApp.component("TDCheckbox", TDCheckbox);
 
 currentApp.use(router);
 

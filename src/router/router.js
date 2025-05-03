@@ -6,10 +6,19 @@ const routerConfig = [
      * trang chủ
      */
     path: "/:pathMatch(.*)*",
-    pathVisible:"/",
+    pathVisible: "/",
     name: "home",
     component: () => import("@/views/TDWelcome.vue"),
     title: "Welcome",
+  },
+  {
+    /**
+     * so sánh code giữa 2 file
+     */
+    path: "/comparecode",
+    name: "comparecode",
+    component: () => import("@/views/tools/TDCompareCode.vue"),
+    title: "Compare code",
   },
   {
     /**

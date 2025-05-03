@@ -27,12 +27,10 @@
         v-model="textGenQR"
       ></TDTextarea>
       <div class="checkbox-wrapper">
-        <input
-          type="checkbox"
-          id="remove-empty-checkbox"
+        <TDCheckbox
           v-model="isRemoveEmpty"
-        />
-        <label for="remove-empty-checkbox">Xóa ký tự xuống dòng</label>
+          label="Xóa ký tự xuống dòng"
+        ></TDCheckbox>
       </div>
       <div class="button-generate">
         <TDButton
