@@ -34,12 +34,14 @@
     </div>
 
     <div class="flex">
+      <TDButton @click="applyMock" label="Example"></TDButton>
       <TDButton label="Chuyển đổi" @click="convertToPostgresSQL"></TDButton>
       <TDButton @click="haddleCopyEvent" label="Copy"></TDButton>
     </div>
   </div>
 </template>
 <script>
+import { JSONToPostgreSQLMock } from "@/mock/mock.js";
 
 export default {
   name: "TDImageToBase64",
@@ -51,6 +53,10 @@ export default {
   },
   mounted() {},
   methods: {
+    applyMock() {
+      let me = this;
+      me.$tdUtility.applyMock(me, JSONToPostgreSQLMock);
+    },
     convertToPostgresSQL() {
       let me = this;
       try {
