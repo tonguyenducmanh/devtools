@@ -9,12 +9,6 @@
   window.__env.defaultValue = {
     theme: "light",
   };
-  window.__env.jsonToPostgreSQLConfig = {
-    // có muốn chạy hàm buildCreateTableScript không
-    enableCreateTable: false,
-    // có muốn tạo script delete không
-    enableDeleteScript: true,
-  };
   window.__env.textToQRConfig = {
     maxTextOneChunk: 1000,
     maxHistoryLength: 10,

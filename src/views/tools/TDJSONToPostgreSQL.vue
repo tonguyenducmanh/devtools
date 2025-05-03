@@ -32,6 +32,16 @@
         v-model="outputSQL"
       ></TDTextarea>
     </div>
+    <div class="flex">
+      <TDCheckbox
+        v-model="enableCreateTable"
+        label="Thêm script tạo bảng"
+      ></TDCheckbox>
+      <TDCheckbox
+        v-model="enableDeleteScript"
+        label="Thêm script xóa dữ liệu cũ"
+      ></TDCheckbox>
+    </div>
 
     <div class="flex">
       <TDButton @click="applyMock" label="Example"></TDButton>
@@ -68,12 +78,12 @@ export default {
           } else {
             input = source;
           }
-          let config = me.$tdUtility.cloneDeep(
-            window.__env.jsonToPostgreSQLConfig
-          );
+          let config = {};
           config.tableName = me.tableName;
           config.schemaName = me.schemaName;
           config.primaryKeyField = me.primaryKeyField;
+          config.enableDeleteScript = me.enableDeleteScript;
+          config.enableCreateTable = me.enableCreateTable;
           me.outputSQL = me.buildScriptPostgreSQLScript(input, config);
         }
       } catch (error) {
@@ -150,7 +160,7 @@ export default {
           ? me.buildDeleteAllScript(source, config)
           : null;
         let insertScripts = me.buildInsertAllScript(source, config);
-        if (deleteScript && insertScripts && Array.isArray(insertScripts)) {
+        if (insertScripts && Array.isArray(insertScripts)) {
           let arrayScript = [];
           if (createTableScript) {
             arrayScript.push(createTableScript);
@@ -260,6 +270,8 @@ export default {
       primaryKeyField: null,
       inputJSON: null,
       outputSQL: null,
+      enableCreateTable: false,
+      enableDeleteScript: true,
     };
   },
 };
