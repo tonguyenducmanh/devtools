@@ -1,5 +1,5 @@
 <template>
-  <div class="td-input" :class="{ 'td-input-read-only': readOnly }">
+  <div class="td-checkbox-container" :class="{ 'td-checkbox-read-only': readOnly }">
     <label class="td-label" :class="{ 'td-label-checked': modelValue }">
       <input
         type="checkbox"
@@ -10,7 +10,7 @@
       <span class="td-checkbox">
         <span v-if="modelValue" class="td-checkbox-active"></span>
       </span>
-      <span class="td-slot-label">{{ label }}</span>
+      <span class="td-label-content">{{ label }}</span>
     </label>
   </div>
 </template>
@@ -55,7 +55,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.td-input {
+.td-checkbox-container {
   position: relative;
   display: flex;
   width: 100%;
@@ -90,7 +90,7 @@ export default {
     border: 1px solid var(--border-color);
     background: #fff;
   }
-  .td-slot-label {
+  .td-label-content {
     white-space: nowrap;
     padding-left: var(--padding);
   }
@@ -108,7 +108,7 @@ export default {
   border-color: var(--btn-color);
   transform: rotate(-45deg) translate(1px, -1px);
 }
-.td-input-read-only input {
+.td-checkbox-read-only input {
   background-color: var(--bg-sub-color);
 }
 </style>
