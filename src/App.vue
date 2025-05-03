@@ -1,9 +1,7 @@
 <template>
   <div class="td-container">
-    <TDSidebar v-if="isShowSidebar" />
+    <TDSidebar />
     <div class="td-main">
-      <div class="td-icon td-menu" @click="toggleSidebar"></div>
-
       <RouterView />
     </div>
   </div>
@@ -23,9 +21,7 @@ export default {
     me.processWhenRunApp();
   },
   data() {
-    return {
-      isShowSidebar: true,
-    };
+    return {};
   },
   methods: {
     /**
@@ -41,19 +37,6 @@ export default {
       me.$tdUtility.setTheme(currentTheme);
 
       document.body.setAttribute("data-theme", currentTheme);
-      let toggleSidebarState = me.$tdCache.get(
-        me.$tdEnum.cacheConfig.isShowSidebar
-      );
-      if (toggleSidebarState) {
-        me.isShowSidebar = toggleSidebarState.value;
-      }
-    },
-    toggleSidebar() {
-      let me = this;
-      me.isShowSidebar = !me.isShowSidebar;
-      me.$tdCache.set(me.$tdEnum.cacheConfig.isShowSidebar, {
-        value: me.isShowSidebar,
-      });
     },
   },
 };
@@ -71,11 +54,6 @@ export default {
     height: 100%;
     overflow: auto;
     position: relative;
-    .td-menu {
-      position: absolute;
-      cursor: pointer;
-      background-position: 0px 0px;
-    }
   }
 }
 </style>

@@ -1,22 +1,29 @@
 <template>
-  <div class="td-sidebar">
-    <div class="td-tool-group">
-      <template v-for="(item, index) in routerLink">
-        <RouterLink
-          class="td-sidebar-item"
-          activeClass="td-item-active"
-          :id="index"
-          :to="item.pathVisible ?? item.path"
-          >{{ item.title }}</RouterLink
-        >
-      </template>
-    </div>
-    <div class="td-sidebar-bottom">
-      <div
-        class="td-icon td-theme-toggle"
-        :class="{ 'td-theme-toggle-dark': isDarkTheme }"
-        @click="toggleTheme"
-      ></div>
+  <div class="td-sidebar-container">
+    <div
+      class="td-icon td-menu"
+      :class="{ 'td-menu-sibar-hide': !isShowSidebar }"
+      @click="toggleSidebar"
+    ></div>
+    <div v-if="isShowSidebar" class="td-sidebar">
+      <div class="td-tool-group">
+        <template v-for="(item, index) in routerLink">
+          <RouterLink
+            class="td-sidebar-item"
+            activeClass="td-item-active"
+            :id="index"
+            :to="item.pathVisible ?? item.path"
+            >{{ item.title }}</RouterLink
+          >
+        </template>
+      </div>
+      <div class="td-sidebar-bottom">
+        <div
+          class="td-icon td-theme-toggle"
+          :class="{ 'td-theme-toggle-dark': isDarkTheme }"
+          @click="toggleTheme"
+        ></div>
+      </div>
     </div>
   </div>
 </template>
@@ -37,12 +44,19 @@ export default {
       me.$tdCache.set(me.$tdEnum.cacheConfig.theme, currentTheme);
     }
     me.isDarkTheme = currentTheme == me.$tdEnum.theme.dark;
+    let toggleSidebarState = me.$tdCache.get(
+      me.$tdEnum.cacheConfig.isShowSidebar
+    );
+    if (toggleSidebarState) {
+      me.isShowSidebar = toggleSidebarState.value;
+    }
   },
   methods: {},
   props: {},
   data() {
     return {
       routerLink: routerConfig,
+      isShowSidebar: true,
       isDarkTheme: false,
     };
   },
@@ -56,10 +70,20 @@ export default {
       me.$tdCache.set(me.$tdEnum.cacheConfig.theme, currentTheme);
       me.$tdUtility.setTheme(currentTheme);
     },
+    toggleSidebar() {
+      let me = this;
+      me.isShowSidebar = !me.isShowSidebar;
+      me.$tdCache.set(me.$tdEnum.cacheConfig.isShowSidebar, {
+        value: me.isShowSidebar,
+      });
+    },
   },
 };
 </script>
 <style lang="scss" scoped>
+.td-sidebar-container {
+  position: relative;
+}
 .td-sidebar {
   position: relative;
   width: 250px;
@@ -106,5 +130,13 @@ export default {
       background-position: -48px 0px;
     }
   }
+}
+.td-menu {
+  position: absolute;
+  cursor: pointer;
+  background-position: 0px 0px;
+  z-index: 2;
+  top: 0;
+  left: 100%;
 }
 </style>
