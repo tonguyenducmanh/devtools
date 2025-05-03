@@ -1,13 +1,17 @@
 <template>
   <div class="td-input" :class="{ 'td-input-read-only': readOnly }">
-    <input
-      :id="inputId"
-      type="checkbox"
-      :checked="modelValue"
-      @input="changeInputValue"
-      :disabled="readOnly"
-    />
-    <label :for="inputId" class="td-label">{{ label }}</label>
+    <label class="td-label" :class="{ 'td-label-checked': modelValue }">
+      <input
+        type="checkbox"
+        :checked="modelValue"
+        @input="changeInputValue"
+        :disabled="readOnly"
+      />
+      <span class="td-checkbox">
+        <span v-if="modelValue" class="td-checkbox-active"></span>
+      </span>
+      <span class="td-slot-label">{{ label }}</span>
+    </label>
   </div>
 </template>
 
@@ -25,7 +29,7 @@ export default {
   props: {
     modelValue: {
       type: Boolean,
-      default: null,
+      default: false,
     },
     readOnly: {
       type: Boolean,
@@ -52,19 +56,57 @@ export default {
 </script>
 <style lang="scss" scoped>
 .td-input {
+  position: relative;
   display: flex;
   width: 100%;
   align-items: center;
   margin: var(--padding);
   .td-label {
+    justify-content: flex-start;
+    position: relative;
+    display: flex;
+    align-items: center;
     cursor: pointer;
-    overflow-wrap: normal; /* Allows breaking long words */
-    word-break: keep-all; /* For wider browser support */
-    white-space: nowrap; /* Ensure wrapping is enabled */
-    padding-right: var(--padding);
-    padding-left: var(--padding);
-    color: var(--text-primary-color);
   }
+  input {
+    opacity: 0;
+    width: 1%;
+  }
+  .td-checkbox {
+    top: 0;
+    left: 0;
+    transition: all 0.2s ease;
+    transform: rotate(-90deg);
+    cursor: pointer;
+    position: relative;
+    display: block;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    background: #fff;
+  }
+  .td-slot-label {
+    white-space: nowrap;
+    padding-left: var(--padding);
+  }
+}
+
+.td-label-checked .td-checkbox {
+  border: 1px solid var(--btn-color);
+  transform: rotate(0);
+}
+.td-checkbox-active {
+  width: 10px;
+  height: 6px;
+  border-width: 0 0 2px 2px;
+  border-style: solid;
+  border-color: var(--btn-color);
+  transform: rotate(-45deg) translate(1px, -1px);
 }
 .td-input-read-only input {
   background-color: var(--bg-sub-color);
