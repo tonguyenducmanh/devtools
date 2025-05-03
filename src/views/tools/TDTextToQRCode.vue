@@ -32,7 +32,9 @@
           label="Xóa ký tự xuống dòng"
         ></TDCheckbox>
       </div>
-      <div class="button-generate">
+      <div class="flex button-generate">
+        <TDButton @click="applyMock" label="Example"></TDButton>
+
         <TDButton
           :readOnly="!textGenQR"
           @click="generateQRCode"
@@ -52,6 +54,8 @@
 </template>
 <script>
 import QRCode from "qrcode";
+import { textToQRCodeMock } from "@/mock/mock.js";
+
 export default {
   name: "TDTextToQRCode",
   created() {
@@ -63,6 +67,10 @@ export default {
   },
   mounted() {},
   methods: {
+    applyMock() {
+      let me = this;
+      me.$tdUtility.applyMock(me, textToQRCodeMock);
+    },
     /**
      * Tạo QR code từ text
      */
