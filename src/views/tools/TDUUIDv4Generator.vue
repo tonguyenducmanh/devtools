@@ -1,5 +1,5 @@
 <template>
-  <div class="container flex flex-col">
+  <div class="container">
     <div class="title">💖 UUIDv4 generator tool!</div>
     <div class="flex flex-col td-uuid-generator">
       <TDInput

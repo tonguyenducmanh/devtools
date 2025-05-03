@@ -1,26 +1,32 @@
 <template>
-  <div class="container flex flex-col">
+  <div class="container">
     <div class="title">
       💖 Mapping JSON object A to JSON object B with recusive key value mapping!
     </div>
     <div class="td-mapping-container">
-      <div class="flex td-mapping-group">
+      <div class="flex flex-wrap td-mapping-group">
         <TDTextarea
           placeHolder="Object need mapping value"
+          label="Object mapping"
+          isLabelTop
           v-model="originalObjectText"
           height="300px"
           width="500px"
         ></TDTextarea>
         <TDTextarea
+          label="Object copy"
           placeHolder="Object copy value"
+          isLabelTop
           v-model="targetObjectText"
           height="300px"
           width="500px"
         ></TDTextarea>
       </div>
-      <div class="flex td-mapping-group">
+      <div class="flex flex-wrap td-mapping-group">
         <TDTextarea
           placeHolder="Result after mapping"
+          label="Result mapping"
+          isLabelTop
           v-model="replacedObjectText"
           height="300px"
           :readOnly="true"
@@ -28,6 +34,8 @@
         ></TDTextarea>
         <TDTextarea
           placeHolder="Key value mapping error"
+          label="Error"
+          isLabelTop
           v-model="errorListText"
           height="300px"
           :readOnly="true"

@@ -1,7 +1,7 @@
 <template>
-  <div class="container flex flex-col">
+  <div class="container">
     <div class="title">💖 Base64 to Image tool!</div>
-    <div class="flex paste-box">
+    <div class="flex flex-wrap paste-box">
       <div class="result-container">
         <TDTextarea
           ref="base64-output"

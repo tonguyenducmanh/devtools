@@ -1,11 +1,13 @@
 <template>
-  <div class="container flex flex-col">
+  <div class="container">
     <div class="title">
       <div>💖 Download VSCode Extension from marketplace.visualstudio.com!</div>
       <div>For legacy download that microsoft is removed.</div>
     </div>
     <div class="flex flex-col">
-      <img src="@/assets/vscodeext.png" />
+      <div class="flex flex-wrap">
+        <img class="td-img" src="@/assets/vscodeext.png" />
+      </div>
       <TDInput label="Item name" type="text" v-model="itemName" />
       <TDInput label="Version" type="text" v-model="version" />
       <TDInput
@@ -80,5 +82,10 @@ export default {
   border-radius: 0;
   min-height: 100vh;
   box-shadow: none;
+}
+.td-img {
+  width: 100%;
+  height: auto;
+  padding: var(--padding);
 }
 </style>

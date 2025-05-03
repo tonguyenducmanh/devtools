@@ -1,7 +1,7 @@
 <template>
-  <div class="container flex flex-col">
+  <div class="container">
     <div class="title">💖 Image To base64 tool!</div>
-    <div class="flex paste-box">
+    <div class="flex flex-wrap paste-box">
       <div
         ref="drop-zone"
         class="drop-zone"
@@ -23,11 +23,13 @@
         ></TDTextarea>
       </div>
     </div>
-    <TDButton
-      ref="copy-btn"
-      @click="haddleCopyEvent"
-      label="Copy Base64"
-    ></TDButton>
+    <div class="flex">
+      <TDButton
+        ref="copy-btn"
+        @click="haddleCopyEvent"
+        label="Copy Base64"
+      ></TDButton>
+    </div>
   </div>
 </template>
 

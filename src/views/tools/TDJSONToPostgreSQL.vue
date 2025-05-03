@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="title">💖 JSON to PostgreSQL tool!</div>
-    <div class="metadata-inputs">
+    <div class="flex flex-wrap metadata-inputs">
       <div>
         <TDInput label="Tên schema" type="text" v-model="schemaName" />
       </div>
@@ -13,7 +13,7 @@
       </div>
     </div>
 
-    <div class="flex io-section">
+    <div class="flex flex-wrap io-section">
       <TDTextarea
         isLabelTop
         label="Nhập JSON"
@@ -279,10 +279,6 @@ export default {
 
 <style scoped>
 .container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   width: 100%;
   height: 100%;
 }

@@ -1,5 +1,5 @@
 <template>
-  <div
+  <span
     class="td-checkbox-container"
     :class="{ 'td-checkbox-read-only': readOnly }"
   >
@@ -15,7 +15,7 @@
       </span>
       <span class="td-label-content">{{ label }}</span>
     </label>
-  </div>
+  </span>
 </template>
 
 <script>
@@ -61,7 +61,6 @@ export default {
 .td-checkbox-container {
   position: relative;
   display: flex;
-  width: 100%;
   align-items: center;
   margin: var(--padding);
   .td-label {
