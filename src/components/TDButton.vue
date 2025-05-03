@@ -26,6 +26,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .td-button {
+  outline: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -51,5 +52,9 @@ export default {
 .td-button:active {
   background-color: var(--focus-color);
   transform: scale(0.98);
+}
+.td-button:focus {
+  border:2px solid var(--focus-color);
+  box-sizing: border-box;
 }
 </style>

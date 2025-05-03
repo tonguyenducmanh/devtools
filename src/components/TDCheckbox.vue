@@ -1,5 +1,8 @@
 <template>
-  <div class="td-checkbox-container" :class="{ 'td-checkbox-read-only': readOnly }">
+  <div
+    class="td-checkbox-container"
+    :class="{ 'td-checkbox-read-only': readOnly }"
+  >
     <label class="td-label" :class="{ 'td-label-checked': modelValue }">
       <input
         type="checkbox"
@@ -107,6 +110,10 @@ export default {
   border-style: solid;
   border-color: var(--btn-color);
   transform: rotate(-45deg) translate(1px, -1px);
+}
+.td-label input:focus + .td-checkbox {
+  border-radius: 4px;
+  border: 2px solid var(--focus-color);
 }
 .td-checkbox-read-only input {
   background-color: var(--bg-sub-color);
