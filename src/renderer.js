@@ -8,6 +8,7 @@ import TDButton from "@/components/TDButton.vue";
 import TDTextarea from "@/components/TDTextarea.vue";
 import TDInput from "@/components/TDInput.vue";
 import TDCheckbox from "@/components/TDCheckbox.vue";
+import "@/common/TDShortkey.js";
 
 const currentApp = createApp(App);
 
