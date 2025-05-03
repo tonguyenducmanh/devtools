@@ -12,7 +12,7 @@ let handleShortcutFunction = utility.debounce((e) => {
   if (e.ctrlKey && e.key.toLowerCase() === "k") {
     console.log("Ctrl + K pressed globally");
   }
-}, 500);
+}, 300);
 
 window.addEventListener("keydown", handleShortcut);
 
