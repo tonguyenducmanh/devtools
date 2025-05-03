@@ -3,9 +3,6 @@
  */
 (function (window) {
   window.__env = window.__env || {};
-  window.__env.testConfig = {
-    testMessage: "hello config",
-  };
   window.__env.defaultValue = {
     theme: "light",
   };
