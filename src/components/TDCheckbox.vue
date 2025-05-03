@@ -70,7 +70,7 @@ export default {
   }
   input {
     opacity: 0;
-    width: 1%;
+    width: 0%;
   }
   .td-checkbox {
     top: 0;
