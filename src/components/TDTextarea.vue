@@ -15,13 +15,12 @@
       @dragover="handleDragOver"
       @dragleave="handleDragLeave"
       @drop="handleDrop"
-      :class="{ 'drag-over': isDragOver }"
+      :class="{ 'drag-over': isDragOver, 'fix-size': !resizeable }"
     />
   </div>
 </template>
 
 <script>
-
 export default {
   name: "TDTextarea",
   created() {},
@@ -66,6 +65,10 @@ export default {
       default: null,
     },
     isLabelTop: {
+      type: Boolean,
+      default: false,
+    },
+    resizeable: {
       type: Boolean,
       default: false,
     },
@@ -135,6 +138,9 @@ export default {
   .drag-over {
     outline: 2px dashed black;
     background-color: rgba(100, 100, 100, 0.6);
+  }
+  .fix-size {
+    resize: none;
   }
 }
 .td-textarea-read-only textarea {
