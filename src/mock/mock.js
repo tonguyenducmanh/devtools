@@ -20,3 +20,8 @@ export const JSONToPostgreSQLMock = {
   inputJSON:
     '{"account_object_id":"65205f0c-033e-4fd4-ae2d-9f8765309909","employee_id":"09aa963c-e0f6-4cea-971b-664bbc462f69","due_time":0,"account_object_type":1,"min_debt_due_date":"2025-03-18T00:00:00.000+07:00","crm_id":"65205f0c-033e-4fd4-ae2d-9f8765309909","is_vendor":false,"is_local_object":false,"is_customer":true,"is_employee":false,"inactive":false,"receiptable_debt_amount":0,"account_object_code":"KH0000002","account_object_name":"Adina","address":"1, Xã Hoàng Diệu, Huyện Chương Mỹ, Thành phố Hà Nội, Việt Nam","description":"Bò wang","legal_representative":"Adina","district":"Huyện Chương Mỹ","ward_or_commune":"Xã Hoàng Diệu","country":"Việt Nam","province_or_city":"Hà Nội","receive_account":"131","is_same_address":false,"account_object_shipping_address":"[{\\"location_name\\":\\"\\"}]","is_convert":false,"is_remind_debt":true,"employee_name":"Nguyễn Bình An","employee_code":"NBAN","is_sync_corp":false,"closing_amount":892500,"is_group":false,"edit_version":433498495,"search_data":"(smecloud_g2)công ty cổ phần misa- tập đoàn test","branch_id":"41558052-ef5d-4f71-a207-7c74b6dd54fa","branch_name":"(SMECLOUD_G2)Công ty cổ phần MISA- Tập đoàn test","created_date":"2025-03-18T17:21:18.099099+07:00","modified_date":"2025-03-18T17:22:05.5765764+07:00","created_by":"CRM","modified_by":"Nguyễn Bình An","auto_refno":false,"force_update":true,"state":0}',
 };
+
+export const mappingJSONMock = {
+  originalObjectText: '{"a":123,"b":"221","c":{"d":"abaac","e":"12315"}}',
+  targetObjectText: '{"a":123,"b":"2212"}',
+};

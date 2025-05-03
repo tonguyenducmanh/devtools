@@ -35,6 +35,7 @@
         ></TDTextarea>
       </div>
       <div class="flex">
+        <TDButton @click="applyMock" label="Example"></TDButton>
         <TDButton @click="mappingNow" label="Mapping now"></TDButton>
         <TDButton @click="formatResult" label="Format result"></TDButton>
         <TDButton
@@ -50,6 +51,8 @@
   </div>
 </template>
 <script>
+import { mappingJSONMock } from "@/mock/mock.js";
+
 export default {
   name: "TDMappingJSON",
   created() {
@@ -79,6 +82,10 @@ export default {
     };
   },
   methods: {
+    applyMock() {
+      let me = this;
+      me.$tdUtility.applyMock(me, mappingJSONMock);
+    },
     haddleCopyEvent(value) {
       let me = this;
       me.$tdUtility.copyToClipboard(value);
