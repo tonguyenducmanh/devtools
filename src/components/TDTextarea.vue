@@ -16,6 +16,7 @@
       @dragleave="handleDragLeave"
       @drop="handleDrop"
       :class="{ 'drag-over': isDragOver, 'fix-size': !resizeable }"
+      spellcheck="false"
     />
   </div>
 </template>

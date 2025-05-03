@@ -11,13 +11,13 @@
       :value="modelValue"
       @input="changeInputValue"
       :disabled="readOnly"
+      spellcheck="false"
     />
     <slot></slot>
   </div>
 </template>
 
 <script>
-
 export default {
   name: "TDInput",
   created() {},
