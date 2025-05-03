@@ -26,7 +26,10 @@
         @input="compare"
         class="td-checkbox-sibe-by-side"
       ></TDCheckbox>
-      <TDButton @click="compare" label="Compare diff changes"></TDButton>
+      <div class="flex">
+        <TDButton @click="compare" label="Compare diff changes"></TDButton>
+        <TDButton @click="applyMock" label="Example"></TDButton>
+      </div>
     </div>
     <div class="diff-output" v-html="diffOutputHtml"></div>
   </div>
@@ -35,6 +38,7 @@
 import * as Diff2Html from "diff2html";
 import "diff2html/bundles/css/diff2html.min.css";
 import { createTwoFilesPatch } from "diff";
+import { compareCodeMock } from "@/mock/mock.js";
 export default {
   name: "TDCompareCode",
   created() {
@@ -45,6 +49,10 @@ export default {
   },
   mounted() {},
   methods: {
+    applyMock() {
+      let me = this;
+      me.$tdUtility.applyMock(me, compareCodeMock);
+    },
     compare() {
       let me = this;
       if (me.firstCodeFile && me.secondCodeFile) {
@@ -84,7 +92,7 @@ export default {
   border-radius: 0;
   box-shadow: none;
 }
-.td-checkbox-sibe-by-side{
+.td-checkbox-sibe-by-side {
   display: flex;
   align-items: center;
   justify-content: center;

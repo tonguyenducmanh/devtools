@@ -66,21 +66,50 @@ class TDUtility {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
+  /**
+   * clone 1 object để tránh reference
+   * @param {object} obj
+   */
   cloneDeep(obj) {
     return structuredClone(obj);
   }
 
+  /**
+   * copy dữ liệu vào bộ nhớ tạm
+   * @param {string} value
+   */
   copyToClipboard(value) {
     let me = this;
     navigator.clipboard.writeText(value);
   }
 
+  /**
+   * tạo uuid v4 mới
+   * @returns uuid
+   */
   newGuid() {
     return uuidv4();
   }
 
+  /**
+   * thiết lập chủ đề giao diện ứng dụng
+   * @param {string} currentTheme
+   */
   setTheme(currentTheme) {
     document.body.setAttribute("data-theme", currentTheme);
+  }
+
+  /**
+   * apply giá trị mock ( fake data ) cho 1 file vue, đỡ phải nhập liệu nhiều
+   * @param  vm vue instance
+   * @param {object} mockObj dữ liệu fake
+   */
+  applyMock(vm, mockObj) {
+    if (vm && vm.$data && typeof vm.$data == "object" && mockObj) {
+      for (const [key, value] of Object.entries(mockObj)) {
+        vm.$data[key] = value;
+      }
+    }
   }
 }
 
