@@ -88,7 +88,7 @@ export default {
     justify-content: center;
     box-sizing: border-box;
     border: 1px solid var(--border-color);
-    background: #fff;
+    background: var(--bg-main-color);
   }
   .td-label-content {
     white-space: nowrap;
