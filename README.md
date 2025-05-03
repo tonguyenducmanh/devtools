@@ -2,7 +2,9 @@
 
 có 2 phiên bản được support: phiên bản web (vue + vite) và phiên bản app (electron + vue + vite)
 
-demo 1 tính năng
+demo 1 số tính năng
+
+![alt text](img/demo-2.png)
 
 ![alt text](img/demo.png)
 
