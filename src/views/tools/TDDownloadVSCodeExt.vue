@@ -17,6 +17,7 @@
     </div>
 
     <div class="flex">
+      <TDButton @click="applyMock" label="Example"></TDButton>
       <TDButton
         @click="handleBuildDownloadLink"
         label="Generate download link"
@@ -26,6 +27,7 @@
   </div>
 </template>
 <script>
+import { downloadVSCodeExtMock } from "@/mock/mock.js";
 
 export default {
   name: "TDDownloadVSCodeExt",
@@ -40,11 +42,14 @@ export default {
     return {
       itemName: null,
       version: null,
-      publisher: null,
       downloadLink: null,
     };
   },
   methods: {
+    applyMock() {
+      let me = this;
+      me.$tdUtility.applyMock(me, downloadVSCodeExtMock);
+    },
     handleBuildDownloadLink() {
       let me = this;
       if (me.itemName && me.version) {
