@@ -24,19 +24,19 @@ const routerConfig = [
     /**
      * chuyển đổi ảnh thành base 64
      */
-    path: "/imagetobase64",
-    name: "imagetobase64",
-    component: () => import("@/views/tools/TDImageToBase64.vue"),
-    title: "Image to base64",
+    path: "/base64toimage",
+    name: "base64toimage",
+    component: () => import("@/views/tools/TDBase64ToImage.vue"),
+    title: "Base64 to image",
   },
   {
     /**
      * chuyển đổi ảnh thành base 64
      */
-    path: "/base64toimage",
-    name: "base64toimage",
-    component: () => import("@/views/tools/TDBase64ToImage.vue"),
-    title: "Base64 to image",
+    path: "/imagetobase64",
+    name: "imagetobase64",
+    component: () => import("@/views/tools/TDImageToBase64.vue"),
+    title: "Image to base64",
   },
   {
     /**
