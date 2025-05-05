@@ -114,7 +114,8 @@ export default {
   border-radius: 4px;
   border: 2px solid var(--focus-color);
 }
-.td-checkbox-read-only input {
+.td-checkbox-read-only .td-checkbox {
   background-color: var(--bg-sub-color);
+  border: 2px solid var(--bg-sub-color);
 }
 </style>
