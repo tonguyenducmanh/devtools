@@ -152,13 +152,12 @@ export default {
     isJSON(str) {
       if (typeof str !== "string") return false;
       try {
-        const parsed = JSON.parse(str);
-        return typeof parsed === "object" && parsed !== null;
+        JSON.parse(str);
+        return true;
       } catch {
         return false;
       }
     },
-
     deepJSONParse(value) {
       let me = this;
       let result = value;
@@ -168,14 +167,14 @@ export default {
         result = JSON.parse(result);
       }
 
-      // Nếu kết quả là object hoặc array, đệ quy vào từng phần tử
-      if (typeof result === "object" && result !== null) {
+      // Nếu là mảng thì duyệt từng phần tử
+      if (Array.isArray(result)) {
+        result = result.map(me.deepJSONParse);
+      }
+      // Nếu là object thì đệ quy từng key
+      else if (typeof result === "object" && result !== null) {
         for (const key in result) {
           result[key] = me.deepJSONParse(result[key]);
-        }
-        // Nếu là mảng, duyệt qua từng phần tử
-        if (Array.isArray(result)) {
-          result = result.map(me.deepJSONParse);
         }
       }
 

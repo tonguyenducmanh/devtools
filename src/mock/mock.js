@@ -38,7 +38,7 @@ export const textToQRCodeMock = {
 
 export const TDJSONParserMock = {
   jsonSource:
-    '{"status":200,"text":"","error":null,"data":[{"news_id":51184,"title":"iPhone X Review: Innovative future with real black technology","source":"Netease phone"},{"news_id":51183,"title":"Traffic paradise: How to design streets for people and unmanned vehicles in the future?","source":"Netease smart"},{"news_id":51182,"title":"American Business Relations: The government does not pay billions to build factories","source":"AI Finance","members":["Daniel","Mike","John"]}]}',
+    '"{\\"order_id\\":\\"OD-789-UVW-012\\",\\"order_date\\":\\"2025-05-06\\",\\"customer_info\\":{\\"customer_name\\":\\"Tran Thi Bich\\",\\"customer_email\\":\\"bich.tran@sample.vn\\"},\\"product_details\\":\\"[{\\\\\\"product_code\\\\\\": \\\\\\"PROD-A1\\\\\\", \\\\\\"quantity\\\\\\": 2, \\\\\\"price\\\\\\": 25.50}, {\\\\\\"product_code\\\\\\": \\\\\\"PROD-B2\\\\\\", \\\\\\"quantity\\\\\\": 1, \\\\\\"price\\\\\\": 49.99}]\\",\\"total_amount\\":100.99,\\"shipping_address\\":\\"456 Nguyen Trai, Ward 5, District 5, Ho Chi Minh City\\"}"',
   objectSource: null,
   jsonSelected: null,
 };
