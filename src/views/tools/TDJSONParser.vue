@@ -144,7 +144,13 @@ export default {
       let me = this;
 
       if (!me.isRecusive) {
-        me.objectSource = JSON.parse(me.jsonSource);
+        let temp = JSON.parse(me.jsonSource);
+        // trường hợp không muốn đệ quy, nhưng vẫn muốn parse ra object mà còn parse được 1 lần thì parse nốt
+        try {
+          me.objectSource = JSON.parse(temp);
+        } catch (error) {
+          me.objectSource = temp;
+        }
       } else {
         me.objectSource = me.deepJSONParse(me.jsonSource);
       }
