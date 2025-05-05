@@ -4,7 +4,7 @@
     :class="{ 'td-button-secondary': type == $tdEnum.buttonType.secondary }"
     :disabled="readOnly"
   >
-    {{ label }}
+    {{ label.capitalize() }}
   </button>
 </template>
 

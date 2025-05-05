@@ -4,7 +4,7 @@
     :class="{ 'flex-col': isLabelTop, 'td-input-read-only': readOnly }"
   >
     <div class="td-label" :class="{ 'td-label-top': isLabelTop }" v-if="label">
-      {{ label }}
+      {{ label.capitalize() }}
     </div>
     <input
       :placeholder="placeHolder"

@@ -46,3 +46,11 @@ String.prototype.contains =
 String.prototype.replaceAll = function (from, to) {
   return this.split(from).join(to)
 }
+/**
+ * Thay thế toàn bộ ký tự thỏa mãn điều kiện
+ */
+String.prototype.capitalize =
+  String.prototype.capitalize ||
+  function () {
+    return this.charAt(0).toUpperCase() + this.slice(1)
+  }

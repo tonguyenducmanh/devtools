@@ -13,7 +13,7 @@
       <span class="td-checkbox">
         <span v-if="modelValue" class="td-checkbox-active"></span>
       </span>
-      <span class="td-label-content">{{ label }}</span>
+      <span class="td-label-content">{{ label.capitalize() }}</span>
     </label>
   </span>
 </template>

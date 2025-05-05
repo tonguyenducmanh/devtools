@@ -5,7 +5,7 @@
     :style="styleComputed"
   >
     <div class="td-label" :class="{ 'td-label-top': isLabelTop }" v-if="label">
-      {{ label }}
+      {{ label.capitalize() }}
     </div>
     <textarea
       :placeholder="placeHolder"
