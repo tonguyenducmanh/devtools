@@ -43,6 +43,10 @@
             v-model="isShowSelectedNode"
             label="hiển thị node đang chọn"
           ></TDCheckbox>
+          <TDCheckbox
+            v-model="isShowSelectedPath"
+            label="hiển thị fullpath node đang chọn"
+          ></TDCheckbox>
         </div>
         <div>
           <TDButton
@@ -66,6 +70,9 @@
           ></TDButton>
         </div>
       </div>
+    </div>
+    <div class="td-fullpath" v-if="isShowSelectedPath && fullPath">
+      Node đang chọn: {{ fullPath }}
     </div>
     <div class="td-pretty-box">
       <VueJsonPretty
@@ -169,11 +176,11 @@ export default {
     changeNodeItem(val) {
       let me = this;
       if (val && val.path && val.path.startsWith("root")) {
-        let fullPath = val.path;
-        fullPath = fullPath.replace("root.", "");
+        me.fullPath = val.path;
+        me.fullPath = me.fullPath.replace("root.", "");
         let valueCurrent = me.$tdUtility.getValueByPath(
           me.objectSource,
-          fullPath
+          me.fullPath
         );
         if (valueCurrent) {
           me.jsonSelected = JSON.stringify(valueCurrent);
@@ -196,6 +203,8 @@ export default {
       showLineNumber: true,
       showLengthWhenCollapsed: true,
       showVirtualScroll: true,
+      isShowSelectedPath: true,
+      fullPath: null,
       currentTheme: "light", // library support "dark", "light"
     };
   },
@@ -261,5 +270,8 @@ h1 {
 
 .result-container {
   display: flex;
+}
+.td-fullpath{
+  padding: var(--padding);
 }
 </style>
