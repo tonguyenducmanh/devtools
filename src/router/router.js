@@ -22,6 +22,15 @@ const routerConfig = [
   },
   {
     /**
+     * convert từ JSON sang object và object sang JSON
+     */
+    path: "/jsonparser",
+    name: "jsonparser",
+    component: () => import("@/views/tools/TDJSONParser.vue"),
+    title: "JSON parser",
+  },
+  {
+    /**
      * chuyển đổi ảnh thành base 64
      */
     path: "/base64toimage",

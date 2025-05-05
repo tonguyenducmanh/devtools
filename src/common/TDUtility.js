@@ -111,6 +111,14 @@ class TDUtility {
       }
     }
   }
+
+  getValueByPath(obj, path) {
+    const keys = path.replace(/\[(\w+)\]/g, ".$1").split(".");
+    return keys.reduce(
+      (acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined),
+      obj
+    );
+  }
 }
 
 export default new TDUtility();

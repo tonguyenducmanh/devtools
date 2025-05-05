@@ -35,8 +35,6 @@ export default {
         me.$tdCache.set(me.$tdEnum.cacheConfig.theme, currentTheme);
       }
       me.$tdUtility.setTheme(currentTheme);
-
-      document.body.setAttribute("data-theme", currentTheme);
     },
   },
 };
