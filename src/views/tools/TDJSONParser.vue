@@ -64,6 +64,11 @@
             label="Copy selected node"
           ></TDButton>
           <TDButton
+            @click="handleCopyEvent(JSON.stringify(jsonSource))"
+            :type="$tdEnum.buttonType.secondary"
+            label="Copy source stringify"
+          ></TDButton>
+          <TDButton
             @click="toggleAllNode"
             :type="$tdEnum.buttonType.secondary"
             label="Toggle all node"
