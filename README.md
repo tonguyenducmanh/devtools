@@ -4,9 +4,9 @@ có 2 phiên bản được support: phiên bản web (vue + vite) và phiên b�
 
 demo 1 số tính năng
 
-![alt text](img/demo-2.png)
+![demo 2](img/demo-2.png)
 
-![alt text](img/demo.png)
+![demo 1](img/demo.png)
 
 config của toàn bộ ứng dụng có thể truy cập thông qua việc enter lệnh sau ở cửa sổ console
 
