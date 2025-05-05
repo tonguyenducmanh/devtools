@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">💖 Text To QRCode tool!</div>
+    <div class="title">Text To QRCode tool!</div>
     <div class="history-section">
       <div class="history-header">
         <h3>Lịch sử</h3>

@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="title">
-      <div>💖 Download VSCode Extension from marketplace.visualstudio.com!</div>
+      <div>Download VSCode Extension from marketplace.visualstudio.com!</div>
       <div>For legacy download that microsoft is removed.</div>
     </div>
     <div class="flex flex-col">

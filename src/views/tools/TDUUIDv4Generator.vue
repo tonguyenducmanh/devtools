@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">💖 UUIDv4 generator tool!</div>
+    <div class="title">UUIDv4 generator tool!</div>
     <div class="flex flex-col td-uuid-generator">
       <TDInput
         label="Result"
@@ -51,7 +51,7 @@ export default {
   min-height: 100vh;
   box-shadow: none;
 }
-.td-uuid-generator{
+.td-uuid-generator {
   width: 100%;
 }
 </style>

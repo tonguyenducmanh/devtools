@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="container">
-      <div class="title">💖 Compare two file (diff changes) !</div>
+      <div class="title">Compare two file (diff changes) !</div>
       <div class="flex flex-wrap td-compare-box">
         <TDTextarea
           placeHolder="Fist code file to compare"

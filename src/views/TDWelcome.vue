@@ -1,7 +1,6 @@
 <template>
   <div class="container">
-    <h1>💖 Hello World!</h1>
-    <p>Welcome to your best utility tools.</p>
+    <h1>Welcome to your best utility tools.</h1>
     <p>Created by tdmanh with luv.</p>
   </div>
 </template>

@@ -32,15 +32,15 @@
 body[data-theme="light"] {
   --bg-main-color: #f6f6f6;
   --bg-sub-color: #efefef;
-  --bg-active-color: rgb(212, 202, 202);
+  --bg-active-color: rgb(202, 212, 203);
   --bg-focus-color: #f8f1f7;
   --bg-hover-color: #f8f1f7;
   --text-primary-color: rgb(0, 0, 0);
   --text-secondary-color: rgb(33, 33, 33);
   --text-tertiary-color: rgb(44, 34, 34);
   --border-color: #a9a8a8;
-  --focus-color: #a33131;
-  --btn-color: #e37b7b;
+  --focus-color: #33a16f;
+  --btn-color: #42b883;
 }
 
 body[data-theme="dark"] {
@@ -53,8 +53,8 @@ body[data-theme="dark"] {
   --text-secondary-color: rgb(220, 220, 220);
   --text-tertiary-color: rgb(217, 217, 217);
   --border-color: #f0f0f0ab;
-  --focus-color: #b0d9c1;
-  --btn-color: #e37b7b;
+  --focus-color: #33a16f;
+  --btn-color: #42b883;
 }
 
 body {

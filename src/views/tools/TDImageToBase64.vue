@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">💖 Image To base64 tool!</div>
+    <div class="title">Image To base64 tool!</div>
     <div class="flex flex-wrap paste-box">
       <div
         ref="drop-zone"

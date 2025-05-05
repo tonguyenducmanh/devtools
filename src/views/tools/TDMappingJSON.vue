@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="title">
-      💖 Mapping JSON object A to JSON object B with recusive key value mapping!
+      Mapping JSON object A to JSON object B with recusive key value mapping!
     </div>
     <div class="td-mapping-container">
       <div class="flex flex-wrap td-mapping-group">

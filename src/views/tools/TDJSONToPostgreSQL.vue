@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">💖 JSON to PostgreSQL tool!</div>
+    <div class="title">JSON to PostgreSQL tool!</div>
     <div class="flex flex-wrap metadata-inputs">
       <div>
         <TDInput label="Tên schema" type="text" v-model="schemaName" />
