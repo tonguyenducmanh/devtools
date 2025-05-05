@@ -33,7 +33,7 @@
           ></TDCheckbox>
           <TDCheckbox
             v-model="showLengthWhenCollapsed"
-            label="hiển thị số phần tử của mảng"
+            label="hiển thị số key/phần tử"
           ></TDCheckbox>
           <TDCheckbox
             v-model="showVirtualScroll"
@@ -271,7 +271,7 @@ h1 {
 .result-container {
   display: flex;
 }
-.td-fullpath{
+.td-fullpath {
   padding: var(--padding);
 }
 </style>
