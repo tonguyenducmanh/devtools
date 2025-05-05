@@ -71,8 +71,11 @@
         </div>
       </div>
     </div>
-    <div class="td-fullpath" v-if="isShowSelectedPath && fullPath">
-      Node đang chọn: {{ fullPath }}
+    <div v-if="isShowSelectedPath">
+      <div class="td-fullpath" v-if="isShowSelectedPath && fullPath">
+        Node đang chọn: {{ fullPath }}
+      </div>
+      <div class="td-fullpath" v-else>Chưa chọn node nào</div>
     </div>
     <div class="td-pretty-box">
       <VueJsonPretty
@@ -177,15 +180,22 @@ export default {
       let me = this;
       if (val && val.path && val.path.startsWith("root")) {
         me.fullPath = val.path;
-        me.fullPath = me.fullPath.replace("root.", "");
-        let valueCurrent = me.$tdUtility.getValueByPath(
-          me.objectSource,
-          me.fullPath
-        );
-        if (valueCurrent) {
-          me.jsonSelected = JSON.stringify(valueCurrent);
+        if (me.fullPath == "root" || !me.fullPath) {
+          me.jsonSelected = JSON.stringify(me.objectSource);
         } else {
-          me.jsonSelected = valueCurrent;
+          let subPath = me.fullPath.replace("root.", "");
+          if (subPath && subPath.startsWith("root")) {
+            subPath = me.fullPath.replace("root", "");
+          }
+          let valueCurrent = me.$tdUtility.getValueByPath(
+            me.objectSource,
+            subPath
+          );
+          if (valueCurrent) {
+            me.jsonSelected = JSON.stringify(valueCurrent);
+          } else {
+            me.jsonSelected = valueCurrent;
+          }
         }
       }
     },

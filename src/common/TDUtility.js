@@ -113,7 +113,23 @@ class TDUtility {
   }
 
   getValueByPath(obj, path) {
-    const keys = path.replace(/\[(\w+)\]/g, ".$1").split(".");
+    const regex = /(?:\[(["'])(.*?)\1\])|(?:\[(\d+)\])|(?:\.?([^.\[\]]+))/g;
+    const keys = [];
+    let match;
+
+    while ((match = regex.exec(path)) !== null) {
+      if (match[2] !== undefined) {
+        // bracket string: ["web-app"]
+        keys.push(match[2]);
+      } else if (match[3] !== undefined) {
+        // bracket index: [0]
+        keys.push(Number(match[3]));
+      } else if (match[4] !== undefined) {
+        // dot or bareword: .key or key
+        keys.push(match[4]);
+      }
+    }
+
     return keys.reduce(
       (acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined),
       obj
