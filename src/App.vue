@@ -47,6 +47,7 @@ export default {
   display: flex;
   width: 100%;
   height: 100%;
+  font-size: var(--font-size-medium);
   .td-main {
     display: flex;
     flex-direction: column;

@@ -1,8 +1,16 @@
 <template>
-  <button class="td-button noselect" :disabled="readOnly">{{ label }}</button>
+  <button
+    class="td-button noselect"
+    :class="{ 'td-button-secondary': type == $tdEnum.buttonType.secondary }"
+    :disabled="readOnly"
+  >
+    {{ label }}
+  </button>
 </template>
 
 <script>
+import tdEnum from "@/common/TDEnum.js";
+
 export default {
   name: "TDButton",
   created() {},
@@ -16,6 +24,10 @@ export default {
     label: {
       type: String,
       default: "Button",
+    },
+    type: {
+      type: String,
+      default: tdEnum.buttonType.primary,
     },
   },
   data() {
@@ -33,14 +45,14 @@ export default {
   justify-content: center;
   width: fit-content;
   height: 30px;
-  padding: var(--padding);
+  padding: var(--padding-x-medium) var(--padding-large);
   margin: var(--padding);
   background-color: var(--btn-color);
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 16px;
   transition: all 0.2s ease;
 }
 
@@ -54,7 +66,22 @@ export default {
   transform: scale(0.98);
 }
 .td-button:focus {
-  border:2px solid var(--focus-color);
+  border: 2px solid var(--focus-color);
   box-sizing: border-box;
+}
+
+.td-button-secondary {
+  background-color: var(--btn-secondary-color);
+  color: var(--btn-secondary-text-color);
+}
+.td-button-secondary:hover {
+  background-color: var(--btn-secondary-focus-color);
+}
+
+.td-button-secondary:active {
+  background-color: var(--btn-secondary-focus-color);
+}
+.td-button-secondary:focus {
+  border: 2px solid var(--btn-secondary-focus-color);
 }
 </style>

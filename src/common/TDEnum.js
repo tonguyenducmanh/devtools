@@ -9,6 +9,10 @@ class TDEnum {
     qrHistory: "qrHistory",
     isShowSidebar: "isShowSidebar",
   };
+  buttonType = {
+    primary: "primary",
+    secondary: "secondary",
+  };
 }
 
 export default new TDEnum();

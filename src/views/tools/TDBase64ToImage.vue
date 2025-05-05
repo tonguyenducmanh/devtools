@@ -23,9 +23,17 @@
       </div>
     </div>
     <div class="flex">
-      <TDButton @click="applyMock" label="Example"></TDButton>
       <TDButton @click="handleConvert" label="Convert to Image"></TDButton>
-      <TDButton @click="handleDownloadImage" label="Download Image"></TDButton>
+      <TDButton
+        :type="$tdEnum.buttonType.secondary"
+        @click="handleDownloadImage"
+        label="Download Image"
+      ></TDButton>
+      <TDButton
+        @click="applyMock"
+        :type="$tdEnum.buttonType.secondary"
+        label="Example"
+      ></TDButton>
     </div>
   </div>
 </template>
@@ -96,7 +104,6 @@ export default {
 h1 {
   text-align: center;
   margin-bottom: 2rem;
-  font-size: 1.5rem;
 }
 
 .drop-zone {
@@ -122,7 +129,6 @@ h1 {
 
 .drop-zone p {
   color: #666;
-  font-size: 0.9rem;
 }
 
 .preview {

@@ -33,12 +33,15 @@
         ></TDCheckbox>
       </div>
       <div class="flex button-generate">
-        <TDButton @click="applyMock" label="Example"></TDButton>
-
         <TDButton
           :readOnly="!textGenQR"
           @click="generateQRCode"
           label="Tạo QR Code"
+        ></TDButton>
+        <TDButton
+          @click="applyMock"
+          :type="$tdEnum.buttonType.secondary"
+          label="Example"
         ></TDButton>
       </div>
     </div>
@@ -290,7 +293,6 @@ export default {
 
 .history-header h3 {
   color: var(--text-primary-color);
-  font-size: 1.1rem;
   margin: 0;
 }
 
@@ -309,7 +311,6 @@ export default {
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   transition: all 0.2s ease;
-  font-size: 0.9rem;
   color: #444;
   max-width: 300px;
   gap: 0.5rem;
@@ -340,7 +341,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
   transition: all 0.2s ease;
   border-radius: 50%;
   margin-left: 4px;
@@ -382,7 +382,6 @@ export default {
 .checkbox-wrapper label {
   color: #333;
   cursor: pointer;
-  font-size: 0.9rem;
 }
 .button-generate {
   margin-bottom: var(--padding);

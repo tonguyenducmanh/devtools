@@ -44,9 +44,17 @@
     </div>
 
     <div class="flex">
-      <TDButton @click="applyMock" label="Example"></TDButton>
       <TDButton label="Chuyển đổi" @click="convertToPostgresSQL"></TDButton>
-      <TDButton @click="haddleCopyEvent" label="Copy"></TDButton>
+      <TDButton
+        @click="haddleCopyEvent"
+        :type="$tdEnum.buttonType.secondary"
+        label="Copy"
+      ></TDButton>
+      <TDButton
+        @click="applyMock"
+        :type="$tdEnum.buttonType.secondary"
+        label="Example"
+      ></TDButton>
     </div>
   </div>
 </template>

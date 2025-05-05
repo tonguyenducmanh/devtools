@@ -43,16 +43,26 @@
         ></TDTextarea>
       </div>
       <div class="flex">
-        <TDButton @click="applyMock" label="Example"></TDButton>
         <TDButton @click="mappingNow" label="Mapping now"></TDButton>
-        <TDButton @click="formatResult" label="Format result"></TDButton>
+        <TDButton
+          @click="formatResult"
+          :type="$tdEnum.buttonType.secondary"
+          label="Format result"
+        ></TDButton>
         <TDButton
           @click="haddleCopyEvent(replacedObjectText)"
+          :type="$tdEnum.buttonType.secondary"
           label="Copy result"
         ></TDButton>
         <TDButton
           @click="haddleCopyEvent(errorListText)"
+          :type="$tdEnum.buttonType.secondary"
           label="Copy error"
+        ></TDButton>
+        <TDButton
+          @click="applyMock"
+          :type="$tdEnum.buttonType.secondary"
+          label="Example"
         ></TDButton>
       </div>
     </div>

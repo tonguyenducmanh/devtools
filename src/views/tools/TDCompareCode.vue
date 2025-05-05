@@ -27,8 +27,12 @@
         class="td-checkbox-sibe-by-side"
       ></TDCheckbox>
       <div class="flex">
-        <TDButton @click="applyMock" label="Example"></TDButton>
         <TDButton @click="compare" label="Compare diff changes"></TDButton>
+        <TDButton
+          @click="applyMock"
+          :type="$tdEnum.buttonType.secondary"
+          label="Example"
+        ></TDButton>
       </div>
     </div>
     <div class="diff-output" v-html="diffOutputHtml"></div>

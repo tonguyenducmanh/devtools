@@ -19,12 +19,20 @@
     </div>
 
     <div class="flex">
-      <TDButton @click="applyMock" label="Example"></TDButton>
       <TDButton
         @click="handleBuildDownloadLink"
         label="Generate download link"
       ></TDButton>
-      <TDButton @click="handleCopyDownloadLink" label="Copy link"></TDButton>
+      <TDButton
+        @click="handleCopyDownloadLink"
+        :type="$tdEnum.buttonType.secondary"
+        label="Copy link"
+      ></TDButton>
+      <TDButton
+        @click="applyMock"
+        :type="$tdEnum.buttonType.secondary"
+        label="Example"
+      ></TDButton>
     </div>
   </div>
 </template>

@@ -7,8 +7,16 @@
 :root {
   --padding: 8px;
   --padding-medium: 4px;
+  --padding-x-medium: 15px;
   --padding-large: 20px;
   --border-radius: 8px;
+  --font-size-large: 20px;
+  --font-size-medium: 16px;
+  --text-color-light: rgba(60, 60, 60, 0.7);
+  --text-color-dark: rgba(235, 235, 235, 0.6);
+  --vt-font-family-base: "Inter var experimental", "Inter var", Inter,
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 }
 
 .flex {
@@ -30,17 +38,20 @@
 }
 
 body[data-theme="light"] {
-  --bg-main-color: #f6f6f6;
+  --bg-main-color: #ffffff;
   --bg-sub-color: #efefef;
   --bg-active-color: rgb(202, 212, 203);
   --bg-focus-color: #f8f1f7;
-  --bg-hover-color: #f8f1f7;
+  --bg-hover-color: unset;
   --text-primary-color: rgb(0, 0, 0);
   --text-secondary-color: rgb(33, 33, 33);
   --text-tertiary-color: rgb(44, 34, 34);
   --border-color: #a9a8a8;
   --focus-color: #33a16f;
   --btn-color: #42b883;
+  --btn-secondary-color: #f1f1f1;
+  --btn-secondary-text-color: #476582;
+  --btn-secondary-focus-color: #e5e5e5;
 }
 
 body[data-theme="dark"] {
@@ -48,13 +59,16 @@ body[data-theme="dark"] {
   --bg-sub-color: rgb(40, 40, 40);
   --bg-active-color: rgb(197, 188, 188);
   --bg-focus-color: #928990;
-  --bg-hover-color: #a2a2a2;
+  --bg-hover-color: unset;
   --text-primary-color: rgb(255, 255, 255);
   --text-secondary-color: rgb(220, 220, 220);
   --text-tertiary-color: rgb(217, 217, 217);
   --border-color: #f0f0f0ab;
   --focus-color: #33a16f;
   --btn-color: #42b883;
+  --btn-secondary-color: #2f2f2f;
+  --btn-secondary-text-color: #aac8e4;
+  --btn-secondary-focus-color: #3a3a3a;
 }
 
 body {
@@ -101,18 +115,18 @@ a {
 
 ::selection {
   color: white; /* Text color */
-  background-color: #df799f; /* Background color */
+  background-color: var(--focus-color); /* Background color */
 }
 
 /* For Firefox support */
 ::-moz-selection {
   color: white;
-  background-color: #df799f;
+  background-color: var(--focus-color);
 }
 .title {
   text-align: center;
   margin-bottom: 2rem;
-  font-size: 1.5rem;
+  font-size: var(--font-size-large);
 }
 html,
 body {

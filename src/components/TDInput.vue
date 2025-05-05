@@ -71,6 +71,7 @@ export default {
     word-break: keep-all; /* For wider browser support */
     white-space: nowrap; /* Ensure wrapping is enabled */
     padding-right: var(--padding);
+    font-size: var(--font-size-large);
   }
   .td-label-top {
     padding-bottom: var(--padding);
@@ -82,6 +83,7 @@ export default {
     border-radius: var(--border-radius);
     background-color: var(--bg-main-color);
     color: var(--text-primary-color);
+    font-size: var(--font-size-medium);
   }
 
   input:focus {

@@ -140,7 +140,6 @@ export default {
 
 .drop-zone p {
   color: #666;
-  font-size: 0.9rem;
 }
 
 .preview {
