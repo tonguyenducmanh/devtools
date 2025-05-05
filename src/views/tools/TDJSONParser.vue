@@ -20,31 +20,31 @@
         <div>
           <TDCheckbox
             v-model="isRecusive"
-            label="có xử lý đệ quy object không"
+            label="Xử lý JSON parse đệ quy object"
             @input="handleJSONToObject"
           ></TDCheckbox>
           <TDCheckbox
             v-model="showCollapseButton"
-            label="có hiển thị icon thu gọn object"
+            label="hiển thị icon thu gọn object"
           ></TDCheckbox>
           <TDCheckbox
             v-model="showLineNumber"
-            label="có hiển thị số dòng không"
+            label="hiển thị số dòng"
           ></TDCheckbox>
           <TDCheckbox
             v-model="showLengthWhenCollapsed"
-            label="có hiển thị số phần tử khi thu gọn"
+            label="hiển thị số phần tử của mảng"
           ></TDCheckbox>
           <TDCheckbox
             v-model="showVirtualScroll"
-            label="có hiển thị thanh cuộn"
+            label="hiển thị thanh cuộn"
           ></TDCheckbox>
           <TDCheckbox
             v-model="isShowSelectedNode"
-            label="có hiển thị Object đang chọn"
+            label="hiển thị node đang chọn"
           ></TDCheckbox>
         </div>
-        <div class="flex">
+        <div>
           <TDButton
             @click="handleJSONToObject"
             label="JSON to Object"
