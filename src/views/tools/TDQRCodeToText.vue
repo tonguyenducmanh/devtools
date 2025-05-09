@@ -11,6 +11,7 @@
         ref="uploadArea"
         class="upload-area"
         maxHeight="200px"
+        :label="'Chọn ảnh QR code'"
         multiple
       ></TDUpload>
       <div class="flex button-generate">
