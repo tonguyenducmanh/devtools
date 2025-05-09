@@ -2,6 +2,9 @@
   <div class="container">
     <div class="title">QRCode To Text tool!</div>
     <div class="qr-section">
+      <div class="flex">
+        <img class="td-img" src="@/assets/qrcodeupload.png" />
+      </div>
       <div>
         Note: thứ tự upload dựa vào thứ tự sắp xếp trên máy tính, vui lòng chọn
         sắp xếp theo ngày tăng dần để nối chuỗi đúng file
@@ -112,6 +115,13 @@ export default {
 </script>
 <style scoped>
 .qr-section {
+  padding: var(--padding);
+}
+
+.td-img {
+  width: 100%;
+  max-width: 1000px;
+  height: auto;
   padding: var(--padding);
 }
 </style>
