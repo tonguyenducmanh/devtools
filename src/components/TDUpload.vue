@@ -72,7 +72,16 @@ export default {
   },
   methods: {
     handleFileSelect(event) {
-      this.selectedFiles = Array.from(event.target.files);
+      let me = this;
+      if (
+        event &&
+        event.target &&
+        event.target.files &&
+        event.target.files.length > 0
+      ) {
+        let uploadFiles = Array.from(event.target.files);
+        me.selectedFiles = uploadFiles;
+      }
     },
     formatFileSize(bytes) {
       if (bytes === 0) return "0 Bytes";

@@ -2,6 +2,8 @@
   <div class="container">
     <div class="title">QRCode To Text tool!</div>
     <div class="qr-section">
+      <div>Note: thứ tự upload dựa vào thứ tự sắp xếp trên máy tính, vui lòng chọn sắp xếp theo ngày tăng dần để nối chuỗi đúng file</div>
+      <br />
       <TDUpload
         ref="uploadArea"
         class="upload-area"
@@ -9,11 +11,11 @@
         multiple
       ></TDUpload>
       <div class="flex button-generate">
-        <TDButton @click="convertQRCode" label="Convert now"></TDButton>
+        <TDButton @click="convertQRCode" label="Chuyển đổi"></TDButton>
         <TDButton
           @click="copyResult"
           :type="$tdEnum.buttonType.secondary"
-          label="Copy result"
+          label="Copy"
         ></TDButton>
       </div>
       <TDTextarea
@@ -48,8 +50,6 @@ export default {
         typeof me.$refs.uploadArea.getFileSelected === "function"
       ) {
         let allFiles = me.$refs.uploadArea.getFileSelected();
-
-        // Tạo danh sách promises
         let decodePromises = Array.from(allFiles).map((file) => {
           return new Promise((resolve) => {
             let reader = new FileReader();
