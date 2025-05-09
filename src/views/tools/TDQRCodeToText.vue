@@ -15,11 +15,6 @@
           :type="$tdEnum.buttonType.secondary"
           label="Copy result"
         ></TDButton>
-        <TDButton
-          @click="applyMock"
-          :type="$tdEnum.buttonType.secondary"
-          label="Example"
-        ></TDButton>
       </div>
       <TDTextarea
         class="input-area"
@@ -32,7 +27,6 @@
   </div>
 </template>
 <script>
-import { textToQRCodeMock } from "@/mock/mock.js";
 import jsQR from "jsqr";
 export default {
   name: "TDQRCodeToText",
@@ -44,10 +38,6 @@ export default {
   },
   mounted() {},
   methods: {
-    applyMock() {
-      let me = this;
-      me.$tdUtility.applyMock(me, textToQRCodeMock);
-    },
     /**
      * Tạo QR code từ text
      */
