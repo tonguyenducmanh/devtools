@@ -1,7 +1,10 @@
 <template>
   <button
     class="td-button noselect"
-    :class="{ 'td-button-secondary': type == $tdEnum.buttonType.secondary }"
+    :class="{
+      'td-button-secondary': type == $tdEnum.buttonType.secondary,
+      'td-button-readonly': readOnly,
+    }"
     :disabled="readOnly"
   >
     {{ label.capitalize() }}
@@ -83,5 +86,10 @@ export default {
 }
 .td-button-secondary:focus {
   border: 2px solid var(--btn-secondary-focus-color);
+}
+
+.td-button-readonly {
+  opacity: 0.5;
+  cursor: unset;
 }
 </style>
