@@ -1,19 +1,34 @@
-# project chứa các tool tiện ích cho dev, được tổng hợp nhằm mục đích tránh phải deploy mỗi tool lên 1 site khác nhau
+## Project chứa các tool tiện ích cho dev, được tổng hợp nhằm mục đích tránh phải deploy mỗi tool lên 1 site khác nhau
 
-có 2 phiên bản được support: phiên bản web (vue + vite) và phiên bản app (electron + vue + vite)
+Có 2 phiên bản được support: phiên bản web (vue + vite) và phiên bản app (electron + vue + vite)
 
-demo 1 số tính năng
+Danh sách các tính năng đã support
+
+```
+1. So sánh code ( giống github pull request)
+2. JSON parse đệ quy
+3. Base64 sang image
+4. Image sang base64
+5. Sinh script postgresql insert vào db từ json data
+6. Văn bản sang nhiều mã QR
+7. Nhiều mã QR sang 1 đoạn văn bản duy nhất
+8. Mapping đệ quy value theo key của 2 object json ( object lồng object cũng map)
+9. Tải extension vscode (legacy)
+10. Tạo UUIDv4 ngẫu nhiên
+```
+
+Demo 1 số tính năng
 
 ![demo 2](img/demo-2.png)
 
 ![demo 1](img/demo.png)
 
-config của toàn bộ ứng dụng có thể truy cập thông qua việc enter lệnh sau ở cửa sổ console
+Config của toàn bộ ứng dụng có thể truy cập thông qua việc enter lệnh sau ở cửa sổ console
 
 ```
 window.__env
 ```
 
-các object global được inject trong file renderer.js, vd $tdCache = import TDCache.js, $tdEnum = import TDEnum.js
+Các object global được inject trong file renderer.js, vd $tdCache = import TDCache.js, $tdEnum = import TDEnum.js
 
 file [mock.js](src/mock/mock.js) sẽ được dùng để fake data cho từng tool
