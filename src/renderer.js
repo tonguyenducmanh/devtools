@@ -8,6 +8,7 @@ import TDButton from "@/components/TDButton.vue";
 import TDTextarea from "@/components/TDTextarea.vue";
 import TDInput from "@/components/TDInput.vue";
 import TDCheckbox from "@/components/TDCheckbox.vue";
+import TDUpload from "@/components/TDUpload.vue";
 
 const currentApp = createApp(App);
 
@@ -21,6 +22,7 @@ currentApp.component("TDButton", TDButton);
 currentApp.component("TDTextarea", TDTextarea);
 currentApp.component("TDInput", TDInput);
 currentApp.component("TDCheckbox", TDCheckbox);
+currentApp.component("TDUpload", TDUpload);
 
 currentApp.use(router);
 

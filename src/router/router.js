@@ -31,7 +31,7 @@ const routerConfig = [
   },
   {
     /**
-     * chuyển đổi ảnh thành base 64
+     * chuyển đổi base 64 thành ảnh
      */
     path: "/base64toimage",
     name: "base64toimage",
@@ -67,7 +67,16 @@ const routerConfig = [
   },
   {
     /**
-     * chuyển đổi văn bản thành mã QR
+     * chuyển đổi mã QR thành văn bản
+     */
+    path: "/qrcodetotext",
+    name: "qrcodetotext",
+    component: () => import("@/views/tools/TDQRCodeToText.vue"),
+    title: "QRCode to text",
+  },
+  {
+    /**
+     * mapping đệ quy json value
      */
     path: "/mappingjson",
     name: "mappingjson",
