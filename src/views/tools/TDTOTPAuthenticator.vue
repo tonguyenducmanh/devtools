@@ -1,6 +1,8 @@
 <template>
   <div class="container">
-    <div class="title">Time-based one-time password authenticator tool!</div>
+    <div class="title">
+      Time-based (TOTP) and HMAC-based (HOTP) One-Time Password!
+    </div>
     <div class="flex">
       <TDInput
         v-model="migrationURL"
@@ -54,10 +56,21 @@ export default {
     async decodeGoogleAuth() {
       let me = this;
       let result = await me.decodeExportUri(me.migrationURL);
-      me.decodedData = result;
-      me.decodedDataString = JSON.stringify(result, null, 2);
+      if (result) {
+        me.decodedData = result;
+        me.decodedDataString = JSON.stringify(result, null, 2);
+        me.generateTOTP();
+      }
     },
-
+    /**
+     * Generate TOTP code from the decoded data.
+     */
+    generateTOTP() {
+      let me = this;
+      if (me.decodedData && me.decodedData.length > 0) {
+        debugger;
+      }
+    },
     /**
      * Google Authenticator uses protobuff to encode the 2fa data.
      *
@@ -136,7 +149,7 @@ export default {
 };
 </script>
 <style scoped>
-.td-decoded-data{
+.td-decoded-data {
   padding: var(--padding);
 }
 </style>
