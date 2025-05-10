@@ -14,4 +14,8 @@
   window.__env.githubSource = {
     url: "https://github.com/tonguyenducmanh/utility-for-dev",
   };
+
+  window.__env.totpAuthenticator = {
+    showDecodedInfo: false,
+  };
 })(this);

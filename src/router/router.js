@@ -22,6 +22,15 @@ const routerConfig = [
   },
   {
     /**
+     * Time-based one-time password authenticator
+     */
+    path: "/totpauthenticator",
+    name: "totpauthenticator",
+    component: () => import("@/views/tools/TDTOTPAuthenticator.vue"),
+    title: "TOTP Authenticator",
+  },
+  {
+    /**
      * convert từ JSON sang object và object sang JSON
      */
     path: "/jsonparser",
