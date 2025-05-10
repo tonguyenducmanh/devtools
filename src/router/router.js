@@ -24,10 +24,10 @@ const routerConfig = [
     /**
      * Time-based one-time password authenticator
      */
-    path: "/totpauthenticator",
-    name: "totpauthenticator",
-    component: () => import("@/views/tools/TDTOTPAuthenticator.vue"),
-    title: "TOTP Authenticator",
+    path: "TDOneTimePassword",
+    name: "TDOneTimePassword",
+    component: () => import("@/views/tools/TDOneTimePassword.vue"),
+    title: "One time password",
   },
   {
     /**
