@@ -24,7 +24,7 @@ const routerConfig = [
     /**
      * Time-based one-time password authenticator
      */
-    path: "TDOneTimePassword",
+    path: "/TDOneTimePassword",
     name: "TDOneTimePassword",
     component: () => import("@/views/tools/TDOneTimePassword.vue"),
     title: "One time password",
