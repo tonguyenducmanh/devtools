@@ -14,6 +14,13 @@
         @click="decodeGoogleAuth"
       />
     </div>
+    <div class="flex">
+      <TDInput
+        v-model="password"
+        :placeHolder="'Enter password to open saved Authenticator'"
+      />
+      <TDButton label="Open" :readOnly="!password" @click="openAuthenSaved" />
+    </div>
     <div class="flex td-decoded-data">
       <TDTextarea
         v-if="isShowDecoded"
@@ -32,7 +39,7 @@ import protobuf from "protobufjs";
 import base32 from "base32";
 import { Buffer } from "buffer";
 export default {
-  name: "TDTOTPAuthenticator",
+  name: "TDOneTimePassword",
   created() {
     let me = this;
   },
@@ -70,6 +77,10 @@ export default {
       if (me.decodedData && me.decodedData.length > 0) {
         debugger;
       }
+    },
+    openAuthenSaved() {
+      let me = this;
+      debugger;
     },
     /**
      * Google Authenticator uses protobuff to encode the 2fa data.
@@ -144,6 +155,7 @@ export default {
       migrationURL: null,
       decodedData: null,
       decodedDataString: null,
+      password: null,
     };
   },
 };
