@@ -244,7 +244,7 @@ export default {
 }
 .otp-container {
   display: grid;
-  gap: 1rem;
+  gap: calc(var(--padding) / 2);
   justify-content: center;
   align-items: stretch;
 }
@@ -253,7 +253,7 @@ export default {
 @media screen and (max-width: 900px) {
   .otp-container {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: calc(var(--padding) / 2);;
   }
 }
 
