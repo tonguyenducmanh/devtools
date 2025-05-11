@@ -78,7 +78,7 @@ export default {
     let me = this;
     // Clean up interval when the component is destroyed
     if (me.intervalId) {
-      clearInterval(me.intervalId);
+      clearTimeout(me.timeoutId); // Clear timeout thay vì interval
     }
   },
   methods: {
@@ -95,9 +95,7 @@ export default {
     generateNow() {
       let me = this;
       me.generateTOTP();
-      me.intervalId = setInterval(() => {
-        me.generateTOTP();
-      }, 10000); // 30,000 ms (30 seconds)
+      me.scheduleNextUpdate(); // Bắt đầu chu kỳ cập nhật
     },
     buildData() {
       let me = this;
@@ -110,6 +108,17 @@ export default {
           }
         });
       }
+    },
+    scheduleNextUpdate() {
+      let me = this;
+      // Lấy số giây còn lại cho đến khi hết chu kỳ 30 giây hiện tại
+      const secondsRemaining = 30 - (Math.floor(Date.now() / 1000) % 30);
+
+      // Lên lịch cập nhật mã OTP sau khoảng thời gian còn lại
+      me.timeoutId = setTimeout(() => {
+        me.generateTOTP();
+        me.scheduleNextUpdate(); // Lên lịch cho lần cập nhật tiếp theo
+      }, secondsRemaining * 1000);
     },
     /**
      * Generate TOTP code from the decoded data.
@@ -172,6 +181,7 @@ export default {
           me.decodedData = result;
           me.decodedDataString = JSON.stringify(result, null, 2);
           me.buildData();
+          me.generateNow();
         }
       }
     },
