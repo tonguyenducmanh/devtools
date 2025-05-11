@@ -15,7 +15,7 @@
     url: "https://github.com/tonguyenducmanh/utility-for-dev",
   };
 
-  window.__env.totpAuthenticator = {
+  window.__env.oneTimePasswordAuthen = {
     showDecodedInfo: false,
   };
 })(this);

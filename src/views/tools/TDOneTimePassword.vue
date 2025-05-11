@@ -42,8 +42,8 @@ export default {
       let result = false;
       if (
         me.decodedData &&
-        window.__env.totpAuthenticator &&
-        window.__env.totpAuthenticator.showDecodedInfo
+        window.__env.oneTimePasswordAuthen &&
+        window.__env.oneTimePasswordAuthen.showDecodedInfo
       ) {
         result = true;
       }
