@@ -36,7 +36,7 @@
 </template>
 <script>
 import protobuf from "protobufjs";
-import base32 from "base32";
+import base32 from "hi-base32";
 import { Buffer } from "buffer";
 export default {
   name: "TDOneTimePassword",
@@ -96,7 +96,6 @@ export default {
       let MigrationPayload = root.MigrationPayload;
 
       let message = MigrationPayload.decode(payload);
-
       return MigrationPayload.toObject(message, {
         longs: String,
         enums: String,
