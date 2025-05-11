@@ -130,7 +130,7 @@ export default {
 
       let payload = await me.decodeProtobuf(buffer);
       let accounts = payload.otpParameters.map((account) => {
-        account.totpSecret = me.toBase32(account.secret);
+        account.secret = me.toBase32(account.secret);
         return account;
       });
 
