@@ -3,7 +3,7 @@
     <div class="title">
       Time-based (TOTP) and HMAC-based (HOTP) One-Time Password!
     </div>
-    <div>Note: HOTP not tested</div>
+    <div class="note">Note: HOTP not tested</div>
     <div class="flex">
       <TDInput
         v-model="migrationURL"
@@ -235,15 +235,19 @@ export default {
   height: 100%;
   padding: var(--padding);
 }
+.note {
+  color: var(--warning-color);
+  margin: var(--padding);
+}
 .td-decoded-data {
   padding: var(--padding);
 }
 .otp-container {
-  margin: var(--padding);
   display: grid;
   gap: 1rem;
   justify-content: center;
   align-items: start;
+  align-items: stretch;
 }
 
 /* Grid responsive cho các mã QR */
@@ -285,7 +289,7 @@ export default {
     font-size: 30px;
     color: var(--focus-color);
   }
-  .otp-type{
+  .otp-type {
     font-size: 12px;
     color: var(--focus-color);
   }
