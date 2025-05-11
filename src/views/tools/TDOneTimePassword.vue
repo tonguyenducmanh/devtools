@@ -16,6 +16,12 @@
       />
     </div>
     <div class="flex">
+      <TDInput v-model="addNewObject.issuer" :placeHolder="'Issuer'" />
+      <TDInput v-model="addNewObject.name" :placeHolder="'Name'" />
+      <TDInput v-model="addNewObject.secret" :placeHolder="'Secret'" />
+      <TDButton label="Add" @click="addNewTOTP" />
+    </div>
+    <div class="flex">
       <TDInput
         v-model="password"
         :placeHolder="'Enter password to open saved Authenticator'"
@@ -53,6 +59,7 @@ import protobuf from "protobufjs";
 import base32 from "hi-base32";
 import { Buffer } from "buffer";
 import * as OTPAuth from "otpauth";
+import { toRaw } from "vue";
 
 export default {
   name: "TDOneTimePassword",
@@ -123,25 +130,33 @@ export default {
     /**
      * Generate TOTP code from the decoded data.
      */
-    generateTOTP() {
+    generateTOTP(secretKey) {
       let me = this;
       if (me.decodedData && me.decodedData.length > 0) {
-        me.decodedData.forEach((item) => {
-          // chỉ tự động interval cho TOTP thôi
-          if (item.type.compareNotSentive("TOTP")) {
-            let totp = new OTPAuth.TOTP({
-              issuer: item.issuer,
-              label: item.name,
-              secret: item.secret,
-              algorithm: item.algorithm,
-              digits: item.digits.compareNotSentive("six") ? 6 : 8,
-              digits: 6,
-              // Interval of time for which a token is valid, in seconds.
-              period: 30,
-            });
-            item.otp = totp.generate();
-          }
-        });
+        let dataCaculate = me.decodedData;
+        if (secretKey) {
+          dataCaculate = me.decodedData.filter((item) => {
+            return item.secret === secretKey;
+          });
+        }
+        if (dataCaculate && dataCaculate.length > 0) {
+          dataCaculate.forEach((item) => {
+            // chỉ tự động interval cho TOTP thôi
+            if (item.type.compareNotSentive("TOTP")) {
+              let totp = new OTPAuth.TOTP({
+                issuer: item.issuer,
+                label: item.name,
+                secret: item.secret,
+                algorithm: item.algorithm,
+                digits: item.digits.compareNotSentive("six") ? 6 : 8,
+                digits: 6,
+                // Interval of time for which a token is valid, in seconds.
+                period: 30,
+              });
+              item.otp = totp.generate();
+            }
+          });
+        }
       }
     },
 
@@ -251,6 +266,30 @@ export default {
 
       return await me.decode(data);
     },
+    addNewTOTP() {
+      let me = this;
+      if (me.addNewObject) {
+        let clonedObject = me.$tdUtility.cloneDeep(toRaw(me.addNewObject));
+        if (clonedObject) {
+          me.decodedData.push(clonedObject);
+          me.buildData();
+          me.addNewObject = {
+            issuer: null,
+            name: null,
+            secret: null,
+            algorithm: "SHA1",
+            digits: "six",
+            counter: 0,
+            type: "TOTP",
+          };
+          // lưu lại authen sau khi thêm mới
+          if (me.password) {
+            me.saveAuthen();
+          }
+          me.generateTOTP(clonedObject.secret);
+        }
+      }
+    },
   },
   data() {
     return {
@@ -259,6 +298,15 @@ export default {
       decodedDataString: null,
       password: null,
       intervalId: null,
+      addNewObject: {
+        issuer: null,
+        name: null,
+        secret: null,
+        algorithm: "SHA1",
+        digits: "six",
+        counter: 0,
+        type: "TOTP",
+      },
     };
   },
 };
