@@ -3,6 +3,7 @@
     <div class="title">
       Time-based (TOTP) and HMAC-based (HOTP) One-Time Password!
     </div>
+    <div>Note: HOTP not tested</div>
     <div class="flex">
       <TDInput
         v-model="migrationURL"
@@ -32,12 +33,27 @@
         height="400px"
       ></TDTextarea>
     </div>
+    <div class="">
+      <template v-for="(item, index) in decodedData">
+        <div class="otp-item">
+          <div class="otp-name">{{ item.displayName }}</div>
+          <div class="otp-value">{{ item.otp }}</div>
+          <TDButton
+            v-if="item.type.compareNotSentive('HOTP')"
+            label="Generate"
+            @click="generateHOTP(item)"
+          />
+        </div>
+      </template>
+    </div>
   </div>
 </template>
 <script>
 import protobuf from "protobufjs";
 import base32 from "hi-base32";
 import { Buffer } from "buffer";
+import * as OTPAuth from "otpauth";
+
 export default {
   name: "TDOneTimePassword",
   created() {
@@ -58,15 +74,36 @@ export default {
     },
   },
   mounted() {},
-  beforeUnmount() {},
+  beforeUnmount() {
+    let me = this;
+    // Clean up interval when the component is destroyed
+    if (me.intervalId) {
+      clearInterval(me.intervalId);
+    }
+  },
   methods: {
     async decodeGoogleAuth() {
       let me = this;
       let result = await me.decodeExportUri(me.migrationURL);
       if (result) {
         me.decodedData = result;
+        me.buildData();
         me.decodedDataString = JSON.stringify(result, null, 2);
-        me.generateTOTP();
+        me.intervalId = setInterval(() => {
+          me.generateTOTP();
+        }, 10000); // 30,000 ms (30 seconds)
+      }
+    },
+    buildData() {
+      let me = this;
+      if (me.decodedData && me.decodedData.length > 0) {
+        me.decodedData.forEach((item) => {
+          if (item.issuer) {
+            item.displayName = item.issuer + " - " + item.name;
+          } else {
+            item.displayName = item.name;
+          }
+        });
       }
     },
     /**
@@ -75,9 +112,40 @@ export default {
     generateTOTP() {
       let me = this;
       if (me.decodedData && me.decodedData.length > 0) {
-        debugger;
+        me.decodedData.forEach((item) => {
+          // chỉ tự động interval cho TOTP thôi
+          if (item.type.compareNotSentive("TOTP")) {
+            let totp = new OTPAuth.TOTP({
+              issuer: item.issuer,
+              label: item.name,
+              secret: item.secret,
+              algorithm: item.algorithm,
+              digits: item.digits.compareNotSentive("six") ? 6 : 8,
+              digits: 6,
+              // Interval of time for which a token is valid, in seconds.
+              period: 30,
+            });
+            item.otp = totp.generate();
+          }
+        });
       }
     },
+
+    generateHOTP(item) {
+      let me = this;
+      if (item && item.type.compareNotSentive("HOTP")) {
+        let hotp = new OTPAuth.HOTP({
+          issuer: item.issuer,
+          label: item.name,
+          secret: item.secret,
+          algorithm: item.algorithm,
+          digits: item.digits.compareNotSentive("six") ? 6 : 8,
+          counter: item.counter,
+        });
+        item.otp = hotp.generate();
+      }
+    },
+
     openAuthenSaved() {
       let me = this;
       debugger;
@@ -155,6 +223,7 @@ export default {
       decodedData: null,
       decodedDataString: null,
       password: null,
+      intervalId: null,
     };
   },
 };
@@ -162,5 +231,7 @@ export default {
 <style scoped>
 .td-decoded-data {
   padding: var(--padding);
+}
+.otp-item {
 }
 </style>
