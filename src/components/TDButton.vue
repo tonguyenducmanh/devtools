@@ -57,6 +57,9 @@ export default {
   cursor: pointer;
   font-size: 16px;
   transition: all 0.2s ease;
+  overflow-wrap: normal; /* Allows breaking long words */
+  word-break: keep-all; /* For wider browser support */
+  white-space: nowrap; /* Ensure wrapping is enabled */
 }
 
 .td-button:hover {

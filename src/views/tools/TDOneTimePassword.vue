@@ -3,17 +3,19 @@
     <div class="title">
       Time-based (TOTP) and HMAC-based (HOTP) One-Time Password!
     </div>
-    <div class="note">Note: HOTP not tested</div>
+    <div class="note">Note: chưa hỗ trợ HOTP</div>
     <div class="flex">
       <TDInput
         v-model="migrationURL"
         :placeHolder="'Google authenticator migration URL exampe: otpauth-migration://offline?data=CjcKFFkwYrPBscVsQXM'"
       />
-      <TDButton
-        label="Import"
-        :readOnly="!migrationURL"
-        @click="decodeGoogleAuth"
-      />
+      <div>
+        <TDButton
+          label="Nhập khẩu"
+          :readOnly="!migrationURL"
+          @click="decodeGoogleAuth"
+        />
+      </div>
     </div>
     <div class="flex">
       <TDInput v-model="addNewObject.issuer" :placeHolder="'Issuer'" />
@@ -21,17 +23,24 @@
       <TDInput v-model="addNewObject.secret" :placeHolder="'Secret'" />
       <TDButton
         :readOnly="!addNewObject || !addNewObject.name || !addNewObject.secret"
-        label="Add"
+        label="Thêm"
         @click="addNewTOTP"
       />
     </div>
     <div class="flex">
       <TDInput
         v-model="password"
-        :placeHolder="'Enter password to open saved Authenticator'"
+        :placeHolder="'Nhập mật khẩu đã lưu để mở danh sách authen'"
       />
-      <TDButton label="Save" :readOnly="!password" @click="saveAuthen" />
-      <TDButton label="Open" :readOnly="!password" @click="openAuthenSaved" />
+      <TDButton label="Lưu" :readOnly="!password" @click="saveAuthen" />
+      <TDButton label="Mở" :readOnly="!password" @click="openAuthenSaved" />
+    </div>
+    <div class="flex">
+      <TDInput
+        v-model="filterRemove"
+        :placeHolder="'Nhập chính xác tên authen để xóa'"
+      />
+      <TDButton label="Xóa" :readOnly="!filterRemove" @click="removeByFilter" />
     </div>
     <div class="flex td-decoded-data">
       <TDTextarea
@@ -306,6 +315,18 @@ export default {
         }
       }
     },
+    removeByFilter() {
+      let me = this;
+      if (me.filterRemove) {
+        me.decodedData = me.decodedData.filter((item) => {
+          return item.displayName != me.filterRemove;
+        });
+        // lưu lại authen sau khi thêm mới
+        if (me.password && me.autoSave) {
+          me.saveAuthen();
+        }
+      }
+    },
   },
   data() {
     return {
@@ -314,6 +335,7 @@ export default {
       decodedDataString: null,
       password: null,
       intervalId: null,
+      filterRemove: null,
       addNewObject: {
         issuer: null,
         name: null,
@@ -375,6 +397,7 @@ export default {
   }
 }
 .otp-item {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
