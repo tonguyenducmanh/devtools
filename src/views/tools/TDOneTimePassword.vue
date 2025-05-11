@@ -19,7 +19,11 @@
       <TDInput v-model="addNewObject.issuer" :placeHolder="'Issuer'" />
       <TDInput v-model="addNewObject.name" :placeHolder="'Name'" />
       <TDInput v-model="addNewObject.secret" :placeHolder="'Secret'" />
-      <TDButton label="Add" @click="addNewTOTP" />
+      <TDButton
+        :readOnly="!addNewObject || !addNewObject.name || !addNewObject.secret"
+        label="Add"
+        @click="addNewTOTP"
+      />
     </div>
     <div class="flex">
       <TDInput
