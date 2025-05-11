@@ -32,8 +32,8 @@
         v-model="password"
         :placeHolder="'Nhập mật khẩu đã lưu để mở danh sách authen'"
       />
-      <TDButton label="Lưu" :readOnly="!password" @click="saveAuthen" />
       <TDButton label="Mở" :readOnly="!password" @click="openAuthenSaved" />
+      <TDButton label="Lưu" :readOnly="!password" @click="saveAuthen" />
     </div>
     <div class="flex">
       <TDInput
@@ -52,6 +52,9 @@
         :readOnly="true"
         height="400px"
       ></TDTextarea>
+    </div>
+    <div v-if="decodedData" class="otp-progress-wrapper">
+      <progress :value="progress" max="100"></progress>
     </div>
     <div class="otp-container">
       <template v-for="(item, index) in decodedData">
@@ -109,8 +112,11 @@ export default {
   beforeUnmount() {
     let me = this;
     // Clean up interval when the component is destroyed
-    if (me.intervalId) {
+    if (me.timeoutId) {
       clearTimeout(me.timeoutId); // Clear timeout thay vì interval
+    }
+    if (me.progressIntervalId) {
+      clearInterval(me.progressIntervalId);
     }
   },
   methods: {
@@ -128,6 +134,7 @@ export default {
       let me = this;
       me.generateTOTP();
       me.scheduleNextUpdate(); // Bắt đầu chu kỳ cập nhật
+      me.startProgressTimer(); // Bắt đầu đồng hồ đếm ngược
     },
     buildData() {
       let me = this;
@@ -327,6 +334,17 @@ export default {
         }
       }
     },
+    startProgressTimer() {
+      let me = this;
+      if (me.progressIntervalId) {
+        clearInterval(me.progressIntervalId);
+      }
+
+      me.progressIntervalId = setInterval(() => {
+        const seconds = Math.floor(Date.now() / 1000) % 30;
+        me.progress = Math.floor((seconds / 30) * 100);
+      }, 1000);
+    },
   },
   data() {
     return {
@@ -334,8 +352,9 @@ export default {
       decodedData: null,
       decodedDataString: null,
       password: null,
-      intervalId: null,
+      timeoutId: null,
       filterRemove: null,
+      progress: 0,
       addNewObject: {
         issuer: null,
         name: null,
@@ -422,6 +441,24 @@ export default {
     font-size: 30px;
     color: var(--focus-color);
     cursor: pointer;
+  }
+}
+.otp-progress-wrapper {
+  width: 100%;
+  padding: 0 var(--padding);
+  progress {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    appearance: none;
+    &::-webkit-progress-bar {
+      background-color: #eee;
+      border-radius: 4px;
+    }
+    &::-webkit-progress-value {
+      background-color: var(--focus-color);
+      border-radius: 4px;
+    }
   }
 }
 </style>
