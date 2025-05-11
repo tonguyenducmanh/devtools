@@ -20,6 +20,7 @@
         v-model="password"
         :placeHolder="'Enter password to open saved Authenticator'"
       />
+      <TDButton label="Save" :readOnly="!password" @click="saveAuthen" />
       <TDButton label="Open" :readOnly="!password" @click="openAuthenSaved" />
     </div>
     <div class="flex td-decoded-data">
@@ -36,7 +37,7 @@
     <div class="otp-container">
       <template v-for="(item, index) in decodedData">
         <div class="otp-item">
-          <div>
+          <div class="otp-left">
             <div class="otp-name">{{ item.displayName }}</div>
             <div class="otp-type">{{ item.type }}</div>
           </div>
@@ -88,10 +89,15 @@ export default {
         me.decodedData = result;
         me.buildData();
         me.decodedDataString = JSON.stringify(result, null, 2);
-        me.intervalId = setInterval(() => {
-          me.generateTOTP();
-        }, 10000); // 30,000 ms (30 seconds)
+        me.generateNow();
       }
+    },
+    generateNow() {
+      let me = this;
+      me.generateTOTP();
+      me.intervalId = setInterval(() => {
+        me.generateTOTP();
+      }, 10000); // 30,000 ms (30 seconds)
     },
     buildData() {
       let me = this;
@@ -145,6 +151,10 @@ export default {
       }
     },
 
+    saveAuthen() {
+      let me = this;
+      debugger;
+    },
     openAuthenSaved() {
       let me = this;
       debugger;
@@ -253,7 +263,7 @@ export default {
 @media screen and (max-width: 900px) {
   .otp-container {
     grid-template-columns: 1fr;
-    gap: calc(var(--padding) / 2);;
+    gap: calc(var(--padding) / 2);
   }
 }
 
@@ -277,19 +287,23 @@ export default {
 .otp-item {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  min-height: 60px;
   padding: var(--padding);
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
   margin: var(--padding);
-  .otp-name {
-    font-weight: bold;
+  .otp-left {
+    .otp-name {
+      font-weight: bold;
+    }
+    .otp-type {
+      font-size: 12px;
+      color: var(--focus-color);
+    }
   }
   .otp-value {
     font-size: 30px;
-    color: var(--focus-color);
-  }
-  .otp-type {
-    font-size: 12px;
     color: var(--focus-color);
   }
 }
