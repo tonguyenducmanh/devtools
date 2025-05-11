@@ -321,6 +321,7 @@ export default {
   .otp-value {
     font-size: 30px;
     color: var(--focus-color);
+    cursor: pointer;
   }
 }
 </style>
