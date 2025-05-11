@@ -10,7 +10,7 @@
         :placeHolder="'Google authenticator migration URL exampe: otpauth-migration://offline?data=CjcKFFkwYrPBscVsQXM'"
       />
       <TDButton
-        label="Decode"
+        label="Import"
         :readOnly="!migrationURL"
         @click="decodeGoogleAuth"
       />
