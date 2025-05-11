@@ -246,7 +246,6 @@ export default {
   display: grid;
   gap: 1rem;
   justify-content: center;
-  align-items: start;
   align-items: stretch;
 }
 
