@@ -153,11 +153,27 @@ export default {
 
     saveAuthen() {
       let me = this;
-      debugger;
+      if (me.password) {
+        me.$tdCache.setWithPassword(
+          me.$tdEnum.cacheConfig.authen,
+          me.decodedData,
+          me.password
+        );
+      }
     },
     openAuthenSaved() {
       let me = this;
-      debugger;
+      if (me.password) {
+        let result = me.$tdCache.getWithPassword(
+          me.$tdEnum.cacheConfig.authen,
+          me.password
+        );
+        if (result) {
+          me.decodedData = result;
+          me.decodedDataString = JSON.stringify(result, null, 2);
+          me.buildData();
+        }
+      }
     },
     /**
      * Google Authenticator uses protobuff to encode the 2fa data.
