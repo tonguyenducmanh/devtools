@@ -33,17 +33,15 @@
         height="400px"
       ></TDTextarea>
     </div>
-    <div class="">
+    <div class="otp-container">
       <template v-for="(item, index) in decodedData">
         <div class="otp-item">
-          <div class="otp-name">{{ item.displayName }}</div>
-          <div class="otp-value">{{ item.otp }}</div>
-          <div class="otp-type">{{ item.type }}</div>
-          <TDButton
-            v-if="item.type.compareNotSentive('HOTP')"
-            label="Generate"
-            @click="generateHOTP(item)"
-          />
+          <div>
+            <div class="otp-name">{{ item.displayName }}</div>
+            <div class="otp-type">{{ item.type }}</div>
+          </div>
+          <div v-if="item.type.compareNotSentive('HOTP')">NotSupported</div>
+          <div v-else class="otp-value">{{ item.otp }}</div>
         </div>
       </template>
     </div>
@@ -229,10 +227,67 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style lang="scss" scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: var(--padding);
+}
 .td-decoded-data {
   padding: var(--padding);
 }
+.otp-container {
+  margin: var(--padding);
+  display: grid;
+  gap: 1rem;
+  justify-content: center;
+  align-items: start;
+}
+
+/* Grid responsive cho các mã QR */
+@media screen and (max-width: 900px) {
+  .otp-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media screen and (min-width: 901px) and (max-width: 1400px) {
+  .otp-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (min-width: 1401px) and (max-width: 2100px) {
+  .otp-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media screen and (min-width: 2101px) {
+  .otp-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
 .otp-item {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--padding);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  margin: var(--padding);
+  .otp-name {
+    font-weight: bold;
+  }
+  .otp-value {
+    font-size: 30px;
+    color: var(--focus-color);
+  }
+  .otp-type{
+    font-size: 12px;
+    color: var(--focus-color);
+  }
 }
 </style>
