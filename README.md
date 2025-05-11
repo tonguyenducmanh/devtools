@@ -20,9 +20,7 @@ Danh sách các tính năng đã support
 
 Demo 1 số tính năng
 
-![demo 2](img/demo-2.png)
-
-![demo 1](img/demo.png)
+![alt text](img/demo_otp.png)
 
 Config của toàn bộ ứng dụng có thể truy cập thông qua việc enter lệnh sau ở cửa sổ console
 
