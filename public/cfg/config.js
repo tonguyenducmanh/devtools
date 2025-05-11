@@ -17,5 +17,6 @@
 
   window.__env.oneTimePasswordAuthen = {
     showDecodedInfo: false,
+    autoSave : true,
   };
 })(this);

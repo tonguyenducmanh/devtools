@@ -79,6 +79,18 @@ export default {
       }
       return result;
     },
+    autoSave() {
+      let me = this;
+      let result = false;
+      if (
+        me.decodedData &&
+        window.__env.oneTimePasswordAuthen &&
+        window.__env.oneTimePasswordAuthen.autoSave
+      ) {
+        result = true;
+      }
+      return result;
+    },
   },
   mounted() {},
   beforeUnmount() {
@@ -283,7 +295,7 @@ export default {
             type: "TOTP",
           };
           // lưu lại authen sau khi thêm mới
-          if (me.password) {
+          if (me.password && me.autoSave) {
             me.saveAuthen();
           }
           me.generateTOTP(clonedObject.secret);
