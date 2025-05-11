@@ -8,6 +8,7 @@ class TDEnum {
     theme: "theme",
     qrHistory: "qrHistory",
     isShowSidebar: "isShowSidebar",
+    authen: "authen",
   };
   buttonType = {
     primary: "primary",

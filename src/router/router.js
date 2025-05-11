@@ -22,6 +22,15 @@ const routerConfig = [
   },
   {
     /**
+     * Time-based one-time password authenticator
+     */
+    path: "/TDOneTimePassword",
+    name: "TDOneTimePassword",
+    component: () => import("@/views/tools/TDOneTimePassword.vue"),
+    title: "One time password",
+  },
+  {
+    /**
      * convert từ JSON sang object và object sang JSON
      */
     path: "/jsonparser",

@@ -14,4 +14,9 @@
   window.__env.githubSource = {
     url: "https://github.com/tonguyenducmanh/utility-for-dev",
   };
+
+  window.__env.oneTimePasswordAuthen = {
+    showDecodedInfo: false,
+    autoSave : true,
+  };
 })(this);

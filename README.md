@@ -15,6 +15,7 @@ Danh sách các tính năng đã support
 8. Mapping đệ quy value theo key của 2 object json ( object lồng object cũng map)
 9. Tải extension vscode (legacy)
 10. Tạo UUIDv4 ngẫu nhiên
+11. Tạo OTP (TOTP)
 ```
 
 Demo 1 số tính năng
