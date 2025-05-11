@@ -322,6 +322,9 @@ export default {
   .otp-left {
     .otp-name {
       font-weight: bold;
+      overflow-wrap: normal; /* Allows breaking long words */
+      word-break: keep-all; /* For wider browser support */
+      white-space: nowrap; /* Ensure wrapping is enabled */
     }
     .otp-type {
       font-size: 12px;
