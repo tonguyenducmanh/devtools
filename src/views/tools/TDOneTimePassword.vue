@@ -38,6 +38,7 @@
         <div class="otp-item">
           <div class="otp-name">{{ item.displayName }}</div>
           <div class="otp-value">{{ item.otp }}</div>
+          <div class="otp-type">{{ item.type }}</div>
           <TDButton
             v-if="item.type.compareNotSentive('HOTP')"
             label="Generate"
