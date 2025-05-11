@@ -109,7 +109,7 @@ export default {
   beforeUnmount() {
     let me = this;
     // Clean up interval when the component is destroyed
-    if (me.intervalId) {
+    if (me.timeoutId) {
       clearTimeout(me.timeoutId); // Clear timeout thay vì interval
     }
   },
@@ -334,7 +334,7 @@ export default {
       decodedData: null,
       decodedDataString: null,
       password: null,
-      intervalId: null,
+      timeoutId: null,
       filterRemove: null,
       addNewObject: {
         issuer: null,
