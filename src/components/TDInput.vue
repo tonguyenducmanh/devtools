@@ -12,6 +12,7 @@
       @input="changeInputValue"
       :disabled="readOnly"
       spellcheck="false"
+      :type="isTypePassword ? 'password' : 'text'"
     />
     <slot></slot>
   </div>
@@ -41,6 +42,10 @@ export default {
       default: null,
     },
     isLabelTop: {
+      type: Boolean,
+      default: false,
+    },
+    isTypePassword: {
       type: Boolean,
       default: false,
     },

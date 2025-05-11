@@ -30,6 +30,7 @@
     <div class="flex">
       <TDInput
         v-model="password"
+        :isTypePassword="true"
         :placeHolder="'Nhập mật khẩu đã lưu để mở danh sách authen'"
       />
       <TDButton label="Mở" :readOnly="!password" @click="openAuthenSaved" />
