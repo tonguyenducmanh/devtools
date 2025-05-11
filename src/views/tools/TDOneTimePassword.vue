@@ -76,7 +76,7 @@ import base32 from "hi-base32";
 import { Buffer } from "buffer";
 import * as OTPAuth from "otpauth";
 import { toRaw } from "vue";
-
+import googleAuthen from "@/script/google_auth.js";
 export default {
   name: "TDOneTimePassword",
   created() {
@@ -239,9 +239,7 @@ export default {
      */
     async decodeProtobuf(payload) {
       let me = this;
-      // bắt buộc phải đặt ở thư mục public thì mới load được
-      let response = await fetch("/proto/google_auth.proto"); // Path relative to the public directory
-      let protoText = await response.text();
+      let protoText = googleAuthen.googleProto;
       let root = protobuf.parse(protoText).root;
       let MigrationPayload = root.MigrationPayload;
 
