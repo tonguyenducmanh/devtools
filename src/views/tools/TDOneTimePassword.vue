@@ -3,22 +3,28 @@
     <div class="title">
       Time-based (TOTP) and HMAC-based (HOTP) One-Time Password!
     </div>
-    <div class="note">Note: chưa hỗ trợ HOTP</div>
+    <div>
+      <TDRadioGroup
+        v-model="sourceOTPImport"
+        label="Nguồn dữ liệu"
+        :options="radioImports"
+      />
+    </div>
     <div class="main-otp-container">
-      <div class="flex">
+      <div v-if="sourceOTPImport == 'google'" class="flex">
         <TDInput
           v-model="migrationURL"
           :placeHolder="'Google authenticator migration URL exampe: otpauth-migration://offline?data=CjcKFFkwYrPBscVsQXM'"
         />
         <div>
           <TDButton
-            label="Nhập khẩu"
+            label="Thêm"
             :readOnly="!migrationURL"
             @click="decodeGoogleAuth"
           />
         </div>
       </div>
-      <div class="flex">
+      <div v-if="sourceOTPImport == 'manual'" class="flex">
         <TDInput v-model="addNewObject.issuer" :placeHolder="'Issuer'" />
         <TDInput v-model="addNewObject.name" :placeHolder="'Name'" />
         <TDInput v-model="addNewObject.secret" :placeHolder="'Secret'" />
@@ -398,6 +404,11 @@ export default {
         type: "TOTP",
       },
       removeAllKey: "Remove All OTP",
+      sourceOTPImport: "google",
+      radioImports: [
+        { value: "google", label: "Google authen" },
+        { value: "manual", label: "Tự nhập" },
+      ],
     };
   },
 };

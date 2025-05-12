@@ -18,6 +18,7 @@ class TDEnum {
     horizontal: "horizontal",
     vertical: "vertical",
   };
+  
 }
 
 export default new TDEnum();
