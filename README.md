@@ -1,33 +1,35 @@
-## Project chứa các tool tiện ích cho dev, được tổng hợp nhằm mục đích tránh phải deploy mỗi tool lên 1 site khác nhau
+## Project: Developer Utility Tools - Aggregated to Avoid Deploying Each Tool on a Separate Site
 
-Có 2 phiên bản được support: phiên bản web (vue + vite) và phiên bản app (electron + vue + vite)
+This project provides a collection of useful tools for developers, aggregated with the aim of avoiding the need to deploy each tool on a separate website.
 
-Danh sách các tính năng đã support
+Two versions are supported: web version (Vue + Vite) and app version (Electron + Vue + Vite).
+
+List of Supported Features:
 
 ```
-1. So sánh code ( giống github pull request)
-2. JSON parse đệ quy
-3. Base64 sang image
-4. Image sang base64
-5. Sinh script postgresql insert vào db từ json data
-6. Văn bản sang nhiều mã QR
-7. Nhiều mã QR sang 1 đoạn văn bản duy nhất
-8. Mapping đệ quy value theo key của 2 object json ( object lồng object cũng map)
-9. Tải extension vscode (legacy)
-10. Tạo UUIDv4 ngẫu nhiên
-11. Tạo OTP (TOTP)
+Code comparison (similar to GitHub pull request)
+Recursive JSON parse
+Base64 to image
+Image to Base64
+Generate PostgreSQL insert scripts into the database from JSON data
+Text to multiple QR codes
+Multiple QR codes to a single text
+Recursive value mapping by key of two JSON objects (nested objects are also mapped)
+Download VSCode extension (legacy)
+Generate random UUIDv4
+Generate OTP (TOTP)
 ```
 
-Demo 1 số tính năng
+Feature Demos:
 
 ![alt text](img/demo_otp.png)
 
-Config của toàn bộ ứng dụng có thể truy cập thông qua việc enter lệnh sau ở cửa sổ console
+Application-wide configuration can be accessed by entering the following command in the console:
 
 ```
 window.__env
 ```
 
-Các object global được inject trong file renderer.js, vd $tdCache = import TDCache.js, $tdEnum = import TDEnum.js
+Global objects are injected in the `renderer.js` file, for example: `$tdCache = import TDCache.js`, `$tdEnum = import TDEnum.js`.
 
-file [mock.js](src/mock/mock.js) sẽ được dùng để fake data cho từng tool
+The `[mock.js](src/mock/mock.js)` file will be used to fake data for each tool.
