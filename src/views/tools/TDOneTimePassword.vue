@@ -537,6 +537,9 @@ export default {
       color: var(--focus-color);
       cursor: pointer;
     }
+    .otp-value:active{
+      font-size: 32px;
+    }
   }
   .otp-progress-wrapper {
     width: 100%;
