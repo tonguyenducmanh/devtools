@@ -24,22 +24,38 @@ function openIndexedDB() {
 
 async function indexedDBSetItem(key, value) {
   const db = await openIndexedDB();
-  const tx = db.transaction(STORE_NAME, "readwrite");
-  tx.objectStore(STORE_NAME).put(value, key);
-  return tx.complete;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.put(value, key);
+
+    request.onsuccess = () => resolve(true);
+    request.onerror = () => reject(request.error);
+  });
 }
 
 async function indexedDBGetItem(key) {
   const db = await openIndexedDB();
-  const tx = db.transaction(STORE_NAME, "readonly");
-  return tx.objectStore(STORE_NAME).get(key);
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readonly");
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.get(key);
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
 }
 
 async function indexedDBRemoveItem(key) {
   const db = await openIndexedDB();
-  const tx = db.transaction(STORE_NAME, "readwrite");
-  tx.objectStore(STORE_NAME).delete(key);
-  return tx.complete;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.delete(key);
+
+    request.onsuccess = () => resolve(true);
+    request.onerror = () => reject(request.error);
+  });
 }
 
 class TDCache {
