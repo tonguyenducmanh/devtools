@@ -37,13 +37,22 @@
         />
       </div>
       <div class="flex">
+        <TDInput v-model="username" :placeHolder="'Nhập tên người dùng'" />
         <TDInput
           v-model="password"
           :isTypePassword="true"
-          :placeHolder="'Nhập mật khẩu đã lưu để mở danh sách authen'"
+          :placeHolder="'Nhập mật khẩu để lưu/mở danh sách authen'"
         />
-        <TDButton label="Mở" :readOnly="!password" @click="openAuthenSaved" />
-        <TDButton label="Lưu" :readOnly="!password" @click="saveAuthen" />
+        <TDButton
+          label="Mở"
+          :readOnly="!password || !username"
+          @click="openAuthenSaved"
+        />
+        <TDButton
+          label="Lưu"
+          :readOnly="!password || !username"
+          @click="saveAuthen"
+        />
       </div>
       <div class="flex td-decoded-data">
         <TDTextarea
@@ -78,13 +87,14 @@
     </div>
   </div>
 </template>
+
 <script>
 import protobuf from "protobufjs";
 import base32 from "hi-base32";
 import { Buffer } from "buffer";
 import * as OTPAuth from "otpauth";
 import { toRaw } from "vue";
-import googleAuthen from "@/script/google_auth.js";
+import googleAuthen from "@/script/googleAuth.js";
 export default {
   name: "TDOneTimePassword",
   created() {
@@ -242,21 +252,17 @@ export default {
 
     saveAuthen() {
       let me = this;
-      if (me.password) {
-        me.$tdCache.setWithPassword(
-          me.$tdEnum.cacheConfig.authen,
-          me.decodedData,
-          me.password
-        );
+      if (me.password && me.username) {
+        const cacheKey = `authen_${me.username}`;
+        me.$tdCache.setWithPassword(cacheKey, me.decodedData, me.password);
+      } else {
       }
     },
     openAuthenSaved() {
       let me = this;
-      if (me.password) {
-        let result = me.$tdCache.getWithPassword(
-          me.$tdEnum.cacheConfig.authen,
-          me.password
-        );
+      if (me.password && me.username) {
+        const cacheKey = `authen_${me.username}`;
+        let result = me.$tdCache.getWithPassword(cacheKey, me.password);
         if (result) {
           me.decodedData = result;
           me.decodedDataString = JSON.stringify(result, null, 2);
@@ -300,7 +306,7 @@ export default {
     },
     /**
      * The data in the URI from Google Authenticator
-     *  is a protobuff payload which is Base64 encoded and then URI encoded.
+     * is a protobuff payload which is Base64 encoded and then URI encoded.
      * This function decodes those, and then decodes the protobuf data contained inside.
      *
      * @param {String} data the `data` query parameter from the totp migration string that google authenticator outputs.
@@ -346,7 +352,7 @@ export default {
             type: "TOTP",
           };
           // lưu lại authen sau khi thêm mới
-          if (me.password && me.autoSave) {
+          if (me.password && me.username && me.autoSave) {
             me.saveAuthen();
           }
           me.generateTOTP(clonedObject.secret);
@@ -367,8 +373,8 @@ export default {
             return item.displayName != me.filterRemove;
           });
         }
-        // lưu lại authen sau khi thêm mới
-        if (me.password && me.autoSave) {
+        // lưu lại authen sau khi xóa
+        if (me.password && me.username && me.autoSave) {
           me.saveAuthen();
         }
       }
@@ -391,6 +397,7 @@ export default {
       decodedData: null,
       decodedDataString: null,
       password: null,
+      username: null, // Thêm trường username
       timeoutId: null,
       filterRemove: null,
       progress: 0,
@@ -403,7 +410,7 @@ export default {
         counter: 0,
         type: "TOTP",
       },
-      removeAllKey: "Remove All OTP",
+      removeAllKey: "removeall",
       sourceOTPImport: "google",
       radioImports: [
         { value: "google", label: "Google authen" },
@@ -413,6 +420,7 @@ export default {
   },
 };
 </script>
+
 <style lang="scss" scoped>
 .container {
   display: flex;
