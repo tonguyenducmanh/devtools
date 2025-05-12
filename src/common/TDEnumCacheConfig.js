@@ -3,4 +3,5 @@ export const EnumCacheConfig = {
   QRHistory: 1,
   IsShowSidebar: 2,
   OneTimeAuthen: 3,
+  LastOneTimeAuthenUserName: 4,
 };

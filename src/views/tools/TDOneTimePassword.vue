@@ -99,6 +99,12 @@ export default {
   name: "TDOneTimePassword",
   created() {
     let me = this;
+    let lastUserName = me.$tdCache.get(
+      me.$tdEnum.cacheConfig.LastOneTimeAuthenUserName
+    );
+    if (lastUserName) {
+      me.username = lastUserName;
+    }
   },
   computed: {
     isShowDecoded() {
@@ -149,8 +155,18 @@ export default {
     if (me.progressIntervalId) {
       clearInterval(me.progressIntervalId);
     }
+    me.saveUsername();
   },
   methods: {
+    saveUsername() {
+      let me = this;
+      if (me.username) {
+        me.$tdCache.set(
+          me.$tdEnum.cacheConfig.LastOneTimeAuthenUserName,
+          me.username
+        );
+      }
+    },
     async decodeGoogleAuth() {
       let me = this;
       let result = await me.decodeExportUri(me.migrationURL);
@@ -261,7 +277,7 @@ export default {
             id: me.username,
           }
         );
-      } else {
+        me.saveUsername();
       }
     },
     openAuthenSaved() {

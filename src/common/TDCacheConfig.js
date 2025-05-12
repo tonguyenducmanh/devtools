@@ -34,4 +34,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cài đặt xác thực",
   },
+  LastOneTimeAuthenUserName: {
+    KeyFormat: "LastOneTimeAuthenUserName",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "tên đăng nhập xác thực một lần cuối cùng",
+  },
 };
