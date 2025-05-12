@@ -269,13 +269,13 @@ export default {
     saveAuthen() {
       let me = this;
       if (me.password && me.username) {
-        me.$tdCache.setEncrypted(
+        me.$tdCache.set(
           me.$tdEnum.cacheConfig.OneTimeAuthen,
           me.decodedData,
-          me.password,
           {
             id: me.username,
-          }
+          },
+          me.password
         );
         me.saveUsername();
       }
@@ -283,12 +283,12 @@ export default {
     openAuthenSaved() {
       let me = this;
       if (me.password && me.username) {
-        let result = me.$tdCache.getEncrypted(
+        let result = me.$tdCache.get(
           me.$tdEnum.cacheConfig.OneTimeAuthen,
-          me.password,
           {
             id: me.username,
-          }
+          },
+          me.password
         );
         if (result) {
           me.decodedData = result;
