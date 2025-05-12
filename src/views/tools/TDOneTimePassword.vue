@@ -42,6 +42,7 @@
           v-model="password"
           :isTypePassword="true"
           :placeHolder="'Nhập mật khẩu để lưu/mở danh sách authen'"
+          @keyup.enter="openAuthenSaved"
         />
         <TDButton
           label="Mở"
@@ -537,7 +538,7 @@ export default {
       color: var(--focus-color);
       cursor: pointer;
     }
-    .otp-value:active{
+    .otp-value:active {
       font-size: 32px;
     }
   }
