@@ -74,7 +74,7 @@ class TDCache {
         result = [];
       }
     } catch {
-      result = raw;
+      result = null;
     }
     return result;
   }
