@@ -4,70 +4,71 @@
       Time-based (TOTP) and HMAC-based (HOTP) One-Time Password!
     </div>
     <div class="note">Note: chưa hỗ trợ HOTP</div>
-    <div class="flex">
-      <TDInput
-        v-model="migrationURL"
-        :placeHolder="'Google authenticator migration URL exampe: otpauth-migration://offline?data=CjcKFFkwYrPBscVsQXM'"
-      />
-      <div>
-        <TDButton
-          label="Nhập khẩu"
-          :readOnly="!migrationURL"
-          @click="decodeGoogleAuth"
+    <div class="main-otp-container">
+      <div class="flex">
+        <TDInput
+          v-model="migrationURL"
+          :placeHolder="'Google authenticator migration URL exampe: otpauth-migration://offline?data=CjcKFFkwYrPBscVsQXM'"
         />
+        <div>
+          <TDButton
+            label="Nhập khẩu"
+            :readOnly="!migrationURL"
+            @click="decodeGoogleAuth"
+          />
+        </div>
+      </div>
+      <div class="flex">
+        <TDInput v-model="addNewObject.issuer" :placeHolder="'Issuer'" />
+        <TDInput v-model="addNewObject.name" :placeHolder="'Name'" />
+        <TDInput v-model="addNewObject.secret" :placeHolder="'Secret'" />
+        <TDButton
+          :readOnly="
+            !addNewObject || !addNewObject.name || !addNewObject.secret
+          "
+          label="Thêm"
+          @click="addNewTOTP"
+        />
+      </div>
+      <div class="flex">
+        <TDInput
+          v-model="password"
+          :isTypePassword="true"
+          :placeHolder="'Nhập mật khẩu đã lưu để mở danh sách authen'"
+        />
+        <TDButton label="Mở" :readOnly="!password" @click="openAuthenSaved" />
+        <TDButton label="Lưu" :readOnly="!password" @click="saveAuthen" />
+      </div>
+      <div class="flex td-decoded-data">
+        <TDTextarea
+          v-if="isShowDecoded"
+          placeHolder="Google authenticator decoded data"
+          v-model="decodedDataString"
+          label="Google authenticator decoded data"
+          isLabelTop
+          :readOnly="true"
+          height="400px"
+        ></TDTextarea>
+      </div>
+      <div v-if="isShowProgress" class="otp-progress-wrapper">
+        <progress :value="progress" max="100"></progress>
+      </div>
+      <div class="otp-container">
+        <template v-for="(item, index) in decodedData">
+          <div class="otp-item">
+            <div class="otp-left">
+              <div class="otp-name">{{ item.displayName }}</div>
+              <div class="otp-type">{{ item.type }}</div>
+            </div>
+            <div v-if="item.type.compareNotSentive('HOTP')">NotSupported</div>
+            <div v-else class="otp-value">{{ item.otp }}</div>
+          </div>
+        </template>
       </div>
     </div>
     <div class="flex">
-      <TDInput v-model="addNewObject.issuer" :placeHolder="'Issuer'" />
-      <TDInput v-model="addNewObject.name" :placeHolder="'Name'" />
-      <TDInput v-model="addNewObject.secret" :placeHolder="'Secret'" />
-      <TDButton
-        :readOnly="!addNewObject || !addNewObject.name || !addNewObject.secret"
-        label="Thêm"
-        @click="addNewTOTP"
-      />
-    </div>
-    <div class="flex">
-      <TDInput
-        v-model="password"
-        :isTypePassword="true"
-        :placeHolder="'Nhập mật khẩu đã lưu để mở danh sách authen'"
-      />
-      <TDButton label="Mở" :readOnly="!password" @click="openAuthenSaved" />
-      <TDButton label="Lưu" :readOnly="!password" @click="saveAuthen" />
-    </div>
-    <div class="flex">
-      <TDInput
-        v-model="filterRemove"
-        :placeHolder="'Nhập chính xác tên authen để xóa'"
-      />
+      <TDInput v-model="filterRemove" :placeHolder="placeHolderRemove" />
       <TDButton label="Xóa" :readOnly="!filterRemove" @click="removeByFilter" />
-    </div>
-    <div class="flex td-decoded-data">
-      <TDTextarea
-        v-if="isShowDecoded"
-        placeHolder="Google authenticator decoded data"
-        v-model="decodedDataString"
-        label="Google authenticator decoded data"
-        isLabelTop
-        :readOnly="true"
-        height="400px"
-      ></TDTextarea>
-    </div>
-    <div v-if="decodedData" class="otp-progress-wrapper">
-      <progress :value="progress" max="100"></progress>
-    </div>
-    <div class="otp-container">
-      <template v-for="(item, index) in decodedData">
-        <div class="otp-item">
-          <div class="otp-left">
-            <div class="otp-name">{{ item.displayName }}</div>
-            <div class="otp-type">{{ item.type }}</div>
-          </div>
-          <div v-if="item.type.compareNotSentive('HOTP')">NotSupported</div>
-          <div v-else class="otp-value">{{ item.otp }}</div>
-        </div>
-      </template>
     </div>
   </div>
 </template>
@@ -92,6 +93,19 @@ export default {
         window.__env.oneTimePasswordAuthen &&
         window.__env.oneTimePasswordAuthen.showDecodedInfo
       ) {
+        result = true;
+      }
+      return result;
+    },
+    placeHolderRemove() {
+      let me = this;
+      let result = `Nhập chính xác tên authen để xóa, nhập ${me.removeAllKey} để xóa tất cả`;
+      return result;
+    },
+    isShowProgress() {
+      let me = this;
+      let result = false;
+      if (me.decodedData && me.decodedData.length > 0) {
         result = true;
       }
       return result;
@@ -336,9 +350,17 @@ export default {
     removeByFilter() {
       let me = this;
       if (me.filterRemove) {
-        me.decodedData = me.decodedData.filter((item) => {
-          return item.displayName != me.filterRemove;
-        });
+        // nếu là xóa tất cả
+        // thì xóa tất cả
+        if (me.filterRemove == me.removeAllKey) {
+          me.decodedData = [];
+        } else {
+          // nếu không thì xóa theo tên authen
+          // tìm và xóa authen theo tên
+          me.decodedData = me.decodedData.filter((item) => {
+            return item.displayName != me.filterRemove;
+          });
+        }
         // lưu lại authen sau khi thêm mới
         if (me.password && me.autoSave) {
           me.saveAuthen();
@@ -375,6 +397,7 @@ export default {
         counter: 0,
         type: "TOTP",
       },
+      removeAllKey: "Remove All OTP",
     };
   },
 };
@@ -391,84 +414,89 @@ export default {
   color: var(--warning-color);
   margin: var(--padding);
 }
-.td-decoded-data {
-  padding: var(--padding);
-}
-.otp-container {
-  display: grid;
-  gap: calc(var(--padding) / 2);
-  justify-content: center;
-  align-items: stretch;
-}
-
-/* Grid responsive cho các mã QR */
-@media screen and (max-width: 900px) {
-  .otp-container {
-    grid-template-columns: 1fr;
-    gap: calc(var(--padding) / 2);
-  }
-}
-
-@media screen and (min-width: 901px) and (max-width: 1400px) {
-  .otp-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media screen and (min-width: 1401px) and (max-width: 2100px) {
-  .otp-container {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media screen and (min-width: 2101px) {
-  .otp-container {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-.otp-item {
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-height: 60px;
-  padding: var(--padding);
-  border-radius: var(--border-radius);
-  border: 1px solid var(--border-color);
-  margin: var(--padding);
-  .otp-left {
-    .otp-name {
-      font-weight: bold;
-      overflow-wrap: normal; /* Allows breaking long words */
-      word-break: keep-all; /* For wider browser support */
-      white-space: nowrap; /* Ensure wrapping is enabled */
-    }
-    .otp-type {
-      font-size: 12px;
-      color: var(--focus-color);
-    }
-  }
-  .otp-value {
-    font-size: 30px;
-    color: var(--focus-color);
-    cursor: pointer;
-  }
-}
-.otp-progress-wrapper {
+.main-otp-container {
+  flex: 1;
   width: 100%;
-  padding: 0 var(--padding);
-  progress {
-    width: 100%;
-    height: 8px;
-    border-radius: 4px;
-    appearance: none;
-    &::-webkit-progress-bar {
-      background-color: #eee;
-      border-radius: 4px;
+  overflow: auto;
+  .td-decoded-data {
+    padding: var(--padding);
+  }
+  .otp-container {
+    display: grid;
+    gap: calc(var(--padding) / 2);
+    justify-content: center;
+    align-items: stretch;
+  }
+
+  /* Grid responsive cho các mã QR */
+  @media screen and (max-width: 900px) {
+    .otp-container {
+      grid-template-columns: 1fr;
+      gap: calc(var(--padding) / 2);
     }
-    &::-webkit-progress-value {
-      background-color: var(--focus-color);
+  }
+
+  @media screen and (min-width: 901px) and (max-width: 1400px) {
+    .otp-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (min-width: 1401px) and (max-width: 2100px) {
+    .otp-container {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media screen and (min-width: 2101px) {
+    .otp-container {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  .otp-item {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 60px;
+    padding: var(--padding);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    margin: var(--padding);
+    .otp-left {
+      .otp-name {
+        font-weight: bold;
+        overflow-wrap: normal; /* Allows breaking long words */
+        word-break: keep-all; /* For wider browser support */
+        white-space: nowrap; /* Ensure wrapping is enabled */
+      }
+      .otp-type {
+        font-size: 12px;
+        color: var(--focus-color);
+      }
+    }
+    .otp-value {
+      font-size: 30px;
+      color: var(--focus-color);
+      cursor: pointer;
+    }
+  }
+  .otp-progress-wrapper {
+    width: 100%;
+    padding: 0 var(--padding);
+    progress {
+      width: 100%;
+      height: 8px;
       border-radius: 4px;
+      appearance: none;
+      &::-webkit-progress-bar {
+        background-color: #eee;
+        border-radius: 4px;
+      }
+      &::-webkit-progress-value {
+        background-color: var(--focus-color);
+        border-radius: 4px;
+      }
     }
   }
 }
