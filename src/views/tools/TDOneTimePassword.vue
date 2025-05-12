@@ -281,7 +281,7 @@ export default {
           },
           me.password
         );
-        me.saveUsername();
+        await me.saveUsername();
       }
     },
     async openAuthenSaved() {
@@ -299,6 +299,7 @@ export default {
           me.decodedDataString = JSON.stringify(result, null, 2);
           me.buildData();
           me.generateNow();
+          await me.saveUsername();
         }
       }
     },
