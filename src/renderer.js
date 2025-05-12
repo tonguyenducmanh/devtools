@@ -9,6 +9,8 @@ import TDTextarea from "@/components/TDTextarea.vue";
 import TDInput from "@/components/TDInput.vue";
 import TDCheckbox from "@/components/TDCheckbox.vue";
 import TDUpload from "@/components/TDUpload.vue";
+import TDRadio from "@/components/TDRadio.vue";
+import TDRadioGroup from "@/components/TDRadioGroup.vue";
 
 const currentApp = createApp(App);
 
@@ -23,6 +25,8 @@ currentApp.component("TDTextarea", TDTextarea);
 currentApp.component("TDInput", TDInput);
 currentApp.component("TDCheckbox", TDCheckbox);
 currentApp.component("TDUpload", TDUpload);
+currentApp.component("TDRadio", TDRadio);
+currentApp.component("TDRadioGroup", TDRadioGroup);
 
 currentApp.use(router);
 

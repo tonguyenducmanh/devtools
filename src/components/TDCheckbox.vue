@@ -26,7 +26,7 @@ export default {
   methods: {},
   computed: {
     inputId() {
-      return this.$.uid;
+      return `td-radio-group-${this.$.uid}`;
     },
   },
   props: {
