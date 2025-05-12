@@ -76,7 +76,9 @@
               <div class="otp-type">{{ item.type }}</div>
             </div>
             <div v-if="item.type.compareNotSentive('HOTP')">NotSupported</div>
-            <div v-else class="otp-value">{{ item.otp }}</div>
+            <div v-else class="otp-value" @click="handleCopyEvent(item.otp)">
+              {{ item.otp }}
+            </div>
           </div>
         </template>
       </div>
@@ -153,6 +155,10 @@ export default {
     me.saveUsername();
   },
   methods: {
+    handleCopyEvent(value) {
+      let me = this;
+      me.$tdUtility.copyToClipboard(value);
+    },
     async processWhenMounted() {
       let me = this;
       let lastUserName = await me.$tdCache.get(
