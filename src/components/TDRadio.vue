@@ -107,6 +107,6 @@ export default {
   }
 }
 .td-radio-disabled {
-  opacity: 0.5; // Giảm độ sáng của radio khi disabled
+  opacity: 0.4; // Giảm độ sáng của radio khi disabled
 }
 </style>

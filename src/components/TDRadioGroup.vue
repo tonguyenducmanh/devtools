@@ -3,7 +3,7 @@
     class="td-radio-group"
     :class="{ 'layout-horizontal': layout === 'horizontal' }"
   >
-    <div class="td-label" v-if="label">{{ label.capitalize() }}</div>
+    <div class="td-radio-group-label" v-if="label">{{ label.capitalize() }}</div>
     <div v-for="(option, index) in options" :key="index">
       <TDRadio
         :value="option.value"
@@ -61,9 +61,9 @@ export default {
 .td-radio-group {
   margin: var(--padding);
 
-  .td-label {
-    margin-bottom: var(--padding-small);
-    font-size: var(--font-size-large);
+  .td-radio-group-label {
+    margin-bottom: var(--padding);
+    font-size: var(--font-size-l-medium);
     color: var(--text-secondary-color);
   }
 }
@@ -72,7 +72,7 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: end;
-  .td-label {
+  .td-radio-group-label {
     margin-bottom: 0;
     margin-right: var(--padding);
   }
