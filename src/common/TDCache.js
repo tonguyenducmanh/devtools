@@ -64,7 +64,9 @@ class TDCache {
       if (password && data) {
         const bytes = CryptoJS.AES.decrypt(data, password);
         const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-        result = JSON.parse(decrypted);
+        if (decrypted) {
+          result = JSON.parse(decrypted);
+        }
       } else {
         result = data;
       }
