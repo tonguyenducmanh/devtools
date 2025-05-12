@@ -14,6 +14,10 @@ class TDEnum {
     primary: "primary",
     secondary: "secondary",
   };
+  radioGroupType = {
+    horizontal: "horizontal",
+    vertical: "vertical",
+  };
 }
 
 export default new TDEnum();

@@ -77,12 +77,12 @@ export default {
     transition: border-color 0.2s ease;
 
     &:hover {
-      border-color: var(--focus-color);
+      border: 1.5px solid var(--btn-color);
     }
 
     &:checked {
-      border: 1px solid var(--focus-color);
-      background-color: var(--focus-color);
+      border: 2px solid var(--btn-color);
+      background-color: var(--btn-color);
 
       &::before {
         content: "";

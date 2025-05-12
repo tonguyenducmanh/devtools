@@ -1,9 +1,13 @@
 <template>
   <div
     class="td-radio-group"
-    :class="{ 'layout-horizontal': layout === 'horizontal' }"
+    :class="{
+      'layout-horizontal': layout === $tdEnum.radioGroupType.horizontal,
+    }"
   >
-    <div class="td-radio-group-label" v-if="label">{{ label.capitalize() }}</div>
+    <div class="td-radio-group-label" v-if="label">
+      {{ label.capitalize() }}
+    </div>
     <div v-for="(option, index) in options" :key="index">
       <TDRadio
         :value="option.value"
@@ -20,6 +24,8 @@
 </template>
 
 <script>
+import tdEnum from "@/common/TDEnum.js";
+
 export default {
   name: "TDRadioGroup",
   props: {
@@ -44,8 +50,12 @@ export default {
     },
     layout: {
       type: String,
-      default: "vertical", // Giá trị mặc định là hiển thị dọc
-      validator: (value) => ["vertical", "horizontal"].includes(value),
+      default: tdEnum.radioGroupType.horizontal, // Giá trị mặc định là hiển thị dọc
+      validator: (value) =>
+        [
+          tdEnum.radioGroupType.horizontal,
+          tdEnum.radioGroupType.vertical,
+        ].includes(value),
     },
   },
   emits: ["update:modelValue"],
