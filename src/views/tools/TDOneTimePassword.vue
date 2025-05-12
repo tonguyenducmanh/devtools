@@ -124,8 +124,20 @@ export default {
     async decodeGoogleAuth() {
       let me = this;
       let result = await me.decodeExportUri(me.migrationURL);
-      if (result) {
-        me.decodedData = result;
+      if (result && result.length > 0) {
+        // chỉ thêm mới nếu không có secret trùng lặp
+        if (!me.decodedData || me.decodedData.length == 0) {
+          me.decodedData = result;
+        } else {
+          result.forEach((item) => {
+            let checkExist = me.decodedData.find((i) => {
+              return i.secret === item.secret;
+            });
+            if (!checkExist) {
+              me.decodedData.push(item);
+            }
+          });
+        }
         me.buildData();
         me.decodedDataString = JSON.stringify(result, null, 2);
         me.generateNow();
