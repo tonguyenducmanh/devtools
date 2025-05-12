@@ -39,20 +39,8 @@ export default {
   created() {},
   mounted() {
     let me = this;
-    let currentTheme = me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
-    if (!currentTheme) {
-      currentTheme = window.__env.defaultValue.theme;
-      me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
-    }
-    me.isDarkTheme = currentTheme == me.$tdEnum.theme.dark;
-    let toggleSidebarState = me.$tdCache.get(
-      me.$tdEnum.cacheConfig.IsShowSidebar
-    );
-    if (toggleSidebarState) {
-      me.isShowSidebar = toggleSidebarState.value;
-    }
+    me.processWhenMounted();
   },
-  methods: {},
   props: {},
   data() {
     return {
@@ -62,19 +50,34 @@ export default {
     };
   },
   methods: {
-    toggleTheme() {
+    async processWhenMounted() {
+      let me = this;
+      let currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
+      if (!currentTheme) {
+        currentTheme = window.__env.defaultValue.theme;
+        await me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
+      }
+      me.isDarkTheme = currentTheme == me.$tdEnum.theme.dark;
+      let toggleSidebarState = await me.$tdCache.get(
+        me.$tdEnum.cacheConfig.IsShowSidebar
+      );
+      if (toggleSidebarState) {
+        me.isShowSidebar = toggleSidebarState.value;
+      }
+    },
+    async toggleTheme() {
       let me = this;
       me.isDarkTheme = !me.isDarkTheme;
       let currentTheme = me.isDarkTheme
         ? me.$tdEnum.theme.dark
         : me.$tdEnum.theme.light;
-      me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
+      await me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
       me.$tdUtility.setTheme(currentTheme);
     },
-    toggleSidebar() {
+    async toggleSidebar() {
       let me = this;
       me.isShowSidebar = !me.isShowSidebar;
-      me.$tdCache.set(me.$tdEnum.cacheConfig.IsShowSidebar, {
+      await me.$tdCache.set(me.$tdEnum.cacheConfig.IsShowSidebar, {
         value: me.isShowSidebar,
       });
     },

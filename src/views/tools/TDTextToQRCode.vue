@@ -77,7 +77,7 @@ export default {
     /**
      * Tạo QR code từ text
      */
-    generateQRCode() {
+    async generateQRCode() {
       let me = this;
       let maxTextOneChunk = window.__env.textToQRConfig.maxTextOneChunk;
 
@@ -86,7 +86,7 @@ export default {
       let textBuild = me.buildTextBeforeGenQR(text);
 
       // Lưu text vào lịch sử nếu khác với lần lưu trước
-      me.saveToHistory(text);
+      await me.saveToHistory(text);
       // reset
       me.qrCodeItems = [];
       // Nếu độ dài text lớn hơn 1000, chia thành nhiều phần
@@ -163,9 +163,9 @@ export default {
      * Lấy lịch sử text từ localStorage
      * @returns {Array} Mảng các text đã lưu
      */
-    getHistory() {
+    async getHistory() {
       let me = this;
-      let history = me.$tdCache.get(me.$tdEnum.cacheConfig.QRHistory);
+      let history = await me.$tdCache.get(me.$tdEnum.cacheConfig.QRHistory);
       return history ? history : [];
     },
 
@@ -173,18 +173,18 @@ export default {
      * Lưu text vào lịch sử nếu khác với lần lưu trước
      * @param {string} text - Text cần lưu
      */
-    saveToHistory(text) {
+    async saveToHistory(text) {
       try {
         let me = this;
-        let history = me.getHistory();
+        let history = await me.getHistory();
         history = history.filter((x) => x.title != text);
         history.push(me.buildHistoryItem(text));
         // Giới hạn số lượng lịch sử lưu trữ
         if (history.length > window.__env.textToQRConfig.maxHistoryLength) {
           history.shift(); // Xóa item cũ nhất
         }
-        me.$tdCache.set(me.$tdEnum.cacheConfig.QRHistory, history);
-        me.updateHistoryDisplay();
+        await me.$tdCache.set(me.$tdEnum.cacheConfig.QRHistory, history);
+        await me.updateHistoryDisplay();
       } catch (error) {
         console.error("Lỗi khi lưu vào history:", error);
         // Lỗi sẽ được bỏ qua để không ảnh hưởng tới luồng chính
@@ -201,15 +201,15 @@ export default {
      * Xóa một item khỏi lịch sử
      * @param {number} index - Vị trí của item cần xóa
      */
-    deleteHistoryItem(historyId) {
+    async deleteHistoryItem(historyId) {
       let me = this;
-      let history = me.getHistory();
+      let history = await me.getHistory();
       history = history.filter((x) => x.historyId != historyId);
-      me.$tdCache.set(
+      await me.$tdCache.set(
         me.$tdEnum.cacheConfig.QRHistory,
         JSON.stringify(history)
       );
-      me.updateHistoryDisplay();
+      await me.updateHistoryDisplay();
     },
 
     /**
@@ -239,9 +239,9 @@ export default {
     /**
      * Cập nhật hiển thị lịch sử
      */
-    updateHistoryDisplay() {
+    async updateHistoryDisplay() {
       let me = this;
-      let history = me.getHistory();
+      let history = await me.getHistory();
       let titleLength = window.__env.textToQRConfig.maxTitleLength;
       me.historyItems = [];
       [...history].reverse().forEach((historyItem, index) => {

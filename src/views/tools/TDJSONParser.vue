@@ -125,9 +125,14 @@ export default {
   },
   mounted() {
     let me = this;
-    me.currentTheme = me.$tdCache.get(me.$tdEnum.cacheConfig.Theme) ?? "light";
+    me.processWhenMounted();
   },
   methods: {
+    async processWhenMounted() {
+      let me = this;
+      me.currentTheme =
+        (await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme)) ?? "light";
+    },
     toggleAllNode() {
       let me = this;
       me.isShowLevelMax = !me.isShowLevelMax;

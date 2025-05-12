@@ -30,7 +30,7 @@ export const TDCacheConfig = {
   },
   OneTimeAuthen: {
     KeyFormat: "OneTimeAuthen_{id}",
-    CacheLevel: tdEnum.cacheType.local,
+    CacheLevel: tdEnum.cacheType.indexedDB,
     ExpireTime: 0,
     Note: "cài đặt xác thực",
   },

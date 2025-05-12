@@ -99,12 +99,7 @@ export default {
   name: "TDOneTimePassword",
   created() {
     let me = this;
-    let lastUserName = me.$tdCache.get(
-      me.$tdEnum.cacheConfig.LastOneTimeAuthenUserName
-    );
-    if (lastUserName) {
-      me.username = lastUserName;
-    }
+    me.processWhenMounted();
   },
   computed: {
     isShowDecoded() {
@@ -158,10 +153,19 @@ export default {
     me.saveUsername();
   },
   methods: {
-    saveUsername() {
+    async processWhenMounted() {
+      let me = this;
+      let lastUserName = await me.$tdCache.get(
+        me.$tdEnum.cacheConfig.LastOneTimeAuthenUserName
+      );
+      if (lastUserName) {
+        me.username = lastUserName;
+      }
+    },
+    async saveUsername() {
       let me = this;
       if (me.username) {
-        me.$tdCache.set(
+        await me.$tdCache.set(
           me.$tdEnum.cacheConfig.LastOneTimeAuthenUserName,
           me.username
         );
@@ -266,10 +270,10 @@ export default {
       }
     },
 
-    saveAuthen() {
+    async saveAuthen() {
       let me = this;
       if (me.password && me.username) {
-        me.$tdCache.set(
+        await me.$tdCache.set(
           me.$tdEnum.cacheConfig.OneTimeAuthen,
           me.decodedData,
           {
@@ -280,10 +284,10 @@ export default {
         me.saveUsername();
       }
     },
-    openAuthenSaved() {
+    async openAuthenSaved() {
       let me = this;
       if (me.password && me.username) {
-        let result = me.$tdCache.get(
+        let result = await me.$tdCache.get(
           me.$tdEnum.cacheConfig.OneTimeAuthen,
           {
             id: me.username,

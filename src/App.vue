@@ -27,12 +27,12 @@ export default {
     /**
      * Xử lý 1 số kịch bản khi khởi chạy ứng dụng
      */
-    processWhenRunApp() {
+    async processWhenRunApp() {
       let me = this;
-      let currentTheme = me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
+      let currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
       if (!currentTheme) {
         currentTheme = window.__env.defaultValue.theme;
-        me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
+        await me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
       }
       me.$tdUtility.setTheme(currentTheme);
     },

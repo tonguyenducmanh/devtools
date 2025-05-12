@@ -4,12 +4,53 @@ import { TDCacheConfig } from "@/common/TDCacheConfig.js";
 import { EnumCacheConfig } from "@/common/TDEnumCacheConfig.js";
 import CryptoJS from "crypto-js";
 
+const DB_NAME = "TDCacheDB";
+const STORE_NAME = "CacheStore";
+const DB_VERSION = 1;
+
+function openIndexedDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = function (event) {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function indexedDBSetItem(key, value) {
+  const db = await openIndexedDB();
+  const tx = db.transaction(STORE_NAME, "readwrite");
+  tx.objectStore(STORE_NAME).put(value, key);
+  return tx.complete;
+}
+
+async function indexedDBGetItem(key) {
+  const db = await openIndexedDB();
+  const tx = db.transaction(STORE_NAME, "readonly");
+  return tx.objectStore(STORE_NAME).get(key);
+}
+
+async function indexedDBRemoveItem(key) {
+  const db = await openIndexedDB();
+  const tx = db.transaction(STORE_NAME, "readwrite");
+  tx.objectStore(STORE_NAME).delete(key);
+  return tx.complete;
+}
+
 class TDCache {
   getStorage(level) {
     switch (level) {
       case tdEnum.cacheType.session:
         return sessionStorage;
       case tdEnum.cacheType.local:
+        return localStorage;
+      case tdEnum.cacheType.indexedDB:
+        return null; // xử lý riêng bằng async
       default:
         return localStorage;
     }
@@ -24,12 +65,11 @@ class TDCache {
     return keyFormat.replace(/\{(\w+)\}/g, (_, k) => params[k] || "");
   }
 
-  set(configKey, value, params = {}, password = null) {
+  async set(configKey, value, params = {}, password = null) {
     const config = this.getCacheConfigByKey(configKey);
     if (!config) throw new Error(`Không tìm thấy cấu hình cache: ${configKey}`);
 
     const key = this.formatKey(config.KeyFormat, params);
-    const storage = this.getStorage(config.CacheLevel);
     let valueSave = value;
     if (password) {
       const valueStr =
@@ -37,30 +77,46 @@ class TDCache {
       const encrypted = CryptoJS.AES.encrypt(valueStr, password).toString();
       valueSave = encrypted;
     }
+
     const payload = {
       data: valueSave,
       expiredAt:
         config.ExpireTime > 0 ? Date.now() + config.ExpireTime * 1000 : null,
     };
 
-    storage.setItem(key, JSON.stringify(payload));
+    if (config.CacheLevel === tdEnum.cacheType.indexedDB) {
+      await indexedDBSetItem(key, payload);
+    } else {
+      const storage = this.getStorage(config.CacheLevel);
+      storage.setItem(key, JSON.stringify(payload));
+    }
   }
 
-  get(configKey, params = {}, password = null) {
+  async get(configKey, params = {}, password = null) {
     const config = this.getCacheConfigByKey(configKey);
     if (!config) throw new Error(`Không tìm thấy cấu hình cache: ${configKey}`);
-    let result = null;
+
     const key = this.formatKey(config.KeyFormat, params);
-    const storage = this.getStorage(config.CacheLevel);
-    const raw = storage.getItem(key);
+    let result = null;
+    let raw;
+
+    if (config.CacheLevel === tdEnum.cacheType.indexedDB) {
+      raw = await indexedDBGetItem(key);
+    } else {
+      const storage = this.getStorage(config.CacheLevel);
+      const rawStr = storage.getItem(key);
+      raw = rawStr ? JSON.parse(rawStr) : null;
+    }
+
     if (!raw) return result;
 
     try {
-      const { data, expiredAt } = JSON.parse(raw);
+      const { data, expiredAt } = raw;
       if (expiredAt && Date.now() > expiredAt) {
-        storage.removeItem(key);
+        await this.remove(configKey, params);
         return result;
       }
+
       if (password && data) {
         const bytes = CryptoJS.AES.decrypt(data, password);
         const decrypted = bytes.toString(CryptoJS.enc.Utf8);
@@ -70,22 +126,26 @@ class TDCache {
       } else {
         result = data;
       }
-      if (result == "[]") {
-        result = [];
-      }
+
+      if (result == "[]") result = [];
     } catch {
       result = null;
     }
+
     return result;
   }
 
-  remove(configKey, params = {}) {
+  async remove(configKey, params = {}) {
     const config = this.getCacheConfigByKey(configKey);
     if (!config) throw new Error(`Không tìm thấy cấu hình cache: ${configKey}`);
 
     const key = this.formatKey(config.KeyFormat, params);
-    const storage = this.getStorage(config.CacheLevel);
-    storage.removeItem(key);
+    if (config.CacheLevel === tdEnum.cacheType.indexedDB) {
+      await indexedDBRemoveItem(key);
+    } else {
+      const storage = this.getStorage(config.CacheLevel);
+      storage.removeItem(key);
+    }
   }
 }
 
