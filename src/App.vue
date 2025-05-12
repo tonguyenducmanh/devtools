@@ -29,10 +29,10 @@ export default {
      */
     processWhenRunApp() {
       let me = this;
-      let currentTheme = me.$tdCache.get(me.$tdEnum.cacheConfig.theme);
+      let currentTheme = me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
       if (!currentTheme) {
         currentTheme = window.__env.defaultValue.theme;
-        me.$tdCache.set(me.$tdEnum.cacheConfig.theme, currentTheme);
+        me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
       }
       me.$tdUtility.setTheme(currentTheme);
     },

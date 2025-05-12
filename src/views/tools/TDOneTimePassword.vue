@@ -253,16 +253,27 @@ export default {
     saveAuthen() {
       let me = this;
       if (me.password && me.username) {
-        const cacheKey = `authen_${me.username}`;
-        me.$tdCache.setWithPassword(cacheKey, me.decodedData, me.password);
+        me.$tdCache.setEncrypted(
+          me.$tdEnum.cacheConfig.OneTimeAuthen,
+          me.decodedData,
+          me.password,
+          {
+            id: me.username,
+          }
+        );
       } else {
       }
     },
     openAuthenSaved() {
       let me = this;
       if (me.password && me.username) {
-        const cacheKey = `authen_${me.username}`;
-        let result = me.$tdCache.getWithPassword(cacheKey, me.password);
+        let result = me.$tdCache.getEncrypted(
+          me.$tdEnum.cacheConfig.OneTimeAuthen,
+          me.password,
+          {
+            id: me.username,
+          }
+        );
         if (result) {
           me.decodedData = result;
           me.decodedDataString = JSON.stringify(result, null, 2);

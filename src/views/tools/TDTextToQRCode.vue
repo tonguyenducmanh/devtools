@@ -165,7 +165,7 @@ export default {
      */
     getHistory() {
       let me = this;
-      let history = me.$tdCache.get(me.$tdEnum.cacheConfig.qrHistory);
+      let history = me.$tdCache.get(me.$tdEnum.cacheConfig.QRHistory);
       return history ? history : [];
     },
 
@@ -183,7 +183,7 @@ export default {
         if (history.length > window.__env.textToQRConfig.maxHistoryLength) {
           history.shift(); // Xóa item cũ nhất
         }
-        me.$tdCache.set(me.$tdEnum.cacheConfig.qrHistory, history);
+        me.$tdCache.set(me.$tdEnum.cacheConfig.QRHistory, history);
         me.updateHistoryDisplay();
       } catch (error) {
         console.error("Lỗi khi lưu vào history:", error);
@@ -206,7 +206,7 @@ export default {
       let history = me.getHistory();
       history = history.filter((x) => x.historyId != historyId);
       me.$tdCache.set(
-        me.$tdEnum.cacheConfig.qrHistory,
+        me.$tdEnum.cacheConfig.QRHistory,
         JSON.stringify(history)
       );
       me.updateHistoryDisplay();
@@ -217,7 +217,7 @@ export default {
      */
     clearAllHistory() {
       let me = this;
-      me.$tdCache.remove(me.$tdEnum.cacheConfig.qrHistory);
+      me.$tdCache.remove(me.$tdEnum.cacheConfig.QRHistory);
       me.historyItems = [];
     },
 

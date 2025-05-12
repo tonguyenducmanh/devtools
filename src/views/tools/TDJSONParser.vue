@@ -125,7 +125,7 @@ export default {
   },
   mounted() {
     let me = this;
-    me.currentTheme = me.$tdCache.get(me.$tdEnum.cacheConfig.theme) ?? "light";
+    me.currentTheme = me.$tdCache.get(me.$tdEnum.cacheConfig.Theme) ?? "light";
   },
   methods: {
     toggleAllNode() {

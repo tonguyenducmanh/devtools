@@ -39,14 +39,14 @@ export default {
   created() {},
   mounted() {
     let me = this;
-    let currentTheme = me.$tdCache.get(me.$tdEnum.cacheConfig.theme);
+    let currentTheme = me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
     if (!currentTheme) {
       currentTheme = window.__env.defaultValue.theme;
-      me.$tdCache.set(me.$tdEnum.cacheConfig.theme, currentTheme);
+      me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
     }
     me.isDarkTheme = currentTheme == me.$tdEnum.theme.dark;
     let toggleSidebarState = me.$tdCache.get(
-      me.$tdEnum.cacheConfig.isShowSidebar
+      me.$tdEnum.cacheConfig.IsShowSidebar
     );
     if (toggleSidebarState) {
       me.isShowSidebar = toggleSidebarState.value;
@@ -68,13 +68,13 @@ export default {
       let currentTheme = me.isDarkTheme
         ? me.$tdEnum.theme.dark
         : me.$tdEnum.theme.light;
-      me.$tdCache.set(me.$tdEnum.cacheConfig.theme, currentTheme);
+      me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
       me.$tdUtility.setTheme(currentTheme);
     },
     toggleSidebar() {
       let me = this;
       me.isShowSidebar = !me.isShowSidebar;
-      me.$tdCache.set(me.$tdEnum.cacheConfig.isShowSidebar, {
+      me.$tdCache.set(me.$tdEnum.cacheConfig.IsShowSidebar, {
         value: me.isShowSidebar,
       });
     },

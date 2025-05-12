@@ -1,0 +1,6 @@
+export const EnumCacheConfig = {
+  Theme: 0,
+  QRHistory: 1,
+  IsShowSidebar: 2,
+  OneTimeAuthen: 3,
+};

@@ -135,6 +135,15 @@ class TDUtility {
       obj
     );
   }
+
+  getKeyByValue(obj, value) {
+    for (const key in obj) {
+      if (obj[key] === value) {
+        return key;
+      }
+    }
+    return null; // hoặc giá trị mặc định nếu không tìm thấy
+  }
 }
 
 export default new TDUtility();
