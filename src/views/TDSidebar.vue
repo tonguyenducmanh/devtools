@@ -13,7 +13,7 @@
             activeClass="td-item-active"
             :id="index"
             :to="item.pathVisible ?? item.path"
-            >{{ item.title }}</RouterLink
+            >{{ item.meta.title }}</RouterLink
           >
         </template>
       </div>

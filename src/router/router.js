@@ -9,7 +9,9 @@ const routerConfig = [
     pathVisible: "/",
     name: "home",
     component: () => import("@/views/TDWelcome.vue"),
-    title: "Welcome",
+    meta: {
+      title: "Welcome",
+    },
   },
   {
     /**
@@ -18,7 +20,9 @@ const routerConfig = [
     path: "/comparecode",
     name: "comparecode",
     component: () => import("@/views/tools/TDCompareCode.vue"),
-    title: "Compare code",
+    meta: {
+      title: "Compare code",
+    },
   },
   {
     /**
@@ -27,7 +31,9 @@ const routerConfig = [
     path: "/TDOneTimePassword",
     name: "TDOneTimePassword",
     component: () => import("@/views/tools/TDOneTimePassword.vue"),
-    title: "One time password",
+    meta: {
+      title: "One time password",
+    },
   },
   {
     /**
@@ -36,7 +42,9 @@ const routerConfig = [
     path: "/jsonparser",
     name: "jsonparser",
     component: () => import("@/views/tools/TDJSONParser.vue"),
-    title: "JSON parser",
+    meta: {
+      title: "JSON parser",
+    },
   },
   {
     /**
@@ -45,7 +53,9 @@ const routerConfig = [
     path: "/base64toimage",
     name: "base64toimage",
     component: () => import("@/views/tools/TDBase64ToImage.vue"),
-    title: "Base64 to image",
+    meta: {
+      title: "Base64 to image",
+    },
   },
   {
     /**
@@ -54,7 +64,9 @@ const routerConfig = [
     path: "/imagetobase64",
     name: "imagetobase64",
     component: () => import("@/views/tools/TDImageToBase64.vue"),
-    title: "Image to base64",
+    meta: {
+      title: "Image to base64",
+    },
   },
   {
     /**
@@ -63,7 +75,9 @@ const routerConfig = [
     path: "/jsontopostgresql",
     name: "jsontopostgresql",
     component: () => import("@/views/tools/TDJSONToPostgreSQL.vue"),
-    title: "Json to postgre sql",
+    meta: {
+      title: "Json to postgre sql",
+    },
   },
   {
     /**
@@ -72,7 +86,9 @@ const routerConfig = [
     path: "/textoqrcode",
     name: "textoqrcode",
     component: () => import("@/views/tools/TDTextToQRCode.vue"),
-    title: "Text to QRCode",
+    meta: {
+      title: "Text to QRCode",
+    },
   },
   {
     /**
@@ -81,7 +97,9 @@ const routerConfig = [
     path: "/qrcodetotext",
     name: "qrcodetotext",
     component: () => import("@/views/tools/TDQRCodeToText.vue"),
-    title: "QRCode to text",
+    meta: {
+      title: "QRCode to text",
+    },
   },
   {
     /**
@@ -90,7 +108,9 @@ const routerConfig = [
     path: "/mappingjson",
     name: "mappingjson",
     component: () => import("@/views/tools/TDMappingJSON.vue"),
-    title: "Mapping JSON",
+    meta: {
+      title: "Mapping JSON",
+    },
   },
   {
     /**
@@ -99,7 +119,9 @@ const routerConfig = [
     path: "/downloadvscodeext",
     name: "downloadvscodeext",
     component: () => import("@/views/tools/TDDownloadVSCodeExt.vue"),
-    title: "Download VSCode Extension",
+    meta: {
+      title: "Download VSCode Extension",
+    },
   },
   {
     /**
@@ -108,13 +130,24 @@ const routerConfig = [
     path: "/uuidv4generator",
     name: "uuidv4generator",
     component: () => import("@/views/tools/TDUUIDv4Generator.vue"),
-    title: "UUIDv4 generator",
+    meta: {
+      title: "UUIDv4 generator",
+    },
   },
 ];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: routerConfig,
+});
+
+router.beforeEach((to, from, next) => {
+  if (to && to.meta && to.meta.title) {
+    document.title = `Utility |  ${to.meta.title}`;
+  } else {
+    document.title = "Utility for dev";
+  }
+  next();
 });
 
 export default router;
