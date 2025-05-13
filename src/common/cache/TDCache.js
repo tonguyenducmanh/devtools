@@ -3,62 +3,18 @@ import tdUtility from "@/common/TDUtility.js";
 import { TDCacheConfig } from "@/common/cache/TDCacheConfig.js";
 import { EnumCacheConfig } from "@/common/cache/TDEnumCacheConfig.js";
 import CryptoJS from "crypto-js";
-
-const DB_NAME = "TDCacheDB";
-const STORE_NAME = "CacheStore";
-const DB_VERSION = 1;
-
-function openIndexedDB() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onupgradeneeded = function (event) {
-      const db = event.target.result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME);
-      }
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-async function indexedDBSetItem(key, value) {
-  const db = await openIndexedDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    const store = tx.objectStore(STORE_NAME);
-    const request = store.put(value, key);
-
-    request.onsuccess = () => resolve(true);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-async function indexedDBGetItem(key) {
-  const db = await openIndexedDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readonly");
-    const store = tx.objectStore(STORE_NAME);
-    const request = store.get(key);
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-async function indexedDBRemoveItem(key) {
-  const db = await openIndexedDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    const store = tx.objectStore(STORE_NAME);
-    const request = store.delete(key);
-
-    request.onsuccess = () => resolve(true);
-    request.onerror = () => reject(request.error);
-  });
-}
+import memoryStorage from "@/common/cache/driver/TDCacheInMemory.js";
+import indexDBStorage from "@/common/cache/driver/TDCacheIndexDB.js";
 
 class TDCache {
+  /**
+   * danh sách các loại cache không cần phải serialize
+   */
+  _typeCacheNotSerialize = [
+    tdEnum.cacheType.indexedDB,
+    tdEnum.cacheType.inMemory,
+  ];
+
   getStorage(level) {
     switch (level) {
       case tdEnum.cacheType.session:
@@ -66,7 +22,9 @@ class TDCache {
       case tdEnum.cacheType.local:
         return localStorage;
       case tdEnum.cacheType.indexedDB:
-        return null; // xử lý riêng bằng async
+        return indexDBStorage; // xử lý riêng bằng async
+      case tdEnum.cacheType.inMemory:
+        return memoryStorage;
       default:
         return localStorage;
     }
@@ -99,12 +57,11 @@ class TDCache {
       expiredAt:
         config.ExpireTime > 0 ? Date.now() + config.ExpireTime * 1000 : null,
     };
-
-    if (config.CacheLevel === tdEnum.cacheType.indexedDB) {
-      await indexedDBSetItem(key, payload);
+    const storage = this.getStorage(config.CacheLevel);
+    if (this._typeCacheNotSerialize.includes(config.CacheLevel)) {
+      await storage.setItem(key, payload);
     } else {
-      const storage = this.getStorage(config.CacheLevel);
-      storage.setItem(key, JSON.stringify(payload));
+      await storage.setItem(key, JSON.stringify(payload));
     }
   }
 
@@ -116,11 +73,11 @@ class TDCache {
     let result = null;
     let raw;
 
-    if (config.CacheLevel === tdEnum.cacheType.indexedDB) {
-      raw = await indexedDBGetItem(key);
+    const storage = this.getStorage(config.CacheLevel);
+    if (this._typeCacheNotSerialize.includes(config.CacheLevel)) {
+      raw = await storage.getItem(key);
     } else {
-      const storage = this.getStorage(config.CacheLevel);
-      const rawStr = storage.getItem(key);
+      const rawStr = await storage.getItem(key);
       raw = rawStr ? JSON.parse(rawStr) : null;
     }
 
@@ -156,12 +113,8 @@ class TDCache {
     if (!config) throw new Error(`Không tìm thấy cấu hình cache: ${configKey}`);
 
     const key = this.formatKey(config.KeyFormat, params);
-    if (config.CacheLevel === tdEnum.cacheType.indexedDB) {
-      await indexedDBRemoveItem(key);
-    } else {
-      const storage = this.getStorage(config.CacheLevel);
-      storage.removeItem(key);
-    }
+    const storage = this.getStorage(config.CacheLevel);
+    await storage.removeItem(key);
   }
 }
 
