@@ -1,101 +1,106 @@
 <template>
   <div class="container">
     <div class="title">Convert JSON sang object đệ quy!</div>
-    <div class="flex flex-wrap io-section">
-      <TDTextarea
-        placeHolder="JSON muốn chuyển sang Object"
-        v-model="jsonSource"
-        height="400px"
-        width="500px"
-      ></TDTextarea>
+    <div class="flex">
+      <div>
+        <div>
+          <TDTextarea
+            placeHolder="JSON muốn chuyển sang Object"
+            v-model="jsonSource"
+            resizeable
+          ></TDTextarea>
+        </div>
+        <div class="flex">
+          <div v-if="isShowConfigLib">
+            <TDCheckbox
+              v-model="isRecusive"
+              label="Xử lý JSON parse đệ quy object"
+              @input="handleJSONToObject"
+            ></TDCheckbox>
+            <TDCheckbox
+              v-model="showCollapseButton"
+              label="hiển thị icon thu gọn object"
+            ></TDCheckbox>
+            <TDCheckbox
+              v-model="showLineNumber"
+              label="hiển thị số dòng"
+            ></TDCheckbox>
+            <TDCheckbox
+              v-model="showLengthWhenCollapsed"
+              label="hiển thị số key/phần tử"
+            ></TDCheckbox>
+            <TDCheckbox
+              v-model="showVirtualScroll"
+              label="hiển thị thanh cuộn"
+            ></TDCheckbox>
+
+            <TDCheckbox
+              v-model="isShowSelectedPath"
+              label="hiển thị fullpath node đang chọn"
+            ></TDCheckbox>
+          </div>
+          <div class="flex">
+            <TDCheckbox
+              v-model="isShowSelectedNode"
+              label="hiển thị node đang chọn"
+            ></TDCheckbox>
+            <TDButton
+              @click="handleJSONToObject"
+              label="JSON to Object"
+            ></TDButton>
+            <TDButton
+              @click="applyMock"
+              :type="$tdEnum.buttonType.secondary"
+              label="Example"
+            ></TDButton>
+            <TDButton
+              @click="handleCopyEvent(jsonSelected)"
+              :type="$tdEnum.buttonType.secondary"
+              label="Copy selected node"
+            ></TDButton>
+            <TDButton
+              @click="handleCopyEvent(JSON.stringify(jsonSource))"
+              :type="$tdEnum.buttonType.secondary"
+              label="Copy source stringify"
+            ></TDButton>
+            <TDButton
+              @click="toggleAllNode"
+              :type="$tdEnum.buttonType.secondary"
+              label="Toggle all node"
+            ></TDButton>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex td-result">
+      <div class="td-pretty-box">
+        <VueJsonPretty
+          v-if="objectSource"
+          :theme="currentTheme"
+          v-model:selectedValue="selectedValue"
+          :showLineNumber="showLineNumber"
+          :virtual="showVirtualScroll"
+          :showLength="showLengthWhenCollapsed"
+          :deep="nodeLevelMax"
+          :showIcon="showCollapseButton"
+          :data="objectSource"
+          selectableType="single"
+          @nodeClick="changeNodeItem"
+        />
+      </div>
       <TDTextarea
         v-if="isShowSelectedNode"
         placeHolder="Node đang chọn"
         v-model="jsonSelected"
-        height="400px"
         :readOnly="true"
         width="500px"
       ></TDTextarea>
-      <div class="flex">
-        <div v-if="isShowConfigLib">
-          <TDCheckbox
-            v-model="isRecusive"
-            label="Xử lý JSON parse đệ quy object"
-            @input="handleJSONToObject"
-          ></TDCheckbox>
-          <TDCheckbox
-            v-model="showCollapseButton"
-            label="hiển thị icon thu gọn object"
-          ></TDCheckbox>
-          <TDCheckbox
-            v-model="showLineNumber"
-            label="hiển thị số dòng"
-          ></TDCheckbox>
-          <TDCheckbox
-            v-model="showLengthWhenCollapsed"
-            label="hiển thị số key/phần tử"
-          ></TDCheckbox>
-          <TDCheckbox
-            v-model="showVirtualScroll"
-            label="hiển thị thanh cuộn"
-          ></TDCheckbox>
-          <TDCheckbox
-            v-model="isShowSelectedNode"
-            label="hiển thị node đang chọn"
-          ></TDCheckbox>
-          <TDCheckbox
-            v-model="isShowSelectedPath"
-            label="hiển thị fullpath node đang chọn"
-          ></TDCheckbox>
-        </div>
-        <div>
-          <TDButton
-            @click="handleJSONToObject"
-            label="JSON to Object"
-          ></TDButton>
-          <TDButton
-            @click="applyMock"
-            :type="$tdEnum.buttonType.secondary"
-            label="Example"
-          ></TDButton>
-          <TDButton
-            @click="handleCopyEvent(jsonSelected)"
-            :type="$tdEnum.buttonType.secondary"
-            label="Copy selected node"
-          ></TDButton>
-          <TDButton
-            @click="handleCopyEvent(JSON.stringify(jsonSource))"
-            :type="$tdEnum.buttonType.secondary"
-            label="Copy source stringify"
-          ></TDButton>
-          <TDButton
-            @click="toggleAllNode"
-            :type="$tdEnum.buttonType.secondary"
-            label="Toggle all node"
-          ></TDButton>
-        </div>
-      </div>
     </div>
     <div v-if="isShowSelectedPath">
       <div class="td-fullpath" v-if="isShowSelectedPath && fullPath">
         Node đang chọn: {{ fullPath }}
       </div>
       <div class="td-fullpath" v-else>Chưa chọn node nào</div>
-    </div>
-    <div class="td-pretty-box">
-      <VueJsonPretty
-        v-if="objectSource"
-        :theme="currentTheme"
-        v-model:selectedValue="selectedValue"
-        :showLineNumber="showLineNumber"
-        :virtual="showVirtualScroll"
-        :showLength="showLengthWhenCollapsed"
-        :deep="nodeLevelMax"
-        :showIcon="showCollapseButton"
-        :data="objectSource"
-        selectableType="single"
-        @nodeClick="changeNodeItem"
-      />
     </div>
   </div>
 </template>
@@ -251,6 +256,8 @@ export default {
   border-radius: 0;
   min-height: 100vh;
   box-shadow: none;
+  display: flex;
+  flex-direction: column;
 }
 .paste-box {
   column-gap: 20px;
@@ -306,5 +313,12 @@ h1 {
 }
 .td-fullpath {
   padding: var(--padding);
+}
+.td-result {
+  width: 100%;
+  height: 100%;
+  .td-pretty-box {
+    flex: 1;
+  }
 }
 </style>
