@@ -72,7 +72,7 @@
         </div>
       </div>
     </div>
-    <div class="flex td-result">
+    <div ref="resultBox" class="flex td-result">
       <div class="td-pretty-box">
         <VueJsonPretty
           v-if="objectSource"
@@ -85,6 +85,7 @@
           :showIcon="showCollapseButton"
           :data="objectSource"
           selectableType="single"
+          :height="computedHeightPrettyBox"
           @nodeClick="changeNodeItem"
         />
       </div>
@@ -126,6 +127,18 @@ export default {
       let result = false;
       if (window.__env && window.__env.jsonParser) {
         result = window.__env.jsonParser.showConfigLib;
+      }
+      return result;
+    },
+    computedHeightPrettyBox() {
+      let me = this;
+      let result = 600;
+      if (me.$refs && me.$refs.resultBox) {
+        let boucing = me.$refs.resultBox.getBoundingClientRect();
+        console.log(boucing);
+        if (boucing && boucing.height) {
+          result = boucing.height - 10;
+        }
       }
       return result;
     },
