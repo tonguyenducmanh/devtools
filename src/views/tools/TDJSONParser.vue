@@ -10,8 +10,8 @@
             resizeable
           ></TDTextarea>
         </div>
-        <div class="flex">
-          <div v-if="isShowConfigLib">
+        <div class="">
+          <div class="flex" v-if="isShowConfigLib">
             <TDCheckbox
               v-model="isRecusive"
               label="Xử lý JSON parse đệ quy object"
