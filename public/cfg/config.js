@@ -15,8 +15,12 @@
     url: "https://github.com/tonguyenducmanh/utility-for-dev",
   };
 
+  window.__env.jsonParser = {
+    showConfigLib: false,
+  };
+
   window.__env.oneTimePasswordAuthen = {
     showDecodedInfo: false,
-    autoSave : true,
+    autoSave: true,
   };
 })(this);

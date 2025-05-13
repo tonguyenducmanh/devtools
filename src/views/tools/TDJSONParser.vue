@@ -17,7 +17,7 @@
         width="500px"
       ></TDTextarea>
       <div class="flex">
-        <div>
+        <div v-if="isShowConfigLib">
           <TDCheckbox
             v-model="isRecusive"
             label="Xử lý JSON parse đệ quy object"
@@ -115,6 +115,14 @@ export default {
         // không show mọi level mặc định chỉ show level 1
         return 1;
       }
+    },
+    isShowConfigLib() {
+      let me = this;
+      let result = false;
+      if (window.__env && window.__env.jsonParser) {
+        result = window.__env.jsonParser.showConfigLib;
+      }
+      return result;
     },
   },
   created() {
