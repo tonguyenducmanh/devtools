@@ -40,4 +40,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "tên đăng nhập xác thực một lần cuối cùng",
   },
+  LastOneTimeAuthenPassword: {
+    KeyFormat: "LastOneTimeAuthenPassword",
+    CacheLevel: tdEnum.cacheType.inMemory,
+    ExpireTime: 0,
+    Note: "mật khẩu đăng nhập xác thực theo user, chỉ được phép lưu trong mem",
+  },
 };

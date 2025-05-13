@@ -4,4 +4,5 @@ export const EnumCacheConfig = {
   IsShowSidebar: 2,
   OneTimeAuthen: 3,
   LastOneTimeAuthenUserName: 4,
+  LastOneTimeAuthenPassword: 5,
 };

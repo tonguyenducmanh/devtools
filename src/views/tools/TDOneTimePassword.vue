@@ -167,6 +167,16 @@ export default {
       );
       if (lastUserName) {
         me.username = lastUserName;
+        let lastAuthen = await me.$tdCache.get(
+          me.$tdEnum.cacheConfig.LastOneTimeAuthenPassword
+        );
+        if (lastAuthen && lastAuthen.userName == lastUserName) {
+          // load luôn danh sách user theo tài khoản, mật khẩu cuối cùng lưu được trong mem
+          await me.openAuthenSavedByUser(
+            lastAuthen.userName,
+            lastAuthen.password
+          );
+        }
       }
     },
     async saveUsername() {
@@ -176,6 +186,16 @@ export default {
           me.$tdEnum.cacheConfig.LastOneTimeAuthenUserName,
           me.username
         );
+        // lưu tạm vào mem sau đỡ phải dùng
+        if (me.password) {
+          await me.$tdCache.set(
+            me.$tdEnum.cacheConfig.LastOneTimeAuthenPassword,
+            {
+              userName: me.username,
+              password: me.password,
+            }
+          );
+        }
       }
     },
     async decodeGoogleAuth() {
@@ -293,13 +313,17 @@ export default {
     },
     async openAuthenSaved() {
       let me = this;
-      if (me.password && me.username) {
+      await me.openAuthenSavedByUser(me.username, me.password);
+    },
+    async openAuthenSavedByUser(username, password) {
+      let me = this;
+      if (password && username) {
         let result = await me.$tdCache.get(
           me.$tdEnum.cacheConfig.OneTimeAuthen,
           {
-            id: me.username,
+            id: username,
           },
-          me.password
+          password
         );
         if (result) {
           me.decodedData = result;
