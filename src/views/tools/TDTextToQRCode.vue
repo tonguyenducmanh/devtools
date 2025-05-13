@@ -57,7 +57,7 @@
 </template>
 <script>
 import QRCode from "qrcode";
-import { textToQRCodeMock } from "@/mock/mock.js";
+import { textToQRCodeMock } from "@/common/mock/mock.js";
 
 export default {
   name: "TDTextToQRCode",

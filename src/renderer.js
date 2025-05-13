@@ -1,6 +1,6 @@
 import { createApp } from "vue";
 import App from "@/App.vue";
-import cache from "@/common/TDCache.js";
+import cache from "@/common/cache/TDCache.js";
 import enumeration from "@/common/TDEnum.js";
 import utility from "@/common/TDUtility.js";
 import router from "@/router/router.js";

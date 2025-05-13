@@ -38,7 +38,7 @@
   </div>
 </template>
 <script>
-import { base64ToImageMock } from "@/mock/mock.js";
+import { base64ToImageMock } from "@/common/mock/mock.js";
 
 export default {
   name: "TDBase64ToImage",

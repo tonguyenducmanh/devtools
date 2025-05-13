@@ -59,7 +59,7 @@
   </div>
 </template>
 <script>
-import { JSONToPostgreSQLMock } from "@/mock/mock.js";
+import { JSONToPostgreSQLMock } from "@/common/mock/mock.js";
 
 export default {
   name: "TDImageToBase64",

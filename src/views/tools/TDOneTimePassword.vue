@@ -97,7 +97,7 @@ import base32 from "hi-base32";
 import { Buffer } from "buffer";
 import * as OTPAuth from "otpauth";
 import { toRaw } from "vue";
-import googleAuthen from "@/script/googleAuth.js";
+import googleAuthen from "@/common/proto/googleAuth.js";
 export default {
   name: "TDOneTimePassword",
   created() {

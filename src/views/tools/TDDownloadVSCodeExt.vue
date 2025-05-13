@@ -37,7 +37,7 @@
   </div>
 </template>
 <script>
-import { downloadVSCodeExtMock } from "@/mock/mock.js";
+import { downloadVSCodeExtMock } from "@/common/mock/mock.js";
 
 export default {
   name: "TDDownloadVSCodeExt",

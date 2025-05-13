@@ -1,4 +1,4 @@
-import { EnumCacheConfig } from "@/common/TDEnumCacheConfig.js";
+import { EnumCacheConfig } from "@/common/cache/TDEnumCacheConfig.js";
 
 class TDEnum {
   // cài đặt chủ đề của app
@@ -10,6 +10,7 @@ class TDEnum {
     local: 0,
     session: 1,
     indexedDB: 2,
+    inMemory: 3,
   };
   cacheConfig = EnumCacheConfig;
   buttonType = {

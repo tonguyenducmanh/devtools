@@ -32,4 +32,4 @@ window.__env
 
 Global objects are injected in the `renderer.js` file, for example: `$tdCache = import TDCache.js`, `$tdEnum = import TDEnum.js`.
 
-The `[mock.js](src/mock/mock.js)` file will be used to fake data for each tool.
+The `[mock.js](src/common/mock/mock.js)` file will be used to fake data for each tool.

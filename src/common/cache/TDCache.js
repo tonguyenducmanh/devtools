@@ -1,7 +1,7 @@
 import tdEnum from "@/common/TDEnum.js";
 import tdUtility from "@/common/TDUtility.js";
-import { TDCacheConfig } from "@/common/TDCacheConfig.js";
-import { EnumCacheConfig } from "@/common/TDEnumCacheConfig.js";
+import { TDCacheConfig } from "@/common/cache/TDCacheConfig.js";
+import { EnumCacheConfig } from "@/common/cache/TDEnumCacheConfig.js";
 import CryptoJS from "crypto-js";
 
 const DB_NAME = "TDCacheDB";

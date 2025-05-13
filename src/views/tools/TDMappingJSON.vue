@@ -69,7 +69,7 @@
   </div>
 </template>
 <script>
-import { mappingJSONMock } from "@/mock/mock.js";
+import { mappingJSONMock } from "@/common/mock/mock.js";
 
 export default {
   name: "TDMappingJSON",
