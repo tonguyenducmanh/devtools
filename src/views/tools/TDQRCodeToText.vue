@@ -91,7 +91,7 @@ export default {
           me.$refs.uploadArea &&
           typeof me.$refs.uploadArea.setFileSelected === "function"
         ) {
-          me.$refs.uploadArea.setFileSelected(files);
+          me.$refs.uploadArea.setFileSelected(files[0]);
           me.convertQRCode();
         }
       }
