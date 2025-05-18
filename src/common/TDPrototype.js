@@ -60,3 +60,12 @@ String.prototype.compareNotSentive =
   function (str) {
     return this.trim().toLowerCase() == str.trim().toLowerCase();
   };
+
+String.prototype.containsNotSentive =
+  String.prototype.containsNotSentive ||
+  function (value) {
+    return (
+      value &&
+      this.trim().toLowerCase().indexOf(value.trim().toLowerCase()) > -1
+    );
+  };

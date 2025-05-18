@@ -6,6 +6,14 @@
       @click="toggleSidebar"
     ></div>
     <div v-if="isShowSidebar" class="td-sidebar">
+      <div class="td-filter-tool">
+        <TDInput
+          v-model="queryTool"
+          :placeHolder="'Filter tool'"
+          @keyup.enter="filterToolNow"
+          @input="filterToolNow"
+        />
+      </div>
       <div class="td-tool-group">
         <template v-for="(item, index) in routerLink">
           <RouterLink
@@ -47,9 +55,20 @@ export default {
       routerLink: routerConfig,
       isShowSidebar: true,
       isDarkTheme: false,
+      queryTool: null,
     };
   },
   methods: {
+    filterToolNow() {
+      let me = this;
+      let allTool = routerConfig;
+      if (me.queryTool && allTool && allTool.length > 0) {
+        allTool = allTool.filter((x) =>
+          x.meta.title.containsNotSentive(me.queryTool)
+        );
+      }
+      me.routerLink = allTool;
+    },
     async processWhenMounted() {
       let me = this;
       let currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
@@ -105,7 +124,10 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-
+  .td-filter-tool {
+    display: flex;
+    margin: var(--padding);
+  }
   .td-sidebar-item {
     display: flex;
     align-items: center;
@@ -124,6 +146,7 @@ export default {
   .td-tool-group {
     flex: 1;
     overflow: auto;
+    width: 100%;
   }
   .td-sidebar-bottom {
     position: relative;
