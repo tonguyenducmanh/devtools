@@ -93,6 +93,16 @@ export default {
     getFileSelected() {
       return this.selectedFiles;
     },
+    setFileSelected(files) {
+      let me = this;
+      if (files) {
+        if (Array.isArray(files)) {
+          me.selectedFiles = files;
+        } else {
+          me.selectedFiles = [files];
+        }
+      }
+    },
   },
 };
 </script>

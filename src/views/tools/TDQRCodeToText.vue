@@ -11,9 +11,13 @@
       </div>
       <br />
       <TDUpload
+        @dragover="handleDragOver"
+        @dragleave="handleDragLeave"
+        @drop="handleDrop"
         ref="uploadArea"
         class="upload-area"
         maxHeight="200px"
+        labelEmpty="Kéo thả ảnh hoặc Ctrl+V ảnh vừa copy vào đây"
         :label="'Chọn ảnh QR code'"
         multiple
       ></TDUpload>
@@ -41,12 +45,57 @@ export default {
   name: "TDQRCodeToText",
   created() {
     let me = this;
+    document.addEventListener("paste", me.handlePasteEvent);
   },
   beforeUnmount() {
     let me = this;
+    document.removeEventListener("paste", me.handlePasteEvent);
   },
   mounted() {},
   methods: {
+    handlePasteEvent(e) {
+      let me = this;
+      e.preventDefault();
+      const items = e.clipboardData.items;
+      for (let item of items) {
+        if (item.type.includes("image")) {
+          const blob = item.getAsFile();
+          if (
+            me.$refs.uploadArea &&
+            typeof me.$refs.uploadArea.setFileSelected === "function"
+          ) {
+            me.$refs.uploadArea.setFileSelected(blob);
+            me.convertQRCode();
+          }
+          break;
+        }
+      }
+    },
+    handleDragOver(e) {
+      let me = this;
+      e.preventDefault();
+      me.isDragOver = true;
+    },
+
+    handleDragLeave(e) {
+      let me = this;
+      e.preventDefault();
+      me.isDragOver = false;
+    },
+    handleDrop(e) {
+      e.preventDefault();
+      let me = this;
+      const files = e.dataTransfer.files;
+      if (files[0] && files[0].type.includes("image")) {
+        if (
+          me.$refs.uploadArea &&
+          typeof me.$refs.uploadArea.setFileSelected === "function"
+        ) {
+          me.$refs.uploadArea.setFileSelected(files);
+          me.convertQRCode();
+        }
+      }
+    },
     /**
      * Tạo QR code từ text
      */
@@ -109,6 +158,7 @@ export default {
       isRemoveEmpty: false,
       historyItems: [],
       qrCodeItems: [],
+      isDragOver: false,
     };
   },
 };
