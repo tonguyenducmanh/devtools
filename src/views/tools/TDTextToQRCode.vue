@@ -43,6 +43,11 @@
           :type="$tdEnum.buttonType.secondary"
           label="Example"
         ></TDButton>
+        <TDInput
+          v-model="maxLengthUserConfig"
+          :inputType="'number'"
+          :placeHolder="'Số ký tự tối đa 1 mã QR'"
+        />
       </div>
     </div>
     <div v-if="textGenQR" class="qrcode-box">
@@ -79,7 +84,8 @@ export default {
      */
     async generateQRCode() {
       let me = this;
-      let maxTextOneChunk = window.__env.textToQRConfig.maxTextOneChunk;
+      let maxTextOneChunk =
+        me.maxLengthUserConfig ?? window.__env.textToQRConfig.maxTextOneChunk;
 
       // Lấy giá trị từ các input
       let text = me.getUserInput();
@@ -264,6 +270,7 @@ export default {
       isRemoveEmpty: false,
       historyItems: [],
       qrCodeItems: [],
+      maxLengthUserConfig: null,
     };
   },
 };

@@ -40,7 +40,7 @@
         <TDInput v-model="username" :placeHolder="'Nhập tên người dùng'" />
         <TDInput
           v-model="password"
-          :isTypePassword="true"
+          :inputType="'password'"
           :placeHolder="'Nhập mật khẩu để lưu/mở danh sách authen'"
           @keyup.enter="openAuthenSaved"
         />

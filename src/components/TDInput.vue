@@ -12,7 +12,7 @@
       @input="changeInputValue"
       :disabled="readOnly"
       spellcheck="false"
-      :type="isTypePassword ? 'password' : 'text'"
+      :type="inputType"
     />
     <slot></slot>
   </div>
@@ -45,9 +45,10 @@ export default {
       type: Boolean,
       default: false,
     },
-    isTypePassword: {
-      type: Boolean,
-      default: false,
+    inputType: {
+      type: String,
+      default: "text",
+      validator: (prop) => ["text", "password", "number"].includes(prop),
     },
   },
   data() {
