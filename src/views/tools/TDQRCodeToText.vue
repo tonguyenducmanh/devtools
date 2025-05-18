@@ -85,13 +85,16 @@ export default {
     handleDrop(e) {
       e.preventDefault();
       let me = this;
-      const files = e.dataTransfer.files;
-      if (files[0] && files[0].type.includes("image")) {
+      const files = Array.from(e.dataTransfer.files).filter((file) =>
+        file.type.includes("image")
+      );
+
+      if (files.length) {
         if (
           me.$refs.uploadArea &&
           typeof me.$refs.uploadArea.setFileSelected === "function"
         ) {
-          me.$refs.uploadArea.setFileSelected(files[0]);
+          me.$refs.uploadArea.setFileSelected(files); // truyền mảng files
           me.convertQRCode();
         }
       }
