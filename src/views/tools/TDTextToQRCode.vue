@@ -84,8 +84,12 @@ export default {
      */
     async generateQRCode() {
       let me = this;
-      let maxTextOneChunk =
-        me.maxLengthUserConfig ?? window.__env.textToQRConfig.maxTextOneChunk;
+      let maxTextOneChunk = Number(
+        me.maxLengthUserConfig ?? window.__env.textToQRConfig.maxTextOneChunk
+      );
+      if (!maxTextOneChunk || isNaN(maxTextOneChunk) || maxTextOneChunk <= 0) {
+        maxTextOneChunk = 1000; // fallback mặc định
+      }
 
       // Lấy giá trị từ các input
       let text = me.getUserInput();
