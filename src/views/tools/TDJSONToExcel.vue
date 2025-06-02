@@ -12,6 +12,13 @@
       ></TDTextarea>
     </div>
     <div class="flex">
+      <TDCheckbox v-model="isBoldColName" label="In đâm tên cột"></TDCheckbox>
+      <TDCheckbox
+        v-model="isFitColWidth"
+        label="Độ rộng vừa với tên cột"
+      ></TDCheckbox>
+    </div>
+    <div class="flex">
       <TDButton label="Chuyển đổi" @click="convertToExcel"></TDButton>
       <TDButton
         @click="applyMock"
@@ -40,6 +47,9 @@ export default {
       let me = this;
       me.$tdUtility.applyMock(me, TDJSONToExcel);
     },
+    /**
+     * tiền xử lý dữ liệu
+     */
     prepareData() {
       let me = this;
       let arrObj = [];
@@ -72,28 +82,80 @@ export default {
         return newRow;
       });
     },
+    /**
+     * cấu hình in đậm cột
+     */
+    configBoldColumn(worksheet, arr) {
+      let me = this;
+      let headerKeys = me.getHeaderKeys(arr);
+      if (worksheet && headerKeys && me.isBoldColName) {
+        // BOLD dòng tiêu đề (dòng đầu)
+        const range = XLSX.utils.decode_range(worksheet["!ref"]);
+
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+          const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
+          if (!worksheet[cellAddress]) continue;
+          worksheet[cellAddress].s = {
+            font: { bold: true },
+          };
+        }
+      }
+    },
+    autoFitColumn(worksheet, arr) {
+      let me = this;
+      let headerKeys = me.getHeaderKeys(arr);
+      if (worksheet && headerKeys && me.isFitColWidth) {
+        // Tự động set độ rộng cột theo nội dung
+        const colWidths = headerKeys.map((key) => {
+          const maxLen = Math.max(
+            key.length,
+            ...arr.map((row) => (row[key] ? String(row[key]).length : 0))
+          );
+          return { wch: maxLen + 2 }; // +2 để đệm
+        });
+        worksheet["!cols"] = colWidths;
+      }
+    },
+    /**
+     * lấy ra danh sách tên cột
+     */
+    getHeaderKeys(arr) {
+      let sampleObj = Array.isArray(arr) ? arr[0] : arr;
+      const headerKeys = Object.keys(sampleObj || {});
+      return headerKeys;
+    },
+    /**
+     * chuyển đổi sang excel
+     */
     convertToExcel() {
       let me = this;
       try {
         let arrObj = me.prepareData();
         // 1. Convert JSON to worksheet
         const worksheet = XLSX.utils.json_to_sheet(arrObj);
+
+        // in đậm tiêu đề cột
+        me.configBoldColumn(worksheet, arrObj);
+
+        // tự động fit độ rộng cột
+        me.autoFitColumn(worksheet, arrObj);
+
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
-        // 2. Generate binary array buffer
+        // Generate binary array buffer
         const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
 
-        // 3. Create a Blob
+        // Create a Blob
         const blob = new Blob([wbout], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
 
-        // 4. Tạo URL download và tự động click
+        // Tạo URL download và tự động click
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "du-lieu.xlsx";
+        a.download = me.fileName;
         a.click();
 
         // 5. Giải phóng bộ nhớ
@@ -106,6 +168,9 @@ export default {
   data() {
     return {
       jsonSource: "",
+      isBoldColName: true,
+      isFitColWidth: true,
+      fileName: "du-lieu.xlsx",
     };
   },
 };
