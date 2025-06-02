@@ -26,6 +26,7 @@
         </template>
       </div>
       <div class="td-sidebar-bottom">
+        <div v-if="versionApp">{{ versionApp }}</div>
         <div
           class="td-icon td-theme-toggle"
           :class="{ 'td-theme-toggle-dark': isDarkTheme }"
@@ -43,7 +44,15 @@ import { routerConfig } from "@/router/router.js";
 export default {
   name: "TDSidebar",
   components: {},
-
+  computed: {
+    versionApp() {
+      let version = "v1.0.0";
+      if (window && window.__env && window.__env.version) {
+        version = window.__env.version;
+      }
+      return version;
+    },
+  },
   created() {},
   mounted() {
     let me = this;

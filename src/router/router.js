@@ -54,7 +54,7 @@ const routerConfig = [
     name: "jsontopostgresql",
     component: () => import("@/views/tools/TDJSONToPostgreSQL.vue"),
     meta: {
-      title: "JSON to postgre sql",
+      title: "JSON to PostgreSQL",
     },
   },
   {
