@@ -26,6 +26,17 @@ const routerConfig = [
   },
   {
     /**
+     * Tnén text bằng 1 số thuật toán phổ biến
+     */
+    path: "/TDTextCompress",
+    name: "TDTextCompress",
+    component: () => import("@/views/tools/TDTextCompress.vue"),
+    meta: {
+      title: "Text Compress",
+    },
+  },
+  {
+    /**
      * so sánh code giữa 2 file
      */
     path: "/comparecode",
