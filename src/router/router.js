@@ -70,6 +70,17 @@ const routerConfig = [
   },
   {
     /**
+     * convert JSON sang Excel
+     */
+    path: "/jsontoexcel",
+    name: "jsontoexcel",
+    component: () => import("@/views/tools/TDJSONToExcel.vue"),
+    meta: {
+      title: "JSON to Excel",
+    },
+  },
+  {
+    /**
      * chuyển đổi base 64 thành ảnh
      */
     path: "/base64toimage",

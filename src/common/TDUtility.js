@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-
+import JSON5 from "json5";
 /**
  * các method TDutility dùng cho toàn bộ frontend
  * Created by tdmanh1 19.09.2024
@@ -143,6 +143,28 @@ class TDUtility {
       }
     }
     return null; // hoặc giá trị mặc định nếu không tìm thấy
+  }
+
+  /**
+   * Json parse unsafe
+   * @param {*} obj
+   * @returns object
+   */
+  JSONParse(source) {
+    let obj = [];
+    try {
+      obj = JSON.parse(source);
+    } catch (error) {
+      console.log(
+        "Đã có lỗi khi try parse mặc định, chuyển qua sử dụng JSON5" + error
+      );
+      try {
+        obj = JSON5.parse(source);
+      } catch (error) {
+        console.log("Không thể try parse được bằng JSON5" + error);
+      }
+    }
+    return obj;
   }
 }
 
