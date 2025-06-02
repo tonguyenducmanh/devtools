@@ -7,17 +7,18 @@ Two versions are supported: web version (Vue + Vite) and app version (Electron +
 List of Supported Features:
 
 ```
-Code comparison (similar to GitHub pull request)
-Recursive JSON parse
-Base64 to image
-Image to Base64
-Generate PostgreSQL insert scripts into the database from JSON data
-Text to multiple QR codes
-Multiple QR codes to a single text
-Recursive value mapping by key of two JSON objects (nested objects are also mapped)
-Download VSCode extension (legacy)
-Generate random UUIDv4
-Generate OTP (TOTP)
+"One time password",
+"Compare code",
+"JSON parser",
+"JSON to postgre sql",
+"JSON Mapping",
+"JSON to Excel",
+"Image from Base64",
+"Image to Base64",
+"QRCode from text",
+"QRCode to text",
+"Download VSCode Extension",
+"UUIDv4 generator"
 ```
 
 Feature Demos:
