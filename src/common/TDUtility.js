@@ -166,6 +166,22 @@ class TDUtility {
     }
     return obj;
   }
+  /**
+   * Tạo file tải xuống
+   */
+  createDownloadFile(buffer, type, fileName) {
+    // Tạo blob và mở popup tải file
+    const blob = new Blob([buffer], {
+      type: type,
+    });
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 }
 
 export default new TDUtility();

@@ -39,6 +39,7 @@
     "diff": "^7.0.0",
     "diff2html": "^3.4.51",
     "electron-squirrel-startup": "^1.0.1",
+    "exceljs": "^4.4.0",
     "hi-base32": "^0.5.1",
     "json5": "^2.2.3",
     "jsqr": "^1.4.0",
@@ -48,7 +49,6 @@
     "uuid": "^11.1.0",
     "vue": "^3.5.13",
     "vue-json-pretty": "^2.4.0",
-    "vue-router": "^4.5.1",
-    "xlsx": "^0.18.5"
+    "vue-router": "^4.5.1"
   }
 }

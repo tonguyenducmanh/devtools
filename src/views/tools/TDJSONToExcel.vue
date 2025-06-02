@@ -31,7 +31,7 @@
 <script>
 import { TDJSONToExcel } from "@/common/mock/mock.js";
 
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 
 export default {
   name: "TDJSONToExcel",
@@ -87,33 +87,29 @@ export default {
      */
     configBoldColumn(worksheet, arr) {
       let me = this;
-      let headerKeys = me.getHeaderKeys(arr);
-      if (worksheet && headerKeys && me.isBoldColName) {
-        // BOLD dòng tiêu đề (dòng đầu)
-        const range = XLSX.utils.decode_range(worksheet["!ref"]);
-
-        for (let C = range.s.c; C <= range.e.c; ++C) {
-          const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
-          if (!worksheet[cellAddress]) continue;
-          worksheet[cellAddress].s = {
-            font: { bold: true },
-          };
+      // Lấy header từ keys của object đầu tiên
+      if (me.isBoldColName) {
+        let headerKeys = arr ? me.getHeaderKeys(arr) : [];
+        if (headerKeys && headerKeys.length > 0 && worksheet) {
+          const headerRow = worksheet.addRow(headerKeys);
+          headerRow.eachCell((cell) => {
+            cell.font = { bold: true };
+          });
         }
       }
     },
-    autoFitColumn(worksheet, arr) {
+    autoFitColumn(worksheet) {
       let me = this;
-      let headerKeys = me.getHeaderKeys(arr);
-      if (worksheet && headerKeys && me.isFitColWidth) {
-        // Tự động set độ rộng cột theo nội dung
-        const colWidths = headerKeys.map((key) => {
-          const maxLen = Math.max(
-            key.length,
-            ...arr.map((row) => (row[key] ? String(row[key]).length : 0))
-          );
-          return { wch: maxLen + 2 }; // +2 để đệm
+      if (worksheet && worksheet.columns && worksheet.columns.length > 0) {
+        // Auto-fit chiều rộng cột
+        worksheet.columns.forEach((column) => {
+          let maxLength = 10; // default
+          column.eachCell({ includeEmpty: true }, (cell) => {
+            const value = cell.value ? cell.value.toString() : "";
+            maxLength = Math.max(maxLength, value.length);
+          });
+          column.width = maxLength + 2;
         });
-        worksheet["!cols"] = colWidths;
       }
     },
     /**
@@ -125,41 +121,52 @@ export default {
       return headerKeys;
     },
     /**
+     * thêm dữ liệu vào trong cell
+     */
+    addDataToCell(worksheet, arr) {
+      let me = this;
+      let headerKeys = arr ? me.getHeaderKeys(arr) : [];
+      if (
+        headerKeys &&
+        headerKeys.length > 0 &&
+        worksheet &&
+        arr &&
+        arr.length > 0
+      ) {
+        // Add data rows
+        arr.forEach((item) => {
+          worksheet.addRow(headerKeys.map((key) => item[key]));
+        });
+      }
+    },
+    /**
      * chuyển đổi sang excel
      */
-    convertToExcel() {
+    async convertToExcel() {
       let me = this;
       try {
         let arrObj = me.prepareData();
-        // 1. Convert JSON to worksheet
-        const worksheet = XLSX.utils.json_to_sheet(arrObj);
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Sheet1");
 
-        // in đậm tiêu đề cột
+        // in đậm cột đầu tiên
         me.configBoldColumn(worksheet, arrObj);
 
-        // tự động fit độ rộng cột
-        me.autoFitColumn(worksheet, arrObj);
+        // tự động co giãn theo độ rộng cột
+        me.autoFitColumn(worksheet);
 
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+        // thêm dữ liệu vào trong cell
+        me.addDataToCell(worksheet, arrObj);
 
-        // Generate binary array buffer
-        const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+        // Ghi workbook ra buffer
+        const buffer = await workbook.xlsx.writeBuffer();
 
-        // Create a Blob
-        const blob = new Blob([wbout], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        });
-
-        // Tạo URL download và tự động click
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = me.fileName;
-        a.click();
-
-        // 5. Giải phóng bộ nhớ
-        URL.revokeObjectURL(url);
+        // Tạo blob và mở popup tải file
+        me.$tdUtility.createDownloadFile(
+          buffer,
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          me.fileName
+        );
       } catch (error) {
         console.error("Error in convertToExcel:", error);
       }
