@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">Base64 to Image tool!</div>
+    <div class="title">Text Compress Algorithms!</div>
     <div class="flex flex-wrap paste-box">
       <div class="flex compress-input">
         <TDTextarea
