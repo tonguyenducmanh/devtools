@@ -24,13 +24,23 @@
         :options="radioImports"
       />
     </div>
-    <div class="flex">
+    <div class="flex group-btn">
       <TDButton @click="handleCompress" label="Compress"></TDButton>
       <TDButton @click="handleDempress" label="Decompress"></TDButton>
       <TDButton
         @click="applyMock"
         :type="$tdEnum.buttonType.secondary"
         label="Example"
+      ></TDButton>
+      <TDButton
+        @click="handleCopyEvent(inputSource)"
+        :type="$tdEnum.buttonType.secondary"
+        label="Copy input"
+      ></TDButton>
+      <TDButton
+        @click="handleCopyEvent(outputSource)"
+        :type="$tdEnum.buttonType.secondary"
+        label="Copy output"
       ></TDButton>
     </div>
     <div v-if="compressRatio">
@@ -72,6 +82,10 @@ export default {
   },
   mounted() {},
   methods: {
+    handleCopyEvent(value) {
+      let me = this;
+      me.$tdUtility.copyToClipboard(value);
+    },
     applyMock() {
       let me = this;
       me.$tdUtility.applyMock(me, TDTextCompress);
@@ -127,5 +141,8 @@ export default {
 }
 .compress-input {
   width: 100%;
+}
+.group-btn{
+  justify-content: flex-start;
 }
 </style>
