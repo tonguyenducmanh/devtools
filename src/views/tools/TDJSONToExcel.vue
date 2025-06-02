@@ -12,10 +12,14 @@
       ></TDTextarea>
     </div>
     <div class="flex">
-      <TDCheckbox v-model="isBoldColName" label="In đâm tên cột"></TDCheckbox>
+      <TDCheckbox v-model="isBoldColName" label="In đậm tên cột"></TDCheckbox>
       <TDCheckbox
         v-model="isFitColWidth"
         label="Độ rộng vừa với tên cột"
+      ></TDCheckbox>
+      <TDCheckbox
+        v-model="isFreezeFirstRow"
+        label="Ghim dòng đầu tiên"
       ></TDCheckbox>
     </div>
     <div class="flex">
@@ -148,6 +152,16 @@ export default {
         });
       }
     },
+    getConfigWorkSheet() {
+      let me = this;
+      let configWorkSheet = null;
+      if (me.isFreezeFirstRow) {
+        configWorkSheet = {
+          views: [{ state: "frozen", ySplit: 1 }],
+        };
+      }
+      return configWorkSheet;
+    },
     /**
      * chuyển đổi sang excel
      */
@@ -156,7 +170,8 @@ export default {
       try {
         let arrObj = me.prepareData();
         const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet("Sheet1");
+        let configWorkSheet = me.getConfigWorkSheet();
+        const worksheet = workbook.addWorksheet("Sheet1", configWorkSheet);
 
         // in đậm cột đầu tiên
         me.configBoldColumn(worksheet, arrObj);
@@ -186,6 +201,7 @@ export default {
       jsonSource: "",
       isBoldColName: true,
       isFitColWidth: true,
+      isFreezeFirstRow: true,
       fileName: "du-lieu.xlsx",
     };
   },
