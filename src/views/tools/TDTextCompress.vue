@@ -66,7 +66,7 @@ export default {
     compressRatio() {
       let ratio = 1;
       if (this.inputSource && this.outputSource) {
-        ratio = this.inputSource.length / this.outputSource.length;
+        ratio = this.outputSource.length / this.inputSource.length;
       }
       let percentRatio = (Math.round(ratio * 100) / 100).toFixed(2);
       return `Tỷ lệ nén ${percentRatio} %`;
@@ -142,7 +142,7 @@ export default {
 .compress-input {
   width: 100%;
 }
-.group-btn{
+.group-btn {
   justify-content: flex-start;
 }
 </style>
