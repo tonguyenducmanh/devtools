@@ -1,29 +1,9 @@
+import tdUtility from "@/common/TDUtility.js";
+
 /**
  * class handle nén bằng thuật toán Gzip
  */
 class TDCompressGzip {
-  constructor() {}
-  /**
-   * Chuyển ArrayBuffer -> Base64 string
-   */
-  arrayBufferToBase64(buffer) {
-    const bytes = new Uint8Array(buffer);
-    let binary = "";
-    for (let b of bytes) binary += String.fromCharCode(b);
-    return btoa(binary);
-  }
-
-  /**
-   * Chuyển Base64 string -> ArrayBuffer
-   */
-  base64ToArrayBuffer(base64) {
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    return bytes.buffer;
-  }
   /**
    * nén text
    */
@@ -41,7 +21,7 @@ class TDCompressGzip {
     );
     const compressedResponse = new Response(compressedStream);
     let result = await compressedResponse.arrayBuffer();
-    let resultText = this.arrayBufferToBase64(result);
+    let resultText = tdUtility.arrayBufferToBase64(result);
     return resultText;
   }
 
@@ -49,7 +29,7 @@ class TDCompressGzip {
    * giải nén text
    */
   async decompressText(inputSource) {
-    let buffer = this.base64ToArrayBuffer(inputSource);
+    let buffer = tdUtility.base64ToArrayBuffer(inputSource);
     const decompressedStream = new Response(buffer).body.pipeThrough(
       new DecompressionStream("gzip")
     );
