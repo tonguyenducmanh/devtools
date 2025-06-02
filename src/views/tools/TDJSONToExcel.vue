@@ -98,18 +98,27 @@ export default {
         }
       }
     },
-    autoFitColumn(worksheet) {
+    autoFitColumn(worksheet, arr) {
       let me = this;
-      if (worksheet && worksheet.columns && worksheet.columns.length > 0) {
-        // Auto-fit chiều rộng cột
-        worksheet.columns.forEach((column) => {
-          let maxLength = 10; // default
-          column.eachCell({ includeEmpty: true }, (cell) => {
-            const value = cell.value ? cell.value.toString() : "";
-            maxLength = Math.max(maxLength, value.length);
+      if (me.isFitColWidth && arr && arr.length > 0) {
+        let headerKeys = me.getHeaderKeys(arr);
+        if (
+          worksheet &&
+          worksheet.columns &&
+          worksheet.columns.length > 0 &&
+          headerKeys
+        ) {
+          // Tự động set độ rộng cột theo nội dung
+          const colWidths = headerKeys.map((field) => {
+            const maxLen = Math.max(
+              field.length,
+              ...arr.map((row) => (row[field] ? String(row[field]).length : 0))
+            );
+            return { header: field, key: field, width: maxLen + 2 }; // +2 để đệm
           });
-          column.width = maxLength + 2;
-        });
+          // Auto-fit chiều rộng cột
+          worksheet.columns = colWidths;
+        }
       }
     },
     /**
@@ -153,7 +162,7 @@ export default {
         me.configBoldColumn(worksheet, arrObj);
 
         // tự động co giãn theo độ rộng cột
-        me.autoFitColumn(worksheet);
+        me.autoFitColumn(worksheet, arrObj);
 
         // thêm dữ liệu vào trong cell
         me.addDataToCell(worksheet, arrObj);
