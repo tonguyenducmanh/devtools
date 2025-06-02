@@ -15,17 +15,6 @@ const routerConfig = [
   },
   {
     /**
-     * so sánh code giữa 2 file
-     */
-    path: "/comparecode",
-    name: "comparecode",
-    component: () => import("@/views/tools/TDCompareCode.vue"),
-    meta: {
-      title: "Compare code",
-    },
-  },
-  {
-    /**
      * Time-based one-time password authenticator
      */
     path: "/TDOneTimePassword",
@@ -33,6 +22,17 @@ const routerConfig = [
     component: () => import("@/views/tools/TDOneTimePassword.vue"),
     meta: {
       title: "One time password",
+    },
+  },
+  {
+    /**
+     * so sánh code giữa 2 file
+     */
+    path: "/comparecode",
+    name: "comparecode",
+    component: () => import("@/views/tools/TDCompareCode.vue"),
+    meta: {
+      title: "Compare code",
     },
   },
   {
@@ -48,28 +48,6 @@ const routerConfig = [
   },
   {
     /**
-     * chuyển đổi base 64 thành ảnh
-     */
-    path: "/base64toimage",
-    name: "base64toimage",
-    component: () => import("@/views/tools/TDBase64ToImage.vue"),
-    meta: {
-      title: "Base64 to image",
-    },
-  },
-  {
-    /**
-     * chuyển đổi ảnh thành base 64
-     */
-    path: "/imagetobase64",
-    name: "imagetobase64",
-    component: () => import("@/views/tools/TDImageToBase64.vue"),
-    meta: {
-      title: "Image to base64",
-    },
-  },
-  {
-    /**
      * chuyển đổi json thành câu lệnh insert postgresql
      */
     path: "/jsontopostgresql",
@@ -81,13 +59,47 @@ const routerConfig = [
   },
   {
     /**
+     * mapping đệ quy json value
+     */
+    path: "/mappingjson",
+    name: "mappingjson",
+    component: () => import("@/views/tools/TDMappingJSON.vue"),
+    meta: {
+      title: "JSON Mapping",
+    },
+  },
+  {
+    /**
+     * chuyển đổi base 64 thành ảnh
+     */
+    path: "/base64toimage",
+    name: "base64toimage",
+    component: () => import("@/views/tools/TDBase64ToImage.vue"),
+    meta: {
+      title: "Image from Base64",
+    },
+  },
+  {
+    /**
+     * chuyển đổi ảnh thành base 64
+     */
+    path: "/imagetobase64",
+    name: "imagetobase64",
+    component: () => import("@/views/tools/TDImageToBase64.vue"),
+    meta: {
+      title: "Image to Base64",
+    },
+  },
+
+  {
+    /**
      * chuyển đổi văn bản thành mã QR
      */
     path: "/textoqrcode",
     name: "textoqrcode",
     component: () => import("@/views/tools/TDTextToQRCode.vue"),
     meta: {
-      title: "Text to QRCode",
+      title: "QRCode from text",
     },
   },
   {
@@ -99,17 +111,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDQRCodeToText.vue"),
     meta: {
       title: "QRCode to text",
-    },
-  },
-  {
-    /**
-     * mapping đệ quy json value
-     */
-    path: "/mappingjson",
-    name: "mappingjson",
-    component: () => import("@/views/tools/TDMappingJSON.vue"),
-    meta: {
-      title: "Mapping JSON",
     },
   },
   {
