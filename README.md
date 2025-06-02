@@ -8,9 +8,10 @@ List of Supported Features:
 
 ```
 "One time password",
+"Text Compress",
 "Compare code",
 "JSON parser",
-"JSON to postgre sql",
+"JSON to pPostgreSQL",
 "JSON Mapping",
 "JSON to Excel",
 "Image from Base64",
