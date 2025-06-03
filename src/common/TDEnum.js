@@ -26,8 +26,9 @@ class TDEnum {
   };
   // loại nén
   compressType = {
-    gzip: 0,
-    brotli: 1,
+    gzip: "gzip",
+    deflate: "deflate",
+    deflateRaw: "deflate-raw",
   };
 }
 

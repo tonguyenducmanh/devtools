@@ -1,51 +1,43 @@
 import tdEnum from "@/common/TDEnum.js";
-import TDCompressGzip from "@/common/compress/driver/TDCompressGzip.js";
-import TDCompressBrotli from "@/common/compress/driver/TDCompressBrotli.js";
+import tdUtility from "@/common/TDUtility.js";
 
 /**
  * class handle nghiệp vụ nén text
  */
 class TDCompress {
   /**
-   * lấy ra driver xử lý nén
-   */
-  getCompressType(typeCompress) {
-    switch (typeCompress) {
-      case tdEnum.compressType.gzip:
-        return TDCompressGzip;
-      case tdEnum.compressType.brotli:
-        return TDCompressBrotli;
-      default:
-        return TDCompressGzip;
-    }
-  }
-
-  /**
    * nén text
    */
   async compressText(inputSource, typeCompress = tdEnum.compressType.gzip) {
-    let compressDriver = this.getCompressType(typeCompress);
-    let result = null;
-    if (compressDriver) {
-      result = await compressDriver.compressText(inputSource);
-    } else {
-      result = inputSource;
-    }
-    return result;
+    const encoder = new TextEncoder();
+    const inputStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(inputSource));
+        controller.close();
+      },
+    });
+
+    const compressedStream = inputStream.pipeThrough(
+      new CompressionStream(typeCompress)
+    );
+    const compressedResponse = new Response(compressedStream);
+    let result = await compressedResponse.arrayBuffer();
+    let resultText = tdUtility.arrayBufferToBase64(result);
+    return resultText;
   }
 
   /**
    * giải nén text
    */
   async decompressText(inputSource, typeCompress = tdEnum.compressType.gzip) {
-    let compressDriver = this.getCompressType(typeCompress);
-    let result = null;
-    if (compressDriver) {
-      result = await compressDriver.decompressText(inputSource);
-    } else {
-      result = inputSource;
-    }
-    return result;
+    let buffer = tdUtility.base64ToArrayBuffer(inputSource);
+    const decompressedStream = new Response(buffer).body.pipeThrough(
+      new DecompressionStream(typeCompress)
+    );
+
+    const decompressedResponse = new Response(decompressedStream);
+    const text = await decompressedResponse.text();
+    return text;
   }
 }
 

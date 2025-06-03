@@ -121,9 +121,12 @@ export default {
       radioImports: [
         { value: this.$tdEnum.compressType.gzip, label: "Gzip" },
         {
-          value: this.$tdEnum.compressType.brotli,
-          label: "Brotli",
-          disabled: true,
+          value: this.$tdEnum.compressType.deflate,
+          label: "Deflate",
+        },
+        {
+          value: this.$tdEnum.compressType.deflateRaw,
+          label: "Deflate raw",
         },
       ],
     };
