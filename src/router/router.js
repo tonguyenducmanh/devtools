@@ -92,6 +92,17 @@ const routerConfig = [
   },
   {
     /**
+     * PostgreSQL Formatter
+     */
+    path: "/postgresqlformatter",
+    name: "postgresqlformatter",
+    component: () => import("@/views/tools/TDPostgreSQLFormatter.vue"),
+    meta: {
+      title: "PostgreSQL Formatter",
+    },
+  },
+  {
+    /**
      * chuyển đổi base 64 thành ảnh
      */
     path: "/base64toimage",
