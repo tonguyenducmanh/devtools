@@ -52,3 +52,87 @@ export const TDTextCompress = {
   inputSource:
     '{"Data":"{\\"ValidateInfo\\":[],\\"Success\\":true,\\"Code\\":0,\\"SubCode\\":1,\\"UserMessage\\":\\"\\",\\"SystemMessage\\":null,\\"Data\\":{\\"ConnectedSyncID\\":\\"85355b03-824b-4df2-bbd0-f4f0a128eecf\\",\\"ConnectedSyncIDOld\\":null,\\"UserID\\":\\"73ddd5b8-c580-43f7-bd87-0de5b49ef892\\",\\"EmployeeCode\\":null,\\"FullName\\":null,\\"ActionCode\\":\\"RequestBillApproval\\",\\"AppCode\\":\\"APU\\",\\"ListProcess\\":[{\\"ProcessURL\\":\\"/process/execute/1?ID=369569&type=1&status=0&appCode=AMISProcess&companyCode=rwduneto&isIFrame=true\\",\\"Note\\":null,\\"UserInfo\\":{\\"UserID\\":\\"73ddd5b8-c580-43f7-bd87-0de5b49ef892\\",\\"EmployeeID\\":null,\\"UserName\\":\\"hr@htsb.vn\\",\\"FullName\\":\\"NGUYỄN THỊ THANH\\",\\"FirstName\\":\\"NGUYỄN THỊ\\",\\"LastName\\":\\"THANH\\",\\"Email\\":\\"hr@htsb.vn\\",\\"Mobile\\":\\"978931811\\",\\"OrganizationUnitID\\":\\"56495e9a-1faa-4031-a9a7-0a2d0fee7111\\",\\"OrganizationUnitName\\":\\"Phòng hành chính nhân sự\\",\\"GroupID\\":null,\\"ListGroupID\\":null,\\"ListGroupName\\":null,\\"IsChangedGroup\\":false,\\"GroupName\\":null,\\"Status\\":3,\\"Avatar\\":null,\\"RoleID\\":null,\\"RoleName\\":null,\\"Birthday\\":null,\\"Gender\\":null,\\"Address\\":null,\\"IsStaff\\":true,\\"IsDeleted\\":false,\\"IsUser\\":true,\\"EmployeeCode\\":\\"HT041920229\\",\\"JobPositionName\\":\\"Trưởng Phòng\\",\\"JobPositionID\\":\\"3f51245f-7feb-45cc-9bfa-dadf37a53d7c\\",\\"EmployeeStatus\\":1,\\"OfficeEmail\\":\\"hr@htsb.vn\\",\\"ContactEmail\\":\\"hr@htsb.vn\\",\\"MISACode\\":null,\\"RoleDetails\\":null,\\"OrganizationPath\\":null,\\"ReportToID\\":null,\\"ReportToName\\":null,\\"JobTitleID\\":\\"9bcf803a-16bf-11f0-8aa8-005056b2b21e\\",\\"JobTitleName\\":\\"Trưởng phòng\\",\\"JobGroupID\\":null,\\"UserGroupID\\":null,\\"OfficeID\\":null,\\"OfficeName\\":null,\\"OrganizationUnitOfficeCode\\":null,\\"OrganizationUnitOfficeID\\":null,\\"OrganizationUnitOfficeName\\":null,\\"TenantID\\":\\"c99c4ef5-ec28-4f85-8693-bcca7777d179\\",\\"CreatedDate\\":\\"2025-05-28T16:34:34.890+07:00\\",\\"CreatedBy\\":null,\\"ModifiedDate\\":\\"2025-05-28T16:34:34.890+07:00\\",\\"ModifiedBy\\":null,\\"EditVersion\\":null,\\"State\\":0,\\"OldData\\":null,\\"PassWarningCode\\":null},\\"UserAccepted\\":[],\\"ActionType\\":1,\\"CurrentStep\\":null,\\"EmployeeCode\\":null,\\"ProcessExecutionID\\":369569,\\"ProcessExecutionCode\\":null,\\"ProcessExecutionTitle\\":\\"Quy trình phê duyệt Đơn mua hàng của NGUYỄN THỊ THANH\\",\\"Status\\":0,\\"CreatorID\\":\\"73ddd5b8-c580-43f7-bd87-0de5b49ef892\\",\\"CreatorName\\":\\"NGUYỄN THỊ THANH\\",\\"CreatorOrgName\\":\\"Phòng hành chính nhân sự\\",\\"CreatorOrgID\\":\\"56495e9a-1faa-4031-a9a7-0a2d0fee7111\\",\\"PublishDate\\":\\"2025-05-28T09:34:34.000+07:00\\",\\"Data\\":null,\\"DataReturn\\":{\\"VoucherRefNo\\":\\"DMH555555\\",\\"VoucherType\\":\\"\\",\\"UserID\\":[{\\"UserID\\":\\"73ddd5b8-c580-43f7-bd87-0de5b49ef892\\",\\"EmployeeID\\":null,\\"UserName\\":\\"hr@htsb.vn\\",\\"FullName\\":\\"NGUYỄN THỊ THANH\\",\\"FirstName\\":\\"NGUYỄN THỊ\\",\\"LastName\\":\\"THANH\\",\\"Email\\":\\"hr@htsb.vn\\",\\"Mobile\\":\\"978931811\\",\\"OrganizationUnitID\\":\\"56495e9a-1faa-4031-a9a7-0a2d0fee7111\\",\\"OrganizationUnitName\\":\\"Phòng hành chính nhân sự\\",\\"GroupID\\":null,\\"ListGroupID\\":null,\\"ListGroupName\\":null,\\"IsChangedGroup\\":false,\\"GroupName\\":null,\\"Status\\":3,\\"Avatar\\":null,\\"RoleID\\":null,\\"RoleName\\":null,\\"Birthday\\":null,\\"Gender\\":null,\\"Address\\":null,\\"IsStaff\\":true,\\"IsDeleted\\":false,\\"IsUser\\":true,\\"EmployeeCode\\":\\"HT041920229\\",\\"JobPositionName\\":\\"Trưởng Phòng\\",\\"JobPositionID\\":\\"3f51245f-7feb-45cc-9bfa-dadf37a53d7c\\",\\"EmployeeStatus\\":1,\\"OfficeEmail\\":\\"hr@htsb.vn\\",\\"ContactEmail\\":\\"hr@htsb.vn\\",\\"MISACode\\":null,\\"RoleDetails\\":null,\\"OrganizationPath\\":\\"Phòng hành chính nhân sự\\",\\"ReportToID\\":null,\\"ReportToName\\":null,\\"JobTitleID\\":\\"9bcf803a-16bf-11f0-8aa8-005056b2b21e\\",\\"JobTitleName\\":\\"Trưởng phòng\\",\\"JobGroupID\\":null,\\"UserGroupID\\":null,\\"OfficeID\\":null,\\"OfficeName\\":null,\\"OrganizationUnitOfficeCode\\":null,\\"OrganizationUnitOfficeID\\":null,\\"OrganizationUnitOfficeName\\":null,\\"TenantID\\":\\"c99c4ef5-ec28-4f85-8693-bcca7777d179\\",\\"CreatedDate\\":\\"2025-05-28T16:34:34.028+07:00\\",\\"CreatedBy\\":null,\\"ModifiedDate\\":\\"2025-05-28T16:34:34.028+07:00\\",\\"ModifiedBy\\":null,\\"EditVersion\\":null,\\"State\\":0,\\"OldData\\":null,\\"PassWarningCode\\":null}],\\"OrganizationUnitID\\":[{\\"OrganizationUnitID\\":\\"56495e9a-1faa-4031-a9a7-0a2d0fee7111\\",\\"OrganizationUnitCode\\":\\"HR\\",\\"OrganizationUnitName\\":\\"Phòng hành chính nhân sự\\",\\"OrganizationUnitParentsName\\":\\"Phòng hành chính nhân sự\\",\\"OrganizationPath\\":null}],\\"VoucherPurpose\\":\\"\\",\\"DeliverDeadline\\":null,\\"DeliveryAddress\\":\\"\\",\\"VoucherPrintTemplate\\":[{\\"FileID\\":\\"c3362148-493b-443c-bcb1-bb1edc355846.pdf\\",\\"FileName\\":\\"Purchase OrderVAT_Soluong_PDF DMH555555.pdf\\",\\"FileSize\\":141005,\\"FileType\\":\\".pdf\\",\\"DownloadURL\\":\\"http://storage.misaonline.local:32469/amis-platform/rwduneto/process/fileattachment/c3362148-493b-443c-bcb1-bb1edc355846.pdf?AWSAccessKeyId=amisplatform&Expires=1748425475&Signature=sAZ%2Fkfr93rJSHRYogp9I%2Bw7pLa4%3D\\"}],\\"FilePrint\\":[]},\\"ConnectedInfoJSON\\":\\"\\"}],\\"TenantID\\":\\"c99c4ef5-ec28-4f85-8693-bcca7777d179\\",\\"CreatedDate\\":\\"2025-05-28T16:34:34.147+07:00\\",\\"CreatedBy\\":null,\\"ModifiedDate\\":\\"2025-05-28T16:34:34.147+07:00\\",\\"ModifiedBy\\":null,\\"EditVersion\\":null,\\"State\\":0,\\"OldData\\":null,\\"PassWarningCode\\":null},\\"GetLastData\\":true,\\"ServerTime\\":\\"2025-05-28T16:34:34.890+07:00\\"}"}',
 };
+
+export const TDPostgreSQLFormatter = {
+  inputSource: `-- sample code comment
+    /*
+    * sample row code comment
+    */
+    select customer_id, customer_code, customer_name from public.customer ao1 where (customer_id is not null and customer_code = 'tdmanh' or (select 1 from public.user_collection mu2 order by created desc group by modified having total >= 0) and 1 = 1) or customer_type = 1;
+
+
+
+    select * from public.voucher_stored gv3;
+
+    select mu.email from public.user_collection mu
+    where mu.user_id in
+    (
+    select mujr.user_id from public.user_collection_join_role mujr where role_id ='c4908208-d527-4b9e-b216-e8fb4fb26a1d'
+    )
+
+    -- query danh sách email nhắc nhở
+    select * from public.email_sent_remind where company_id ='';
+
+    -- query lập lịch gửi email
+    select * from public.report_submission_schedule_config where refid = ''
+    -- query size của db
+    SELECT pg_database_size(pd.datname)/1024/1024 AS size_in_mb
+                                FROM pg_database pd where pd.datname = current_database();
+
+    -- query user email
+    select
+                                    vtdu.company_id,
+    vtdu.company_name ,
+    vtdu.email ,
+    max(vtdu.full_name) as full_name
+                                from
+    public.view_company_database_user vtdu
+                                where
+    vtdu.company_id = any(:p_company_checks)
+    and vtdu.amis_role_type in (1, 2)
+                                group by
+                                    vtdu.company_id,
+    vtdu.company_name ,
+    vtdu.email;
+
+    select
+    ou2.partner_platform_id as partner_platform_id,
+    ou.partner_platform_id as branch_id
+                            from
+    public.org_info ou
+                            join public.org_info ou2 on
+    ou2.org_info_id = ou.branch_id
+                            where
+    ou.partner_platform_id = any(:p_org_ids);
+
+
+    -- thông tin vật tư mapping
+    select
+        smis.item_id_shopee,
+        smis.model_id_shopee,
+        smis.product_id,
+        smis.product_code,
+        smis.product_name,
+        ii.is_customized,
+        ii.tax_rate,
+        ii.other_vat_rate,
+        smis.tier_variation1,
+        smis.tier_variation2,
+        smis.tier_group_name1,
+        smis.tier_group_name2,
+        smis.unit_id,
+        smis.unit_name,
+        smis.is_model_detail,
+        ii.unit_list,
+        ii.unit_id as main_unit_id,
+        ii.unit_name as main_unit_name
+    from
+        public.setting_mapping smis
+    left join public.shopee_connection_info sci
+        on sci.connection_id = smis.connection_id
+    left join public.product ii
+        on ii.product_id = smis.product_id
+    where
+        sci.shop_id = :p_shop_id
+        and smis.item_id_shopee = any(:p_item_ids);`,
+};
