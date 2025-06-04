@@ -108,8 +108,8 @@ export const TDPostgreSQLFormatter = {
 
     -- thông tin vật tư mapping
     select
-        smis.item_id_shopee,
-        smis.model_id_shopee,
+        smis.item_id_tiki,
+        smis.model_id_tiki,
         smis.product_id,
         smis.product_code,
         smis.product_name,
@@ -128,11 +128,11 @@ export const TDPostgreSQLFormatter = {
         ii.unit_name as main_unit_name
     from
         public.setting_mapping smis
-    left join public.shopee_connection_info sci
+    left join public.tiki_connection_info sci
         on sci.connection_id = smis.connection_id
     left join public.product ii
         on ii.product_id = smis.product_id
     where
         sci.shop_id = :p_shop_id
-        and smis.item_id_shopee = any(:p_item_ids);`,
+        and smis.item_id_tiki = any(:p_item_ids);`,
 };
