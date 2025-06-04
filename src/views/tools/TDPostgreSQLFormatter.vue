@@ -5,13 +5,13 @@
       <TDTextarea
         placeHolder="PostgreSQL raw input"
         v-model="inputSource"
-        height="400px"
+        height="100%"
         width="50%"
       ></TDTextarea>
       <TDTextarea
         placeHolder="PostgreSQL formatted output"
         v-model="outputSource"
-        height="400px"
+        height="100%"
         width="50%"
       ></TDTextarea>
     </div>
@@ -80,5 +80,6 @@ export default {
 }
 .input-container {
   column-gap: var(--padding);
+  height: 80%;
 }
 </style>
