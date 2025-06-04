@@ -1,15 +1,15 @@
 <template>
   <div class="container">
-    <div class="title">PostgreSQL Formatter!</div>
-    <div class="flex compress-input">
+    <div class="title">PostgreSQL formatter (beta)!</div>
+    <div class="flex input-container">
       <TDTextarea
-        placeHolder="Text to compress"
+        placeHolder="PostgreSQL raw input"
         v-model="inputSource"
         height="400px"
         width="50%"
       ></TDTextarea>
       <TDTextarea
-        placeHolder="Text from compress"
+        placeHolder="PostgreSQL formatted output"
         v-model="outputSource"
         height="400px"
         width="50%"
@@ -71,5 +71,8 @@ export default {
   border-radius: 0;
   min-height: 100vh;
   box-shadow: none;
+}
+.input-container {
+  column-gap: var(--padding);
 }
 </style>
