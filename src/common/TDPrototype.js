@@ -69,3 +69,48 @@ String.prototype.containsNotSentive =
       this.trim().toLowerCase().indexOf(value.trim().toLowerCase()) > -1
     );
   };
+
+/**
+ * so sánh 2 text string không phân biệt hoa thường và khoảng cách
+ */
+String.prototype.compareText =
+  String.prototype.compareText ||
+  function (value) {
+    return (
+      arguments &&
+      arguments[0] &&
+      this.trim().toLowerCase() == value.toString().trim().toLowerCase()
+    );
+  };
+
+/**
+ * kiểm tra bắt đầu bằng không phân biệt hoa thường và khoảng cách
+ */
+String.prototype.compareStartText =
+  String.prototype.compareStartText ||
+  function (value) {
+    // kiểm tra nếu bắt đầu chứa text cần check
+    // và length phải lớn hơn text cần check
+    return (
+      arguments &&
+      arguments[0] &&
+      value.trim().toLowerCase().startsWith(this.trim().toLowerCase()) &&
+      value.trim().length > this.trim().length
+    );
+  };
+
+/**
+ * kiểm tra kết thúc bằng không phân biệt hoa thường và khoảng cách
+ */
+String.prototype.compareEndText =
+  String.prototype.compareEndText ||
+  function (value) {
+    // kiểm tra nếu kết thúc chứa text cần check
+    // và length phải lớn hơn text cần check
+    return (
+      arguments &&
+      arguments[0] &&
+      value.trim().toLowerCase().endsWith(this.trim().toLowerCase()) &&
+      value.trim().length > this.trim().length
+    );
+  };

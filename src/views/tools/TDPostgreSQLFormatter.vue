@@ -32,6 +32,7 @@
 </template>
 <script>
 import { TDPostgreSQLFormatter } from "@/common/mock/mock.js";
+import { formatCode } from "@/common/formatter/postgresql/postgreSQLFormatter.js";
 
 export default {
   name: "TDPostgreSQLFormatter",
@@ -49,6 +50,11 @@ export default {
     },
     handleFormat() {
       let me = this;
+      if (me.inputSource) {
+        me.outputSource = formatCode(me.inputSource);
+      } else {
+        me.outputSource = null;
+      }
     },
     handleCopyEvent(value) {
       let me = this;
