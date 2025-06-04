@@ -4,6 +4,12 @@ This project provides a collection of useful tools for developers, aggregated wi
 
 Two versions are supported: web version (Vue + Vite) and app version (Electron + Vue + Vite).
 
+[https://utilityfordev.pages.dev/](https://utilityfordev.pages.dev/)
+
+[https://utilityfordev.netlify.app/](https://utilityfordev.netlify.app/)
+
+[https://utilityfordev.vercel.app/](https://utilityfordev.vercel.app/)
+
 List of Supported Features:
 
 ```
@@ -35,3 +41,31 @@ window.__env
 Global objects are injected in the `renderer.js` file, for example: `$tdCache = import TDCache.js`, `$tdEnum = import TDEnum.js`.
 
 The `[mock.js](src/common/mock/mock.js)` file will be used to fake data for each tool.
+
+To setup this project
+
+```
+npm i
+```
+
+To Run and Build project
+
+For web version
+
+```
+npm run web:dev
+```
+
+```
+npm run web:build
+```
+
+For desktop version
+
+```
+npm run electron:dev
+```
+
+```
+npm run electron:build
+```
