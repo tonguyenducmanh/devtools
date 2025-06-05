@@ -1,6 +1,5 @@
-// object lưu enum dùng chung cho toàn bộ tool
-export const enumeration = {
-  tokenType: {
+class postgreSQLConstant {
+  tokenType = {
     // dấu đóng mở ngoặc
     parenthesis: "parenthesis",
     // từ khóa
@@ -17,8 +16,8 @@ export const enumeration = {
     number: "number",
     // chữ cái vd "123"
     text: "text",
-  },
-  astType: {
+  };
+  astType = {
     // chương trình
     program: "program",
     // bọc biểu thức bằng ()
@@ -37,5 +36,27 @@ export const enumeration = {
     number: "number",
     // chữ cái vd "123"
     text: "text",
-  },
-};
+  };
+  keywords = {
+    SLASHCHAR: "/",
+    ASTERISKCHAR: "*",
+    OPENPARENTHESISCHAR: "(",
+    CLOSEPARENTHESISCHAR: ")",
+    EMPTYPARENTHESIS: "()",
+    SEMICOLONCHAR: ";",
+    SEMICHAR: ",",
+    HYPHENCHAR: "-",
+    ASTERISKANDSLASH: "*/",
+    APOSTROPHECHAR: "'",
+    SPACECHAR: " ",
+    BREAKLINECHAR: "\n",
+    NUMBERS: /[0-9]/,
+    WHITESPACE: /\s/,
+    BREAKLINE: `
+`,
+    NEWLINE: /\n/,
+    LETTERSCONTAINNUM: /^[a-z_.:*%><=0-9]+$/i,
+  };
+}
+
+export default new postgreSQLConstant();

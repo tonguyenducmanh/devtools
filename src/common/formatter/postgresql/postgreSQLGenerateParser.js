@@ -1,8 +1,4 @@
-import { enumeration } from "@/common/formatter/keyword/SQLEnumeration.js";
-import {
-  CLOSEPARENTHESISCHAR,
-  OPENPARENTHESISCHAR,
-} from "@/common/formatter/keyword/SQLConstant.js";
+import postgreSQLConstant from "@/common/formatter/postgresql/postgreSQLConstant.js";
 
 /**
  * biến đổi các token thành Abstract Syntax Tree
@@ -16,31 +12,31 @@ export function generateParser(tokens) {
 
     if (
       [
-        enumeration.tokenType.number,
-        enumeration.tokenType.text,
-        enumeration.tokenType.keyword,
-        enumeration.tokenType.semicolon,
-        enumeration.tokenType.semi,
-        enumeration.tokenType.newLine,
-        enumeration.tokenType.comment,
+        postgreSQLConstant.tokenType.number,
+        postgreSQLConstant.tokenType.text,
+        postgreSQLConstant.tokenType.keyword,
+        postgreSQLConstant.tokenType.semicolon,
+        postgreSQLConstant.tokenType.semi,
+        postgreSQLConstant.tokenType.newLine,
+        postgreSQLConstant.tokenType.comment,
       ].includes(token.type)
     ) {
       current++;
       return {
-        type: enumeration.astType[token.type],
+        type: postgreSQLConstant.astType[token.type],
         value: token.value,
       };
     }
 
     if (
-      token.type === enumeration.tokenType.parenthesis &&
-      token.value === OPENPARENTHESISCHAR
+      token.type === postgreSQLConstant.tokenType.parenthesis &&
+      token.value === postgreSQLConstant.keywords.OPENPARENTHESISCHAR
     ) {
       token = tokens[++current];
       // kiểm tra xem trong ngoặc có phần tử nào không
       let firstItemInParenthesis = walk(token);
       let node = {
-        type: enumeration.astType.callExpression,
+        type: postgreSQLConstant.astType.callExpression,
       };
       if (firstItemInParenthesis) {
         node.params = [firstItemInParenthesis];
@@ -50,9 +46,9 @@ export function generateParser(tokens) {
       // nếu trong ngoặc có phần tử thì thực hiện vòng while để quét bằng hết các phần tử
       while (
         token &&
-        (token.type !== enumeration.tokenType.parenthesis ||
-          (token.type === enumeration.tokenType.parenthesis &&
-            token.value !== CLOSEPARENTHESISCHAR))
+        (token.type !== postgreSQLConstant.tokenType.parenthesis ||
+          (token.type === postgreSQLConstant.tokenType.parenthesis &&
+            token.value !== postgreSQLConstant.keywords.CLOSEPARENTHESISCHAR))
       ) {
         let nextWalk = walk();
         if (nextWalk) {
@@ -75,7 +71,7 @@ export function generateParser(tokens) {
 
   // cây phân hệ
   let ast = {
-    type: enumeration.astType.program,
+    type: postgreSQLConstant.astType.program,
     body: [],
   };
 

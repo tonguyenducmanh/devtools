@@ -1,14 +1,6 @@
 let config = window.__env.postgreSQLFormatter || {};
-import { enumeration } from "@/common/formatter/keyword/SQLEnumeration.js";
 import { postgreSQLKeyword } from "@/common/formatter/postgresql/postgreSQLKeyword.js";
-import {
-  APOSTROPHECHAR,
-  OPENPARENTHESISCHAR,
-  CLOSEPARENTHESISCHAR,
-  SPACECHAR,
-  BREAKLINECHAR,
-  EMPTYPARENTHESIS,
-} from "@/common/formatter/keyword/SQLConstant.js";
+import postgreSQLConstant from "@/common/formatter/postgresql/postgreSQLConstant.js";
 
 const TAB = config.tabSpace;
 let _currentLevel = 0;
@@ -29,7 +21,7 @@ export function codeGenerator(node, index, allNodes) {
   _startNewLine = false;
   switch (node.type) {
     // node là program thì chạy toàn bộ các node con
-    case enumeration.astType.program: {
+    case postgreSQLConstant.astType.program: {
       let allValues = node.body.map((x, index, arr) =>
         codeGenerator(x, index, arr)
       );
@@ -37,38 +29,47 @@ export function codeGenerator(node, index, allNodes) {
       break;
     }
     // bỏ qua xuống dòng thừa thãi từ source code
-    case enumeration.astType.newLine: {
+    case postgreSQLConstant.astType.newLine: {
       result = null;
       break;
     }
 
-    case enumeration.astType.semicolon: {
-      result = node.value + BREAKLINECHAR;
+    case postgreSQLConstant.astType.semicolon: {
+      result = node.value + postgreSQLConstant.keywords.BREAKLINECHAR;
       break;
     }
-    case enumeration.astType.comment: {
-      result = BREAKLINECHAR + tabSpace + node.value + BREAKLINECHAR;
+    case postgreSQLConstant.astType.comment: {
+      result =
+        postgreSQLConstant.keywords.BREAKLINECHAR +
+        tabSpace +
+        node.value +
+        postgreSQLConstant.keywords.BREAKLINECHAR;
       break;
     }
-    case enumeration.astType.semi: {
+    case postgreSQLConstant.astType.semi: {
       _startNewLine = true;
-      result = node.value + BREAKLINECHAR + tabForSemi;
+      result =
+        node.value + postgreSQLConstant.keywords.BREAKLINECHAR + tabForSemi;
       break;
     }
-    case enumeration.astType.keyword: {
+    case postgreSQLConstant.astType.keyword: {
       result = buildKeyWordText(node, tabSpace, tabForNewLine, allNodes, index);
       break;
     }
-    case enumeration.astType.number: {
+    case postgreSQLConstant.astType.number: {
       let subFix = buildSubFix(allNodes, index);
       result = tabForNewLine + node.value + subFix;
       break;
     }
-    case enumeration.astType.text: {
-      result = tabForNewLine + APOSTROPHECHAR + node.value + APOSTROPHECHAR;
+    case postgreSQLConstant.astType.text: {
+      result =
+        tabForNewLine +
+        postgreSQLConstant.keywords.APOSTROPHECHAR +
+        node.value +
+        postgreSQLConstant.keywords.APOSTROPHECHAR;
       break;
     }
-    case enumeration.astType.callExpression: {
+    case postgreSQLConstant.astType.callExpression: {
       result = buildCallExpressionText(node, tabSpace);
       break;
     }
@@ -86,13 +87,13 @@ export function codeGenerator(node, index, allNodes) {
  * @returns subfix
  */
 function buildSubFix(allNodes, index) {
-  let subFix = SPACECHAR;
+  let subFix = postgreSQLConstant.keywords.SPACECHAR;
   if (allNodes?.length > 0 && index + 1 < allNodes.length) {
     let nextNode = allNodes[index + 1];
     // nếu node tiếp theo là dấu ; hoặc , thì không build subfix
     if (
-      nextNode.type == enumeration.astType.semi ||
-      nextNode.type == enumeration.astType.semicolon
+      nextNode.type == postgreSQLConstant.astType.semi ||
+      nextNode.type == postgreSQLConstant.astType.semicolon
     ) {
       subFix = "";
     }
@@ -119,12 +120,12 @@ function buildCallExpressionText(node, tabSpace) {
   }
   if (parenthesisValue) {
     result = [
-      OPENPARENTHESISCHAR,
+      postgreSQLConstant.keywords.OPENPARENTHESISCHAR,
       parenthesisValue,
-      tabSpace + CLOSEPARENTHESISCHAR,
-    ].join(BREAKLINECHAR);
+      tabSpace + postgreSQLConstant.keywords.CLOSEPARENTHESISCHAR,
+    ].join(postgreSQLConstant.keywords.BREAKLINECHAR);
   } else {
-    result = EMPTYPARENTHESIS;
+    result = postgreSQLConstant.keywords.EMPTYPARENTHESIS;
   }
   _currentLevel--;
   return result;
@@ -154,18 +155,27 @@ function buildKeyWordText(node, tabSpace, tabForNewLine, allNodes, index) {
 
   if (config.listKeyWordBreakLine.find((x) => valueBuild.compareText(x))) {
     _startNewLine = true;
-    result = BREAKLINECHAR + tabSpace + valueBuild + BREAKLINECHAR + tabSpace;
+    result =
+      postgreSQLConstant.keywords.BREAKLINECHAR +
+      tabSpace +
+      valueBuild +
+      postgreSQLConstant.keywords.BREAKLINECHAR +
+      tabSpace;
   } else if (
     config.listMutipleKeyWordBreakLine.find((x) =>
       valueBuild.compareStartText(x)
     )
   ) {
-    result = BREAKLINECHAR + tabSpace + valueBuild + subFix;
+    result =
+      postgreSQLConstant.keywords.BREAKLINECHAR +
+      tabSpace +
+      valueBuild +
+      subFix;
   } else if (
     config.listMutipleKeyWordBreakLine.find((x) => valueBuild.compareEndText(x))
   ) {
     _startNewLine = true;
-    result = valueBuild + BREAKLINECHAR + tabSpace;
+    result = valueBuild + postgreSQLConstant.keywords.BREAKLINECHAR + tabSpace;
   } else {
     result = tabForNewLine + valueBuild + subFix;
   }
