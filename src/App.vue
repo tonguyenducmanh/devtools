@@ -15,15 +15,34 @@ export default {
   components: { TDSidebar },
   created() {
     let me = this;
-    console.log(
-      "App is running success: " + me.$tdUtility.formatDate(new Date())
-    );
+    me.logSomeInfo();
     me.processWhenRunApp();
   },
   data() {
     return {};
   },
   methods: {
+    logSomeInfo() {
+      let me = this;
+      let gitHubLink = null;
+      if (
+        window.__env &&
+        window.__env.githubSource &&
+        window.__env.githubSource.url
+      ) {
+        gitHubLink = window.__env.githubSource.url;
+      }
+      if (gitHubLink) {
+        console.info(
+          "%cWE ♥️ OPEN SOURCE",
+          "margin:8px 0;font-family:sans-serif;font-weight:600;font-size:50px;color:violet;"
+        );
+        console.info(
+          "%cContribute: " + gitHubLink,
+          "margin:8px 0;font-family:sans-serif;font-weight:500;font-size:24px;color:violet;"
+        );
+      }
+    },
     /**
      * Xử lý 1 số kịch bản khi khởi chạy ứng dụng
      */
