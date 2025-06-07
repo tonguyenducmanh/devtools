@@ -37,7 +37,7 @@
   </div>
 </template>
 <script>
-import { downloadVSCodeExtMock } from "@/common/mock/mock.js";
+import { TDMockDownloadVSCodeExt } from "@/common/mock/TDMockDownloadVSCodeExt.js";
 
 export default {
   name: "TDDownloadVSCodeExt",
@@ -58,7 +58,7 @@ export default {
   methods: {
     applyMock() {
       let me = this;
-      me.$tdUtility.applyMock(me, downloadVSCodeExtMock);
+      me.$tdUtility.applyMock(me, TDMockDownloadVSCodeExt);
     },
     handleBuildDownloadLink() {
       let me = this;

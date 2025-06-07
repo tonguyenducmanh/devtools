@@ -38,7 +38,7 @@
   </div>
 </template>
 <script>
-import { base64ToImageMock } from "@/common/mock/mock.js";
+import { TDMockBase64ToImage } from "@/common/mock/TDMockBase64ToImage.js";
 
 export default {
   name: "TDBase64ToImage",
@@ -52,7 +52,7 @@ export default {
   methods: {
     applyMock() {
       let me = this;
-      me.$tdUtility.applyMock(me, base64ToImageMock);
+      me.$tdUtility.applyMock(me, TDMockBase64ToImage);
     },
     handleConvert() {
       let me = this;

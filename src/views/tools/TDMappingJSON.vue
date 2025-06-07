@@ -69,7 +69,7 @@
   </div>
 </template>
 <script>
-import { mappingJSONMock } from "@/common/mock/mock.js";
+import { TDMockMappingJSON } from "@/common/mock/TDMockMappingJSON.js";
 
 export default {
   name: "TDMappingJSON",
@@ -102,7 +102,7 @@ export default {
   methods: {
     applyMock() {
       let me = this;
-      me.$tdUtility.applyMock(me, mappingJSONMock);
+      me.$tdUtility.applyMock(me, TDMockMappingJSON);
     },
     haddleCopyEvent(value) {
       let me = this;

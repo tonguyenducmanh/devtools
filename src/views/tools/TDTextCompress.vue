@@ -51,11 +51,11 @@
   </div>
 </template>
 <script>
-import { TDTextCompress } from "@/common/mock/mock.js";
+import { TDMockTextCompress } from "@/common/mock/TDMockTextCompress.js";
 import TDCompress from "@/common/compress/TDCompress.js";
 
 export default {
-  name: "TDTextCompress",
+  name: "TDMockTextCompress",
   created() {
     let me = this;
   },
@@ -88,7 +88,7 @@ export default {
     },
     applyMock() {
       let me = this;
-      me.$tdUtility.applyMock(me, TDTextCompress);
+      me.$tdUtility.applyMock(me, TDMockTextCompress);
     },
     async handleCompress() {
       let me = this;

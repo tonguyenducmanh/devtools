@@ -42,7 +42,7 @@
 import * as Diff2Html from "diff2html";
 import "diff2html/bundles/css/diff2html.min.css";
 import { createTwoFilesPatch } from "diff";
-import { compareCodeMock } from "@/common/mock/mock.js";
+import { TDMockCompareCode } from "@/common/mock/TDMockCompareCode.js";
 export default {
   name: "TDCompareCode",
   created() {
@@ -55,7 +55,7 @@ export default {
   methods: {
     applyMock() {
       let me = this;
-      me.$tdUtility.applyMock(me, compareCodeMock);
+      me.$tdUtility.applyMock(me, TDMockCompareCode);
     },
     compare() {
       let me = this;

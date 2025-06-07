@@ -38,8 +38,8 @@
 <script>
 // import sqlFormatter từ thư viện
 import { format as sqlFormat } from "sql-formatter";
-import { TDPostgreSQLFormatter } from "@/common/mock/mock.js";
-import { TDMySQLFormatter } from "@/common/mock/mock.js";
+import { TDMockPostgreSQLFormatter } from "@/common/mock/TDMockPostgreSQLFormatter.js";
+import { TDMockMySQLFormatter } from "@/common/mock/TDMockMySQLFormatter.js";
 import tdEnum from "@/common/TDEnum.js";
 
 export default {
@@ -55,9 +55,9 @@ export default {
     applyMock() {
       let me = this;
       if (me.currentFormatType === tdEnum.typeOfCode.postgresql) {
-        me.$tdUtility.applyMock(me, TDPostgreSQLFormatter);
+        me.$tdUtility.applyMock(me, TDMockPostgreSQLFormatter);
       } else {
-        me.$tdUtility.applyMock(me, TDMySQLFormatter);
+        me.$tdUtility.applyMock(me, TDMockMySQLFormatter);
       }
     },
     getCurrentFormatSQL() {

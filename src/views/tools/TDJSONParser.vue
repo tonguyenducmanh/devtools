@@ -107,7 +107,7 @@
 </template>
 <script>
 import VueJsonPretty from "vue-json-pretty";
-import { TDJSONParserMock } from "@/common/mock/mock.js";
+import { TDMockJSONParser } from "@/common/mock/TDMockJSONParser.js";
 import "vue-json-pretty/lib/styles.css";
 export default {
   name: "TDJSONParser",
@@ -169,7 +169,7 @@ export default {
     },
     applyMock() {
       let me = this;
-      me.$tdUtility.applyMock(me, TDJSONParserMock);
+      me.$tdUtility.applyMock(me, TDMockJSONParser);
     },
     handleJSONToObject() {
       let me = this;
