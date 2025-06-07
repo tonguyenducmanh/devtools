@@ -39,6 +39,13 @@
           label="Tạo QR Code"
         ></TDButton>
         <TDButton
+          @click="downloadAllQRCodes"
+          :type="$tdEnum.buttonType.secondary"
+          :readOnly="!qrCodeItems || !qrCodeItems.length"
+          label="Tải xuống tất cả"
+          class="download-all-btn"
+        ></TDButton>
+        <TDButton
           @click="applyMock"
           :type="$tdEnum.buttonType.secondary"
           label="Example"
@@ -50,18 +57,29 @@
         />
       </div>
     </div>
-    <div v-if="textGenQR" class="qrcode-box">
-      <template v-for="(item, index) in qrCodeItems">
-        <div class="qr-container">
-          <div>{{ `Phần ${index + 1}/${qrCodeItems.length}` }}</div>
-          <img :src="item.src" />
-        </div>
-      </template>
+    <div v-if="textGenQR" class="qrcode-section">
+      <div class="qrcode-box">
+        <template v-for="(item, index) in qrCodeItems">
+          <div class="qr-container">
+            <div class="qr-header">
+              <span>{{ `Phần ${index + 1}/${qrCodeItems.length}` }}</span>
+              <TDButton
+                @click="downloadQRCode(item.src, index)"
+                :type="$tdEnum.buttonType.secondary"
+                label="Tải xuống"
+                class="download-btn"
+              ></TDButton>
+            </div>
+            <img :src="item.src" />
+          </div>
+        </template>
+      </div>
     </div>
   </div>
 </template>
 <script>
 import QRCode from "qrcode";
+import JSZip from "jszip";
 export default {
   name: "TDTextToQRCode",
   created() {
@@ -249,6 +267,56 @@ export default {
     },
 
     /**
+     * Chuyển đổi Data URL thành Blob
+     * @param {string} dataUrl - Data URL cần chuyển đổi
+     * @returns {Blob} Blob data
+     */
+    dataURLtoBlob(dataUrl) {
+      const arr = dataUrl.split(",");
+      const mime = arr[0].match(/:(.*?);/)[1];
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new Blob([u8arr], { type: mime });
+    },
+
+    /**
+     * Tải xuống tất cả QR codes dưới dạng tệp ZIP
+     */
+    async downloadAllQRCodes() {
+      let me = this;
+      const zip = new JSZip();
+
+      // Thêm từng QR code vào ZIP
+      this.qrCodeItems.forEach((item, index) => {
+        const blob = this.dataURLtoBlob(item.src);
+        zip.file(`qrcode-part-${index + 1}.png`, blob);
+      });
+
+      // Tạo và tải xuống tệp ZIP
+      const content = await zip.generateAsync({ type: "blob" });
+      // Tạo blob và mở popup tải file
+      me.$tdUtility.createDownloadFileFromBlob(content, "qrcodes.zip");
+    },
+
+    /**
+     * Tải xuống QR code dưới dạng hình ảnh PNG
+     * @param {string} dataUrl - Data URL của QR code
+     * @param {number} index - Vị trí của QR code trong danh sách
+     */
+    downloadQRCode(dataUrl, index) {
+      let me = this;
+      // Tạo blob và mở popup tải file
+      me.$tdUtility.createDownloadFileFromUrl(
+        dataUrl,
+        `qrcode-part-${index + 1}.png`
+      );
+    },
+
+    /**
      * Cập nhật hiển thị lịch sử
      */
     async updateHistoryDisplay() {
@@ -399,8 +467,11 @@ export default {
 .button-generate {
   margin-bottom: var(--padding);
 }
-.qrcode-box {
+.qrcode-section {
   margin: var(--padding);
+}
+
+.qrcode-box {
   display: grid;
   gap: 3rem;
   justify-content: center;
@@ -441,6 +512,17 @@ export default {
   padding: 1rem;
   border-radius: 8px;
   border: 1px solid var(--border-color);
+}
+
+.qr-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.download-btn {
+  margin-left: 1rem;
 }
 
 .qr-container canvas,

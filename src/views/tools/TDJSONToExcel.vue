@@ -188,7 +188,7 @@ export default {
         const buffer = await workbook.xlsx.writeBuffer();
 
         // Tạo blob và mở popup tải file
-        me.$tdUtility.createDownloadFile(
+        me.$tdUtility.createDownloadFileFromBuffer(
           buffer,
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           me.fileName

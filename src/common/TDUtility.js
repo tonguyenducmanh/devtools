@@ -167,15 +167,28 @@ class TDUtility {
     return obj;
   }
   /**
-   * Tạo file tải xuống
+   * Tạo file tải xuống từ buffer
    */
-  createDownloadFile(buffer, type, fileName) {
+  createDownloadFileFromBuffer(buffer, type, fileName) {
     // Tạo blob và mở popup tải file
     const blob = new Blob([buffer], {
       type: type,
     });
-
+    if (blob) {
+      this.createDownloadFileFromBlob(blob, fileName);
+    }
+  }
+  /**
+   * Tạo file tải xuống từ blob
+   */
+  createDownloadFileFromBlob(blob, fileName) {
     const url = URL.createObjectURL(blob);
+    this.createDownloadFileFromUrl(url, fileName);
+  }
+  /**
+   * Tạo file tải xuống từ url file
+   */
+  createDownloadFileFromUrl(url, fileName) {
     const a = document.createElement("a");
     a.href = url;
     a.download = fileName;
