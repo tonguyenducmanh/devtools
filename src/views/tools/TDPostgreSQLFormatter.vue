@@ -60,6 +60,20 @@ export default {
       } else {
         me.outputSource = null;
       }
+      // so sánh input và output, nếu giống nhau thì xoá output
+      if (me.normalizeSQL(me.inputSource) != me.normalizeSQL(me.outputSource)) {
+        me.outputSource = null;
+      }
+    },
+    /**
+     * @param sql chuỗi SQL cần chuẩn hoá
+     * @returns chuỗi SQL đã được chuẩn hoá, loại bỏ khoảng trắng và chuyển về chữ thường
+     */
+    normalizeSQL(sql) {
+      return sql
+        .replace(/\s+/g, "") // Đổi nhiều khoảng trắng/dòng trắng thành 1 space
+        .trim()
+        .toLowerCase(); // Đổi về chữ thường cho dễ so sánh
     },
     handleCopyEvent(value) {
       let me = this;
