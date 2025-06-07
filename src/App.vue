@@ -34,12 +34,12 @@ export default {
       }
       if (gitHubLink) {
         console.info(
-          "%cWE ♥️ OPEN SOURCE",
-          "margin:8px 0;font-family:sans-serif;font-weight:600;font-size:50px;color:violet;"
+          "%cWE LUV OPEN SOURCE",
+          "margin:8px 0;font-family:sans-serif;font-weight:600;font-size:50px;color:#42b883;"
         );
         console.info(
           "%cContribute: " + gitHubLink,
-          "margin:8px 0;font-family:sans-serif;font-weight:500;font-size:24px;color:violet;"
+          "margin:8px 0;font-family:sans-serif;font-weight:500;font-size:24px;color:#42b883;"
         );
       }
     },
