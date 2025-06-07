@@ -42,7 +42,6 @@
 import * as Diff2Html from "diff2html";
 import "diff2html/bundles/css/diff2html.min.css";
 import { createTwoFilesPatch } from "diff";
-import { TDMockCompareCode } from "@/common/mock/TDMockCompareCode.js";
 export default {
   name: "TDCompareCode",
   created() {
@@ -53,9 +52,13 @@ export default {
   },
   mounted() {},
   methods: {
-    applyMock() {
-      let me = this;
-      me.$tdUtility.applyMock(me, TDMockCompareCode);
+    async applyMock() {
+      // Lazy-load module
+      const { TDMockCompareCode } = await import(
+        /* webpackChunkName: "mock-compare-code" */
+        "@/common/mock/TDMockCompareCode.js"
+      );
+      this.$tdUtility.applyMock(this, TDMockCompareCode);
     },
     compare() {
       let me = this;

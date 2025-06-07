@@ -62,8 +62,6 @@
 </template>
 <script>
 import QRCode from "qrcode";
-import { TDMockTextToQRCode } from "@/common/mock/TDMockTextToQRCode.js";
-
 export default {
   name: "TDTextToQRCode",
   created() {
@@ -75,9 +73,13 @@ export default {
   },
   mounted() {},
   methods: {
-    applyMock() {
-      let me = this;
-      me.$tdUtility.applyMock(me, TDMockTextToQRCode);
+    async applyMock() {
+      // Lazy-load module
+      const { TDMockTextToQRCode } = await import(
+        /* webpackChunkName: "mock-text-to-qr-code" */
+        "@/common/mock/TDMockTextToQRCode.js"
+      );
+      this.$tdUtility.applyMock(this, TDMockTextToQRCode);
     },
     /**
      * Tạo QR code từ text

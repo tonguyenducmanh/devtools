@@ -37,8 +37,6 @@
   </div>
 </template>
 <script>
-import { TDMockDownloadVSCodeExt } from "@/common/mock/TDMockDownloadVSCodeExt.js";
-
 export default {
   name: "TDDownloadVSCodeExt",
   created() {
@@ -56,9 +54,13 @@ export default {
     };
   },
   methods: {
-    applyMock() {
-      let me = this;
-      me.$tdUtility.applyMock(me, TDMockDownloadVSCodeExt);
+    async applyMock() {
+      // Lazy-load module
+      const { TDMockDownloadVSCodeExt } = await import(
+        /* webpackChunkName: "mock-download-vscode-ext" */
+        "@/common/mock/TDMockDownloadVSCodeExt.js"
+      );
+      this.$tdUtility.applyMock(this, TDMockDownloadVSCodeExt);
     },
     handleBuildDownloadLink() {
       let me = this;

@@ -69,8 +69,6 @@
   </div>
 </template>
 <script>
-import { TDMockMappingJSON } from "@/common/mock/TDMockMappingJSON.js";
-
 export default {
   name: "TDMappingJSON",
   created() {
@@ -100,9 +98,13 @@ export default {
     };
   },
   methods: {
-    applyMock() {
-      let me = this;
-      me.$tdUtility.applyMock(me, TDMockMappingJSON);
+    async applyMock() {
+      // Lazy-load module
+      const { TDMockMappingJSON } = await import(
+        /* webpackChunkName: "mock-mapping-json" */
+        "@/common/mock/TDMockMappingJSON.js"
+      );
+      this.$tdUtility.applyMock(this, TDMockMappingJSON);
     },
     haddleCopyEvent(value) {
       let me = this;

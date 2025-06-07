@@ -51,7 +51,6 @@
   </div>
 </template>
 <script>
-import { TDMockTextCompress } from "@/common/mock/TDMockTextCompress.js";
 import TDCompress from "@/common/compress/TDCompress.js";
 
 export default {
@@ -86,9 +85,13 @@ export default {
       let me = this;
       me.$tdUtility.copyToClipboard(value);
     },
-    applyMock() {
-      let me = this;
-      me.$tdUtility.applyMock(me, TDMockTextCompress);
+    async applyMock() {
+      // Lazy-load module
+      const { TDMockTextCompress } = await import(
+        /* webpackChunkName: "mock-text-compress" */
+        "@/common/mock/TDMockTextCompress.js"
+      );
+      this.$tdUtility.applyMock(this, TDMockTextCompress);
     },
     async handleCompress() {
       let me = this;

@@ -59,8 +59,6 @@
   </div>
 </template>
 <script>
-import { TDMockJSONToPostgreSQL } from "@/common/mock/TDMockJSONToPostgreSQL.js";
-
 export default {
   name: "TDImageToBase64",
   created() {
@@ -71,9 +69,13 @@ export default {
   },
   mounted() {},
   methods: {
-    applyMock() {
-      let me = this;
-      me.$tdUtility.applyMock(me, TDMockJSONToPostgreSQL);
+    async applyMock() {
+      // Lazy-load module
+      const { TDMockJSONToPostgreSQL } = await import(
+        /* webpackChunkName: "mock-json-to-postgresql" */
+        "@/common/mock/TDMockJSONToPostgreSQL.js"
+      );
+      this.$tdUtility.applyMock(this, TDMockJSONToPostgreSQL);
     },
     convertToPostgresSQL() {
       let me = this;

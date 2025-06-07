@@ -38,8 +38,6 @@
 <script>
 // import sqlFormatter từ thư viện
 import { format as sqlFormat } from "sql-formatter";
-import { TDMockPostgreSQLFormatter } from "@/common/mock/TDMockPostgreSQLFormatter.js";
-import { TDMockMySQLFormatter } from "@/common/mock/TDMockMySQLFormatter.js";
 import tdEnum from "@/common/TDEnum.js";
 
 export default {
@@ -52,12 +50,25 @@ export default {
   },
   mounted() {},
   methods: {
-    applyMock() {
-      let me = this;
-      if (me.currentFormatType === tdEnum.typeOfCode.postgresql) {
-        me.$tdUtility.applyMock(me, TDMockPostgreSQLFormatter);
-      } else {
-        me.$tdUtility.applyMock(me, TDMockMySQLFormatter);
+    async applyMock() {
+      try {
+        if (this.currentFormatType === tdEnum.typeOfCode.postgresql) {
+          // Lazy-load module PostgreSQL
+          const { TDMockPostgreSQLFormatter } = await import(
+            /* webpackChunkName: "mock-postgresql-formatter" */
+            "@/common/mock/TDMockPostgreSQLFormatter.js"
+          );
+          this.$tdUtility.applyMock(this, TDMockPostgreSQLFormatter);
+        } else {
+          // Lazy-load module MySQL
+          const { TDMockMySQLFormatter } = await import(
+            /* webpackChunkName: "mock-mysql-formatter" */
+            "@/common/mock/TDMockMySQLFormatter.js"
+          );
+          this.$tdUtility.applyMock(this, TDMockMySQLFormatter);
+        }
+      } catch (error) {
+        console.error("Load mock formatter failed:", error);
       }
     },
     getCurrentFormatSQL() {

@@ -38,8 +38,6 @@
   </div>
 </template>
 <script>
-import { TDMockBase64ToImage } from "@/common/mock/TDMockBase64ToImage.js";
-
 export default {
   name: "TDBase64ToImage",
   created() {
@@ -50,9 +48,13 @@ export default {
   },
   mounted() {},
   methods: {
-    applyMock() {
-      let me = this;
-      me.$tdUtility.applyMock(me, TDMockBase64ToImage);
+    async applyMock() {
+      // Lazy-load module
+      const { TDMockBase64ToImage } = await import(
+        /* webpackChunkName: "mock-base64-to-image" */
+        "@/common/mock/TDMockBase64ToImage.js"
+      );
+      this.$tdUtility.applyMock(this, TDMockBase64ToImage);
     },
     handleConvert() {
       let me = this;

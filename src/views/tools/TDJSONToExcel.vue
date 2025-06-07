@@ -33,8 +33,6 @@
   </div>
 </template>
 <script>
-import { TDMockJSONToExcel } from "@/common/mock/TDMockJSONToExcel.js";
-
 import ExcelJS from "exceljs";
 
 export default {
@@ -47,9 +45,13 @@ export default {
   },
   mounted() {},
   methods: {
-    applyMock() {
-      let me = this;
-      me.$tdUtility.applyMock(me, TDMockJSONToExcel);
+    async applyMock() {
+      // Lazy-load module
+      const { TDMockJSONToExcel } = await import(
+        /* webpackChunkName: "mock-json-to-excel" */
+        "@/common/mock/TDMockJSONToExcel.js"
+      );
+      this.$tdUtility.applyMock(this, TDMockJSONToExcel);
     },
     /**
      * tiền xử lý dữ liệu
