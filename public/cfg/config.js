@@ -9,7 +9,7 @@
   };
   window.__env.textToQRConfig = {
     maxTextOneChunk: 1000,
-    maxHistoryLength: 10,
+    maxHistoryLength: 100,
     maxTitleLength: 50,
   };
   window.__env.githubSource = {
