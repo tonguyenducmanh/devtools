@@ -25,10 +25,7 @@
           multiple
         ></TDUpload>
         <div>
-          <TDButton
-            label="Thêm"
-            @click="decodeGoogleAuth"
-          />
+          <TDButton label="Thêm" @click="decodeGoogleAuth" />
         </div>
       </div>
       <div v-if="sourceOTPImport == 'google'" class="flex">
@@ -658,5 +655,8 @@ export default {
       }
     }
   }
+}
+.upload-area {
+  margin-left: var(--padding);
 }
 </style>
