@@ -26,12 +26,6 @@
         placeHolder="Nhập văn bản để tạo mã QR code..."
         v-model="textGenQR"
       ></TDTextarea>
-      <div class="checkbox-wrapper">
-        <TDCheckbox
-          v-model="isRemoveEmpty"
-          label="Xóa ký tự xuống dòng"
-        ></TDCheckbox>
-      </div>
       <div class="flex button-generate">
         <TDButton
           :readOnly="!textGenQR"
@@ -53,6 +47,7 @@
         <TDInput
           v-model="maxLengthUserConfig"
           :inputType="'number'"
+          class="max-length-input"
           :placeHolder="'Số ký tự tối đa 1 mã QR'"
         />
       </div>
@@ -146,12 +141,7 @@ export default {
      */
     buildTextBeforeGenQR(text) {
       let me = this;
-      // Nếu có thì xóa ký tự trắng trong text
-      let simpleText = me.isRemoveEmpty
-        ? text.replace(/(\r\n|\n|\r)/gm, "")
-        : text;
-
-      return simpleText;
+      return text;
     },
 
     /**
@@ -341,7 +331,6 @@ export default {
   data() {
     return {
       textGenQR: null,
-      isRemoveEmpty: false,
       historyItems: [],
       qrCodeItems: [],
       maxLengthUserConfig: null,
@@ -445,12 +434,10 @@ export default {
 .input-area {
   min-height: 100px;
   padding: 0.5rem;
-  margin-bottom: 0.5rem;
   border-radius: 5px;
   resize: vertical;
 }
 .checkbox-wrapper {
-  margin: var(--padding);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -530,5 +517,8 @@ export default {
   min-width: 100%;
   max-width: 100%;
   height: auto;
+}
+.title {
+  margin-bottom: unset;
 }
 </style>
