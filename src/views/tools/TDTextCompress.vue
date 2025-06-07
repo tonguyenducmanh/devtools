@@ -54,7 +54,7 @@
 import TDCompress from "@/common/compress/TDCompress.js";
 
 export default {
-  name: "TDMockTextCompress",
+  name: "TDTextCompress",
   created() {
     let me = this;
   },

@@ -36,7 +36,7 @@
 import ExcelJS from "exceljs";
 
 export default {
-  name: "TDMockJSONToExcel",
+  name: "TDJSONToExcel",
   created() {
     let me = this;
   },
