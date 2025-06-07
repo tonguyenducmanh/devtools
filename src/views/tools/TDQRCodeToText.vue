@@ -40,7 +40,6 @@
   </div>
 </template>
 <script>
-import jsQR from "jsqr";
 export default {
   name: "TDQRCodeToText",
   created() {
@@ -108,42 +107,16 @@ export default {
         me.$refs.uploadArea &&
         typeof me.$refs.uploadArea.getFileSelected === "function"
       ) {
-        let allFiles = me.$refs.uploadArea.getFileSelected();
-        let decodePromises = Array.from(allFiles).map((file) => {
-          return new Promise((resolve) => {
-            let reader = new FileReader();
-            reader.onload = function (event) {
-              let imageData = event.target.result;
-              let img = new Image();
-              img.onload = function () {
-                let canvas = document.createElement("canvas");
-                canvas.width = img.width;
-                canvas.height = img.height;
-                let ctx = canvas.getContext("2d");
-                ctx.drawImage(img, 0, 0);
-                let imageDataObj = ctx.getImageData(
-                  0,
-                  0,
-                  img.width,
-                  img.height
-                );
-                let code = jsQR(
-                  imageDataObj.data,
-                  imageDataObj.width,
-                  imageDataObj.height
-                );
-                resolve(code ? code.data : null);
-              };
-              img.src = imageData;
-            };
-            reader.readAsDataURL(file);
-          });
-        });
-
-        // Đợi tất cả ảnh xử lý xong
-        let results = await Promise.all(decodePromises);
+        // Lazy-load module
+        const { convertQRCode } = await import(
+          /* webpackChunkName: "mock-qr-code-common" */
+          "@/common/qrcode/TDQRCodeCommon.js"
+        );
         // Lọc kết quả hợp lệ
-        me.textOutput = results.filter(Boolean).join("");
+        let result = await convertQRCode(me.$refs.uploadArea);
+        if (result && result.length > 0) {
+          me.textOutput = result.join("");
+        }
       }
     },
 
