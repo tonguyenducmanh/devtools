@@ -71,18 +71,25 @@ export default {
     },
     handleFormat() {
       let me = this;
-      if (me.inputSource) {
-        me.outputSource = sqlFormat(me.inputSource, {
-          language: me.getCurrentFormatSQL(),
-          indent: "\t", // Dùng tab để thụt lề
-          uppercase: true, // In hoa từ khoá
-        });
-      } else {
-        me.outputSource = null;
-      }
-      // so sánh input và output, nếu giống nhau thì xoá output
-      if (me.normalizeSQL(me.inputSource) != me.normalizeSQL(me.outputSource)) {
-        me.outputSource = null;
+      try {
+        if (me.inputSource) {
+          me.outputSource = sqlFormat(me.inputSource, {
+            language: me.getCurrentFormatSQL(),
+            indent: "\t", // Dùng tab để thụt lề
+            uppercase: true, // In hoa từ khoá
+          });
+        } else {
+          me.outputSource = null;
+        }
+        // so sánh input và output, nếu giống nhau thì xoá output
+        if (
+          me.normalizeSQL(me.inputSource) != me.normalizeSQL(me.outputSource)
+        ) {
+          me.outputSource = null;
+        }
+      } catch (error) {
+        console.error("Error formatting SQL:", error);
+        me.outputSource = null; // Nếu có lỗi thì xoá output
       }
     },
     /**
