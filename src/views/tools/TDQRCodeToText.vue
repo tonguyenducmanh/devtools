@@ -108,12 +108,12 @@ export default {
         typeof me.$refs.uploadArea.getFileSelected === "function"
       ) {
         // Lazy-load module
-        const { convertQRCode } = await import(
+        const { qrToText } = await import(
           /* webpackChunkName: "mock-qr-code-util" */
           "@/common/qrcode/TDQRCodeUtil.js"
         );
         // Lọc kết quả hợp lệ
-        let result = await convertQRCode(me.$refs.uploadArea);
+        let result = await qrToText(me.$refs.uploadArea);
         if (result && result.length > 0) {
           me.textOutput = result.join("");
         }

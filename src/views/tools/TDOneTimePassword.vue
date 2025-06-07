@@ -11,6 +11,26 @@
       />
     </div>
     <div class="main-otp-container">
+      <div v-if="sourceOTPImport == 'googleqrcode'" class="flex">
+        <TDUpload
+          @dragover="handleDragOver"
+          @dragleave="handleDragLeave"
+          @drop="handleDrop"
+          @selected="convertQRCode"
+          ref="uploadArea"
+          class="upload-area"
+          maxHeight="200px"
+          labelEmpty="Kéo thả ảnh hoặc tải lên"
+          :label="'Chọn ảnh QR code'"
+          multiple
+        ></TDUpload>
+        <div>
+          <TDButton
+            label="Thêm"
+            @click="decodeGoogleAuth"
+          />
+        </div>
+      </div>
       <div v-if="sourceOTPImport == 'google'" class="flex">
         <TDInput
           v-model="migrationURL"
@@ -156,6 +176,58 @@ export default {
     me.saveUsername();
   },
   methods: {
+    handleDragOver(e) {
+      let me = this;
+      e.preventDefault();
+      me.isDragOver = true;
+    },
+
+    handleDragLeave(e) {
+      let me = this;
+      e.preventDefault();
+      me.isDragOver = false;
+    },
+    handleDrop(e) {
+      e.preventDefault();
+      let me = this;
+      const files = Array.from(e.dataTransfer.files).filter((file) =>
+        file.type.includes("image")
+      );
+
+      if (files.length) {
+        if (
+          me.$refs.uploadArea &&
+          typeof me.$refs.uploadArea.setFileSelected === "function"
+        ) {
+          me.$refs.uploadArea.setFileSelected(files); // truyền mảng files
+          me.convertQRCode();
+        }
+      }
+    },
+    async convertQRCode() {
+      let me = this;
+      if (
+        me.$refs.uploadArea &&
+        typeof me.$refs.uploadArea.getFileSelected === "function"
+      ) {
+        // Lazy-load module
+        const { qrToText } = await import(
+          /* webpackChunkName: "mock-qr-code-util" */
+          "@/common/qrcode/TDQRCodeUtil.js"
+        );
+        // Lọc kết quả hợp lệ
+        let result = await qrToText(me.$refs.uploadArea);
+        if (result && result.length > 0) {
+          result.forEach((item) => {
+            // Chỉ lấy những chuỗi có định dạng otpauth-migration
+            if (item.startsWith("otpauth-migration://")) {
+              me.migrationURL = item;
+              me.decodeGoogleAuth();
+            }
+          });
+        }
+      }
+    },
     handleCopyEvent(value) {
       let me = this;
       me.$tdUtility.copyToClipboard(value);
@@ -474,11 +546,13 @@ export default {
         type: "TOTP",
       },
       removeAllKey: "removeall",
-      sourceOTPImport: "google",
+      sourceOTPImport: "googleqrcode",
       radioImports: [
+        { value: "googleqrcode", label: "Google authen qrcode" },
         { value: "google", label: "Google authen" },
         { value: "manual", label: "Tự nhập" },
       ],
+      isDragOver: false,
     };
   },
 };

@@ -81,6 +81,7 @@ export default {
       ) {
         let uploadFiles = Array.from(event.target.files);
         me.selectedFiles = uploadFiles;
+        me.$emit("selected", uploadFiles);
       }
     },
     formatFileSize(bytes) {
