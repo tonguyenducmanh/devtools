@@ -109,8 +109,8 @@ export default {
       ) {
         // Lazy-load module
         const { convertQRCode } = await import(
-          /* webpackChunkName: "mock-qr-code-common" */
-          "@/common/qrcode/TDQRCodeCommon.js"
+          /* webpackChunkName: "mock-qr-code-util" */
+          "@/common/qrcode/TDQRCodeUtil.js"
         );
         // Lọc kết quả hợp lệ
         let result = await convertQRCode(me.$refs.uploadArea);
