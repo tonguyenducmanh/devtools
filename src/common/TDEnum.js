@@ -30,6 +30,11 @@ class TDEnum {
     deflate: "deflate",
     deflateRaw: "deflate-raw",
   };
+  // typeofcode
+  typeOfCode = {
+    postgresql: 1,
+    mysql: 2,
+  };
 }
 
 export default new TDEnum();

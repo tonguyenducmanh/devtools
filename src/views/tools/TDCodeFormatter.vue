@@ -1,15 +1,20 @@
 <template>
   <div class="container">
-    <div class="title">PostgreSQL formatter tool</div>
+    <div class="title">Code formatter tool</div>
+    <TDRadioGroup
+      v-model="currentFormatType"
+      label="Type of code"
+      :options="formatType"
+    />
     <div class="flex input-container">
       <TDTextarea
-        placeHolder="PostgreSQL raw input"
+        placeHolder="input code"
         v-model="inputSource"
         height="100%"
         width="50%"
       ></TDTextarea>
       <TDTextarea
-        placeHolder="PostgreSQL formatted output"
+        placeHolder="output code"
         v-model="outputSource"
         height="100%"
         width="50%"
@@ -31,12 +36,14 @@
   </div>
 </template>
 <script>
-import { TDPostgreSQLFormatter } from "@/common/mock/mock.js";
 // import sqlFormatter từ thư viện
-import { format } from "sql-formatter";
+import { format as sqlFormat } from "sql-formatter";
+import { TDPostgreSQLFormatter } from "@/common/mock/mock.js";
+import { TDMySQLFormatter } from "@/common/mock/mock.js";
+import tdEnum from "@/common/TDEnum.js";
 
 export default {
-  name: "TDPostgreSQLFormatter",
+  name: "TDCodeFormatter",
   created() {
     let me = this;
   },
@@ -47,13 +54,26 @@ export default {
   methods: {
     applyMock() {
       let me = this;
-      me.$tdUtility.applyMock(me, TDPostgreSQLFormatter);
+      if (me.currentFormatType === tdEnum.typeOfCode.postgresql) {
+        me.$tdUtility.applyMock(me, TDPostgreSQLFormatter);
+      } else {
+        me.$tdUtility.applyMock(me, TDMySQLFormatter);
+      }
+    },
+    getCurrentFormatSQL() {
+      let me = this;
+      if (me.currentFormatType === tdEnum.typeOfCode.postgresql) {
+        return "postgresql";
+      } else if (me.currentFormatType === tdEnum.typeOfCode.mysql) {
+        return "mysql";
+      }
+      return "postgresql"; // Mặc định là postgresql nếu không có lựa chọn
     },
     handleFormat() {
       let me = this;
       if (me.inputSource) {
-        me.outputSource = format(me.inputSource, {
-          language: "postgresql",
+        me.outputSource = sqlFormat(me.inputSource, {
+          language: me.getCurrentFormatSQL(),
           indent: "\t", // Dùng tab để thụt lề
           uppercase: true, // In hoa từ khoá
         });
@@ -84,6 +104,11 @@ export default {
     return {
       inputSource: null,
       outputSource: null,
+      currentFormatType: tdEnum.typeOfCode.postgresql,
+      formatType: [
+        { value: tdEnum.typeOfCode.postgresql, label: "PostgreSQL" },
+        { value: tdEnum.typeOfCode.mysql, label: "MySQL" },
+      ],
     };
   },
 };

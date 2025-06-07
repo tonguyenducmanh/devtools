@@ -20,7 +20,7 @@ List of Supported Features:
 "JSON to pPostgreSQL",
 "JSON Mapping",
 "JSON to Excel",
-"PostgreSQL Formatter",
+"Code formatter",
 "Image from Base64",
 "Image to Base64",
 "QRCode from text",

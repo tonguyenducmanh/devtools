@@ -94,11 +94,11 @@ const routerConfig = [
     /**
      * PostgreSQL Formatter
      */
-    path: "/postgresqlformatter",
-    name: "postgresqlformatter",
-    component: () => import("@/views/tools/TDPostgreSQLFormatter.vue"),
+    path: "/codeformatter",
+    name: "codeformatter",
+    component: () => import("@/views/tools/TDCodeFormatter.vue"),
     meta: {
-      title: "PostgreSQL Formatter",
+      title: "Code formatter",
     },
   },
   {
