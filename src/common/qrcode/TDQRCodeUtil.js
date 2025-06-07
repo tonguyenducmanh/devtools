@@ -1,10 +1,10 @@
 import jsQR from "jsqr";
 
 /**
- * Tạo QR code từ text
+ * đọc ra text từ danh sách ảnh QR
  * @param uploadArea ref trỏ tới TDUpload
  */
-export async function qrToText(uploadArea) {
+export async function imagesQRToText(uploadArea) {
   // Lazy-load module
   if (uploadArea && typeof uploadArea.getFileSelected === "function") {
     let allFiles = uploadArea.getFileSelected();

@@ -208,12 +208,12 @@ export default {
         typeof me.$refs.uploadArea.getFileSelected === "function"
       ) {
         // Lazy-load module
-        const { qrToText } = await import(
+        const { imagesQRToText } = await import(
           /* webpackChunkName: "mock-qr-code-util" */
           "@/common/qrcode/TDQRCodeUtil.js"
         );
         // Lọc kết quả hợp lệ
-        let result = await qrToText(me.$refs.uploadArea);
+        let result = await imagesQRToText(me.$refs.uploadArea);
         if (result && result.length > 0) {
           result.forEach((item) => {
             // Chỉ lấy những chuỗi có định dạng otpauth-migration
