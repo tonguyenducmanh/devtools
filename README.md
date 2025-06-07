@@ -31,7 +31,7 @@ List of Supported Features:
 
 Feature Demos:
 
-![alt text](img/demo_otp.png)
+![alt text](img/demo.png)
 
 Application-wide configuration can be accessed by entering the following command in the console:
 
