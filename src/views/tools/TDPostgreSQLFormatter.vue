@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">PostgreSQL formatter (beta)!</div>
+    <div class="title">PostgreSQL formatter tool</div>
     <div class="flex input-container">
       <TDTextarea
         placeHolder="PostgreSQL raw input"
@@ -32,7 +32,8 @@
 </template>
 <script>
 import { TDPostgreSQLFormatter } from "@/common/mock/mock.js";
-import { formatCode } from "@/common/formatter/postgresql/postgreSQLFormatter.js";
+// import sqlFormatter từ thư viện
+import { format } from "sql-formatter";
 
 export default {
   name: "TDPostgreSQLFormatter",
@@ -51,7 +52,11 @@ export default {
     handleFormat() {
       let me = this;
       if (me.inputSource) {
-        me.outputSource = formatCode(me.inputSource);
+        me.outputSource = format(me.inputSource, {
+          language: "postgresql",
+          indent: "\t", // Dùng tab để thụt lề
+          uppercase: true, // In hoa từ khoá
+        });
       } else {
         me.outputSource = null;
       }
