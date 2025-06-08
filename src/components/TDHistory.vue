@@ -149,7 +149,7 @@ export default {
         let newHistory =
           typeof source === "string" ? source : JSON.stringify(source);
         let history = await me.getHistory();
-        if (!isAppendDuplicate) {
+        if (!me.isAppendDuplicate) {
           if (typeof source === "string") {
             history = history.filter((x) => x.source != source);
           } else {
