@@ -17,6 +17,7 @@
       @drop="handleDrop"
       :class="{ 'drag-over': isDragOver, 'fix-size': !resizeable }"
       spellcheck="false"
+      :name="inputId"
     />
   </div>
 </template>
@@ -38,6 +39,9 @@ export default {
         style += `height: ${me.height} !important; `;
       }
       return style;
+    },
+    inputId() {
+      return `td-text-area-${this.$.uid}`;
     },
   },
   props: {

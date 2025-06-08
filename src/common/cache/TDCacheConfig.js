@@ -22,6 +22,12 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử quét mã",
   },
+  JSONToExcelHistory: {
+    KeyFormat: "JSONToExcelHistory",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "lịch sử json xuất ra excel",
+  },
   IsShowSidebar: {
     KeyFormat: "IsShowSidebar",
     CacheLevel: tdEnum.cacheType.local,

@@ -9,6 +9,7 @@
         :checked="modelValue"
         @input="changeInputValue"
         :disabled="readOnly"
+        :name="inputId"
       />
       <span class="td-checkbox">
         <span v-if="modelValue" class="td-checkbox-active"></span>

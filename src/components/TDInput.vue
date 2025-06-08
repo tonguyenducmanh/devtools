@@ -13,6 +13,7 @@
       :disabled="readOnly"
       spellcheck="false"
       :type="inputType"
+      :name="inputId"
     />
     <slot></slot>
   </div>
@@ -24,6 +25,11 @@ export default {
   created() {},
   mounted() {},
   methods: {},
+  computed: {
+    inputId() {
+      return `td-input-${this.$.uid}`;
+    },
+  },
   props: {
     placeHolder: {
       type: String,

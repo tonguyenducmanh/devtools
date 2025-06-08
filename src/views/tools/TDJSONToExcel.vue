@@ -2,6 +2,14 @@
   <div class="container">
     <div class="title">Convert mảng JSON object sang file excel!</div>
     <div class="flex">
+      <TDHistory
+        ref="history"
+        class="history-container"
+        :applyFunction="convertToExcelFromHistory"
+        :cacheKey="$tdEnum.cacheConfig.JSONToExcelHistory"
+      ></TDHistory>
+    </div>
+    <div class="flex">
       <TDTextarea
         isLabelTop
         label="Nhập JSON, key level 1 sẽ dùng làm tên cột"
@@ -164,6 +172,11 @@ export default {
       }
       return configWorkSheet;
     },
+    async convertToExcelFromHistory(text) {
+      let me = this;
+      me.jsonSource = text;
+      me.convertToExcel();
+    },
     /**
      * chuyển đổi sang excel
      */
@@ -193,6 +206,8 @@ export default {
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           me.fileName
         );
+        // Lưu text vào lịch sử nếu khác với lần lưu trước
+        await me.$refs.history.saveToHistory(me.jsonSource);
       } catch (error) {
         console.error("Error in convertToExcel:", error);
       }
@@ -217,5 +232,8 @@ export default {
 }
 .io-section {
   column-gap: 20px;
+}
+.history-container {
+  width: 95%;
 }
 </style>
