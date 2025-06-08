@@ -141,7 +141,13 @@ export default {
         let newHistory =
           typeof source === "string" ? source : JSON.stringify(source);
         let history = await me.getHistory();
-        history = history.filter((x) => x.title != newHistory);
+        if (typeof source === "string") {
+          history = history.filter((x) => x.source != source);
+        } else {
+          history = history.filter(
+            (x) => JSON.stringify(x.source) != JSON.stringify(source)
+          );
+        }
         history.push(me.buildHistoryItem(newHistory, source));
         // Giới hạn số lượng lịch sử lưu trữ
         if (history.length > window.__env.textToQRConfig.maxHistoryLength) {
