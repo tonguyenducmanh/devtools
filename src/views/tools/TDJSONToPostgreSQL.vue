@@ -7,7 +7,7 @@
         class="history-container"
         titleKey="inputJSON"
         :applyFunction="convertToPostgresSQLFromHistory"
-        :cacheKey="$tdEnum.cacheConfig.JSONToPostgreSQL"
+        :cacheKey="$tdEnum.cacheConfig.JSONToPostgreSQLHistory"
       ></TDHistory>
     </div>
     <div class="flex flex-wrap metadata-inputs">

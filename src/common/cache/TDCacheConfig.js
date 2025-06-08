@@ -28,8 +28,8 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử json xuất ra excel",
   },
-  JSONToPostgreSQL: {
-    KeyFormat: "JSONToPostgreSQL",
+  JSONToPostgreSQLHistory: {
+    KeyFormat: "JSONToPostgreSQLHistory",
     CacheLevel: tdEnum.cacheType.indexedDB,
     ExpireTime: 0,
     Note: "lịch sử json convert thành postgresql",
