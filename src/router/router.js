@@ -48,6 +48,17 @@ const routerConfig = [
   },
   {
     /**
+     * chọn màu từ ảnh
+     */
+    path: "/colorpicker",
+    name: "colorpicker",
+    component: () => import("@/views/tools/TDColorPicker.vue"),
+    meta: {
+      title: "Color picker",
+    },
+  },
+  {
+    /**
      * convert từ JSON sang object và object sang JSON
      */
     path: "/jsonparser",
