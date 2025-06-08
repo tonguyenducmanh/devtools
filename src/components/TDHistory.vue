@@ -54,6 +54,14 @@ export default {
     titleKey: {
       type: String,
     },
+    /**
+     * Cho phép append duplicate vào lịch sử
+     * Nếu true, sẽ không kiểm tra trùng lặp khi lưu vào lịch sử
+     */
+    isAppendDuplicate: {
+      type: Boolean,
+      default: false, // Mặc định không append duplicate
+    },
   },
   data() {
     return {
@@ -141,12 +149,14 @@ export default {
         let newHistory =
           typeof source === "string" ? source : JSON.stringify(source);
         let history = await me.getHistory();
-        if (typeof source === "string") {
-          history = history.filter((x) => x.source != source);
-        } else {
-          history = history.filter(
-            (x) => JSON.stringify(x.source) != JSON.stringify(source)
-          );
+        if (!isAppendDuplicate) {
+          if (typeof source === "string") {
+            history = history.filter((x) => x.source != source);
+          } else {
+            history = history.filter(
+              (x) => JSON.stringify(x.source) != JSON.stringify(source)
+            );
+          }
         }
         history.push(me.buildHistoryItem(newHistory, source));
         // Giới hạn số lượng lịch sử lưu trữ
