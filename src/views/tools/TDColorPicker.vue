@@ -1,113 +1,83 @@
 <template>
-  <div class="title">Color picker tool!</div>
-  <div class="td-color-picker">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Image Upload Section -->
-      <div class="lg:col-span-2">
-        <div class="card">
-          <TDUpload
-            v-if="!imageLoaded"
-            @dragover="handleDragOver"
-            @dragleave="handleDragLeave"
-            @drop="handleDrop"
-            @selected="processFile"
-            ref="uploadArea"
-            class="upload-area"
-            maxHeight="200px"
-            labelEmpty="Choose an image or drag it here, PNG, JPG, GIF up to 10MB"
-            :label="'Upload'"
-          ></TDUpload>
-          <div v-else class="image-container">
-            <div class="image-wrapper" ref="imageWrapper">
-              <canvas
-                ref="canvas"
-                @mousemove="handleMouseMove"
-                @mouseleave="hideMagnifier"
-                @click="selectColor"
-                class="main-canvas"
-              ></canvas>
+  <div class="container">
+    <div class="title">Color picker tool!</div>
+    <div class="flex td-color-picker">
+      <div v-if="!imageLoaded" class="upload-area-container">
+        <TDUpload
+          @dragover="handleDragOver"
+          @dragleave="handleDragLeave"
+          @drop="handleDrop"
+          @selected="processFile"
+          ref="uploadArea"
+          class="upload-area"
+          maxHeight="100vh"
+          labelEmpty="Choose an image or drag it here, PNG, JPG, GIF up to 10MB"
+          :label="'Upload'"
+        ></TDUpload>
+      </div>
+      <div v-if="imageLoaded" class="flex color-picker-container">
+        <div class="flex flex-col image-container">
+          <div class="flex image-wrapper" ref="imageWrapper">
+            <canvas
+              ref="canvas"
+              @mousemove="handleMouseMove"
+              @mouseleave="hideMagnifier"
+              @click="selectColor"
+              class="main-canvas"
+            ></canvas>
+            <MagnifyingGlass
+              v-if="showMagnifier"
+              :x="magnifierX"
+              :y="magnifierY"
+              :canvas="canvas"
+              :mouse-x="mouseX"
+              :mouse-y="mouseY"
+            />
+          </div>
+          <div
+            v-if="colorPalette && colorPalette.length > 0"
+            class="flex palette-info"
+          >
+            <div>Color Palette</div>
 
-              <MagnifyingGlass
-                v-if="showMagnifier"
-                :x="magnifierX"
-                :y="magnifierY"
-                :canvas="canvas"
-                :mouse-x="mouseX"
-                :mouse-y="mouseY"
-              />
-            </div>
-
-            <div class="image-controls mt-4">
-              <TDButton
-                @click="resetImage"
-                label="Upload New Image"
-                class="btn btn-secondary"
+            <div class="flex palette-grid">
+              <div
+                v-for="(color, index) in colorPalette"
+                :key="index"
+                class="palette-color"
+                :style="{ backgroundColor: color.hex }"
+                @click="handleColorSelected(color)"
+                :title="color.hex"
               >
-              </TDButton>
+                <div class="color-overlay">
+                  <span class="color-hex">{{ color.hex }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Color Info and Palette Section -->
-      <div class="color-info-section">
-        <div v-if="selectedColor" class="mb-6">
-          <div class="card color-info">
-            <h3 class="color-info-title">Selected Color</h3>
-
+        <div class="flex flex-col color-info-section">
+          <div>Selected Color</div>
+          <template v-if="selectedColor">
+            <div>{{ selectedColor.hex }}</div>
             <div
               class="color-preview"
               :style="{ backgroundColor: selectedColor.hex }"
             ></div>
-
-            <div class="color-values">
-              <div
-                class="color-value"
-                @click="copyToClipboard(selectedColor.hex)"
-              >
-                <label>HEX</label>
-                <span class="value">{{ selectedColor.hex }}</span>
-                <button class="copy-btn">📋</button>
-              </div>
-
-              <div class="color-value" @click="copyToClipboard(rgbString)">
-                <label>RGB</label>
-                <span class="value">{{ rgbString }}</span>
-                <button class="copy-btn">📋</button>
-              </div>
-
-              <div class="color-value" @click="copyToClipboard(hslString)">
-                <label>HSL</label>
-                <span class="value">{{ hslString }}</span>
-                <button class="copy-btn">📋</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          v-if="colorPalette && colorPalette.length > 0"
-          class="card color-palette"
-        >
-          <h3 class="palette-title">Color Palette</h3>
-
-          <div class="palette-grid">
-            <div
-              v-for="(color, index) in colorPalette"
-              :key="index"
-              class="palette-color"
-              :style="{ backgroundColor: color.hex }"
-              @click="handleColorSelected(color)"
-              :title="color.hex"
-            >
-              <div class="color-overlay">
-                <span class="color-hex">{{ color.hex }}</span>
-              </div>
-            </div>
-          </div>
-
-          <p class="palette-info">
-            {{ colorPalette.length }} dominant colors extracted
-          </p>
+            <TDButton
+              v-if="selectedColor"
+              ref="copy-btn"
+              @click="haddleCopyEvent(selectedColor.hex)"
+              label="Copy color"
+            ></TDButton>
+          </template>
+          <TDButton
+            :type="$tdEnum.buttonType.secondary"
+            @click="resetImage"
+            label="Upload New Image"
+            class="btn btn-secondary"
+          >
+          </TDButton>
         </div>
       </div>
     </div>
@@ -153,6 +123,10 @@ export default {
   },
   mounted() {},
   methods: {
+    haddleCopyEvent(value) {
+      let me = this;
+      me.$tdUtility.copyToClipboard(value);
+    },
     handleDragOver(e) {
       let me = this;
       e.preventDefault();
@@ -301,139 +275,90 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+.td-color-picker {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+.upload-area-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+.upload-area {
+  width: 70%;
+  height: 50%;
+}
+.color-picker-container {
+  width: 100%;
+  height: 100%;
+}
 .image-container {
   position: relative;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
 }
 
 .image-wrapper {
   position: relative;
-  display: inline-block;
   width: 100%;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
 }
 
 .main-canvas {
-  max-width: 100%;
+  width: 100%;
   height: auto;
   border-radius: 12px;
   cursor: crosshair;
   display: block;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
-
-.image-controls {
-  display: flex;
-  justify-content: center;
-}
-
-.color-info-section {
-  display: flex;
-  flex-direction: column;
-}
-.color-info-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--gray-800);
-  margin: 0 0 16px 0;
-}
-
-.color-preview {
+.palette-info {
   width: 100%;
+  position: relative;
+  align-items: center;
+}
+.color-preview {
+  width: 80px;
   height: 80px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  border: 1px solid var(--gray-200);
+  border-radius: var(--border-radius);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
-.color-values {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.color-value {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  background: var(--gray-50);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.color-value:hover {
-  background: var(--gray-100);
-}
-
-.color-value label {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--gray-500);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.color-value .value {
-  font-family: "Monaco", "Consolas", monospace;
-  font-size: 14px;
-  color: var(--gray-800);
-  flex: 1;
-  text-align: center;
-}
-
-.copy-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 12px;
-  opacity: 0.5;
-  transition: opacity 0.2s ease;
-}
-
-.copy-btn:hover {
-  opacity: 1;
-}
-
-.copy-message {
-  text-align: center;
-  padding: 8px;
-  background: var(--success);
-  color: white;
-  border-radius: 6px;
-  font-size: 14px;
-  margin-top: 8px;
-}
-
-.palette-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--gray-800);
-  margin: 0 0 16px 0;
-}
-
 .palette-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-  gap: 8px;
-  margin-bottom: 16px;
+  height: 100px;
+  overflow: auto;
+  column-gap: var(--padding);
+  margin: var(--padding);
 }
 
 .palette-color {
+  width: 80px;
   aspect-ratio: 1;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
-  border: 2px solid var(--gray-200);
+  border: 2px solid var(--border-color);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .palette-color:hover {
-  transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  border-color: var(--primary);
+  border-color: var(--border-color);
 }
 
 .color-overlay {
@@ -447,23 +372,12 @@ export default {
   transform: translateY(100%);
   transition: transform 0.2s ease;
 }
-
 .palette-color:hover .color-overlay {
   transform: translateY(0);
 }
-
 .color-hex {
-  font-size: 10px;
-  font-family: "Monaco", "Consolas", monospace;
+  font-size: 15px;
   text-align: center;
   display: block;
 }
-
-.palette-info {
-  font-size: 14px;
-  color: var(--gray-500);
-  text-align: center;
-  margin: 0;
-}
-
 </style>

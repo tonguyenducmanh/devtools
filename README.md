@@ -12,7 +12,7 @@ Two versions are supported: web version (Vue + Vite) and app version (Electron +
 
 List of Supported Features:
 
-One time password, Text Compress, Compare code, JSON parser, JSON to PostgreSQL, JSON Mapping, JSON to Excel, Code formatter, Image from Base64, Image to Base64, QRCode from text, QRCode to text, Download VSCode Extension, UUIDv4 generator
+One time password, Color picker, Text Compress, Compare code, JSON parser, JSON to PostgreSQL, JSON Mapping, JSON to Excel, Code formatter, Image from Base64, Image to Base64, QRCode from text, QRCode to text, Download VSCode Extension, UUIDv4 generator
 
 Application-wide configuration can be accessed by entering the following command in the console:
 
