@@ -160,6 +160,7 @@ export default {
   margin: var(--padding);
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
+  width: 100%;
 }
 
 .td-history-header {
