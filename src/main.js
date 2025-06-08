@@ -6,6 +6,24 @@ import started from "electron-squirrel-startup";
 if (started) {
   app.quit();
 }
+const openDevTools = () => {
+  const win = BrowserWindow.getFocusedWindow();
+  if (win) {
+    if (win.webContents.isDevToolsOpened()) {
+      win.webContents.closeDevTools();
+    } else {
+      win.webContents.openDevTools();
+    }
+  }
+};
+
+const keyHandler = (event, input) => {
+  // Check for F12
+  if (input.key === "F12") {
+    event.preventDefault();
+    openDevTools();
+  }
+};
 
 const createWindow = () => {
   // Create the browser window.
@@ -32,6 +50,7 @@ const createWindow = () => {
 
   // Open the DevTools.
   //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.on("before-input-event", keyHandler);
 };
 
 // This method will be called when Electron has finished
