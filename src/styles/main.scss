@@ -53,6 +53,9 @@ body[data-theme="light"] {
   --btn-secondary-color: #f1f1f1;
   --btn-secondary-text-color: #476582;
   --btn-secondary-focus-color: #e5e5e5;
+  --scroll-bg-color: #f0f0f0;
+  --scroll-thumb-color: #888;
+  --scroll-thumb-hover-color: #555;
 }
 
 body[data-theme="dark"] {
@@ -70,6 +73,9 @@ body[data-theme="dark"] {
   --btn-secondary-color: #2f2f2f;
   --btn-secondary-text-color: #aac8e4;
   --btn-secondary-focus-color: #3a3a3a;
+  --scroll-bg-color: #2c2c2c;
+  --scroll-thumb-color: #9f9f9f;
+  --scroll-thumb-hover-color: #d1d1d1;
 }
 
 body {
@@ -98,20 +104,20 @@ a {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #f0f0f0;
+  background: var(--scroll-bg-color);
   border-radius: 10px;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: var(--scroll-thumb-color);
   border-radius: 10px;
-  border: 3px solid #f0f0f0; /* space around thumb */
+  border: 3px solid var(--scroll-bg-color); /* space around thumb */
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: var(--scroll-thumb-hover-color);
 }
 
 ::selection {
