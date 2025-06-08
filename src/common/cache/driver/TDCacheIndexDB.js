@@ -48,8 +48,8 @@ class TDCacheIndexDB {
     let me = this;
     const db = await me.openIndexedDB();
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(this.STORE_NAME, "readwrite");
-      const store = tx.objectStore(this.STORE_NAME);
+      const tx = db.transaction(me.STORE_NAME, "readwrite");
+      const store = tx.objectStore(me.STORE_NAME);
       const request = store.delete(key);
 
       request.onsuccess = () => resolve(true);
