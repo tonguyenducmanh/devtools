@@ -129,9 +129,10 @@ export default {
     async saveToHistory(text) {
       try {
         let me = this;
+        let newHistory = typeof text === "string" ? text : JSON.stringify(text);
         let history = await me.getHistory();
-        history = history.filter((x) => x.title != text);
-        history.push(me.buildHistoryItem(text));
+        history = history.filter((x) => x.title != newHistory);
+        history.push(me.buildHistoryItem(newHistory));
         // Giới hạn số lượng lịch sử lưu trữ
         if (history.length > window.__env.textToQRConfig.maxHistoryLength) {
           history.shift(); // Xóa item cũ nhất

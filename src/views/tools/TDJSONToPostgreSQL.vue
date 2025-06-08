@@ -1,6 +1,14 @@
 <template>
-  <div class="container">
+  <div class="flex flex-col container">
     <div class="title">JSON to PostgreSQL tool!</div>
+    <div class="flex history-wrapper">
+      <TDHistory
+        ref="history"
+        class="history-container"
+        :applyFunction="convertToPostgresSQLFromHistory"
+        :cacheKey="$tdEnum.cacheConfig.JSONToPostgreSQL"
+      ></TDHistory>
+    </div>
     <div class="flex flex-wrap metadata-inputs">
       <div>
         <TDInput label="Tên schema" type="text" v-model="schemaName" />
@@ -13,13 +21,11 @@
       </div>
     </div>
 
-    <div class="flex flex-wrap io-section">
+    <div class="flex io-section">
       <TDTextarea
         isLabelTop
         label="Nhập JSON"
         placeHolder="Nhập JSON ở đây..."
-        height="400px"
-        width="500px"
         v-model="inputJSON"
       ></TDTextarea>
       <TDTextarea
@@ -27,8 +33,6 @@
         label="Kết quả SQL"
         :readOnly="true"
         placeHolder="SQL sẽ xuất hiện ở đây..."
-        height="400px"
-        width="500px"
         v-model="outputSQL"
       ></TDTextarea>
     </div>
@@ -77,7 +81,21 @@ export default {
       );
       this.$tdUtility.applyMock(this, TDMockJSONToPostgreSQL);
     },
-    convertToPostgresSQL() {
+
+    async convertToPostgresSQLFromHistory(item) {
+      let me = this;
+      let historyItem = item ? JSON.parse(item) : null;
+      if (historyItem && historyItem.inputJSON) {
+        me.inputJSON = historyItem.inputJSON;
+        me.tableName = historyItem.tableName;
+        me.schemaName = historyItem.schemaName;
+        me.primaryKeyField = historyItem.primaryKeyField;
+        me.enableCreateTable = historyItem.enableCreateTable;
+        me.enableDeleteScript = historyItem.enableDeleteScript;
+        await me.convertToPostgresSQL();
+      }
+    },
+    async convertToPostgresSQL() {
       let me = this;
       try {
         let source = JSON.parse(me.inputJSON);
@@ -95,6 +113,16 @@ export default {
           config.enableDeleteScript = me.enableDeleteScript;
           config.enableCreateTable = me.enableCreateTable;
           me.outputSQL = me.buildScriptPostgreSQLScript(input, config);
+          // Lưu text vào lịch sử nếu khác với lần lưu trước
+          let historyItem = {
+            inputJSON: me.inputJSON,
+            tableName: me.tableName,
+            schemaName: me.schemaName,
+            primaryKeyField: me.primaryKeyField,
+            enableCreateTable: me.enableCreateTable,
+            enableDeleteScript: me.enableDeleteScript,
+          };
+          await me.$refs.history.saveToHistory(historyItem);
         }
       } catch (error) {
         console.error("Error in convertToPostgresSQL:", error);
@@ -293,6 +321,14 @@ export default {
   height: 100%;
 }
 .io-section {
+  flex: 1;
   column-gap: 20px;
+  width: 95%;
+}
+.history-wrapper{
+  width: 95%;
+}
+.history-container {
+  width: 100%;
 }
 </style>

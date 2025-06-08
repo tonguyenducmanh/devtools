@@ -18,15 +18,21 @@ export const TDCacheConfig = {
   },
   QRHistory: {
     KeyFormat: "QRHistory",
-    CacheLevel: tdEnum.cacheType.local,
+    CacheLevel: tdEnum.cacheType.indexedDB,
     ExpireTime: 0,
     Note: "lịch sử quét mã",
   },
   JSONToExcelHistory: {
     KeyFormat: "JSONToExcelHistory",
-    CacheLevel: tdEnum.cacheType.local,
+    CacheLevel: tdEnum.cacheType.indexedDB,
     ExpireTime: 0,
     Note: "lịch sử json xuất ra excel",
+  },
+  JSONToPostgreSQL: {
+    KeyFormat: "JSONToPostgreSQL",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử json convert thành postgresql",
   },
   IsShowSidebar: {
     KeyFormat: "IsShowSidebar",
