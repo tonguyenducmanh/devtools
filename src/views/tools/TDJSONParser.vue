@@ -90,7 +90,7 @@
         />
       </div>
       <TDTextarea
-        v-if="isShowSelectedNode"
+        v-if="isShowSelectedNode && objectSource"
         placeHolder="Node đang chọn"
         v-model="jsonSelected"
         :readOnly="true"
