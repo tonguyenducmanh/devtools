@@ -37,6 +37,10 @@ export default {
       type: Number,
       required: true,
     },
+    canvasRect: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -64,8 +68,15 @@ export default {
   },
   mounted() {
     this.updateMagnifier();
+    window.addEventListener("resize", this.updateCanvasRect);
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.updateCanvasRect);
   },
   methods: {
+    updateCanvasRect() {
+      this.canvasRect = this.canvas.getBoundingClientRect();
+    },
     updateMagnifier() {
       if (!this.canvas || !this.$refs.magnifierCanvas) return;
 
@@ -77,8 +88,14 @@ export default {
 
       // Calculate the source region to magnify
       const sourceSize = this.magnifierSize / this.zoomLevel;
-      const sourceX = Math.max(0, this.mouseX - sourceSize / 2);
-      const sourceY = Math.max(0, this.mouseY - sourceSize / 2);
+      const scaleX = this.canvas.width / this.canvasRect.width;
+      const scaleY = this.canvas.height / this.canvasRect.height;
+
+      const relativeX = (this.x - this.canvasRect.left) * scaleX;
+      const relativeY = (this.y - this.canvasRect.top) * scaleY;
+
+      const sourceX = Math.max(0, relativeX - sourceSize / 2);
+      const sourceY = Math.max(0, relativeY - sourceSize / 2);
       const actualSourceWidth = Math.min(
         sourceSize,
         this.canvas.width - sourceX

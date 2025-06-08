@@ -32,6 +32,7 @@
               :canvas="canvas"
               :mouse-x="mouseX"
               :mouse-y="mouseY"
+              :canvasRect="canvasRect"
             />
           </div>
           <div
@@ -109,6 +110,7 @@ export default {
       selectedColor: null,
       colorPalette: [],
       imageData: null,
+      canvasRect: null,
     };
   },
   computed: {
@@ -196,21 +198,32 @@ export default {
       this.canvas = this.$refs.canvas;
       this.ctx = this.canvas.getContext("2d");
 
-      // Set canvas size
-      const containerWidth = this.$refs.imageWrapper.clientWidth;
-      const aspectRatio = image.height / image.width;
+      const wrapper = this.$refs.imageWrapper;
+      const containerWidth = wrapper.clientWidth;
+      const containerHeight = wrapper.clientHeight;
 
-      this.canvas.width = Math.min(containerWidth, image.width);
-      this.canvas.height = this.canvas.width * aspectRatio;
+      const imageWidth = image.width;
+      const imageHeight = image.height;
+      const imageAspectRatio = imageWidth / imageHeight;
 
-      // Draw image
-      this.ctx.drawImage(image, 0, 0, this.canvas.width, this.canvas.height);
-      this.imageData = this.ctx.getImageData(
-        0,
-        0,
-        this.canvas.width,
-        this.canvas.height
-      );
+      // Tính scale phù hợp nhất dựa trên cả width và height container
+      const widthScale = containerWidth / imageWidth;
+      const heightScale = containerHeight / imageHeight;
+      const scale = Math.min(widthScale, heightScale, 1); // không phóng to ảnh quá kích thước thật
+
+      // Gán kích thước canvas
+      const scaledWidth = imageWidth * scale;
+      const scaledHeight = imageHeight * scale;
+
+      this.canvas.width = scaledWidth;
+      this.canvas.height = scaledHeight;
+
+      // Vẽ ảnh đã scale vào canvas
+      this.ctx.clearRect(0, 0, scaledWidth, scaledHeight);
+      this.ctx.drawImage(image, 0, 0, scaledWidth, scaledHeight);
+
+      // Lưu imageData
+      this.imageData = this.ctx.getImageData(0, 0, scaledWidth, scaledHeight);
     },
 
     handleMouseMove(event) {
@@ -223,6 +236,7 @@ export default {
       this.magnifierY = event.clientY;
 
       this.showMagnifier = true;
+      this.canvasRect = this.$refs.canvas.getBoundingClientRect();
     },
 
     hideMagnifier() {
@@ -231,10 +245,19 @@ export default {
 
     selectColor(event) {
       if (!this.imageData) return;
-
       const rect = this.canvas.getBoundingClientRect();
-      const x = Math.floor(event.clientX - rect.left);
-      const y = Math.floor(event.clientY - rect.top);
+
+      // Tọa độ chuột tính theo kích thước hiển thị
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+
+      // Tỷ lệ giữa canvas thật và kích thước hiển thị
+      const scaleX = this.canvas.width / rect.width;
+      const scaleY = this.canvas.height / rect.height;
+
+      // Tọa độ thực trên canvas
+      const x = Math.floor(mouseX * scaleX);
+      const y = Math.floor(mouseY * scaleY);
 
       const pixelIndex = (y * this.canvas.width + x) * 4;
       const r = this.imageData.data[pixelIndex];
