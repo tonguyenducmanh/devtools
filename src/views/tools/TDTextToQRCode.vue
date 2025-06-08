@@ -1,25 +1,12 @@
 <template>
   <div class="container">
     <div class="title">Text To QRCode tool!</div>
-    <div class="history-section">
-      <div class="history-header">
-        <h3>Lịch sử</h3>
-        <TDButton @click="clearAllHistory" label="Xóa tất cả"></TDButton>
-      </div>
-      <div ref="history-list" class="history-list">
-        <template v-for="(item, index) in historyItems">
-          <div class="history-item" @click="applyHistoryText(item.historyId)">
-            <span>{{ item.textContent }}</span>
-            <button
-              class="delete-btn"
-              @click.stop.prevent="deleteHistoryItem(item.historyId)"
-            >
-              x
-            </button>
-          </div>
-        </template>
-      </div>
-    </div>
+    <TDHistory
+      ref="history"
+      :applyFunction="generateQRCode"
+      :cacheKey="$tdEnum.cacheConfig.QRHistory"
+    ></TDHistory>
+
     <div class="flex flex-col input-section">
       <TDTextarea
         class="input-area"
@@ -29,7 +16,7 @@
       <div class="flex button-generate">
         <TDButton
           :readOnly="!textGenQR"
-          @click="generateQRCode"
+          @click="generateQRCode(null)"
           label="Tạo QR Code"
         ></TDButton>
         <TDButton
@@ -79,7 +66,6 @@ export default {
   name: "TDTextToQRCode",
   created() {
     let me = this;
-    me.updateHistoryDisplay();
   },
   beforeUnmount() {
     let me = this;
@@ -97,7 +83,7 @@ export default {
     /**
      * Tạo QR code từ text
      */
-    async generateQRCode() {
+    async generateQRCode(textInput) {
       let me = this;
       let maxTextOneChunk = Number(
         me.maxLengthUserConfig ?? window.__env.textToQRConfig.maxTextOneChunk
@@ -107,11 +93,11 @@ export default {
       }
 
       // Lấy giá trị từ các input
-      let text = me.getUserInput();
+      let text = me.getUserInput(textInput);
       let textBuild = me.buildTextBeforeGenQR(text);
 
       // Lưu text vào lịch sử nếu khác với lần lưu trước
-      await me.saveToHistory(text);
+      await me.$refs.history.saveToHistory(text);
       // reset
       me.qrCodeItems = [];
       // Nếu độ dài text lớn hơn 1000, chia thành nhiều phần
@@ -148,9 +134,12 @@ export default {
      * lấy giá trị từ input text
      * @returns {string} giá trị text từ input
      */
-    getUserInput() {
+    getUserInput(textInput) {
       let me = this;
-      let inputElement = me.textGenQR.toString();
+      let inputElement = textInput ? textInput : me.textGenQR.toString();
+      if (textInput) {
+        me.textGenQR = textInput;
+      }
       let text = inputElement ? inputElement.trim() : null;
       return text;
     },
@@ -178,84 +167,6 @@ export default {
       });
       me.qrCodeItems.push(result);
     },
-
-    /**
-     * Lấy lịch sử text từ localStorage
-     * @returns {Array} Mảng các text đã lưu
-     */
-    async getHistory() {
-      let me = this;
-      let history = await me.$tdCache.get(me.$tdEnum.cacheConfig.QRHistory);
-      return history ? history : [];
-    },
-
-    /**
-     * Lưu text vào lịch sử nếu khác với lần lưu trước
-     * @param {string} text - Text cần lưu
-     */
-    async saveToHistory(text) {
-      try {
-        let me = this;
-        let history = await me.getHistory();
-        history = history.filter((x) => x.title != text);
-        history.push(me.buildHistoryItem(text));
-        // Giới hạn số lượng lịch sử lưu trữ
-        if (history.length > window.__env.textToQRConfig.maxHistoryLength) {
-          history.shift(); // Xóa item cũ nhất
-        }
-        await me.$tdCache.set(me.$tdEnum.cacheConfig.QRHistory, history);
-        await me.updateHistoryDisplay();
-      } catch (error) {
-        console.error("Lỗi khi lưu vào history:", error);
-        // Lỗi sẽ được bỏ qua để không ảnh hưởng tới luồng chính
-      }
-    },
-    buildHistoryItem(text) {
-      let me = this;
-      return {
-        title: text,
-        historyId: me.$tdUtility.newGuid(),
-      };
-    },
-    /**
-     * Xóa một item khỏi lịch sử
-     * @param {number} index - Vị trí của item cần xóa
-     */
-    async deleteHistoryItem(historyId) {
-      let me = this;
-      let history = await me.getHistory();
-      history = history.filter((x) => x.historyId != historyId);
-      await me.$tdCache.set(
-        me.$tdEnum.cacheConfig.QRHistory,
-        JSON.stringify(history)
-      );
-      await me.updateHistoryDisplay();
-    },
-
-    /**
-     * Xóa tất cả lịch sử
-     */
-    clearAllHistory() {
-      let me = this;
-      me.$tdCache.remove(me.$tdEnum.cacheConfig.QRHistory);
-      me.historyItems = [];
-    },
-
-    /**
-     * Áp dụng text từ lịch sử
-     * @param {string} text - Text cần áp dụng
-     */
-    applyHistoryText(historyId) {
-      let me = this;
-      if (me.historyItems && me.historyItems.length > 0 && historyId) {
-        let currentItem = me.historyItems.find((x) => x.historyId == historyId);
-        if (currentItem) {
-          me.textGenQR = currentItem.title;
-          me.generateQRCode();
-        }
-      }
-    },
-
     /**
      * Chuyển đổi Data URL thành Blob
      * @param {string} dataUrl - Data URL cần chuyển đổi
@@ -305,33 +216,10 @@ export default {
         `qrcode-part-${index + 1}.png`
       );
     },
-
-    /**
-     * Cập nhật hiển thị lịch sử
-     */
-    async updateHistoryDisplay() {
-      let me = this;
-      let history = await me.getHistory();
-      let titleLength = window.__env.textToQRConfig.maxTitleLength;
-      me.historyItems = [];
-      [...history].reverse().forEach((historyItem, index) => {
-        let text = historyItem.title;
-        let item = {};
-        let displayText =
-          text && text.length > titleLength
-            ? text.slice(0, titleLength) + "..."
-            : text;
-        item.textContent = displayText;
-        item.title = text;
-        item.historyId = historyItem.historyId;
-        me.historyItems.push(item);
-      });
-    },
   },
   data() {
     return {
       textGenQR: null,
-      historyItems: [],
       qrCodeItems: [],
       maxLengthUserConfig: null,
     };
@@ -345,84 +233,6 @@ export default {
   width: 100%;
   height: 100%;
   overflow: auto;
-}
-
-.history-section {
-  padding: var(--padding);
-  margin: var(--padding);
-  border-radius: var(--border-radius);
-  border: 1px solid var(--border-color);
-}
-
-.history-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.history-header h3 {
-  color: var(--text-primary-color);
-  margin: 0;
-}
-
-.history-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.history-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--padding);
-  background-color: var(--bg-sub-color);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  transition: all 0.2s ease;
-  color: #444;
-  max-width: 300px;
-  gap: 0.5rem;
-}
-
-.history-item span {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  cursor: pointer;
-  color: var(--text-primary-color);
-}
-
-.history-item:hover {
-  background-color: var(--bg-hover-color);
-  border: 1px solid var(--focus-color);
-  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.1);
-}
-
-.history-item .delete-btn {
-  background: none;
-  border: none;
-  color: var(--text-primary-color);
-  cursor: pointer;
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  border-radius: 50%;
-  margin-left: 4px;
-}
-
-.history-item .delete-btn:hover {
-  color: var(--focus-color);
-}
-
-.history-item span:hover {
-  color: var(--focus-color);
-  text-decoration: underline;
 }
 
 .input-section {

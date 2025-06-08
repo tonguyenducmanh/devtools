@@ -11,6 +11,7 @@ import TDCheckbox from "@/components/TDCheckbox.vue";
 import TDUpload from "@/components/TDUpload.vue";
 import TDRadio from "@/components/TDRadio.vue";
 import TDRadioGroup from "@/components/TDRadioGroup.vue";
+import TDHistory from "@/components/TDHistory.vue";
 
 const currentApp = createApp(App);
 
@@ -27,6 +28,7 @@ currentApp.component("TDCheckbox", TDCheckbox);
 currentApp.component("TDUpload", TDUpload);
 currentApp.component("TDRadio", TDRadio);
 currentApp.component("TDRadioGroup", TDRadioGroup);
+currentApp.component("TDHistory", TDHistory);
 
 currentApp.use(router);
 
