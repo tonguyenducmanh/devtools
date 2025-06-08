@@ -5,6 +5,7 @@
       <TDHistory
         ref="history"
         class="history-container"
+        titleKey="inputJSON"
         :applyFunction="convertToPostgresSQLFromHistory"
         :cacheKey="$tdEnum.cacheConfig.JSONToPostgreSQL"
       ></TDHistory>
@@ -84,7 +85,7 @@ export default {
 
     async convertToPostgresSQLFromHistory(item) {
       let me = this;
-      let historyItem = item ? JSON.parse(item) : null;
+      let historyItem = item || {};
       if (historyItem && historyItem.inputJSON) {
         me.inputJSON = historyItem.inputJSON;
         me.tableName = historyItem.tableName;
@@ -325,7 +326,7 @@ export default {
   column-gap: 20px;
   width: 95%;
 }
-.history-wrapper{
+.history-wrapper {
   width: 95%;
 }
 .history-container {

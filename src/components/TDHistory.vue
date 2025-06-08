@@ -39,8 +39,20 @@ export default {
       type: Function,
       default: () => {},
     },
+    /**
+     * Khóa cache để lưu lịch sử
+     * @type {string}
+     */
     cacheKey: {
       type: Number,
+    },
+    /**
+     * Khóa tiêu đề của lịch sử
+     * Để trống mặc định sẽ dùng luôn lịch sử làm tiêu đề
+     * @type {string}
+     */
+    titleKey: {
+      type: String,
     },
   },
   data() {
@@ -58,7 +70,7 @@ export default {
       if (me.historyItems && me.historyItems.length > 0 && historyId) {
         let currentItem = me.historyItems.find((x) => x.historyId == historyId);
         if (currentItem) {
-          me.applyFunction(currentItem.title);
+          me.applyFunction(currentItem.source || currentItem.title);
         }
       }
     },
@@ -91,15 +103,12 @@ export default {
       me.historyItems = [];
       [...history].reverse().forEach((historyItem, index) => {
         let text = historyItem.title;
-        let item = {};
         let displayText =
           text && text.length > titleLength
             ? text.slice(0, titleLength) + "..."
             : text;
-        item.textContent = displayText;
-        item.title = text;
-        item.historyId = historyItem.historyId;
-        me.historyItems.push(item);
+        historyItem.textContent = displayText;
+        me.historyItems.push(historyItem);
       });
     },
     /**
@@ -123,16 +132,17 @@ export default {
     },
 
     /**
-     * Lưu text vào lịch sử nếu khác với lần lưu trước
+     * Lưu source vào lịch sử nếu khác với lần lưu trước
      * @param {string} text - Text cần lưu
      */
-    async saveToHistory(text) {
+    async saveToHistory(source) {
       try {
         let me = this;
-        let newHistory = typeof text === "string" ? text : JSON.stringify(text);
+        let newHistory =
+          typeof source === "string" ? source : JSON.stringify(source);
         let history = await me.getHistory();
         history = history.filter((x) => x.title != newHistory);
-        history.push(me.buildHistoryItem(newHistory));
+        history.push(me.buildHistoryItem(newHistory, source));
         // Giới hạn số lượng lịch sử lưu trữ
         if (history.length > window.__env.textToQRConfig.maxHistoryLength) {
           history.shift(); // Xóa item cũ nhất
@@ -144,12 +154,18 @@ export default {
         // Lỗi sẽ được bỏ qua để không ảnh hưởng tới luồng chính
       }
     },
-    buildHistoryItem(text) {
+    buildHistoryItem(newHistory, source) {
       let me = this;
-      return {
-        title: text,
+      let historyItem = {
         historyId: me.$tdUtility.newGuid(),
+        source: source,
       };
+      if (me.titleKey && source && source.hasOwnProperty(me.titleKey)) {
+        historyItem.title = source[me.titleKey] || newHistory;
+      } else {
+        historyItem.title = newHistory;
+      }
+      return historyItem;
     },
   },
 };
