@@ -1,9 +1,6 @@
 <template>
-  <div 
-    class="magnifying-glass"
-    :style="magnifierStyle"
-  >
-    <canvas 
+  <div class="magnifying-glass" :style="magnifierStyle">
+    <canvas
       ref="magnifierCanvas"
       :width="magnifierSize"
       :height="magnifierSize"
@@ -18,34 +15,34 @@
 
 <script>
 export default {
-  name: 'MagnifyingGlass',
+  name: "TDMagnifyingGlass",
   props: {
     x: {
       type: Number,
-      required: true
+      required: true,
     },
     y: {
       type: Number,
-      required: true
+      required: true,
     },
     canvas: {
       type: Object,
-      required: true
+      required: true,
     },
     mouseX: {
       type: Number,
-      required: true
+      required: true,
     },
     mouseY: {
       type: Number,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
       magnifierSize: 120,
-      zoomLevel: 3
-    }
+      zoomLevel: 3,
+    };
   },
   computed: {
     magnifierStyle() {
@@ -53,65 +50,77 @@ export default {
         left: `${this.x + 20}px`,
         top: `${this.y - this.magnifierSize / 2}px`,
         width: `${this.magnifierSize}px`,
-        height: `${this.magnifierSize}px`
-      }
-    }
+        height: `${this.magnifierSize}px`,
+      };
+    },
   },
   watch: {
     mouseX() {
-      this.updateMagnifier()
+      this.updateMagnifier();
     },
     mouseY() {
-      this.updateMagnifier()
-    }
+      this.updateMagnifier();
+    },
   },
   mounted() {
-    this.updateMagnifier()
+    this.updateMagnifier();
   },
   methods: {
     updateMagnifier() {
-      if (!this.canvas || !this.$refs.magnifierCanvas) return
-      
-      const magnifierCanvas = this.$refs.magnifierCanvas
-      const magnifierCtx = magnifierCanvas.getContext('2d')
-      
+      if (!this.canvas || !this.$refs.magnifierCanvas) return;
+
+      const magnifierCanvas = this.$refs.magnifierCanvas;
+      const magnifierCtx = magnifierCanvas.getContext("2d");
+
       // Clear the magnifier canvas
-      magnifierCtx.clearRect(0, 0, this.magnifierSize, this.magnifierSize)
-      
+      magnifierCtx.clearRect(0, 0, this.magnifierSize, this.magnifierSize);
+
       // Calculate the source region to magnify
-      const sourceSize = this.magnifierSize / this.zoomLevel
-      const sourceX = Math.max(0, this.mouseX - sourceSize / 2)
-      const sourceY = Math.max(0, this.mouseY - sourceSize / 2)
-      const actualSourceWidth = Math.min(sourceSize, this.canvas.width - sourceX)
-      const actualSourceHeight = Math.min(sourceSize, this.canvas.height - sourceY)
-      
+      const sourceSize = this.magnifierSize / this.zoomLevel;
+      const sourceX = Math.max(0, this.mouseX - sourceSize / 2);
+      const sourceY = Math.max(0, this.mouseY - sourceSize / 2);
+      const actualSourceWidth = Math.min(
+        sourceSize,
+        this.canvas.width - sourceX
+      );
+      const actualSourceHeight = Math.min(
+        sourceSize,
+        this.canvas.height - sourceY
+      );
+
       // Create a circular clipping path
-      magnifierCtx.save()
-      magnifierCtx.beginPath()
+      magnifierCtx.save();
+      magnifierCtx.beginPath();
       magnifierCtx.arc(
-        this.magnifierSize / 2, 
-        this.magnifierSize / 2, 
-        this.magnifierSize / 2 - 2, 
-        0, 
+        this.magnifierSize / 2,
+        this.magnifierSize / 2,
+        this.magnifierSize / 2 - 2,
+        0,
         2 * Math.PI
-      )
-      magnifierCtx.clip()
-      
+      );
+      magnifierCtx.clip();
+
       // Draw the magnified portion
       try {
         magnifierCtx.drawImage(
           this.canvas,
-          sourceX, sourceY, actualSourceWidth, actualSourceHeight,
-          0, 0, this.magnifierSize, this.magnifierSize
-        )
+          sourceX,
+          sourceY,
+          actualSourceWidth,
+          actualSourceHeight,
+          0,
+          0,
+          this.magnifierSize,
+          this.magnifierSize
+        );
       } catch (error) {
-        console.error('Error drawing magnified image:', error)
+        console.error("Error drawing magnified image:", error);
       }
-      
-      magnifierCtx.restore()
-    }
-  }
-}
+
+      magnifierCtx.restore();
+    },
+  },
+};
 </script>
 
 <style scoped>
