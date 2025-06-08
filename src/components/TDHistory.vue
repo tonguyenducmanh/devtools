@@ -179,6 +179,8 @@ export default {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  max-height: 100px;
+  overflow: auto;
 }
 
 .td-history-item {
