@@ -323,7 +323,7 @@ export default {
 .td-color-picker {
   display: flex;
   width: 100%;
-  height: 100%;
+  height: 95%;
 }
 .upload-area-container {
   display: flex;
@@ -352,6 +352,7 @@ export default {
   position: relative;
   width: 100%;
   flex: 1;
+  overflow: auto;
   align-items: center;
   justify-content: center;
 }
