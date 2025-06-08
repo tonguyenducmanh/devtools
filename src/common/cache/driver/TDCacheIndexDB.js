@@ -4,12 +4,13 @@ class TDCacheIndexDB {
   DB_VERSION = 1;
 
   openIndexedDB() {
+    let me = this;
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+      const request = indexedDB.open(me.DB_NAME, me.DB_VERSION);
       request.onupgradeneeded = function (event) {
         const db = event.target.result;
-        if (!db.objectStoreNames.contains(this.STORE_NAME)) {
-          db.createObjectStore(this.STORE_NAME);
+        if (!db.objectStoreNames.contains(me.STORE_NAME)) {
+          db.createObjectStore(me.STORE_NAME);
         }
       };
       request.onsuccess = () => resolve(request.result);
@@ -21,8 +22,8 @@ class TDCacheIndexDB {
     let me = this;
     const db = await me.openIndexedDB();
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(this.STORE_NAME, "readwrite");
-      const store = tx.objectStore(this.STORE_NAME);
+      const tx = db.transaction(me.STORE_NAME, "readwrite");
+      const store = tx.objectStore(me.STORE_NAME);
       const request = store.put(value, key);
 
       request.onsuccess = () => resolve(true);
@@ -34,8 +35,8 @@ class TDCacheIndexDB {
     let me = this;
     const db = await me.openIndexedDB();
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(this.STORE_NAME, "readonly");
-      const store = tx.objectStore(this.STORE_NAME);
+      const tx = db.transaction(me.STORE_NAME, "readonly");
+      const store = tx.objectStore(me.STORE_NAME);
       const request = store.get(key);
 
       request.onsuccess = () => resolve(request.result);
