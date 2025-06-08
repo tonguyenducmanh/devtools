@@ -1,11 +1,13 @@
 <template>
   <div class="container">
     <div class="title">Text To QRCode tool!</div>
-    <TDHistory
-      ref="history"
-      :applyFunction="generateQRCode"
-      :cacheKey="$tdEnum.cacheConfig.QRHistory"
-    ></TDHistory>
+    <div class="flex">
+      <TDHistory
+        ref="history"
+        :applyFunction="generateQRCode"
+        :cacheKey="$tdEnum.cacheConfig.QRHistory"
+      ></TDHistory>
+    </div>
 
     <div class="flex flex-col input-section">
       <TDTextarea
