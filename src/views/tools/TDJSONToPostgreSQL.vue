@@ -323,7 +323,7 @@ export default {
 }
 .io-section {
   flex: 1;
-  column-gap: 20px;
+  column-gap: var(--padding);
   width: 95%;
 }
 .history-wrapper {

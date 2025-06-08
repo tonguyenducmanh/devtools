@@ -34,6 +34,12 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử json convert thành postgresql",
   },
+  CodeFormatterHistory: {
+    KeyFormat: "CodeFormatterHistory",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử format code",
+  },
   IsShowSidebar: {
     KeyFormat: "IsShowSidebar",
     CacheLevel: tdEnum.cacheType.local,

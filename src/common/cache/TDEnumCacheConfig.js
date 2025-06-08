@@ -7,4 +7,5 @@ export const EnumCacheConfig = {
   LastOneTimeAuthenPassword: 5,
   JSONToExcelHistory: 6,
   JSONToPostgreSQLHistory: 7,
+  CodeFormatterHistory: 8,
 };

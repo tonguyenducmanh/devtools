@@ -1,6 +1,15 @@
 <template>
-  <div class="container">
+  <div class="flex flex-col container">
     <div class="title">Code formatter tool</div>
+    <div class="flex history-wrapper">
+      <TDHistory
+        ref="history"
+        class="history-container"
+        titleKey="inputSource"
+        :applyFunction="handleFormatFromHistory"
+        :cacheKey="$tdEnum.cacheConfig.CodeFormatterHistory"
+      ></TDHistory>
+    </div>
     <TDRadioGroup
       v-model="currentFormatType"
       label="Type of code"
@@ -80,7 +89,16 @@ export default {
       }
       return "postgresql"; // Mặc định là postgresql nếu không có lựa chọn
     },
-    handleFormat() {
+    async handleFormatFromHistory(item) {
+      let me = this;
+      if (item && item.inputSource) {
+        me.inputSource = item.inputSource;
+        me.currentFormatType =
+          item.currentFormatType || tdEnum.typeOfCode.postgresql;
+        await me.handleFormat();
+      }
+    },
+    async handleFormat() {
       let me = this;
       try {
         if (me.inputSource) {
@@ -93,6 +111,11 @@ export default {
           me.outputSource = null;
         }
         // so sánh input và output, nếu giống nhau thì xoá output
+        let historyItem = {
+          inputSource: me.inputSource,
+          currentFormatType: me.currentFormatType,
+        };
+        await me.$refs.history.saveToHistory(historyItem);
         if (
           me.normalizeSQL(me.inputSource) != me.normalizeSQL(me.outputSource)
         ) {
@@ -135,13 +158,16 @@ export default {
 .container {
   width: 100%;
   height: 100%;
-  padding: 2rem;
-  border-radius: 0;
-  min-height: 100vh;
-  box-shadow: none;
 }
 .input-container {
+  flex: 1;
   column-gap: var(--padding);
-  height: 80%;
+  width: 95%;
+}
+.history-wrapper {
+  width: 95%;
+}
+.history-container {
+  width: 100%;
 }
 </style>
