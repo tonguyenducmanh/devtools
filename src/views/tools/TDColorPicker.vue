@@ -1,7 +1,6 @@
 <template>
   <div class="title">Color picker tool!</div>
-
-  <div class="color-picker">
+  <div class="td-color-picker">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Image Upload Section -->
       <div class="lg:col-span-2">
@@ -467,48 +466,4 @@ export default {
   margin: 0;
 }
 
-.magnifying-glass {
-  position: fixed;
-  pointer-events: none;
-  z-index: 1000;
-  border-radius: 50%;
-  border: 3px solid var(--primary);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  background: white;
-}
-
-.magnifier-canvas {
-  display: block;
-  border-radius: 50%;
-}
-
-.crosshair {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-.crosshair-horizontal,
-.crosshair-vertical {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
-}
-
-.crosshair-horizontal {
-  width: 20px;
-  height: 1px;
-  top: 0;
-  left: -10px;
-}
-
-.crosshair-vertical {
-  width: 1px;
-  height: 20px;
-  top: -10px;
-  left: 0;
-}
 </style>
