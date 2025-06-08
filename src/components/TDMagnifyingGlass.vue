@@ -1,14 +1,14 @@
 <template>
-  <div class="magnifying-glass" :style="magnifierStyle">
+  <div class="td-magnifying-glass" :style="magnifierStyle">
     <canvas
       ref="magnifierCanvas"
       :width="magnifierSize"
       :height="magnifierSize"
-      class="magnifier-canvas"
+      class="td-magnifier-canvas"
     ></canvas>
-    <div class="crosshair">
-      <div class="crosshair-horizontal"></div>
-      <div class="crosshair-vertical"></div>
+    <div class="td-crosshair">
+      <div class="td-crosshair-horizontal"></div>
+      <div class="td-crosshair-vertical"></div>
     </div>
   </div>
 </template>
@@ -124,7 +124,7 @@ export default {
 </script>
 
 <style scoped>
-.magnifying-glass {
+.td-magnifying-glass {
   position: fixed;
   pointer-events: none;
   z-index: 1000;
@@ -135,12 +135,12 @@ export default {
   background: white;
 }
 
-.magnifier-canvas {
+.td-magnifier-canvas {
   display: block;
   border-radius: 50%;
 }
 
-.crosshair {
+.td-crosshair {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -148,21 +148,21 @@ export default {
   pointer-events: none;
 }
 
-.crosshair-horizontal,
-.crosshair-vertical {
+.td-crosshair-horizontal,
+.td-crosshair-vertical {
   position: absolute;
   background: rgba(255, 255, 255, 0.8);
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
-.crosshair-horizontal {
+.td-crosshair-horizontal {
   width: 20px;
   height: 1px;
   top: 0;
   left: -10px;
 }
 
-.crosshair-vertical {
+.td-crosshair-vertical {
   width: 1px;
   height: 20px;
   top: -10px;
