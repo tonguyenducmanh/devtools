@@ -2,7 +2,7 @@
   <div class="container">
     <div class="title">Color picker tool!</div>
     <div class="flex td-color-picker">
-      <div v-if="!imageLoaded" class="upload-area-container">
+      <div v-show="!imageLoaded" class="upload-area-container">
         <TDUpload
           @dragover="handleDragOver"
           @dragleave="handleDragLeave"
@@ -123,6 +123,14 @@ export default {
       return `hsl(${h}, ${s}%, ${l}%)`;
     },
   },
+  created() {
+    let me = this;
+    document.addEventListener("paste", me.handlePasteEvent);
+  },
+  beforeUnmount() {
+    let me = this;
+    document.removeEventListener("paste", me.handlePasteEvent);
+  },
   mounted() {},
   methods: {
     haddleCopyEvent(value) {
@@ -183,15 +191,22 @@ export default {
         this.generateColorPalette(image);
       });
     },
-    async copyToClipboard(text) {
-      try {
-        await navigator.clipboard.writeText(text);
-        this.showCopyMessage = true;
-        setTimeout(() => {
-          this.showCopyMessage = false;
-        }, 2000);
-      } catch (error) {
-        console.error("Failed to copy to clipboard:", error);
+    handlePasteEvent(e) {
+      let me = this;
+      e.preventDefault();
+      const items = e.clipboardData.items;
+      for (let item of items) {
+        if (item.type.includes("image")) {
+          const blob = item.getAsFile();
+          if (
+            me.$refs.uploadArea &&
+            typeof me.$refs.uploadArea.setFileSelected === "function"
+          ) {
+            me.$refs.uploadArea.setFileSelected(blob);
+            me.processFile([blob]);
+          }
+          break;
+        }
       }
     },
     setupCanvas(image) {
