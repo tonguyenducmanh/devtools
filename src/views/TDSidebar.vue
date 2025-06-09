@@ -79,6 +79,11 @@ export default {
       let me = this;
       let allTool = routerConfig;
       if (me.queryTool && allTool && allTool.length > 0) {
+        allTool.forEach((element) => {
+          if (element.meta && element.meta.titleKey) {
+            element.meta.title = me.$t(element.meta.titleKey);
+          }
+        });
         allTool = allTool.filter((x) =>
           x.meta.title.containsNotSentive(me.queryTool)
         );

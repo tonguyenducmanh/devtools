@@ -26,5 +26,13 @@ export default {
       DownloadVSCodeExtension: "Tải tiện ích mở rộng VS Code",
       UUIDV4Generator: "Trình tạo UUID V4",
     },
+    example: "ví dụ",
+    base64ToImage: {
+      title: "Công cụ chuyển đổi Base64 sang hình ảnh!",
+      donwloadImage: "Tải xuống hình ảnh",
+      convert: "Chuyển đổi",
+      placeHolder: "Dán mã Base64 vào đây",
+      result: "Kết quả chuyển đổi",
+    },
   },
 };

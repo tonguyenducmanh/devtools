@@ -26,5 +26,13 @@ export default {
       DownloadVSCodeExtension: "Download VSCode Extension",
       UUIDV4Generator: "UUIDv4 generator",
     },
+    example: "example",
+    base64ToImage: {
+      title: "Base64 to Image tool!",
+      donwloadImage: "Download Image",
+      convert: "Convert",
+      placeHolder: "Paste your Base64 string here",
+      result: "Result converted",
+    },
   },
 };
