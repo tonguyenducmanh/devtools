@@ -8,7 +8,7 @@
       class="td-upload-button"
       :class="{ 'td-upload-btn-read-only': readOnly }"
     >
-      {{ label.capitalize() }}
+      {{ label ? label.capitalize() : $t("i18nCommon.uploadFile") }}
       <input
         type="file"
         class="td-upload-input"
@@ -46,7 +46,7 @@ export default {
     },
     label: {
       type: String,
-      default: "Upload File",
+      default: null,
     },
     labelEmpty: {
       type: String,

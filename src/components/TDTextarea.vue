@@ -8,7 +8,7 @@
       {{ label.capitalize() }}
     </div>
     <textarea
-      :placeholder="placeHolder"
+      :placeholder="placeHolder || $t('i18nCommon.typeInput')"
       :value="modelValue"
       :disabled="readOnly"
       @input="changeInputValue"
@@ -47,7 +47,7 @@ export default {
   props: {
     placeHolder: {
       type: String,
-      default: "Nhập giá trị",
+      default: null,
     },
     modelValue: {
       type: String,

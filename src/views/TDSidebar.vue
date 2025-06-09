@@ -43,6 +43,7 @@
 
 <script>
 import { routerConfig } from "@/router/router.js";
+import { loadLocale } from "@/i18n/i18nLoader.js";
 
 export default {
   name: "TDSidebar",
@@ -118,7 +119,7 @@ export default {
         me.$tdEnum.cacheConfig.Language,
         me.currentLanguage
       );
-      me.$i18n.locale = me.currentLanguage;
+      loadLocale(me.currentLanguage);
     },
     async toggleTheme() {
       let me = this;
