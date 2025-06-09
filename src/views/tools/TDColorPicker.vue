@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">Color picker tool!</div>
+    <div class="title">{{ $t("i18nCommon.colorPicker.title") }}</div>
     <div class="flex td-color-picker">
       <div v-show="!imageLoaded" class="upload-area-container">
         <TDUpload
@@ -11,8 +11,8 @@
           ref="uploadArea"
           class="upload-area"
           maxHeight="100vh"
-          labelEmpty="Choose an image or drag it here, PNG, JPG, GIF up to 10MB"
-          :label="'Upload'"
+          :labelEmpty="$t('i18nCommon.colorPicker.uploadLabel')"
+          :label="$t('i18nCommon.colorPicker.uploadButton')"
         ></TDUpload>
       </div>
       <div v-if="imageLoaded" class="flex color-picker-container">
@@ -39,7 +39,7 @@
             v-if="colorPalette && colorPalette.length > 0"
             class="flex palette-info"
           >
-            <div>Color Palette</div>
+            <div>{{ $t("i18nCommon.colorPicker.colorPalette") }}</div>
 
             <div class="flex palette-grid">
               <div
@@ -58,7 +58,7 @@
           </div>
         </div>
         <div class="flex flex-col color-info-section">
-          <div>Selected Color</div>
+          <div>{{ $t("i18nCommon.colorPicker.selectedColor") }}</div>
           <template v-if="selectedColor">
             <div>{{ selectedColor.hex }}</div>
             <div
@@ -69,13 +69,13 @@
               v-if="selectedColor"
               ref="copy-btn"
               @click="haddleCopyEvent(selectedColor.hex)"
-              label="Copy color"
+              :label="$t('i18nCommon.colorPicker.copyColor')"
             ></TDButton>
           </template>
           <TDButton
             :type="$tdEnum.buttonType.secondary"
             @click="resetImage"
-            label="Upload New Image"
+            :label="$t('i18nCommon.colorPicker.uploadNewImage')"
             class="btn btn-secondary"
           >
           </TDButton>

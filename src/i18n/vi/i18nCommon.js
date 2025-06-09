@@ -42,5 +42,14 @@ export default {
       formatCode: "Định dạng mã",
       copyOutput: "Sao chép đầu ra",
     },
+    colorPicker: {
+      title: "Công cụ chọn màu!",
+      uploadLabel: "Chọn hoặc kéo thả hình ảnh vào đây, PNG, JPG, GIF tối đa 10MB",
+      uploadButton: "Tải lên",
+      colorPalette: "Bảng màu",
+      selectedColor: "Màu đã chọn",
+      copyColor: "Sao chép màu",
+      uploadNewImage: "Tải ảnh mới"
+    },
   },
 };

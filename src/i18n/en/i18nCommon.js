@@ -42,5 +42,14 @@ export default {
       formatCode: "Format code",
       copyOutput: "Copy output",
     },
+    colorPicker: {
+      title: "Color picker tool!",
+      uploadLabel: "Choose an image or drag it here, PNG, JPG, GIF up to 10MB",
+      uploadButton: "Upload",
+      colorPalette: "Color Palette",
+      selectedColor: "Selected Color",
+      copyColor: "Copy color",
+      uploadNewImage: "Upload New Image"
+    },
   },
 };
