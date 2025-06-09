@@ -4,6 +4,10 @@ export default {
     history: "History",
     deleteAll: "Delete all",
     uploadFile: "Upload file",
+    createbyAuthor: "Created by tdmanh with luv.",
+    welcomeTextOne: "The",
+    welcomeTextTwo: "Essential",
+    welcomeTextThree: "Utility Tool for Dev",
     feature: {
       welcome: "Welcome",
       oneTimePassword: "One time password",

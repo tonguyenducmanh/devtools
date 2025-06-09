@@ -4,6 +4,10 @@ export default {
     history: "Lịch sử",
     deleteAll: "Xóa tất cả",
     uploadFile: "Tải lên tệp",
+    createbyAuthor: "Được tạo ra bởi tdmanh.",
+    welcomeTextOne: "Vũ khí",
+    welcomeTextTwo: "Tối thượng",
+    welcomeTextThree: "Cho dân Dev",
     feature: {
       welcome: "Welcome",
       oneTimePassword: "Mật khẩu một lần",

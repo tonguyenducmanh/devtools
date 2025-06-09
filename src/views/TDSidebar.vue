@@ -33,7 +33,7 @@
           @click="toggleTheme"
         ></div>
         <div class="td-icon tg-github" @click="goToSource"></div>
-        <div class="language-session" @click="changeLanguage">
+        <div class="noselect language-session" @click="changeLanguage">
           {{ currentLanguage }}
         </div>
       </div>
