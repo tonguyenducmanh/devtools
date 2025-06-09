@@ -10,6 +10,12 @@ import tdEnum from "@/common/TDEnum.js";
  */
 
 export const TDCacheConfig = {
+  Language: {
+    KeyFormat: "Language",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cài đặt ngôn ngữ của app",
+  },
   Theme: {
     KeyFormat: "Theme",
     CacheLevel: tdEnum.cacheType.local,

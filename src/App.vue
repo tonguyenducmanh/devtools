@@ -54,6 +54,13 @@ export default {
         await me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
       }
       me.$tdUtility.setTheme(currentTheme);
+      // Lấy ngôn ngữ hiện tại
+      let currentLanguage = await me.$tdCache.get(
+        me.$tdEnum.cacheConfig.Language
+      );
+      me.$i18n.locale = currentLanguage
+        ? currentLanguage
+        : me.$tdEnum.language.en;
     },
   },
 };

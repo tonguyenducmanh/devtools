@@ -33,6 +33,9 @@
           @click="toggleTheme"
         ></div>
         <div class="td-icon tg-github" @click="goToSource"></div>
+        <div class="language-session" @click="changeLanguage">
+          {{ currentLanguage }}
+        </div>
       </div>
     </div>
   </div>
@@ -60,11 +63,14 @@ export default {
   },
   props: {},
   data() {
+    let me = this;
     return {
       routerLink: routerConfig,
       isShowSidebar: true,
       isDarkTheme: false,
       queryTool: null,
+      currentLanguage: null,
+      languageList: [me.$tdEnum.language.en, me.$tdEnum.language.vi],
     };
   },
   methods: {
@@ -92,6 +98,27 @@ export default {
       if (toggleSidebarState) {
         me.isShowSidebar = toggleSidebarState.value;
       }
+      me.currentLanguage = await me.getCurrentLanguage();
+    },
+    async getCurrentLanguage() {
+      let currentLanguage = await this.$tdCache.get(
+        this.$tdEnum.cacheConfig.Language
+      );
+      if (currentLanguage) {
+        return currentLanguage;
+      }
+      return this.$tdEnum.language.en;
+    },
+    async changeLanguage() {
+      let me = this;
+      let currentIndex = me.languageList.indexOf(me.currentLanguage);
+      let nextIndex = (currentIndex + 1) % me.languageList.length;
+      me.currentLanguage = me.languageList[nextIndex];
+      await me.$tdCache.set(
+        me.$tdEnum.cacheConfig.Language,
+        me.currentLanguage
+      );
+      me.$i18n.locale = me.currentLanguage;
     },
     async toggleTheme() {
       let me = this;
@@ -175,6 +202,12 @@ export default {
     .tg-github {
       cursor: pointer;
       background-position: -76px 0px;
+    }
+    .language-session {
+      cursor: pointer;
+      color: var(--btn-color);
+      text-transform: uppercase;
+      font-weight: 600;
     }
   }
 }

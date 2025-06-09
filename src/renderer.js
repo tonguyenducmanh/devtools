@@ -12,6 +12,7 @@ import TDUpload from "@/components/TDUpload.vue";
 import TDRadio from "@/components/TDRadio.vue";
 import TDRadioGroup from "@/components/TDRadioGroup.vue";
 import TDHistory from "@/components/TDHistory.vue";
+import i18nData from "@/i18n/i18nData.js";
 
 const currentApp = createApp(App);
 
@@ -30,6 +31,10 @@ currentApp.component("TDRadio", TDRadio);
 currentApp.component("TDRadioGroup", TDRadioGroup);
 currentApp.component("TDHistory", TDHistory);
 
+// router link
 currentApp.use(router);
+
+// globalization language
+currentApp.use(i18nData);
 
 currentApp.mount("#app");
