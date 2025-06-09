@@ -59,5 +59,15 @@ export default {
       compare: "Compare diff changes",
       example: "Example"
     },
+    downloadVSCodeExt: {
+      title: "Download VSCode Extension from marketplace.visualstudio.com!",
+      subtitle: "For legacy download that microsoft is removed.",
+      itemName: "Item name",
+      version: "Version",
+      downloadLink: "Download link",
+      generateLink: "Generate download link", 
+      copyLink: "Copy link",
+      example: "Example"
+    },
   },
 };

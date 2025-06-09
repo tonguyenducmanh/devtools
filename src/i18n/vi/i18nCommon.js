@@ -59,5 +59,15 @@ export default {
       compare: "So sánh thay đổi",
       example: "Ví dụ"
     },
+    downloadVSCodeExt: {
+      title: "Tải tiện ích mở rộng VSCode từ marketplace.visualstudio.com!",
+      subtitle: "Dùng cho các phiên bản cũ đã bị Microsoft gỡ bỏ.",
+      itemName: "Tên tiện ích",
+      version: "Phiên bản",
+      downloadLink: "Đường dẫn tải xuống",
+      generateLink: "Tạo đường dẫn tải xuống",
+      copyLink: "Sao chép đường dẫn",
+      example: "Ví dụ"
+    },
   },
 };
