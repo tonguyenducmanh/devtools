@@ -59,7 +59,7 @@ export default {
         me.$tdEnum.cacheConfig.Language
       );
       let locale = currentLanguage ? currentLanguage : me.$tdEnum.language.en;
-      loadLocale(locale);
+      await loadLocale(locale);
     },
   },
 };

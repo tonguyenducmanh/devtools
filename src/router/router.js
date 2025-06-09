@@ -10,7 +10,7 @@ const routerConfig = [
     name: "home",
     component: () => import("@/views/TDWelcome.vue"),
     meta: {
-      title: "Welcome",
+      titleKey: "i18nCommon.feature.welcome",
     },
   },
   {
@@ -21,7 +21,7 @@ const routerConfig = [
     name: "TDOneTimePassword",
     component: () => import("@/views/tools/TDOneTimePassword.vue"),
     meta: {
-      title: "One time password",
+      titleKey: "i18nCommon.feature.oneTimePassword",
     },
   },
   {
@@ -32,7 +32,7 @@ const routerConfig = [
     name: "TDTextCompress",
     component: () => import("@/views/tools/TDTextCompress.vue"),
     meta: {
-      title: "Text Compress",
+      titleKey: "i18nCommon.feature.textCompress",
     },
   },
   {
@@ -43,7 +43,7 @@ const routerConfig = [
     name: "comparecode",
     component: () => import("@/views/tools/TDCompareCode.vue"),
     meta: {
-      title: "Compare code",
+      titleKey: "i18nCommon.feature.compareCode",
     },
   },
   {
@@ -54,7 +54,7 @@ const routerConfig = [
     name: "colorpicker",
     component: () => import("@/views/tools/TDColorPicker.vue"),
     meta: {
-      title: "Color picker",
+      titleKey: "i18nCommon.feature.colorPicker",
     },
   },
   {
@@ -65,7 +65,7 @@ const routerConfig = [
     name: "jsonparser",
     component: () => import("@/views/tools/TDJSONParser.vue"),
     meta: {
-      title: "JSON parser",
+      titleKey: "i18nCommon.feature.JSONParser",
     },
   },
   {
@@ -76,7 +76,7 @@ const routerConfig = [
     name: "jsontopostgresql",
     component: () => import("@/views/tools/TDJSONToPostgreSQL.vue"),
     meta: {
-      title: "JSON to PostgreSQL",
+      titleKey: "i18nCommon.feature.JSONToPostgreSQL",
     },
   },
   {
@@ -87,7 +87,7 @@ const routerConfig = [
     name: "mappingjson",
     component: () => import("@/views/tools/TDMappingJSON.vue"),
     meta: {
-      title: "JSON Mapping",
+      titleKey: "i18nCommon.feature.JSONMapping",
     },
   },
   {
@@ -98,7 +98,7 @@ const routerConfig = [
     name: "jsontoexcel",
     component: () => import("@/views/tools/TDJSONToExcel.vue"),
     meta: {
-      title: "JSON to Excel",
+      titleKey: "i18nCommon.feature.JSONToExcel",
     },
   },
   {
@@ -109,7 +109,7 @@ const routerConfig = [
     name: "codeformatter",
     component: () => import("@/views/tools/TDCodeFormatter.vue"),
     meta: {
-      title: "Code formatter",
+      titleKey: "i18nCommon.feature.CodeFormatter",
     },
   },
   {
@@ -120,7 +120,7 @@ const routerConfig = [
     name: "base64toimage",
     component: () => import("@/views/tools/TDBase64ToImage.vue"),
     meta: {
-      title: "Image from Base64",
+      titleKey: "i18nCommon.feature.ImageFromBase64",
     },
   },
   {
@@ -131,7 +131,7 @@ const routerConfig = [
     name: "imagetobase64",
     component: () => import("@/views/tools/TDImageToBase64.vue"),
     meta: {
-      title: "Image to Base64",
+      titleKey: "i18nCommon.feature.ImageToBase64",
     },
   },
 
@@ -143,7 +143,7 @@ const routerConfig = [
     name: "textoqrcode",
     component: () => import("@/views/tools/TDTextToQRCode.vue"),
     meta: {
-      title: "QRCode from text",
+      titleKey: "i18nCommon.feature.QRCodeFromText",
     },
   },
   {
@@ -154,7 +154,7 @@ const routerConfig = [
     name: "qrcodetotext",
     component: () => import("@/views/tools/TDQRCodeToText.vue"),
     meta: {
-      title: "QRCode to text",
+      titleKey: "i18nCommon.feature.QRCodeToText",
     },
   },
   {
@@ -165,7 +165,7 @@ const routerConfig = [
     name: "downloadvscodeext",
     component: () => import("@/views/tools/TDDownloadVSCodeExt.vue"),
     meta: {
-      title: "Download VSCode Extension",
+      titleKey: "i18nCommon.feature.DownloadVSCodeExtension",
     },
   },
   {
@@ -176,7 +176,7 @@ const routerConfig = [
     name: "uuidv4generator",
     component: () => import("@/views/tools/TDUUIDv4Generator.vue"),
     meta: {
-      title: "UUIDv4 generator",
+      titleKey: "i18nCommon.feature.UUIDV4Generator",
     },
   },
 ];

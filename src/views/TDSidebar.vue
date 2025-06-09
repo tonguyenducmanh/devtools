@@ -21,7 +21,7 @@
             activeClass="td-item-active"
             :id="index"
             :to="item.pathVisible ?? item.path"
-            >{{ item.meta.title }}</RouterLink
+            >{{ $t(item.meta.titleKey) }}</RouterLink
           >
         </template>
       </div>
@@ -57,11 +57,11 @@ export default {
       return version;
     },
   },
-  created() {},
-  mounted() {
+  created() {
     let me = this;
-    me.processWhenMounted();
+    me.processWhenCreated();
   },
+  mounted() {},
   props: {},
   data() {
     let me = this;
@@ -85,7 +85,7 @@ export default {
       }
       me.routerLink = allTool;
     },
-    async processWhenMounted() {
+    async processWhenCreated() {
       let me = this;
       let currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
       if (!currentTheme) {
@@ -119,7 +119,7 @@ export default {
         me.$tdEnum.cacheConfig.Language,
         me.currentLanguage
       );
-      loadLocale(me.currentLanguage);
+      await loadLocale(me.currentLanguage);
     },
     async toggleTheme() {
       let me = this;
