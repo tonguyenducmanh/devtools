@@ -14,32 +14,35 @@ import TDRadioGroup from "@/components/TDRadioGroup.vue";
 import TDHistory from "@/components/TDHistory.vue";
 import i18nData, { loadLocale } from "@/i18n/i18nData.js";
 
-const currentApp = createApp(App);
+// Async IIFE
+(async () => {
+  const currentApp = createApp(App);
 
-// add 1 vài global object
-currentApp.config.globalProperties.$tdCache = cache;
-currentApp.config.globalProperties.$tdEnum = enumeration;
-currentApp.config.globalProperties.$tdUtility = utility;
+  // add 1 vài global object
+  currentApp.config.globalProperties.$tdCache = cache;
+  currentApp.config.globalProperties.$tdEnum = enumeration;
+  currentApp.config.globalProperties.$tdUtility = utility;
 
-// add 1 vài component global
-currentApp.component("TDButton", TDButton);
-currentApp.component("TDTextarea", TDTextarea);
-currentApp.component("TDInput", TDInput);
-currentApp.component("TDCheckbox", TDCheckbox);
-currentApp.component("TDUpload", TDUpload);
-currentApp.component("TDRadio", TDRadio);
-currentApp.component("TDRadioGroup", TDRadioGroup);
-currentApp.component("TDHistory", TDHistory);
+  // add 1 vài component global
+  currentApp.component("TDButton", TDButton);
+  currentApp.component("TDTextarea", TDTextarea);
+  currentApp.component("TDInput", TDInput);
+  currentApp.component("TDCheckbox", TDCheckbox);
+  currentApp.component("TDUpload", TDUpload);
+  currentApp.component("TDRadio", TDRadio);
+  currentApp.component("TDRadioGroup", TDRadioGroup);
+  currentApp.component("TDHistory", TDHistory);
 
-// router link
-currentApp.use(router);
+  // router link
+  currentApp.use(router);
 
-// globalization language
-currentApp.use(i18nData);
+  // globalization language
+  currentApp.use(i18nData);
 
-// Lấy ngôn ngữ hiện tại
-let currentLanguage = await cache.get(enumeration.cacheConfig.Language);
-let locale = currentLanguage ? currentLanguage : enumeration.language.en;
-await loadLocale(locale);
+  // Lấy ngôn ngữ hiện tại
+  let currentLanguage = await cache.get(enumeration.cacheConfig.Language);
+  let locale = currentLanguage ? currentLanguage : enumeration.language.en;
+  await loadLocale(locale);
 
-currentApp.mount("#app");
+  currentApp.mount("#app");
+})();
