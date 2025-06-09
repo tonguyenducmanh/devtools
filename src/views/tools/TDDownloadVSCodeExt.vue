@@ -1,17 +1,17 @@
 <template>
   <div class="container">
     <div class="title">
-      <div>Download VSCode Extension from marketplace.visualstudio.com!</div>
-      <div>For legacy download that microsoft is removed.</div>
+      <div>{{ $t("i18nCommon.downloadVSCodeExt.title") }}</div>
+      <div>{{ $t("i18nCommon.downloadVSCodeExt.subtitle") }}</div>
     </div>
     <div class="flex flex-col">
       <div class="flex flex-wrap">
         <img class="td-img" src="@/assets/vscodeext.png" />
       </div>
-      <TDInput label="Item name" type="text" v-model="itemName" />
-      <TDInput label="Version" type="text" v-model="version" />
+      <TDInput :label="$t('i18nCommon.downloadVSCodeExt.itemName')" type="text" v-model="itemName" />
+      <TDInput :label="$t('i18nCommon.downloadVSCodeExt.version')" type="text" v-model="version" />
       <TDInput
-        label="Download link"
+        :label="$t('i18nCommon.downloadVSCodeExt.downloadLink')"
         :readOnly="true"
         type="text"
         v-model="downloadLink"
@@ -21,17 +21,17 @@
     <div class="flex">
       <TDButton
         @click="handleBuildDownloadLink"
-        label="Generate download link"
+        :label="$t('i18nCommon.downloadVSCodeExt.generateLink')"
       ></TDButton>
       <TDButton
         @click="handleCopyDownloadLink"
         :type="$tdEnum.buttonType.secondary"
-        label="Copy link"
+        :label="$t('i18nCommon.downloadVSCodeExt.copyLink')"
       ></TDButton>
       <TDButton
         @click="applyMock"
         :type="$tdEnum.buttonType.secondary"
-        label="Example"
+        :label="$t('i18nCommon.downloadVSCodeExt.example')"
       ></TDButton>
     </div>
   </div>

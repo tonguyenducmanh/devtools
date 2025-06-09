@@ -1,16 +1,16 @@
 <template>
   <div class="container">
-    <div class="title">UUIDv4 generator tool!</div>
+    <div class="title">{{ $t("i18nCommon.uuidGenerator.title") }}</div>
     <div class="flex flex-col td-uuid-generator">
       <TDInput
-        label="Result"
+        :label="$t('i18nCommon.uuidGenerator.input.result')"
         type="text"
         :readOnly="true"
         v-model="uuidv4Result"
       />
       <div class="flex">
-        <TDButton @click="handleGenerate" label="Generate"></TDButton>
-        <TDButton @click="haddleCopyEvent" label="Copy"></TDButton>
+        <TDButton @click="handleGenerate" :label="$t('i18nCommon.uuidGenerator.buttons.generate')"></TDButton>
+        <TDButton @click="haddleCopyEvent" :label="$t('i18nCommon.uuidGenerator.buttons.copy')"></TDButton>
       </div>
     </div>
   </div>

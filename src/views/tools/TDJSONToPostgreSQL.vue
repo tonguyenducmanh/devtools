@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col container">
-    <div class="title">JSON to PostgreSQL tool!</div>
+    <div class="title">{{ $t("i18nCommon.jsonToPostgreSQL.title") }}</div>
     <div class="flex history-wrapper">
       <TDHistory
         ref="history"
@@ -12,53 +12,53 @@
     </div>
     <div class="flex flex-wrap metadata-inputs">
       <div>
-        <TDInput label="Tên schema" type="text" v-model="schemaName" />
+        <TDInput :label="$t('i18nCommon.jsonToPostgreSQL.schemaName')" type="text" v-model="schemaName" />
       </div>
       <div>
-        <TDInput label="Tên bảng" type="text" v-model="tableName" />
+        <TDInput :label="$t('i18nCommon.jsonToPostgreSQL.tableName')" type="text" v-model="tableName" />
       </div>
       <div>
-        <TDInput label="Cột khóa chính" type="text" v-model="primaryKeyField" />
+        <TDInput :label="$t('i18nCommon.jsonToPostgreSQL.primaryKey')" type="text" v-model="primaryKeyField" />
       </div>
     </div>
 
     <div class="flex io-section">
       <TDTextarea
         isLabelTop
-        label="Nhập JSON"
-        placeHolder="Nhập JSON ở đây..."
+        :label="$t('i18nCommon.jsonToPostgreSQL.inputLabel')"
+        :placeHolder="$t('i18nCommon.jsonToPostgreSQL.inputPlaceholder')"
         v-model="inputJSON"
       ></TDTextarea>
       <TDTextarea
         isLabelTop
-        label="Kết quả SQL"
+        :label="$t('i18nCommon.jsonToPostgreSQL.outputLabel')"
         :readOnly="true"
-        placeHolder="SQL sẽ xuất hiện ở đây..."
+        :placeHolder="$t('i18nCommon.jsonToPostgreSQL.outputPlaceholder')"
         v-model="outputSQL"
       ></TDTextarea>
     </div>
     <div class="flex">
       <TDCheckbox
         v-model="enableCreateTable"
-        label="Thêm script tạo bảng"
+        :label="$t('i18nCommon.jsonToPostgreSQL.createTable')"
       ></TDCheckbox>
       <TDCheckbox
         v-model="enableDeleteScript"
-        label="Thêm script xóa dữ liệu cũ"
+        :label="$t('i18nCommon.jsonToPostgreSQL.deleteOld')"
       ></TDCheckbox>
     </div>
 
     <div class="flex">
-      <TDButton label="Chuyển đổi" @click="convertToPostgresSQL"></TDButton>
+      <TDButton :label="$t('i18nCommon.jsonToPostgreSQL.convert')" @click="convertToPostgresSQL"></TDButton>
       <TDButton
         @click="haddleCopyEvent"
         :type="$tdEnum.buttonType.secondary"
-        label="Copy"
+        :label="$t('i18nCommon.jsonToPostgreSQL.copy')"
       ></TDButton>
       <TDButton
         @click="applyMock"
         :type="$tdEnum.buttonType.secondary"
-        label="Example"
+        :label="$t('i18nCommon.jsonToPostgreSQL.example')"
       ></TDButton>
     </div>
   </div>

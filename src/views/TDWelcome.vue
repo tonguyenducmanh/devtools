@@ -1,13 +1,14 @@
 <template>
   <div class="container">
-    <h1 data-v-b51301ac="" class="tagline">
-      The <span data-v-b51301ac="" class="accent">Essential</span
-      ><br data-v-b51301ac="" />Utility Tool for Dev
+    <h1 class="tagline">
+      {{ $t("i18nCommon.welcomeTextOne") }}
+      <span class="accent">{{ $t("i18nCommon.welcomeTextTwo") }}</span
+      ><br />{{ $t("i18nCommon.welcomeTextThree") }}
     </h1>
-    <p class="description">Created by tdmanh with luv.</p>
+    <p class="description">{{ $t("i18nCommon.createbyAuthor") }}</p>
   </div>
 </template>
-
+<script></script>
 <style scoped>
 .tagline {
   font-size: 76px;

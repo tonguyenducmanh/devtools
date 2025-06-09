@@ -7,7 +7,7 @@
       {{ label.capitalize() }}
     </div>
     <input
-      :placeholder="placeHolder"
+      :placeholder="placeHolder || $t('i18nCommon.typeInput')"
       :value="modelValue"
       @input="changeInputValue"
       :disabled="readOnly"
@@ -33,7 +33,7 @@ export default {
   props: {
     placeHolder: {
       type: String,
-      default: "Nhập giá trị",
+      default: null,
     },
     modelValue: {
       type: String,

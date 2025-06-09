@@ -1,10 +1,10 @@
 <template>
   <div>
     <div class="container">
-      <div class="title">Compare two file (diff changes) !</div>
+      <div class="title">{{ $t("i18nCommon.compareCode.title") }}</div>
       <div class="flex flex-wrap td-compare-box">
         <TDTextarea
-          placeHolder="Fist code file to compare"
+          :placeHolder="$t('i18nCommon.compareCode.firstFile')"
           v-model="firstCodeFile"
           :label="oldTitle"
           isLabelTop
@@ -12,7 +12,7 @@
           width="500px"
         ></TDTextarea>
         <TDTextarea
-          placeHolder="Second code file to compare"
+          :placeHolder="$t('i18nCommon.compareCode.secondFile')"
           v-model="secondCodeFile"
           :label="newTitle"
           isLabelTop
@@ -22,16 +22,16 @@
       </div>
       <TDCheckbox
         v-model="isCompareSideBySide"
-        label="compare style (true is side by side, false is line by line)"
+        :label="$t('i18nCommon.compareCode.compareStyle')"
         @input="compare"
         class="td-checkbox-sibe-by-side"
       ></TDCheckbox>
       <div class="flex">
-        <TDButton @click="compare" label="Compare diff changes"></TDButton>
+        <TDButton @click="compare" :label="$t('i18nCommon.compareCode.compare')"></TDButton>
         <TDButton
           @click="applyMock"
           :type="$tdEnum.buttonType.secondary"
-          label="Example"
+          :label="$t('i18nCommon.compareCode.example')"
         ></TDButton>
       </div>
     </div>

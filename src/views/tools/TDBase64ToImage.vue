@@ -1,11 +1,11 @@
 <template>
   <div class="container">
-    <div class="title">Base64 to Image tool!</div>
+    <div class="title">{{ $t("i18nCommon.base64ToImage.title") }}</div>
     <div class="flex flex-wrap paste-box">
       <div class="result-container">
         <TDTextarea
           ref="base64-output"
-          placeHolder="Paste your Base64 string here"
+          :placeHolder="$t('i18nCommon.base64ToImage.placeHolder')"
           v-model="base64Result"
           height="400px"
           width="500px"
@@ -18,21 +18,24 @@
         @dragleave="handleDragLeave"
         @drop="handleDrop"
       >
-        <p v-if="!srcImg">Result convert</p>
+        <p v-if="!srcImg">{{ $t("i18nCommon.base64ToImage.result") }}</p>
         <img v-if="srcImg" :src="srcImg" class="preview" ref="preview" />
       </div>
     </div>
     <div class="flex">
-      <TDButton @click="handleConvert" label="Convert to Image"></TDButton>
+      <TDButton
+        @click="handleConvert"
+        :label="$t('i18nCommon.base64ToImage.convert')"
+      ></TDButton>
       <TDButton
         :type="$tdEnum.buttonType.secondary"
         @click="handleDownloadImage"
-        label="Download Image"
+        :label="$t('i18nCommon.base64ToImage.donwloadImage')"
       ></TDButton>
       <TDButton
         @click="applyMock"
         :type="$tdEnum.buttonType.secondary"
-        label="Example"
+        :label="$t('i18nCommon.example')"
       ></TDButton>
     </div>
   </div>
@@ -61,7 +64,7 @@ export default {
       try {
         me.srcImg = me.base64Result;
       } catch (error) {
-        alert("Invalid Base64 string");
+        console.log("Invalid Base64 string");
       }
     },
     handleDownloadImage() {

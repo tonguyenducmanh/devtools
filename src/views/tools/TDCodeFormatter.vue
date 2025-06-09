@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col container">
-    <div class="title">Code formatter tool</div>
+    <div class="title">{{ $t("i18nCommon.codeFormatter.title") }}</div>
     <div class="flex history-wrapper">
       <TDHistory
         ref="history"
@@ -12,34 +12,37 @@
     </div>
     <TDRadioGroup
       v-model="currentFormatType"
-      label="Type of code"
+      :label="$t('i18nCommon.codeFormatter.typeOfCode')"
       :options="formatType"
     />
     <div class="flex input-container">
       <TDTextarea
-        placeHolder="input code"
+        :placeHolder="$t('i18nCommon.codeFormatter.inputCode')"
         v-model="inputSource"
         height="100%"
         width="50%"
       ></TDTextarea>
       <TDTextarea
-        placeHolder="output code"
+        :placeHolder="$t('i18nCommon.codeFormatter.outputCode')"
         v-model="outputSource"
         height="100%"
         width="50%"
       ></TDTextarea>
     </div>
     <div class="flex">
-      <TDButton @click="handleFormat" label="format"></TDButton>
+      <TDButton
+        @click="handleFormat"
+        :label="$t('i18nCommon.codeFormatter.formatCode')"
+      ></TDButton>
       <TDButton
         @click="applyMock"
         :type="$tdEnum.buttonType.secondary"
-        label="Example"
+        :label="$t('i18nCommon.example')"
       ></TDButton>
       <TDButton
         @click="handleCopyEvent(outputSource)"
         :type="$tdEnum.buttonType.secondary"
-        label="Copy output"
+        :label="$t('i18nCommon.codeFormatter.copyOutput')"
       ></TDButton>
     </div>
   </div>

@@ -35,6 +35,11 @@ class TDEnum {
     postgresql: 1,
     mysql: 2,
   };
+  // loại ngôn ngữ
+  language = {
+    vi: "vi",
+    en: "en",
+  };
 }
 
 export default new TDEnum();

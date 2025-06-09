@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">Text To QRCode tool!</div>
+    <div class="title">{{ $t("i18nCommon.textToQRCode.title") }}</div>
     <div class="flex">
       <TDHistory
         ref="history"
@@ -12,32 +12,32 @@
     <div class="flex flex-col input-section">
       <TDTextarea
         class="input-area"
-        placeHolder="Nhập văn bản để tạo mã QR code..."
+        :placeHolder="$t('i18nCommon.textToQRCode.input.placeholder')"
         v-model="textGenQR"
       ></TDTextarea>
       <div class="flex button-generate">
         <TDButton
           :readOnly="!textGenQR"
           @click="generateQRCode(null)"
-          label="Tạo QR Code"
+          :label="$t('i18nCommon.textToQRCode.buttons.generate')"
         ></TDButton>
         <TDButton
           @click="downloadAllQRCodes"
           :type="$tdEnum.buttonType.secondary"
           :readOnly="!qrCodeItems || !qrCodeItems.length"
-          label="Tải xuống tất cả"
+          :label="$t('i18nCommon.textToQRCode.buttons.downloadAll')"
           class="download-all-btn"
         ></TDButton>
         <TDButton
           @click="applyMock"
           :type="$tdEnum.buttonType.secondary"
-          label="Example"
+          :label="$t('i18nCommon.textToQRCode.buttons.example')"
         ></TDButton>
         <TDInput
           v-model="maxLengthUserConfig"
           :inputType="'number'"
           class="max-length-input"
-          :placeHolder="'Số ký tự tối đa 1 mã QR'"
+          :placeHolder="$t('i18nCommon.textToQRCode.input.maxLength')"
         />
       </div>
     </div>
@@ -46,11 +46,11 @@
         <template v-for="(item, index) in qrCodeItems">
           <div class="qr-container">
             <div class="qr-header">
-              <span>{{ `Phần ${index + 1}/${qrCodeItems.length}` }}</span>
+              <span>{{ $t('i18nCommon.textToQRCode.part', [index + 1, qrCodeItems.length]) }}</span>
               <TDButton
                 @click="downloadQRCode(item.src, index)"
                 :type="$tdEnum.buttonType.secondary"
-                label="Tải xuống"
+                :label="$t('i18nCommon.textToQRCode.buttons.download')"
                 class="download-btn"
               ></TDButton>
             </div>

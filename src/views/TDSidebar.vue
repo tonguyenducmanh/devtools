@@ -21,7 +21,7 @@
             activeClass="td-item-active"
             :id="index"
             :to="item.pathVisible ?? item.path"
-            >{{ item.meta.title }}</RouterLink
+            >{{ $t(item.meta.titleKey) }}</RouterLink
           >
         </template>
       </div>
@@ -33,6 +33,9 @@
           @click="toggleTheme"
         ></div>
         <div class="td-icon tg-github" @click="goToSource"></div>
+        <div class="noselect language-session" @click="changeLanguage">
+          {{ currentLanguage }}
+        </div>
       </div>
     </div>
   </div>
@@ -40,6 +43,7 @@
 
 <script>
 import { routerConfig } from "@/router/router.js";
+import { loadLocale } from "@/i18n/i18nData.js";
 
 export default {
   name: "TDSidebar",
@@ -53,18 +57,21 @@ export default {
       return version;
     },
   },
-  created() {},
-  mounted() {
+  created() {
     let me = this;
-    me.processWhenMounted();
+    me.processWhenCreated();
   },
+  mounted() {},
   props: {},
   data() {
+    let me = this;
     return {
       routerLink: routerConfig,
       isShowSidebar: true,
       isDarkTheme: false,
       queryTool: null,
+      currentLanguage: null,
+      languageList: [me.$tdEnum.language.en, me.$tdEnum.language.vi],
     };
   },
   methods: {
@@ -72,13 +79,18 @@ export default {
       let me = this;
       let allTool = routerConfig;
       if (me.queryTool && allTool && allTool.length > 0) {
+        allTool.forEach((element) => {
+          if (element.meta && element.meta.titleKey) {
+            element.meta.title = me.$t(element.meta.titleKey);
+          }
+        });
         allTool = allTool.filter((x) =>
           x.meta.title.containsNotSentive(me.queryTool)
         );
       }
       me.routerLink = allTool;
     },
-    async processWhenMounted() {
+    async processWhenCreated() {
       let me = this;
       let currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
       if (!currentTheme) {
@@ -92,6 +104,27 @@ export default {
       if (toggleSidebarState) {
         me.isShowSidebar = toggleSidebarState.value;
       }
+      me.currentLanguage = await me.getCurrentLanguage();
+    },
+    async getCurrentLanguage() {
+      let currentLanguage = await this.$tdCache.get(
+        this.$tdEnum.cacheConfig.Language
+      );
+      if (currentLanguage) {
+        return currentLanguage;
+      }
+      return this.$tdEnum.language.en;
+    },
+    async changeLanguage() {
+      let me = this;
+      let currentIndex = me.languageList.indexOf(me.currentLanguage);
+      let nextIndex = (currentIndex + 1) % me.languageList.length;
+      me.currentLanguage = me.languageList[nextIndex];
+      await me.$tdCache.set(
+        me.$tdEnum.cacheConfig.Language,
+        me.currentLanguage
+      );
+      await loadLocale(me.currentLanguage);
     },
     async toggleTheme() {
       let me = this;
@@ -175,6 +208,12 @@ export default {
     .tg-github {
       cursor: pointer;
       background-position: -76px 0px;
+    }
+    .language-session {
+      cursor: pointer;
+      color: var(--btn-color);
+      text-transform: uppercase;
+      font-weight: 600;
     }
   }
 }

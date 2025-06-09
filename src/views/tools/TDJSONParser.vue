@@ -1,11 +1,11 @@
 <template>
   <div class="container">
-    <div class="title">Convert JSON sang object đệ quy!</div>
+    <div class="title">{{ $t("i18nCommon.jsonParser.title") }}</div>
     <div class="flex">
       <div>
         <div>
           <TDTextarea
-            placeHolder="JSON muốn chuyển sang Object"
+            :placeHolder="$t('i18nCommon.jsonParser.inputPlaceholder')"
             v-model="jsonSource"
             resizeable
           ></TDTextarea>
@@ -14,59 +14,59 @@
           <div class="flex" v-if="isShowConfigLib">
             <TDCheckbox
               v-model="isRecusive"
-              label="Xử lý JSON parse đệ quy object"
+              :label="$t('i18nCommon.jsonParser.recursiveParser')"
               @input="handleJSONToObject"
             ></TDCheckbox>
             <TDCheckbox
               v-model="showCollapseButton"
-              label="hiển thị icon thu gọn object"
+              :label="$t('i18nCommon.jsonParser.showCollapseIcon')"
             ></TDCheckbox>
             <TDCheckbox
               v-model="showLineNumber"
-              label="hiển thị số dòng"
+              :label="$t('i18nCommon.jsonParser.showLineNumber')"
             ></TDCheckbox>
             <TDCheckbox
               v-model="showLengthWhenCollapsed"
-              label="hiển thị số key/phần tử"
+              :label="$t('i18nCommon.jsonParser.showLength')"
             ></TDCheckbox>
             <TDCheckbox
               v-model="showVirtualScroll"
-              label="hiển thị thanh cuộn"
+              :label="$t('i18nCommon.jsonParser.showScroll')"
             ></TDCheckbox>
 
             <TDCheckbox
               v-model="isShowSelectedPath"
-              label="hiển thị fullpath node đang chọn"
+              :label="$t('i18nCommon.jsonParser.showFullPath')"
             ></TDCheckbox>
           </div>
           <div class="flex">
             <TDCheckbox
               v-model="isShowSelectedNode"
-              label="hiển thị node đang chọn"
+              :label="$t('i18nCommon.jsonParser.showSelectedNode')"
             ></TDCheckbox>
             <TDButton
               @click="handleJSONToObject"
-              label="JSON to Object"
+              :label="$t('i18nCommon.jsonParser.convertButton')"
             ></TDButton>
             <TDButton
               @click="applyMock"
               :type="$tdEnum.buttonType.secondary"
-              label="Example"
+              :label="$t('i18nCommon.jsonParser.example')"
             ></TDButton>
             <TDButton
               @click="handleCopyEvent(jsonSelected)"
               :type="$tdEnum.buttonType.secondary"
-              label="Copy selected node"
+              :label="$t('i18nCommon.jsonParser.copySelected')"
             ></TDButton>
             <TDButton
               @click="handleCopyEvent(JSON.stringify(jsonSource))"
               :type="$tdEnum.buttonType.secondary"
-              label="Copy source stringify"
+              :label="$t('i18nCommon.jsonParser.copyStringify')"
             ></TDButton>
             <TDButton
               @click="toggleAllNode"
               :type="$tdEnum.buttonType.secondary"
-              label="Toggle all node"
+              :label="$t('i18nCommon.jsonParser.toggleNode')"
             ></TDButton>
           </div>
         </div>
@@ -91,7 +91,7 @@
       </div>
       <TDTextarea
         v-if="isShowSelectedNode && objectSource"
-        placeHolder="Node đang chọn"
+        :placeHolder="$t('i18nCommon.jsonParser.selectedNode')"
         v-model="jsonSelected"
         :readOnly="true"
         width="500px"
@@ -99,9 +99,9 @@
     </div>
     <div v-if="isShowSelectedPath">
       <div class="td-fullpath" v-if="isShowSelectedPath && fullPath">
-        Node đang chọn: {{ fullPath }}
+        {{ $t("i18nCommon.jsonParser.selectedNode") }}: {{ fullPath }}
       </div>
-      <div class="td-fullpath" v-else>Chưa chọn node nào</div>
+      <div class="td-fullpath" v-else>{{ $t("i18nCommon.jsonParser.noSelection") }}</div>
     </div>
   </div>
 </template>

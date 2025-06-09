@@ -1,8 +1,11 @@
 <template>
   <div class="td-history-container">
     <div class="td-history-header">
-      <h3>Lịch sử</h3>
-      <TDButton @click="clearAllHistory" label="Xóa tất cả"></TDButton>
+      <h3>{{ $t("i18nCommon.history") }}</h3>
+      <TDButton
+        @click="clearAllHistory"
+        :label="$t('i18nCommon.deleteAll')"
+      ></TDButton>
     </div>
     <div class="td-history">
       <template v-for="(item, index) in historyItems">

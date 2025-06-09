@@ -1,12 +1,12 @@
 <template>
   <div class="container">
     <div class="title">
-      Time-based (TOTP) and HMAC-based (HOTP) One-Time Password!
+      {{ $t("i18nCommon.oneTimePassword.title") }}
     </div>
     <div>
       <TDRadioGroup
         v-model="sourceOTPImport"
-        label="Nguồn dữ liệu"
+        :label="$t('i18nCommon.oneTimePassword.sourceLabel')"
         :options="radioImports"
       />
     </div>
@@ -20,54 +20,54 @@
           ref="uploadArea"
           class="upload-area"
           maxHeight="200px"
-          labelEmpty="Kéo thả ảnh hoặc tải lên"
-          :label="'Chọn ảnh QR code'"
+          :labelEmpty="$t('i18nCommon.oneTimePassword.dropZone.placeholder')"
+          :label="$t('i18nCommon.oneTimePassword.dropZone.label')"
           multiple
         ></TDUpload>
         <div>
-          <TDButton label="Thêm" @click="decodeGoogleAuth" />
+          <TDButton :label="$t('i18nCommon.oneTimePassword.auth.add')" @click="decodeGoogleAuth" />
         </div>
       </div>
       <div v-if="sourceOTPImport == 'google'" class="flex">
         <TDInput
           v-model="migrationURL"
-          :placeHolder="'Google authenticator migration URL exampe: otpauth-migration://offline?data=CjcKFFkwYrPBscVsQXM'"
+          :placeHolder="$t('i18nCommon.oneTimePassword.urlPlaceholder')"
         />
         <div>
           <TDButton
-            label="Thêm"
+            :label="$t('i18nCommon.oneTimePassword.auth.add')"
             :readOnly="!migrationURL"
             @click="decodeGoogleAuth"
           />
         </div>
       </div>
       <div v-if="sourceOTPImport == 'manual'" class="flex">
-        <TDInput v-model="addNewObject.issuer" :placeHolder="'Issuer'" />
-        <TDInput v-model="addNewObject.name" :placeHolder="'Name'" />
-        <TDInput v-model="addNewObject.secret" :placeHolder="'Secret'" />
+        <TDInput v-model="addNewObject.issuer" :placeHolder="$t('i18nCommon.oneTimePassword.inputs.issuer')" />
+        <TDInput v-model="addNewObject.name" :placeHolder="$t('i18nCommon.oneTimePassword.inputs.name')" />
+        <TDInput v-model="addNewObject.secret" :placeHolder="$t('i18nCommon.oneTimePassword.inputs.secret')" />
         <TDButton
           :readOnly="
             !addNewObject || !addNewObject.name || !addNewObject.secret
           "
-          label="Thêm"
+          :label="$t('i18nCommon.oneTimePassword.auth.add')"
           @click="addNewTOTP"
         />
       </div>
       <div class="flex">
-        <TDInput v-model="username" :placeHolder="'Nhập tên người dùng'" />
+        <TDInput v-model="username" :placeHolder="$t('i18nCommon.oneTimePassword.auth.username')" />
         <TDInput
           v-model="password"
           :inputType="'password'"
-          :placeHolder="'Nhập mật khẩu để lưu/mở danh sách authen'"
+          :placeHolder="$t('i18nCommon.oneTimePassword.auth.password')"
           @keyup.enter="openAuthenSaved"
         />
         <TDButton
-          label="Mở"
+          :label="$t('i18nCommon.oneTimePassword.auth.open')"
           :readOnly="!password || !username"
           @click="openAuthenSaved"
         />
         <TDButton
-          label="Lưu"
+          :label="$t('i18nCommon.oneTimePassword.auth.save')"
           :readOnly="!password || !username"
           @click="saveAuthen"
         />
@@ -75,9 +75,9 @@
       <div class="flex td-decoded-data">
         <TDTextarea
           v-if="isShowDecoded"
-          placeHolder="Google authenticator decoded data"
+          :placeHolder="$t('i18nCommon.oneTimePassword.decodeData')"
           v-model="decodedDataString"
-          label="Google authenticator decoded data"
+          :label="$t('i18nCommon.oneTimePassword.decodeData')"
           isLabelTop
           :readOnly="true"
           height="400px"
@@ -103,7 +103,7 @@
     </div>
     <div class="flex">
       <TDInput v-model="filterRemove" :placeHolder="placeHolderRemove" />
-      <TDButton label="Xóa" :readOnly="!filterRemove" @click="removeByFilter" />
+      <TDButton :label="$t('i18nCommon.oneTimePassword.remove.button')" :readOnly="!filterRemove" @click="removeByFilter" />
     </div>
   </div>
 </template>
@@ -136,7 +136,7 @@ export default {
     },
     placeHolderRemove() {
       let me = this;
-      let result = `Nhập chính xác tên authen để xóa, nhập ${me.removeAllKey} để xóa tất cả`;
+      let result = me.$t('i18nCommon.oneTimePassword.remove.filter', [me.removeAllKey]);
       return result;
     },
     isShowProgress() {
@@ -545,9 +545,9 @@ export default {
       removeAllKey: "removeall",
       sourceOTPImport: "googleqrcode",
       radioImports: [
-        { value: "googleqrcode", label: "Google authen qrcode" },
-        { value: "google", label: "Google authen" },
-        { value: "manual", label: "Tự nhập" },
+        { value: "googleqrcode", label: this.$t("i18nCommon.oneTimePassword.importOptions.googleQR") },
+        { value: "google", label: this.$t("i18nCommon.oneTimePassword.importOptions.google") },
+        { value: "manual", label: this.$t("i18nCommon.oneTimePassword.importOptions.manual") },
       ],
       isDragOver: false,
     };
