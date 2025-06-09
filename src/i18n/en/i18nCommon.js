@@ -51,5 +51,13 @@ export default {
       copyColor: "Copy color",
       uploadNewImage: "Upload New Image"
     },
+    compareCode: {
+      title: "Compare two file (diff changes) !",
+      firstFile: "First code file to compare",
+      secondFile: "Second code file to compare",
+      compareStyle: "compare style (true is side by side, false is line by line)",
+      compare: "Compare diff changes",
+      example: "Example"
+    },
   },
 };

@@ -51,5 +51,13 @@ export default {
       copyColor: "Sao chép màu",
       uploadNewImage: "Tải ảnh mới"
     },
+    compareCode: {
+      title: "Công cụ so sánh hai tệp (diff) !",
+      firstFile: "Tệp mã nguồn thứ nhất để so sánh",
+      secondFile: "Tệp mã nguồn thứ hai để so sánh",
+      compareStyle: "kiểu so sánh (true là song song, false là từng dòng)",
+      compare: "So sánh thay đổi",
+      example: "Ví dụ"
+    },
   },
 };
