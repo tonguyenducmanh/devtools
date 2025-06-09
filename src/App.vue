@@ -10,7 +10,6 @@
 <script>
 import TDSidebar from "@/views/TDSidebar.vue";
 import "@/common/TDPrototype.js";
-import { loadLocale } from "@/i18n/i18nLoader.js";
 export default {
   components: { TDSidebar },
   created() {
@@ -54,12 +53,6 @@ export default {
         await me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
       }
       me.$tdUtility.setTheme(currentTheme);
-      // Lấy ngôn ngữ hiện tại
-      let currentLanguage = await me.$tdCache.get(
-        me.$tdEnum.cacheConfig.Language
-      );
-      let locale = currentLanguage ? currentLanguage : me.$tdEnum.language.en;
-      await loadLocale(locale);
     },
   },
 };

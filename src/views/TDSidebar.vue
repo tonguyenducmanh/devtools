@@ -43,7 +43,7 @@
 
 <script>
 import { routerConfig } from "@/router/router.js";
-import { loadLocale } from "@/i18n/i18nLoader.js";
+import { loadLocale } from "@/i18n/i18nData.js";
 
 export default {
   name: "TDSidebar",

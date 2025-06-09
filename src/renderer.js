@@ -12,7 +12,7 @@ import TDUpload from "@/components/TDUpload.vue";
 import TDRadio from "@/components/TDRadio.vue";
 import TDRadioGroup from "@/components/TDRadioGroup.vue";
 import TDHistory from "@/components/TDHistory.vue";
-import i18nData from "@/i18n/i18nData.js";
+import i18nData, { loadLocale } from "@/i18n/i18nData.js";
 
 const currentApp = createApp(App);
 
@@ -36,5 +36,10 @@ currentApp.use(router);
 
 // globalization language
 currentApp.use(i18nData);
+
+// Lấy ngôn ngữ hiện tại
+let currentLanguage = await cache.get(enumeration.cacheConfig.Language);
+let locale = currentLanguage ? currentLanguage : enumeration.language.en;
+await loadLocale(locale);
 
 currentApp.mount("#app");
