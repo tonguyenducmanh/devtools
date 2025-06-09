@@ -34,5 +34,13 @@ export default {
       placeHolder: "Paste your Base64 string here",
       result: "Result converted",
     },
+    codeFormatter: {
+      title: "Code formatter tool!",
+      typeOfCode: "Type of code",
+      inputCode: "Input your code",
+      outputCode: "Output code",
+      formatCode: "Format code",
+      copyOutput: "Copy output",
+    },
   },
 };

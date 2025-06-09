@@ -34,5 +34,13 @@ export default {
       placeHolder: "Dán mã Base64 vào đây",
       result: "Kết quả chuyển đổi",
     },
+    codeFormatter: {
+      title: "Công cụ định dạng mã!",
+      typeOfCode: "Loại mã",
+      inputCode: "Nhập mã của bạn",
+      outputCode: "Mã đầu ra",
+      formatCode: "Định dạng mã",
+      copyOutput: "Sao chép đầu ra",
+    },
   },
 };
