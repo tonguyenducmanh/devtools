@@ -1,21 +1,21 @@
 <template>
   <div class="container">
     <div class="title">
-      Mapping JSON object A to JSON object B with recusive key value mapping!
+      {{ $t("i18nCommon.jsonMapping.title") }}
     </div>
     <div class="td-mapping-container">
       <div class="flex flex-wrap td-mapping-group">
         <TDTextarea
-          placeHolder="Object need mapping value"
-          label="Object mapping"
+          :placeHolder="$t('i18nCommon.jsonMapping.sourcePlaceholder')"
+          :label="$t('i18nCommon.jsonMapping.sourceLabel')"
           isLabelTop
           v-model="originalObjectText"
           height="300px"
           width="500px"
         ></TDTextarea>
         <TDTextarea
-          label="Object copy"
-          placeHolder="Object copy value"
+          :label="$t('i18nCommon.jsonMapping.targetLabel')"
+          :placeHolder="$t('i18nCommon.jsonMapping.targetPlaceholder')"
           isLabelTop
           v-model="targetObjectText"
           height="300px"
@@ -24,8 +24,8 @@
       </div>
       <div class="flex flex-wrap td-mapping-group">
         <TDTextarea
-          placeHolder="Result after mapping"
-          label="Result mapping"
+          :placeHolder="$t('i18nCommon.jsonMapping.resultPlaceholder')"
+          :label="$t('i18nCommon.jsonMapping.resultLabel')"
           isLabelTop
           v-model="replacedObjectText"
           height="300px"
@@ -33,8 +33,8 @@
           width="500px"
         ></TDTextarea>
         <TDTextarea
-          placeHolder="Key value mapping error"
-          label="Error"
+          :placeHolder="$t('i18nCommon.jsonMapping.errorPlaceholder')"
+          :label="$t('i18nCommon.jsonMapping.errorLabel')"
           isLabelTop
           v-model="errorListText"
           height="300px"
@@ -43,26 +43,26 @@
         ></TDTextarea>
       </div>
       <div class="flex">
-        <TDButton @click="mappingNow" label="Mapping now"></TDButton>
+        <TDButton @click="mappingNow" :label="$t('i18nCommon.jsonMapping.mappingButton')"></TDButton>
         <TDButton
           @click="formatResult"
           :type="$tdEnum.buttonType.secondary"
-          label="Format result"
+          :label="$t('i18nCommon.jsonMapping.formatButton')"
         ></TDButton>
         <TDButton
           @click="haddleCopyEvent(replacedObjectText)"
           :type="$tdEnum.buttonType.secondary"
-          label="Copy result"
+          :label="$t('i18nCommon.jsonMapping.copyResultButton')"
         ></TDButton>
         <TDButton
           @click="haddleCopyEvent(errorListText)"
           :type="$tdEnum.buttonType.secondary"
-          label="Copy error"
+          :label="$t('i18nCommon.jsonMapping.copyErrorButton')"
         ></TDButton>
         <TDButton
           @click="applyMock"
           :type="$tdEnum.buttonType.secondary"
-          label="Example"
+          :label="$t('i18nCommon.jsonMapping.example')"
         ></TDButton>
       </div>
     </div>

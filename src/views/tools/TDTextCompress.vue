@@ -1,16 +1,16 @@
 <template>
   <div class="container">
-    <div class="title">Text Compress Algorithms!</div>
+    <div class="title">{{ $t("i18nCommon.textCompress.title") }}</div>
     <div class="flex flex-wrap paste-box">
       <div class="flex compress-input">
         <TDTextarea
-          placeHolder="Text to compress"
+          :placeHolder="$t('i18nCommon.textCompress.input.compress')"
           v-model="inputSource"
           height="400px"
           width="50%"
         ></TDTextarea>
         <TDTextarea
-          placeHolder="Text from compress"
+          :placeHolder="$t('i18nCommon.textCompress.input.decompress')"
           v-model="outputSource"
           height="400px"
           width="50%"
@@ -20,27 +20,27 @@
     <div>
       <TDRadioGroup
         v-model="compressAlgorithms"
-        label="Thuật toán nén dữ liệu"
+        :label="$t('i18nCommon.textCompress.input.algorithm')"
         :options="radioImports"
       />
     </div>
     <div class="flex group-btn">
-      <TDButton @click="handleCompress" label="Compress"></TDButton>
-      <TDButton @click="handleDempress" label="Decompress"></TDButton>
+      <TDButton @click="handleCompress" :label="$t('i18nCommon.textCompress.buttons.compress')"></TDButton>
+      <TDButton @click="handleDempress" :label="$t('i18nCommon.textCompress.buttons.decompress')"></TDButton>
       <TDButton
         @click="applyMock"
         :type="$tdEnum.buttonType.secondary"
-        label="Example"
+        :label="$t('i18nCommon.textCompress.buttons.example')"
       ></TDButton>
       <TDButton
         @click="handleCopyEvent(inputSource)"
         :type="$tdEnum.buttonType.secondary"
-        label="Copy input"
+        :label="$t('i18nCommon.textCompress.buttons.copyInput')"
       ></TDButton>
       <TDButton
         @click="handleCopyEvent(outputSource)"
         :type="$tdEnum.buttonType.secondary"
-        label="Copy output"
+        :label="$t('i18nCommon.textCompress.buttons.copyOutput')"
       ></TDButton>
     </div>
     <div v-if="compressRatio">
@@ -68,15 +68,15 @@ export default {
         ratio = this.inputSource.length / this.outputSource.length;
       }
       let percentRatio = Math.round(ratio * 100).toFixed(2);
-      return `Tỷ lệ nén ${percentRatio} %`;
+      return this.$t('i18nCommon.textCompress.stats.ratio', [percentRatio]);
     },
     inputLengthText() {
       let sourceLength = this.inputSource ? this.inputSource.length : 0;
-      return `Độ dài text input ${sourceLength}`;
+      return this.$t('i18nCommon.textCompress.stats.inputLength', [sourceLength]);
     },
     outputLengthText() {
       let sourceLength = this.outputSource ? this.outputSource.length : 0;
-      return `Độ dài text output ${sourceLength}`;
+      return this.$t('i18nCommon.textCompress.stats.outputLength', [sourceLength]);
     },
   },
   mounted() {},

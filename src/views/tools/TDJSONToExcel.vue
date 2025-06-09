@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">Convert mảng JSON object sang file excel!</div>
+    <div class="title">{{ $t("i18nCommon.jsonToExcel.title") }}</div>
     <div class="flex">
       <TDHistory
         ref="history"
@@ -12,30 +12,30 @@
     <div class="flex">
       <TDTextarea
         isLabelTop
-        label="Nhập JSON, key level 1 sẽ dùng làm tên cột"
-        placeHolder="Nhập JSON ở đây..."
+        :label="$t('i18nCommon.jsonToExcel.inputLabel')"
+        :placeHolder="$t('i18nCommon.jsonToExcel.inputPlaceholder')"
         height="400px"
         width="95%"
         v-model="jsonSource"
       ></TDTextarea>
     </div>
     <div class="flex">
-      <TDCheckbox v-model="isBoldColName" label="In đậm tên cột"></TDCheckbox>
+      <TDCheckbox v-model="isBoldColName" :label="$t('i18nCommon.jsonToExcel.boldColumns')"></TDCheckbox>
       <TDCheckbox
         v-model="isFitColWidth"
-        label="Độ rộng vừa với tên cột"
+        :label="$t('i18nCommon.jsonToExcel.fitColumns')"
       ></TDCheckbox>
       <TDCheckbox
         v-model="isFreezeFirstRow"
-        label="Ghim dòng đầu tiên"
+        :label="$t('i18nCommon.jsonToExcel.freezeRow')"
       ></TDCheckbox>
     </div>
     <div class="flex">
-      <TDButton label="Chuyển đổi" @click="convertToExcel"></TDButton>
+      <TDButton :label="$t('i18nCommon.jsonToExcel.convert')" @click="convertToExcel"></TDButton>
       <TDButton
         @click="applyMock"
         :type="$tdEnum.buttonType.secondary"
-        label="Example"
+        :label="$t('i18nCommon.jsonToExcel.example')"
       ></TDButton>
     </div>
   </div>

@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">Image To base64 tool!</div>
+    <div class="title">{{ $t("i18nCommon.imageToBase64.title") }}</div>
     <div class="flex flex-wrap paste-box">
       <div
         ref="drop-zone"
@@ -9,13 +9,13 @@
         @dragleave="handleDragLeave"
         @drop="handleDrop"
       >
-        <p v-if="!srcImg">Paste image here (Ctrl+V) or drag & drop</p>
+        <p v-if="!srcImg">{{ $t("i18nCommon.imageToBase64.dropZone") }}</p>
         <img v-if="srcImg" :src="srcImg" class="preview" ref="preview" />
       </div>
       <div class="result-container">
         <TDTextarea
           ref="base64-output"
-          placeHolder="Base64 output will appear here"
+          :placeHolder="$t('i18nCommon.imageToBase64.placeHolder')"
           v-model="base64Result"
           :readOnly="true"
           height="400px"
@@ -27,7 +27,7 @@
       <TDButton
         ref="copy-btn"
         @click="haddleCopyEvent"
-        label="Copy Base64"
+        :label="$t('i18nCommon.imageToBase64.copyButton')"
       ></TDButton>
     </div>
   </div>

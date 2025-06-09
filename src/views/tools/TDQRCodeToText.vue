@@ -1,13 +1,12 @@
 <template>
   <div class="container">
-    <div class="title">QRCode To Text tool!</div>
+    <div class="title">{{ $t("i18nCommon.qrCodeToText.title") }}</div>
     <div class="qr-section">
       <div class="flex">
         <img class="td-img" src="@/assets/qrcodeupload.png" />
       </div>
       <div>
-        Note: thứ tự upload dựa vào thứ tự sắp xếp trên máy tính, vui lòng chọn
-        sắp xếp theo ngày tăng dần để nối chuỗi đúng file
+        {{ $t("i18nCommon.qrCodeToText.note") }}
       </div>
       <br />
       <TDUpload
@@ -17,21 +16,21 @@
         ref="uploadArea"
         class="upload-area"
         maxHeight="200px"
-        labelEmpty="Kéo thả ảnh hoặc Ctrl+V ảnh vừa copy vào đây"
-        :label="'Chọn ảnh QR code'"
+        :labelEmpty="$t('i18nCommon.qrCodeToText.dropZone.placeholder')"
+        :label="$t('i18nCommon.qrCodeToText.dropZone.label')"
         multiple
       ></TDUpload>
       <div class="flex button-generate">
-        <TDButton @click="convertQRCode" label="Chuyển đổi"></TDButton>
+        <TDButton @click="convertQRCode" :label="$t('i18nCommon.qrCodeToText.convert')"></TDButton>
         <TDButton
           @click="copyResult"
           :type="$tdEnum.buttonType.secondary"
-          label="Copy"
+          :label="$t('i18nCommon.qrCodeToText.copy')"
         ></TDButton>
       </div>
       <TDTextarea
         class="input-area"
-        placeHolder="Kết quả sẽ xuất hiện sau khi paste ảnh"
+        :placeHolder="$t('i18nCommon.qrCodeToText.result')"
         v-model="textOutput"
         :readOnly="true"
         height="200px"
