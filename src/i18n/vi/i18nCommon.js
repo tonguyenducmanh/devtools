@@ -8,8 +8,22 @@ export default {
     welcomeTextOne: "Vũ khí",
     welcomeTextTwo: "Tối thượng",
     welcomeTextThree: "Cho dân Dev",
+    sidebar: {
+      filter: "Lọc công cụ",
+      menu: {
+        show: "Hiển thị menu",
+        hide: "Ẩn menu"
+      },
+      theme: {
+        light: "Chuyển sang chế độ tối",
+        dark: "Chuyển sang chế độ sáng"
+      },
+      language: {
+        switch: "Đổi ngôn ngữ"
+      }
+    },
     feature: {
-      welcome: "Welcome",
+      welcome: "Tổng quan",
       oneTimePassword: "Mật khẩu một lần",
       textCompress: "Nén văn bản",
       compareCode: "So sánh mã",

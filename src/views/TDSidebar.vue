@@ -9,7 +9,7 @@
       <div class="td-filter-tool">
         <TDInput
           v-model="queryTool"
-          :placeHolder="'Filter tool'"
+          :placeHolder="$t('i18nCommon.sidebar.filter')"
           @keyup.enter="filterToolNow"
           @input="filterToolNow"
         />

@@ -8,6 +8,20 @@ export default {
     welcomeTextOne: "The",
     welcomeTextTwo: "Essential",
     welcomeTextThree: "Utility Tool for Dev",
+    sidebar: {
+      filter: "Filter tool",
+      menu: {
+        show: "Show menu",
+        hide: "Hide menu"
+      },
+      theme: {
+        light: "Switch to dark theme",
+        dark: "Switch to light theme"
+      },
+      language: {
+        switch: "Switch language"
+      }
+    },
     feature: {
       welcome: "Welcome",
       oneTimePassword: "One time password",
