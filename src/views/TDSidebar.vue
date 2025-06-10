@@ -6,14 +6,14 @@
       @click="toggleSidebar"
     ></div>
     <div v-if="isShowSidebar" class="td-sidebar">
-      <div class="td-filter-tool">
+      <!-- <div class="td-filter-tool">
         <TDInput
           v-model="queryTool"
           :placeHolder="$t('i18nCommon.sidebar.filter')"
           @keyup.enter="filterToolNow"
           @input="filterToolNow"
         />
-      </div>
+      </div> -->
       <div class="td-tool-group">
         <template v-for="(item, index) in routerLink">
           <RouterLink

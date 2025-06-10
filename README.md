@@ -6,13 +6,15 @@ Two versions are supported: web version (Vue + Vite) and app version (Electron +
 
 [https://utilityfordev.pages.dev/](https://utilityfordev.pages.dev/)
 
-[https://utilityfordev.netlify.app/](https://utilityfordev.netlify.app/)
-
-[https://utilityfordev.vercel.app/](https://utilityfordev.vercel.app/)
-
 List of Supported Features:
 
 One time password, Color picker, Text Compress, Compare code, JSON parser, JSON to PostgreSQL, JSON Mapping, JSON to Excel, Code formatter, Image from Base64, Image to Base64, QRCode from text, QRCode to text, Download VSCode Extension, UUIDv4 generator
+
+List of Supported languages: Vietnamese, English, Japansese, Chinese, Korean, Japanese, Russian
+
+Demo:
+
+![demo image](img/demo-1.png) ![demo image](img/demo-2.png) ![demo image](img/demo-3.png) ![demo image](img/demo-4.png)
 
 Application-wide configuration can be accessed by entering the following command in the console:
 
