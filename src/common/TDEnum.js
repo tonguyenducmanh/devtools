@@ -39,6 +39,10 @@ class TDEnum {
   language = {
     vi: "vi",
     en: "en",
+    zh: "zh",
+    ja: "ja",
+    ko: "ko",
+    ru: "ru",
   };
 }
 

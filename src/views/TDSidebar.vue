@@ -71,7 +71,7 @@ export default {
       isDarkTheme: false,
       queryTool: null,
       currentLanguage: null,
-      languageList: [me.$tdEnum.language.en, me.$tdEnum.language.vi],
+      languageList: Object.keys(me.$tdEnum.language),
     };
   },
   methods: {
