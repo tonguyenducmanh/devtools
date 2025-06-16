@@ -9,14 +9,14 @@
       <p class="description">{{ $t("i18nCommon.createbyAuthor") }}</p>
     </div>
     <div class="language-buttons">
-      <button
+      <div
         v-for="lang in languageList"
         :key="lang"
         :class="['language-btn', { active: currentLanguage === lang }]"
         @click="changeLanguage(lang)"
       >
         {{ lang.toUpperCase() }}
-      </button>
+      </div>
     </div>
   </div>
 </template>
@@ -28,7 +28,7 @@ export default {
   data() {
     return {
       currentLanguage: null,
-      languageList: Object.keys(this.$tdEnum.language).sort()
+      languageList: Object.keys(this.$tdEnum.language).sort(),
     };
   },
   async created() {
@@ -104,8 +104,8 @@ body[data-theme="dark"] .description {
   padding: 8px 16px;
   border: 2px solid transparent;
   border-radius: 8px;
-  background: var(--bg-sub-color);
-  color: var(--btn-color);
+  background: var(--btn-secondary-color);
+  color: var(--btn-secondary-text-color);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -113,13 +113,14 @@ body[data-theme="dark"] .description {
   letter-spacing: 0.5px;
 
   &:hover {
-    background: var(--bg-active-color);
+    background: var(--btn-secondary-focus-color);
     transform: translateY(-2px);
   }
 
   &.active {
     border-color: var(--btn-color);
-    color: var(--text-primary-color);
+    background-color: var(--btn-color);
+    color: white;
   }
 }
 
