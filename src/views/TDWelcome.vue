@@ -39,7 +39,7 @@ export default {
       let languageName = this.$t(`i18nGlobal.language.${key}`);
       locate.push({ key, name: languageName });
     }
-    this.languageList = locate.sort((a, b) => a.name.localeCompare(b.name));
+    this.languageList = locate.sort((a, b) => a.key - b.key);
   },
   methods: {
     async getCurrentLanguage() {
@@ -60,8 +60,29 @@ export default {
           this.currentLanguage
         );
         await loadLocale(this.currentLanguage);
+        this.$tdEventBus.emit(
+          this.$tdEnum.eventGlobal.changeLanguage,
+          this.currentLanguage
+        );
       }
     },
+    changeLangFromEvent(data, options) {
+      if (data) {
+        this.currentLanguage = data;
+      }
+    },
+  },
+  mounted() {
+    this.$tdEventBus.on(
+      this.$tdEnum.eventGlobal.changeLanguageFromSidebar,
+      this.changeLangFromEvent
+    );
+  },
+  beforeUnmount() {
+    this.$tdEventBus.off(
+      this.$tdEnum.eventGlobal.changeLanguageFromSidebar,
+      this.changeLangFromEvent
+    );
   },
 };
 </script>

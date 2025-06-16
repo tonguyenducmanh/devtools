@@ -125,6 +125,10 @@ export default {
         me.currentLanguage
       );
       await loadLocale(me.currentLanguage);
+      this.$tdEventBus.emit(
+        this.$tdEnum.eventGlobal.changeLanguageFromSidebar,
+        me.currentLanguage
+      );
     },
     async toggleTheme() {
       let me = this;
@@ -148,6 +152,23 @@ export default {
         window.open(window.__env.githubSource.url, "_blank").focus();
       }
     },
+    changeLangFromEvent(data, options) {
+      if (data) {
+        this.currentLanguage = data;
+      }
+    },
+  },
+  mounted() {
+    this.$tdEventBus.on(
+      this.$tdEnum.eventGlobal.changeLanguage,
+      this.changeLangFromEvent
+    );
+  },
+  beforeUnmount() {
+    this.$tdEventBus.off(
+      this.$tdEnum.eventGlobal.changeLanguage,
+      this.changeLangFromEvent
+    );
   },
 };
 </script>

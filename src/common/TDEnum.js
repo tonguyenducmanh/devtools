@@ -1,4 +1,5 @@
 import { EnumCacheConfig } from "@/common/cache/TDEnumCacheConfig.js";
+import { TDEnumEventBus } from "@/common/event/TDEnumEventBus.js";
 
 class TDEnum {
   // cài đặt chủ đề của app
@@ -15,6 +16,8 @@ class TDEnum {
   };
   // config cache
   cacheConfig = EnumCacheConfig;
+  // loại event global
+  eventGlobal = TDEnumEventBus;
   buttonType = {
     primary: "primary",
     secondary: "secondary",

@@ -13,6 +13,7 @@ import TDRadio from "@/components/TDRadio.vue";
 import TDRadioGroup from "@/components/TDRadioGroup.vue";
 import TDHistory from "@/components/TDHistory.vue";
 import i18nData, { loadLocale } from "@/i18n/i18nData.js";
+import eventBus from "@/common/event/TDEventBus.js";
 
 // Async IIFE
 (async () => {
@@ -22,6 +23,7 @@ import i18nData, { loadLocale } from "@/i18n/i18nData.js";
   currentApp.config.globalProperties.$tdCache = cache;
   currentApp.config.globalProperties.$tdEnum = enumeration;
   currentApp.config.globalProperties.$tdUtility = utility;
+  currentApp.config.globalProperties.$tdEventBus = eventBus;
 
   // add 1 vài component global
   currentApp.component("TDButton", TDButton);
