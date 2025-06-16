@@ -4,4 +4,5 @@
 export const TDEnumEventBus = {
   changeLanguage: "change-language",
   changeLanguageFromSidebar: "change-language-from-sidebar",
+  changeTheme: "change-theme",
 };

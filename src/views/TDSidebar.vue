@@ -138,6 +138,7 @@ export default {
         : me.$tdEnum.theme.light;
       await me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
       me.$tdUtility.setTheme(currentTheme);
+      this.$tdEventBus.emit(this.$tdEnum.eventGlobal.changeTheme, currentTheme);
     },
     async toggleSidebar() {
       let me = this;

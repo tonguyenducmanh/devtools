@@ -101,7 +101,9 @@
       <div class="td-fullpath" v-if="isShowSelectedPath && fullPath">
         {{ $t("i18nCommon.jsonParser.selectedNode") }}: {{ fullPath }}
       </div>
-      <div class="td-fullpath" v-else>{{ $t("i18nCommon.jsonParser.noSelection") }}</div>
+      <div class="td-fullpath" v-else>
+        {{ $t("i18nCommon.jsonParser.noSelection") }}
+      </div>
     </div>
   </div>
 </template>
@@ -147,6 +149,10 @@ export default {
   },
   beforeUnmount() {
     let me = this;
+    this.$tdEventBus.off(
+      this.$tdEnum.eventGlobal.changeTheme,
+      this.changeThemeEvent
+    );
   },
   mounted() {
     let me = this;
@@ -157,6 +163,16 @@ export default {
       let me = this;
       me.currentTheme =
         (await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme)) ?? "light";
+      this.$tdEventBus.on(
+        this.$tdEnum.eventGlobal.changeTheme,
+        this.changeThemeEvent
+      );
+    },
+    changeThemeEvent(data, options) {
+      let me = this;
+      if (data) {
+        me.currentTheme = data;
+      }
     },
     toggleAllNode() {
       let me = this;
