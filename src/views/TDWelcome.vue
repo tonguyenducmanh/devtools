@@ -11,11 +11,11 @@
     <div class="language-buttons">
       <div
         v-for="lang in languageList"
-        :key="lang"
-        :class="['language-btn', { active: currentLanguage === lang }]"
-        @click="changeLanguage(lang)"
+        :key="lang.key"
+        :class="['language-btn', { active: currentLanguage === lang.key }]"
+        @click="changeLanguage(lang.key)"
       >
-        {{ lang.toUpperCase() }}
+        {{ lang && lang.name ? lang.name.toUpperCase() : null }}
       </div>
     </div>
   </div>
@@ -34,6 +34,12 @@ export default {
   async created() {
     // Get current language when component is created
     this.currentLanguage = await this.getCurrentLanguage();
+    let locate = [];
+    for (let key in this.$tdEnum.language) {
+      let languageName = this.$t(`i18nGlobal.language.${key}`);
+      locate.push({ key, name: languageName });
+    }
+    this.languageList = locate.sort((a, b) => a.name.localeCompare(b.name));
   },
   methods: {
     async getCurrentLanguage() {
