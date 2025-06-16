@@ -21,7 +21,7 @@
             activeClass="td-item-active"
             :id="index"
             :to="item.pathVisible ?? item.path"
-            >{{ $t(item.meta.titleKey) }}</RouterLink
+            ><span>{{ $t(item.meta.titleKey) }}</span></RouterLink
           >
         </template>
       </div>
@@ -177,41 +177,77 @@ export default {
 .td-sidebar-container {
   position: relative;
 }
+
 .td-sidebar {
   position: relative;
   width: 250px;
   min-width: 250px;
   max-width: 250px;
   height: 100%;
-  background-color: var(--bg-sub-color);
+  background-color: var(--bg-main-color);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
+  transition: transform 0.3s ease-in-out;
+  border-right: 1px solid var(--border-color);
+
   .td-filter-tool {
     display: flex;
     margin: var(--padding);
+    width: calc(100% - 2 * var(--padding));
   }
+
   .td-sidebar-item {
     display: flex;
     align-items: center;
     justify-content: flex-start;
     width: 100%;
-    height: 30px;
+    height: 36px;
     padding: var(--padding);
     padding-left: var(--padding-large);
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      background-color: var(--bg-sub-color);
+      span {
+        transform: translateX(2px);
+      }
+    }
+
+    &.td-item-active {
+      background-color: var(--btn-color);
+      color: white;
+      font-weight: 600;
+    }
   }
-  .td-sidebar-item:hover {
-    background-color: var(--bg-main-color);
-  }
-  .td-item-active {
-    background-color: var(--bg-active-color);
-  }
+
   .td-tool-group {
     flex: 1;
     overflow: auto;
     width: 100%;
+    padding-top: var(--padding);
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb-color) transparent;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--scroll-thumb-color);
+      border-radius: 3px;
+    }
   }
+
   .td-sidebar-bottom {
     position: relative;
     display: flex;
@@ -220,25 +256,50 @@ export default {
     align-items: center;
     justify-content: center;
     padding: var(--padding);
-    .td-theme-toggle {
-      cursor: pointer;
-      background-position: -26px 0px;
-    }
-    .td-theme-toggle-dark {
-      background-position: -48px 0px;
-    }
+    border-top: 1px solid var(--border-color);
+
+    .td-theme-toggle,
     .tg-github {
       cursor: pointer;
+      width: 24px;
+      height: 24px;
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+
+    .td-theme-toggle {
+      background-position: -26px 0px;
+      &.td-theme-toggle-dark {
+        background-position: -48px 0px;
+      }
+    }
+
+    .tg-github {
       background-position: -76px 0px;
     }
+
     .language-session {
       cursor: pointer;
       color: var(--btn-color);
       text-transform: uppercase;
       font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      background-color: var(--btn-secondary-color);
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
     }
   }
 }
+
 .td-menu {
   position: absolute;
   cursor: pointer;
@@ -246,5 +307,8 @@ export default {
   z-index: 2;
   top: 0;
   left: 100%;
+}
+.td-sidebar {
+  animation: slideIn 0.3s ease-out forwards;
 }
 </style>
