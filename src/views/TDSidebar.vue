@@ -113,7 +113,7 @@ export default {
       if (currentLanguage) {
         return currentLanguage;
       }
-      return this.$tdEnum.language.en;
+      return this.$tdEnum.language.vi;
     },
     async changeLanguage() {
       let me = this;

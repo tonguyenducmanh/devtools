@@ -43,7 +43,7 @@ export default {
       if (currentLanguage) {
         return currentLanguage;
       }
-      return this.$tdEnum.language.en;
+      return this.$tdEnum.language.vi;
     },
     async changeLanguage(lang) {
       // Only change if different language is selected
@@ -60,7 +60,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.wrap-container{
+.wrap-container {
   width: 100%;
   height: 100%;
 }

@@ -41,7 +41,7 @@ import i18nData, { loadLocale } from "@/i18n/i18nData.js";
 
   // Lấy ngôn ngữ hiện tại
   let currentLanguage = await cache.get(enumeration.cacheConfig.Language);
-  let locale = currentLanguage ? currentLanguage : enumeration.language.en;
+  let locale = currentLanguage ? currentLanguage : enumeration.language.vi;
   await loadLocale(locale);
 
   currentApp.mount("#app");
