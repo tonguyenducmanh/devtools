@@ -28,7 +28,7 @@ export default {
   data() {
     return {
       currentLanguage: null,
-      languageList: Object.keys(this.$tdEnum.language),
+      languageList: Object.keys(this.$tdEnum.language).sort()
     };
   },
   async created() {
