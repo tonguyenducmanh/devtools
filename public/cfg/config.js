@@ -3,7 +3,7 @@
  */
 (function (window) {
   window.__env = window.__env || {};
-  window.__env.version = "v1.1.2";
+  window.__env.version = "v1.1.3";
   window.__env.defaultValue = {
     theme: "light",
   };
