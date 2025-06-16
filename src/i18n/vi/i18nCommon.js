@@ -5,22 +5,22 @@ export default {
     deleteAll: "Xóa tất cả",
     uploadFile: "Tải lên tệp",
     createbyAuthor: "Được tạo ra bởi tdmanh.",
-    welcomeTextOne: "Vũ khí",
-    welcomeTextTwo: "Tối thượng",
-    welcomeTextThree: "Cho dân Dev",
+    welcomeTextOne: "Bộ công cụ",
+    welcomeTextTwo: "thiết yếu",
+    welcomeTextThree: "cho lập trình viên",
     sidebar: {
       filter: "Lọc công cụ",
       menu: {
         show: "Hiển thị menu",
-        hide: "Ẩn menu"
+        hide: "Ẩn menu",
       },
       theme: {
         light: "Chuyển sang chế độ tối",
-        dark: "Chuyển sang chế độ sáng"
+        dark: "Chuyển sang chế độ sáng",
       },
       language: {
-        switch: "Đổi ngôn ngữ"
-      }
+        switch: "Đổi ngôn ngữ",
+      },
     },
     feature: {
       welcome: "Tổng quan",
