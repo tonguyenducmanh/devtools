@@ -14,7 +14,11 @@ List of Supported languages: Vietnamese, English, Japansese, Chinese, Korean, Ja
 
 Demo:
 
-![demo image](img/demo-1.png) ![demo image](img/demo-2.png) ![demo image](img/demo-3.png) ![demo image](img/demo-4.png)
+![alt text](img/demo-one.png)
+
+![alt text](img/demo-two.png)
+
+![alt text](img/demo-three.png)
 
 Application-wide configuration can be accessed by entering the following command in the console:
 
