@@ -10,6 +10,7 @@
 <script>
 import TDSidebar from "@/views/TDSidebar.vue";
 import "@/common/TDPrototype.js";
+import TDAppStartup from "@/common/TDAppStartup.js";
 export default {
   components: { TDSidebar },
   created() {
@@ -53,6 +54,7 @@ export default {
         await me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
       }
       me.$tdUtility.setTheme(currentTheme);
+      await TDAppStartup.initialize();
     },
   },
 };
