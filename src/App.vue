@@ -85,13 +85,14 @@ export default {
     padding: var(--padding);
     column-gap: var(--padding);
     width: 100%;
-    height: 100%;
+    height: calc(100% - 50px);
     .td-sidebar-wrap {
       border-radius: calc(var(--border-radius) * 2);
       background-color: var(--bg-main-color);
       display: flex;
       flex-direction: column;
       height: 100%;
+      overflow: auto;
     }
     .td-main {
       padding: var(--padding);
