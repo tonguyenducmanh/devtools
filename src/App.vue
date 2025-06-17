@@ -77,7 +77,7 @@ export default {
   font-size: var(--font-size-medium);
   background-color: var(--bg-layer-color);
   .td-header-wrap {
-    border-radius: calc(var(--border-radius) * 2);
+    border-radius: calc(var(--border-radius) * 1.5);
     width: 100%;
     height: 50px;
   }
@@ -87,7 +87,7 @@ export default {
     width: 100%;
     height: calc(100% - 50px);
     .td-sidebar-wrap {
-      border-radius: calc(var(--border-radius) * 2);
+      border-radius: calc(var(--border-radius) * 1.5);
       background-color: var(--bg-main-color);
       display: flex;
       flex-direction: column;
@@ -102,7 +102,7 @@ export default {
       height: 100%;
       overflow: auto;
       position: relative;
-      border-radius: calc(var(--border-radius) * 2);
+      border-radius: calc(var(--border-radius) * 1.5);
       background-color: var(--bg-main-color);
     }
   }

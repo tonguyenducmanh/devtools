@@ -100,7 +100,7 @@ export default {
 <style lang="scss" scoped>
 .td-sidebar-container {
   position: relative;
-  padding-top: calc(var(--padding) * 2);
+  padding-top: calc(var(--padding) * 1.5);
   height: 100vh;
   overflow: hidden;
 }
@@ -110,7 +110,7 @@ export default {
   width: 250px;
   min-width: 250px;
   max-width: 250px;
-  height: 100%;
+  height: calc(100% - var(--padding));
   background-color: var(--bg-main-color);
   display: flex;
   flex-direction: column;

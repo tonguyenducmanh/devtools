@@ -127,7 +127,7 @@ export default {
   height: 100%;
   background-color: var(--bg-main-color);
   justify-content: space-between;
-  padding: var(--padding) calc(var(--padding) * 2);
+  padding: var(--padding) calc(var(--padding) * 1.5);
   .td-app-name {
     column-gap: var(--padding);
     .td-logo {
