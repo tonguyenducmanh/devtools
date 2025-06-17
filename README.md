@@ -13,12 +13,11 @@ One time password, Color picker, Text Compress, Compare code, JSON parser, JSON 
 List of Supported languages: Vietnamese, English, Japansese, Chinese, Korean, Japanese, Russian
 
 Demo:
+![alt text](img/demo.png)
 
-![alt text](img/demo-one.png)
+![alt text](<img/demo 2.png>)
 
-![alt text](img/demo-two.png)
-
-![alt text](img/demo-three.png)
+![alt text](<img/demo 3.png>)
 
 Application-wide configuration can be accessed by entering the following command in the console:
 
