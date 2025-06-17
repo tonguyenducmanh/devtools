@@ -1,3 +1,5 @@
+import utility from "@/common/TDUtility.js";
+
 class TDAppStartup {
   constructor() {}
 
@@ -6,7 +8,7 @@ class TDAppStartup {
    */
   async initialize() {
     // đảm bảo rằng __env là một đối tượng bất biến
-    Object.freeze(window.__env);
+    utility.freezeDeepObject(window.__env);
   }
 }
 

@@ -216,6 +216,30 @@ class TDUtility {
     }
     return bytes.buffer;
   }
+
+  /**
+   * Đóng băng sâu một object, ngăn chặn mọi thay đổi ở mọi cấp độ
+   * @param {Object} obj Object cần đóng băng
+   * @returns {Object} Object đã được đóng băng hoàn toàn
+   * Created by tdmanh1 17.06.2025
+   */
+  freezeDeepObject(obj) {
+    // Lấy tất cả thuộc tính của object, bao gồm cả thuộc tính không liệt kê được
+    const propNames = Object.getOwnPropertyNames(obj);
+
+    // Đóng băng các thuộc tính trước khi đóng băng object cha
+    propNames.forEach(name => {
+      const prop = obj[name];
+
+      // Nếu prop là object và không null, đệ quy đóng băng nó
+      if (prop && typeof prop === "object") {
+        this.freezeDeepObject(prop);
+      }
+    });
+
+    // Đóng băng object cha
+    return Object.freeze(obj);
+  }
 }
 
 export default new TDUtility();
