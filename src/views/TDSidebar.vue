@@ -101,6 +101,8 @@ export default {
 .td-sidebar-container {
   position: relative;
   padding-top: calc(var(--padding) * 2);
+  height: 100vh;
+  overflow: hidden;
 }
 
 .td-sidebar {
@@ -108,12 +110,14 @@ export default {
   width: 250px;
   min-width: 250px;
   max-width: 250px;
+  height: 100%;
   background-color: var(--bg-main-color);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
   transition: transform 0.3s ease-in-out;
+  overflow-x: hidden;
 
   .td-filter-tool {
     display: flex;
@@ -155,8 +159,10 @@ export default {
 
   .td-tool-group {
     flex: 1;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     width: 100%;
+    max-height: calc(100vh - 60px);
     padding-top: var(--padding);
     scrollbar-width: thin;
     scrollbar-color: var(--scroll-thumb-color) transparent;
