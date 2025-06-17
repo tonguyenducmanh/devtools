@@ -1,6 +1,9 @@
 <template>
   <div class="flex td-header-container">
-    <div class="td-app-name">{{ $t("i18nGlobal.appinfo.appName") }}</div>
+    <div class="flex td-app-name">
+      <div class="td-logo"></div>
+      <div>{{ $t("i18nGlobal.appinfo.appName") }}</div>
+    </div>
     <div>
       <div class="td-header-btn">
         <div
@@ -124,9 +127,16 @@ export default {
   height: 100%;
   background-color: var(--bg-main-color);
   justify-content: space-between;
-  padding: var(--padding) calc(var(--padding) * 3);
+  padding: var(--padding) calc(var(--padding) * 2);
   .td-app-name {
     font-weight: 600;
+    column-gap: var(--padding);
+    .td-logo {
+      width: 40px;
+      height: 40px;
+      background: url(@/assets/favicon.ico);
+      background-size: cover;
+    }
   }
   .td-header-btn {
     position: relative;
