@@ -143,7 +143,7 @@ const routerConfig = [
     component: () => import("@/views/tools/TDImageToBase64.vue"),
     meta: {
       titleKey: "i18nCommon.feature.ImageToBase64",
-      icon: "td-icon",
+      icon: "td-icon-base64-to-image",
     },
   },
 
@@ -168,7 +168,7 @@ const routerConfig = [
     component: () => import("@/views/tools/TDQRCodeToText.vue"),
     meta: {
       titleKey: "i18nCommon.feature.QRCodeToText",
-      icon: "td-icon",
+      icon: "td-icon-qr-to-text",
     },
   },
   {
@@ -180,7 +180,7 @@ const routerConfig = [
     component: () => import("@/views/tools/TDDownloadVSCodeExt.vue"),
     meta: {
       titleKey: "i18nCommon.feature.DownloadVSCodeExtension",
-      icon: "td-icon",
+      icon: "td-icon-download",
     },
   },
   {
@@ -192,7 +192,7 @@ const routerConfig = [
     component: () => import("@/views/tools/TDUUIDv4Generator.vue"),
     meta: {
       titleKey: "i18nCommon.feature.UUIDV4Generator",
-      icon: "td-icon",
+      icon: "td-icon-uuid",
     },
   },
 ];
