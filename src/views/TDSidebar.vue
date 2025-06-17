@@ -21,10 +21,12 @@
             activeClass="td-item-active"
             :id="index"
             :to="item.pathVisible ?? item.path"
-            ><span class="td-item-content">{{
-              $t(item.meta.titleKey)
-            }}</span></RouterLink
           >
+            <div class="flex td-item-content">
+              <div class="td-icon" :class="item.meta.icon"></div>
+              <div>{{ $t(item.meta.titleKey) }}</div>
+            </div>
+          </RouterLink>
         </template>
       </div>
     </div>
@@ -98,6 +100,8 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@use "@/styles/icon.scss";
+
 .td-sidebar-container {
   position: relative;
   padding-top: calc(var(--padding) * 1.5);
@@ -139,6 +143,8 @@ export default {
     position: relative;
     overflow: hidden;
     .td-item-content {
+      justify-content: flex-start;
+      column-gap: var(--padding);
       width: 100%;
       padding: var(--padding);
       border-radius: calc(var(--border-radius) * 1.5);
