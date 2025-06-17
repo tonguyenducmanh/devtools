@@ -43,7 +43,10 @@
         ></TDTextarea>
       </div>
       <div class="flex">
-        <TDButton @click="mappingNow" :label="$t('i18nCommon.jsonMapping.mappingButton')"></TDButton>
+        <TDButton
+          @click="mappingNow"
+          :label="$t('i18nCommon.jsonMapping.mappingButton')"
+        ></TDButton>
         <TDButton
           @click="formatResult"
           :type="$tdEnum.buttonType.secondary"
@@ -362,7 +365,7 @@ export default {
   height: 100%;
   padding: 2rem;
   border-radius: 0;
-  min-height: 100vh;
+
   box-shadow: none;
 }
 .td-mapping-group {

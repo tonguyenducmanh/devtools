@@ -9,8 +9,14 @@
         v-model="uuidv4Result"
       />
       <div class="flex">
-        <TDButton @click="handleGenerate" :label="$t('i18nCommon.uuidGenerator.buttons.generate')"></TDButton>
-        <TDButton @click="haddleCopyEvent" :label="$t('i18nCommon.uuidGenerator.buttons.copy')"></TDButton>
+        <TDButton
+          @click="handleGenerate"
+          :label="$t('i18nCommon.uuidGenerator.buttons.generate')"
+        ></TDButton>
+        <TDButton
+          @click="haddleCopyEvent"
+          :label="$t('i18nCommon.uuidGenerator.buttons.copy')"
+        ></TDButton>
       </div>
     </div>
   </div>
@@ -48,7 +54,7 @@ export default {
   height: 100%;
   padding: 2rem;
   border-radius: 0;
-  min-height: 100vh;
+
   box-shadow: none;
 }
 .td-uuid-generator {

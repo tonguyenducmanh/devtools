@@ -129,7 +129,7 @@ body[data-theme="dark"] .description {
 
 .language-btn {
   padding: 8px 16px;
-  border: 2px solid transparent;
+  border: 1px solid transparent;
   border-radius: 8px;
   background: var(--btn-secondary-color);
   color: var(--btn-secondary-text-color);

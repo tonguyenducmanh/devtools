@@ -392,7 +392,7 @@ export default {
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 

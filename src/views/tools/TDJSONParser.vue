@@ -286,7 +286,7 @@ export default {
   height: 100%;
   padding: 2rem;
   border-radius: 0;
-  min-height: 100vh;
+
   box-shadow: none;
   display: flex;
   flex-direction: column;
@@ -308,7 +308,7 @@ h1 {
   max-width: 500px;
   min-height: 400px;
   max-height: 400px;
-  border: 2px dashed var(--bg-active-color);
+  border: 1px dashed var(--bg-active-color);
   padding: 1.5rem;
   text-align: center;
   border-radius: 8px;

@@ -1,18 +1,26 @@
 <template>
   <div class="td-container">
-    <TDSidebar />
-    <div class="td-main">
-      <RouterView />
+    <div class="td-header-wrap">
+      <TDHeader />
+    </div>
+    <div class="flex td-content-wrap">
+      <div class="td-sidebar-wrap">
+        <TDSidebar />
+      </div>
+      <div class="td-main">
+        <RouterView />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import TDHeader from "@/views/TDHeader.vue";
 import TDSidebar from "@/views/TDSidebar.vue";
 import "@/common/TDPrototype.js";
 import TDAppStartup from "@/common/TDAppStartup.js";
 export default {
-  components: { TDSidebar },
+  components: { TDHeader, TDSidebar },
   created() {
     let me = this;
     me.logSomeInfo();
@@ -63,16 +71,40 @@ export default {
 @use "@/styles/main.scss";
 .td-container {
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   font-size: var(--font-size-medium);
-  .td-main {
-    display: flex;
-    flex-direction: column;
+  background-color: var(--bg-layer-color);
+  .td-header-wrap {
+    border-radius: calc(var(--border-radius) * 2);
+    width: 100%;
+    height: 50px;
+  }
+  .td-content-wrap {
+    padding: var(--padding);
+    column-gap: var(--padding);
     width: 100%;
     height: 100%;
-    overflow: auto;
-    position: relative;
+    .td-sidebar-wrap {
+      border-radius: calc(var(--border-radius) * 2);
+      background-color: var(--bg-main-color);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .td-main {
+      padding: var(--padding);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      position: relative;
+      border-radius: calc(var(--border-radius) * 2);
+      background-color: var(--bg-main-color);
+    }
   }
 }
 </style>

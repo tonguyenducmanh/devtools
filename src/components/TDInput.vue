@@ -89,7 +89,7 @@ export default {
     padding-bottom: var(--padding);
   }
   input {
-    border: 2px solid var(--border-color);
+    border: 1px solid var(--border-color);
     width: 100%;
     padding: var(--padding);
     border-radius: var(--border-radius);
@@ -100,7 +100,7 @@ export default {
 
   input:focus {
     outline: none;
-    border: 2px solid var(--focus-color);
+    border: 1px solid var(--focus-color);
   }
 }
 .td-input-read-only input {

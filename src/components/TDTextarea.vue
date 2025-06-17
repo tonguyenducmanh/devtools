@@ -128,7 +128,7 @@ export default {
     padding-bottom: var(--padding);
   }
   textarea {
-    border: 2px solid var(--border-color);
+    border: 1px solid var(--border-color);
     width: 100%;
     height: 100%;
     padding: var(--padding);
@@ -140,7 +140,7 @@ export default {
 
   textarea:focus {
     outline: none;
-    border: 2px solid var(--focus-color);
+    border: 1px solid var(--focus-color);
   }
   .drag-over {
     outline: 2px dashed black;

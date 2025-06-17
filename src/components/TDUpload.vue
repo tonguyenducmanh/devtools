@@ -112,7 +112,7 @@ export default {
 .td-upload {
   display: flex;
   align-items: center;
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
   width: 100%;
   height: 100%;
   padding: var(--padding);
@@ -122,12 +122,12 @@ export default {
   font-size: var(--font-size-medium);
 }
 .td-upload:hover {
-  border: 2px solid var(--focus-color);
+  border: 1px solid var(--focus-color);
 }
 .td-upload-read-only {
   background-color: var(--bg-sub-color);
   color: var(--text-secondary-color);
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
 }
 .td-upload-button {
   padding: var(--padding);

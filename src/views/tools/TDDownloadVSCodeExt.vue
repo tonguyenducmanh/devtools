@@ -8,8 +8,16 @@
       <div class="flex flex-wrap">
         <img class="td-img" src="@/assets/vscodeext.png" />
       </div>
-      <TDInput :label="$t('i18nCommon.downloadVSCodeExt.itemName')" type="text" v-model="itemName" />
-      <TDInput :label="$t('i18nCommon.downloadVSCodeExt.version')" type="text" v-model="version" />
+      <TDInput
+        :label="$t('i18nCommon.downloadVSCodeExt.itemName')"
+        type="text"
+        v-model="itemName"
+      />
+      <TDInput
+        :label="$t('i18nCommon.downloadVSCodeExt.version')"
+        type="text"
+        v-model="version"
+      />
       <TDInput
         :label="$t('i18nCommon.downloadVSCodeExt.downloadLink')"
         :readOnly="true"
@@ -90,7 +98,7 @@ export default {
   height: 100%;
   padding: 2rem;
   border-radius: 0;
-  min-height: 100vh;
+
   box-shadow: none;
 }
 .td-img {

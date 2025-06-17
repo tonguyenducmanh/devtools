@@ -81,7 +81,7 @@ export default {
     }
 
     &:checked {
-      border: 2px solid var(--btn-color);
+      border: 1px solid var(--btn-color);
       background-color: var(--btn-color);
 
       &::before {

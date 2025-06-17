@@ -72,7 +72,7 @@ export default {
   transform: scale(0.98);
 }
 .td-button:focus {
-  border: 2px solid var(--focus-color);
+  border: 1px solid var(--focus-color);
   box-sizing: border-box;
 }
 
@@ -88,7 +88,7 @@ export default {
   background-color: var(--btn-secondary-focus-color);
 }
 .td-button-secondary:focus {
-  border: 2px solid var(--btn-secondary-focus-color);
+  border: 1px solid var(--btn-secondary-focus-color);
 }
 
 .td-button-readonly {

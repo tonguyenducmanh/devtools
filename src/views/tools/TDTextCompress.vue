@@ -25,8 +25,14 @@
       />
     </div>
     <div class="flex group-btn">
-      <TDButton @click="handleCompress" :label="$t('i18nCommon.textCompress.buttons.compress')"></TDButton>
-      <TDButton @click="handleDempress" :label="$t('i18nCommon.textCompress.buttons.decompress')"></TDButton>
+      <TDButton
+        @click="handleCompress"
+        :label="$t('i18nCommon.textCompress.buttons.compress')"
+      ></TDButton>
+      <TDButton
+        @click="handleDempress"
+        :label="$t('i18nCommon.textCompress.buttons.decompress')"
+      ></TDButton>
       <TDButton
         @click="applyMock"
         :type="$tdEnum.buttonType.secondary"
@@ -68,15 +74,19 @@ export default {
         ratio = this.inputSource.length / this.outputSource.length;
       }
       let percentRatio = Math.round(ratio * 100).toFixed(2);
-      return this.$t('i18nCommon.textCompress.stats.ratio', [percentRatio]);
+      return this.$t("i18nCommon.textCompress.stats.ratio", [percentRatio]);
     },
     inputLengthText() {
       let sourceLength = this.inputSource ? this.inputSource.length : 0;
-      return this.$t('i18nCommon.textCompress.stats.inputLength', [sourceLength]);
+      return this.$t("i18nCommon.textCompress.stats.inputLength", [
+        sourceLength,
+      ]);
     },
     outputLengthText() {
       let sourceLength = this.outputSource ? this.outputSource.length : 0;
-      return this.$t('i18nCommon.textCompress.stats.outputLength', [sourceLength]);
+      return this.$t("i18nCommon.textCompress.stats.outputLength", [
+        sourceLength,
+      ]);
     },
   },
   mounted() {},
@@ -142,7 +152,7 @@ export default {
   height: 100%;
   padding: 2rem;
   border-radius: 0;
-  min-height: 100vh;
+
   box-shadow: none;
 }
 .compress-input {
