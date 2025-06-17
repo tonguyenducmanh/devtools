@@ -163,22 +163,6 @@ export default {
     overflow-x: hidden;
     width: 100%;
     max-height: calc(100vh - 60px);
-    padding-top: var(--padding);
-    scrollbar-width: thin;
-    scrollbar-color: var(--scroll-thumb-color) transparent;
-
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background-color: var(--scroll-thumb-color);
-      border-radius: 3px;
-    }
   }
 }
 
