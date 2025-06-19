@@ -39,6 +39,11 @@
           class="max-length-input"
           :placeHolder="$t('i18nCommon.textToQRCode.input.maxLength')"
         />
+        <TDCheckbox
+          v-model="isCompressText"
+          :label="$t('i18nCommon.textToQRCode.compressText')"
+          @input="toggleCompressText"
+        ></TDCheckbox>
       </div>
     </div>
     <div v-if="textGenQR" class="qrcode-section">
@@ -46,7 +51,12 @@
         <template v-for="(item, index) in qrCodeItems">
           <div class="qr-container">
             <div class="qr-header">
-              <span>{{ $t('i18nCommon.textToQRCode.part', [index + 1, qrCodeItems.length]) }}</span>
+              <span>{{
+                $t("i18nCommon.textToQRCode.part", [
+                  index + 1,
+                  qrCodeItems.length,
+                ])
+              }}</span>
               <TDButton
                 @click="downloadQRCode(item.src, index)"
                 :type="$tdEnum.buttonType.secondary"
@@ -64,6 +74,8 @@
 <script>
 import QRCode from "qrcode";
 import JSZip from "jszip";
+import TDCompress from "@/common/compress/TDCompress.js";
+
 export default {
   name: "TDTextToQRCode",
   created() {
@@ -82,6 +94,12 @@ export default {
       );
       this.$tdUtility.applyMock(this, TDMockTextToQRCode);
     },
+    async toggleCompressText() {
+      let me = this;
+      if (me.textGenQR) {
+        await me.generateQRCode(null);
+      }
+    },
     /**
      * Tạo QR code từ text
      */
@@ -96,7 +114,7 @@ export default {
 
       // Lấy giá trị từ các input
       let text = me.getUserInput(textInput);
-      let textBuild = me.buildTextBeforeGenQR(text);
+      let textBuild = await me.buildTextBeforeGenQR(text);
 
       // Lưu text vào lịch sử nếu khác với lần lưu trước
       await me.$refs.history.saveToHistory(text);
@@ -127,9 +145,16 @@ export default {
     /**
      * Tiền xử lý text trước khi tạo QR code
      */
-    buildTextBeforeGenQR(text) {
+    async buildTextBeforeGenQR(text) {
       let me = this;
-      return text;
+      let textTransformed = text;
+      if (me.isCompressText && textTransformed) {
+        textTransformed = await TDCompress.compressText(
+          text,
+          me.$tdEnum.compressType.gzip
+        );
+      }
+      return textTransformed;
     },
 
     /**
@@ -224,6 +249,10 @@ export default {
       textGenQR: null,
       qrCodeItems: [],
       maxLengthUserConfig: null,
+      isCompressText:
+        window.__env &&
+        window.__env.textToQRConfig &&
+        window.__env.textToQRConfig.isCompressText,
     };
   },
 };

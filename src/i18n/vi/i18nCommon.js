@@ -192,6 +192,7 @@ export default {
         example: "Ví dụ",
       },
       part: "Phần {0}/{1}",
+      compressText: "Nén dữ liệu (gzip)",
     },
     qrCodeToText: {
       title: "Công cụ chuyển đổi mã QR sang văn bản!",

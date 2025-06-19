@@ -3,7 +3,7 @@
  */
 (function (window) {
   window.__env = window.__env || {};
-  window.__env.version = "v1.1.4";
+  window.__env.version = "v1.1.5";
   window.__env.defaultValue = {
     theme: "light",
   };
@@ -11,6 +11,7 @@
     maxTextOneChunk: 1000,
     maxHistoryLength: 100,
     maxTitleLength: 50,
+    isCompressText: true,
   };
   window.__env.githubSource = {
     url: "https://github.com/tonguyenducmanh/utility-for-dev",
