@@ -190,6 +190,7 @@ export default {
         generate: "Generate QR Code",
         downloadAll: "Download All",
         download: "Download",
+        copyImage: "Copy",
         example: "Example",
       },
       part: "Part {0}/{1}",

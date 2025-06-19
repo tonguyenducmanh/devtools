@@ -166,6 +166,26 @@ class TDUtility {
     }
     return obj;
   }
+
+  /**
+   * copy ảnh từ url
+   */
+  async copyImageFromUrl(imageUrl) {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+
+      await this.copyImageFromBlob(blob);
+    } catch (error) {
+      console.error("❌ Lỗi khi copy ảnh:", error);
+    }
+  }
+  /**
+   * copy ảnh từ blob
+   */
+  async copyImageFromBlob(blob) {
+    await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+  }
   /**
    * Tạo file tải xuống từ buffer
    */
@@ -228,7 +248,7 @@ class TDUtility {
     const propNames = Object.getOwnPropertyNames(obj);
 
     // Đóng băng các thuộc tính trước khi đóng băng object cha
-    propNames.forEach(name => {
+    propNames.forEach((name) => {
       const prop = obj[name];
 
       // Nếu prop là object và không null, đệ quy đóng băng nó

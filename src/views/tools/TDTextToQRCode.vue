@@ -58,6 +58,12 @@
                 ])
               }}</span>
               <TDButton
+                @click="copyQRCode(item.src, index)"
+                :type="$tdEnum.buttonType.secondary"
+                :label="$t('i18nCommon.textToQRCode.buttons.copyImage')"
+                class="download-btn"
+              ></TDButton>
+              <TDButton
                 @click="downloadQRCode(item.src, index)"
                 :type="$tdEnum.buttonType.secondary"
                 :label="$t('i18nCommon.textToQRCode.buttons.download')"
@@ -242,6 +248,15 @@ export default {
         dataUrl,
         `qrcode-part-${index + 1}.png`
       );
+    },
+    /**
+     * Copy ảnh từ url
+     * @param {string} dataUrl - Data URL của QR code
+     */
+    copyQRCode(dataUrl, index) {
+      let me = this;
+      // Tạo blob và mở popup tải file
+      me.$tdUtility.copyImageFromUrl(dataUrl);
     },
   },
   data() {

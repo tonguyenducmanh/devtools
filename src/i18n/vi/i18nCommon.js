@@ -189,6 +189,7 @@ export default {
         generate: "Tạo mã QR",
         downloadAll: "Tải xuống tất cả",
         download: "Tải xuống",
+        copyImage: "Sao chép",
         example: "Ví dụ",
       },
       part: "Phần {0}/{1}",
