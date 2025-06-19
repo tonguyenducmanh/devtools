@@ -28,6 +28,30 @@ const routerConfig = [
   },
   {
     /**
+     * chuyển đổi văn bản thành mã QR
+     */
+    path: "/textoqrcode",
+    name: "textoqrcode",
+    component: () => import("@/views/tools/TDTextToQRCode.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.QRCodeFromText",
+      icon: "td-icon-qr",
+    },
+  },
+  {
+    /**
+     * chuyển đổi mã QR thành văn bản
+     */
+    path: "/qrcodetotext",
+    name: "qrcodetotext",
+    component: () => import("@/views/tools/TDQRCodeToText.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.QRCodeToText",
+      icon: "td-icon-qr-to-text",
+    },
+  },
+  {
+    /**
      * Tnén text bằng 1 số thuật toán phổ biến
      */
     path: "/TDTextCompress",
@@ -60,6 +84,18 @@ const routerConfig = [
     meta: {
       titleKey: "i18nCommon.feature.colorPicker",
       icon: "td-icon-color-picker",
+    },
+  },
+  {
+    /**
+     * PostgreSQL Formatter
+     */
+    path: "/codeformatter",
+    name: "codeformatter",
+    component: () => import("@/views/tools/TDCodeFormatter.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.CodeFormatter",
+      icon: "td-icon",
     },
   },
   {
@@ -112,18 +148,6 @@ const routerConfig = [
   },
   {
     /**
-     * PostgreSQL Formatter
-     */
-    path: "/codeformatter",
-    name: "codeformatter",
-    component: () => import("@/views/tools/TDCodeFormatter.vue"),
-    meta: {
-      titleKey: "i18nCommon.feature.CodeFormatter",
-      icon: "td-icon",
-    },
-  },
-  {
-    /**
      * chuyển đổi base 64 thành ảnh
      */
     path: "/base64toimage",
@@ -144,31 +168,6 @@ const routerConfig = [
     meta: {
       titleKey: "i18nCommon.feature.ImageToBase64",
       icon: "td-icon-base64-to-image",
-    },
-  },
-
-  {
-    /**
-     * chuyển đổi văn bản thành mã QR
-     */
-    path: "/textoqrcode",
-    name: "textoqrcode",
-    component: () => import("@/views/tools/TDTextToQRCode.vue"),
-    meta: {
-      titleKey: "i18nCommon.feature.QRCodeFromText",
-      icon: "td-icon-qr",
-    },
-  },
-  {
-    /**
-     * chuyển đổi mã QR thành văn bản
-     */
-    path: "/qrcodetotext",
-    name: "qrcodetotext",
-    component: () => import("@/views/tools/TDQRCodeToText.vue"),
-    meta: {
-      titleKey: "i18nCommon.feature.QRCodeToText",
-      icon: "td-icon-qr-to-text",
     },
   },
   {
