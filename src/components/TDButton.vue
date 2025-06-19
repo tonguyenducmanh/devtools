@@ -60,16 +60,15 @@ export default {
   overflow-wrap: normal; /* Allows breaking long words */
   word-break: keep-all; /* For wider browser support */
   white-space: nowrap; /* Ensure wrapping is enabled */
+  border: 1px solid transparent;
 }
 
 .td-button:hover {
   background-color: var(--focus-color);
-  transform: scale(1.01);
 }
 
 .td-button:active {
   background-color: var(--focus-color);
-  transform: scale(0.98);
 }
 .td-button:focus {
   border: 1px solid var(--focus-color);
