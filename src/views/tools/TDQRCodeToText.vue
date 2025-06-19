@@ -1,10 +1,7 @@
 <template>
-  <div class="container">
+  <div class="flex flex-col container">
     <div class="title">{{ $t("i18nCommon.qrCodeToText.title") }}</div>
-    <div class="qr-section">
-      <div class="flex">
-        <img class="td-img" src="@/assets/qrcodeupload.png" />
-      </div>
+    <div class="flex flex-col qr-section">
       <div>
         {{ $t("i18nCommon.qrCodeToText.note") }}
       </div>
@@ -15,7 +12,7 @@
         @drop="handleDrop"
         ref="uploadArea"
         class="upload-area"
-        maxHeight="200px"
+        maxHeight="60px"
         :labelEmpty="$t('i18nCommon.qrCodeToText.dropZone.placeholder')"
         :label="$t('i18nCommon.qrCodeToText.dropZone.label')"
         multiple
@@ -41,7 +38,6 @@
         :placeHolder="$t('i18nCommon.qrCodeToText.result')"
         v-model="textOutput"
         :readOnly="true"
-        height="200px"
       ></TDTextarea>
     </div>
   </div>
@@ -169,8 +165,12 @@ export default {
 };
 </script>
 <style scoped>
+.container {
+  height: 100%;
+}
 .qr-section {
   padding: var(--padding);
+  flex: 1;
 }
 
 .td-img {
@@ -178,5 +178,9 @@ export default {
   max-width: 1000px;
   height: auto;
   padding: var(--padding);
+}
+
+.input-area {
+  flex: 1;
 }
 </style>
