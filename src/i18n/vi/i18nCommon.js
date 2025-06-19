@@ -204,6 +204,7 @@ export default {
       convert: "Chuyển đổi",
       copy: "Sao chép",
       result: "Kết quả sẽ xuất hiện sau khi paste ảnh",
+      compressText: "Là dữ liệu nén (gzip)",
     },
     oneTimePassword: {
       title: "Mật khẩu một lần theo thời gian (TOTP) và theo HMAC (HOTP)!",

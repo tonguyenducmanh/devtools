@@ -205,6 +205,7 @@ export default {
       convert: "Convert",
       copy: "Copy",
       result: "Result will appear after pasting image",
+      compressText: "Is Compressed text (gzip)",
     },
     oneTimePassword: {
       title: "Time-based (TOTP) and HMAC-based (HOTP) One-Time Password!",

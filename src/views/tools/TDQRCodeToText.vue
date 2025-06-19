@@ -21,12 +21,20 @@
         multiple
       ></TDUpload>
       <div class="flex button-generate">
-        <TDButton @click="convertQRCode" :label="$t('i18nCommon.qrCodeToText.convert')"></TDButton>
+        <TDButton
+          @click="convertQRCode"
+          :label="$t('i18nCommon.qrCodeToText.convert')"
+        ></TDButton>
         <TDButton
           @click="copyResult"
           :type="$tdEnum.buttonType.secondary"
           :label="$t('i18nCommon.qrCodeToText.copy')"
         ></TDButton>
+        <TDCheckbox
+          v-model="isCompressText"
+          :label="$t('i18nCommon.qrCodeToText.compressText')"
+          @input="convertQRCode"
+        ></TDCheckbox>
       </div>
       <TDTextarea
         class="input-area"
@@ -39,6 +47,8 @@
   </div>
 </template>
 <script>
+import TDCompress from "@/common/compress/TDCompress.js";
+
 export default {
   name: "TDQRCodeToText",
   created() {
@@ -114,7 +124,23 @@ export default {
         // Lọc kết quả hợp lệ
         let result = await imagesQRToText(me.$refs.uploadArea);
         if (result && result.length > 0) {
-          me.textOutput = result.join("");
+          if (me.isCompressText) {
+            let decompressedTexts = [];
+            for (let i = 0; i < result.length; i++) {
+              let temp = await TDCompress.decompressText(
+                result[i],
+                me.$tdEnum.compressType.gzip
+              );
+              if (temp) {
+                decompressedTexts.push(temp);
+              }
+            }
+            if (decompressedTexts && decompressedTexts.length > 0) {
+              me.textOutput = decompressedTexts.join("");
+            }
+          } else {
+            me.textOutput = result.join("");
+          }
         }
       }
     },
@@ -134,6 +160,10 @@ export default {
       historyItems: [],
       qrCodeItems: [],
       isDragOver: false,
+      isCompressText:
+        window.__env &&
+        window.__env.textToQRConfig &&
+        window.__env.textToQRConfig.isCompressText,
     };
   },
 };
