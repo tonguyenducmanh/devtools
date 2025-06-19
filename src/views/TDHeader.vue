@@ -15,7 +15,6 @@
         <div class="noselect language-session" @click="changeLanguage">
           {{ currentLanguage }}
         </div>
-        <div v-if="versionApp">{{ versionApp }}</div>
       </div>
     </div>
   </div>
@@ -27,15 +26,7 @@ import { loadLocale } from "@/i18n/i18nData.js";
 export default {
   name: "TDHeader",
   components: {},
-  computed: {
-    versionApp() {
-      let version = "v1.0.0";
-      if (window && window.__env && window.__env.version) {
-        version = window.__env.version;
-      }
-      return version;
-    },
-  },
+  computed: {},
   created() {
     let me = this;
     me.processWhenCreated();

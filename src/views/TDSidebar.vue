@@ -39,15 +39,7 @@ import { routerConfig } from "@/router/router.js";
 export default {
   name: "TDSidebar",
   components: {},
-  computed: {
-    versionApp() {
-      let version = "v1.0.0";
-      if (window && window.__env && window.__env.version) {
-        version = window.__env.version;
-      }
-      return version;
-    },
-  },
+  computed: {},
   created() {
     let me = this;
     me.processWhenCreated();
