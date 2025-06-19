@@ -52,7 +52,7 @@ const routerConfig = [
   },
   {
     /**
-     * Tnén text bằng 1 số thuật toán phổ biến
+     * Nén text bằng 1 số thuật toán phổ biến
      */
     path: "/TDTextCompress",
     name: "TDTextCompress",
