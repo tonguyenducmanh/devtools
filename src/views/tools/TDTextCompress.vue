@@ -1,19 +1,15 @@
 <template>
-  <div class="container">
+  <div class="flex flex-col container">
     <div class="title">{{ $t("i18nCommon.textCompress.title") }}</div>
-    <div class="flex flex-wrap paste-box">
+    <div class="paste-box">
       <div class="flex compress-input">
         <TDTextarea
           :placeHolder="$t('i18nCommon.textCompress.input.compress')"
           v-model="inputSource"
-          height="400px"
-          width="50%"
         ></TDTextarea>
         <TDTextarea
           :placeHolder="$t('i18nCommon.textCompress.input.decompress')"
           v-model="outputSource"
-          height="400px"
-          width="50%"
         ></TDTextarea>
       </div>
     </div>
@@ -150,13 +146,18 @@ export default {
 .container {
   width: 100%;
   height: 100%;
-  padding: 2rem;
   border-radius: 0;
 
   box-shadow: none;
 }
+.paste-box {
+  flex: 1;
+  width: 100%;
+}
 .compress-input {
   width: 100%;
+  column-gap: var(--padding);
+  height: 100%;
 }
 .group-btn {
   justify-content: flex-start;

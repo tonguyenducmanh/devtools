@@ -171,6 +171,7 @@ export default {
 .qr-section {
   padding: var(--padding);
   flex: 1;
+  width: 100%;
 }
 
 .td-img {
