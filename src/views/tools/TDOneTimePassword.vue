@@ -631,6 +631,7 @@ export default {
     .otp-value {
       font-size: 30px;
       color: var(--focus-color);
+      font-weight: 700;
       cursor: pointer;
     }
     .otp-value:active {

@@ -48,7 +48,7 @@ export const TDCacheConfig = {
   },
   IsShowSidebar: {
     KeyFormat: "IsShowSidebar",
-    CacheLevel: tdEnum.cacheType.local,
+    CacheLevel: tdEnum.cacheType.inMemory,
     ExpireTime: 0,
     Note: "cài đặt hiển thị sidebar",
   },
@@ -66,7 +66,7 @@ export const TDCacheConfig = {
   },
   LastOneTimeAuthenPassword: {
     KeyFormat: "LastOneTimeAuthenPassword",
-    CacheLevel: tdEnum.cacheType.inMemory,
+    CacheLevel: tdEnum.cacheType.session,
     ExpireTime: 0,
     Note: "mật khẩu đăng nhập xác thực theo user, chỉ được phép lưu trong mem",
   },
