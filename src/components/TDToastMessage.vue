@@ -152,7 +152,8 @@ export default {
 .toast {
   font-size: var(--font-size-medium);
   background-color: var(--bg-main-color);
-  border-radius: var(--border-radius);
+  border-radius: calc(var(--border-radius) * 1.5);
+
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--border-color);
   padding: 16px;
@@ -164,31 +165,6 @@ export default {
   overflow: hidden;
   pointer-events: auto;
   margin-top: 10px;
-}
-
-.toast::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 5px;
-}
-
-.td-toast-success::before {
-  background: #10b981;
-}
-
-.td-toast-error::before {
-  background: #ef4444;
-}
-
-.td-toast-warning::before {
-  background: #f59e0b;
-}
-
-.td-toast-info::before {
-  background: #3b82f6;
 }
 
 .td-toast-content {
