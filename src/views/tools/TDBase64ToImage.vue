@@ -65,7 +65,6 @@ export default {
         me.srcImg = me.base64Result;
         me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
       } catch (error) {
-        console.log("Invalid Base64 string");
         me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
       }
     },

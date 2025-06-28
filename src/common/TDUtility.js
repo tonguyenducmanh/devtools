@@ -163,13 +163,10 @@ class TDUtility {
     try {
       obj = JSON.parse(source);
     } catch (error) {
-      console.log(
-        "Đã có lỗi khi try parse mặc định, chuyển qua sử dụng JSON5" + error
-      );
       try {
         obj = JSON5.parse(source);
-      } catch (error) {
-        console.log("Không thể try parse được bằng JSON5" + error);
+      } catch (errorSub) {
+        console.error("Không thể try parse được bằng JSON5" + errorSub);
       }
     }
     return obj;

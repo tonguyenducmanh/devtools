@@ -132,10 +132,8 @@ export default {
       let me = this;
       let history = await me.$tdCache.get(me.cacheKey);
       if (history) {
-        if (Array.isArray(history)) {
+        if (!Array.isArray(history)) {
           // Nếu history là mảng, không cần xử lý gì thêm
-          console.log("History is already an array.");
-        } else {
           history = JSON.parse(history);
         }
       } else {

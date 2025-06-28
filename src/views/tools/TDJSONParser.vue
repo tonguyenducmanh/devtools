@@ -136,7 +136,6 @@ export default {
       let result = 600;
       if (me.$refs && me.$refs.resultBox) {
         let boucing = me.$refs.resultBox.getBoundingClientRect();
-        console.log(boucing);
         if (boucing && boucing.height) {
           result = boucing.height - 10;
         }

@@ -175,9 +175,6 @@ export default {
       }
 
       try {
-        console.log(
-          "Không phải JSON chuẩn, thử xử lý đặc biệt (có hỗ trợ đệ quy):"
-        );
         const trimmedValue = value.trim();
         if (!trimmedValue.startsWith("{") || !trimmedValue.endsWith("}")) {
           console.warn(
@@ -260,7 +257,7 @@ export default {
 
         return result;
       } catch (ex) {
-        console.log(ex);
+        console.error(ex);
       }
     },
     unquote(str) {
