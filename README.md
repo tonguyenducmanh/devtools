@@ -35,7 +35,17 @@ To setup this project
 npm i
 ```
 
-To Run and Build project
+To add new release on github, example version is v1.2.5
+
+```
+git tag v1.2.5
+```
+
+```
+git push && git push --tags
+```
+
+To Run and Build project local
 
 For web version
 
