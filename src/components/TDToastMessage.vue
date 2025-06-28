@@ -2,7 +2,7 @@
 <template>
   <teleport to="body">
     <div class="td-toast-container">
-      <transition-group name="toast" tag="div">
+      <transition-group name="td-toast" tag="div">
         <div
           v-for="toast in toasts"
           :key="toast.id"
