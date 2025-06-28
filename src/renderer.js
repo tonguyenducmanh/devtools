@@ -14,6 +14,7 @@ import TDRadioGroup from "@/components/TDRadioGroup.vue";
 import TDHistory from "@/components/TDHistory.vue";
 import i18nData, { loadLocale } from "@/i18n/i18nData.js";
 import eventBus from "@/common/event/TDEventBus.js";
+import ToastPlugin from "@/common/TDToastUtil.js";
 
 // Async IIFE
 (async () => {
@@ -40,6 +41,9 @@ import eventBus from "@/common/event/TDEventBus.js";
 
   // globalization language
   currentApp.use(i18nData);
+
+  // using toastmessage
+  currentApp.use(ToastPlugin);
 
   // Lấy ngôn ngữ hiện tại
   let currentLanguage = await cache.get(enumeration.cacheConfig.Language);
