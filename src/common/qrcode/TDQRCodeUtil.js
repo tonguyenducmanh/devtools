@@ -792,9 +792,6 @@ export async function imagesQRToText(uploadArea, options = {}) {
     const successfulResults = validateResults
       ? results.filter((r) => r.success).map((r) => r.text)
       : results;
-
-    const successCount = results.filter((r) => r.success).length;
-
     return returnDetailedResults ? results : successfulResults;
   } catch (error) {
     console.error("❌ Lỗi trong quá trình xử lý:", error);
