@@ -240,5 +240,9 @@ export default {
         button: "Remove",
       },
     },
+    toastMessage: {
+      copy: "Copied",
+      converted: "Converted",
+    },
   },
 };

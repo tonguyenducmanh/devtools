@@ -1,15 +1,15 @@
 <!-- components/ToastContainer.vue -->
 <template>
   <teleport to="body">
-    <div class="toast-container">
+    <div class="td-toast-container">
       <transition-group name="toast" tag="div">
         <div
           v-for="toast in toasts"
           :key="toast.id"
-          :class="['toast', `toast-${toast.type}`]"
+          :class="['toast', `td-toast-${toast.type}`]"
         >
-          <div class="toast-content">
-            <div class="toast-icon">
+          <div class="td-toast-content">
+            <div class="td-toast-icon">
               <svg
                 v-if="toast.type === 'success'"
                 viewBox="0 0 20 20"
@@ -51,14 +51,14 @@
                 />
               </svg>
             </div>
-            <div class="toast-message">
-              <div class="toast-title">{{ toast.title }}</div>
-              <div v-if="toast.message" class="toast-text">
+            <div class="td-toast-message">
+              <div class="td-toast-title">{{ toast.title }}</div>
+              <div v-if="toast.message" class="td-toast-text">
                 {{ toast.message }}
               </div>
             </div>
           </div>
-          <button @click="removeToast(toast.id)" class="toast-close">
+          <button @click="removeToast(toast.id)" class="td-toast-close">
             <svg viewBox="0 0 20 20" fill="currentColor">
               <path
                 fill-rule="evenodd"
@@ -135,7 +135,7 @@ export default {
 </script>
 
 <style scoped>
-.toast-container {
+.td-toast-container {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -161,6 +161,7 @@ export default {
   position: relative;
   overflow: hidden;
   pointer-events: auto;
+  margin-top: 10px;
 }
 
 .toast::before {
@@ -172,58 +173,58 @@ export default {
   width: 4px;
 }
 
-.toast-success::before {
+.td-toast-success::before {
   background: #10b981;
 }
 
-.toast-error::before {
+.td-toast-error::before {
   background: #ef4444;
 }
 
-.toast-warning::before {
+.td-toast-warning::before {
   background: #f59e0b;
 }
 
-.toast-info::before {
+.td-toast-info::before {
   background: #3b82f6;
 }
 
-.toast-content {
+.td-toast-content {
   display: flex;
   align-items: flex-start;
   gap: 12px;
   flex: 1;
 }
 
-.toast-icon {
+.td-toast-icon {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
   margin-top: 2px;
 }
 
-.toast-success .toast-icon {
+.td-toast-success .td-toast-icon {
   color: #10b981;
 }
 
-.toast-error .toast-icon {
+.td-toast-error .td-toast-icon {
   color: #ef4444;
 }
 
-.toast-warning .toast-icon {
+.td-toast-warning .td-toast-icon {
   color: #f59e0b;
 }
 
-.toast-info .toast-icon {
+.td-toast-info .td-toast-icon {
   color: #3b82f6;
 }
 
-.toast-message {
+.td-toast-message {
   flex: 1;
   min-width: 0;
 }
 
-.toast-title {
+.td-toast-title {
   font-weight: 600;
   font-size: 14px;
   color: #1f2937;
@@ -231,13 +232,13 @@ export default {
   margin-bottom: 2px;
 }
 
-.toast-text {
+.td-toast-text {
   font-size: 13px;
   color: #6b7280;
   line-height: 1.4;
 }
 
-.toast-close {
+.td-toast-close {
   background: none;
   border: none;
   cursor: pointer;
@@ -254,37 +255,37 @@ export default {
   margin-left: 8px;
 }
 
-.toast-close:hover {
+.td-toast-close:hover {
   background: #f3f4f6;
   color: #6b7280;
 }
 
 /* Animation transitions */
-.toast-enter-active {
+.td-toast-enter-active {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.toast-leave-active {
+.td-toast-leave-active {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.toast-enter-from {
+.td-toast-enter-from {
   opacity: 0;
   transform: translateX(100%) scale(0.95);
 }
 
-.toast-leave-to {
+.td-toast-leave-to {
   opacity: 0;
   transform: translateX(100%) scale(0.95);
 }
 
-.toast-move {
+.td-toast-move {
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Responsive */
 @media (max-width: 480px) {
-  .toast-container {
+  .td-toast-container {
     top: 10px;
     right: 10px;
     left: 10px;
@@ -296,11 +297,11 @@ export default {
     padding: 12px;
   }
 
-  .toast-title {
+  .td-toast-title {
     font-size: 13px;
   }
 
-  .toast-text {
+  .td-toast-text {
     font-size: 12px;
   }
 }

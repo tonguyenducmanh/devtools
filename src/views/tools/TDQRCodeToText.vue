@@ -131,6 +131,9 @@ export default {
             me.textOutput = tempOutput;
           }
         }
+        me.$tdToast.show({
+          message: me.$t("i18nCommon.toastMessage.converted"),
+        });
       }
     },
 
@@ -140,6 +143,9 @@ export default {
     copyResult() {
       let me = this;
       me.$tdUtility.copyToClipboard(me.textOutput);
+      me.$tdToast.show({
+        message: me.$t("i18nCommon.toastMessage.copy"),
+      });
     },
   },
   data() {

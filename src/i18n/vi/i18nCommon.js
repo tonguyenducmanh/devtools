@@ -239,5 +239,9 @@ export default {
         button: "Xóa",
       },
     },
+    toastMessage: {
+      copy: "Đã sao chép",
+      converted: "Đã chuyển đổi",
+    },
   },
 };
