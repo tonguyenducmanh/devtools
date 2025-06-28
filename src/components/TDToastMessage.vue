@@ -233,7 +233,7 @@ export default {
 }
 
 .td-toast-text {
-  font-size: 13px;
+  font-size: 15px;
   color: #6b7280;
   line-height: 1.4;
 }

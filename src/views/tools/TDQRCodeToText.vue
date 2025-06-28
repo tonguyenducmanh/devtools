@@ -143,9 +143,7 @@ export default {
     copyResult() {
       let me = this;
       me.$tdUtility.copyToClipboard(me.textOutput);
-      me.$tdToast.show({
-        message: me.$t("i18nCommon.toastMessage.copy"),
-      });
+      me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.copy"));
     },
   },
   data() {

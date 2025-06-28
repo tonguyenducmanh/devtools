@@ -243,6 +243,9 @@ export default {
     toastMessage: {
       copy: "Copied",
       converted: "Converted",
+      opened: "Opened",
+      saved: "Saved",
+      removed: "Removed",
     },
   },
 };

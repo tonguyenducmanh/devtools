@@ -25,7 +25,10 @@
           multiple
         ></TDUpload>
         <div>
-          <TDButton :label="$t('i18nCommon.oneTimePassword.auth.add')" @click="decodeGoogleAuth" />
+          <TDButton
+            :label="$t('i18nCommon.oneTimePassword.auth.add')"
+            @click="decodeGoogleAuth"
+          />
         </div>
       </div>
       <div v-if="sourceOTPImport == 'google'" class="flex">
@@ -42,9 +45,18 @@
         </div>
       </div>
       <div v-if="sourceOTPImport == 'manual'" class="flex">
-        <TDInput v-model="addNewObject.issuer" :placeHolder="$t('i18nCommon.oneTimePassword.inputs.issuer')" />
-        <TDInput v-model="addNewObject.name" :placeHolder="$t('i18nCommon.oneTimePassword.inputs.name')" />
-        <TDInput v-model="addNewObject.secret" :placeHolder="$t('i18nCommon.oneTimePassword.inputs.secret')" />
+        <TDInput
+          v-model="addNewObject.issuer"
+          :placeHolder="$t('i18nCommon.oneTimePassword.inputs.issuer')"
+        />
+        <TDInput
+          v-model="addNewObject.name"
+          :placeHolder="$t('i18nCommon.oneTimePassword.inputs.name')"
+        />
+        <TDInput
+          v-model="addNewObject.secret"
+          :placeHolder="$t('i18nCommon.oneTimePassword.inputs.secret')"
+        />
         <TDButton
           :readOnly="
             !addNewObject || !addNewObject.name || !addNewObject.secret
@@ -54,7 +66,10 @@
         />
       </div>
       <div class="flex">
-        <TDInput v-model="username" :placeHolder="$t('i18nCommon.oneTimePassword.auth.username')" />
+        <TDInput
+          v-model="username"
+          :placeHolder="$t('i18nCommon.oneTimePassword.auth.username')"
+        />
         <TDInput
           v-model="password"
           :inputType="'password'"
@@ -103,7 +118,11 @@
     </div>
     <div class="flex">
       <TDInput v-model="filterRemove" :placeHolder="placeHolderRemove" />
-      <TDButton :label="$t('i18nCommon.oneTimePassword.remove.button')" :readOnly="!filterRemove" @click="removeByFilter" />
+      <TDButton
+        :label="$t('i18nCommon.oneTimePassword.remove.button')"
+        :readOnly="!filterRemove"
+        @click="removeByFilter"
+      />
     </div>
   </div>
 </template>
@@ -136,7 +155,9 @@ export default {
     },
     placeHolderRemove() {
       let me = this;
-      let result = me.$t('i18nCommon.oneTimePassword.remove.filter', [me.removeAllKey]);
+      let result = me.$t("i18nCommon.oneTimePassword.remove.filter", [
+        me.removeAllKey,
+      ]);
       return result;
     },
     isShowProgress() {
@@ -228,6 +249,7 @@ export default {
     handleCopyEvent(value) {
       let me = this;
       me.$tdUtility.copyToClipboard(value);
+      me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.copy"));
     },
     async processWhenMounted() {
       let me = this;
@@ -378,6 +400,7 @@ export default {
           me.password
         );
         await me.saveUsername();
+        me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.saved"));
       }
     },
     async openAuthenSaved() {
@@ -402,6 +425,7 @@ export default {
           await me.saveUsername();
         }
       }
+      me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.opened"));
     },
     /**
      * Google Authenticator uses protobuff to encode the 2fa data.
@@ -509,6 +533,7 @@ export default {
         if (me.password && me.username && me.autoSave) {
           me.saveAuthen();
         }
+        me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.removed"));
       }
     },
     startProgressTimer() {
@@ -545,9 +570,18 @@ export default {
       removeAllKey: "removeall",
       sourceOTPImport: "googleqrcode",
       radioImports: [
-        { value: "googleqrcode", label: this.$t("i18nCommon.oneTimePassword.importOptions.googleQR") },
-        { value: "google", label: this.$t("i18nCommon.oneTimePassword.importOptions.google") },
-        { value: "manual", label: this.$t("i18nCommon.oneTimePassword.importOptions.manual") },
+        {
+          value: "googleqrcode",
+          label: this.$t("i18nCommon.oneTimePassword.importOptions.googleQR"),
+        },
+        {
+          value: "google",
+          label: this.$t("i18nCommon.oneTimePassword.importOptions.google"),
+        },
+        {
+          value: "manual",
+          label: this.$t("i18nCommon.oneTimePassword.importOptions.manual"),
+        },
       ],
       isDragOver: false,
     };

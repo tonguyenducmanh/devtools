@@ -242,6 +242,9 @@ export default {
     toastMessage: {
       copy: "Đã sao chép",
       converted: "Đã chuyển đổi",
+      opened: "Đã mở",
+      saved: "Đã lưu",
+      removed: "Đã xóa",
     },
   },
 };
