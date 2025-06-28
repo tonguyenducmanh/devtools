@@ -68,11 +68,13 @@ async function readQRWithJsQR(file) {
 async function readQRWithQrScanner(file) {
   try {
     // QrScanner.scanImage có thể nhận File object trực tiếp
-    const result = await QrScanner.scanImage(file);
+    const result = await QrScanner.scanImage(file, {
+      returnDetailedScanResult: !0,
+    });
     return result || null;
   } catch (error) {
     console.warn("QrScanner error:", error);
-    return null;
+    throw error;
   }
 }
 
@@ -136,6 +138,6 @@ export async function imagesQRToText(uploadArea) {
     return results;
   } catch (error) {
     console.error("Lỗi trong quá trình xử lý:", error);
-    return [];
+    throw error;
   }
 }

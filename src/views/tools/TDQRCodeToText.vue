@@ -119,19 +119,24 @@ export default {
           "@/common/qrcode/TDQRCodeUtil.js"
         );
         // Lọc kết quả hợp lệ
-        let result = await imagesQRToText(me.$refs.uploadArea);
-        if (result && result.length > 0) {
-          let tempOutput = result.join("");
-          if (me.isCompressText) {
-            me.textOutput = await TDCompress.decompressText(
-              tempOutput,
-              me.$tdEnum.compressType.gzip
-            );
-          } else {
-            me.textOutput = tempOutput;
+        try {
+          let result = await imagesQRToText(me.$refs.uploadArea);
+          if (result && result.length > 0) {
+            let tempOutput = result.join("");
+            if (me.isCompressText) {
+              me.textOutput = await TDCompress.decompressText(
+                tempOutput,
+                me.$tdEnum.compressType.gzip
+              );
+            } else {
+              me.textOutput = tempOutput;
+            }
           }
+          me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.converted"));
+        } catch (error) {
+          console.error("Error in convertQRCode:", error);
+          me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
         }
-        me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.converted"));
       }
     },
 
