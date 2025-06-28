@@ -358,10 +358,6 @@ async function readQRWithJsQR(file) {
 
               // Try different scales
               for (const scale of scales) {
-                console.log(
-                  `Trying jsQR with scale: ${scale.scale} (${scale.width}x${scale.height})`
-                );
-
                 const canvas = document.createElement("canvas");
                 const ctx = canvas.getContext("2d", {
                   willReadFrequently: true,
@@ -484,10 +480,6 @@ async function readQRWithJsQR(file) {
                       attempt.options
                     );
                     if (code && code.data) {
-                      console.log(
-                        `✅ jsQR success with ${attempt.name} at scale ${scale.scale}:`,
-                        code.data
-                      );
                       resolve(code.data);
                       return;
                     }
@@ -509,10 +501,6 @@ async function readQRWithJsQR(file) {
                           attempt.options
                         );
                         if (rotatedCode && rotatedCode.data) {
-                          console.log(
-                            `✅ jsQR success with ${attempt.name} + ${rotation.rotation}° rotation at scale ${scale.scale}:`,
-                            rotatedCode.data
-                          );
                           resolve(rotatedCode.data);
                           return;
                         }
@@ -577,22 +565,20 @@ async function readQRWithQrScanner(file) {
 
     for (const options of scanOptions) {
       try {
-        console.log(`Trying QrScanner with options:`, options);
         const result = await QrScanner.scanImage(file, options);
 
         const qrData = result?.data || result;
         if (qrData && typeof qrData === "string" && qrData.trim()) {
-          console.log("✅ QrScanner success:", qrData);
           return qrData;
         }
       } catch (optionError) {
-        console.warn(`QrScanner option failed:`, optionError.message);
+        console.error(`QrScanner option failed:`, optionError.message);
       }
     }
 
     return null;
   } catch (error) {
-    console.warn("QrScanner error:", error.message || error);
+    console.error("QrScanner error:", error.message || error);
     throw error;
   }
 }
@@ -614,7 +600,6 @@ async function readQRWithZXing(file) {
       try {
         const result = await reader.decodeFromImageElement(img);
         if (result && result.getText()) {
-          console.log("✅ ZXing success:", result.getText());
           return result.getText();
         }
       } catch (readerError) {
@@ -671,31 +656,16 @@ async function readQRFromFile(file) {
     { name: "ZXing", fn: readQRWithZXing },
   ];
 
-  console.log(
-    `🔍 Starting QR scan for file: ${file.name} (${file.size} bytes, ${file.type})`
-  );
-
   for (const method of scanMethods) {
-    console.log(`📋 Trying ${method.name} for file: ${file.name}`);
-
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         const result = await method.fn(file);
 
         if (result && typeof result === "string" && result.trim()) {
-          console.log(
-            `✅ ${method.name} success on attempt ${attempt + 1}:`,
-            result.substring(0, 100) + (result.length > 100 ? "..." : "")
-          );
           return result.trim();
         }
 
         if (attempt < maxRetries) {
-          console.log(
-            `${method.name} attempt ${
-              attempt + 1
-            } failed, retrying in ${retryDelay}ms...`
-          );
           await delay(retryDelay);
         }
       } catch (error) {
@@ -709,11 +679,7 @@ async function readQRFromFile(file) {
         }
       }
     }
-
-    console.log(`❌ ${method.name} failed after ${maxRetries + 1} attempts`);
   }
-
-  console.log(`❌ All methods failed for file: ${file.name}`);
   return null;
 }
 
@@ -730,7 +696,6 @@ async function batchProcessQRFiles(files, onProgress = null) {
     let error = null;
 
     try {
-      console.log(`📄 Processing file ${i + 1}/${total}: ${file.name}`);
       result = await readQRFromFile(file);
 
       if (!result) {
@@ -780,11 +745,8 @@ export async function imagesQRToText(uploadArea, options = {}) {
     const allFiles = uploadArea.getFileSelected();
 
     if (!allFiles || allFiles.length === 0) {
-      console.log("Không có file nào được chọn");
       return [];
     }
-
-    console.log(`🚀 Bắt đầu xử lý ${allFiles.length} files...`);
 
     // Filter supported files
     const supportedFiles = allFiles.filter((file) => {
@@ -832,9 +794,6 @@ export async function imagesQRToText(uploadArea, options = {}) {
       : results;
 
     const successCount = results.filter((r) => r.success).length;
-    console.log(
-      `✅ Hoàn thành: ${successCount}/${allFiles.length} QR codes đã được đọc thành công`
-    );
 
     return returnDetailedResults ? results : successfulResults;
   } catch (error) {
