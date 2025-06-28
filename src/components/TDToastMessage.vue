@@ -84,13 +84,14 @@ export default {
   },
   methods: {
     addToast(toast) {
+      let me = this;
       const id = ++this.toastIdCounter;
       const newToast = {
         id,
         type: toast.type || "info",
-        title: toast.title || "Thông báo",
+        title: toast.title || me.$t("i18nCommon.toastMessage.notiTitle"),
         message: toast.message || "",
-        duration: toast.duration || 5000,
+        duration: toast.duration || 3000,
       };
 
       this.toasts.unshift(newToast);
@@ -149,10 +150,11 @@ export default {
 }
 
 .toast {
-  background: white;
-  border-radius: 8px;
+  font-size: var(--font-size-medium);
+  background-color: var(--bg-layer-color);
+  border-radius: var(--border-radius);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   padding: 16px;
   display: flex;
   align-items: flex-start;
@@ -170,7 +172,7 @@ export default {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 4px;
+  width: 5px;
 }
 
 .td-toast-success::before {
@@ -226,16 +228,12 @@ export default {
 
 .td-toast-title {
   font-weight: 600;
-  font-size: 14px;
-  color: #1f2937;
-  line-height: 1.4;
+  font-size: 17px;
   margin-bottom: 2px;
 }
 
 .td-toast-text {
-  font-size: 15px;
-  color: #6b7280;
-  line-height: 1.4;
+  font-size: 17px;
 }
 
 .td-toast-close {

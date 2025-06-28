@@ -31,7 +31,7 @@ class ToastManager {
       type: options.type || "info",
       title: options.title || "Thông báo",
       message: options.message || "",
-      duration: options.duration || 5000,
+      duration: options.duration || 3000,
     };
 
     return this.toastInstance.addToast(config);

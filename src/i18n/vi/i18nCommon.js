@@ -240,6 +240,7 @@ export default {
       },
     },
     toastMessage: {
+      notiTitle: "Thông báo",
       copy: "Đã sao chép",
       converted: "Đã chuyển đổi",
       opened: "Đã mở",

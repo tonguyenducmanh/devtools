@@ -241,6 +241,7 @@ export default {
       },
     },
     toastMessage: {
+      notiTitle: "New Notification",
       copy: "Copied",
       converted: "Converted",
       opened: "Opened",
