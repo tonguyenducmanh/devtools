@@ -249,6 +249,7 @@ export default {
       success: "Success",
       fail: "Fail",
       error: "Have error",
+      applyMockSuccess: "Apply mock success",
     },
   },
 };

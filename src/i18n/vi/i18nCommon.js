@@ -248,6 +248,7 @@ export default {
       success: "Thành công",
       fail: "Thất bại",
       error: "Đã có lỗi xảy ra",
+      applyMockSuccess: "Đã áp dụng ví dụ",
     },
   },
 };

@@ -113,6 +113,10 @@ class TDUtility {
       for (const [key, value] of Object.entries(mockObj)) {
         vm.$data[key] = value;
       }
+      toast.success(
+        null,
+        i18nData.global.t("i18nCommon.toastMessage.applyMockSuccess")
+      );
     }
   }
 
@@ -180,8 +184,10 @@ class TDUtility {
       const blob = await response.blob();
 
       await this.copyImageFromBlob(blob);
+      toast.success(null, i18nData.global.t("i18nCommon.toastMessage.copy"));
     } catch (error) {
       console.error("❌ Lỗi khi copy ảnh:", error);
+      toast.error(null, i18nData.global.t("i18nCommon.toastMessage.error"));
     }
   }
   /**
