@@ -12,13 +12,25 @@
     </div>
     <div class="flex flex-wrap metadata-inputs">
       <div>
-        <TDInput :label="$t('i18nCommon.jsonToPostgreSQL.schemaName')" type="text" v-model="schemaName" />
+        <TDInput
+          :label="$t('i18nCommon.jsonToPostgreSQL.schemaName')"
+          type="text"
+          v-model="schemaName"
+        />
       </div>
       <div>
-        <TDInput :label="$t('i18nCommon.jsonToPostgreSQL.tableName')" type="text" v-model="tableName" />
+        <TDInput
+          :label="$t('i18nCommon.jsonToPostgreSQL.tableName')"
+          type="text"
+          v-model="tableName"
+        />
       </div>
       <div>
-        <TDInput :label="$t('i18nCommon.jsonToPostgreSQL.primaryKey')" type="text" v-model="primaryKeyField" />
+        <TDInput
+          :label="$t('i18nCommon.jsonToPostgreSQL.primaryKey')"
+          type="text"
+          v-model="primaryKeyField"
+        />
       </div>
     </div>
 
@@ -49,7 +61,10 @@
     </div>
 
     <div class="flex">
-      <TDButton :label="$t('i18nCommon.jsonToPostgreSQL.convert')" @click="convertToPostgresSQL"></TDButton>
+      <TDButton
+        :label="$t('i18nCommon.jsonToPostgreSQL.convert')"
+        @click="convertToPostgresSQL"
+      ></TDButton>
       <TDButton
         @click="haddleCopyEvent"
         :type="$tdEnum.buttonType.secondary"

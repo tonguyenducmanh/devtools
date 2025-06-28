@@ -249,7 +249,6 @@ export default {
     handleCopyEvent(value) {
       let me = this;
       me.$tdUtility.copyToClipboard(value);
-      me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.copy"));
     },
     async processWhenMounted() {
       let me = this;

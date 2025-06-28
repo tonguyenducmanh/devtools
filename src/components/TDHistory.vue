@@ -92,6 +92,7 @@ export default {
       let me = this;
       me.$tdCache.remove(me.cacheKey);
       me.historyItems = [];
+      me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.removed"));
     },
     /**
      * Xóa một item khỏi lịch sử
@@ -103,6 +104,7 @@ export default {
       history = history.filter((x) => x.historyId != historyId);
       await me.$tdCache.set(me.cacheKey, JSON.stringify(history));
       await me.updateHistoryDisplay();
+      me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.removed"));
     },
     /**
      * Cập nhật hiển thị lịch sử

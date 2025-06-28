@@ -1,5 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 import JSON5 from "json5";
+import { toast } from "@/common/TDToastUtil.js";
+import i18nData, { loadLocale } from "@/i18n/i18nData.js";
+
 /**
  * các method TDutility dùng cho toàn bộ frontend
  * Created by tdmanh1 19.09.2024
@@ -81,6 +84,7 @@ class TDUtility {
   copyToClipboard(value) {
     let me = this;
     navigator.clipboard.writeText(value);
+    toast.success(null, i18nData.global.t("i18nCommon.toastMessage.copy"));
   }
 
   /**
