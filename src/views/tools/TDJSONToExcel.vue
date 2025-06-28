@@ -20,7 +20,10 @@
       ></TDTextarea>
     </div>
     <div class="flex">
-      <TDCheckbox v-model="isBoldColName" :label="$t('i18nCommon.jsonToExcel.boldColumns')"></TDCheckbox>
+      <TDCheckbox
+        v-model="isBoldColName"
+        :label="$t('i18nCommon.jsonToExcel.boldColumns')"
+      ></TDCheckbox>
       <TDCheckbox
         v-model="isFitColWidth"
         :label="$t('i18nCommon.jsonToExcel.fitColumns')"
@@ -31,7 +34,10 @@
       ></TDCheckbox>
     </div>
     <div class="flex">
-      <TDButton :label="$t('i18nCommon.jsonToExcel.convert')" @click="convertToExcel"></TDButton>
+      <TDButton
+        :label="$t('i18nCommon.jsonToExcel.convert')"
+        @click="convertToExcel"
+      ></TDButton>
       <TDButton
         @click="applyMock"
         :type="$tdEnum.buttonType.secondary"
@@ -208,8 +214,10 @@ export default {
         );
         // Lưu text vào lịch sử nếu khác với lần lưu trước
         await me.$refs.history.saveToHistory(me.jsonSource);
+        me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
       } catch (error) {
         console.error("Error in convertToExcel:", error);
+        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
       }
     },
   },

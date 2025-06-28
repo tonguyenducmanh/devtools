@@ -139,9 +139,11 @@ export default {
             enableDeleteScript: me.enableDeleteScript,
           };
           await me.$refs.history.saveToHistory(historyItem);
+          me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
         }
       } catch (error) {
         console.error("Error in convertToPostgresSQL:", error);
+        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
       }
     },
     haddleCopyEvent() {

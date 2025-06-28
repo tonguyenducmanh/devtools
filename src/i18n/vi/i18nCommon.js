@@ -247,6 +247,7 @@ export default {
       removed: "Đã xóa",
       success: "Thành công",
       fail: "Thất bại",
+      error: "Đã có lỗi xảy ra",
     },
   },
 };

@@ -92,6 +92,7 @@ export default {
         me.base64Result = reader.result;
       };
       reader.readAsDataURL(blob);
+      me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
     },
   },
   data() {

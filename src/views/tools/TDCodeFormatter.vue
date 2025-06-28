@@ -124,9 +124,11 @@ export default {
         ) {
           me.outputSource = null;
         }
+        me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
       } catch (error) {
         console.error("Error formatting SQL:", error);
         me.outputSource = null; // Nếu có lỗi thì xoá output
+        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
       }
     },
     /**

@@ -248,6 +248,7 @@ export default {
       removed: "Removed",
       success: "Success",
       fail: "Fail",
+      error: "Have error",
     },
   },
 };

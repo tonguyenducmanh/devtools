@@ -133,11 +133,13 @@ export default {
         me.replacedObjectText = JSON.stringify(me.replacedObject);
         me.errorListText = JSON.stringify(me.errorList);
       }
+      me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
     },
     formatResult() {
       let me = this;
       me.replacedObjectText = JSON.stringify(me.replacedObject, null, " ");
       me.errorListText = JSON.stringify(me.errorList, null, " ");
+      me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
     },
     /**
      * chuẩn bị dữ liệu
