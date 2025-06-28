@@ -35,6 +35,7 @@
     "vite": "^6.3.4"
   },
   "dependencies": {
+    "@zxing/library": "^0.21.3",
     "crypto-js": "^4.2.0",
     "diff": "^7.0.0",
     "diff2html": "^3.4.51",
