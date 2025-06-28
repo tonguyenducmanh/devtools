@@ -246,6 +246,8 @@ export default {
       opened: "Opened",
       saved: "Saved",
       removed: "Removed",
+      success: "Success",
+      fail: "Fail",
     },
   },
 };

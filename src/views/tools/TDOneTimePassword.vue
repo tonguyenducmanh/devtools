@@ -497,6 +497,7 @@ export default {
         let clonedObject = me.$tdUtility.cloneDeep(toRaw(me.addNewObject));
         if (clonedObject) {
           me.decodedData.push(clonedObject);
+          me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
           me.buildData();
           me.addNewObject = {
             issuer: null,

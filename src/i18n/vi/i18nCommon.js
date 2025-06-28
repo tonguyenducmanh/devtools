@@ -245,6 +245,8 @@ export default {
       opened: "Đã mở",
       saved: "Đã lưu",
       removed: "Đã xóa",
+      success: "Thành công",
+      fail: "Thất bại",
     },
   },
 };
