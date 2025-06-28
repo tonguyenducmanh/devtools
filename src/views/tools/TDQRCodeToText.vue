@@ -16,6 +16,7 @@
         :labelEmpty="$t('i18nCommon.qrCodeToText.dropZone.placeholder')"
         :label="$t('i18nCommon.qrCodeToText.dropZone.label')"
         multiple
+        @selected="convertQRCode"
       ></TDUpload>
       <div class="flex button-generate">
         <TDButton
@@ -120,22 +121,14 @@ export default {
         // Lọc kết quả hợp lệ
         let result = await imagesQRToText(me.$refs.uploadArea);
         if (result && result.length > 0) {
+          let tempOutput = result.join("");
           if (me.isCompressText) {
-            let decompressedTexts = [];
-            for (let i = 0; i < result.length; i++) {
-              let temp = await TDCompress.decompressText(
-                result[i],
-                me.$tdEnum.compressType.gzip
-              );
-              if (temp) {
-                decompressedTexts.push(temp);
-              }
-            }
-            if (decompressedTexts && decompressedTexts.length > 0) {
-              me.textOutput = decompressedTexts.join("");
-            }
+            me.textOutput = await TDCompress.decompressText(
+              tempOutput,
+              me.$tdEnum.compressType.gzip
+            );
           } else {
-            me.textOutput = result.join("");
+            me.textOutput = tempOutput;
           }
         }
       }
