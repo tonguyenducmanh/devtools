@@ -255,21 +255,11 @@ function getMultipleScales(img) {
 
   const scales = [];
 
-  // Original size (if within limits)
-  if (
-    width <= maxWidth &&
-    height <= maxHeight &&
-    width >= minWidth &&
-    height >= minHeight
-  ) {
-    scales.push({ width, height, scale: 1 });
-  }
-
   // Scaled down versions
   const maxScale = Math.min(maxWidth / width, maxHeight / height);
   const minScale = Math.max(minWidth / width, minHeight / height);
 
-  [1.0, 0.8, 0.6, 0.5, 0.4, 0.3].forEach((factor) => {
+  [0.5, 0.4, 0.3].forEach((factor) => {
     const scale = Math.min(maxScale, factor);
     if (scale >= minScale && scale !== 1) {
       scales.push({
@@ -289,7 +279,16 @@ function getMultipleScales(img) {
       scale,
     });
   }
-
+  // đưa việc xử lý scale = 1 xuống dưới
+  // Original size (if within limits)
+  if (
+    width <= maxWidth &&
+    height <= maxHeight &&
+    width >= minWidth &&
+    height >= minHeight
+  ) {
+    scales.push({ width, height, scale: 1 });
+  }
   return scales;
 }
 
@@ -667,8 +666,8 @@ async function readQRFromFile(file) {
 
   // Define scanning methods in order of preference (QrScanner first for better performance)
   const scanMethods = [
-    { name: "QrScanner", fn: readQRWithQrScanner },
     { name: "jsQR", fn: readQRWithJsQR },
+    { name: "QrScanner", fn: readQRWithQrScanner },
     { name: "ZXing", fn: readQRWithZXing },
   ];
 
