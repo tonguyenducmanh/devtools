@@ -253,7 +253,6 @@ export default {
     },
     search: {
       placeholder: "Tìm kiếm",
-      tools: "Công cụ",
       noResults: "Không tìm thấy kết quả nào",
       help: "Gõ để tìm kiếm các tính năng, sử dụng ↑↓ để điều hướng và Enter để chọn",
     },

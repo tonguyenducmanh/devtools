@@ -254,7 +254,6 @@ export default {
     },
     search: {
       placeholder: "Search",
-      tools: "Tools",
       noResults: "No results found",
       help: "Type to search features, use ↑↓ to navigate and Enter to select",
     },

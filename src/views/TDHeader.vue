@@ -40,9 +40,6 @@
 
             <div class="td-search-results" v-if="filteredRoutes.length > 0">
               <div class="td-search-section">
-                <div class="td-search-section-title">
-                  {{ $t("i18nCommon.search.tools") }}
-                </div>
                 <div
                   v-for="(route, index) in filteredRoutes"
                   :key="route.name"
@@ -76,7 +73,6 @@
               v-else-if="searchQuery && filteredRoutes.length === 0"
               class="td-search-empty"
             >
-              <div class="td-search-empty-icon">🔍</div>
               <div class="td-search-empty-text">
                 {{ $t("i18nCommon.search.noResults") }}
               </div>
@@ -417,15 +413,6 @@ export default {
         .td-search-section {
           padding: 8px 0;
 
-          .td-search-section-title {
-            padding: 8px 16px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-color-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-          }
-
           .td-search-item {
             display: flex;
             align-items: center;
@@ -479,13 +466,6 @@ export default {
       .td-search-help {
         padding: 40px 16px;
         text-align: center;
-
-        .td-search-empty-icon {
-          font-size: 48px;
-          margin-bottom: 16px;
-          opacity: 0.5;
-        }
-
         .td-search-empty-text,
         .td-search-help-text {
           color: var(--text-color-secondary);
