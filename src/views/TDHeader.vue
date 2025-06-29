@@ -118,14 +118,14 @@ export default {
   computed: {
     filteredRoutes() {
       if (!this.searchQuery) return [];
+      const query = this.searchQuery.normalizeText();
 
-      const query = this.searchQuery.toLowerCase();
       return this.routerConfig
         .filter((route) => {
-          const title = this.$t(route.meta.titleKey).toLowerCase();
-          return (
-            title.includes(query) || route.name.toLowerCase().includes(query)
-          );
+          const title = this.$t(route.meta.titleKey).normalizeText();
+          const routeName = route.name.normalizeText();
+
+          return title.includes(query) || routeName.includes(query);
         })
         .slice(0, 8); // Giới hạn 8 kết quả
     },

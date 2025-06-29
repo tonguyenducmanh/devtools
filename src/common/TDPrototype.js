@@ -114,3 +114,16 @@ String.prototype.compareEndText =
       value.trim().length > this.trim().length
     );
   };
+
+/**
+ * loại bỏ dấu câu
+ */
+String.prototype.normalizeText =
+  String.prototype.normalizeText ||
+  function () {
+    // kiểm tra nếu kết thúc chứa text cần check
+    // và length phải lớn hơn text cần check
+    return this.toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  };
