@@ -1,6 +1,7 @@
 // utils/toast.js
 import { createApp } from "vue";
 import ToastContainer from "@/components/TDToastMessage.vue";
+import i18nData from "@/i18n/i18nData.js";
 
 class ToastManager {
   constructor() {
@@ -29,7 +30,8 @@ class ToastManager {
 
     const config = {
       type: options.type || "info",
-      title: options.title || "Thông báo",
+      title:
+        options.title || i18nData.global.t("i18nCommon.toastMessage.notiTitle"),
       message: options.message || "",
       duration: options.duration || 3000,
     };
