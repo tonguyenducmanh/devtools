@@ -127,10 +127,10 @@
           </div>
         </button>
 
-        <div class="td-icon tg-github" @click="goToSource"></div>
         <div class="noselect language-session" @click="changeLanguage">
           {{ currentLanguage }}
         </div>
+        <div class="td-icon tg-github" @click="goToSource"></div>
       </div>
     </div>
   </div>
@@ -606,8 +606,8 @@ export default {
 
     .tg-github {
       cursor: pointer;
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
       transition: transform 0.2s ease;
       background-position: -76px 0px;
 
@@ -622,7 +622,7 @@ export default {
       text-transform: uppercase;
       font-weight: 600;
       padding: 4px 8px;
-      border-radius: 4px;
+      border-radius: calc(var(--border-radius) * 1.5);
       border: 1px solid var(--border-color);
       background-color: var(--btn-secondary-color);
       transition: all 0.2s ease;
