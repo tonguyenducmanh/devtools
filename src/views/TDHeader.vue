@@ -539,7 +539,9 @@ export default {
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         overflow: hidden;
       }
-
+      .td-switch-track:hover {
+        border: 1px solid var(--focus-color);
+      }
       .td-switch-thumb {
         position: absolute;
         top: 2px;
@@ -630,6 +632,7 @@ export default {
       &:hover {
         transform: translateY(-1px);
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--focus-color);
       }
     }
   }
