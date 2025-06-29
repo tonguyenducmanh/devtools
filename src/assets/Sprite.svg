@@ -20,10 +20,10 @@
   </g>
 
   <!-- Sleep Icon (Zzz) -->
-  <g transform="translate(52, 0)">
-    <text x="2" y="8" font-size="6" font-family="Arial" fill="#33a16f">Z</text>
-    <text x="6" y="12" font-size="6" font-family="Arial" fill="#33a16f">Z</text>
-    <text x="10" y="16" font-size="6" font-family="Arial" fill="#33a16f">Z</text>
+  <g transform="translate(52, 2)">
+    <path d="M3 4h6l-4 4h4v1H3l4-4H3V4z" fill="#33a16f"/>
+    <path d="M7 8h4l-2.5 2.5h2.5v1H7l2.5-2.5H7V8z" fill="#33a16f"/>
+    <path d="M10 12h3l-1.5 1.5h1.5v1h-3l1.5-1.5H10V12z" fill="#33a16f"/>
   </g>
 
   <!-- GitHub Icon -->
@@ -39,8 +39,9 @@
   </g>
 
   <!-- Compress Icon -->
-  <g transform="translate(128, 0)">
-    <path d="M2 4h16v2H2zm0 4h12v2H2zm0 4h16v2H2z" fill="#33a16f"/>
+  <g transform="translate(128, 2)">
+    <path d="M2 2h14v2H2zm0 4h10v2H2zm0 4h12v2H2zm0 4h8v2H2z" fill="#33a16f"/>
+    <path d="M16 6l2 2-2 2" stroke="#33a16f" stroke-width="1.5" fill="none"/>
   </g>
 
   <!-- Compare Code Icon -->
@@ -51,18 +52,26 @@
   <!-- Color Picker Icon -->
   <g transform="translate(180, 0)">
     <circle cx="10" cy="10" r="8" fill="none" stroke="#33a16f" stroke-width="2"/>
-    <circle cx="10" cy="10" r="4" fill="#33a16f"/>
+    <path d="M10 2A8 8 0 0 1 18 10" fill="#33a16f"/>
+    <path d="M10 2A8 8 0 0 0 2 10" fill="#33a16f" opacity="0.7"/>
+    <path d="M10 2A8 8 0 0 0 10 18" fill="#33a16f" opacity="0.4"/>
+    <circle cx="10" cy="10" r="2" fill="white"/>
   </g>
 
   <!-- JSON Parser Icon -->
-  <g transform="translate(206, 0)">
-    <path d="M2 4v12h16V4H2zm2 3h12M2 11h16" stroke="#33a16f" stroke-width="2" fill="none"/>
+  <g transform="translate(206, 2)">
+    <path d="M4 2c-2 0-2 2-2 3v2c0 1-1 1-1 2s1 1 1 2v2c0 1 0 3 2 3M16 2c2 0 2 2 2 3v2c0 1 1 1 1 2s-1 1-1 2v2c0 1 0 3-2 3" stroke="#33a16f" stroke-width="1.5" fill="none"/>
+    <circle cx="8" cy="8" r="1" fill="#33a16f"/>
+    <circle cx="12" cy="8" r="1" fill="#33a16f"/>
   </g>
 
-  <!-- SQL Icon -->
+  <!-- SQL Icon - Improved -->
   <g transform="translate(232, 0)">
-    <rect x="4" y="4" width="12" height="12" rx="2" stroke="#33a16f" stroke-width="2" fill="none"/>
-    <text x="6" y="13" font-size="8" font-family="Arial" fill="#33a16f">SQL</text>
+    <rect x="2" y="4" width="16" height="12" rx="2" stroke="#33a16f" stroke-width="2" fill="none"/>
+    <ellipse cx="10" cy="8" rx="6" ry="2" fill="#33a16f" opacity="0.3"/>
+    <ellipse cx="10" cy="12" rx="6" ry="2" fill="none" stroke="#33a16f" stroke-width="1"/>
+    <line x1="4" y1="8" x2="4" y2="12" stroke="#33a16f" stroke-width="1"/>
+    <line x1="16" y1="8" x2="16" y2="12" stroke="#33a16f" stroke-width="1"/>
   </g>
 
   <!-- JSON Mapping Icon -->
@@ -80,11 +89,15 @@
   <g transform="translate(310, 0)">
     <rect x="4" y="4" width="12" height="12" rx="2" stroke="#33a16f" stroke-width="2" fill="none"/>
     <circle cx="8" cy="8" r="2" fill="#33a16f"/>
+    <path d="M6 12l2-2 2 2 4-4" stroke="#33a16f" stroke-width="1.5" fill="none"/>
   </g>
 
   <!-- Text to QR Code Icon -->
   <g transform="translate(336, 0)">
     <path d="M4 4h5v5H4zM11 4h5v5h-5zM4 11h5v5H4z" stroke="#33a16f" stroke-width="2" fill="none"/>
+    <rect x="5.5" y="5.5" width="2" height="2" fill="#33a16f"/>
+    <rect x="12.5" y="5.5" width="2" height="2" fill="#33a16f"/>
+    <rect x="5.5" y="12.5" width="2" height="2" fill="#33a16f"/>
     <path d="M12 12h2v2h-2zM16 12h2v2h-2zM12 16h2v2h-2z" fill="#33a16f"/>
   </g>
 
@@ -95,20 +108,25 @@
   </g>
 
   <!-- UUID Generator Icon -->
-  <g transform="translate(388, 0)">
-    <rect x="2" y="4" width="16" height="12" rx="2" stroke="#33a16f" stroke-width="2" fill="none"/>
-    <path d="M5 8h2M9 8h2M13 8h2M7 12h2M11 12h2" stroke="#33a16f" stroke-width="2"/>
+  <g transform="translate(388, 2)">
+    <rect x="2" y="2" width="16" height="12" rx="2" stroke="#33a16f" stroke-width="2" fill="none"/>
+    <text x="4" y="9" font-size="4" font-family="monospace" fill="#33a16f">UUID</text>
+    <path d="M5 11h2M9 11h2M13 11h2" stroke="#33a16f" stroke-width="1"/>
   </g>
 
-  <!-- Download Icon -->
+  <!-- Download Icon - Improved -->
   <g transform="translate(414, 0)">
-    <path d="M4 10h12M10 4v8M6 8l4 4 4-4" stroke="#33a16f" stroke-width="2" fill="none"/>
-    <path d="M4 14h12" stroke="#33a16f" stroke-width="2"/>
+    <path d="M10 2v12" stroke="#33a16f" stroke-width="2"/>
+    <path d="M6 10l4 4 4-4" stroke="#33a16f" stroke-width="2" fill="none"/>
+    <rect x="4" y="16" width="12" height="2" rx="1" fill="#33a16f"/>
+    <circle cx="10" cy="2" r="1" fill="#33a16f"/>
   </g>
 
   <!-- QR to Text Icon -->
   <g transform="translate(440, 0)">
     <path d="M2 4h6v6H2z" stroke="#33a16f" stroke-width="2" fill="none"/>
+    <rect x="3" y="5" width="4" height="4" fill="#33a16f" opacity="0.3"/>
+    <rect x="4" y="6" width="2" height="2" fill="#33a16f"/>
     <rect x="12" y="4" width="6" height="2" fill="#33a16f"/>
     <rect x="12" y="8" width="6" height="2" fill="#33a16f"/>
     <rect x="12" y="12" width="6" height="2" fill="#33a16f"/>
@@ -118,7 +136,9 @@
   <g transform="translate(466, 0)">
     <rect x="2" y="4" width="8" height="8" rx="1" stroke="#33a16f" stroke-width="2" fill="none"/>
     <circle cx="5" cy="7" r="1" fill="#33a16f"/>
-    <text x="12" y="11" font-size="6" font-family="Arial" fill="#33a16f">64</text>
+    <path d="M3 10l2-1.5 2 1.5 2-2" stroke="#33a16f" stroke-width="1" fill="none"/>
+    <text x="12" y="9" font-size="5" font-family="monospace" fill="#33a16f">64</text>
+    <path d="M11 4l4 4-4 4" stroke="#33a16f" stroke-width="1" fill="none"/>
   </g>
 
   <!-- Search Icon -->
