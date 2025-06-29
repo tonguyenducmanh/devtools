@@ -376,7 +376,9 @@ export default {
         align-items: center;
         padding: 16px;
         border-bottom: 1px solid var(--border-color);
-
+        .td-search-icon{
+          margin-right: var(--padding);
+        }
         .td-search-input {
           flex: 1;
           border: none;
