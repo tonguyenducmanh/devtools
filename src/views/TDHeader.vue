@@ -621,7 +621,7 @@ export default {
       color: var(--btn-color);
       text-transform: uppercase;
       font-weight: 600;
-      padding: 4px 8px;
+      padding: 2px 8px;
       border-radius: calc(var(--border-radius) * 1.5);
       border: 1px solid var(--border-color);
       background-color: var(--btn-secondary-color);
