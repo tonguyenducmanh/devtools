@@ -45,7 +45,7 @@
         :label="$t('i18nCommon.textCompress.buttons.copyOutput')"
       ></TDButton>
     </div>
-    <div v-if="compressRatio">
+    <div class="flex compress-info" v-if="compressRatio">
       <div>{{ inputLengthText }}</div>
       <div>{{ outputLengthText }}</div>
       <div>{{ compressRatio }}</div>
@@ -163,5 +163,9 @@ export default {
 }
 .group-btn {
   justify-content: flex-start;
+}
+
+.compress-info{
+  column-gap: var(--padding);
 }
 </style>
