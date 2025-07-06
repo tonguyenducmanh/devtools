@@ -116,7 +116,7 @@ export default {
   border: 1px solid var(--focus-color);
 }
 .td-checkbox-read-only .td-checkbox {
-  background-color: var(--bg-sub-color);
-  border: 1px solid var(--bg-sub-color);
+  background-color: var(--bg-layer-color);
+  border: 1px solid var(--bg-layer-color);
 }
 </style>

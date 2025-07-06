@@ -125,7 +125,7 @@ export default {
   border: 1px solid var(--focus-color);
 }
 .td-upload-read-only {
-  background-color: var(--bg-sub-color);
+  background-color: var(--bg-layer-color);
   color: var(--text-secondary-color);
   border: 1px solid var(--border-color);
 }

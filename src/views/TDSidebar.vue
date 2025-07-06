@@ -143,13 +143,13 @@ export default {
     }
     &:hover {
       .td-item-content {
-        background-color: var(--bg-sub-color);
+        background-color: var(--bg-layer-color);
       }
     }
 
     &.td-item-active {
       .td-item-content {
-        background-color: var(--bg-sub-color);
+        background-color: var(--bg-layer-color);
       }
       font-weight: 600;
     }

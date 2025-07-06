@@ -151,7 +151,7 @@ export default {
   }
 }
 .td-textarea-read-only textarea {
-  background-color: var(--bg-sub-color);
+  background-color: var(--bg-layer-color);
   border: 1px solid transparent;
 }
 </style>

@@ -435,7 +435,7 @@ export default {
 
           &:hover {
             opacity: 1;
-            background-color: var(--bg-sub-color);
+            background-color: var(--bg-layer-color);
           }
         }
       }
@@ -456,7 +456,7 @@ export default {
 
             &:hover,
             &.td-search-item-active {
-              background-color: var(--bg-sub-color);
+              background-color: var(--bg-layer-color);
             }
 
             .td-icon {
@@ -533,7 +533,7 @@ export default {
         position: relative;
         width: 100%;
         height: 100%;
-        background-color: var(--bg-sub-color);
+        background-color: var(--bg-layer-color);
         border: 1px solid var(--border-color);
         border-radius: 12px;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

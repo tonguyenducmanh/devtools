@@ -223,7 +223,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: var(--padding);
-  background-color: var(--bg-sub-color);
+  background-color: var(--bg-layer-color);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   transition: all 0.2s ease;

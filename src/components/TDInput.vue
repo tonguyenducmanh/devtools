@@ -105,6 +105,6 @@ export default {
 }
 .td-input-read-only input {
   border: 1px solid transparent;
-  background-color: var(--bg-sub-color);
+  background-color: var(--bg-layer-color);
 }
 </style>
