@@ -17,7 +17,7 @@
         height="100%"
         :width="isFullscreenPreview ? '100%' : '50%'"
       ></TDTextarea>
-      <iframe 
+      <iframe
         v-if="!isFullscreenPreview"
         ref="previewFrame"
         class="preview-frame"
@@ -25,7 +25,10 @@
         :srcdoc="outputHtml"
       ></iframe>
     </div>
-    <div class="preview-popup" v-if="isFullscreenPreview && outputHtml && isShowPopupPreview">
+    <div
+      class="preview-popup"
+      v-if="isFullscreenPreview && outputHtml && isShowPopupPreview"
+    >
       <div class="popup-overlay">
         <div class="popup-content">
           <TDButton
@@ -35,7 +38,7 @@
             class="close-button"
           ></TDButton>
           <iframe
-            ref="popupFrame" 
+            ref="popupFrame"
             class="popup-frame"
             sandbox="allow-scripts allow-modals allow-forms allow-popups allow-same-origin allow-top-navigation allow-downloads allow-pointer-lock allow-presentation"
             :srcdoc="outputHtml"
@@ -109,10 +112,12 @@ export default {
           me.outputHtml = me.inputHtml;
           me.isShowPopupPreview = me.isFullscreenPreview;
           let historyItem = {
-            inputHtml: me.inputHtml
+            inputHtml: me.inputHtml,
           };
           await me.$refs.history.saveToHistory(historyItem);
-          me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
+          if (!me.isFullscreenPreview) {
+            me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
+          }
         }
       } catch (error) {
         console.error("Error previewing HTML:", error);
@@ -139,7 +144,7 @@ export default {
       inputHtml: null,
       outputHtml: null,
       isFullscreenPreview: true,
-      isShowPopupPreview: false
+      isShowPopupPreview: false,
     };
   },
 };
