@@ -30,6 +30,9 @@
   column-gap: var(--padding);
   row-gap: var(--padding);
 }
+.flex-start {
+  justify-content: flex-start;
+}
 
 .flex-col {
   flex-direction: column;

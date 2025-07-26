@@ -1,10 +1,17 @@
 <template>
   <div>
-    <div class="flex button-group">
+    <div
+      class="flex flex-start button-group"
+      :class="{ 'td-hide-history': !isHistoryVisible }"
+    >
       <TDButton
         @click="toggleHistory"
         :type="$tdEnum.buttonType.secondary"
-        :label="isHistoryVisible ? $t('i18nCommon.history.hide') : $t('i18nCommon.history.show')"
+        :label="
+          isHistoryVisible
+            ? $t('i18nCommon.history.hide')
+            : $t('i18nCommon.history.show')
+        "
       ></TDButton>
       <TDButton
         v-if="isHistoryVisible"
@@ -13,11 +20,14 @@
         :label="$t('i18nCommon.deleteAll')"
       ></TDButton>
     </div>
-    
+
     <div v-if="isHistoryVisible" class="td-history-container">
       <div class="td-history">
         <template v-for="(item, index) in historyItems">
-          <div class="td-history-item" @click="applyHistoryText(item.historyId)">
+          <div
+            class="td-history-item"
+            @click="applyHistoryText(item.historyId)"
+          >
             <span>{{ item.textContent }}</span>
             <button
               class="td-history-delete-btn"
@@ -212,8 +222,10 @@ export default {
 }
 
 .button-group {
-  gap: var(--padding);
-  margin-bottom: var(--padding);
+  column-gap: var(--padding);
+  button {
+    margin: unset;
+  }
 }
 
 .td-history {
@@ -222,6 +234,10 @@ export default {
   gap: 0.5rem;
   max-height: 100px;
   overflow: auto;
+}
+
+.td-hide-history {
+  margin-bottom: var(--padding);
 }
 
 .td-history-item {
