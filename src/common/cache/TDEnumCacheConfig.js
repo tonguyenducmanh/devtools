@@ -9,4 +9,5 @@ export const EnumCacheConfig = {
   JSONToPostgreSQLHistory: 7,
   CodeFormatterHistory: 8,
   Language: 9,
+  HTMLPreviewHistory: 10,
 };

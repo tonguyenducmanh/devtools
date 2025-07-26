@@ -46,6 +46,12 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử format code",
   },
+  HTMLPreviewHistory: {
+    KeyFormat: "HTMLPreviewHistory",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử preview HTML",
+  },
   IsShowSidebar: {
     KeyFormat: "IsShowSidebar",
     CacheLevel: tdEnum.cacheType.inMemory,

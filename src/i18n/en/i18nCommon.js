@@ -181,6 +181,13 @@ export default {
         copy: "Copy",
       },
     },
+    htmlPreview: {
+      title: "HTML Preview tool!",
+      inputHTML: "Enter your HTML here",
+      preview: "Preview",
+      copyHtml: "Copy HTML",
+      fullscreenPreview: "Fullscreen Preview"
+    },
     textToQRCode: {
       title: "Text To QRCode tool!",
       input: {

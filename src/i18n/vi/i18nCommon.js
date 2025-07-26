@@ -180,6 +180,13 @@ export default {
         copy: "Sao chép",
       },
     },
+    htmlPreview: {
+      title: "Công cụ xem trước HTML!",
+      inputHTML: "Nhập HTML của bạn vào đây",
+      preview: "Xem trước",
+      copyHtml: "Sao chép HTML",
+      fullscreenPreview: "Xem trước toàn màn hình"
+    },
     textToQRCode: {
       title: "Công cụ tạo mã QR từ văn bản!",
       input: {
