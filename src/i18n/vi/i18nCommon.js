@@ -4,7 +4,7 @@ export default {
     history: {
       title: "Lịch sử",
       show: "Xem lịch sử",
-      hide: "Ẩn lịch sử"
+      hide: "Ẩn lịch sử",
     },
     deleteAll: "Xóa tất cả lịch sử",
     uploadFile: "Tải lên tệp",
@@ -33,7 +33,7 @@ export default {
       compareCode: "So sánh mã",
       colorPicker: "Chọn màu",
       JSONParser: "Phân tích JSON",
-      JSONToPostgreSQL: "JSON sang PostgreSQL",
+      JSONToPostgreSQL: "JSON sang SQL",
       JSONMapping: "JSON Mapping",
       JSONToExcel: "JSON sang Excel",
       CodeFormatter: "Định dạng mã",
