@@ -185,7 +185,8 @@ export default {
       inputHTML: "Nhập HTML của bạn vào đây",
       preview: "Xem trước",
       copyHtml: "Sao chép HTML",
-      fullscreenPreview: "Xem trước toàn màn hình"
+      fullscreenPreview: "Xem trước toàn màn hình",
+      popupTitle: "Xem trước HTML",
     },
     textToQRCode: {
       title: "Công cụ tạo mã QR từ văn bản!",

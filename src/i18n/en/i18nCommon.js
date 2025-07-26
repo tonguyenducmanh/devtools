@@ -186,7 +186,8 @@ export default {
       inputHTML: "Enter your HTML here",
       preview: "Preview",
       copyHtml: "Copy HTML",
-      fullscreenPreview: "Fullscreen Preview"
+      fullscreenPreview: "Fullscreen Preview",
+      popupTitle: "HTML Preview",
     },
     textToQRCode: {
       title: "Text To QRCode tool!",

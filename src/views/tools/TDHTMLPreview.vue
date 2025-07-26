@@ -28,11 +28,12 @@
     <div class="preview-popup" v-if="isFullscreenPreview && outputHtml && isShowPopupPreview">
       <div class="popup-overlay">
         <div class="popup-header">
-          <span>HTML Preview</span>
+          <span>{{ $t('i18nCommon.htmlPreview.popupTitle') }}</span>
           <TDButton
             @click="closePopup"
             :type="$tdEnum.buttonType.secondary"
-            :label="'×'"
+            :label="'✕'"
+            class="close-button"
           ></TDButton>
         </div>
         <iframe
@@ -77,8 +78,11 @@ export default {
   },
   beforeUnmount() {
     let me = this;
+    document.removeEventListener("keydown", this.handleKeydown);
   },
-  mounted() {},
+  mounted() {
+    document.addEventListener("keydown", this.handleKeydown);
+  },
   methods: {
     async applyMock() {
       try {
@@ -124,12 +128,18 @@ export default {
       // Only toggle off the popup visibility
       this.isShowPopupPreview = false;
     },
+    handleKeydown(event) {
+      // Close popup when ESC is pressed
+      if (event.key === "Escape" && this.isShowPopupPreview) {
+        this.closePopup();
+      }
+    },
   },
   data() {
     return {
       inputHtml: null,
       outputHtml: null,
-      isFullscreenPreview: false,
+      isFullscreenPreview: true,
       isShowPopupPreview: false
     };
   },
@@ -168,20 +178,23 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: center;
+  animation: fadeIn 0.2s ease;
 }
 .popup-overlay {
   background: var(--bg-color);
-  width: 90%;
-  height: 90%;
+  width: 100%;
+  height: 100%;
   border-radius: var(--border-radius);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  animation: scaleIn 0.2s ease;
 }
 .popup-header {
   padding: var(--padding);
@@ -189,10 +202,38 @@ export default {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--border-color);
+  background: var(--bg-active-color);
+}
+.popup-header span {
+  font-size: 1em;
+  font-weight: normal;
+}
+.close-button {
+  padding: 4px 8px;
+  font-size: 0.9em;
 }
 .popup-frame {
   flex: 1;
   width: 100%;
   border: none;
+  background: var(--bg-color);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+  }
+  to {
+    transform: scale(1);
+  }
 }
 </style>
