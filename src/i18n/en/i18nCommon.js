@@ -1,8 +1,12 @@
 export default {
   i18nCommon: {
     typeInput: "Type value",
-    history: "History",
-    deleteAll: "Delete all",
+    history: {
+      title: "History",
+      show: "Show History",
+      hide: "Hide History"
+    },
+    deleteAll: "Delete all history",
     uploadFile: "Upload file",
     createbyAuthor: "Created by tdmanh with luv.",
     welcomeTextOne: "The",

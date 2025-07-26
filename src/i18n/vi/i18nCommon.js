@@ -1,8 +1,12 @@
 export default {
   i18nCommon: {
     typeInput: "Nhập giá trị",
-    history: "Lịch sử",
-    deleteAll: "Xóa tất cả",
+    history: {
+      title: "Lịch sử",
+      show: "Xem lịch sử",
+      hide: "Ẩn lịch sử"
+    },
+    deleteAll: "Xóa tất cả lịch sử",
     uploadFile: "Tải lên tệp",
     createbyAuthor: "Được tạo ra bởi tdmanh.",
     welcomeTextOne: "Bộ công cụ",

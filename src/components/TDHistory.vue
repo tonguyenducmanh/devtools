@@ -1,24 +1,33 @@
 <template>
-  <div class="td-history-container">
-    <div class="td-history-header">
-      <h3>{{ $t("i18nCommon.history") }}</h3>
+  <div>
+    <div class="flex button-group">
       <TDButton
+        @click="toggleHistory"
+        :type="$tdEnum.buttonType.secondary"
+        :label="isHistoryVisible ? $t('i18nCommon.history.hide') : $t('i18nCommon.history.show')"
+      ></TDButton>
+      <TDButton
+        v-if="isHistoryVisible"
         @click="clearAllHistory"
+        :type="$tdEnum.buttonType.secondary"
         :label="$t('i18nCommon.deleteAll')"
       ></TDButton>
     </div>
-    <div class="td-history">
-      <template v-for="(item, index) in historyItems">
-        <div class="td-history-item" @click="applyHistoryText(item.historyId)">
-          <span>{{ item.textContent }}</span>
-          <button
-            class="td-history-delete-btn"
-            @click.stop.prevent="deleteHistoryItem(item.historyId)"
-          >
-            x
-          </button>
-        </div>
-      </template>
+    
+    <div v-if="isHistoryVisible" class="td-history-container">
+      <div class="td-history">
+        <template v-for="(item, index) in historyItems">
+          <div class="td-history-item" @click="applyHistoryText(item.historyId)">
+            <span>{{ item.textContent }}</span>
+            <button
+              class="td-history-delete-btn"
+              @click.stop.prevent="deleteHistoryItem(item.historyId)"
+            >
+              x
+            </button>
+          </div>
+        </template>
+      </div>
     </div>
   </div>
 </template>
@@ -69,9 +78,13 @@ export default {
   data() {
     return {
       historyItems: [],
+      isHistoryVisible: false,
     };
   },
   methods: {
+    toggleHistory() {
+      this.isHistoryVisible = !this.isHistoryVisible;
+    },
     /**
      * Áp dụng text từ lịch sử
      * @param {string} text - Text cần áp dụng
@@ -198,16 +211,9 @@ export default {
   width: 100%;
 }
 
-.td-history-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.td-history-header h3 {
-  color: var(--text-primary-color);
-  margin: 0;
+.button-group {
+  gap: var(--padding);
+  margin-bottom: var(--padding);
 }
 
 .td-history {
