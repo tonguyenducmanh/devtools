@@ -39,6 +39,7 @@ export default {
       QRCodeToText: "Mã QR sang văn bản",
       DownloadVSCodeExtension: "Tải tiện ích VS Code",
       UUIDV4Generator: "Trình tạo UUID V4",
+      HTMLPreview: "Xem trước HTML",
     },
     example: "ví dụ",
     base64ToImage: {

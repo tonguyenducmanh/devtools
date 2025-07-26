@@ -28,6 +28,18 @@ const routerConfig = [
   },
   {
     /**
+     * Time-based one-time password authenticator
+     */
+    path: "/TDHTMLPreview",
+    name: "TDHTMLPreview",
+    component: () => import("@/views/tools/TDHTMLPreview.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.HTMLPreview",
+      icon: "td-icon-html-preview",
+    },
+  },
+  {
+    /**
      * chuyển đổi văn bản thành mã QR
      */
     path: "/textoqrcode",

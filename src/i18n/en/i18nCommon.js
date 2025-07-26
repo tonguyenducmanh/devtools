@@ -39,6 +39,7 @@ export default {
       QRCodeToText: "QRCode to text",
       DownloadVSCodeExtension: "Download VSCode Extension",
       UUIDV4Generator: "UUIDv4 generator",
+      HTMLPreview: "HTML Preview",
     },
     example: "example",
     base64ToImage: {
