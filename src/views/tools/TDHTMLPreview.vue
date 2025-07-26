@@ -80,11 +80,9 @@ export default {
   },
   beforeUnmount() {
     let me = this;
-    document.removeEventListener("keydown", me.handleKeydown);
   },
   mounted() {
     let me = this;
-    document.addEventListener("keydown", me.handleKeydown);
   },
   methods: {
     async applyMock() {
@@ -132,14 +130,7 @@ export default {
     closePopup() {
       // Only toggle off the popup visibility
       this.isShowPopupPreview = false;
-    },
-    handleKeydown(event) {
-      let me = this;
-      // Close popup when ESC is pressed
-      if (event.key === "Escape" && this.isShowPopupPreview) {
-        me.closePopup();
-      }
-    },
+    }
   },
   data() {
     return {
