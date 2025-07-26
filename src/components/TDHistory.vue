@@ -192,7 +192,7 @@ export default {
 <style lang="scss" scoped>
 .td-history-container {
   padding: var(--padding);
-  margin: var(--padding);
+  margin: var(--padding) 0;
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
   width: 100%;
