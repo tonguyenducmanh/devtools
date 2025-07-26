@@ -27,21 +27,20 @@
     </div>
     <div class="preview-popup" v-if="isFullscreenPreview && outputHtml && isShowPopupPreview">
       <div class="popup-overlay">
-        <div class="popup-header">
-          <span>{{ $t('i18nCommon.htmlPreview.popupTitle') }}</span>
+        <div class="popup-content">
           <TDButton
             @click="closePopup"
             :type="$tdEnum.buttonType.secondary"
             :label="'✕'"
             class="close-button"
           ></TDButton>
+          <iframe
+            ref="popupFrame" 
+            class="popup-frame"
+            sandbox="allow-scripts allow-modals allow-forms allow-popups allow-same-origin allow-top-navigation allow-downloads allow-pointer-lock allow-presentation"
+            :srcdoc="outputHtml"
+          ></iframe>
         </div>
-        <iframe
-          ref="popupFrame" 
-          class="popup-frame"
-          sandbox="allow-scripts allow-modals allow-forms allow-popups allow-same-origin allow-top-navigation allow-downloads allow-pointer-lock allow-presentation"
-          :srcdoc="outputHtml"
-        ></iframe>
       </div>
     </div>
     <div class="flex button-container">
@@ -189,32 +188,26 @@ export default {
   background: var(--bg-color);
   width: 100%;
   height: 100%;
-  border-radius: var(--border-radius);
   display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  align-items: center;
   animation: scaleIn 0.2s ease;
 }
-.popup-header {
-  padding: var(--padding);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--bg-active-color);
-}
-.popup-header span {
-  font-size: 1em;
-  font-weight: normal;
+.popup-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 .close-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
   padding: 4px 8px;
-  font-size: 0.9em;
 }
 .popup-frame {
-  flex: 1;
   width: 100%;
+  height: 100%;
   border: none;
   background: var(--bg-color);
 }
