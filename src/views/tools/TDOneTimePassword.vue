@@ -613,33 +613,11 @@ export default {
     gap: calc(var(--padding) / 2);
     justify-content: center;
     align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
   }
 
-  /* Grid responsive cho các mã QR */
-  @media screen and (max-width: 900px) {
-    .otp-container {
-      grid-template-columns: 1fr;
-      gap: calc(var(--padding) / 2);
-    }
-  }
-
-  @media screen and (min-width: 901px) and (max-width: 1400px) {
-    .otp-container {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media screen and (min-width: 1401px) and (max-width: 2100px) {
-    .otp-container {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  @media screen and (min-width: 2101px) {
-    .otp-container {
-      grid-template-columns: repeat(4, 1fr);
-    }
-  }
   .otp-item {
     position: relative;
     display: flex;
