@@ -8,8 +8,8 @@
     "web:dev": "vite",
     "web:build": "vite build",
     "electron:dev": "electron-forge start",
-    "electron:build": "electron-forge package",
-    "electron:make": "electron-forge make",
+    "electron:build": "electron-forge package --platform win32 --arch x64",
+    "electron:make": "electron-forge make --platform win32 --arch x64",
     "electron:publish": "electron-forge publish",
     "lint": "echo \"No linting configured\""
   },
