@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
+import i18nData from "@/i18n/i18nData.js";
+
 // cấu hình router dùng chung cho nhiều file
 const routerConfig = [
   {
@@ -214,10 +216,11 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to && to.meta && to.meta.title) {
-    document.title = `Utility |  ${to.meta.title}`;
-  } else {
-    document.title = "Utility for dev";
+  let appName = window.__env.appName
+  if (to && to.meta && to.meta.titleKey && i18nData.global.te(to.meta.titleKey)) {
+    document.title = i18nData.global.t(to.meta.titleKey);
+  } else if (appName) {
+  document.title = `${window.__env.author} | ${appName}`;
   }
   next();
 });

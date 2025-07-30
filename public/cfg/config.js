@@ -3,6 +3,8 @@
  */
 (function (window) {
   window.__env = window.__env || {};
+  window.__env.appName = "Tool";
+  window.__env.author = "Tô Mạnh";
   window.__env.defaultValue = {
     theme: "light",
   };

@@ -2,7 +2,7 @@
   <div class="flex td-header-container">
     <div class="flex td-app-name">
       <div class="td-logo"></div>
-      <div class="td-app-title">{{ $t("i18nGlobal.appinfo.appName") }}</div>
+      <div class="td-app-title">{{ appName }}</div>
       <!-- Search Box -->
       <div class="td-search-container">
         <div class="td-search-box" @click="openSearchModal">
@@ -156,6 +156,9 @@ export default {
           return title.includes(query) || routeName.includes(query);
         })
         .slice(0, 8); // Giới hạn 8 kết quả
+    },
+    appName() {
+      return window.__env.appName;
     },
   },
   created() {

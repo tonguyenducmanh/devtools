@@ -4,7 +4,7 @@ This project provides a collection of useful tools for developers, aggregated wi
 
 Two versions are supported: web version (Vue + Vite) and app version (Electron + Vue + Vite).
 
-[https://utilityfordev.pages.dev/](https://utilityfordev.pages.dev/)
+[https://tool.tomanh.com/](https://tool.tomanh.com/)
 
 List of Supported Features:
 
