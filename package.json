@@ -1,8 +1,8 @@
 {
-  "name": "utility-for-dev",
-  "productName": "utility-for-dev",
+  "name": "tool-tomanh",
+  "productName": "tool-tomanh",
   "version": "1.0.0",
-  "description": "utility for dev app",
+  "description": "tool tomanh",
   "main": ".vite/build/main.js",
   "scripts": {
     "web:dev": "vite",
