@@ -15,7 +15,7 @@
     isCompressText: true,
   };
   window.__env.githubSource = {
-    url: "https://github.com/tonguyenducmanh/utility-for-dev",
+    url: "https://github.com/tonguyenducmanh/tool-tomanh",
   };
   window.__env.jsonParser = {
     showConfigLib: false,
