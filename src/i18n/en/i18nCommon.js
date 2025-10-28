@@ -4,7 +4,7 @@ export default {
     history: {
       title: "History",
       show: "Show History",
-      hide: "Hide History"
+      hide: "Hide History",
     },
     deleteAll: "Delete all history",
     uploadFile: "Upload file",
@@ -124,6 +124,9 @@ export default {
       example: "Example",
     },
     jsonToPostgreSQL: {
+      useFileUpload: "Use file upload",
+      uploadLabel: "Choose JSON file",
+      downloadSQL: "Download SQL",
       title: "JSON to PostgreSQL tool!",
       schemaName: "Schema name",
       tableName: "Table name",

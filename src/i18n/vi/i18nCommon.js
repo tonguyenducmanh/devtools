@@ -124,6 +124,9 @@ export default {
       example: "Ví dụ",
     },
     jsonToPostgreSQL: {
+      useFileUpload: "Sử dụng file",
+      uploadLabel: "Chọn file JSON",
+      downloadSQL: "Tải file SQL",
       title: "Công cụ chuyển JSON sang PostgreSQL!",
       schemaName: "Tên schema",
       tableName: "Tên bảng",

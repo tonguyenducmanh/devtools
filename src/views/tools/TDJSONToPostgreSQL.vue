@@ -33,23 +33,39 @@
         />
       </div>
     </div>
-
     <div class="flex io-section">
-      <TDTextarea
-        isLabelTop
-        :label="$t('i18nCommon.jsonToPostgreSQL.inputLabel')"
-        :placeHolder="$t('i18nCommon.jsonToPostgreSQL.inputPlaceholder')"
-        v-model="inputJSON"
-      ></TDTextarea>
-      <TDTextarea
-        isLabelTop
-        :label="$t('i18nCommon.jsonToPostgreSQL.outputLabel')"
-        :readOnly="true"
-        :placeHolder="$t('i18nCommon.jsonToPostgreSQL.outputPlaceholder')"
-        v-model="outputSQL"
-      ></TDTextarea>
+      <template v-if="!enableFileUpload">
+        <TDTextarea
+          isLabelTop
+          :label="$t('i18nCommon.jsonToPostgreSQL.inputLabel')"
+          :placeHolder="$t('i18nCommon.jsonToPostgreSQL.inputPlaceholder')"
+          v-model="inputJSON"
+        ></TDTextarea>
+      </template>
+      <template v-else>
+        <div class="upload-container">
+          <TDUpload
+            :label="$t('i18nCommon.jsonToPostgreSQL.uploadLabel')"
+            :accept="'.json'"
+            @change="handleFileUpload"
+          />
+        </div>
+      </template>
+      <template v-if="!enableFileUpload">
+        <TDTextarea
+          isLabelTop
+          :label="$t('i18nCommon.jsonToPostgreSQL.outputLabel')"
+          :readOnly="true"
+          :placeHolder="$t('i18nCommon.jsonToPostgreSQL.outputPlaceholder')"
+          v-model="outputSQL"
+        ></TDTextarea>
+      </template>
     </div>
     <div class="flex">
+      <TDCheckbox
+        v-model="enableFileUpload"
+        :label="$t('i18nCommon.jsonToPostgreSQL.useFileUpload')"
+      ></TDCheckbox>
       <TDCheckbox
         v-model="enableCreateTable"
         :label="$t('i18nCommon.jsonToPostgreSQL.createTable')"
@@ -61,15 +77,24 @@
     </div>
 
     <div class="flex">
-      <TDButton
-        :label="$t('i18nCommon.jsonToPostgreSQL.convert')"
-        @click="convertToPostgresSQL"
-      ></TDButton>
-      <TDButton
-        @click="haddleCopyEvent"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.jsonToPostgreSQL.copy')"
-      ></TDButton>
+      <template v-if="!enableFileUpload">
+        <TDButton
+          :label="$t('i18nCommon.jsonToPostgreSQL.convert')"
+          @click="convertToPostgresSQL"
+        ></TDButton>
+        <TDButton
+          @click="haddleCopyEvent"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.jsonToPostgreSQL.copy')"
+        ></TDButton>
+      </template>
+      <template v-else>
+        <TDButton
+          :label="$t('i18nCommon.jsonToPostgreSQL.downloadSQL')"
+          @click="downloadSQLFile"
+          :disabled="!outputSQL"
+        ></TDButton>
+      </template>
       <TDButton
         @click="applyMock"
         :type="$tdEnum.buttonType.secondary"
@@ -80,7 +105,7 @@
 </template>
 <script>
 export default {
-  name: "TDImageToBase64",
+  name: "TDJSONToPostgreSQL",
   created() {
     let me = this;
   },
@@ -149,6 +174,38 @@ export default {
     haddleCopyEvent() {
       let me = this;
       me.$tdUtility.copyToClipboard(me.outputSQL);
+    },
+    async handleFileUpload(event) {
+      let me = this;
+      try {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = async (e) => {
+            try {
+              me.inputJSON = e.target.result;
+              await me.convertToPostgresSQL();
+            } catch (error) {
+              console.error("Error processing JSON file:", error);
+              me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+            }
+          };
+          reader.readAsText(file);
+        }
+      } catch (error) {
+        console.error("Error handling file upload:", error);
+        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+      }
+    },
+    downloadSQLFile() {
+      let me = this;
+      if (me.outputSQL) {
+        const blob = new Blob([me.outputSQL], { type: "text/plain" });
+        me.$tdUtility.createDownloadFileFromBlob(
+          blob,
+          `${me.tableName || "export"}.sql`
+        );
+      }
     },
     /**
      * build ra script insert dữ liệu
@@ -328,6 +385,7 @@ export default {
       outputSQL: null,
       enableCreateTable: false,
       enableDeleteScript: true,
+      enableFileUpload: false,
     };
   },
 };
@@ -348,5 +406,18 @@ export default {
 }
 .history-container {
   width: 100%;
+}
+.upload-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  margin-right: var(--padding);
+}
+.mb-4 {
+  margin-bottom: 1rem;
 }
 </style>
