@@ -271,7 +271,7 @@ export default {
     cosinSimilarity: {
       firstVector: "Vector thứ nhất",
       secondVector: "Vector thứ hai",
-      vectorPlaceholder: "Nhập các số cách nhau bằng dấu phẩy (vd: 1, 2, 3, 4)",
+      vectorPlaceholder: "Nhập vector dưới dạng mảng số",
       result: "Kết quả độ tương đồng",
       calculate: "Tính độ tương đồng",
       invalidVectors: "Vector không hợp lệ. Cả hai vector phải có cùng độ dài và chứa các số hợp lệ.",

@@ -272,7 +272,7 @@ export default {
     cosinSimilarity: {
       firstVector: "First Vector",
       secondVector: "Second Vector",
-      vectorPlaceholder: "Enter numbers separated by commas (e.g. 1, 2, 3, 4)",
+      vectorPlaceholder: "Enter numbers separated by commas",
       result: "Similarity Result",
       calculate: "Calculate Similarity",
       invalidVectors: "Invalid vectors. Both vectors must have same length and contain valid numbers.",
