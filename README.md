@@ -53,3 +53,8 @@ npm run electron:dev
 ```
 npm run electron:build
 ```
+
+
+Để build các source liên quan tới wasm, vui lòng vào folder wasm, build project, 
+
+sau đó làm theo hướng dẫn và copy folder đã build vào thư mục project
