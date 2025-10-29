@@ -95,8 +95,14 @@ export default {
     },
     parseVector(input) {
       try {
+        // Remove brackets if present
+        let processedInput = input;
+        if (input.startsWith("[") && input.endsWith("]")) {
+          processedInput = input.slice(1, -1);
+        }
+        
         // Split by commas and convert to numbers
-        return input
+        return processedInput
           .split(",")
           .map((num) => num.trim())
           .filter((num) => num !== "")
@@ -120,34 +126,57 @@ export default {
 .td-tool-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 20px;
+  gap: 24px;
+  padding: 24px;
+  margin: 0 auto;
+  background: var(--td-background-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .td-input-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+
+  label {
+    font-weight: 600;
+    color: var(--td-text-color);
+  }
 }
 
 .td-result-group {
-  margin-top: 20px;
+  margin-top: 24px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+
+  label {
+    font-weight: 600;
+    color: var(--td-text-color); 
+  }
 }
 
 .td-result {
-  padding: 10px;
+  padding: 16px;
   background-color: var(--td-background-color);
-  border: 1px solid var(--td-border-color);
-  border-radius: 4px;
+  border: 2px solid var(--td-border-color);
+  border-radius: 8px;
   min-height: 42px;
+  font-size: 1.1em;
+  font-weight: 500;
+  transition: all 0.3s ease;
+
+  &:not(:empty) {
+    border-color: var(--td-primary-color);
+    background-color: var(--td-background-color-hover);
+  }
 }
 
 .td-button-group {
   display: flex;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 16px;
+  margin-top: 24px;
+  justify-content: flex-end;
 }
 </style>
