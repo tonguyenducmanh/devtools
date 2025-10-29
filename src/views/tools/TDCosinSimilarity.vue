@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col container">
     <div class="title">{{ $t("i18nCommon.feature.cosinSimilarity") }}</div>
-    
+
     <div class="flex io-section">
       <TDTextarea
         isLabelTop
@@ -29,6 +29,11 @@
       <TDButton
         @click="calculateSimilarity"
         :label="$t('i18nCommon.cosinSimilarity.calculate')"
+      ></TDButton>
+      <TDButton
+        @click="handleCopyResult"
+        :type="$tdEnum.buttonType.secondary"
+        :label="$t('i18nCommon.jsonToPostgreSQL.copy')"
       ></TDButton>
       <TDButton
         @click="applyExample"
@@ -98,7 +103,7 @@ export default {
         if (input.startsWith("[") && input.endsWith("]")) {
           processedInput = input.slice(1, -1);
         }
-        
+
         // Split by commas and convert to numbers
         return processedInput
           .split(",")
@@ -108,6 +113,9 @@ export default {
       } catch {
         return null;
       }
+    },
+    handleCopyResult() {
+      this.$tdUtility.copyToClipboard(this.similarity);
     },
     applyExample() {
       this.firstVector = mock.firstVector.join(", ");
