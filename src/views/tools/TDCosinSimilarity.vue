@@ -46,7 +46,7 @@
 
 <script>
 import mock from "@/common/mock/TDMockCosinSimilarity.js";
-
+import TDWasm from "@/common/TDWasm.js";
 export default {
   name: "TDCosinSimilarity",
   data() {
@@ -55,6 +55,10 @@ export default {
       secondVector: "",
       similarity: "",
     };
+  },
+  created() {
+    let me = this;
+    TDWasm.initWasmRuntime();
   },
   methods: {
     async calculateSimilarity() {
