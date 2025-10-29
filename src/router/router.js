@@ -114,6 +114,18 @@ const routerConfig = [
   },
   {
     /**
+     * Tính độ tương đồng cosine giữa 2 vector
+     */
+    path: "/cosinsimilarity",
+    name: "cosinsimilarity",
+    component: () => import("@/views/tools/TDCosinSimilarity.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.cosinSimilarity",
+      icon: "td-icon",
+    },
+  },
+  {
+    /**
      * convert từ JSON sang object và object sang JSON
      */
     path: "/jsonparser",
@@ -216,11 +228,16 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  let appName = window.__env.appName
-  if (to && to.meta && to.meta.titleKey && i18nData.global.te(to.meta.titleKey)) {
+  let appName = window.__env.appName;
+  if (
+    to &&
+    to.meta &&
+    to.meta.titleKey &&
+    i18nData.global.te(to.meta.titleKey)
+  ) {
     document.title = i18nData.global.t(to.meta.titleKey);
   } else if (appName) {
-  document.title = `${window.__env.author} | ${appName}`;
+    document.title = `${window.__env.author} | ${appName}`;
   }
   next();
 });

@@ -28,6 +28,7 @@ export default {
     },
     feature: {
       welcome: "Tổng quan",
+      cosinSimilarity: "Độ tương đồng",
       oneTimePassword: "Mật khẩu một lần",
       textCompress: "Nén văn bản",
       compareCode: "So sánh mã",
@@ -266,6 +267,15 @@ export default {
       fail: "Thất bại",
       error: "Đã có lỗi xảy ra",
       applyMockSuccess: "Đã áp dụng ví dụ",
+    },
+    cosinSimilarity: {
+      firstVector: "Vector thứ nhất",
+      secondVector: "Vector thứ hai",
+      vectorPlaceholder: "Nhập các số cách nhau bằng dấu phẩy (vd: 1, 2, 3, 4)",
+      result: "Kết quả độ tương đồng",
+      calculate: "Tính độ tương đồng",
+      invalidVectors: "Vector không hợp lệ. Cả hai vector phải có cùng độ dài và chứa các số hợp lệ.",
+      calculated: "Đã tính độ tương đồng thành công",
     },
     search: {
       placeholder: "Tìm kiếm",

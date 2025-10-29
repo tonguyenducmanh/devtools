@@ -28,6 +28,7 @@ export default {
     },
     feature: {
       welcome: "Welcome",
+      cosinSimilarity: "Cosine Similarity",
       oneTimePassword: "One time password",
       textCompress: "Text Compress",
       compareCode: "Compare code",
@@ -267,6 +268,15 @@ export default {
       fail: "Fail",
       error: "Have error",
       applyMockSuccess: "Apply mock success",
+    },
+    cosinSimilarity: {
+      firstVector: "First Vector",
+      secondVector: "Second Vector",
+      vectorPlaceholder: "Enter numbers separated by commas (e.g. 1, 2, 3, 4)",
+      result: "Similarity Result",
+      calculate: "Calculate Similarity",
+      invalidVectors: "Invalid vectors. Both vectors must have same length and contain valid numbers.",
+      calculated: "Similarity calculated successfully",
     },
     search: {
       placeholder: "Search",
