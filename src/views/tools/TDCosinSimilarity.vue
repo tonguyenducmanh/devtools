@@ -1,42 +1,40 @@
 <template>
-  <div class="td-container">
-    <h1 class="td-title">{{ $t("i18nCommon.feature.cosinSimilarity") }}</h1>
+  <div class="flex flex-col container">
+    <div class="title">{{ $t("i18nCommon.feature.cosinSimilarity") }}</div>
+    
+    <div class="flex io-section">
+      <TDTextarea
+        isLabelTop
+        :label="$t('i18nCommon.cosinSimilarity.firstVector')"
+        :placeHolder="$t('i18nCommon.cosinSimilarity.vectorPlaceholder')"
+        v-model="firstVector"
+      ></TDTextarea>
 
-    <div class="td-tool-container">
-      <div class="td-input-group">
-        <label>{{ $t("i18nCommon.cosinSimilarity.firstVector") }}</label>
-        <TDTextarea
-          v-model="firstVector"
-          :placeholder="$t('i18nCommon.cosinSimilarity.vectorPlaceholder')"
-        />
-      </div>
+      <TDTextarea
+        isLabelTop
+        :label="$t('i18nCommon.cosinSimilarity.secondVector')"
+        :placeHolder="$t('i18nCommon.cosinSimilarity.vectorPlaceholder')"
+        v-model="secondVector"
+      ></TDTextarea>
+    </div>
 
-      <div class="td-input-group">
-        <label>{{ $t("i18nCommon.cosinSimilarity.secondVector") }}</label>
-        <TDTextarea
-          v-model="secondVector"
-          :placeholder="$t('i18nCommon.cosinSimilarity.vectorPlaceholder')"
-        />
-      </div>
-
-      <div class="td-result-group">
+    <div class="flex result-section">
+      <div class="result-container">
         <label>{{ $t("i18nCommon.cosinSimilarity.result") }}</label>
-        <div class="td-result">{{ similarity }}</div>
+        <div class="result">{{ similarity }}</div>
       </div>
+    </div>
 
-      <div class="td-button-group">
-        <TDButton
-          @click="calculateSimilarity"
-          :label="$t('i18nCommon.cosinSimilarity.calculate')"
-        >
-        </TDButton>
-        <TDButton
-          @click="applyExample"
-          :label="$t('i18nCommon.example')"
-          :type="$tdEnum.buttonType.secondary"
-        >
-        </TDButton>
-      </div>
+    <div class="flex">
+      <TDButton
+        @click="calculateSimilarity"
+        :label="$t('i18nCommon.cosinSimilarity.calculate')"
+      ></TDButton>
+      <TDButton
+        @click="applyExample"
+        :type="$tdEnum.buttonType.secondary"
+        :label="$t('i18nCommon.example')"
+      ></TDButton>
     </div>
   </div>
 </template>
@@ -122,61 +120,50 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.td-tool-container {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding: 24px;
-  margin: 0 auto;
-  background: var(--td-background-color);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+<style scoped>
+.container {
+  width: 100%;
+  height: 100%;
 }
 
-.td-input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-  label {
-    font-weight: 600;
-    color: var(--td-text-color);
-  }
+.io-section {
+  flex: 1;
+  column-gap: var(--padding);
+  width: 95%;
 }
 
-.td-result-group {
-  margin-top: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-  label {
-    font-weight: 600;
-    color: var(--td-text-color); 
-  }
+.result-section {
+  width: 95%;
+  margin-top: var(--padding);
 }
 
-.td-result {
-  padding: 16px;
+.result-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding);
+}
+
+.result {
+  padding: var(--padding);
   background-color: var(--td-background-color);
-  border: 2px solid var(--td-border-color);
-  border-radius: 8px;
+  border: 1px solid var(--td-border-color);
+  border-radius: var(--border-radius);
   min-height: 42px;
-  font-size: 1.1em;
-  font-weight: 500;
-  transition: all 0.3s ease;
-
-  &:not(:empty) {
-    border-color: var(--td-primary-color);
-    background-color: var(--td-background-color-hover);
-  }
 }
 
-.td-button-group {
+.flex {
   display: flex;
-  gap: 16px;
-  margin-top: 24px;
-  justify-content: flex-end;
+  gap: var(--padding);
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: var(--padding);
 }
 </style>
