@@ -189,14 +189,27 @@ export default {
         );
       }
 
+      // Tìm timestamp lớn nhất, tránh trường hợp user chọn nhiều qr code từ các lần gen khác nhau
+      let maxTimestamp = "";
+      if (chunksWithHeader.length > 0) {
+        maxTimestamp = chunksWithHeader.reduce((maxTs, chunk) => {
+          return chunk.timestamp > maxTs ? chunk.timestamp : maxTs;
+        }, chunksWithHeader[0].timestamp);
+      }
+
+      // Lọc chỉ những chunk có timestamp lớn nhất
+      let latestChunks = chunksWithHeader.filter(
+        (chunk) => chunk.timestamp === maxTimestamp
+      );
+
       // Sắp xếp theo timestamp và index
-      chunksWithHeader.sort((a, b) => {
+      latestChunks.sort((a, b) => {
         if (a.timestamp !== b.timestamp) {
           return a.timestamp.localeCompare(b.timestamp);
         }
         return a.index - b.index;
       });
-      finalOutput = chunksWithHeader.map((chunk) => chunk.content).join("");
+      finalOutput = latestChunks.map((chunk) => chunk.content).join("");
       return finalOutput;
     },
   },
