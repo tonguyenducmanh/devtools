@@ -122,6 +122,13 @@ export default {
         maxTextOneChunk = 1000; // fallback mặc định
       }
 
+      // Nếu có header, giảm maxLength đi 19 ký tự (độ dài của YYYYMMDDHHmmss-NNN-)
+      const HEADER_LENGTH = 19;
+      let effectiveMaxTextOneChunk = maxTextOneChunk;
+      if (me.addHeaderToQR) {
+        effectiveMaxTextOneChunk = Math.max(1, maxTextOneChunk - HEADER_LENGTH); // Đảm bảo không nhỏ hơn 1
+      }
+
       // Lấy giá trị từ các input
       let text = me.getUserInput(textInput);
       let textBuild = await me.buildTextBeforeGenQR(text);
@@ -137,7 +144,7 @@ export default {
       // Nếu độ dài text lớn hơn 1000, chia thành nhiều phần
       let chunks = me.splitTextIntoChunks(
         textBuild,
-        maxTextOneChunk,
+        effectiveMaxTextOneChunk,
         me.addHeaderToQR,
         timestamp
       );
