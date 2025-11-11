@@ -44,7 +44,7 @@ const QR_CONFIG = {
 
   // Retry configuration
   retryOptions: {
-    maxRetries: 3,
+    maxRetries: 0,
     retryDelay: 0,
   },
 };
