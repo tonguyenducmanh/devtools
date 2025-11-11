@@ -212,6 +212,7 @@ export default {
       },
       part: "Part {0}/{1}",
       compressText: "Compress text (gzip)",
+      addHeaderToQR: "Use QR header",
     },
     qrCodeToText: {
       title: "QRCode To Text tool!",
@@ -224,6 +225,7 @@ export default {
       copy: "Copy",
       result: "Result will appear after pasting image",
       compressText: "Is Compressed text (gzip)",
+      hasHeaderInQR: "Use QR header",
     },
     oneTimePassword: {
       title: "Time-based (TOTP) and HMAC-based (HOTP) One-Time Password!",

@@ -211,6 +211,7 @@ export default {
       },
       part: "Phần {0}/{1}",
       compressText: "Nén dữ liệu (gzip)",
+      addHeaderToQR: "Có sử dụng header QR",
     },
     qrCodeToText: {
       title: "Công cụ chuyển đổi mã QR sang văn bản!",
@@ -223,6 +224,7 @@ export default {
       copy: "Sao chép",
       result: "Kết quả sẽ xuất hiện sau khi paste ảnh",
       compressText: "Là dữ liệu nén (gzip)",
+      hasHeaderInQR: "Có sử dụng header QR",
     },
     oneTimePassword: {
       title: "Mật khẩu một lần theo thời gian (TOTP) và theo HMAC (HOTP)!",

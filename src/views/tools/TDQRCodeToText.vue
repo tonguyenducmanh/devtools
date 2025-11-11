@@ -33,6 +33,11 @@
           :label="$t('i18nCommon.qrCodeToText.compressText')"
           @input="convertQRCode"
         ></TDCheckbox>
+        <TDCheckbox
+          v-model="hasHeaderInQR"
+          :label="$t('i18nCommon.qrCodeToText.hasHeaderInQR')"
+          @input="convertQRCode"
+        ></TDCheckbox>
       </div>
       <TDTextarea
         class="input-area"
@@ -120,16 +125,57 @@ export default {
         );
         // Lọc kết quả hợp lệ
         try {
-          let result = await imagesQRToText(me.$refs.uploadArea);
-          if (result && result.length > 0) {
-            let tempOutput = result.join("");
+          let rawResults = await imagesQRToText(me.$refs.uploadArea);
+          if (rawResults && rawResults.length > 0) {
+            const headerRegex = /^(\d{14})-(\d{3})-/; // Regex để khớp với header: YYYYMMDDHHmmss-NNN-
+
+            let processedChunks = rawResults.map((chunk) => {
+              const match = chunk.match(headerRegex);
+              if (match) {
+                const timestamp = match[1];
+                const index = parseInt(match[2], 10);
+                const content = chunk.substring(match[0].length);
+                return { timestamp, index, content, hasHeader: true };
+              }
+              return { content: chunk, hasHeader: false };
+            });
+
+            let finalOutput = "";
+            if (me.hasHeaderInQR) {
+              // Lọc ra các chunk có header để sắp xếp
+              const chunksWithHeader = processedChunks.filter(
+                (chunk) => chunk.hasHeader
+              );
+
+              // Nếu có cả chunk có header và không có header, có thể có lỗi hoặc dữ liệu không nhất quán.
+              if (chunksWithHeader.length !== rawResults.length) {
+                console.warn(
+                  "Một số QR code có header, một số thì không. Chỉ các QR có header sẽ được sắp xếp và ghép nối."
+                );
+              }
+
+              // Sắp xếp theo timestamp và index
+              chunksWithHeader.sort((a, b) => {
+                if (a.timestamp !== b.timestamp) {
+                  return a.timestamp.localeCompare(b.timestamp);
+                }
+                return a.index - b.index;
+              });
+              finalOutput = chunksWithHeader
+                .map((chunk) => chunk.content)
+                .join("");
+            } else {
+              // Nếu không có header nào hoặc checkbox không được chọn, nối trực tiếp như cũ
+              finalOutput = rawResults.join("");
+            }
+
             if (me.isCompressText) {
               me.textOutput = await TDCompress.decompressText(
-                tempOutput,
+                finalOutput,
                 me.$tdEnum.compressType.gzip
               );
             } else {
-              me.textOutput = tempOutput;
+              me.textOutput = finalOutput;
             }
           }
           me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.converted"));
@@ -159,6 +205,7 @@ export default {
         window.__env &&
         window.__env.textToQRConfig &&
         window.__env.textToQRConfig.isCompressText,
+      hasHeaderInQR: true,
     };
   },
 };

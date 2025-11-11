@@ -44,6 +44,10 @@
           :label="$t('i18nCommon.textToQRCode.compressText')"
           @input="toggleCompressText"
         ></TDCheckbox>
+        <TDCheckbox
+          v-model="addHeaderToQR"
+          :label="$t('i18nCommon.textToQRCode.addHeaderToQR')"
+        ></TDCheckbox>
       </div>
     </div>
     <div v-if="textGenQR" class="qrcode-section">
@@ -126,8 +130,26 @@ export default {
       await me.$refs.history.saveToHistory(text);
       // reset
       me.qrCodeItems = [];
+
+      let timestamp = null;
+      if (me.addHeaderToQR) {
+        const now = new Date();
+        timestamp =
+          now.getFullYear().toString() +
+          (now.getMonth() + 1).toString().padStart(2, "0") +
+          now.getDate().toString().padStart(2, "0") +
+          now.getHours().toString().padStart(2, "0") +
+          now.getMinutes().toString().padStart(2, "0") +
+          now.getSeconds().toString().padStart(2, "0");
+      }
+
       // Nếu độ dài text lớn hơn 1000, chia thành nhiều phần
-      let chunks = me.splitTextIntoChunks(textBuild, maxTextOneChunk);
+      let chunks = me.splitTextIntoChunks(
+        textBuild,
+        maxTextOneChunk,
+        me.addHeaderToQR,
+        timestamp
+      );
       // Tạo QR code cho từng phần
       chunks.forEach((chunk) => {
         me.generateQRCodeJS(chunk);
@@ -139,12 +161,19 @@ export default {
      * Chia text thành các phần nhỏ hơn với độ dài cho trước
      * @param {string} text - Text cần chia
      * @param {number} maxLength - Độ dài tối đa của mỗi phần
+     * @param {boolean} addHeader - Có thêm header vào mỗi chunk hay không
+     * @param {string} timestamp - Timestamp để thêm vào header
      * @returns {string[]} Mảng các phần text đã chia
      */
-    splitTextIntoChunks(text, maxLength) {
+    splitTextIntoChunks(text, maxLength, addHeader, timestamp) {
       let chunks = [];
       for (let i = 0; i < text.length; i += maxLength) {
-        chunks.push(text.slice(i, i + maxLength));
+        let chunk = text.slice(i, i + maxLength);
+        if (addHeader) {
+          const index = (chunks.length + 1).toString().padStart(3, "0"); // Số thứ tự 3 chữ số
+          chunk = `${timestamp}-${index}-${chunk}`;
+        }
+        chunks.push(chunk);
       }
       return chunks;
     },
@@ -269,6 +298,7 @@ export default {
         window.__env &&
         window.__env.textToQRConfig &&
         window.__env.textToQRConfig.isCompressText,
+      addHeaderToQR: true,
     };
   },
 };
