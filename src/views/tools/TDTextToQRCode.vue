@@ -131,17 +131,8 @@ export default {
       // reset
       me.qrCodeItems = [];
 
-      let timestamp = null;
-      if (me.addHeaderToQR) {
-        const now = new Date();
-        timestamp =
-          now.getFullYear().toString() +
-          (now.getMonth() + 1).toString().padStart(2, "0") +
-          now.getDate().toString().padStart(2, "0") +
-          now.getHours().toString().padStart(2, "0") +
-          now.getMinutes().toString().padStart(2, "0") +
-          now.getSeconds().toString().padStart(2, "0");
-      }
+      // build ra ngày giờ hiện tại để thêm vào header
+      let timestamp = me.getCurrentTimestampForHeader();
 
       // Nếu độ dài text lớn hơn 1000, chia thành nhiều phần
       let chunks = me.splitTextIntoChunks(
@@ -287,6 +278,22 @@ export default {
       let me = this;
       // Tạo blob và mở popup tải file
       me.$tdUtility.copyImageFromUrl(dataUrl);
+    },
+
+    /**
+     * Lấy timestamp hiện tại để thêm vào header
+     * @returns {string} Timestamp định dạng YYYYMMDDHHmmss
+     */
+    getCurrentTimestampForHeader() {
+      let now = new Date();
+      let timestamp =
+        now.getFullYear().toString() +
+        (now.getMonth() + 1).toString().padStart(2, "0") +
+        now.getDate().toString().padStart(2, "0") +
+        now.getHours().toString().padStart(2, "0") +
+        now.getMinutes().toString().padStart(2, "0") +
+        now.getSeconds().toString().padStart(2, "0");
+      return timestamp;
     },
   },
   data() {
