@@ -127,43 +127,9 @@ export default {
         try {
           let rawResults = await imagesQRToText(me.$refs.uploadArea);
           if (rawResults && rawResults.length > 0) {
-            const headerRegex = /^(\d{14})-(\d{3})-/; // Regex để khớp với header: YYYYMMDDHHmmss-NNN-
-
-            let processedChunks = rawResults.map((chunk) => {
-              const match = chunk.match(headerRegex);
-              if (match) {
-                const timestamp = match[1];
-                const index = parseInt(match[2], 10);
-                const content = chunk.substring(match[0].length);
-                return { timestamp, index, content, hasHeader: true };
-              }
-              return { content: chunk, hasHeader: false };
-            });
-
             let finalOutput = "";
             if (me.hasHeaderInQR) {
-              // Lọc ra các chunk có header để sắp xếp
-              const chunksWithHeader = processedChunks.filter(
-                (chunk) => chunk.hasHeader
-              );
-
-              // Nếu có cả chunk có header và không có header, có thể có lỗi hoặc dữ liệu không nhất quán.
-              if (chunksWithHeader.length !== rawResults.length) {
-                console.warn(
-                  "Một số QR code có header, một số thì không. Chỉ các QR có header sẽ được sắp xếp và ghép nối."
-                );
-              }
-
-              // Sắp xếp theo timestamp và index
-              chunksWithHeader.sort((a, b) => {
-                if (a.timestamp !== b.timestamp) {
-                  return a.timestamp.localeCompare(b.timestamp);
-                }
-                return a.index - b.index;
-              });
-              finalOutput = chunksWithHeader
-                .map((chunk) => chunk.content)
-                .join("");
+              finalOutput = me.recoveryFullTextFromQRWithHeader(rawResults);
             } else {
               // Nếu không có header nào hoặc checkbox không được chọn, nối trực tiếp như cũ
               finalOutput = rawResults.join("");
@@ -192,6 +158,46 @@ export default {
     copyResult() {
       let me = this;
       me.$tdUtility.copyToClipboard(me.textOutput);
+    },
+
+    /**
+     * Phục hồi văn bản đầy đủ từ các kết quả QR code có header
+     * @param {Array} rawResults Mảng các chuỗi văn bản từ QR code
+     * @returns {String} Văn bản đầy đủ đã được phục hồi và sắp xếp
+     */
+    recoveryFullTextFromQRWithHeader(rawResults) {
+      let headerRegex = /^(\d{14})-(\d{3})-/; // Regex để khớp với header: YYYYMMDDHHmmss-NNN-
+
+      let finalOutput = "";
+      let processedChunks = rawResults.map((chunk) => {
+        let match = chunk.match(headerRegex);
+        if (match) {
+          let timestamp = match[1];
+          let index = parseInt(match[2], 10);
+          let content = chunk.substring(match[0].length);
+          return { timestamp, index, content, hasHeader: true };
+        }
+        return { content: chunk, hasHeader: false };
+      });
+      // Lọc ra các chunk có header để sắp xếp
+      let chunksWithHeader = processedChunks.filter((chunk) => chunk.hasHeader);
+
+      // Nếu có cả chunk có header và không có header, có thể có lỗi hoặc dữ liệu không nhất quán.
+      if (chunksWithHeader.length !== rawResults.length) {
+        console.warn(
+          "Một số QR code có header, một số thì không. Chỉ các QR có header sẽ được sắp xếp và ghép nối."
+        );
+      }
+
+      // Sắp xếp theo timestamp và index
+      chunksWithHeader.sort((a, b) => {
+        if (a.timestamp !== b.timestamp) {
+          return a.timestamp.localeCompare(b.timestamp);
+        }
+        return a.index - b.index;
+      });
+      finalOutput = chunksWithHeader.map((chunk) => chunk.content).join("");
+      return finalOutput;
     },
   },
   data() {
