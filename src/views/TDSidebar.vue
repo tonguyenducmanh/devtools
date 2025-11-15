@@ -1,19 +1,6 @@
 <template>
   <div class="td-sidebar-container">
-    <!-- <div
-      class="td-icon td-menu"
-      :class="{ 'td-menu-sibar-hide': !isShowSidebar }"
-      @click="toggleSidebar"
-    ></div> -->
     <div v-if="isShowSidebar" class="td-sidebar">
-      <!-- <div class="td-filter-tool">
-        <TDInput
-          v-model="queryTool"
-          :placeHolder="$t('i18nCommon.sidebar.filter')"
-          @keyup.enter="filterToolNow"
-          @input="filterToolNow"
-        />
-      </div> -->
       <div class="td-tool-group">
         <template v-for="(item, index) in routerLink">
           <RouterLink
@@ -23,7 +10,6 @@
             :to="item.pathVisible ?? item.path"
           >
             <div class="flex td-item-content">
-              <div class="td-icon" :class="item.meta.icon"></div>
               <div>{{ $t(item.meta.titleKey) }}</div>
             </div>
           </RouterLink>

@@ -46,7 +46,6 @@
 
 <script>
 import mock from "@/common/mock/TDMockCosinSimilarity.js";
-import TDWasm from "@/common/TDWasm.js";
 export default {
   name: "TDCosinSimilarity",
   data() {
@@ -58,7 +57,6 @@ export default {
   },
   created() {
     let me = this;
-    TDWasm.initWasmRuntime();
   },
   methods: {
     async calculateSimilarity() {
@@ -75,23 +73,8 @@ export default {
           return;
         }
 
-        // Prepare input data
-        const inputData = {
-          FirstVector: vector1,
-          SecondVector: vector2,
-        };
-
-        // Convert to JSON
-        const jsonString = JSON.stringify(inputData);
-
-        // Get dotnet runtime
-        const runtime = window.__dotnet_runtime;
-        const { getAssemblyExports } = runtime;
-        const exports = await getAssemblyExports("Tools.NetWrapper.dll");
-        const { ToolsTensor } = exports.Tools.NetWrapper;
-
         // Calculate similarity
-        const resultString = ToolsTensor.CosinSimilarity(jsonString);
+        const resultString = this.cosineSimilarity(vector1, vector2);
         this.similarity = resultString;
 
         this.$tdToast.success(this.$t("i18nCommon.cosinSimilarity.calculated"));
@@ -100,6 +83,23 @@ export default {
         this.$tdToast.error(this.$t("i18nCommon.toastMessage.error"));
       }
     },
+
+    cosineSimilarity(a, b) {
+      if (a.length !== b.length) throw new Error("Vector phải cùng chiều");
+
+      let dot = 0;
+      let normA = 0;
+      let normB = 0;
+
+      for (let i = 0; i < a.length; i++) {
+        dot += a[i] * b[i];
+        normA += a[i] * a[i];
+        normB += b[i] * b[i];
+      }
+
+      return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+    },
+
     parseVector(input) {
       try {
         // Remove brackets if present
