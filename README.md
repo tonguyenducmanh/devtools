@@ -14,7 +14,7 @@ List of Supported languages: Vietnamese, English
 
 Demo:
 
-![alt text](img/info.png)
+![alt text](img/screenshoot.png)
 
 Application-wide configuration can be accessed by entering the following command in the console:
 
@@ -53,10 +53,3 @@ npm run electron:dev
 ```
 npm run electron:build
 ```
-
-Để build các source liên quan tới wasm, vui lòng vào folder wasm, build project,
-
-sau đó làm theo hướng dẫn và copy folder đã build vào thư mục public
-
-lưu ý: tạm thời chỉ có 2 file là dotnet.js và dotnet.js.map là để ở public/\_framework khi triển khai,
-còn các file còn lại ném hết vào public/assets khi triển khai, tạm thời chưa dựng cơ chế khi buid nên move vào folder nào
