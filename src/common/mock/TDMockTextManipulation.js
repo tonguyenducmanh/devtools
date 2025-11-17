@@ -9,4 +9,5 @@ I'm sorry to inform you of a terrible accident at $2.
 ---`,
   columnSeperator: ", ",
   rowSeperator: "\\n",
+  outputRowSeperator: "\\n",
 };

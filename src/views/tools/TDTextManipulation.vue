@@ -26,10 +26,21 @@
       </div>
     </div>
 
-    <TDTextarea
-      :placeHolder="$t('i18nCommon.textManipulation.expressionSource')"
-      v-model="expressionSource"
-    ></TDTextarea>
+    <div class="td-input-source">
+      <TDTextarea
+        :placeHolder="$t('i18nCommon.textManipulation.expressionSource')"
+        v-model="expressionSource"
+        class="td-input-source-textbox"
+      ></TDTextarea>
+      <div class="flex td-seperate">
+        <TDInput
+          v-model="outputRowSeperator"
+          :label="$t('i18nCommon.textManipulation.rowSeperator')"
+          placeHolder=" "
+          class="td-column-seperate"
+        />
+      </div>
+    </div>
 
     <div class="flex">
       <TDButton
@@ -65,10 +76,12 @@ export default {
       expressionSource: "",
       columnSeperator: ",",
       rowSeperator: "\\n",
+      outputRowSeperator: "\\n",
       breakLineDisplay: "\\n",
       breakLineDisplayActual: "\n",
       defaultRowSeperator: "\n",
       defaultColSeperator: ",",
+      defaultOutputRowSeperator: "\n",
       outputSource: "",
     };
   },
@@ -81,6 +94,17 @@ export default {
       }
       if (!result) {
         result = me.defaultRowSeperator;
+      }
+      return result;
+    },
+    outputRowSeperatorActual() {
+      let me = this;
+      let result = me.outputRowSeperator;
+      if (result == me.breakLineDisplay) {
+        result = me.breakLineDisplayActual;
+      }
+      if (!result) {
+        result = me.defaultOutputRowSeperator;
       }
       return result;
     },
@@ -135,7 +159,7 @@ export default {
           });
         }
         if (arrResult && arrResult.length > 0) {
-          me.outputSource = arrResult.join(me.breakLineDisplayActual);
+          me.outputSource = arrResult.join(me.outputRowSeperatorActual);
         }
       }
     },
@@ -158,6 +182,7 @@ export default {
       this.expressionSource = mock.expressionSource;
       this.columnSeperator = mock.columnSeperator;
       this.rowSeperator = mock.rowSeperator;
+      this.outputRowSeperator = mock.outputRowSeperator;
       this.outputSource = "";
       this.$tdToast.success(
         this.$t("i18nCommon.toastMessage.applyMockSuccess")
