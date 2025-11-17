@@ -3,6 +3,7 @@
     <TDTextarea
       :placeHolder="$t('i18nCommon.textManipulation.inputSource')"
       v-model="inputSource"
+      class="mb-medium"
     ></TDTextarea>
 
     <TDTextarea

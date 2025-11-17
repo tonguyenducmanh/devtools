@@ -183,3 +183,29 @@ html[data-theme="dark"] {
   user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
 }
+
+.mb-medium {
+  margin-bottom: var(--padding);
+}
+.mt-medium {
+  margin-top: var(--padding);
+}
+.ml-medium {
+  margin-left: var(--padding);
+}
+.mr-medium {
+  margin-right: var(--padding);
+}
+
+.pb-medium {
+  padding-bottom: var(--padding);
+}
+.pt-medium {
+  padding-top: var(--padding);
+}
+.pl-medium {
+  padding-left: var(--padding);
+}
+.pr-medium {
+  padding-right: var(--padding);
+}
