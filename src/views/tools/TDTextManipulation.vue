@@ -14,13 +14,13 @@
         <TDInput
           v-model="columnSeperator"
           :label="$t('i18nCommon.textManipulation.columnSeperator')"
-          :placeHolder="$t('i18nCommon.textManipulation.columnSeperator')"
+          placeHolder=" "
           class="td-column-seperate"
         />
         <TDInput
           v-model="rowSeperator"
           :label="$t('i18nCommon.textManipulation.rowSeperator')"
-          :placeHolder="$t('i18nCommon.textManipulation.rowSeperator')"
+          placeHolder=" "
           class="td-column-seperate"
         />
       </div>
@@ -111,8 +111,18 @@ export default {
     let me = this;
   },
   methods: {
+    beforeManipulate() {
+      let me = this;
+      if (!me.rowSeperator) {
+        me.rowSeperator = mock.rowSeperator;
+      }
+      if (!me.columnSeperator) {
+        me.columnSeperator = mock.columnSeperator;
+      }
+    },
     manipulate() {
       let me = this;
+      me.beforeManipulate();
       if (me.inputSource) {
         me.outputSource = "";
         let arrInput = me.inputSource.split(me.rowSeperatorActual);
