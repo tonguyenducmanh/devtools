@@ -64,7 +64,8 @@ export default {
       expressionSource: "",
       columnSeperator: ",",
       rowSeperator: "\\n",
-      breankLineDisplay: "\\n",
+      breakLineDisplay: "\\n",
+      breakLineDisplayActual: "\n",
       defaultRowSeperator: "\n",
       defaultColSeperator: ",",
       outputSource: "",
@@ -74,7 +75,10 @@ export default {
     rowSeperatorActual() {
       let me = this;
       let result = me.rowSeperator;
-      if (!result || result == me.breankLineDisplay) {
+      if (result == me.breakLineDisplay) {
+        result = me.breakLineDisplayActual;
+      }
+      if (!result) {
         result = me.defaultRowSeperator;
       }
       return result;
@@ -82,6 +86,9 @@ export default {
     colSeperatorActual() {
       let me = this;
       let result = me.columnSeperator;
+      if (result == me.breakLineDisplay) {
+        result = me.breakLineDisplayActual;
+      }
       if (!result) {
         result = me.defaultColSeperator;
       }
