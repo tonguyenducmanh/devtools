@@ -57,7 +57,6 @@
 
 <script>
 import mock from "@/common/mock/TDMockTextManipulation.js";
-import { forEach } from "jszip";
 export default {
   name: "TDTextManipulation",
   data() {
