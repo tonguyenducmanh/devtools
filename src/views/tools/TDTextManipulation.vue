@@ -136,7 +136,7 @@ export default {
           });
         }
         if (arrResult && arrResult.length > 0) {
-          me.outputSource = arrResult.join(me.breakLineDisplayActual);
+          me.outputSource = arrResult.join(me.rowSeperatorActual);
         }
       }
     },
