@@ -1,11 +1,11 @@
 export default {
-  inputSource: `Lumbergh, Bill, Initech
-Waddams, Milton, Initech
-Gibbons, Peter, Initech
-Bolton, Michael, Initech`,
-  expressionSource: `To: $1.$0@$2.com
-Hello $1 $0,
-I'm sorry to inform you of a terrible accident at $2.
+  inputSource: `Nguyễn, An, VNG
+Trần, Bình, FPT
+Lê, Châu, Viettel
+Phạm, Dũng, VNPT`,
+  expressionSource: `Gửi đến: $1.$0@$2.vn
+Xin chào $1 $0,
+Chúng tôi xin thông báo rằng có một lịch họp khẩn tại $2 vào lúc 9:00 sáng mai.
 ---`,
   columnSeperator: ", ",
   rowSeperator: "\\n",
