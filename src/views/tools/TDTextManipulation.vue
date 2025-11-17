@@ -42,6 +42,8 @@ export default {
     return {
       inputSource: "",
       expressionSource: "",
+      columnSeperator: ", ",
+      rowSeperator: "\n",
       outputSource: "",
     };
   },
@@ -49,13 +51,20 @@ export default {
     let me = this;
   },
   methods: {
-    manipulate() {},
+    manipulate() {
+      let me = this;
+      if (me.inputSource && me.expressionSource) {
+        me.outputSource = "";
+      }
+    },
     handleCopyResult() {
       this.$tdUtility.copyToClipboard(this.similarity);
     },
     applyExample() {
       this.inputSource = mock.inputSource;
       this.expressionSource = mock.expressionSource;
+      this.columnSeperator = mock.columnSeperator;
+      this.rowSeperator = mock.rowSeperator;
       this.outputSource = "";
       this.$tdToast.success(
         this.$t("i18nCommon.toastMessage.applyMockSuccess")
