@@ -282,6 +282,15 @@ export default {
         "Invalid vectors. Both vectors must have same length and contain valid numbers.",
       calculated: "Similarity calculated successfully",
     },
+    textManipulation: {
+      inputSource: "Data to be processed",
+      expressionSource: "Data processing expression",
+      outputSource: "Data processing result",
+      manipulate: "Processing",
+      columnSeperator: "Column break",
+      rowSeperator: "Line break",
+      rowNum: "Line number",
+    },
     search: {
       placeholder: "Search",
       noResults: "No results found",
