@@ -7,6 +7,9 @@
         class="td-input-source-textbox"
       >
       </TDTextarea>
+      <div class="td-row-num">
+        {{ totalRow }}
+      </div>
       <div class="flex td-seperate">
         <TDInput
           v-model="columnSeperator"
@@ -59,10 +62,41 @@ export default {
     return {
       inputSource: "",
       expressionSource: "",
-      columnSeperator: ", ",
+      columnSeperator: ",",
       rowSeperator: "\\n",
+      breankLineDisplay: "\\n",
+      defaultRowSeperator: "\n",
+      defaultColSeperator: ",",
       outputSource: "",
     };
+  },
+  computed: {
+    rowSeperatorActual() {
+      let me = this;
+      let result = me.rowSeperator;
+      if (!result || result == me.breankLineDisplay) {
+        result = me.defaultRowSeperator;
+      }
+      return result;
+    },
+    colSeperatorActual() {
+      let me = this;
+      let result = me.columnSeperator;
+      if (!result) {
+        result = me.defaultColSeperator;
+      }
+      return result;
+    },
+    totalRow() {
+      let me = this;
+      let total = 0;
+      let textRow = me.$t("i18nCommon.textManipulation.rowNum");
+      if (me.inputSource && me.rowSeperatorActual) {
+        let arr = me.inputSource.split(me.rowSeperatorActual);
+        total = arr.length;
+      }
+      return `${textRow}: ${total}`;
+    },
   },
   created() {
     let me = this;
@@ -103,15 +137,27 @@ export default {
   .td-input-source-textbox {
     position: relative;
   }
+  .td-row-num {
+    position: absolute;
+    top: var(--padding);
+    right: var(--padding);
+    font-size: var(--font-size-medium);
+  }
+  .td-row-num:hover {
+    opacity: 0.5;
+  }
   .td-seperate {
     position: absolute;
     bottom: 0;
     right: 0;
     width: fit-content;
-    ::v-deep .td-input .td-label {
+    :deep(.td-input .td-label) {
       font-size: var(--font-size-medium);
     }
-    ::v-deep .td-input input {
+    :deep(.td-input .td-label:hover) {
+      opacity: 0.5;
+    }
+    :deep(.td-input input) {
       width: 40px;
     }
   }

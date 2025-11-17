@@ -288,6 +288,7 @@ export default {
       manipulate: "Xử lý",
       columnSeperator: "Ngắt cột",
       rowSeperator: "Ngắt dòng",
+      rowNum: "Số dòng",
     },
     search: {
       placeholder: "Tìm kiếm",
