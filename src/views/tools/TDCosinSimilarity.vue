@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col container">
-    <div class="title">{{ $t("i18nCommon.feature.cosinSimilarity") }}</div>
+    <!-- <div class="title">{{ $t("i18nCommon.feature.cosinSimilarity") }}</div> -->
 
     <div class="flex io-section">
       <TDTextarea

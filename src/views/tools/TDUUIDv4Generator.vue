@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">{{ $t("i18nCommon.uuidGenerator.title") }}</div>
+    <!-- <div class="title">{{ $t("i18nCommon.uuidGenerator.title") }}</div> -->
     <div class="flex flex-col td-uuid-generator">
       <TDInput
         :label="$t('i18nCommon.uuidGenerator.input.result')"

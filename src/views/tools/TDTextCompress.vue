@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col container">
-    <div class="title">{{ $t("i18nCommon.textCompress.title") }}</div>
+    <!-- <div class="title">{{ $t("i18nCommon.textCompress.title") }}</div> -->
     <div class="paste-box">
       <div class="flex compress-input">
         <TDTextarea
@@ -165,7 +165,7 @@ export default {
   justify-content: flex-start;
 }
 
-.compress-info{
+.compress-info {
   column-gap: var(--padding);
 }
 </style>

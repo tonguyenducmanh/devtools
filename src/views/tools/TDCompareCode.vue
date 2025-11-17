@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="container">
-      <div class="title">{{ $t("i18nCommon.compareCode.title") }}</div>
+      <!-- <div class="title">{{ $t("i18nCommon.compareCode.title") }}</div> -->
       <div class="flex flex-wrap td-compare-box">
         <TDTextarea
           :placeHolder="$t('i18nCommon.compareCode.firstFile')"
@@ -27,7 +27,10 @@
         class="td-checkbox-sibe-by-side"
       ></TDCheckbox>
       <div class="flex">
-        <TDButton @click="compare" :label="$t('i18nCommon.compareCode.compare')"></TDButton>
+        <TDButton
+          @click="compare"
+          :label="$t('i18nCommon.compareCode.compare')"
+        ></TDButton>
         <TDButton
           @click="applyMock"
           :type="$tdEnum.buttonType.secondary"

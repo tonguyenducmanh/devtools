@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col container">
-    <div class="title">{{ $t("i18nCommon.htmlPreview.title") }}</div>
+    <!-- <div class="title">{{ $t("i18nCommon.htmlPreview.title") }}</div> -->
     <div class="flex history-wrapper">
       <TDHistory
         ref="history"
@@ -130,7 +130,7 @@ export default {
     closePopup() {
       // Only toggle off the popup visibility
       this.isShowPopupPreview = false;
-    }
+    },
   },
   data() {
     return {

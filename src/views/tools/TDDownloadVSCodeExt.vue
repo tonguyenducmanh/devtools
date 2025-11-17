@@ -1,9 +1,9 @@
 <template>
   <div class="container">
-    <div class="title">
+    <!-- <div class="title">
       <div>{{ $t("i18nCommon.downloadVSCodeExt.title") }}</div>
       <div>{{ $t("i18nCommon.downloadVSCodeExt.subtitle") }}</div>
-    </div>
+    </div> -->
     <div class="flex flex-col">
       <div class="flex flex-wrap">
         <img class="td-img" src="@/assets/vscodeext.png" />

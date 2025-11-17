@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">{{ $t("i18nCommon.colorPicker.title") }}</div>
+    <!-- <div class="title">{{ $t("i18nCommon.colorPicker.title") }}</div> -->
     <div class="flex td-color-picker">
       <div v-show="!imageLoaded" class="upload-area-container">
         <TDUpload

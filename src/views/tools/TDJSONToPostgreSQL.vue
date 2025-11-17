@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col container">
-    <div class="title">{{ $t("i18nCommon.jsonToPostgreSQL.title") }}</div>
+    <!-- <div class="title">{{ $t("i18nCommon.jsonToPostgreSQL.title") }}</div> -->
     <div class="flex history-wrapper">
       <TDHistory
         ref="history"

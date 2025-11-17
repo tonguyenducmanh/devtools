@@ -45,6 +45,7 @@ export default {
       DownloadVSCodeExtension: "VSCode Extension",
       UUIDV4Generator: "UUIDv4 generator",
       HTMLPreview: "HTML Preview",
+      textManipulation: "Text manipulation",
     },
     example: "example",
     base64ToImage: {
@@ -277,7 +278,8 @@ export default {
       vectorPlaceholder: "Enter numbers separated by commas",
       result: "Similarity Result",
       calculate: "Calculate Similarity",
-      invalidVectors: "Invalid vectors. Both vectors must have same length and contain valid numbers.",
+      invalidVectors:
+        "Invalid vectors. Both vectors must have same length and contain valid numbers.",
       calculated: "Similarity calculated successfully",
     },
     search: {

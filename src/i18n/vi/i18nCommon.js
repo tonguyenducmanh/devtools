@@ -45,6 +45,7 @@ export default {
       DownloadVSCodeExtension: "Tiện ích VS Code",
       UUIDV4Generator: "Trình tạo UUID V4",
       HTMLPreview: "Xem trước HTML",
+      textManipulation: "Xử lý văn bản",
     },
     example: "ví dụ",
     base64ToImage: {
@@ -276,8 +277,15 @@ export default {
       vectorPlaceholder: "Nhập vector dưới dạng mảng số",
       result: "Kết quả độ tương đồng",
       calculate: "Tính độ tương đồng",
-      invalidVectors: "Vector không hợp lệ. Cả hai vector phải có cùng độ dài và chứa các số hợp lệ.",
+      invalidVectors:
+        "Vector không hợp lệ. Cả hai vector phải có cùng độ dài và chứa các số hợp lệ.",
       calculated: "Đã tính độ tương đồng thành công",
+    },
+    textManipulation: {
+      inputSource: "Dữ liệu cần xử lý",
+      expressionSource: "Biểu thức xử lý dữ liệu",
+      outputSource: "Kết quả xử lý dữ liệu",
+      manipulate: "Xử lý",
     },
     search: {
       placeholder: "Tìm kiếm",

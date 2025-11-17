@@ -1,8 +1,8 @@
 <template>
   <div class="container">
-    <div class="title">
+    <!-- <div class="title">
       {{ $t("i18nCommon.oneTimePassword.title") }}
-    </div>
+    </div> -->
     <div>
       <TDRadioGroup
         v-model="sourceOTPImport"

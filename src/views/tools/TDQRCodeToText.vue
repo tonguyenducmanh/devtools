@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col container">
-    <div class="title">{{ $t("i18nCommon.qrCodeToText.title") }}</div>
+    <!-- <div class="title">{{ $t("i18nCommon.qrCodeToText.title") }}</div> -->
     <div class="flex flex-col qr-section">
       <div>
         {{ $t("i18nCommon.qrCodeToText.note") }}

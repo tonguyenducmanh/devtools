@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">{{ $t("i18nCommon.jsonParser.title") }}</div>
+    <!-- <div class="title">{{ $t("i18nCommon.jsonParser.title") }}</div> -->
     <div class="flex">
       <div>
         <div>

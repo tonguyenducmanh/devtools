@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title">{{ $t("i18nCommon.imageToBase64.title") }}</div>
+    <!-- <div class="title">{{ $t("i18nCommon.imageToBase64.title") }}</div> -->
     <div class="flex flex-wrap paste-box">
       <div
         ref="drop-zone"

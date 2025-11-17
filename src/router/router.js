@@ -13,7 +13,6 @@ const routerConfig = [
     component: () => import("@/views/TDWelcome.vue"),
     meta: {
       titleKey: "i18nCommon.feature.welcome",
-      icon: "td-icon-welcome",
     },
   },
   {
@@ -25,7 +24,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDOneTimePassword.vue"),
     meta: {
       titleKey: "i18nCommon.feature.oneTimePassword",
-      icon: "td-icon-otp",
     },
   },
   {
@@ -37,7 +35,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDHTMLPreview.vue"),
     meta: {
       titleKey: "i18nCommon.feature.HTMLPreview",
-      icon: "td-icon-html-preview",
     },
   },
   {
@@ -49,7 +46,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDTextToQRCode.vue"),
     meta: {
       titleKey: "i18nCommon.feature.QRCodeFromText",
-      icon: "td-icon-qr",
     },
   },
   {
@@ -61,7 +57,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDQRCodeToText.vue"),
     meta: {
       titleKey: "i18nCommon.feature.QRCodeToText",
-      icon: "td-icon-qr-to-text",
     },
   },
   {
@@ -73,7 +68,17 @@ const routerConfig = [
     component: () => import("@/views/tools/TDTextCompress.vue"),
     meta: {
       titleKey: "i18nCommon.feature.textCompress",
-      icon: "td-icon-compress",
+    },
+  },
+  {
+    /**
+     * Xử lý văn bản/thao túng văn bản
+     */
+    path: "/TDTextManipulation",
+    name: "TDTextManipulation",
+    component: () => import("@/views/tools/TDTextManipulation.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.textManipulation",
     },
   },
   {
@@ -85,7 +90,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDCompareCode.vue"),
     meta: {
       titleKey: "i18nCommon.feature.compareCode",
-      icon: "td-icon-compare-code",
     },
   },
   {
@@ -97,7 +101,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDColorPicker.vue"),
     meta: {
       titleKey: "i18nCommon.feature.colorPicker",
-      icon: "td-icon-color-picker",
     },
   },
   {
@@ -109,7 +112,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDCodeFormatter.vue"),
     meta: {
       titleKey: "i18nCommon.feature.CodeFormatter",
-      icon: "td-icon",
     },
   },
   {
@@ -121,7 +123,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDCosinSimilarity.vue"),
     meta: {
       titleKey: "i18nCommon.feature.cosinSimilarity",
-      icon: "td-icon",
     },
   },
   {
@@ -133,7 +134,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDJSONParser.vue"),
     meta: {
       titleKey: "i18nCommon.feature.JSONParser",
-      icon: "td-icon-json-parser",
     },
   },
   {
@@ -145,7 +145,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDJSONToPostgreSQL.vue"),
     meta: {
       titleKey: "i18nCommon.feature.JSONToPostgreSQL",
-      icon: "td-icon-postgresql",
     },
   },
   {
@@ -157,7 +156,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDMappingJSON.vue"),
     meta: {
       titleKey: "i18nCommon.feature.JSONMapping",
-      icon: "td-icon-json-mapping",
     },
   },
   {
@@ -169,7 +167,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDJSONToExcel.vue"),
     meta: {
       titleKey: "i18nCommon.feature.JSONToExcel",
-      icon: "td-icon-json-excel",
     },
   },
   {
@@ -181,7 +178,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDBase64ToImage.vue"),
     meta: {
       titleKey: "i18nCommon.feature.ImageFromBase64",
-      icon: "td-icon-base64-image",
     },
   },
   {
@@ -193,7 +189,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDImageToBase64.vue"),
     meta: {
       titleKey: "i18nCommon.feature.ImageToBase64",
-      icon: "td-icon-base64-to-image",
     },
   },
   {
@@ -205,7 +200,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDDownloadVSCodeExt.vue"),
     meta: {
       titleKey: "i18nCommon.feature.DownloadVSCodeExtension",
-      icon: "td-icon-download",
     },
   },
   {
@@ -217,7 +211,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDUUIDv4Generator.vue"),
     meta: {
       titleKey: "i18nCommon.feature.UUIDV4Generator",
-      icon: "td-icon-uuid",
     },
   },
 ];

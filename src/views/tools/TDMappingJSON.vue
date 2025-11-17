@@ -1,8 +1,8 @@
 <template>
   <div class="container">
-    <div class="title">
+    <!-- <div class="title">
       {{ $t("i18nCommon.jsonMapping.title") }}
-    </div>
+    </div> -->
     <div class="td-mapping-container">
       <div class="flex flex-wrap td-mapping-group">
         <TDTextarea
