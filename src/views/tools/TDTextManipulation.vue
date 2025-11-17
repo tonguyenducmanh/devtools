@@ -50,12 +50,14 @@
     <TDTextarea
       :placeHolder="$t('i18nCommon.textManipulation.outputSource')"
       v-model="outputSource"
+      :readOnly="true"
     ></TDTextarea>
   </div>
 </template>
 
 <script>
 import mock from "@/common/mock/TDMockTextManipulation.js";
+import { forEach } from "jszip";
 export default {
   name: "TDTextManipulation",
   data() {
@@ -111,12 +113,36 @@ export default {
   methods: {
     manipulate() {
       let me = this;
-      if (me.inputSource && me.expressionSource) {
+      if (me.inputSource) {
         me.outputSource = "";
+        let arrInput = me.inputSource.split(me.rowSeperatorActual);
+        let arrResult = [];
+        if (arrInput && arrInput.length > 0) {
+          arrInput.forEach((inputItem) => {
+            let res = me.manipulateByRow(inputItem);
+            if (res) {
+              arrResult.push(res);
+            }
+          });
+        }
+        if (arrResult && arrResult.length > 0) {
+          me.outputSource = arrResult.join(me.breakLineDisplayActual);
+        }
       }
     },
+    manipulateByRow(inputItem) {
+      let me = this;
+      let result = "";
+      if (inputItem && me.expressionSource && me.colSeperatorActual) {
+        let arrInput = inputItem.split(me.colSeperatorActual);
+        result = me.expressionSource;
+        // replace $0, $1 => $n
+        result = me.replaceMarkText(arrInput, result);
+      }
+      return result;
+    },
     handleCopyResult() {
-      this.$tdUtility.copyToClipboard(this.similarity);
+      this.$tdUtility.copyToClipboard(this.outputSource);
     },
     applyExample() {
       this.inputSource = mock.inputSource;
@@ -127,6 +153,20 @@ export default {
       this.$tdToast.success(
         this.$t("i18nCommon.toastMessage.applyMockSuccess")
       );
+    },
+    /**
+     * replace $0, $1 -> $n by text
+     */
+    replaceMarkText(arrInput, result) {
+      if (arrInput && arrInput.length > 0) {
+        for (let i = 0; i < arrInput.length; i++) {
+          let expression = `$${i}`;
+          if (result.includes(expression)) {
+            result = result.replaceAll(expression, arrInput[i]);
+          }
+        }
+      }
+      return result;
     },
   },
 };
