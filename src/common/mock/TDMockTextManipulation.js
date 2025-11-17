@@ -8,5 +8,5 @@ Hello $1 $0,
 I'm sorry to inform you of a terrible accident at $2.
 ---`,
   columnSeperator: ", ",
-  rowSeperator: "\n",
+  rowSeperator: "\\n",
 };

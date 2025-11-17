@@ -1,10 +1,27 @@
 <template>
   <div class="flex flex-col container">
-    <TDTextarea
-      :placeHolder="$t('i18nCommon.textManipulation.inputSource')"
-      v-model="inputSource"
-      class="mb-medium"
-    ></TDTextarea>
+    <div class="mb-medium td-input-source">
+      <TDTextarea
+        :placeHolder="$t('i18nCommon.textManipulation.inputSource')"
+        v-model="inputSource"
+        class="td-input-source-textbox"
+      >
+      </TDTextarea>
+      <div class="flex td-seperate">
+        <TDInput
+          v-model="columnSeperator"
+          :label="$t('i18nCommon.textManipulation.columnSeperator')"
+          :placeHolder="$t('i18nCommon.textManipulation.columnSeperator')"
+          class="td-column-seperate"
+        />
+        <TDInput
+          v-model="rowSeperator"
+          :label="$t('i18nCommon.textManipulation.rowSeperator')"
+          :placeHolder="$t('i18nCommon.textManipulation.rowSeperator')"
+          class="td-column-seperate"
+        />
+      </div>
+    </div>
 
     <TDTextarea
       :placeHolder="$t('i18nCommon.textManipulation.expressionSource')"
@@ -43,7 +60,7 @@ export default {
       inputSource: "",
       expressionSource: "",
       columnSeperator: ", ",
-      rowSeperator: "\n",
+      rowSeperator: "\\n",
       outputSource: "",
     };
   },
@@ -74,9 +91,29 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .container {
   width: 100%;
   height: 100%;
+}
+.td-input-source {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  .td-input-source-textbox {
+    position: relative;
+  }
+  .td-seperate {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: fit-content;
+    ::v-deep .td-input .td-label {
+      font-size: var(--font-size-medium);
+    }
+    ::v-deep .td-input input {
+      width: 40px;
+    }
+  }
 }
 </style>

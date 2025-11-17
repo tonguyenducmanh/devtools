@@ -286,6 +286,8 @@ export default {
       expressionSource: "Biểu thức xử lý dữ liệu",
       outputSource: "Kết quả xử lý dữ liệu",
       manipulate: "Xử lý",
+      columnSeperator: "Ngắt cột",
+      rowSeperator: "Ngắt dòng",
     },
     search: {
       placeholder: "Tìm kiếm",
