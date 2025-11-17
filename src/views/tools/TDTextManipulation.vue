@@ -193,8 +193,8 @@ export default {
      */
     replaceMarkText(arrInput, result) {
       if (arrInput && arrInput.length > 0) {
-        for (let i = 0; i < arrInput.length; i++) {
-          let expression = `$${i}`;
+        for (let i = arrInput.length - 1; i >= 0; i--) {
+          const expression = `$${i}`;
           if (result.includes(expression)) {
             result = result.replaceAll(expression, arrInput[i]);
           }
