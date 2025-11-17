@@ -1,7 +1,7 @@
 {
   "name": "tool-tomanh",
   "productName": "tool-tomanh",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "tool tomanh",
   "main": ".vite/build/main.js",
   "scripts": {
