@@ -21,8 +21,7 @@ export default {
     let me = this;
     me.debouncedFunc = me.$tdUtility.debounce((e) => {
       e.preventDefault();
-      console.log("1231");
-      me.$emit("click");
+      me.$emit("click", e);
     }, me.debounceTime);
   },
   mounted() {},
