@@ -53,3 +53,9 @@ npm run electron:dev
 ```
 npm run electron:build
 ```
+
+For macos
+
+```
+npm run electron:build_mac
+```
