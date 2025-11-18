@@ -145,22 +145,27 @@ export default {
     },
     manipulate() {
       let me = this;
-      me.beforeManipulate();
-      if (me.inputSource) {
-        me.outputSource = "";
-        let arrInput = me.inputSource.split(me.rowSeperatorActual);
-        let arrResult = [];
-        if (arrInput && arrInput.length > 0) {
-          arrInput.forEach((inputItem) => {
-            let res = me.manipulateByRow(inputItem);
-            if (res) {
-              arrResult.push(res);
-            }
-          });
+      try {
+        me.beforeManipulate();
+        if (me.inputSource) {
+          me.outputSource = "";
+          let arrInput = me.inputSource.split(me.rowSeperatorActual);
+          let arrResult = [];
+          if (arrInput && arrInput.length > 0) {
+            arrInput.forEach((inputItem) => {
+              let res = me.manipulateByRow(inputItem);
+              if (res) {
+                arrResult.push(res);
+              }
+            });
+          }
+          if (arrResult && arrResult.length > 0) {
+            me.outputSource = arrResult.join(me.outputRowSeperatorActual);
+          }
         }
-        if (arrResult && arrResult.length > 0) {
-          me.outputSource = arrResult.join(me.outputRowSeperatorActual);
-        }
+        me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
+      } catch (error) {
+        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
       }
     },
     manipulateByRow(inputItem) {

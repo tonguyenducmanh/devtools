@@ -2,12 +2,20 @@ import { v4 as uuidv4 } from "uuid";
 import JSON5 from "json5";
 import { toast } from "@/common/TDToastUtil.js";
 import i18nData from "@/i18n/i18nData.js";
-
+import * as _ from "lodash";
 /**
  * các method TDutility dùng cho toàn bộ frontend
  * Created by tdmanh1 19.09.2024
  */
 class TDUtility {
+  /**
+   * wrap hàm debounce của lodash
+   * @param {*} fn function cần deboune
+   */
+  debounce(fn, timeDelay) {
+    return _.debounce(fn, timeDelay);
+  }
+
   /**
    * Thực hiện duyệt từng phần tử của bảng hoặc thuộc tính của object để call fn
    * @param {Array/Object/...} obj

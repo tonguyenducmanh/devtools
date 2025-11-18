@@ -1,5 +1,6 @@
 <template>
   <button
+    @click="handleClick"
     class="td-button noselect"
     :class="{
       'td-button-secondary': type == $tdEnum.buttonType.secondary,
@@ -16,9 +17,20 @@ import tdEnum from "@/common/TDEnum.js";
 
 export default {
   name: "TDButton",
-  created() {},
+  created() {
+    let me = this;
+    me.debouncedFunc = me.$tdUtility.debounce((e) => {
+      e.preventDefault();
+      console.log("1231");
+      me.$emit("click");
+    }, me.debounceTime);
+  },
   mounted() {},
-  methods: {},
+  emits: ["click"],
+  beforeUnmount() {
+    let me = this;
+    me.debouncedFunc = null;
+  },
   props: {
     readOnly: {
       type: Boolean,
@@ -32,11 +44,23 @@ export default {
       type: String,
       default: tdEnum.buttonType.primary,
     },
+    debounceTime: {
+      type: Number,
+      default: 200,
+    },
   },
   data() {
-    return {};
+    return {
+      debouncedFunc: null,
+    };
   },
-  methods: {},
+  methods: {
+    handleClick(e) {
+      let me = this;
+      e.preventDefault();
+      me.debouncedFunc(e);
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
