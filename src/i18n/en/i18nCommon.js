@@ -284,7 +284,8 @@ export default {
     },
     textManipulation: {
       inputSource: "Data to be processed",
-      expressionSource: "Data processing expression",
+      expressionSource:
+        "Data processing expression.\nUse $0, $1, $2,... to replace the order of the column to be replaced.\nUse $0.upper to replace the uppercase of the column to be replaced. (Similar to $0.lower, $0.snake, $0.trim).",
       outputSource: "Data processing result",
       manipulate: "Processing",
       columnSeperator: "Column break",

@@ -174,7 +174,6 @@ export default {
       if (inputItem && me.expressionSource && me.colSeperatorActual) {
         let arrInput = inputItem.split(me.colSeperatorActual);
         result = me.expressionSource;
-        // replace $0, $1 => $n
         result = me.replaceMarkText(arrInput, result);
       }
       return result;
@@ -194,14 +193,36 @@ export default {
       );
     },
     /**
-     * replace $0, $1 -> $n by text
+     * Biến đổi text theo cấu hình có sẵn
      */
     replaceMarkText(arrInput, result) {
       if (arrInput && arrInput.length > 0) {
         for (let i = arrInput.length - 1; i >= 0; i--) {
-          const expression = `$${i}`;
-          if (result.includes(expression)) {
-            result = result.replaceAll(expression, arrInput[i]);
+          let currentText = arrInput[i];
+          if (currentText) {
+            // viết hoa văn bản
+            let expressionUpper = `$${i}.upper`;
+            let textUpper = currentText.toUpperCase();
+            result = result.replaceAll(expressionUpper, textUpper);
+
+            // viết thường văn bản
+            let expressionLower = `$${i}.lower`;
+            let textLower = currentText.toLowerCase();
+            result = result.replaceAll(expressionLower, textLower);
+
+            // snake case văn bản
+            let expressionSnake = `$${i}.snake`;
+            let textSnake = currentText.split(" ").join("_").toLowerCase();
+            result = result.replaceAll(expressionSnake, textSnake);
+
+            // trim văn bản
+            let expressionTrim = `$${i}.trim`;
+            let textTrim = currentText.trim();
+            result = result.replaceAll(expressionTrim, textTrim);
+
+            // thay thế $0, $1 -> $n bằng text của user
+            let expressionReplace = `$${i}`;
+            result = result.replaceAll(expressionReplace, currentText);
           }
         }
       }

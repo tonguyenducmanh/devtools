@@ -283,7 +283,8 @@ export default {
     },
     textManipulation: {
       inputSource: "Dữ liệu cần xử lý",
-      expressionSource: "Biểu thức xử lý dữ liệu",
+      expressionSource:
+        "Biểu thức xử lý dữ liệu.\nSử dụng $0, $1, $2,... để thay thế cho thứ tự cột cần replace.\nSử dụng $0.upper để thay thế cho việc viết hoa cột cần replace. (Tương tự với $0.lower, $0.snake, $0.trim).",
       outputSource: "Kết quả xử lý dữ liệu",
       manipulate: "Xử lý",
       columnSeperator: "Ngắt cột",
