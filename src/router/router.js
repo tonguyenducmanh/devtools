@@ -127,17 +127,6 @@ const routerConfig = [
   },
   {
     /**
-     * convert từ JSON sang object và object sang JSON
-     */
-    path: "/jsonparser",
-    name: "jsonparser",
-    component: () => import("@/views/tools/TDJSONParser.vue"),
-    meta: {
-      titleKey: "i18nCommon.feature.JSONParser",
-    },
-  },
-  {
-    /**
      * chuyển đổi json thành câu lệnh insert postgresql
      */
     path: "/jsontopostgresql",

@@ -17,9 +17,6 @@
   window.__env.githubSource = {
     url: "https://github.com/tonguyenducmanh/tool-tomanh",
   };
-  window.__env.jsonParser = {
-    showConfigLib: false,
-  };
   window.__env.oneTimePasswordAuthen = {
     showDecodedInfo: false,
     autoSave: true,
