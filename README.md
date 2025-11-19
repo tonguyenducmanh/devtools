@@ -6,12 +6,6 @@ Two versions are supported: web version (Vue + Vite) and app version (Electron +
 
 [https://tool.tomanh.com/](https://tool.tomanh.com/)
 
-List of Supported Features:
-
-One time password, Color picker, Text Compress, Compare code, JSON parser, JSON to PostgreSQL, JSON Mapping, JSON to Excel, Code formatter, Image from Base64, Image to Base64, QRCode from text, QRCode to text, Download VSCode Extension, UUIDv4 generator
-
-List of Supported languages: Vietnamese, English
-
 Demo:
 
 ![alt text](img/screenshoot.png)
