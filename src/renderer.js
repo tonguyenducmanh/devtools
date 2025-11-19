@@ -47,7 +47,7 @@ import ToastPlugin from "@/common/TDToastUtil.js";
 
   // Lấy ngôn ngữ hiện tại
   let currentLanguage = await cache.get(enumeration.cacheConfig.Language);
-  let locale = currentLanguage ? currentLanguage : enumeration.language.vi;
+  let locale = currentLanguage ? currentLanguage : enumeration.language.en;
   await loadLocale(locale);
 
   currentApp.mount("#app");
