@@ -12,6 +12,8 @@ export default {
     welcomeTextOne: "The",
     welcomeTextTwo: "Essential",
     welcomeTextThree: "Utility Tool for Dev",
+    agreement:
+      "When using this website, you agree to only exploit the tools and utilities here for positive, healthy purposes and bring value to the community. We strictly prohibit any act of exploiting the website to cause harm, destruction, violate privacy, attack the system, create malicious content or perform any act that causes loss of benefits to any organization, individual or company. Continued use means you commit to comply with these principles and use the tools responsibly.",
     sidebar: {
       filter: "Filter tool",
       menu: {

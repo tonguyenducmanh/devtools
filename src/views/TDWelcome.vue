@@ -7,6 +7,7 @@
         ><br />{{ $t("i18nCommon.welcomeTextThree") }}
       </h1>
       <p class="description">{{ $t("i18nCommon.createbyAuthor") }}</p>
+      <p class="agreement">{{ $t("i18nCommon.agreement") }}</p>
     </div>
     <div class="language-buttons">
       <div
@@ -119,7 +120,14 @@ body[data-theme="dark"] .tagline {
 body[data-theme="dark"] .description {
   color: var(--text-color-dark);
 }
-
+.agreement {
+  color: var(--text-color-light);
+  text-align: center;
+  max-width: 800px;
+}
+body[data-theme="dark"] .agreement {
+  color: var(--text-color-dark);
+}
 .language-buttons {
   display: flex;
   gap: 10px;
