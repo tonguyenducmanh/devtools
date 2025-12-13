@@ -16,15 +16,17 @@
       </div>
 
       <div class="flex method-selection">
-        <TDRadioGroup
-          v-model="currentAPIInfoOption"
-          :options="APIInfoOptions"
-        />
-        <TDComboBox
-          :label="$t('i18nCommon.apiTesting.method')"
-          v-model="httpMethod"
-          :options="methodOptions"
-        />
+        <div class="flex">
+          <TDRadioGroup
+            v-model="currentAPIInfoOption"
+            :options="APIInfoOptions"
+          />
+          <TDComboBox
+            :label="$t('i18nCommon.apiTesting.method')"
+            v-model="httpMethod"
+            :options="methodOptions"
+          />
+        </div>
         <div class="status-info" v-if="statusCode">
           <div class="status-badge" :class="statusClass">
             Status: {{ statusCode }}
@@ -315,7 +317,7 @@ export default {
   display: flex;
   flex-direction: column;
   .method-selection {
-    justify-content: start;
+    justify-content: space-between;
     width: 100%;
   }
   .text-area-box {
