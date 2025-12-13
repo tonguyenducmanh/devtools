@@ -284,7 +284,7 @@ export default {
     apiTesting: {
       title: "API Testing Tool!",
       url: "URL",
-      urlPlaceholder: "Enter API endpoint",
+      urlPlaceholder: "Enter URL",
       urlRequired: "API URL is required",
       method: "Method",
       headers: "Headers",

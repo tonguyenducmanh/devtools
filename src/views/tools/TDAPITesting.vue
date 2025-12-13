@@ -11,7 +11,6 @@
         <TDComboBox v-model="httpMethod" :options="methodOptions" />
         <TDInput
           v-model="apiUrl"
-          :label="$t('i18nCommon.apiTesting.url')"
           :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
         ></TDInput>
       </div>

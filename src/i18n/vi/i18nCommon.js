@@ -283,7 +283,7 @@ export default {
     apiTesting: {
       title: "Công cụ kiểm tra API!",
       url: "URL",
-      urlPlaceholder: "Nhập endpoint API",
+      urlPlaceholder: "Nhập URL",
       urlRequired: "URL API là bắt buộc",
       method: "Method",
       headers: "Headers",
