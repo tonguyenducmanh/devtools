@@ -10,4 +10,5 @@ export const EnumCacheConfig = {
   CodeFormatterHistory: 8,
   Language: 9,
   HTMLPreviewHistory: 10,
+  APIHistory: 11,
 };

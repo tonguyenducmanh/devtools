@@ -28,6 +28,12 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử quét mã",
   },
+  APIHistory: {
+    KeyFormat: "APIHistory",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử gọi API",
+  },
   JSONToExcelHistory: {
     KeyFormat: "JSONToExcelHistory",
     CacheLevel: tdEnum.cacheType.indexedDB,
