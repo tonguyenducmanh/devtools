@@ -401,7 +401,7 @@ export default {
       let CURLParsed = me.parseCurl(me.curlContent);
       if (CURLParsed) {
         me.apiUrl = CURLParsed.url;
-        me.bodyText = CURLParsed.body;
+        me.bodyText = JSON.stringify(JSON.parse(CURLParsed.body), null, 2);
         me.httpMethod = CURLParsed.method;
         me.headersText = CURLParsed.headersText;
         me.isImportingCURL = false;
