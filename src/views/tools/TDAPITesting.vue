@@ -1,14 +1,12 @@
 <template>
   <div class="flex flex-col container">
     <div class="paste-box">
-      <div class="flex">
-        <TDHistory
-          ref="history"
-          :applyFunction="handleSendRequestFromHistory"
-          titleKey="apiUrl"
-          :cacheKey="$tdEnum.cacheConfig.APIHistory"
-        ></TDHistory>
-      </div>
+      <TDHistory
+        ref="history"
+        :applyFunction="handleSendRequestFromHistory"
+        titleKey="apiUrl"
+        :cacheKey="$tdEnum.cacheConfig.APIHistory"
+      ></TDHistory>
       <div>
         <TDInput
           v-model="apiUrl"
