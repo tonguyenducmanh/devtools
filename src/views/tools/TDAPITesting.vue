@@ -348,7 +348,11 @@ export default {
     }
   }
 }
-
+.group-btn {
+  width: 100%;
+  position: relative;
+  flex-wrap: wrap;
+}
 .status-info {
   display: flex;
   align-items: center;
