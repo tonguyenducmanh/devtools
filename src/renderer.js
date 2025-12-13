@@ -11,6 +11,7 @@ import TDCheckbox from "@/components/TDCheckbox.vue";
 import TDUpload from "@/components/TDUpload.vue";
 import TDRadio from "@/components/TDRadio.vue";
 import TDRadioGroup from "@/components/TDRadioGroup.vue";
+import TDComboBox from "@/components/TDComboBox.vue";
 import TDHistory from "@/components/TDHistory.vue";
 import i18nData, { loadLocale } from "@/i18n/i18nData.js";
 import eventBus from "@/common/event/TDEventBus.js";
@@ -34,6 +35,7 @@ import ToastPlugin from "@/common/TDToastUtil.js";
   currentApp.component("TDUpload", TDUpload);
   currentApp.component("TDRadio", TDRadio);
   currentApp.component("TDRadioGroup", TDRadioGroup);
+  currentApp.component("TDComboBox", TDComboBox);
   currentApp.component("TDHistory", TDHistory);
 
   // router link

@@ -20,7 +20,7 @@
           v-model="currentAPIInfoOption"
           :options="APIInfoOptions"
         />
-        <TDRadioGroup
+        <TDComboBox
           :label="$t('i18nCommon.apiTesting.method')"
           v-model="httpMethod"
           :options="methodOptions"
