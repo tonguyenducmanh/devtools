@@ -205,7 +205,7 @@ export default {
         await me.$refs.history.saveToHistory(historyItem);
       }
     },
-    async handleSendRequestFromHistory(item) {
+    handleSendRequestFromHistory(item) {
       let me = this;
       if (item && item.apiUrl) {
         me.apiUrl = item.apiUrl;
