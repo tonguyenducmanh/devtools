@@ -47,7 +47,7 @@ export default {
       UUIDV4Generator: "UUIDv4 generator",
       HTMLPreview: "HTML Preview",
       textManipulation: "Text manipulation",
-      APITesting: "API Testing",
+      APITesting: "API",
     },
     example: "example",
     base64ToImage: {
@@ -284,11 +284,13 @@ export default {
     apiTesting: {
       title: "API Testing Tool!",
       url: "API URL",
-      urlPlaceholder: "Enter API endpoint (e.g., https://api.example.com/users)",
+      urlPlaceholder:
+        "Enter API endpoint (e.g., https://api.example.com/users)",
       urlRequired: "API URL is required",
       method: "HTTP Method",
       headers: "Headers",
-      headersPlaceholder: "Content-Type: application/json\nAuthorization: Bearer token",
+      headersPlaceholder:
+        "Content-Type: application/json\nAuthorization: Bearer token",
       body: "Request Body",
       bodyPlaceholder: "Enter JSON or form data here",
       response: "Response",

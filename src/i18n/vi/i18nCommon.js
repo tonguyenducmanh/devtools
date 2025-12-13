@@ -47,7 +47,7 @@ export default {
       UUIDV4Generator: "Trình tạo UUID V4",
       HTMLPreview: "Xem trước HTML",
       textManipulation: "Xử lý văn bản",
-      APITesting: "Kiểm tra API",
+      APITesting: "API",
     },
     example: "ví dụ",
     base64ToImage: {
@@ -283,11 +283,13 @@ export default {
     apiTesting: {
       title: "Công cụ kiểm tra API!",
       url: "URL API",
-      urlPlaceholder: "Nhập endpoint API (ví dụ: https://api.example.com/users)",
+      urlPlaceholder:
+        "Nhập endpoint API (ví dụ: https://api.example.com/users)",
       urlRequired: "URL API là bắt buộc",
       method: "HTTP Method",
       headers: "Headers",
-      headersPlaceholder: "Content-Type: application/json\nAuthorization: Bearer token",
+      headersPlaceholder:
+        "Content-Type: application/json\nAuthorization: Bearer token",
       body: "Request Body",
       bodyPlaceholder: "Nhập dữ liệu JSON hoặc form vào đây",
       response: "Response",
