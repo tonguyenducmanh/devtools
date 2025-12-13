@@ -8,11 +8,7 @@
         :cacheKey="$tdEnum.cacheConfig.APIHistory"
       ></TDHistory>
       <div class="flex">
-        <TDComboBox
-          :label="$t('i18nCommon.apiTesting.method')"
-          v-model="httpMethod"
-          :options="methodOptions"
-        />
+        <TDComboBox v-model="httpMethod" :options="methodOptions" />
         <TDInput
           v-model="apiUrl"
           :label="$t('i18nCommon.apiTesting.url')"
