@@ -14,48 +14,50 @@
           :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
         ></TDInput>
       </div>
-
-      <div class="flex method-selection">
-        <div class="flex">
-          <TDRadioGroup
-            v-model="currentAPIInfoOption"
-            :options="APIInfoOptions"
-          />
-        </div>
-        <div class="status-info" v-if="statusCode">
-          <div class="status-badge" :class="statusClass">
-            Status: {{ statusCode }}
-          </div>
-          <div class="response-time" v-if="responseTime">
-            {{ responseTime }}ms
-          </div>
-        </div>
-      </div>
       <div class="flex text-area-box">
-        <div class="flex text-area-request">
+        <div class="flex flex-col text-area-request">
+          <div class="flex request-area-title">
+            <TDRadioGroup
+              v-model="currentAPIInfoOption"
+              :options="APIInfoOptions"
+            />
+          </div>
           <TDTextarea
             v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.header"
-            :label="$t('i18nCommon.apiTesting.headers')"
             :isLabelTop="true"
             v-model="headersText"
             :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
           ></TDTextarea>
-
           <TDTextarea
             v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.body"
-            :label="$t('i18nCommon.apiTesting.body')"
             :isLabelTop="true"
             v-model="bodyText"
             :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
           ></TDTextarea>
         </div>
-        <TDTextarea
-          :label="$t('i18nCommon.apiTesting.response')"
-          :isLabelTop="true"
-          :modelValue="responseText"
-          :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
-          :readOnly="true"
-        ></TDTextarea>
+        <div class="flex flex-col text-area-response">
+          <div class="flex response-area-title">
+            <div>
+              {{ $t("i18nCommon.apiTesting.response") }}
+            </div>
+            <div>
+              <div class="status-info" v-if="statusCode">
+                <div class="status-badge" :class="statusClass">
+                  Status: {{ statusCode }}
+                </div>
+                <div class="response-time" v-if="responseTime">
+                  {{ responseTime }}ms
+                </div>
+              </div>
+            </div>
+          </div>
+          <TDTextarea
+            :isLabelTop="true"
+            :modelValue="responseText"
+            :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
+            :readOnly="true"
+          ></TDTextarea>
+        </div>
       </div>
     </div>
 
@@ -328,9 +330,21 @@ export default {
     gap: var(--padding);
     flex: 1;
     .text-area-request {
-      gap: var(--padding);
       width: 100%;
       height: 100%;
+      .request-area-title {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+    .text-area-response {
+      width: 100%;
+      height: 100%;
+      .response-area-title {
+        justify-content: space-between;
+        width: 100%;
+        height: 40px;
+      }
     }
   }
 }
@@ -339,7 +353,6 @@ export default {
   display: flex;
   align-items: center;
   gap: var(--padding);
-  padding: var(--padding);
   background-color: var(--bg-secondary);
   border-radius: 0.375rem;
   font-size: 0.875rem;
