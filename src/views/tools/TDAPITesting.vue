@@ -1,66 +1,57 @@
 <template>
   <div class="flex flex-col container">
     <div class="paste-box">
-      <div class="api-section">
-        <!-- URL Input -->
-        <div class="form-group">
-          <label>{{ $t("i18nCommon.apiTesting.url") }}</label>
-          <TDInput
-            v-model="apiUrl"
-            :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
-          ></TDInput>
-        </div>
+      <div>
+        <TDInput
+          v-model="apiUrl"
+          :label="$t('i18nCommon.apiTesting.url')"
+          :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
+        ></TDInput>
+      </div>
 
-        <!-- Method Selection -->
-        <div class="form-group">
-          <label>{{ $t("i18nCommon.apiTesting.method") }}</label>
-          <TDRadioGroup
-            v-model="httpMethod"
-            :options="methodOptions"
-          />
-        </div>
+      <div class="flex method-selection">
+        <TDRadioGroup
+          :label="$t('i18nCommon.apiTesting.method')"
+          v-model="httpMethod"
+          :options="methodOptions"
+        />
+      </div>
 
-        <!-- Headers Input -->
-        <div class="form-group">
-          <label>{{ $t("i18nCommon.apiTesting.headers") }}</label>
+      <div class="flex flex-col text-area-box">
+        <div class="flex text-area-request">
           <TDTextarea
+            :label="$t('i18nCommon.apiTesting.headers')"
+            :isLabelTop="true"
             v-model="headersText"
             :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
           ></TDTextarea>
-        </div>
 
-        <!-- Body Input (for POST, PUT, PATCH) -->
-        <div class="form-group" v-if="['POST', 'PUT', 'PATCH'].includes(httpMethod)">
-          <label>{{ $t("i18nCommon.apiTesting.body") }}</label>
           <TDTextarea
+            :label="$t('i18nCommon.apiTesting.body')"
+            :isLabelTop="true"
             v-model="bodyText"
             :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
           ></TDTextarea>
         </div>
+        <TDTextarea
+          :label="$t('i18nCommon.apiTesting.response')"
+          :isLabelTop="true"
+          :modelValue="responseText"
+          :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
+          :readOnly="true"
+        ></TDTextarea>
+      </div>
 
-        <!-- Response Output -->
-        <div class="form-group">
-          <label>{{ $t("i18nCommon.apiTesting.response") }}</label>
-          <TDTextarea
-            :modelValue="responseText"
-            :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
-            :disabled="true"
-          ></TDTextarea>
+      <div class="status-info" v-if="statusCode">
+        <div class="status-badge" :class="statusClass">
+          Status: {{ statusCode }}
         </div>
-
-        <!-- Status Info -->
-        <div class="status-info" v-if="statusCode">
-          <div class="status-badge" :class="statusClass">
-            Status: {{ statusCode }}
-          </div>
-          <div class="response-time" v-if="responseTime">
-            {{ responseTime }}ms
-          </div>
+        <div class="response-time" v-if="responseTime">
+          {{ responseTime }}ms
         </div>
       </div>
     </div>
 
-    <!-- Action Buttons -->
     <div class="flex group-btn">
       <TDButton
         @click="handleSendRequest"
@@ -111,7 +102,8 @@ export default {
       if (!this.statusCode) return "";
       if (this.statusCode >= 200 && this.statusCode < 300) return "success";
       if (this.statusCode >= 300 && this.statusCode < 400) return "redirect";
-      if (this.statusCode >= 400 && this.statusCode < 500) return "client-error";
+      if (this.statusCode >= 400 && this.statusCode < 500)
+        return "client-error";
       if (this.statusCode >= 500) return "server-error";
       return "";
     },
@@ -120,7 +112,7 @@ export default {
     parseHeaders(headerString) {
       const headers = {};
       if (!headerString) return headers;
-      
+
       headerString.split("\n").forEach((line) => {
         const trimmed = line.trim();
         if (trimmed) {
@@ -130,7 +122,7 @@ export default {
           }
         }
       });
-      
+
       return headers;
     },
     async handleSendRequest() {
@@ -150,14 +142,20 @@ export default {
           headers: headers,
         };
 
-        if (["POST", "PUT", "PATCH"].includes(this.httpMethod) && this.bodyText) {
+        if (
+          ["POST", "PUT", "PATCH"].includes(this.httpMethod) &&
+          this.bodyText
+        ) {
           requestData.body = this.bodyText;
         }
 
         let response;
-        
+
         // Use extension if available
-        if (window.__toolTomanh && typeof window.__toolTomanh.callAPI === "function") {
+        if (
+          window.__toolTomanh &&
+          typeof window.__toolTomanh.callAPI === "function"
+        ) {
           response = await window.__toolTomanh.callAPI(requestData);
         } else {
           throw new Error("Extension not available");
@@ -209,7 +207,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .container {
   width: 100%;
   height: 100%;
@@ -217,36 +215,25 @@ export default {
   box-shadow: none;
 }
 
+:deep .td-input {
+  margin: unset;
+}
 .paste-box {
+  width: 100%;
   flex: 1;
-  width: 100%;
-  overflow-y: auto;
-  padding-bottom: var(--padding);
-}
-
-.api-section {
   display: flex;
   flex-direction: column;
-  gap: var(--padding);
-  width: 100%;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-group label {
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: var(--text-primary);
-}
-
-.group-btn {
-  justify-content: flex-start;
-  gap: var(--padding);
-  margin-top: var(--padding);
+  .method-selection {
+  }
+  .text-area-box {
+    gap: var(--padding);
+    flex: 1;
+    .text-area-request {
+      gap: var(--padding);
+      width: 100%;
+      height: 100%;
+    }
+  }
 }
 
 .status-info {
