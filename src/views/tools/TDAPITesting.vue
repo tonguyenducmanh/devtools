@@ -1,6 +1,14 @@
 <template>
   <div class="flex flex-col container">
     <div class="paste-box">
+      <div class="flex">
+        <TDHistory
+          ref="history"
+          :applyFunction="handleSendRequestFromHistory"
+          titleKey="apiUrl"
+          :cacheKey="$tdEnum.cacheConfig.APIHistory"
+        ></TDHistory>
+      </div>
       <div>
         <TDInput
           v-model="apiUrl"
@@ -126,6 +134,7 @@ export default {
       return headers;
     },
     async handleSendRequest() {
+      let me = this;
       if (!this.apiUrl) {
         this.$tdToast.error(null, this.$t("i18nCommon.apiTesting.urlRequired"));
         return;
@@ -187,6 +196,25 @@ export default {
         this.$tdToast.error(null, `${error.message}`);
       } finally {
         this.isLoading = false;
+        // Lưu text vào lịch sử nếu khác với lần lưu trước
+        // so sánh input và output, nếu giống nhau thì xoá output
+        let historyItem = {
+          apiUrl: me.apiUrl,
+          httpMethod: me.httpMethod,
+          headersText: me.headersText,
+          bodyText: me.bodyText,
+        };
+        await me.$refs.history.saveToHistory(historyItem);
+      }
+    },
+    async handleSendRequestFromHistory(item) {
+      let me = this;
+      if (item && item.apiUrl) {
+        me.apiUrl = item.apiUrl;
+        me.httpMethod = item.httpMethod;
+        me.headersText = item.headersText;
+        me.bodyText = item.bodyText;
+        await me.handleSendRequest();
       }
     },
     handleClear() {
