@@ -202,6 +202,17 @@ const routerConfig = [
       titleKey: "i18nCommon.feature.UUIDV4Generator",
     },
   },
+  {
+    /**
+     * API Testing Tool
+     */
+    path: "/apitesting",
+    name: "apitesting",
+    component: () => import("@/views/tools/TDAPITesting.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.APITesting",
+    },
+  },
 ];
 
 const router = createRouter({
