@@ -47,7 +47,7 @@ export default {
       UUIDV4Generator: "Trình tạo UUID V4",
       HTMLPreview: "Xem trước HTML",
       textManipulation: "Xử lý văn bản",
-      APITesting: "API",
+      APITesting: "API develop",
     },
     example: "ví dụ",
     base64ToImage: {
