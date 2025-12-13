@@ -290,7 +290,7 @@ export default {
       headersPlaceholder:
         "Content-Type: application/json\nAuthorization: Bearer token",
       body: "Request Body",
-      bodyPlaceholder: "Nhập dữ liệu JSON hoặc form vào đây",
+      bodyPlaceholder: "Nhập dữ liệu JSON",
       response: "Response",
       responsePlaceholder: "Response sẽ xuất hiện ở đây...",
       send: "Gửi Request",

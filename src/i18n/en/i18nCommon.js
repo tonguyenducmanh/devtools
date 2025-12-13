@@ -291,7 +291,7 @@ export default {
       headersPlaceholder:
         "Content-Type: application/json\nAuthorization: Bearer token",
       body: "Request Body",
-      bodyPlaceholder: "Enter JSON or form data here",
+      bodyPlaceholder: "Enter JSON data here",
       response: "Response",
       responsePlaceholder: "Response will appear here...",
       send: "Send Request",
