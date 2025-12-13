@@ -407,6 +407,9 @@ export default {
           console.log(ex);
           me.bodyText = CURLParsed.body;
         }
+        if (me.bodyText == "null") {
+          me.bodyText = null;
+        }
         me.httpMethod = CURLParsed.method;
         me.headersText = CURLParsed.headersText;
         me.isImportingCURL = false;
