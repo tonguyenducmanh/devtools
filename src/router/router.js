@@ -28,13 +28,13 @@ const routerConfig = [
   },
   {
     /**
-     * Time-based one-time password authenticator
+     * API Testing Tool
      */
-    path: "/TDHTMLPreview",
-    name: "TDHTMLPreview",
-    component: () => import("@/views/tools/TDHTMLPreview.vue"),
+    path: "/apitesting",
+    name: "apitesting",
+    component: () => import("@/views/tools/TDAPITesting.vue"),
     meta: {
-      titleKey: "i18nCommon.feature.HTMLPreview",
+      titleKey: "i18nCommon.feature.APITesting",
     },
   },
   {
@@ -200,6 +200,17 @@ const routerConfig = [
     component: () => import("@/views/tools/TDUUIDv4Generator.vue"),
     meta: {
       titleKey: "i18nCommon.feature.UUIDV4Generator",
+    },
+  },
+  {
+    /**
+     * Time-based one-time password authenticator
+     */
+    path: "/TDHTMLPreview",
+    name: "TDHTMLPreview",
+    component: () => import("@/views/tools/TDHTMLPreview.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.HTMLPreview",
     },
   },
 ];
