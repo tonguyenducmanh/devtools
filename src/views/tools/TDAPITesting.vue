@@ -1,98 +1,112 @@
 <template>
   <div class="flex flex-col container">
-    <div class="paste-box">
-      <TDHistory
-        ref="history"
-        :applyFunction="handleSendRequestFromHistory"
-        titleKey="apiUrl"
-        :cacheKey="$tdEnum.cacheConfig.APIHistory"
-      ></TDHistory>
-      <div class="flex">
-        <TDComboBox v-model="httpMethod" :options="methodOptions" />
-        <TDInput
-          v-model="apiUrl"
-          :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
-        ></TDInput>
-        <TDButton
-          @click="importCURL"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.apiTesting.importCURL')"
-        ></TDButton>
-      </div>
-      <div class="flex text-area-box">
-        <div class="flex flex-col text-area-request">
-          <div class="flex request-area-title">
-            <TDRadioGroup
-              v-model="currentAPIInfoOption"
-              :options="APIInfoOptions"
-            />
-          </div>
-          <TDTextarea
-            v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.header"
-            :isLabelTop="true"
-            v-model="headersText"
-            :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
-          ></TDTextarea>
-          <TDTextarea
-            v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.body"
-            :isLabelTop="true"
-            v-model="bodyText"
-            :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
-          ></TDTextarea>
+    <template v-if="isImportingCURL">
+      <TDTextarea
+        :isLabelTop="true"
+        v-model="curlContent"
+        :placeHolder="$t('i18nCommon.apiTesting.contentCURL')"
+      ></TDTextarea>
+      <TDButton
+        @click="importCURL"
+        :label="$t('i18nCommon.apiTesting.importCURL')"
+        :disabled="isLoading"
+      ></TDButton>
+    </template>
+    <template v-else>
+      <div class="paste-box">
+        <TDHistory
+          ref="history"
+          :applyFunction="handleSendRequestFromHistory"
+          titleKey="apiUrl"
+          :cacheKey="$tdEnum.cacheConfig.APIHistory"
+        ></TDHistory>
+        <div class="flex">
+          <TDComboBox v-model="httpMethod" :options="methodOptions" />
+          <TDInput
+            v-model="apiUrl"
+            :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
+          ></TDInput>
+          <TDButton
+            @click="openFormImportCURL"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.apiTesting.importCURL')"
+          ></TDButton>
         </div>
-        <div class="flex flex-col text-area-response">
-          <div class="flex response-area-title">
-            <div>
-              {{ $t("i18nCommon.apiTesting.response") }}
+        <div class="flex text-area-box">
+          <div class="flex flex-col text-area-request">
+            <div class="flex request-area-title">
+              <TDRadioGroup
+                v-model="currentAPIInfoOption"
+                :options="APIInfoOptions"
+              />
             </div>
-            <div>
-              <div class="status-info" v-if="statusCode">
-                <div class="status-badge" :class="statusClass">
-                  Status: {{ statusCode }}
-                </div>
-                <div class="response-time" v-if="responseTime">
-                  {{ responseTime }}ms
+            <TDTextarea
+              v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.header"
+              :isLabelTop="true"
+              v-model="headersText"
+              :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
+            ></TDTextarea>
+            <TDTextarea
+              v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.body"
+              :isLabelTop="true"
+              v-model="bodyText"
+              :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
+            ></TDTextarea>
+          </div>
+          <div class="flex flex-col text-area-response">
+            <div class="flex response-area-title">
+              <div>
+                {{ $t("i18nCommon.apiTesting.response") }}
+              </div>
+              <div>
+                <div class="status-info" v-if="statusCode">
+                  <div class="status-badge" :class="statusClass">
+                    Status: {{ statusCode }}
+                  </div>
+                  <div class="response-time" v-if="responseTime">
+                    {{ responseTime }}ms
+                  </div>
                 </div>
               </div>
             </div>
+            <TDTextarea
+              :isLabelTop="true"
+              :modelValue="responseText"
+              :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
+              :readOnly="true"
+            ></TDTextarea>
           </div>
-          <TDTextarea
-            :isLabelTop="true"
-            :modelValue="responseText"
-            :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
-            :readOnly="true"
-          ></TDTextarea>
         </div>
       </div>
-    </div>
 
-    <div class="flex group-btn">
-      <TDButton
-        @click="handleSendRequest"
-        :label="$t('i18nCommon.apiTesting.send')"
-        :disabled="isLoading"
-      ></TDButton>
-      <TDButton
-        @click="handleClear"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.apiTesting.clear')"
-      ></TDButton>
-      <TDButton
-        @click="handleCopyResponse"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.apiTesting.copyResponse')"
-      ></TDButton>
-      <TDButton
-        @click="handleCopyCurl"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.apiTesting.copyCURL')"
-      ></TDButton>
-      <TDButton
-        @click="downloadExtension"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.apiTesting.downloadExtension')"
-      ></TDButton>
-    </div>
+      <div class="flex group-btn">
+        <TDButton
+          @click="handleSendRequest"
+          :label="$t('i18nCommon.apiTesting.send')"
+          :disabled="isLoading"
+        ></TDButton>
+        <TDButton
+          @click="handleClear"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.apiTesting.clear')"
+        ></TDButton>
+        <TDButton
+          @click="handleCopyResponse"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.apiTesting.copyResponse')"
+        ></TDButton>
+        <TDButton
+          @click="handleCopyCurl"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.apiTesting.copyCURL')"
+        ></TDButton>
+        <TDButton
+          @click="downloadExtension"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.apiTesting.downloadExtension')"
+        ></TDButton>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -110,6 +124,8 @@ export default {
       responseTime: null,
       isLoading: false,
       startTime: null,
+      isImportingCURL: false,
+      curlContent: "",
       methodOptions: [
         { value: "GET", label: "GET" },
         { value: "POST", label: "POST" },
@@ -253,13 +269,13 @@ export default {
       };
       if (!historyItem?.apiUrl) throw new Error("apiUrl is required");
 
-      const lines = [];
+      let lines = [];
 
       // base curl
       lines.push(`curl '${historyItem.apiUrl}'`);
 
       // method
-      const method = (historyItem.httpMethod || "GET").toUpperCase();
+      let method = (historyItem.httpMethod || "GET").toUpperCase();
       if (method !== "GET") {
         lines.push(`--request ${method}`);
       }
@@ -294,6 +310,7 @@ export default {
       this.responseText = "";
       this.statusCode = null;
       this.responseTime = null;
+      this.curlContent = "";
     },
     handleCopyResponse() {
       if (this.responseText) {
@@ -309,8 +326,82 @@ export default {
         me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
       }
     },
+    parseCurl(curlText) {
+      let me = this;
+      let result = {
+        url: "",
+        method: "GET",
+        headers: {},
+        body: null,
+        headersText: "",
+      };
+      let allHeaders = [];
+      // normalize
+      let tokens = curlText
+        .replace(/\\\n/g, " ")
+        .replace(/\n/g, " ")
+        .match(/'[^']*'|"[^"]*"|\S+/g);
+
+      for (let i = 0; i < tokens.length; i++) {
+        let token = tokens[i];
+
+        // URL
+        if (token.startsWith("http") || token.startsWith("'http")) {
+          result.url = me.strip(token);
+        }
+
+        // Method
+        if (token === "-X" || token === "--request") {
+          result.method = me.strip(tokens[++i]).toUpperCase();
+        }
+
+        // Headers
+        if (token === "-H" || token === "--header") {
+          let header = me.strip(tokens[++i]);
+          let [key, ...rest] = header.split(":");
+          result.headers[key.trim()] = rest.join(":").trim();
+          allHeaders.push(header);
+        }
+
+        // Body
+        if (
+          token === "--data" ||
+          token === "--data-raw" ||
+          token === "--data-binary" ||
+          token === "-d"
+        ) {
+          result.body = me.strip(tokens[++i]);
+          if (result.method === "GET") {
+            result.method = "POST";
+          }
+        }
+      }
+
+      if (allHeaders && allHeaders.length > 0) {
+        result.headersText = allHeaders.join("\n");
+      }
+      return result;
+    },
+    strip(str) {
+      return str.replace(/^['"]|['"]$/g, "");
+    },
+    openFormImportCURL() {
+      let me = this;
+      me.isImportingCURL = true;
+    },
     importCURL() {
       let me = this;
+      let CURLParsed = me.parseCurl(me.curlContent);
+      if (CURLParsed) {
+        me.apiUrl = CURLParsed.url;
+        me.bodyText = CURLParsed.body;
+        me.httpMethod = CURLParsed.method;
+        me.headersText = CURLParsed.headersText;
+        me.isImportingCURL = false;
+        me.curlContent = "";
+      } else {
+        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+      }
     },
   },
 };
