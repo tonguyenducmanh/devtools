@@ -212,7 +212,8 @@ export default {
         me.httpMethod = item.httpMethod;
         me.headersText = item.headersText;
         me.bodyText = item.bodyText;
-        await me.handleSendRequest();
+        // lúc apply lịch sử mà gọi luôn hơi tốn server :v
+        // await me.handleSendRequest();
       }
     },
     handleClear() {
