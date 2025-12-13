@@ -116,13 +116,13 @@ export default {
   },
   methods: {
     parseHeaders(headerString) {
-      const headers = {};
+      let headers = {};
       if (!headerString) return headers;
 
       headerString.split("\n").forEach((line) => {
-        const trimmed = line.trim();
+        let trimmed = line.trim();
         if (trimmed) {
-          const [key, ...valueParts] = trimmed.split(":");
+          let [key, ...valueParts] = trimmed.split(":");
           if (key && valueParts.length > 0) {
             headers[key.trim()] = valueParts.join(":").trim();
           }
@@ -142,17 +142,14 @@ export default {
       this.startTime = performance.now();
 
       try {
-        const headers = this.parseHeaders(this.headersText);
-        const requestData = {
+        let headers = this.parseHeaders(this.headersText);
+        let requestData = {
           url: this.apiUrl,
           method: this.httpMethod,
           headers: headers,
         };
 
-        if (
-          ["POST", "PUT", "PATCH"].includes(this.httpMethod) &&
-          this.bodyText
-        ) {
+        if (this.bodyText) {
           requestData.body = this.bodyText;
         }
 
@@ -165,10 +162,13 @@ export default {
         ) {
           response = await window.__toolTomanh.callAPI(requestData);
         } else {
-          throw new Error("Extension not available");
+          this.$tdToast.error(
+            null,
+            me.$t("i18nCommon.apiTesting.extensionNotAvailable")
+          );
         }
 
-        const endTime = performance.now();
+        let endTime = performance.now();
         this.responseTime = Math.round(endTime - this.startTime);
         this.statusCode = response.status;
 
@@ -178,7 +178,7 @@ export default {
         } else if (typeof response.body === "string") {
           // Try to parse as JSON if it looks like JSON
           try {
-            const parsed = JSON.parse(response.body);
+            let parsed = JSON.parse(response.body);
             this.responseText = JSON.stringify(parsed, null, 2);
           } catch {
             this.responseText = response.body;
