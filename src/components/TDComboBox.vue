@@ -4,7 +4,7 @@
       {{ label.capitalize() }}
     </div>
 
-    <div>
+    <div class="td-combobox-wraper">
       <div
         class="td-combobox-control"
         :class="{ disabled }"
@@ -121,41 +121,44 @@ export default {
   .td-label-top {
     padding-bottom: var(--padding);
   }
-
-  .td-combobox-control {
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--padding);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    background: var(--bg-main-color);
-
-    &:hover {
-      border-color: var(--btn-color);
-    }
-
-    &.disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-  }
-  .td-combobox-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 10;
+  .td-combobox-wraper {
     width: 100%;
-    margin-top: 4px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-main-color);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-  .td-combobox-arrow-open {
-    rotate: 180deg;
-    color: var(--border-color);
+    position: relative;
+    .td-combobox-control {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--padding);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      background: var(--bg-main-color);
+
+      &:hover {
+        border-color: var(--btn-color);
+      }
+
+      &.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+    .td-combobox-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      z-index: 10;
+      width: 100%;
+      margin-top: 4px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-main-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .td-combobox-arrow-open {
+      rotate: 180deg;
+      color: var(--border-color);
+    }
   }
 }
 </style>
