@@ -80,6 +80,11 @@
         :type="$tdEnum.buttonType.secondary"
         :label="$t('i18nCommon.apiTesting.copyCURL')"
       ></TDButton>
+      <TDButton
+        @click="downloadExtension"
+        :type="$tdEnum.buttonType.secondary"
+        :label="$t('i18nCommon.apiTesting.downloadExtension')"
+      ></TDButton>
     </div>
   </div>
 </template>
@@ -126,6 +131,10 @@ export default {
     },
   },
   methods: {
+    downloadExtension() {
+      let me = this;
+      me.$tdUtility.goToSource("releases");
+    },
     parseHeaders(headerString) {
       let headers = {};
       if (!headerString) return headers;

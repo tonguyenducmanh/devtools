@@ -298,6 +298,7 @@ export default {
       copyResponse: "Sao chép Response",
       copyCURL: "Sao chép CURL",
       extensionNotAvailable: "Extension helper chưa được cài đặt",
+      downloadExtension: "Tải tiện ích mở rộng (bắt buộc để call api)",
     },
   },
 };

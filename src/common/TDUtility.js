@@ -15,7 +15,19 @@ class TDUtility {
   debounce(fn, timeDelay) {
     return _.debounce(fn, timeDelay);
   }
-
+  /**
+   * go to source code link
+   */
+  goToSource(subPath) {
+    let me = this;
+    if (window.__env.githubSource && window.__env.githubSource.url) {
+      let url = window.__env.githubSource.url;
+      if (subPath) {
+        url += `/${subPath}`;
+      }
+      window.open(url, "_blank").focus();
+    }
+  }
   /**
    * Thực hiện duyệt từng phần tử của bảng hoặc thuộc tính của object để call fn
    * @param {Array/Object/...} obj

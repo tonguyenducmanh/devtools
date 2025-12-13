@@ -299,6 +299,7 @@ export default {
       copyResponse: "Copy Response",
       copyCURL: "Copy CURL",
       extensionNotAvailable: "Extension helper not installed",
+      downloadExtension: "Download the extension (required to call the API)",
     },
   },
 };

@@ -221,9 +221,7 @@ export default {
 
     goToSource() {
       let me = this;
-      if (window.__env.githubSource && window.__env.githubSource.url) {
-        window.open(window.__env.githubSource.url, "_blank").focus();
-      }
+      me.$tdUtility.goToSource();
     },
 
     async getCurrentLanguage() {
