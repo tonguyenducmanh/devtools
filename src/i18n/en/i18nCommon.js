@@ -297,6 +297,7 @@ export default {
       send: "Send Request",
       clear: "Clear All",
       copyResponse: "Copy Response",
+      copyCURL: "Copy CURL",
       extensionNotAvailable: "Extension helper not installed",
     },
   },

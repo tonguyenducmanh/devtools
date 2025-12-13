@@ -74,6 +74,11 @@
         :type="$tdEnum.buttonType.secondary"
         :label="$t('i18nCommon.apiTesting.copyResponse')"
       ></TDButton>
+      <TDButton
+        @click="handleCopyCurl"
+        :type="$tdEnum.buttonType.secondary"
+        :label="$t('i18nCommon.apiTesting.copyCURL')"
+      ></TDButton>
     </div>
   </div>
 </template>
@@ -216,6 +221,49 @@ export default {
         // await me.handleSendRequest();
       }
     },
+    buildCurlFromRequest() {
+      let me = this;
+      let historyItem = {
+        apiUrl: me.apiUrl,
+        httpMethod: me.httpMethod,
+        headersText: me.headersText,
+        bodyText: me.bodyText,
+      };
+      if (!historyItem?.apiUrl) throw new Error("apiUrl is required");
+
+      const lines = [];
+
+      // base curl
+      lines.push(`curl '${historyItem.apiUrl}'`);
+
+      // method
+      const method = (historyItem.httpMethod || "GET").toUpperCase();
+      if (method !== "GET") {
+        lines.push(`--request ${method}`);
+      }
+
+      // headers
+      if (historyItem.headersText) {
+        historyItem.headersText
+          .split("\n")
+          .map((h) => h.trim())
+          .filter(Boolean)
+          .forEach((header) => {
+            lines.push(`--header '${me.escapeShell(header)}'`);
+          });
+      }
+
+      // body
+      if (historyItem.bodyText && historyItem.bodyText.trim() !== "") {
+        lines.push(`--data '${me.escapeShell(historyItem.bodyText)}'`);
+      }
+
+      return lines.join(" \\\n");
+    },
+    escapeShell(value) {
+      return String(value).replace(/'/g, `'\\''`);
+    },
+
     handleClear() {
       this.apiUrl = "";
       this.httpMethod = "GET";
@@ -228,6 +276,13 @@ export default {
     handleCopyResponse() {
       if (this.responseText) {
         this.$tdUtility.copyToClipboard(this.responseText);
+      }
+    },
+    handleCopyCurl() {
+      let me = this;
+      let curlBuilded = me.buildCurlFromRequest();
+      if (curlBuilded) {
+        this.$tdUtility.copyToClipboard(curlBuilded);
       }
     },
   },
@@ -250,8 +305,6 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
-  .method-selection {
-  }
   .text-area-box {
     gap: var(--padding);
     flex: 1;
