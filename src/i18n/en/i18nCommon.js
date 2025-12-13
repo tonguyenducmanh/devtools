@@ -302,6 +302,7 @@ export default {
       extensionNotAvailable: "Extension helper not installed",
       downloadExtension: "Download the extension (required to call the API)",
       contentCURL: "CURL import content",
+      cancel: "Cancel",
     },
   },
 };

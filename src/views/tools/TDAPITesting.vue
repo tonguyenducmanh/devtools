@@ -6,11 +6,18 @@
         v-model="curlContent"
         :placeHolder="$t('i18nCommon.apiTesting.contentCURL')"
       ></TDTextarea>
-      <TDButton
-        @click="importCURL"
-        :label="$t('i18nCommon.apiTesting.importCURL')"
-        :disabled="isLoading"
-      ></TDButton>
+      <div class="flex">
+        <TDButton
+          @click="importCURL"
+          :label="$t('i18nCommon.apiTesting.importCURL')"
+          :disabled="isLoading"
+        ></TDButton>
+        <TDButton
+          @click="cancelImportCURL"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.apiTesting.cancel')"
+        ></TDButton>
+      </div>
     </template>
     <template v-else>
       <div class="paste-box">
@@ -402,6 +409,10 @@ export default {
       } else {
         me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
       }
+    },
+    cancelImportCURL() {
+      let me = this;
+      me.isImportingCURL = false;
     },
   },
 };

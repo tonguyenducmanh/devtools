@@ -300,7 +300,8 @@ export default {
       importCURL: "Nhập CURL",
       extensionNotAvailable: "Extension helper chưa được cài đặt",
       downloadExtension: "Tải tiện ích mở rộng (bắt buộc để call api)",
-      contentCURL: "Nội dung CURL muốn import"
+      contentCURL: "Nội dung CURL muốn import",
+      cancel: "Hủy",
     },
   },
 };
