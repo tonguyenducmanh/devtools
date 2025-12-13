@@ -297,6 +297,7 @@ export default {
       clear: "Xóa tất cả",
       copyResponse: "Sao chép Response",
       copyCURL: "Sao chép CURL",
+      importCURL: "Nhập CURL",
       extensionNotAvailable: "Extension helper chưa được cài đặt",
       downloadExtension: "Tải tiện ích mở rộng (bắt buộc để call api)",
     },

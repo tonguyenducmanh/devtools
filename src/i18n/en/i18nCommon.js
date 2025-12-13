@@ -298,6 +298,7 @@ export default {
       clear: "Clear All",
       copyResponse: "Copy Response",
       copyCURL: "Copy CURL",
+      importCURL: "Import CURL",
       extensionNotAvailable: "Extension helper not installed",
       downloadExtension: "Download the extension (required to call the API)",
     },

@@ -13,6 +13,11 @@
           v-model="apiUrl"
           :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
         ></TDInput>
+        <TDButton
+          @click="importCURL"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.apiTesting.importCURL')"
+        ></TDButton>
       </div>
       <div class="flex text-area-box">
         <div class="flex flex-col text-area-request">
@@ -299,8 +304,13 @@ export default {
       let me = this;
       let curlBuilded = me.buildCurlFromRequest();
       if (curlBuilded) {
-        this.$tdUtility.copyToClipboard(curlBuilded);
+        me.$tdUtility.copyToClipboard(curlBuilded);
+      } else {
+        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
       }
+    },
+    importCURL() {
+      let me = this;
     },
   },
 };
