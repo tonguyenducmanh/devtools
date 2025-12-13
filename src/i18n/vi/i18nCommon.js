@@ -285,7 +285,7 @@ export default {
       url: "URL",
       urlPlaceholder: "Nhập endpoint API",
       urlRequired: "URL API là bắt buộc",
-      method: "HTTP Method",
+      method: "Method",
       headers: "Headers",
       headersPlaceholder:
         "Content-Type: application/json\nAuthorization: Bearer token",

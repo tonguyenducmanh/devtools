@@ -17,15 +17,27 @@
 
       <div class="flex method-selection">
         <TDRadioGroup
+          v-model="currentAPIInfoOption"
+          :options="APIInfoOptions"
+        />
+        <TDRadioGroup
           :label="$t('i18nCommon.apiTesting.method')"
           v-model="httpMethod"
           :options="methodOptions"
         />
+        <div class="status-info" v-if="statusCode">
+          <div class="status-badge" :class="statusClass">
+            Status: {{ statusCode }}
+          </div>
+          <div class="response-time" v-if="responseTime">
+            {{ responseTime }}ms
+          </div>
+        </div>
       </div>
-
-      <div class="flex flex-col text-area-box">
+      <div class="flex text-area-box">
         <div class="flex text-area-request">
           <TDTextarea
+            v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.header"
             :label="$t('i18nCommon.apiTesting.headers')"
             :isLabelTop="true"
             v-model="headersText"
@@ -33,6 +45,7 @@
           ></TDTextarea>
 
           <TDTextarea
+            v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.body"
             :label="$t('i18nCommon.apiTesting.body')"
             :isLabelTop="true"
             v-model="bodyText"
@@ -46,15 +59,6 @@
           :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
           :readOnly="true"
         ></TDTextarea>
-      </div>
-
-      <div class="status-info" v-if="statusCode">
-        <div class="status-badge" :class="statusClass">
-          Status: {{ statusCode }}
-        </div>
-        <div class="response-time" v-if="responseTime">
-          {{ responseTime }}ms
-        </div>
       </div>
     </div>
 
@@ -105,6 +109,11 @@ export default {
         { value: "DELETE", label: "DELETE" },
         { value: "HEAD", label: "HEAD" },
         { value: "OPTIONS", label: "OPTIONS" },
+      ],
+      currentAPIInfoOption: 2,
+      APIInfoOptions: [
+        { value: this.$tdEnum.APIInfoOption.header, label: "Header" },
+        { value: this.$tdEnum.APIInfoOption.body, label: "Body" },
       ],
     };
   },
@@ -305,6 +314,10 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
+  .method-selection {
+    justify-content: start;
+    width: 100%;
+  }
   .text-area-box {
     gap: var(--padding);
     flex: 1;

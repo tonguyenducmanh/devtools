@@ -286,7 +286,7 @@ export default {
       url: "URL",
       urlPlaceholder: "Enter API endpoint",
       urlRequired: "API URL is required",
-      method: "HTTP Method",
+      method: "Method",
       headers: "Headers",
       headersPlaceholder:
         "Content-Type: application/json\nAuthorization: Bearer token",

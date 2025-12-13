@@ -43,6 +43,10 @@ class TDEnum {
     vi: "vi",
     en: "en",
   };
+  APIInfoOption = {
+    header: 1,
+    body: 2,
+  };
 }
 
 export default new TDEnum();
