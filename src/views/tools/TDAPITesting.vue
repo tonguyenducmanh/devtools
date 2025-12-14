@@ -72,6 +72,16 @@
                 v-model="showReponse"
                 :label="$t('i18nCommon.apiTesting.showReponse')"
               ></TDCheckbox>
+              <div v-if="!showReponse">
+                <div class="status-info" v-if="statusCode">
+                  <div class="status-badge" :class="statusClass">
+                    {{ statusText }}
+                  </div>
+                  <div class="response-time" v-if="responseTime">
+                    {{ responseTime }}ms
+                  </div>
+                </div>
+              </div>
             </div>
             <TDTextarea
               v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.header"
