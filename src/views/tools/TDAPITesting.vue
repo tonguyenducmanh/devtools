@@ -21,13 +21,21 @@
     </template>
     <template v-else>
       <div class="paste-box">
-        <TDHistory
-          ref="history"
-          :applyFunction="handleSendRequestFromHistory"
-          titleKey="apiUrl"
-          :cacheKey="$tdEnum.cacheConfig.APIHistory"
-        ></TDHistory>
-        <div class="flex header-btn">
+        <div class="flex header-top-btn">
+          <TDHistory
+            ref="history"
+            :applyFunction="handleSendRequestFromHistory"
+            titleKey="apiUrl"
+            :noMargin="true"
+            :positionRelative="false"
+            :cacheKey="$tdEnum.cacheConfig.APIHistory"
+          ></TDHistory>
+          <TDInput
+            v-model="requestName"
+            :placeHolder="$t('i18nCommon.apiTesting.requestName')"
+          ></TDInput>
+        </div>
+        <div class="flex header-second-btn">
           <TDComboBox
             v-model="httpMethod"
             :options="methodOptions"
@@ -129,6 +137,7 @@ export default {
   data() {
     return {
       apiUrl: "",
+      requestName: "",
       httpMethod: "GET",
       headersText: "Content-Type: application/json",
       bodyText: "",
@@ -514,7 +523,14 @@ export default {
 .response-time {
   color: var(--text-secondary);
 }
-.header-btn {
+.header-top-btn {
+  gap: var(--padding);
+  align-items: center;
+  justify-content: center;
+  margin: var(--padding) 0;
+  position: relative;
+}
+.header-second-btn {
   gap: var(--padding);
 }
 </style>

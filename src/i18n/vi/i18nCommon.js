@@ -302,6 +302,7 @@ export default {
       downloadExtension: "Tải tiện ích mở rộng (bắt buộc để call api)",
       contentCURL: "Nội dung CURL muốn import",
       cancel: "Hủy",
+      requestName: "Tên request",
     },
   },
 };

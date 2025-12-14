@@ -1,8 +1,10 @@
 <template>
-  <div class="td-history-wrapper">
+  <div class="td-history-wrapper" :style="styleHistoryWrapper">
     <div
       class="flex flex-start button-group"
-      :class="{ 'td-hide-history': !isHistoryVisible }"
+      :class="{
+        'td-hide-history': !isHistoryVisible,
+      }"
     >
       <TDButton
         @click="toggleHistory"
@@ -87,12 +89,35 @@ export default {
       type: Boolean,
       default: false, // Mặc định không append duplicate
     },
+    noMargin: {
+      type: Boolean,
+      default: false,
+    },
+    positionRelative: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
       historyItems: [],
       isHistoryVisible: false,
     };
+  },
+  computed: {
+    styleHistoryWrapper() {
+      let me = this;
+      let currentStyleHistoryWraper = {};
+      if (me.positionRelative) {
+        currentStyleHistoryWraper.position = "relative";
+      }
+      if (me.noMargin) {
+        currentStyleHistoryWraper.margin = "unset";
+      } else {
+        currentStyleHistoryWraper.margin = "var(--padding)";
+      }
+      return currentStyleHistoryWraper;
+    },
   },
   methods: {
     toggleHistory() {
@@ -108,6 +133,7 @@ export default {
         let currentItem = me.historyItems.find((x) => x.historyId == historyId);
         if (currentItem) {
           me.applyFunction(currentItem.source || currentItem.title);
+          me.isHistoryVisible = false;
         }
       }
     },
@@ -217,8 +243,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 .td-history-wrapper {
-  position: relative;
-  margin-bottom: var(--padding);
 }
 .td-history-container {
   padding: var(--padding);

@@ -303,6 +303,7 @@ export default {
       downloadExtension: "Download the extension (required to call the API)",
       contentCURL: "CURL import content",
       cancel: "Cancel",
+      requestName: "Request name",
     },
   },
 };
