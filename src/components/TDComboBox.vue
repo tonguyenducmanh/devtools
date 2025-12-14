@@ -1,5 +1,5 @@
 <template>
-  <div class="flex td-combobox" :class="{ 'flex-col': isLabelTop }">
+  <div class="flex no-select td-combobox" :class="{ 'flex-col': isLabelTop }">
     <div class="td-label" :class="{ 'td-label-top': isLabelTop }" v-if="label">
       {{ label.capitalize() }}
     </div>
@@ -14,11 +14,18 @@
         <span class="td-combobox-value">
           {{ selectedLabel }}
         </span>
-        <span
-          class="td-combobox-arrow"
-          :class="{ 'td-combobox-arrow-open': open }"
-          >▾</span
-        >
+        <span :class="{ 'td-combobox-arrow-open': open }">
+          <svg class="arrow" viewBox="0 0 24 14">
+            <path
+              d="M2 2 L12 12 L22 2"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
       </div>
       <div v-if="open" class="td-combobox-dropdown">
         <TDComboBoxOption
@@ -137,6 +144,9 @@ export default {
 
       &:hover {
         border-color: var(--btn-color);
+        .arrow {
+          color: var(--btn-color);
+        }
       }
 
       &.disabled {
@@ -155,9 +165,16 @@ export default {
       background: var(--bg-main-color);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
-    .td-combobox-arrow-open {
-      rotate: 180deg;
+
+    .arrow {
+      width: 12px;
+      height: 8px;
       color: var(--border-color);
+    }
+    .td-combobox-arrow-open {
+      transform: rotate(180deg);
+      color: var(--border-color);
+      transition: transform 0.2s ease;
     }
   }
 }
