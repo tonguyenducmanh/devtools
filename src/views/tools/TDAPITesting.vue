@@ -85,7 +85,7 @@
               <div>
                 <div class="status-info" v-if="statusCode">
                   <div class="status-badge" :class="statusClass">
-                    Status: {{ statusCode }}
+                    {{ statusText }}
                   </div>
                   <div class="response-time" v-if="responseTime">
                     {{ responseTime }}ms
@@ -187,6 +187,51 @@ export default {
         return "client-error";
       if (this.statusCode >= 500) return "server-error";
       return "";
+    },
+    statusText() {
+      const code = Number(this.statusCode);
+      if (!code) return "";
+
+      // mapping chi tiết
+      const exactMap = {
+        200: "OK",
+        201: "Created",
+        202: "Accepted",
+        204: "No Content",
+        301: "Moved Permanently",
+        302: "Found",
+        304: "Not Modified",
+        400: "Bad Request",
+        401: "Unauthorized",
+        403: "Forbidden",
+        404: "Not Found",
+        408: "Request Timeout",
+        409: "Conflict",
+        429: "Too Many Requests",
+        500: "Internal Server Error",
+        502: "Bad Gateway",
+        503: "Service Unavailable",
+        504: "Gateway Timeout",
+      };
+
+      // ưu tiên exact
+      if (exactMap[code]) {
+        return `${code} ${exactMap[code]}`;
+      }
+
+      // fallback theo nhóm HTTP
+      const group = Math.floor(code / 100);
+      const groupMap = {
+        1: "Informational",
+        2: "Success",
+        3: "Redirection",
+        4: "Client Error",
+        5: "Server Error",
+      };
+
+      return groupMap[group]
+        ? `${code} ${groupMap[group]}`
+        : `${code} Unknown Status`;
     },
   },
   beforeUnmount() {
