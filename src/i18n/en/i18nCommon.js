@@ -304,6 +304,7 @@ export default {
       contentCURL: "CURL import content",
       cancel: "Cancel",
       requestName: "Request name",
+      requestCanceled: "Current request canceled",
     },
   },
 };

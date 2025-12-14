@@ -90,7 +90,13 @@
                 </div>
               </div>
             </div>
-            <div class="flex response-loading" v-if="isLoading">
+            <div class="flex flex-col response-loading" v-if="isLoading">
+              <TDButton
+                v-if="isLoading"
+                @click="handleCancelRequest"
+                :type="$tdEnum.buttonType.secondary"
+                :label="$t('i18nCommon.apiTesting.cancel')"
+              />
               <div class="loader"></div>
             </div>
             <TDTextarea
@@ -151,6 +157,7 @@ export default {
       isLoading: false,
       startTime: null,
       isImportingCURL: false,
+      currentRequest: null,
       curlContent: "",
       methodOptions: [
         { value: "GET", label: "GET" },
@@ -179,6 +186,12 @@ export default {
       return "";
     },
   },
+  beforeUnmount() {
+    // rời khỏi tool này phải hủy request
+    if (this.currentRequest && this.currentRequest.cancel) {
+      this.currentRequest.cancel();
+    }
+  },
   methods: {
     downloadExtension() {
       let me = this;
@@ -202,6 +215,7 @@ export default {
     },
     async handleSendRequest() {
       let me = this;
+
       if (!this.apiUrl) {
         this.$tdToast.error(null, this.$t("i18nCommon.apiTesting.urlRequired"));
         return;
@@ -209,33 +223,34 @@ export default {
 
       this.isLoading = true;
       this.startTime = performance.now();
+      this.responseText = "";
+      this.statusCode = null;
 
       try {
         let headers = this.parseHeaders(this.headersText);
+
         let requestData = {
           url: this.apiUrl,
           method: this.httpMethod,
-          headers: headers,
+          headers,
+          body: this.bodyText || null,
         };
 
-        if (this.bodyText) {
-          requestData.body = this.bodyText;
-        }
-
-        let response;
-
-        // Use extension if available
         if (
-          window.__toolTomanh &&
-          typeof window.__toolTomanh.callAPI === "function"
+          !window.__toolTomanh ||
+          typeof window.__toolTomanh.callAPI !== "function"
         ) {
-          response = await window.__toolTomanh.callAPI(requestData);
-        } else {
           this.$tdToast.error(
             null,
             me.$t("i18nCommon.apiTesting.extensionNotAvailable")
           );
+          return;
         }
+
+        // gọi API + gữ handle
+        this.currentRequest = window.__toolTomanh.callAPI(requestData);
+
+        const response = await this.currentRequest.promise;
 
         let endTime = performance.now();
         this.responseTime = Math.round(endTime - this.startTime);
@@ -258,25 +273,43 @@ export default {
 
         this.$tdToast.success(null, this.$t("i18nCommon.toastMessage.success"));
       } catch (error) {
-        this.statusCode = null;
-        this.responseText = `Error: ${error.message}`;
-        this.$tdToast.error(null, `${error.message}`);
+        if (error.message === "Request cancelled by user") {
+          this.responseText = this.$t("i18nCommon.apiTesting.requestCanceled");
+          this.$tdToast.success(
+            null,
+            this.$t("i18nCommon.apiTesting.requestCanceled")
+          );
+        } else {
+          this.responseText = `Error: ${error.message}`;
+          this.$tdToast.error(null, error.message);
+        }
       } finally {
         this.isLoading = false;
+        this.currentRequest = null;
         // setTimeout(() => {
         //   this.isLoading = false;
         // }, 2000); // 2000 milliseconds = 2 seconds
-        // Lưu text vào lịch sử nếu khác với lần lưu trước
-        // so sánh input và output, nếu giống nhau thì xoá output
+
         let historyItem = {
           apiUrl: me.apiUrl,
           httpMethod: me.httpMethod,
           headersText: me.headersText,
           bodyText: me.bodyText,
-          requestName: me.requestName ? me.requestName : me.apiUrl,
+          requestName: me.requestName || me.apiUrl,
         };
         await me.$refs.history.saveToHistory(historyItem);
       }
+    },
+    handleCancelRequest() {
+      if (
+        this.currentRequest &&
+        typeof this.currentRequest.cancel === "function"
+      ) {
+        this.currentRequest.cancel();
+      }
+
+      this.isLoading = false;
+      this.currentRequest = null;
     },
     handleSendRequestFromHistory(item) {
       let me = this;

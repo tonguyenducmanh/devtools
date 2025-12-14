@@ -303,6 +303,7 @@ export default {
       contentCURL: "Nội dung CURL muốn import",
       cancel: "Hủy",
       requestName: "Tên request",
+      requestCanceled: "Đã hủy request hiện tại",
     },
   },
 };
