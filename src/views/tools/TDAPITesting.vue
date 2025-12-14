@@ -63,17 +63,23 @@
                 :options="APIInfoOptions"
                 :noMargin="true"
               />
+              <TDCheckbox
+                v-model="wrapText"
+                :label="$t('i18nCommon.apiTesting.wrapText')"
+              ></TDCheckbox>
             </div>
             <TDTextarea
               v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.header"
               :isLabelTop="true"
               v-model="headersText"
+              :wrapText="wrapText"
               :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
             ></TDTextarea>
             <TDTextarea
               v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.body"
               :isLabelTop="true"
               v-model="bodyText"
+              :wrapText="wrapText"
               :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
             ></TDTextarea>
           </div>
@@ -108,6 +114,7 @@
               :modelValue="responseText"
               :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
               :readOnly="true"
+              :wrapText="wrapText"
             ></TDTextarea>
           </div>
         </div>
@@ -161,6 +168,7 @@ export default {
       startTime: null,
       isImportingCURL: false,
       currentRequest: null,
+      wrapText: false,
       curlContent: "",
       methodOptions: [
         { value: "GET", label: "GET" },

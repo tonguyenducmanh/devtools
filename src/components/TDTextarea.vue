@@ -15,7 +15,11 @@
       @dragover="handleDragOver"
       @dragleave="handleDragLeave"
       @drop="handleDrop"
-      :class="{ 'drag-over': isDragOver, 'fix-size': !resizeable }"
+      :class="{
+        'drag-over': isDragOver,
+        'fix-size': !resizeable,
+        'td-textarea-nowrap-text': !wrapText,
+      }"
       spellcheck="false"
       :name="inputId"
     />
@@ -77,6 +81,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    wrapText: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -136,6 +144,12 @@ export default {
     background-color: var(--bg-main-color);
     color: var(--text-primary-color);
     font-size: var(--font-size-medium);
+  }
+
+  .td-textarea-nowrap-text {
+    white-space: nowrap; /* không wrap, text chạy 1 dòng */
+    overflow-x: auto; /* bật scroll ngang */
+    overflow-y: auto; /* vẫn cho scroll dọc nếu cần */
   }
 
   textarea:focus {

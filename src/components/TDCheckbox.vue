@@ -3,7 +3,10 @@
     class="td-checkbox-container"
     :class="{ 'td-checkbox-read-only': readOnly }"
   >
-    <label class="td-label" :class="{ 'td-label-checked': modelValue }">
+    <label
+      class="td-label no-select"
+      :class="{ 'td-label-checked': modelValue }"
+    >
       <input
         type="checkbox"
         :checked="modelValue"
