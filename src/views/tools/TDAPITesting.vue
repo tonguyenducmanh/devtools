@@ -10,7 +10,6 @@
         <TDButton
           @click="importCURL"
           :label="$t('i18nCommon.apiTesting.importCURL')"
-          :disabled="isLoading"
         ></TDButton>
         <TDButton
           @click="cancelImportCURL"
@@ -40,6 +39,7 @@
             :type="$tdEnum.buttonType.secondary"
             :debounceTime="100"
             :noMargin="true"
+            :readOnly="isLoading"
             :label="$t('i18nCommon.apiTesting.importCURL')"
           ></TDButton>
         </div>
@@ -152,7 +152,7 @@
         <TDButton
           @click="handleSendRequest"
           :label="$t('i18nCommon.apiTesting.send')"
-          :disabled="isLoading"
+          :readOnly="isLoading"
         ></TDButton>
         <TDButton
           @click="handleClear"
