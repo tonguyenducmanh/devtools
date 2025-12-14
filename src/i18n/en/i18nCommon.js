@@ -305,6 +305,8 @@ export default {
       cancel: "Cancel",
       requestName: "Request name",
       requestCanceled: "Current request canceled",
+      notpermissionExtension:
+        "You have not granted permission for the extension to call the API.",
     },
   },
 };
