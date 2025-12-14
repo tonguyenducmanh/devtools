@@ -263,6 +263,9 @@ export default {
         this.$tdToast.error(null, `${error.message}`);
       } finally {
         this.isLoading = false;
+        // setTimeout(() => {
+        //   this.isLoading = false;
+        // }, 2000); // 2000 milliseconds = 2 seconds
         // Lưu text vào lịch sử nếu khác với lần lưu trước
         // so sánh input và output, nếu giống nhau thì xoá output
         let historyItem = {
@@ -543,38 +546,33 @@ export default {
 .response-loading {
   width: 100%;
   height: 100%;
-  /* HTML: <div class="loader"></div> */
+  background-color: var(--bg-layer-color);
+  border: 1px solid transparent;
   .loader {
-    width: 32px;
+    width: 20px;
     aspect-ratio: 1;
-    --_g: no-repeat radial-gradient(farthest-side, #000 90%, #0000);
-    background: var(--_g), var(--_g), var(--_g), var(--_g);
-    background-size: 40% 40%;
-    animation: l46 1s infinite;
+    background: var(--btn-color);
+    box-shadow: 0 0 60px 15px var(--btn-color);
+    transform: translate(-80px);
+    clip-path: inset(0);
+    animation:
+      l4-1 0.5s ease-in-out infinite alternate,
+      l4-2 1s ease-in-out infinite;
   }
-  @keyframes l46 {
-    0% {
-      background-position:
-        0 0,
-        100% 0,
-        100% 100%,
-        0 100%;
-    }
-    40%,
-    50% {
-      background-position:
-        100% 100%,
-        100% 0,
-        0 0,
-        0 100%;
-    }
-    90%,
+  @keyframes l4-1 {
     100% {
-      background-position:
-        100% 100%,
-        0 100%,
-        0 0,
-        100% 0;
+      transform: translateX(80px);
+    }
+  }
+  @keyframes l4-2 {
+    33% {
+      clip-path: inset(0 0 0 -100px);
+    }
+    50% {
+      clip-path: inset(0 0 0 0);
+    }
+    83% {
+      clip-path: inset(0 -100px 0 0);
     }
   }
 }
