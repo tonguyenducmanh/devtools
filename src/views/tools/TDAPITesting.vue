@@ -61,6 +61,7 @@
               <TDRadioGroup
                 v-model="currentAPIInfoOption"
                 :options="APIInfoOptions"
+                :noMargin="true"
               />
             </div>
             <TDTextarea
@@ -520,6 +521,7 @@ export default {
       .request-area-title {
         width: 100%;
         justify-content: flex-start;
+        margin: var(--padding) 0;
       }
     }
     .text-area-response {

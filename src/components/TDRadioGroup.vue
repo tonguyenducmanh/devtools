@@ -3,6 +3,7 @@
     class="td-radio-group"
     :class="{
       'layout-horizontal': layout === $tdEnum.radioGroupType.horizontal,
+      'td-radio-group-no-margin': noMargin,
     }"
   >
     <div class="td-radio-group-label" v-if="label">
@@ -57,6 +58,10 @@ export default {
           tdEnum.radioGroupType.vertical,
         ].includes(value),
     },
+    noMargin: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ["update:modelValue"],
   computed: {
@@ -76,6 +81,10 @@ export default {
     font-size: var(--font-size-l-medium);
     color: var(--text-secondary-color);
   }
+}
+
+.td-radio-group-no-margin {
+  margin: unset;
 }
 
 .td-radio-group.layout-horizontal {
