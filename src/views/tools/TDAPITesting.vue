@@ -72,7 +72,19 @@
                 v-model="showReponse"
                 :label="$t('i18nCommon.apiTesting.showReponse')"
               ></TDCheckbox>
-              <div v-if="!showReponse">
+              <div
+                class="flex loader-without-response"
+                v-if="!showReponse && isLoading"
+              >
+                <div class="loader"></div>
+                <TDButton
+                  class="btn-cancel-without-response"
+                  @click="handleCancelRequest"
+                  :type="$tdEnum.buttonType.secondary"
+                  :label="$t('i18nCommon.apiTesting.cancel')"
+                />
+              </div>
+              <div v-if="!showReponse && !isLoading">
                 <div class="status-info" v-if="statusCode">
                   <div class="status-badge" :class="statusClass">
                     {{ statusText }}
@@ -685,32 +697,11 @@ export default {
   height: 100%;
   background-color: var(--bg-layer-color);
   border: 1px solid transparent;
-  .loader {
-    width: 20px;
-    aspect-ratio: 1;
-    background: var(--btn-color);
-    box-shadow: 0 0 60px 15px var(--btn-color);
-    transform: translate(-80px);
-    clip-path: inset(0);
-    animation:
-      l4-1 0.5s ease-in-out infinite alternate,
-      l4-2 1s ease-in-out infinite;
-  }
-  @keyframes l4-1 {
-    100% {
-      transform: translateX(80px);
-    }
-  }
-  @keyframes l4-2 {
-    33% {
-      clip-path: inset(0 0 0 -100px);
-    }
-    50% {
-      clip-path: inset(0 0 0 0);
-    }
-    83% {
-      clip-path: inset(0 -100px 0 0);
-    }
-  }
+}
+.loader-without-response {
+  margin-left: 100px;
+}
+.btn-cancel-without-response {
+  margin-left: 100px;
 }
 </style>
