@@ -1,5 +1,8 @@
 <template>
-  <div class="flex no-select td-combobox" :class="{ 'flex-col': isLabelTop }">
+  <div
+    class="flex no-select td-combobox"
+    :class="{ 'flex-col': isLabelTop, 'td-combobox-no-margin': noMargin }"
+  >
     <div class="td-label" :class="{ 'td-label-top': isLabelTop }" v-if="label">
       {{ label.capitalize() }}
     </div>
@@ -48,6 +51,10 @@ export default {
     modelValue: {
       type: [String, Number, Boolean, Object],
       default: null,
+    },
+    noMargin: {
+      type: Boolean,
+      default: false,
     },
     options: {
       type: Array,
@@ -170,5 +177,8 @@ export default {
       transition: transform 0.2s ease;
     }
   }
+}
+.td-combobox-no-margin {
+  margin: unset;
 }
 </style>

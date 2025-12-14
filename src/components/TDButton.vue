@@ -5,6 +5,7 @@
     :class="{
       'td-button-secondary': type == $tdEnum.buttonType.secondary,
       'td-button-readonly': readOnly,
+      'td-button-no-margin': noMargin,
     }"
     :disabled="readOnly"
   >
@@ -47,6 +48,10 @@ export default {
       type: Number,
       default: 200,
     },
+    noMargin: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -85,7 +90,9 @@ export default {
   white-space: nowrap; /* Ensure wrapping is enabled */
   border: 1px solid transparent;
 }
-
+.td-button-no-margin {
+  margin: unset;
+}
 .td-button:hover {
   background-color: var(--focus-color);
 }

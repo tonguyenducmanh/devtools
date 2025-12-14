@@ -27,8 +27,12 @@
           titleKey="apiUrl"
           :cacheKey="$tdEnum.cacheConfig.APIHistory"
         ></TDHistory>
-        <div class="flex">
-          <TDComboBox v-model="httpMethod" :options="methodOptions" />
+        <div class="flex header-btn">
+          <TDComboBox
+            v-model="httpMethod"
+            :options="methodOptions"
+            :noMargin="true"
+          />
           <TDInput
             v-model="apiUrl"
             :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
@@ -37,6 +41,7 @@
             @click="openFormImportCURL"
             :type="$tdEnum.buttonType.secondary"
             :debounceTime="100"
+            :noMargin="true"
             :label="$t('i18nCommon.apiTesting.importCURL')"
           ></TDButton>
         </div>
@@ -508,5 +513,8 @@ export default {
 
 .response-time {
   color: var(--text-secondary);
+}
+.header-btn {
+  gap: var(--padding);
 }
 </style>
