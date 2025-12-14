@@ -1,7 +1,11 @@
 <template>
   <div
     class="td-input"
-    :class="{ 'flex-col': isLabelTop, 'td-input-read-only': readOnly }"
+    :class="{
+      'flex-col': isLabelTop,
+      'td-input-read-only': readOnly,
+      'td-input-no-margin': noMargin,
+    }"
   >
     <div class="td-label" :class="{ 'td-label-top': isLabelTop }" v-if="label">
       {{ label.capitalize() }}
@@ -56,6 +60,10 @@ export default {
       default: "text",
       validator: (prop) => ["text", "password", "number"].includes(prop),
     },
+    noMargin: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -106,5 +114,8 @@ export default {
 .td-input-read-only input {
   border: 1px solid transparent;
   background-color: var(--bg-layer-color);
+}
+.td-input-no-margin {
+  margin: unset;
 }
 </style>

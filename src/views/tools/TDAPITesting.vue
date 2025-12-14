@@ -32,6 +32,7 @@
           ></TDHistory>
           <TDInput
             v-model="requestName"
+            :noMargin="true"
             :placeHolder="$t('i18nCommon.apiTesting.requestName')"
           ></TDInput>
           <TDButton
@@ -51,6 +52,7 @@
           <TDInput
             v-model="apiUrl"
             :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
+            :noMargin="true"
           ></TDInput>
         </div>
         <div class="flex text-area-box">
@@ -500,9 +502,6 @@ export default {
   box-shadow: none;
 }
 
-:deep .td-input {
-  margin: unset;
-}
 .paste-box {
   width: 100%;
   flex: 1;
