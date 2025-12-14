@@ -54,9 +54,11 @@ export default {
   name: "TDHistory",
   created() {
     let me = this;
-    me.updateHistoryDisplay();
   },
-  mounted() {},
+  mounted() {
+    let me = this;
+    me.prepareData();
+  },
   methods: {},
   props: {
     /**
@@ -93,7 +95,17 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * style để là relative thì khu vực history sẽ width max theo historywrap
+     */
     positionRelative: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * Có tự động load history cuối cùng không
+     */
+    autoLoadLastHistory: {
       type: Boolean,
       default: true,
     },
@@ -175,6 +187,25 @@ export default {
         historyItem.textContent = displayText;
         me.historyItems.push(historyItem);
       });
+    },
+    /**
+     * Chuẩn bị dữ liệu khi đã loading xong
+     */
+    async prepareData() {
+      let me = this;
+      await me.updateHistoryDisplay();
+      if (
+        me.autoLoadLastHistory &&
+        me.historyItems &&
+        me.historyItems.length > 0
+      ) {
+        me.$nextTick(() => {
+          let lastHistoryItem = me.historyItems[0];
+          if (lastHistoryItem) {
+            me.applyHistoryText(lastHistoryItem.historyId);
+          }
+        });
+      }
     },
     /**
      * Lấy lịch sử text từ localStorage
