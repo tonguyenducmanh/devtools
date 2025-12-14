@@ -80,7 +80,6 @@
                 <TDButton
                   class="btn-cancel-without-response"
                   @click="handleCancelRequest"
-                  :type="$tdEnum.buttonType.secondary"
                   :label="$t('i18nCommon.apiTesting.cancel')"
                 />
               </div>
@@ -131,7 +130,6 @@
               <TDButton
                 v-if="isLoading"
                 @click="handleCancelRequest"
-                :type="$tdEnum.buttonType.secondary"
                 :label="$t('i18nCommon.apiTesting.cancel')"
               />
               <div class="loader"></div>
