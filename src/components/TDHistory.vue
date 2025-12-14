@@ -21,7 +21,10 @@
       ></TDButton>
     </div>
 
-    <div v-if="isHistoryVisible" class="td-history-container">
+    <div
+      v-if="isHistoryVisible && historyItems && historyItems.length > 0"
+      class="td-history-container"
+    >
       <div class="td-history">
         <template v-for="(item, index) in historyItems">
           <div
@@ -215,6 +218,7 @@ export default {
 <style lang="scss" scoped>
 .td-history-wrapper {
   position: relative;
+  margin-bottom: var(--padding);
 }
 .td-history-container {
   padding: var(--padding);
@@ -241,10 +245,6 @@ export default {
   gap: 0.5rem;
   max-height: 400px;
   overflow: auto;
-}
-
-.td-hide-history {
-  margin-bottom: var(--padding);
 }
 
 .td-history-item {
