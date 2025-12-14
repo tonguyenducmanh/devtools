@@ -14,18 +14,7 @@
         <span class="td-combobox-value">
           {{ selectedLabel }}
         </span>
-        <span :class="{ 'td-combobox-arrow-open': open }">
-          <svg class="arrow" viewBox="0 0 24 14">
-            <path
-              d="M2 2 L12 12 L22 2"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="3"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </span>
+        <TDArrow :openProp="open" />
       </div>
       <div v-if="open" class="td-combobox-dropdown">
         <TDComboBoxOption
@@ -47,10 +36,10 @@
 
 <script>
 import TDComboBoxOption from "./TDComboBoxOption.vue";
-
+import TDArrow from "./TDArrow.vue";
 export default {
   name: "TDComboBox",
-  components: { TDComboBoxOption },
+  components: { TDComboBoxOption, TDArrow },
   props: {
     label: {
       type: String,
@@ -145,9 +134,6 @@ export default {
 
       &:hover {
         border-color: var(--btn-color);
-        .arrow {
-          color: var(--btn-color);
-        }
       }
 
       &.disabled {

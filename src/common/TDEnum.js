@@ -47,6 +47,12 @@ class TDEnum {
     header: 1,
     body: 2,
   };
+  Direction = {
+    top: 1,
+    left: 2,
+    bottom: 3,
+    right: 4,
+  };
 }
 
 export default new TDEnum();
