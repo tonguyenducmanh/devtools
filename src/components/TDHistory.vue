@@ -281,10 +281,12 @@ export default {
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
   width: 100%;
+  max-height: 500px;
   position: absolute;
   z-index: 999;
   background-color: var(--bg-main-color);
   box-shadow: var(--box-shadow);
+  overflow-y: auto; /* ✅ QUAN TRỌNG */
 }
 
 .button-group {
@@ -296,10 +298,8 @@ export default {
 
 .td-history {
   display: flex;
-  flex-wrap: wrap;
   gap: 0.5rem;
-  max-height: 400px;
-  overflow: auto;
+  width: 100%;
 }
 
 .td-history-item {
