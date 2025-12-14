@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { routerConfig } from "@/router/router.js";
+import { getRouterConfig } from "@/router/router.js";
 
 export default {
   name: "TDSidebar",
@@ -35,7 +35,7 @@ export default {
   data() {
     let me = this;
     return {
-      routerLink: routerConfig,
+      routerLink: getRouterConfig(),
       isShowSidebar: true,
       queryTool: null,
     };
@@ -43,7 +43,7 @@ export default {
   methods: {
     filterToolNow() {
       let me = this;
-      let allTool = routerConfig;
+      let allTool = getRouterConfig();
       if (me.queryTool && allTool && allTool.length > 0) {
         allTool.forEach((element) => {
           if (element.meta && element.meta.titleKey) {

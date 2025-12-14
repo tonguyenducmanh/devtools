@@ -36,6 +36,7 @@ const routerConfig = [
     meta: {
       titleKey: "i18nCommon.feature.APITesting",
     },
+    electronNotSupport: true,
   },
   {
     /**
@@ -237,4 +238,12 @@ router.beforeEach((to, from, next) => {
 
 export default router;
 
-export { routerConfig };
+export function getRouterConfig() {
+  let allRoutes = [];
+  if (window && window.__electron && window.__electron.isElectron) {
+    allRoutes = routerConfig.filter((x) => !x.electronNotSupport);
+  } else {
+    allRoutes = routerConfig;
+  }
+  return allRoutes;
+}

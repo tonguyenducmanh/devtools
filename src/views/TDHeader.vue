@@ -138,7 +138,7 @@
 
 <script>
 import { loadLocale } from "@/i18n/i18nData.js";
-import { routerConfig } from "@/router/router.js";
+import { getRouterConfig } from "@/router/router.js";
 
 export default {
   name: "TDHeader",
@@ -148,7 +148,7 @@ export default {
       if (!this.searchQuery) return [];
       const query = this.searchQuery.normalizeText();
 
-      return this.routerConfig
+      return this.getRouterConfig()
         .filter((route) => {
           const title = this.$t(route.meta.titleKey).normalizeText();
           const routeName = route.name.normalizeText();
@@ -193,7 +193,7 @@ export default {
       isSearchModalOpen: false,
       searchQuery: "",
       selectedIndex: 0,
-      routerConfig: routerConfig.filter((route) => route.name !== "home"), // Loại bỏ trang home
+      routerConfig: getRouterConfig().filter((route) => route.name !== "home"), // Loại bỏ trang home
     };
   },
   methods: {
