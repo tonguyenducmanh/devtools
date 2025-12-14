@@ -27,7 +27,7 @@
       v-if="isHistoryVisible && historyItems && historyItems.length > 0"
       class="td-history-container"
     >
-      <div class="td-history">
+      <div class="flex flex-col td-history">
         <template v-for="(item, index) in historyItems">
           <div
             class="td-history-item"
@@ -176,15 +176,15 @@ export default {
     async updateHistoryDisplay() {
       let me = this;
       let history = await me.getHistory();
-      let titleLength = window.__env.textToQRConfig.maxTitleLength;
+      // let titleLength = window.__env.textToQRConfig.maxTitleLength;
       me.historyItems = [];
       [...history].reverse().forEach((historyItem, index) => {
         let text = historyItem.title;
-        let displayText =
-          text && text.length > titleLength
-            ? text.slice(0, titleLength) + "..."
-            : text;
-        historyItem.textContent = displayText;
+        // let displayText =
+        //   text && text.length > titleLength && me.isSliceHistoryText
+        //     ? text.slice(0, titleLength) + "..."
+        //     : text;
+        historyItem.textContent = text;
         me.historyItems.push(historyItem);
       });
     },
@@ -312,13 +312,14 @@ export default {
   border-radius: var(--border-radius);
   transition: all 0.2s ease;
   color: #444;
-  max-width: 300px;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .td-history-item span {
   white-space: nowrap;
   overflow: hidden;
+  width: 100%;
   text-overflow: ellipsis;
   cursor: pointer;
   color: var(--text-primary-color);

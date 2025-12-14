@@ -11,7 +11,6 @@
   window.__env.textToQRConfig = {
     maxTextOneChunk: 1000,
     maxHistoryLength: 100,
-    maxTitleLength: 50,
     isCompressText: true,
   };
   window.__env.githubSource = {
