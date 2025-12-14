@@ -50,7 +50,6 @@
                   @click="selectRoute(route)"
                   @mouseenter="selectedIndex = index"
                 >
-                  <div class="td-icon" :class="route.meta.icon"></div>
                   <div class="td-search-item-content">
                     <div class="td-search-item-title">
                       {{ $t(route.meta.titleKey) }}
@@ -148,7 +147,7 @@ export default {
       if (!this.searchQuery) return [];
       const query = this.searchQuery.normalizeText();
 
-      return this.getRouterConfig()
+      return getRouterConfig()
         .filter((route) => {
           const title = this.$t(route.meta.titleKey).normalizeText();
           const routeName = route.name.normalizeText();
