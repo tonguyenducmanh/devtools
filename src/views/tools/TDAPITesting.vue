@@ -90,7 +90,11 @@
                 </div>
               </div>
             </div>
+            <div class="flex response-loading" v-if="isLoading">
+              <div class="loader"></div>
+            </div>
             <TDTextarea
+              v-else
               :isLabelTop="true"
               :modelValue="responseText"
               :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
@@ -535,5 +539,43 @@ export default {
 }
 .header-second-btn {
   gap: var(--padding);
+}
+.response-loading {
+  width: 100%;
+  height: 100%;
+  /* HTML: <div class="loader"></div> */
+  .loader {
+    width: 32px;
+    aspect-ratio: 1;
+    --_g: no-repeat radial-gradient(farthest-side, #000 90%, #0000);
+    background: var(--_g), var(--_g), var(--_g), var(--_g);
+    background-size: 40% 40%;
+    animation: l46 1s infinite;
+  }
+  @keyframes l46 {
+    0% {
+      background-position:
+        0 0,
+        100% 0,
+        100% 100%,
+        0 100%;
+    }
+    40%,
+    50% {
+      background-position:
+        100% 100%,
+        100% 0,
+        0 0,
+        0 100%;
+    }
+    90%,
+    100% {
+      background-position:
+        100% 100%,
+        0 100%,
+        0 0,
+        100% 0;
+    }
+  }
 }
 </style>
