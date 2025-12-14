@@ -574,7 +574,8 @@ export default {
       .request-area-title {
         width: 100%;
         justify-content: flex-start;
-        margin: var(--padding) 0;
+        height: 40px;
+        align-items: center;
       }
     }
     .text-area-response {
