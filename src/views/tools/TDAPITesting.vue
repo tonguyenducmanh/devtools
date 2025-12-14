@@ -34,6 +34,13 @@
             v-model="requestName"
             :placeHolder="$t('i18nCommon.apiTesting.requestName')"
           ></TDInput>
+          <TDButton
+            @click="openFormImportCURL"
+            :type="$tdEnum.buttonType.secondary"
+            :debounceTime="100"
+            :noMargin="true"
+            :label="$t('i18nCommon.apiTesting.importCURL')"
+          ></TDButton>
         </div>
         <div class="flex header-second-btn">
           <TDComboBox
@@ -45,13 +52,6 @@
             v-model="apiUrl"
             :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
           ></TDInput>
-          <TDButton
-            @click="openFormImportCURL"
-            :type="$tdEnum.buttonType.secondary"
-            :debounceTime="100"
-            :noMargin="true"
-            :label="$t('i18nCommon.apiTesting.importCURL')"
-          ></TDButton>
         </div>
         <div class="flex text-area-box">
           <div class="flex flex-col text-area-request">
