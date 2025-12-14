@@ -147,7 +147,7 @@ export default {
   }
 
   .td-textarea-nowrap-text {
-    white-space: nowrap; /* không wrap, text chạy 1 dòng */
+    white-space: pre;
     overflow-x: auto; /* bật scroll ngang */
     overflow-y: auto; /* vẫn cho scroll dọc nếu cần */
   }
