@@ -36,6 +36,7 @@
           <TDButton
             @click="openFormImportCURL"
             :type="$tdEnum.buttonType.secondary"
+            :debounceTime="100"
             :label="$t('i18nCommon.apiTesting.importCURL')"
           ></TDButton>
         </div>
