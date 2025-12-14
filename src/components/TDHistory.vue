@@ -107,7 +107,7 @@ export default {
      */
     autoLoadLastHistory: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   data() {
