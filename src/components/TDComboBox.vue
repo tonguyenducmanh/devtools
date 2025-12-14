@@ -164,7 +164,6 @@ export default {
       margin-top: 4px;
       border: 1px solid var(--border-color);
       background: var(--bg-main-color);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       border-radius: var(--border-radius);
       .td-dropdown-item:first-child {
         border-radius: var(--border-radius) var(--border-radius) 0 0;

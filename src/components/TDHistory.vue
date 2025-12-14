@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="td-history-wrapper">
     <div
       class="flex flex-start button-group"
       :class="{ 'td-hide-history': !isHistoryVisible }"
@@ -213,12 +213,19 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.td-history-wrapper {
+  position: relative;
+}
 .td-history-container {
   padding: var(--padding);
   margin: var(--padding) 0;
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
   width: 100%;
+  position: absolute;
+  z-index: 999;
+  background-color: var(--bg-main-color);
+  box-shadow: var(--box-shadow);
 }
 
 .button-group {
@@ -232,7 +239,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  max-height: 100px;
+  max-height: 400px;
   overflow: auto;
 }
 
@@ -265,7 +272,7 @@ export default {
 .td-history-item:hover {
   background-color: var(--bg-hover-color);
   border: 1px solid var(--focus-color);
-  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.1);
+  box-shadow: var(--box-shadow);
 }
 
 .td-history-item .td-history-delete-btn {
