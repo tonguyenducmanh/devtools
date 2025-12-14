@@ -137,11 +137,20 @@
           :type="$tdEnum.buttonType.secondary"
           :label="$t('i18nCommon.apiTesting.clear')"
         ></TDButton>
-        <TDButton
-          @click="handleCopyResponse"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.apiTesting.copyResponse')"
-        ></TDButton>
+        <div>
+          <TDButton
+            v-if="showReponse"
+            @click="handleCopyResponse"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.apiTesting.copyResponse')"
+          ></TDButton>
+          <TDButton
+            v-else
+            @click="handleDownloadReponse"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.apiTesting.downloadReponse')"
+          ></TDButton>
+        </div>
         <TDButton
           @click="handleCopyCurl"
           :type="$tdEnum.buttonType.secondary"
@@ -450,6 +459,21 @@ export default {
     handleCopyResponse() {
       if (this.responseText) {
         this.$tdUtility.copyToClipboard(this.responseText);
+      }
+    },
+    handleDownloadReponse() {
+      let me = this;
+      if (me.responseText) {
+        let encoder = new TextEncoder();
+        let buffer = encoder.encode(me.responseText); // Uint8Array
+        let fileName = me.$tdUtility.createFileDownloadName(me.requestName, {
+          ext: ".txt",
+        });
+        me.$tdUtility.createDownloadFileFromBuffer(
+          buffer,
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          fileName
+        );
       }
     },
     handleCopyCurl() {

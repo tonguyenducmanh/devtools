@@ -214,6 +214,43 @@ class TDUtility {
     await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
   }
   /**
+   * Tạo tên file an toàn để download
+   * - Giữ nguyên tiếng Việt & dấu cách
+   * - Chỉ loại ký tự cấm theo chuẩn OS
+   */
+  createFileDownloadName(
+    input,
+    { ext = "", maxLength = 120, fallback = "download" } = {}
+  ) {
+    if (typeof input !== "string") {
+      input = fallback;
+    }
+
+    let name = input
+      .replace(/[<>:"/\\|?*\x00-\x1F]/g, "") // ký tự cấm
+      .replace(/\s+/g, " ") // gộp nhiều space
+      .replace(/^\.+/, "") // không bắt đầu bằng .
+      .replace(/[. ]+$/, "") // không kết thúc bằng . hoặc space
+      .trim();
+
+    if (!name) {
+      name = fallback;
+    }
+
+    // Giới hạn độ dài (không cắt extension)
+    if (name.length > maxLength) {
+      name = name.slice(0, maxLength).trim();
+    }
+
+    // Gắn extension
+    if (ext) {
+      ext = ext.replace(/^\./, "");
+      name += `.${ext}`;
+    }
+
+    return name;
+  }
+  /**
    * Tạo file tải xuống từ buffer
    */
   createDownloadFileFromBuffer(buffer, type, fileName) {

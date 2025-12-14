@@ -309,6 +309,7 @@ export default {
         "You have not granted permission for the extension to call the API.",
       wrapText: "Wrap text",
       showReponse: "Show response",
+      downloadReponse: "Download response",
     },
   },
 };
