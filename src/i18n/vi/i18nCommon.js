@@ -306,6 +306,7 @@ export default {
       requestCanceled: "Đã hủy request hiện tại",
       notpermissionExtension: "Bạn chưa cấp quyền cho extension gọi api",
       wrapText: "Xuống dòng",
+      showReponse: "Xem response",
     },
   },
 };

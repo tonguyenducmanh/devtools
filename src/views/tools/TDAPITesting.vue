@@ -67,6 +67,11 @@
                 v-model="wrapText"
                 :label="$t('i18nCommon.apiTesting.wrapText')"
               ></TDCheckbox>
+              <TDCheckbox
+                v-if="!showReponse"
+                v-model="showReponse"
+                :label="$t('i18nCommon.apiTesting.showReponse')"
+              ></TDCheckbox>
             </div>
             <TDTextarea
               v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.header"
@@ -83,11 +88,12 @@
               :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
             ></TDTextarea>
           </div>
-          <div class="flex flex-col text-area-response">
+          <div v-if="showReponse" class="flex flex-col text-area-response">
             <div class="flex response-area-title">
-              <div>
-                {{ $t("i18nCommon.apiTesting.response") }}
-              </div>
+              <TDCheckbox
+                v-model="showReponse"
+                :label="$t('i18nCommon.apiTesting.showReponse')"
+              ></TDCheckbox>
               <div>
                 <div class="status-info" v-if="statusCode">
                   <div class="status-badge" :class="statusClass">
@@ -169,6 +175,7 @@ export default {
       isImportingCURL: false,
       currentRequest: null,
       wrapText: false,
+      showReponse: true,
       curlContent: "",
       methodOptions: [
         { value: "GET", label: "GET" },
