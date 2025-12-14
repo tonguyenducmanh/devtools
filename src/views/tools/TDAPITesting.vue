@@ -25,7 +25,7 @@
           <TDHistory
             ref="history"
             :applyFunction="handleSendRequestFromHistory"
-            titleKey="apiUrl"
+            titleKey="requestName"
             :noMargin="true"
             :positionRelative="false"
             :cacheKey="$tdEnum.cacheConfig.APIHistory"
@@ -266,6 +266,7 @@ export default {
           httpMethod: me.httpMethod,
           headersText: me.headersText,
           bodyText: me.bodyText,
+          requestName: me.requestName ? me.requestName : me.apiUrl,
         };
         await me.$refs.history.saveToHistory(historyItem);
       }
@@ -277,6 +278,7 @@ export default {
         me.httpMethod = item.httpMethod;
         me.headersText = item.headersText;
         me.bodyText = item.bodyText;
+        me.requestName = item.requestName;
         // lúc apply lịch sử mà gọi luôn hơi tốn server :v
         // await me.handleSendRequest();
       }
@@ -416,6 +418,7 @@ export default {
       let CURLParsed = me.parseCurl(me.curlContent);
       if (CURLParsed) {
         me.apiUrl = CURLParsed.url;
+        me.requestName = CURLParsed.url;
         try {
           me.bodyText = JSON.stringify(JSON.parse(CURLParsed.body), null, 2);
         } catch (ex) {
