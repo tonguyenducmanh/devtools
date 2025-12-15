@@ -34,6 +34,12 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử gọi API",
   },
+  APIPromodeHistory: {
+    KeyFormat: "APIPromodeHistory",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử gọi API",
+  },
   JSONToExcelHistory: {
     KeyFormat: "JSONToExcelHistory",
     CacheLevel: tdEnum.cacheType.indexedDB,

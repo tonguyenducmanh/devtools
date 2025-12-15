@@ -15,6 +15,17 @@
         :placeHolder="$t('i18nCommon.apiTesting.requestName')"
       ></TDInput>
       <TDHistory
+        v-if="currentAPIMode == $tdEnum.APIMode.ProMode"
+        ref="historyProMode"
+        :applyFunction="handleSendRequestFromHistoryProMode"
+        titleKey="requestName"
+        :noMargin="true"
+        :positionRelative="false"
+        :cacheKey="$tdEnum.cacheConfig.APIPromodeHistory"
+        :historyContainerStyleEnum="$tdEnum.AbsolutePositionStyle.Top100Left"
+      ></TDHistory>
+      <TDHistory
+        v-else
         ref="history"
         :applyFunction="handleSendRequestFromHistory"
         titleKey="requestName"
@@ -1026,7 +1037,23 @@ return finalResponeArr;`,
         me.$tdToast.error(null, error.message);
       } finally {
         me.isLoading = false;
+        if (me.proModeSecranioCode) {
+          let shortCode = me.proModeSecranioCode.slice(0, 100);
+          let historyItem = {
+            requestName: me.requestName || shortCode,
+            proModeSecranioCode: me.proModeSecranioCode,
+          };
+          await me.$refs.historyProMode.saveToHistory(historyItem);
+        }
       }
+    },
+    handleSendRequestFromHistoryProMode(item) {
+      let me = this;
+      if (item && item.proModeSecranioCode) {
+        me.proModeSecranioCode = item.proModeSecranioCode;
+        me.requestName = item.requestName;
+      }
+      // không gọi api ngay mà để user gọi
     },
   },
 };
