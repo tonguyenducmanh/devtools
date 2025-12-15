@@ -313,6 +313,8 @@ export default {
       wrapText: "Wrap text",
       showReponse: "Show response",
       downloadReponse: "Download response",
+      tutorialProModeCode:
+        "--requestCURL() is a built-in function used to call APIs using CURL\n--Example:\n",
     },
   },
 };

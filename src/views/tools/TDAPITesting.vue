@@ -436,7 +436,9 @@ export default {
         { value: this.$tdEnum.APIMode.CURL, label: "CURL" },
         { value: this.$tdEnum.APIMode.ProMode, label: "Pro Mode" },
       ],
-      proModeSecranioCode: `let curlOne = \`
+      proModeSecranioCode:
+        this.$t("i18nCommon.apiTesting.tutorialProModeCode") +
+        `let curlOne = \`
     curl 'http://localhost:3000/api/get_list_item?limit=5' \\
     --header 'Content-Type: application/json'
 \`;

@@ -311,6 +311,8 @@ export default {
       wrapText: "Xuống dòng",
       showReponse: "Xem response",
       downloadReponse: "Tải xuống response",
+      tutorialProModeCode:
+        "--requestCURL() là hàm cung cấp sẵn dùng để gọi api bằng CURL\n--Ví dụ:\n",
     },
   },
 };
