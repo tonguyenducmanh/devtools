@@ -10,7 +10,7 @@
     <div class="td-combobox-wraper">
       <div
         class="td-combobox-control"
-        :class="{ disabled }"
+        :class="{ readOnly }"
         :style="styleCombo"
         @click="toggle"
       >
@@ -65,7 +65,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    disabled: {
+    readOnly: {
       type: Boolean,
       default: false,
     },
@@ -100,7 +100,7 @@ export default {
   },
   methods: {
     toggle() {
-      if (this.disabled) return;
+      if (this.readOnly) return;
       this.open = !this.open;
     },
     select(value) {
@@ -143,7 +143,7 @@ export default {
         border-color: var(--btn-color);
       }
 
-      &.disabled {
+      &.readOnly {
         opacity: 0.4;
         cursor: not-allowed;
       }

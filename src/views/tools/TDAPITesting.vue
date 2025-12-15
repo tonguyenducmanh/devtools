@@ -1,68 +1,203 @@
 <template>
   <div class="flex flex-col container">
-    <template v-if="isImportingCURL">
-      <TDTextarea
-        :isLabelTop="true"
-        v-model="curlContent"
-        :placeHolder="$t('i18nCommon.apiTesting.contentCURL')"
-      ></TDTextarea>
-      <div class="flex">
-        <TDButton
-          @click="importCURL"
-          :label="$t('i18nCommon.apiTesting.importCURL')"
-        ></TDButton>
-        <TDButton
-          @click="cancelImportCURL"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.apiTesting.cancel')"
-        ></TDButton>
-      </div>
-    </template>
-    <template v-else>
-      <div class="paste-box">
-        <div class="flex header-top-btn">
-          <TDHistory
-            ref="history"
-            :applyFunction="handleSendRequestFromHistory"
-            titleKey="requestName"
-            :noMargin="true"
-            :positionRelative="false"
-            :cacheKey="$tdEnum.cacheConfig.APIHistory"
-          ></TDHistory>
-          <TDInput
-            v-model="requestName"
-            :noMargin="true"
-            :placeHolder="$t('i18nCommon.apiTesting.requestName')"
-          ></TDInput>
+    <div class="flex header-top-btn">
+      <TDComboBox
+        :width="120"
+        v-model="currentAPIMode"
+        :options="APIModeOptions"
+        :noMargin="true"
+        :readOnly="isLoading"
+      />
+      <TDInput
+        v-model="requestName"
+        :noMargin="true"
+        :placeHolder="$t('i18nCommon.apiTesting.requestName')"
+      ></TDInput>
+      <TDHistory
+        ref="history"
+        :applyFunction="handleSendRequestFromHistory"
+        titleKey="requestName"
+        :noMargin="true"
+        :positionRelative="false"
+        :cacheKey="$tdEnum.cacheConfig.APIHistory"
+        :historyContainerStyleEnum="$tdEnum.AbsolutePositionStyle.Top100Left"
+      ></TDHistory>
+      <TDButton
+        @click="downloadExtension"
+        :type="$tdEnum.buttonType.secondary"
+        :label="$t('i18nCommon.apiTesting.downloadExtension')"
+      ></TDButton>
+    </div>
+    <template v-if="currentAPIMode == $tdEnum.APIMode.Normal">
+      <template v-if="isImportingCURL">
+        <TDTextarea
+          :isLabelTop="true"
+          v-model="curlContent"
+          :placeHolder="$t('i18nCommon.apiTesting.contentCURL')"
+        ></TDTextarea>
+        <div class="flex">
           <TDButton
-            @click="openFormImportCURL"
-            :type="$tdEnum.buttonType.secondary"
-            :debounceTime="100"
-            :noMargin="true"
-            :readOnly="isLoading"
+            @click="importCURL"
             :label="$t('i18nCommon.apiTesting.importCURL')"
           ></TDButton>
+          <TDButton
+            @click="cancelImportCURL"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.apiTesting.cancel')"
+          ></TDButton>
         </div>
-        <div class="flex header-second-btn">
-          <TDComboBox
-            v-model="httpMethod"
-            :options="methodOptions"
-            :noMargin="true"
-          />
-          <TDInput
-            v-model="apiUrl"
-            :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
-            :noMargin="true"
-          ></TDInput>
+      </template>
+      <template v-else>
+        <div class="paste-box">
+          <div class="flex header-second-btn">
+            <TDComboBox
+              v-model="httpMethod"
+              :options="methodOptions"
+              :noMargin="true"
+            />
+            <TDInput
+              v-model="apiUrl"
+              :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
+              :noMargin="true"
+            ></TDInput>
+            <TDButton
+              @click="openFormImportCURL"
+              :type="$tdEnum.buttonType.secondary"
+              :debounceTime="100"
+              :noMargin="true"
+              :readOnly="isLoading"
+              :label="$t('i18nCommon.apiTesting.importCURL')"
+            ></TDButton>
+          </div>
+          <div class="flex text-area-box">
+            <div class="flex flex-col text-area-request">
+              <div class="flex request-area-title">
+                <TDRadioGroup
+                  v-model="currentAPIInfoOption"
+                  :options="APIInfoOptions"
+                  :noMargin="true"
+                />
+                <TDCheckbox
+                  v-model="wrapText"
+                  :label="$t('i18nCommon.apiTesting.wrapText')"
+                ></TDCheckbox>
+                <TDCheckbox
+                  v-if="!showReponse"
+                  v-model="showReponse"
+                  :label="$t('i18nCommon.apiTesting.showReponse')"
+                ></TDCheckbox>
+                <div
+                  class="flex loader-without-response"
+                  v-if="!showReponse && isLoading"
+                >
+                  <div class="loader"></div>
+                  <TDButton
+                    class="btn-cancel-without-response"
+                    @click="handleCancelRequest"
+                    :label="$t('i18nCommon.apiTesting.cancel')"
+                  />
+                </div>
+                <div v-if="!showReponse && !isLoading">
+                  <div class="status-info" v-if="statusCode">
+                    <div class="status-badge" :class="statusClass">
+                      {{ statusText }}
+                    </div>
+                    <div class="response-time" v-if="responseTime">
+                      {{ responseTime }}ms
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <TDTextarea
+                v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.header"
+                :isLabelTop="true"
+                v-model="headersText"
+                :wrapText="wrapText"
+                :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
+              ></TDTextarea>
+              <TDTextarea
+                v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.body"
+                :isLabelTop="true"
+                v-model="bodyText"
+                :wrapText="wrapText"
+                :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
+              ></TDTextarea>
+            </div>
+            <div v-if="showReponse" class="flex flex-col text-area-response">
+              <div class="flex response-area-title">
+                <TDCheckbox
+                  v-model="showReponse"
+                  :label="$t('i18nCommon.apiTesting.showReponse')"
+                ></TDCheckbox>
+                <div>
+                  <div class="status-info" v-if="statusCode">
+                    <div class="status-badge" :class="statusClass">
+                      {{ statusText }}
+                    </div>
+                    <div class="response-time" v-if="responseTime">
+                      {{ responseTime }}ms
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-col response-loading" v-if="isLoading">
+                <TDButton
+                  v-if="isLoading"
+                  @click="handleCancelRequest"
+                  :label="$t('i18nCommon.apiTesting.cancel')"
+                />
+                <div class="loader"></div>
+              </div>
+              <TDTextarea
+                v-else
+                :isLabelTop="true"
+                :modelValue="responseText"
+                :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
+                :readOnly="true"
+                :wrapText="wrapText"
+              ></TDTextarea>
+            </div>
+          </div>
         </div>
+
+        <div class="flex group-btn">
+          <TDButton
+            @click="handleSendRequest"
+            :label="$t('i18nCommon.apiTesting.send')"
+            :readOnly="isLoading"
+          ></TDButton>
+          <TDButton
+            @click="handleClear"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.apiTesting.clear')"
+          ></TDButton>
+          <div>
+            <TDButton
+              v-if="showReponse"
+              @click="handleCopyResponse"
+              :type="$tdEnum.buttonType.secondary"
+              :label="$t('i18nCommon.apiTesting.copyResponse')"
+            ></TDButton>
+            <TDButton
+              v-else
+              @click="handleDownloadReponse"
+              :type="$tdEnum.buttonType.secondary"
+              :label="$t('i18nCommon.apiTesting.downloadReponse')"
+            ></TDButton>
+          </div>
+          <TDButton
+            @click="handleCopyCurl"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.apiTesting.copyCURL')"
+          ></TDButton>
+        </div>
+      </template>
+    </template>
+    <template v-else-if="currentAPIMode == $tdEnum.APIMode.CURL">
+      <div class="paste-box">
         <div class="flex text-area-box">
           <div class="flex flex-col text-area-request">
             <div class="flex request-area-title">
-              <TDRadioGroup
-                v-model="currentAPIInfoOption"
-                :options="APIInfoOptions"
-                :noMargin="true"
-              />
               <TDCheckbox
                 v-model="wrapText"
                 :label="$t('i18nCommon.apiTesting.wrapText')"
@@ -95,18 +230,10 @@
               </div>
             </div>
             <TDTextarea
-              v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.header"
               :isLabelTop="true"
-              v-model="headersText"
+              v-model="curlContent"
               :wrapText="wrapText"
-              :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
-            ></TDTextarea>
-            <TDTextarea
-              v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.body"
-              :isLabelTop="true"
-              v-model="bodyText"
-              :wrapText="wrapText"
-              :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
+              :placeHolder="$t('i18nCommon.apiTesting.contentCURLExecute')"
             ></TDTextarea>
           </div>
           <div v-if="showReponse" class="flex flex-col text-area-response">
@@ -145,17 +272,11 @@
           </div>
         </div>
       </div>
-
       <div class="flex group-btn">
         <TDButton
-          @click="handleSendRequest"
+          @click="handleSendRequestCURL"
           :label="$t('i18nCommon.apiTesting.send')"
           :readOnly="isLoading"
-        ></TDButton>
-        <TDButton
-          @click="handleClear"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.apiTesting.clear')"
         ></TDButton>
         <div>
           <TDButton
@@ -171,18 +292,9 @@
             :label="$t('i18nCommon.apiTesting.downloadReponse')"
           ></TDButton>
         </div>
-        <TDButton
-          @click="handleCopyCurl"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.apiTesting.copyCURL')"
-        ></TDButton>
-        <TDButton
-          @click="downloadExtension"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.apiTesting.downloadExtension')"
-        ></TDButton>
       </div>
     </template>
+    <template v-else-if="currentAPIMode == $tdEnum.APIMode.ProMode"> </template>
   </div>
 </template>
 
@@ -202,6 +314,7 @@ export default {
       isLoading: false,
       startTime: null,
       isImportingCURL: false,
+      currentAPIMode: this.$tdEnum.APIMode.Normal,
       currentRequest: null,
       wrapText: false,
       showReponse: true,
@@ -219,6 +332,11 @@ export default {
       APIInfoOptions: [
         { value: this.$tdEnum.APIInfoOption.header, label: "Header" },
         { value: this.$tdEnum.APIInfoOption.body, label: "Body" },
+      ],
+      APIModeOptions: [
+        { value: this.$tdEnum.APIMode.Normal, label: "Normal" },
+        { value: this.$tdEnum.APIMode.CURL, label: "CURL" },
+        { value: this.$tdEnum.APIMode.ProMode, label: "Pro Mode" },
       ],
     };
   },
@@ -304,6 +422,13 @@ export default {
       });
 
       return headers;
+    },
+    async handleSendRequestCURL() {
+      let me = this;
+      let parseCURLSuccess = me.importCURL();
+      if (parseCURLSuccess) {
+        await me.handleSendRequest();
+      }
     },
     async handleSendRequest() {
       let me = this;
@@ -419,34 +544,36 @@ export default {
         me.headersText = item.headersText;
         me.bodyText = item.bodyText;
         me.requestName = item.requestName;
+        // build luôn CURL
+        me.buildCurlFromRequest();
         // lúc apply lịch sử mà gọi luôn hơi tốn server :v
         // await me.handleSendRequest();
       }
     },
     buildCurlFromRequest() {
       let me = this;
-      let historyItem = {
+      let tempRequest = {
         apiUrl: me.apiUrl,
         httpMethod: me.httpMethod,
         headersText: me.headersText,
         bodyText: me.bodyText,
       };
-      if (!historyItem?.apiUrl) throw new Error("apiUrl is required");
+      if (!tempRequest?.apiUrl) throw new Error("apiUrl is required");
 
       let lines = [];
 
       // base curl
-      lines.push(`curl '${historyItem.apiUrl}'`);
+      lines.push(`curl '${tempRequest.apiUrl}'`);
 
       // method
-      let method = (historyItem.httpMethod || "GET").toUpperCase();
+      let method = (tempRequest.httpMethod || "GET").toUpperCase();
       if (method !== "GET") {
         lines.push(`--request ${method}`);
       }
 
       // headers
-      if (historyItem.headersText) {
-        historyItem.headersText
+      if (tempRequest.headersText) {
+        tempRequest.headersText
           .split("\n")
           .map((h) => h.trim())
           .filter(Boolean)
@@ -456,11 +583,11 @@ export default {
       }
 
       // body
-      if (historyItem.bodyText && historyItem.bodyText.trim() !== "") {
-        lines.push(`--data '${me.escapeShell(historyItem.bodyText)}'`);
+      if (tempRequest.bodyText && tempRequest.bodyText.trim() !== "") {
+        lines.push(`--data '${me.escapeShell(tempRequest.bodyText)}'`);
       }
-
-      return lines.join(" \\\n");
+      me.curlContent = lines.join(" \\\n");
+      return me.curlContent;
     },
     escapeShell(value) {
       return String(value).replace(/'/g, `'\\''`);
@@ -568,9 +695,10 @@ export default {
       let me = this;
       me.isImportingCURL = true;
     },
-    importCURL() {
+    importCURL(isSilence = false) {
       let me = this;
       let CURLParsed = me.parseCurl(me.curlContent);
+      let result = false;
       if (CURLParsed) {
         me.apiUrl = CURLParsed.url;
         me.requestName = CURLParsed.url;
@@ -586,10 +714,14 @@ export default {
         me.httpMethod = CURLParsed.method;
         me.headersText = CURLParsed.headersText;
         me.isImportingCURL = false;
-        me.curlContent = "";
+        result = true;
       } else {
-        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+        if (!isSilence) {
+          me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+        }
+        result = false;
       }
+      return result;
     },
     cancelImportCURL() {
       let me = this;
@@ -684,8 +816,9 @@ export default {
   gap: var(--padding);
   align-items: center;
   justify-content: center;
-  margin: var(--padding) 0;
+  margin-bottom: var(--padding);
   position: relative;
+  width: 100%;
 }
 .header-second-btn {
   gap: var(--padding);
