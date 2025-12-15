@@ -5,7 +5,7 @@ import i18nData from "@/i18n/i18nData.js";
 import * as _ from "lodash";
 /**
  * các method TDutility dùng cho toàn bộ frontend
- * Created by tdmanh1 19.09.2024
+ * Created by tdmanh 19.09.2024
  */
 class TDUtility {
   /**
@@ -32,7 +32,7 @@ class TDUtility {
    * Thực hiện duyệt từng phần tử của bảng hoặc thuộc tính của object để call fn
    * @param {Array/Object/...} obj
    * @param {Function} fn hàm thực hiện khi for
-   * Created by tdmanh1 19.09.2024
+   * Created by tdmanh 19.09.2024
    */
   forEach(obj, fn) {
     if (obj === null || typeof obj === "undefined") {
@@ -305,7 +305,7 @@ class TDUtility {
    * Đóng băng sâu một object, ngăn chặn mọi thay đổi ở mọi cấp độ
    * @param {Object} obj Object cần đóng băng
    * @returns {Object} Object đã được đóng băng hoàn toàn
-   * Created by tdmanh1 17.06.2025
+   * Created by tdmanh 17.06.2025
    */
   freezeDeepObject(obj) {
     // Lấy tất cả thuộc tính của object, bao gồm cả thuộc tính không liệt kê được

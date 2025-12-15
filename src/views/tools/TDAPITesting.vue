@@ -408,6 +408,7 @@
 </template>
 
 <script>
+import TDCURLUtil from "@/common/api/TDCURLUtil";
 export default {
   name: "TDAPITesting",
   data() {
@@ -701,52 +702,19 @@ return finalResponeArr;`,
         me.bodyText = item.bodyText;
         me.requestName = item.requestName;
         // build luôn CURL
-        me.buildCurlFromRequest();
+        me.curlContent = TDCURLUtil.stringify(me.getRequestObj());
         // lúc apply lịch sử mà gọi luôn hơi tốn server :v
         // await me.handleSendRequest();
       }
     },
-    buildCurlFromRequest() {
+    getRequestObj() {
       let me = this;
-      let tempRequest = {
+      return {
         apiUrl: me.apiUrl,
         httpMethod: me.httpMethod,
         headersText: me.headersText,
         bodyText: me.bodyText,
       };
-      if (!tempRequest?.apiUrl) throw new Error("apiUrl is required");
-
-      let lines = [];
-
-      // base curl
-      lines.push(`curl '${tempRequest.apiUrl}'`);
-
-      // method
-      let method = (tempRequest.httpMethod || "GET").toUpperCase();
-      if (method !== "GET") {
-        lines.push(`--request ${method}`);
-      }
-
-      // headers
-      if (tempRequest.headersText) {
-        tempRequest.headersText
-          .split("\n")
-          .map((h) => h.trim())
-          .filter(Boolean)
-          .forEach((header) => {
-            lines.push(`--header '${me.escapeShell(header)}'`);
-          });
-      }
-
-      // body
-      if (tempRequest.bodyText && tempRequest.bodyText.trim() !== "") {
-        lines.push(`--data '${me.escapeShell(tempRequest.bodyText)}'`);
-      }
-      me.curlContent = lines.join(" \\\n");
-      return me.curlContent;
-    },
-    escapeShell(value) {
-      return String(value).replace(/'/g, `'\\''`);
     },
 
     handleClear() {
@@ -781,71 +749,12 @@ return finalResponeArr;`,
     },
     handleCopyCurl() {
       let me = this;
-      let curlBuilded = me.buildCurlFromRequest();
+      let curlBuilded = TDCURLUtil.stringify(me.getRequestObj());
       if (curlBuilded) {
         me.$tdUtility.copyToClipboard(curlBuilded);
       } else {
         me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
       }
-    },
-    parseCurl(curlText) {
-      let me = this;
-      let result = {
-        url: "",
-        method: "GET",
-        headers: {},
-        body: null,
-        headersText: "",
-      };
-      let allHeaders = [];
-      // normalize
-      let tokens = curlText
-        .replace(/\\\n/g, " ")
-        .replace(/\n/g, " ")
-        .match(/'[^']*'|"[^"]*"|\S+/g);
-
-      for (let i = 0; i < tokens.length; i++) {
-        let token = tokens[i];
-
-        // URL
-        if (token.startsWith("http") || token.startsWith("'http")) {
-          result.url = me.strip(token);
-        }
-
-        // Method
-        if (token === "-X" || token === "--request") {
-          result.method = me.strip(tokens[++i]).toUpperCase();
-        }
-
-        // Headers
-        if (token === "-H" || token === "--header") {
-          let header = me.strip(tokens[++i]);
-          let [key, ...rest] = header.split(":");
-          result.headers[key.trim()] = rest.join(":").trim();
-          allHeaders.push(header);
-        }
-
-        // Body
-        if (
-          token === "--data" ||
-          token === "--data-raw" ||
-          token === "--data-binary" ||
-          token === "-d"
-        ) {
-          result.body = me.strip(tokens[++i]);
-          if (result.method === "GET") {
-            result.method = "POST";
-          }
-        }
-      }
-
-      if (allHeaders && allHeaders.length > 0) {
-        result.headersText = allHeaders.join("\n");
-      }
-      return result;
-    },
-    strip(str) {
-      return str.replace(/^['"]|['"]$/g, "");
     },
     openFormImportCURL() {
       let me = this;
@@ -853,7 +762,7 @@ return finalResponeArr;`,
     },
     importCURL(isSilence = false) {
       let me = this;
-      let CURLParsed = me.parseCurl(me.curlContent);
+      let CURLParsed = TDCURLUtil.parse(me.curlContent);
       let result = false;
       if (CURLParsed) {
         me.apiUrl = CURLParsed.url;

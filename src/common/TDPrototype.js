@@ -1,6 +1,6 @@
 /**
  * hàm format string giống như String.Format của C#
- * Created by tdmanh1 19/09/2024
+ * Created by tdmanh 19/09/2024
  */
 String.prototype.format =
   String.prototype.format ||
