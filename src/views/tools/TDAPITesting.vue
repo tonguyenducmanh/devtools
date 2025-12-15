@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col container">
-    <div class="flex header-top-btn">
+    <div class="flex td-api-header-group">
       <TDComboBox
         :width="120"
         v-model="currentAPIMode"
@@ -60,8 +60,8 @@
         </div>
       </template>
       <template v-else>
-        <div class="paste-box">
-          <div class="flex header-second-btn">
+        <div class="td-api-content">
+          <div class="flex td-api-info-btn">
             <TDComboBox
               v-model="httpMethod"
               :options="methodOptions"
@@ -81,9 +81,9 @@
               :label="$t('i18nCommon.apiTesting.importCURL')"
             ></TDButton>
           </div>
-          <div class="flex text-area-box">
-            <div class="flex flex-col text-area-request">
-              <div class="flex request-area-title">
+          <div class="flex td-api-input-area">
+            <div class="flex flex-col td-api-request">
+              <div class="flex td-api-request-title">
                 <TDRadioGroup
                   v-model="currentAPIInfoOption"
                   :options="APIInfoOptions"
@@ -135,8 +135,8 @@
                 :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
               ></TDTextarea>
             </div>
-            <div v-if="showReponse" class="flex flex-col text-area-response">
-              <div class="flex response-area-title">
+            <div v-if="showReponse" class="flex flex-col td-api-response">
+              <div class="flex td-api-response-title">
                 <TDCheckbox
                   v-model="showReponse"
                   :label="$t('i18nCommon.apiTesting.showReponse')"
@@ -172,7 +172,7 @@
           </div>
         </div>
 
-        <div class="flex group-btn">
+        <div class="flex td-api-group-btn">
           <TDButton
             @click="handleSendRequest"
             :label="$t('i18nCommon.apiTesting.send')"
@@ -206,10 +206,10 @@
       </template>
     </template>
     <template v-else-if="currentAPIMode == $tdEnum.APIMode.CURL">
-      <div class="paste-box">
-        <div class="flex text-area-box">
-          <div class="flex flex-col text-area-request">
-            <div class="flex request-area-title">
+      <div class="td-api-content">
+        <div class="flex td-api-input-area">
+          <div class="flex flex-col td-api-request">
+            <div class="flex td-api-request-title">
               <TDCheckbox
                 v-model="wrapText"
                 :label="$t('i18nCommon.apiTesting.wrapText')"
@@ -248,8 +248,8 @@
               :placeHolder="$t('i18nCommon.apiTesting.contentCURLExecute')"
             ></TDTextarea>
           </div>
-          <div v-if="showReponse" class="flex flex-col text-area-response">
-            <div class="flex response-area-title">
+          <div v-if="showReponse" class="flex flex-col td-api-response">
+            <div class="flex td-api-response-title">
               <TDCheckbox
                 v-model="showReponse"
                 :label="$t('i18nCommon.apiTesting.showReponse')"
@@ -284,7 +284,7 @@
           </div>
         </div>
       </div>
-      <div class="flex group-btn">
+      <div class="flex td-api-group-btn">
         <TDButton
           @click="handleSendRequestCURL"
           :label="$t('i18nCommon.apiTesting.send')"
@@ -307,10 +307,10 @@
       </div>
     </template>
     <template v-else-if="currentAPIMode == $tdEnum.APIMode.ProMode">
-      <div class="paste-box">
-        <div class="flex text-area-box">
-          <div class="flex flex-col text-area-request">
-            <div class="flex request-area-title">
+      <div class="td-api-content">
+        <div class="flex td-api-input-area">
+          <div class="flex flex-col td-api-request">
+            <div class="flex td-api-request-title">
               <div>
                 {{ $t("i18nCommon.apiTesting.proModeTitle") }}
               </div>
@@ -347,8 +347,8 @@
               :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
             ></TDTextarea>
           </div>
-          <div v-if="showReponse" class="flex flex-col text-area-response">
-            <div class="flex response-area-title">
+          <div v-if="showReponse" class="flex flex-col td-api-response">
+            <div class="flex td-api-response-title">
               <TDCheckbox
                 v-model="showReponse"
                 :label="$t('i18nCommon.apiTesting.showReponse')"
@@ -382,7 +382,7 @@
           </div>
         </div>
       </div>
-      <div class="flex group-btn">
+      <div class="flex td-api-group-btn">
         <TDButton
           @click="handleSendRequestProMode"
           :label="$t('i18nCommon.apiTesting.send')"
@@ -1064,7 +1064,7 @@ return finalResponeArr;`,
   box-shadow: none;
 }
 
-.paste-box {
+.td-api-content {
   width: 100%;
   flex: 1;
   display: flex;
@@ -1073,23 +1073,23 @@ return finalResponeArr;`,
     justify-content: space-between;
     width: 100%;
   }
-  .text-area-box {
+  .td-api-input-area {
     gap: var(--padding);
     flex: 1;
-    .text-area-request {
+    .td-api-request {
       width: 100%;
       height: 100%;
-      .request-area-title {
+      .td-api-request-title {
         width: 100%;
         justify-content: flex-start;
         height: 40px;
         align-items: center;
       }
     }
-    .text-area-response {
+    .td-api-response {
       width: 100%;
       height: 100%;
-      .response-area-title {
+      .td-api-response-title {
         justify-content: space-between;
         width: 100%;
         height: 40px;
@@ -1097,7 +1097,7 @@ return finalResponeArr;`,
     }
   }
 }
-.group-btn {
+.td-api-group-btn {
   width: 100%;
   position: relative;
   flex-wrap: wrap;
@@ -1137,7 +1137,7 @@ return finalResponeArr;`,
 .response-time {
   color: var(--text-secondary);
 }
-.header-top-btn {
+.td-api-header-group {
   gap: var(--padding);
   align-items: center;
   justify-content: center;
@@ -1145,7 +1145,7 @@ return finalResponeArr;`,
   position: relative;
   width: 100%;
 }
-.header-second-btn {
+.td-api-info-btn {
   gap: var(--padding);
 }
 .response-loading {
