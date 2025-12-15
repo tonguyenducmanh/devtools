@@ -530,9 +530,11 @@ export default {
     },
     async handleSendRequestCURL() {
       let me = this;
-      let parseCURLSuccess = me.importCURL();
+      let parseCURLSuccess = me.importCURL(true);
       if (parseCURLSuccess) {
         await me.handleSendRequest();
+      } else {
+        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
       }
     },
     async handleSendRequest() {
@@ -841,6 +843,11 @@ export default {
         me.$tdEnum.cacheConfig.APIMode,
         JSON.stringify(historyAPIMode)
       );
+      if (me.currentAPIMode == me.$tdEnum.APIMode.CURL) {
+        me.buildCurlFromRequest();
+      } else if (me.currentAPIMode == me.$tdEnum.APIMode.Normal) {
+        me.importCURL(true);
+      }
     },
   },
 };
