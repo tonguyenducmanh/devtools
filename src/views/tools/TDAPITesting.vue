@@ -710,7 +710,7 @@ export default {
         });
         me.$tdUtility.createDownloadFileFromBuffer(
           buffer,
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "text/plain;charset=utf-8",
           fileName
         );
       }
