@@ -837,64 +837,7 @@ return finalResponeArr;`,
          */
         const injectedCode = `
         const requestCURL = async (curlText) => {
-        const strip = function(str) {
-          return str.replace(/^['"]|['"]$/g, "");
-        };
-        const parseCurl =  function (curlText) {
-          let result = {
-            url: "",
-            method: "GET",
-            headers: {},
-            body: null,
-            headersText: "",
-          };
-          let allHeaders = [];
-          // normalize
-          let tokens = curlText
-            .replace(/\\\\\\n/g, " ")
-            .replace(/\\n/g, " ")
-            .match(/'[^']*'|"[^"]*"|\\S+/g);
-
-          for (let i = 0; i < tokens.length; i++) {
-            let token = tokens[i];
-
-            // URL
-            if (token.startsWith("http") || token.startsWith("'http")) {
-              result.url = strip(token);
-            }
-
-            // Method
-            if (token === "-X" || token === "--request") {
-              result.method = strip(tokens[++i]).toUpperCase();
-            }
-
-            // Headers
-            if (token === "-H" || token === "--header") {
-              let header = strip(tokens[++i]);
-              let [key, ...rest] = header.split(":");
-              result.headers[key.trim()] = rest.join(":").trim();
-              allHeaders.push(header);
-            }
-
-            // Body
-            if (
-              token === "--data" ||
-              token === "--data-raw" ||
-              token === "--data-binary" ||
-              token === "-d"
-            ) {
-              result.body = strip(tokens[++i]);
-              if (result.method === "GET") {
-                result.method = "POST";
-              }
-            }
-          }
-
-          if (allHeaders && allHeaders.length > 0) {
-            result.headersText = allHeaders.join("\\n");
-          }
-          return result;
-        };
+        ${TDCURLUtil.parseFuncContent()}
         const parsed = parseCurl(curlText);
 
         const requestData = {
