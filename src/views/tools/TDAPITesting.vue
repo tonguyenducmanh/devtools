@@ -295,7 +295,101 @@
         </div>
       </div>
     </template>
-    <template v-else-if="currentAPIMode == $tdEnum.APIMode.ProMode"> </template>
+    <template v-else-if="currentAPIMode == $tdEnum.APIMode.ProMode">
+      <div class="paste-box">
+        <div class="flex text-area-box">
+          <div class="flex flex-col text-area-request">
+            <div class="flex request-area-title">
+              <div>
+                {{ $t("i18nCommon.apiTesting.proModeTitle") }}
+              </div>
+              <TDCheckbox
+                v-if="!showReponse"
+                v-model="showReponse"
+                :label="$t('i18nCommon.apiTesting.showReponse')"
+              ></TDCheckbox>
+              <div
+                class="flex loader-without-response"
+                v-if="!showReponse && isLoading"
+              >
+                <div class="loader"></div>
+                <TDButton
+                  class="btn-cancel-without-response"
+                  :label="$t('i18nCommon.apiTesting.cancel')"
+                />
+              </div>
+              <div v-if="!showReponse && !isLoading">
+                <div class="status-info" v-if="statusCode">
+                  <div class="status-badge" :class="statusClass">
+                    {{ statusText }}
+                  </div>
+                  <div class="response-time" v-if="responseTime">
+                    {{ responseTime }}ms
+                  </div>
+                </div>
+              </div>
+            </div>
+            <TDTextarea
+              :isLabelTop="true"
+              v-model="curlContent"
+              :wrapText="wrapText"
+              :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
+            ></TDTextarea>
+          </div>
+          <div v-if="showReponse" class="flex flex-col text-area-response">
+            <div class="flex response-area-title">
+              <TDCheckbox
+                v-model="showReponse"
+                :label="$t('i18nCommon.apiTesting.showReponse')"
+              ></TDCheckbox>
+              <div>
+                <div class="status-info" v-if="statusCode">
+                  <div class="status-badge" :class="statusClass">
+                    {{ statusText }}
+                  </div>
+                  <div class="response-time" v-if="responseTime">
+                    {{ responseTime }}ms
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col response-loading" v-if="isLoading">
+              <TDButton
+                v-if="isLoading"
+                :label="$t('i18nCommon.apiTesting.cancel')"
+              />
+              <div class="loader"></div>
+            </div>
+            <TDTextarea
+              v-else
+              :isLabelTop="true"
+              :modelValue="responseText"
+              :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
+              :readOnly="true"
+              :wrapText="wrapText"
+            ></TDTextarea>
+          </div>
+        </div>
+      </div>
+      <div class="flex group-btn">
+        <TDButton
+          :label="$t('i18nCommon.apiTesting.send')"
+          :readOnly="isLoading"
+        ></TDButton>
+        <div>
+          <TDButton
+            v-if="showReponse"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.apiTesting.copyResponse')"
+          ></TDButton>
+          <TDButton
+            v-else
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.apiTesting.downloadReponse')"
+          ></TDButton>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 

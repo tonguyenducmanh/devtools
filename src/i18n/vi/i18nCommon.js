@@ -302,6 +302,8 @@ export default {
       downloadExtension: "Tải tiện ích mở rộng",
       contentCURL: "Nội dung CURL muốn import",
       contentCURLExecute: "Nội dung CURL muốn chạy",
+      scriptExecute: "Kịch bản muốn chạy",
+      proModeTitle: "Custom logic",
       cancel: "Hủy",
       requestName: "Tên request",
       requestCanceled: "Đã hủy request hiện tại",

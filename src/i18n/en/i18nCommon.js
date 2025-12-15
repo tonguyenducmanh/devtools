@@ -303,6 +303,8 @@ export default {
       downloadExtension: "Download the extension",
       contentCURL: "CURL import content",
       contentCURLExecute: "CURL content to execute",
+      scriptExecute: "Script want to execute",
+      proModeTitle: "Custom logic",
       cancel: "Cancel",
       requestName: "Request name",
       requestCanceled: "Current request canceled",
