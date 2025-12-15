@@ -857,7 +857,9 @@ return finalResponeArr;`,
       let result = false;
       if (CURLParsed) {
         me.apiUrl = CURLParsed.url;
-        me.requestName = CURLParsed.url;
+        if (!isSilence) {
+          me.requestName = CURLParsed.url;
+        }
         try {
           me.bodyText = JSON.stringify(JSON.parse(CURLParsed.body), null, 2);
         } catch (ex) {
@@ -892,11 +894,6 @@ return finalResponeArr;`,
         me.$tdEnum.cacheConfig.APIMode,
         JSON.stringify(historyAPIMode)
       );
-      if (me.currentAPIMode == me.$tdEnum.APIMode.CURL) {
-        me.buildCurlFromRequest();
-      } else if (me.currentAPIMode == me.$tdEnum.APIMode.Normal) {
-        me.importCURL(true);
-      }
     },
     async handleSendRequestProMode() {
       let me = this;
