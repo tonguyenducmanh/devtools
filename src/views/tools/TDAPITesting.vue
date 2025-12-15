@@ -915,6 +915,7 @@ return finalResponeArr;`,
       try {
         /**
          * ========= Inject helper function =========
+         * logic của hàm parseCurl và strip giống 2 hàm trong file này, tuy nhiên viết dạng này để inject code
          * requestCURL(curlText) -> response.body
          */
         const injectedCode = `
