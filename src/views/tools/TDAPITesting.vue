@@ -462,8 +462,8 @@ if(responseOne && responseOne.data && responseOne.data.length > 0){
       let tempCurl = curlTwo.replace(keyReplace, item)
       let tempRespone = await requestCURL(tempCurl);
       finalResponeArr.push({
-          dataRequest: tempCurl,
-          dataRespone: tempRespone
+          item_id: item,
+          res: tempRespone
       })
     }
 }
