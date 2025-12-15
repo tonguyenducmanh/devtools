@@ -82,4 +82,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "mật khẩu đăng nhập xác thực theo user, chỉ được phép lưu trong mem",
   },
+  APIMode: {
+    KeyFormat: "APIMode",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "chế độ API cuối cùng của user thiết lập",
+  },
 };

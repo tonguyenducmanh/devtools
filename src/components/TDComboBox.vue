@@ -74,7 +74,7 @@ export default {
       default: 100,
     },
   },
-  emits: ["update:modelValue"],
+  emits: ["update:modelValue", "selected"],
   data() {
     return {
       open: false,
@@ -105,6 +105,7 @@ export default {
     },
     select(value) {
       this.$emit("update:modelValue", value);
+      this.$emit("selected", value);
       this.open = false;
     },
   },

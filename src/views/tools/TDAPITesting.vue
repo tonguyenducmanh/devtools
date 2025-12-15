@@ -7,6 +7,7 @@
         :options="APIModeOptions"
         :noMargin="true"
         :readOnly="isLoading"
+        @selected="handleSelectedAPIMode"
       />
       <TDInput
         v-model="requestName"
@@ -339,6 +340,16 @@ export default {
         { value: this.$tdEnum.APIMode.ProMode, label: "Pro Mode" },
       ],
     };
+  },
+  async created() {
+    let me = this;
+    let oldAPIMode = await me.$tdCache.get(me.$tdEnum.cacheConfig.APIMode);
+    if (oldAPIMode) {
+      let oldData = JSON.parse(oldAPIMode);
+      if (oldData) {
+        me.currentAPIMode = oldData.mode;
+      }
+    }
   },
   computed: {
     statusClass() {
@@ -726,6 +737,16 @@ export default {
     cancelImportCURL() {
       let me = this;
       me.isImportingCURL = false;
+    },
+    async handleSelectedAPIMode() {
+      let me = this;
+      let historyAPIMode = {
+        mode: me.currentAPIMode,
+      };
+      await me.$tdCache.set(
+        me.$tdEnum.cacheConfig.APIMode,
+        JSON.stringify(historyAPIMode)
+      );
     },
   },
 };
