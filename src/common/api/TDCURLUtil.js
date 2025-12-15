@@ -172,7 +172,7 @@ class TDCURLUtil {
   /**
    * Đoạn code inject demo việc dùng nhiều CURL theo kịch bản custom gọi API
    */
-  sampleInjectCode() {
+  sampleCURLScript() {
     return `let curlOne = \`
     curl 'http://localhost:3000/api/get_list_item?limit=5' \\
     --header 'Content-Type: application/json'
@@ -207,7 +207,10 @@ if(responseOne && responseOne.data && responseOne.data.length > 0){
 
 return finalResponeArr;`;
   }
-
+  /**
+   * Đoạn code build ra script javascript động để chạy request bằng CURL
+   * theo kịch bản người dùng tự viết
+   */
   buildInjectCode(secranioCode) {
     let me = this;
     return `

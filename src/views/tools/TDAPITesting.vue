@@ -450,7 +450,7 @@ export default {
       ],
       proModeSecranioCode:
         this.$t("i18nCommon.apiTesting.tutorialProModeCode") +
-        TDCURLUtil.sampleInjectCode(),
+        TDCURLUtil.sampleCURLScript(),
     };
   },
   async created() {
