@@ -1,5 +1,9 @@
 <template>
-  <div class="td-history-wrapper" :style="styleHistoryWrapper">
+  <div
+    class="td-history-wrapper"
+    :style="styleHistoryWrapper"
+    v-click-outside="closeHistory"
+  >
     <div
       class="flex flex-start button-group"
       :class="{
@@ -50,10 +54,10 @@
 
 <script>
 import tdEnum from "@/common/TDEnum.js";
-import StylePremitiveMixin from "@/mixins/StylePremitiveMixin";
+import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
 export default {
   name: "TDHistory",
-  mixins: [StylePremitiveMixin],
+  mixins: [TDStylePremitiveMixin],
   created() {
     let me = this;
   },
@@ -145,6 +149,9 @@ export default {
   methods: {
     toggleHistory() {
       this.isHistoryVisible = !this.isHistoryVisible;
+    },
+    closeHistory() {
+      this.isHistoryVisible = false;
     },
     /**
      * Áp dụng text từ lịch sử

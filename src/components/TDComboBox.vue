@@ -2,6 +2,7 @@
   <div
     class="flex no-select td-combobox"
     :class="{ 'flex-col': isLabelTop, 'td-combobox-no-margin': noMargin }"
+    v-click-outside="closeCombo"
   >
     <div class="td-label" :class="{ 'td-label-top': isLabelTop }" v-if="label">
       {{ label.capitalize() }}
@@ -106,6 +107,9 @@ export default {
     select(value) {
       this.$emit("update:modelValue", value);
       this.$emit("selected", value);
+      this.open = false;
+    },
+    closeCombo() {
       this.open = false;
     },
   },

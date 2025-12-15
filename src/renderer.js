@@ -16,10 +16,13 @@ import TDHistory from "@/components/TDHistory.vue";
 import i18nData, { loadLocale } from "@/i18n/i18nData.js";
 import eventBus from "@/common/event/TDEventBus.js";
 import ToastPlugin from "@/common/TDToastUtil.js";
-
+import TDClickOutside from "@/mixins/TDClickOutside.js";
 // Async IIFE
 (async () => {
   const currentApp = createApp(App);
+
+  // add 1 vài directive
+  currentApp.directive("click-outside", TDClickOutside);
 
   // add 1 vài global object
   currentApp.config.globalProperties.$tdCache = cache;
