@@ -373,6 +373,7 @@
       </div>
       <div class="flex group-btn">
         <TDButton
+          @click="handleSendRequestProMode"
           :label="$t('i18nCommon.apiTesting.send')"
           :readOnly="isLoading"
         ></TDButton>
@@ -380,11 +381,13 @@
           <TDButton
             v-if="showReponse"
             :type="$tdEnum.buttonType.secondary"
+            @click="handleCopyResponse"
             :label="$t('i18nCommon.apiTesting.copyResponse')"
           ></TDButton>
           <TDButton
             v-else
             :type="$tdEnum.buttonType.secondary"
+            @click="handleDownloadReponse"
             :label="$t('i18nCommon.apiTesting.downloadReponse')"
           ></TDButton>
         </div>
@@ -449,14 +452,14 @@ let curlTwo = \`
     }'
 \`
 
-let responseOne = requestCURL(readCURL(curlOne));
+let responseOne = requestCURL(curlOne));
 
 let finalResponeArr = [];
 
 if(responseOne && responseOne.data && responseOne.data.length > 0){
     responseOne.data.forEach((item) =>{
         let tempCurl = curlTwo.replace(keyReplace, item)
-        let tempRespone = requestCURL(readCURL(curlOne));
+        let tempRespone = requestCURL(curlOne));
         finalResponeArr.push({
             dataRequest: tempCurl,
             dataRespone: tempRespone
@@ -464,8 +467,7 @@ if(responseOne && responseOne.data && responseOne.data.length > 0){
     });
 }
 
-return finalResponeArr;
-      `,
+return finalResponeArr;`,
     };
   },
   async created() {
@@ -880,6 +882,14 @@ return finalResponeArr;
         me.buildCurlFromRequest();
       } else if (me.currentAPIMode == me.$tdEnum.APIMode.Normal) {
         me.importCURL(true);
+      }
+    },
+    handleSendRequestProMode() {
+      let me = this;
+      if (me.proModeSecranioCode) {
+        debugger;
+      } else {
+        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
       }
     },
   },
