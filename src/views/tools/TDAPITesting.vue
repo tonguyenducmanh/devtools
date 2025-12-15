@@ -452,19 +452,20 @@ let curlTwo = \`
     }'
 \`
 
-let responseOne = requestCURL(curlOne));
+let responseOne = await requestCURL(curlOne);
 
 let finalResponeArr = [];
 
 if(responseOne && responseOne.data && responseOne.data.length > 0){
-    responseOne.data.forEach((item) =>{
-        let tempCurl = curlTwo.replace(keyReplace, item)
-        let tempRespone = requestCURL(curlOne));
-        finalResponeArr.push({
-            dataRequest: tempCurl,
-            dataRespone: tempRespone
-        })
-    });
+    for(let i = 0; i < responseOne.data.length ; i ++){
+      let item = responseOne.data[i]
+      let tempCurl = curlTwo.replace(keyReplace, item)
+      let tempRespone = await requestCURL(tempCurl);
+      finalResponeArr.push({
+          dataRequest: tempCurl,
+          dataRespone: tempRespone
+      })
+    }
 }
 
 return finalResponeArr;`,
@@ -884,12 +885,144 @@ return finalResponeArr;`,
         me.importCURL(true);
       }
     },
-    handleSendRequestProMode() {
+    async handleSendRequestProMode() {
       let me = this;
-      if (me.proModeSecranioCode) {
-        debugger;
-      } else {
+
+      if (!me.proModeSecranioCode) {
         me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+        return;
+      }
+
+      if (
+        !window.__toolTomanh ||
+        typeof window.__toolTomanh.callAPI !== "function"
+      ) {
+        me.$tdToast.error(
+          null,
+          me.$t("i18nCommon.apiTesting.extensionNotAvailable")
+        );
+        return;
+      }
+
+      me.isLoading = true;
+      me.responseText = "";
+      me.statusCode = null;
+      me.responseTime = null;
+      me.startTime = performance.now();
+
+      try {
+        /**
+         * ========= Inject helper function =========
+         * requestCURL(curlText) -> response.body
+         */
+        const injectedCode = `
+        const requestCURL = async (curlText) => {
+        const strip = function(str) {
+          return str.replace(/^['"]|['"]$/g, "");
+        };
+        const parseCurl =  function (curlText) {
+          let result = {
+            url: "",
+            method: "GET",
+            headers: {},
+            body: null,
+            headersText: "",
+          };
+          let allHeaders = [];
+          // normalize
+          let tokens = curlText
+            .replace(/\\\\\\n/g, " ")
+            .replace(/\\n/g, " ")
+            .match(/'[^']*'|"[^"]*"|\\S+/g);
+
+          for (let i = 0; i < tokens.length; i++) {
+            let token = tokens[i];
+
+            // URL
+            if (token.startsWith("http") || token.startsWith("'http")) {
+              result.url = strip(token);
+            }
+
+            // Method
+            if (token === "-X" || token === "--request") {
+              result.method = strip(tokens[++i]).toUpperCase();
+            }
+
+            // Headers
+            if (token === "-H" || token === "--header") {
+              let header = strip(tokens[++i]);
+              let [key, ...rest] = header.split(":");
+              result.headers[key.trim()] = rest.join(":").trim();
+              allHeaders.push(header);
+            }
+
+            // Body
+            if (
+              token === "--data" ||
+              token === "--data-raw" ||
+              token === "--data-binary" ||
+              token === "-d"
+            ) {
+              result.body = strip(tokens[++i]);
+              if (result.method === "GET") {
+                result.method = "POST";
+              }
+            }
+          }
+
+          if (allHeaders && allHeaders.length > 0) {
+            result.headersText = allHeaders.join("\\n");
+          }
+          return result;
+        };
+        const parsed = parseCurl(curlText);
+
+        const requestData = {
+          url: parsed.url,
+          method: parsed.method || "GET",
+          headers: parsed.headers || {},
+          body: parsed.body || null,
+        };
+
+        const req = window.__toolTomanh.callAPI(requestData);
+        const resp = await req.promise;
+
+        return resp.body;
+      };
+
+      (async () => {
+        ${me.proModeSecranioCode}
+      })();
+    `;
+
+        // Thực thi script
+        const result = await eval(injectedCode);
+
+        let endTime = performance.now();
+        me.responseTime = Math.round(endTime - me.startTime);
+        me.statusCode = 200;
+
+        // format output
+        if (typeof result === "object") {
+          me.responseText = JSON.stringify(result, null, 2);
+        } else if (typeof result === "string") {
+          try {
+            me.responseText = JSON.stringify(JSON.parse(result), null, 2);
+          } catch {
+            me.responseText = result;
+          }
+        } else if (typeof result !== "undefined") {
+          me.responseText = String(result);
+        } else {
+          me.responseText = "// Script executed successfully (no return)";
+        }
+
+        me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
+      } catch (error) {
+        me.responseText = `ProMode Error: ${error.message}`;
+        me.$tdToast.error(null, error.message);
+      } finally {
+        me.isLoading = false;
       }
     },
   },
