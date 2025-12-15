@@ -26,6 +26,7 @@
     <div
       v-if="isHistoryVisible && historyItems && historyItems.length > 0"
       class="td-history-container"
+      :style="styleHistoryContainer"
     >
       <div class="flex flex-col td-history">
         <template v-for="(item, index) in historyItems">
@@ -49,9 +50,10 @@
 
 <script>
 import tdEnum from "@/common/TDEnum.js";
-
+import StylePremitiveMixin from "@/mixins/StylePremitiveMixin";
 export default {
   name: "TDHistory",
+  mixins: [StylePremitiveMixin],
   created() {
     let me = this;
   },
@@ -109,6 +111,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    historyContainerStyleEnum: {
+      type: Number,
+      default: tdEnum.AbsolutePositionStyle.Unset,
+    },
   },
   data() {
     return {
@@ -129,6 +135,11 @@ export default {
         currentStyleHistoryWraper.margin = "var(--padding)";
       }
       return currentStyleHistoryWraper;
+    },
+    styleHistoryContainer() {
+      let me = this;
+      let style = me.getPositionAbsoluteStyle(me.historyContainerStyleEnum);
+      return style;
     },
   },
   methods: {

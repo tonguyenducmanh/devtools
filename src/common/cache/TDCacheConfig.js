@@ -34,6 +34,12 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử gọi API",
   },
+  APIPromodeHistory: {
+    KeyFormat: "APIPromodeHistory",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử gọi API",
+  },
   JSONToExcelHistory: {
     KeyFormat: "JSONToExcelHistory",
     CacheLevel: tdEnum.cacheType.indexedDB,
@@ -81,5 +87,11 @@ export const TDCacheConfig = {
     CacheLevel: tdEnum.cacheType.session,
     ExpireTime: 0,
     Note: "mật khẩu đăng nhập xác thực theo user, chỉ được phép lưu trong mem",
+  },
+  APIMode: {
+    KeyFormat: "APIMode",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "chế độ API cuối cùng của user thiết lập",
   },
 };

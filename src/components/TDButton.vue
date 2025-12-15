@@ -122,6 +122,6 @@ export default {
 
 .td-button-readonly {
   opacity: 0.5;
-  cursor: unset;
+  cursor: not-allowed;
 }
 </style>

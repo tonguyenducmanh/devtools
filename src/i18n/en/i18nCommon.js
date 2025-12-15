@@ -300,8 +300,11 @@ export default {
       copyCURL: "Copy CURL",
       importCURL: "Import CURL",
       extensionNotAvailable: "Extension helper not installed",
-      downloadExtension: "Download the extension (required to call the API)",
+      downloadExtension: "Download the extension",
       contentCURL: "CURL import content",
+      contentCURLExecute: "CURL content to execute",
+      scriptExecute: "Script want to execute",
+      proModeTitle: "JavaScript logic",
       cancel: "Cancel",
       requestName: "Request name",
       requestCanceled: "Current request canceled",
@@ -310,6 +313,8 @@ export default {
       wrapText: "Wrap text",
       showReponse: "Show response",
       downloadReponse: "Download response",
+      tutorialProModeCode:
+        "//requestCURL() is a built-in function used to call APIs using CURL\n//Example:\n",
     },
   },
 };

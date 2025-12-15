@@ -108,5 +108,6 @@ export default {
 }
 .td-radio-disabled {
   opacity: 0.4; // Giảm độ sáng của radio khi disabled
+  cursor: not-allowed;
 }
 </style>

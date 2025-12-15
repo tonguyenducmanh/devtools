@@ -43,15 +43,43 @@ class TDEnum {
     vi: "vi",
     en: "en",
   };
+  /**
+   * Thông tin info của câu lệnh
+   */
   APIInfoOption = {
     header: 1,
     body: 2,
   };
+  /**
+   * Các hướng mũi tên
+   */
   Direction = {
     top: 1,
     left: 2,
     bottom: 3,
     right: 4,
+  };
+  /**
+   * Các chế độ của tool API
+   */
+  APIMode = {
+    Normal: 1,
+    CURL: 2,
+    ProMode: 3,
+  };
+  /**
+   * Các chế độ absolute style chung
+   */
+  AbsolutePositionStyle = {
+    Unset: 1,
+    TopLeft: 2,
+    TopRight: 3,
+    BottomLeft: 4,
+    BottomRight: 5,
+    Top100Left: 6,
+    Top100Right: 7,
+    Bottom100Left: 8,
+    Bottom100Right: 9,
   };
 }
 

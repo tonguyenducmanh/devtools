@@ -21,6 +21,7 @@
         'td-textarea-nowrap-text': !wrapText,
       }"
       spellcheck="false"
+      @keydown.tab.prevent="handleTab"
       :name="inputId"
     />
   </div>
@@ -116,6 +117,17 @@ export default {
       e.preventDefault();
       me.isDragOver = false;
       me.$emit("dropValue", e);
+    },
+    handleTab(e) {
+      const TAB_SIZE = "  "; // hoặc "    "
+      const el = e.target;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+
+      el.value = el.value.slice(0, start) + TAB_SIZE + el.value.slice(end);
+
+      el.selectionStart = el.selectionEnd = start + TAB_SIZE.length;
+      this.content = el.value;
     },
   },
 };

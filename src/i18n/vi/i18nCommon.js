@@ -299,8 +299,11 @@ export default {
       copyCURL: "Sao chép CURL",
       importCURL: "Nhập CURL",
       extensionNotAvailable: "Extension helper chưa được cài đặt",
-      downloadExtension: "Tải tiện ích mở rộng (bắt buộc để call api)",
+      downloadExtension: "Tải tiện ích mở rộng",
       contentCURL: "Nội dung CURL muốn import",
+      contentCURLExecute: "Nội dung CURL muốn chạy",
+      scriptExecute: "Kịch bản muốn chạy",
+      proModeTitle: "JavaScript logic",
       cancel: "Hủy",
       requestName: "Tên request",
       requestCanceled: "Đã hủy request hiện tại",
@@ -308,6 +311,8 @@ export default {
       wrapText: "Xuống dòng",
       showReponse: "Xem response",
       downloadReponse: "Tải xuống response",
+      tutorialProModeCode:
+        "//requestCURL() là hàm cung cấp sẵn dùng để gọi api bằng CURL\n//Ví dụ:\n",
     },
   },
 };
