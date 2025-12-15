@@ -331,7 +331,7 @@
             </div>
             <TDTextarea
               :isLabelTop="true"
-              v-model="curlContent"
+              v-model="proModeSecranioCode"
               :wrapText="wrapText"
               :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
             ></TDTextarea>
@@ -433,6 +433,40 @@ export default {
         { value: this.$tdEnum.APIMode.CURL, label: "CURL" },
         { value: this.$tdEnum.APIMode.ProMode, label: "Pro Mode" },
       ],
+      proModeSecranioCode: `let me = this;
+let curlOne = \`
+    curl 'http://localhost:3000/api/get_list_item?limit=5' \\
+    --header 'Content-Type: application/json'
+\`;
+
+let keyReplace = "##item_id##";
+
+let curlTwo = \`
+    curl 'http://localhost:3000/api/get_detail_item' \\
+    --request POST \\
+    --header 'Content-Type: application/json' \\
+    --data '{
+    "item_id": "$\{keyReplace}"
+    }'
+\`
+
+let responseOne = me.requestCURL(me.readCURL(curlOne));
+
+let finalResponeArr = [];
+
+if(responseOne && responseOne.data && responseOne.data.length > 0){
+    responseOne.data.forEach((item) =>{
+        let tempCurl = curlTwo.replace(keyReplace, item)
+        let tempRespone = me.requestCURL(me.readCURL(curlOne));
+        finalResponeArr.push({
+            dataRequest: tempCurl,
+            dataRespone: tempRespone
+        })
+    });
+}
+
+return finalResponeArr;
+      `,
     };
   },
   async created() {
