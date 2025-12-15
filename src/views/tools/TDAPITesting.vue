@@ -450,39 +450,7 @@ export default {
       ],
       proModeSecranioCode:
         this.$t("i18nCommon.apiTesting.tutorialProModeCode") +
-        `let curlOne = \`
-    curl 'http://localhost:3000/api/get_list_item?limit=5' \\
-    --header 'Content-Type: application/json'
-\`;
-
-let keyReplace = "##item_id##";
-
-let curlTwo = \`
-    curl 'http://localhost:3000/api/get_detail_item' \\
-    --request POST \\
-    --header 'Content-Type: application/json' \\
-    --data '{
-    "item_id": "$\{keyReplace}"
-    }'
-\`
-
-let responseOne = await requestCURL(curlOne);
-
-let finalResponeArr = [];
-
-if(responseOne && responseOne.data && responseOne.data.length > 0){
-    for(let i = 0; i < responseOne.data.length ; i ++){
-      let item = responseOne.data[i]
-      let tempCurl = curlTwo.replace(keyReplace, item)
-      let tempRespone = await requestCURL(tempCurl);
-      finalResponeArr.push({
-          item_id: item,
-          res: tempRespone
-      })
-    }
-}
-
-return finalResponeArr;`,
+        TDCURLUtil.sampleInjectCode(),
     };
   },
   async created() {
@@ -830,28 +798,7 @@ return finalResponeArr;`,
       me.startTime = performance.now();
 
       try {
-        const injectedCode = `
-        const requestCURL = async (curlText) => {
-        ${TDCURLUtil.parseFuncContent()}
-        const parsed = parseCurl(curlText);
-
-        const requestData = {
-          url: parsed.url,
-          method: parsed.method || "GET",
-          headers: parsed.headers || {},
-          body: parsed.body || null,
-        };
-
-        const req = window.__toolTomanh.callAPI(requestData);
-        const resp = await req.promise;
-
-        return resp.body;
-      };
-
-      (async () => {
-        ${me.proModeSecranioCode}
-      })();
-    `;
+        const injectedCode = TDCURLUtil.buildInjectCode(me.proModeSecranioCode);
 
         // Thực thi script
         const result = await eval(injectedCode);

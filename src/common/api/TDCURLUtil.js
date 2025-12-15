@@ -22,23 +22,25 @@ class TDCURLUtil {
       .replace(/\\\n/g, " ")
       .replace(/\n/g, " ")
       .match(/'[^']*'|"[^"]*"|\S+/g);
-
+    let strip = function (str) {
+      return str.replace(/^['"]|['"]$/g, "");
+    };
     for (let i = 0; i < tokens.length; i++) {
       let token = tokens[i];
 
       // URL
       if (token.startsWith("http") || token.startsWith("'http")) {
-        result.url = me.strip(token);
+        result.url = strip(token);
       }
 
       // Method
       if (token === "-X" || token === "--request") {
-        result.method = me.strip(tokens[++i]).toUpperCase();
+        result.method = strip(tokens[++i]).toUpperCase();
       }
 
       // Headers
       if (token === "-H" || token === "--header") {
-        let header = me.strip(tokens[++i]);
+        let header = strip(tokens[++i]);
         let [key, ...rest] = header.split(":");
         result.headers[key.trim()] = rest.join(":").trim();
         allHeaders.push(header);
@@ -51,7 +53,7 @@ class TDCURLUtil {
         token === "--data-binary" ||
         token === "-d"
       ) {
-        result.body = me.strip(tokens[++i]);
+        result.body = strip(tokens[++i]);
         if (result.method === "GET") {
           result.method = "POST";
         }
@@ -64,6 +66,44 @@ class TDCURLUtil {
     return result;
   }
 
+  /**
+   * Build ra CURL dạng text
+   */
+  stringify(request) {
+    let me = this;
+    if (!request?.apiUrl) throw new Error("apiUrl is required");
+
+    let lines = [];
+    let escapeShell = function (value) {
+      return String(value).replace(/'/g, `'\\''`);
+    };
+    // base curl
+    lines.push(`curl '${request.apiUrl}'`);
+
+    // method
+    let method = (request.httpMethod || "GET").toUpperCase();
+    if (method !== "GET") {
+      lines.push(`--request ${method}`);
+    }
+
+    // headers
+    if (request.headersText) {
+      request.headersText
+        .split("\n")
+        .map((h) => h.trim())
+        .filter(Boolean)
+        .forEach((header) => {
+          lines.push(`--header '${escapeShell(header)}'`);
+        });
+    }
+
+    // body
+    if (request.bodyText && request.bodyText.trim() !== "") {
+      lines.push(`--data '${escapeShell(request.bodyText)}'`);
+    }
+    let curlContent = lines.join(" \\\n");
+    return curlContent;
+  }
   /**
    * Đọc nội dung CURL (dạng text code để inject động)
    */
@@ -129,47 +169,68 @@ class TDCURLUtil {
     };`;
   }
 
-  strip(str) {
-    return str.replace(/^['"]|['"]$/g, "");
-  }
-  escapeShell(value) {
-    return String(value).replace(/'/g, `'\\''`);
-  }
   /**
-   * Build ra CURL dạng text
+   * Đoạn code inject demo việc dùng nhiều CURL theo kịch bản custom gọi API
    */
-  stringify(request) {
+  sampleInjectCode() {
+    return `let curlOne = \`
+    curl 'http://localhost:3000/api/get_list_item?limit=5' \\
+    --header 'Content-Type: application/json'
+\`;
+
+let keyReplace = "##item_id##";
+
+let curlTwo = \`
+    curl 'http://localhost:3000/api/get_detail_item' \\
+    --request POST \\
+    --header 'Content-Type: application/json' \\
+    --data '{
+    "item_id": "$\{keyReplace}"
+    }'
+\`
+
+let responseOne = await requestCURL(curlOne);
+
+let finalResponeArr = [];
+
+if(responseOne && responseOne.data && responseOne.data.length > 0){
+    for(let i = 0; i < responseOne.data.length ; i ++){
+      let item = responseOne.data[i]
+      let tempCurl = curlTwo.replace(keyReplace, item)
+      let tempRespone = await requestCURL(tempCurl);
+      finalResponeArr.push({
+          item_id: item,
+          res: tempRespone
+      })
+    }
+}
+
+return finalResponeArr;`;
+  }
+
+  buildInjectCode(secranioCode) {
     let me = this;
-    if (!request?.apiUrl) throw new Error("apiUrl is required");
+    return `
+    const requestCURL = async (curlText) => {
+        ${me.parseFuncContent()}
+        const parsed = parseCurl(curlText);
 
-    let lines = [];
+        const requestData = {
+          url: parsed.url,
+          method: parsed.method || "GET",
+          headers: parsed.headers || {},
+          body: parsed.body || null,
+        };
 
-    // base curl
-    lines.push(`curl '${request.apiUrl}'`);
+        const req = window.__toolTomanh.callAPI(requestData);
+        const resp = await req.promise;
 
-    // method
-    let method = (request.httpMethod || "GET").toUpperCase();
-    if (method !== "GET") {
-      lines.push(`--request ${method}`);
-    }
+        return resp.body;
+      };
 
-    // headers
-    if (request.headersText) {
-      request.headersText
-        .split("\n")
-        .map((h) => h.trim())
-        .filter(Boolean)
-        .forEach((header) => {
-          lines.push(`--header '${me.escapeShell(header)}'`);
-        });
-    }
-
-    // body
-    if (request.bodyText && request.bodyText.trim() !== "") {
-      lines.push(`--data '${me.escapeShell(request.bodyText)}'`);
-    }
-    let curlContent = lines.join(" \\\n");
-    return curlContent;
+      (async () => {
+        ${secranioCode}
+      })();`;
   }
 }
 
