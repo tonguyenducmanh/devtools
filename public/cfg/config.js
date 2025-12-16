@@ -20,4 +20,7 @@
     showDecodedInfo: false,
     autoSave: true,
   };
+  window.__env.APITesting = {
+    agentServer: "http://127.0.0.1:7777",
+  };
 })(this);

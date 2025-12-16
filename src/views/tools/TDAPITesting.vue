@@ -569,28 +569,17 @@ export default {
       this.statusCode = null;
 
       try {
-        let headers = this.parseHeaders(this.headersText);
+        // let headers = this.parseHeaders(this.headersText);
 
         let requestData = {
-          url: this.apiUrl,
-          method: this.httpMethod,
-          headers,
-          body: this.bodyText || null,
+          apiUrl: this.apiUrl,
+          httpMethod: this.httpMethod,
+          headersText: this.headersText,
+          bodyText: this.bodyText || null,
         };
 
-        if (
-          !window.__toolTomanh ||
-          typeof window.__toolTomanh.callAPI !== "function"
-        ) {
-          this.$tdToast.error(
-            null,
-            me.$t("i18nCommon.apiTesting.extensionNotAvailable")
-          );
-          return;
-        }
-
-        // gọi API + gữ handle
-        this.currentRequest = window.__toolTomanh.callAPI(requestData);
+        // gọi API
+        this.currentRequest = TDCURLUtil.fetchAgent(requestData);
 
         const response = await this.currentRequest.promise;
 

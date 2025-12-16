@@ -235,6 +235,51 @@ return finalResponeArr;`;
         ${secranioCode}
       })();`;
   }
+
+  /**
+   * Sử dụng agent để thực hiện chạy command curl gọi API,
+   * không bị giới hạn bởi các tool của trình duyệt
+   */
+  fetchAgent(request) {
+    let serverAgent = window.__env?.APITesting?.agentServer;
+    if (!serverAgent) {
+      throw new Error("Agent server not configured");
+    }
+
+    const controller = new AbortController();
+
+    const promise = fetch(`${serverAgent}/exec`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+      signal: controller.signal,
+    }).then(async (res) => {
+      const text = await res.text();
+      let body;
+
+      try {
+        body = JSON.parse(text);
+      } catch {
+        body = text;
+      }
+
+      return {
+        status: res.status,
+        headers: Object.fromEntries(res.headers.entries()),
+        body,
+      };
+    });
+
+    return {
+      promise,
+      cancel() {
+        controller.abort();
+        throw new Error("Request cancelled by user");
+      },
+    };
+  }
 }
 
 export default new TDCURLUtil();
