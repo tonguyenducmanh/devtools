@@ -43,11 +43,3 @@ For macos
 ```
 npm run electron:build_mac
 ```
-
-extension chrome for better tooling
-
-(must download and install to chrome for api testing without block CORS)
-
-[src/extension/toolapi/](src/extension/toolapi)
-
-![extension img](img/extension.png)
