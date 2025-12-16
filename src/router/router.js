@@ -36,7 +36,7 @@ const routerConfig = [
     meta: {
       titleKey: "i18nCommon.feature.APITesting",
     },
-    electronNotSupport: true,
+    // electronNotSupport: true,
   },
   {
     /**
