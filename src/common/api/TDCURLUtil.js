@@ -256,22 +256,26 @@ return finalResponeArr;`;
       },
       body: JSON.stringify(request),
       signal: controller.signal,
-    }).then(async (res) => {
-      const text = await res.text();
-      let body;
+    })
+      .then(async (res) => {
+        const text = await res.text();
+        let body;
 
-      try {
-        body = JSON.parse(text);
-      } catch {
-        body = text;
-      }
+        try {
+          body = JSON.parse(text);
+        } catch {
+          body = text;
+        }
 
-      return {
-        status: res.status,
-        headers: Object.fromEntries(res.headers.entries()),
-        body,
-      };
-    });
+        return {
+          status: res.status,
+          headers: Object.fromEntries(res.headers.entries()),
+          body,
+        };
+      })
+      .catch((error) => {
+        throw error;
+      });
 
     return {
       promise,
@@ -287,7 +291,48 @@ return finalResponeArr;`;
    * (dạng text code để inject động)
    */
   fetchAgentFuncContent() {
-    return 'const fetchAgent = function(request) {\n    let serverAgent = window.__env?.APITesting?.agentServer;\n    if (!serverAgent) {\n      throw new Error("Agent server not configured");\n    }\n\n    const controller = new AbortController();\n\n    const promise = fetch(`${serverAgent}/exec`, {\n      method: "POST",\n      headers: {\n        "Content-Type": "application/json",\n      },\n      body: JSON.stringify(request),\n      signal: controller.signal,\n    }).then(async (res) => {\n      const text = await res.text();\n      let body;\n\n      try {\n        body = JSON.parse(text);\n      } catch {\n        body = text;\n      }\n\n      return {\n        status: res.status,\n        headers: Object.fromEntries(res.headers.entries()),\n        body,\n      };\n    });\n\n    return {\n      promise,\n      cancel() {\n        controller.abort();\n        throw new Error("Request cancelled by user");\n      },\n    };\n  }';
+    return `const fetchAgent = function(request) {
+        let serverAgent = window.__env?.APITesting?.agentServer;
+        if (!serverAgent) {
+          throw new Error("Agent server not configured");
+        }
+    
+        const controller = new AbortController();
+    
+        const promise = fetch(\`\${serverAgent}/exec\`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(request),
+          signal: controller.signal,
+        }).then(async (res) => {
+            const text = await res.text();
+          let body;
+    
+          try {
+            body = JSON.parse(text);
+          } catch {
+            body = text;
+          }
+    
+          return {
+            status: res.status,
+            headers: Object.fromEntries(res.headers.entries()),
+            body,
+          };
+        }).catch((error) => {
+          throw error;
+        });
+    
+        return {
+          promise,
+          cancel() {
+            controller.abort();
+            throw new Error("Request cancelled by user");
+          },
+        };
+      }`;
   }
 }
 

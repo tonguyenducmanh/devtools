@@ -610,14 +610,6 @@ export default {
             null,
             this.$t("i18nCommon.apiTesting.requestCanceled")
           );
-        } else if (error.message === "Extension is disabled on this site") {
-          this.responseText = this.$t(
-            "i18nCommon.apiTesting.notpermissionExtension"
-          );
-          this.$tdToast.error(
-            null,
-            this.$t("i18nCommon.apiTesting.notpermissionExtension")
-          );
         } else {
           this.responseText = `Error: ${error.message}`;
           this.$tdToast.error(null, error.message);
