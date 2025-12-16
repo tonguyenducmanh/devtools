@@ -769,17 +769,6 @@ export default {
         return;
       }
 
-      if (
-        !window.__toolTomanh ||
-        typeof window.__toolTomanh.callAPI !== "function"
-      ) {
-        me.$tdToast.error(
-          null,
-          me.$t("i18nCommon.apiTesting.extensionNotAvailable")
-        );
-        return;
-      }
-
       me.isLoading = true;
       me.responseText = "";
       me.statusCode = null;

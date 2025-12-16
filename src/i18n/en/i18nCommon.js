@@ -300,7 +300,7 @@ export default {
       copyCURL: "Copy CURL",
       importCURL: "Import CURL",
       extensionNotAvailable: "Extension helper not installed",
-      downloadExtension: "Download the extension",
+      downloadExtension: "Download Agent",
       contentCURL: "CURL import content",
       contentCURLExecute: "CURL content to execute",
       scriptExecute: "Script want to execute",

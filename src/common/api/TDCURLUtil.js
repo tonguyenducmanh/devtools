@@ -216,16 +216,17 @@ return finalResponeArr;`;
     return `
     const requestCURL = async (curlText) => {
         ${me.parseFuncContent()}
+        ${me.fetchAgentFuncContent()}
         const parsed = parseCurl(curlText);
 
         const requestData = {
-          url: parsed.url,
-          method: parsed.method || "GET",
-          headers: parsed.headers || {},
-          body: parsed.body || null,
+          apiUrl: parsed.url,
+          httpMethod: parsed.method || "GET",
+          headersText: parsed.headersText || null,
+          bodyText: parsed.body || null,
         };
 
-        const req = window.__toolTomanh.callAPI(requestData);
+        const req = fetchAgent(requestData);
         const resp = await req.promise;
 
         return resp.body;
@@ -279,6 +280,14 @@ return finalResponeArr;`;
         throw new Error("Request cancelled by user");
       },
     };
+  }
+  /**
+   * Sử dụng agent để thực hiện chạy command curl gọi API,
+   * không bị giới hạn bởi các tool của trình duyệt
+   * (dạng text code để inject động)
+   */
+  fetchAgentFuncContent() {
+    return 'const fetchAgent = function(request) {\n    let serverAgent = window.__env?.APITesting?.agentServer;\n    if (!serverAgent) {\n      throw new Error("Agent server not configured");\n    }\n\n    const controller = new AbortController();\n\n    const promise = fetch(`${serverAgent}/exec`, {\n      method: "POST",\n      headers: {\n        "Content-Type": "application/json",\n      },\n      body: JSON.stringify(request),\n      signal: controller.signal,\n    }).then(async (res) => {\n      const text = await res.text();\n      let body;\n\n      try {\n        body = JSON.parse(text);\n      } catch {\n        body = text;\n      }\n\n      return {\n        status: res.status,\n        headers: Object.fromEntries(res.headers.entries()),\n        body,\n      };\n    });\n\n    return {\n      promise,\n      cancel() {\n        controller.abort();\n        throw new Error("Request cancelled by user");\n      },\n    };\n  }';
   }
 }
 
