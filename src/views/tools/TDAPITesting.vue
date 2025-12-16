@@ -771,11 +771,13 @@ export default {
         const injectedCode = TDCURLUtil.buildInjectCode(me.proModeSecranioCode);
 
         // Thực thi script
-        const result = await eval(injectedCode);
+        const response = await eval(injectedCode);
 
         let endTime = performance.now();
         me.responseTime = Math.round(endTime - me.startTime);
-        me.statusCode = 200;
+        me.statusCode = response.status;
+
+        let result = response.body;
 
         // format output
         if (typeof result === "object") {

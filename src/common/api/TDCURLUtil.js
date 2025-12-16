@@ -191,6 +191,10 @@ let curlTwo = \`
 
 let responseOne = await requestCURL(curlOne);
 
+if(responseOne && responseOne.status != 200){
+  return responseOne;
+}
+
 let finalResponeArr = [];
 
 if(responseOne && responseOne.data && responseOne.data.length > 0){
@@ -229,7 +233,7 @@ return finalResponeArr;`;
         const req = fetchAgent(requestData);
         const resp = await req.promise;
 
-        return resp.body;
+        return resp;
       };
 
       (async () => {
