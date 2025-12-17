@@ -1,4 +1,4 @@
- #!/bin/sh
+#!/bin/sh
 set -e
 
 # ===============================
@@ -10,7 +10,6 @@ OUT_DIR="out"
 SRC_FILE="./src/extension/toolAPIAgent/tool_api_agent.go"
 
 ZIP_WIN="$DIST_DIR/tool-tomanh-win32.zip"
-ZIP_MAC="$DIST_DIR/tool-tomanh-mac.zip"
 
 # ===============================
 # HELPER
@@ -50,43 +49,41 @@ zip -r "../$ZIP_WIN" *-win32-x64
 cd - >/dev/null
 
 # ===============================
-# 2. BUILD ELECTRON MAC
+# 2. BUILD ELECTRON MAC (MOVE, NOT ZIP)
 # ===============================
 log "Build Electron bundle for macOS"
 npm run electron:build_mac
 
-# log "Zip macOS bundle"
-# rm -f "$ZIP_MAC"
-# cd "$OUT_DIR"
-# zip -r "../$ZIP_MAC" *-darwin-*
-# cd - >/dev/null
+log "Move macOS bundle to dist"
 
+# Xóa bundle mac cũ nếu tồn tại
+rm -rf "$DIST_DIR"/*-darwin-*
+
+# Move trực tiếp bundle sang dist
+mv "$OUT_DIR"/*-darwin-* "$DIST_DIR/"
+
+# Xóa out sau khi xong
 rm -rf "$OUT_DIR"
-
 
 # ===============================
 # 3. BUILD ALL GO AGENTS
 # ===============================
-
-echo "==> Checking Go version"
-go version
-
-echo "==> Build macOS Intel (amd64)"
+log "Build macOS Intel (amd64)"
 GOOS=darwin GOARCH=amd64 go build -o ${APP_NAME}-mac-intel ${SRC_FILE}
 
-echo "==> Build macOS Apple Silicon (arm64)"
+log "Build macOS Apple Silicon (arm64)"
 GOOS=darwin GOARCH=arm64 go build -o ${APP_NAME}-mac-arm ${SRC_FILE}
 
-echo "==> Build Linux x86_64 (amd64)"
+log "Build Linux x86_64 (amd64)"
 GOOS=linux GOARCH=amd64 go build -o ${APP_NAME}-linux ${SRC_FILE}
 
-echo "==> Build Linux ARM64"
+log "Build Linux ARM64"
 GOOS=linux GOARCH=arm64 go build -o ${APP_NAME}-linux-arm ${SRC_FILE}
 
-echo "==> Build Windows x86_64 (amd64)"
+log "Build Windows x86_64 (amd64)"
 GOOS=windows GOARCH=amd64 go build -o ${APP_NAME}.exe ${SRC_FILE}
 
-echo "==> Build Windows ARM64"
+log "Build Windows ARM64"
 GOOS=windows GOARCH=arm64 go build -o ${APP_NAME}-arm.exe ${SRC_FILE}
 
-echo "==> Build completed successfully"
+log "Build completed successfully"
