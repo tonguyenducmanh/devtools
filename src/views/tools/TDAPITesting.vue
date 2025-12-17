@@ -525,9 +525,6 @@
               v-for="(collection, index) in allCollection"
               :key="collection.name"
               class="td-search-item"
-              :class="{
-                'td-search-item-active': index === selectedIndex,
-              }"
               @click="saveToCollection(collection)"
             >
               <div class="td-search-item-content">
@@ -591,7 +588,6 @@ export default {
       curlContent: "",
       isSaveRequestToCollectionModelOpen: false,
       searchQuery: "",
-      selectedIndex: 0,
       methodOptions: [
         { value: "GET", label: "GET" },
         { value: "POST", label: "POST" },
@@ -840,7 +836,6 @@ export default {
     closeSearchModal() {
       this.isSaveRequestToCollectionModelOpen = false;
       this.searchQuery = "";
-      this.selectedIndex = 0;
     },
     createNewRequest() {
       let me = this;
