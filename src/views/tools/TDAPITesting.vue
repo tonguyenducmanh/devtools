@@ -573,7 +573,11 @@ export default {
     statusText() {
       const code = Number(this.statusCode);
       if (!code) return "";
-
+      // nếu đang hiển thị thanh bên phải, thì không cho show đủ status do thiếu diện tích
+      // sau nghĩ ra thiết kế khác thì để full
+      if (this.isShowSidebar && this.showReponse) {
+        return code;
+      }
       // mapping chi tiết
       const exactMap = {
         200: "OK",
