@@ -752,6 +752,11 @@ export default {
               for (let request of collection.requests) {
                 if (request && request.requestId == me.currentRequestId) {
                   Object.assign(request, historyItem);
+                  this.$tdToast.success(
+                    null,
+                    this.$t("i18nCommon.toastMessage.success")
+                  );
+                  break;
                 }
               }
             }
@@ -774,6 +779,7 @@ export default {
         collection.requests.push(historyItem);
         await me.saveCollectionToCache();
         me.currentRequestId = newRequestId;
+        this.$tdToast.success(null, this.$t("i18nCommon.toastMessage.success"));
       }
       this.closeSearchModal();
     },
