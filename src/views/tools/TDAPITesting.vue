@@ -480,6 +480,61 @@
         @toggle="toggleSidebar"
       />
     </div>
+    <div
+      v-if="isSaveRequestToCollectionModelOpen"
+      class="td-api-request-save-collection"
+    >
+      <div class="td-search-modal" @click.stop>
+        <div class="td-search-input-container">
+          <div class="td-icon td-search-icon"></div>
+          <input
+            ref="searchInput"
+            v-model="searchQuery"
+            type="text"
+            :placeholder="$t('i18nCommon.search.placeholder')"
+            class="td-search-input"
+          />
+          <button class="td-search-close" @click="closeSearchModal">
+            <div class="td-icon td-close-icon"></div>
+          </button>
+        </div>
+
+        <div class="td-search-results" v-if="allCollection.length > 0">
+          <div class="td-search-section">
+            <div
+              v-for="(collection, index) in allCollection"
+              :key="collection.name"
+              class="td-search-item"
+              :class="{
+                'td-search-item-active': index === selectedIndex,
+              }"
+              @click="saveToCollection(collection)"
+            >
+              <div class="td-search-item-content">
+                <div class="td-search-item-title">
+                  {{ collection.name }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          v-else-if="searchQuery && allCollection.length === 0"
+          class="td-search-empty"
+        >
+          <div class="td-search-empty-text">
+            {{ $t("i18nCommon.search.noResults") }}
+          </div>
+        </div>
+
+        <div v-else class="td-search-help">
+          <div class="td-search-help-text">
+            {{ $t("i18nCommon.search.help") }}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -514,6 +569,9 @@ export default {
       wrapText: false,
       showReponse: true,
       curlContent: "",
+      isSaveRequestToCollectionModelOpen: false,
+      searchQuery: "",
+      selectedIndex: 0,
       methodOptions: [
         { value: "GET", label: "GET" },
         { value: "POST", label: "POST" },
@@ -677,14 +735,34 @@ export default {
     saveToCollection() {
       let me = this;
       if (me.requestName) {
-        let historyItem = me.buildHistoryItemForSave();
-
         // nếu đã tồn tại request thì lưu luôn
         if (me.currentRequestId) {
+          let historyItem = me.buildHistoryItemForSave();
         } else {
           // nếu không tồn tại request thì show popup tạo mới
+          me.isSaveRequestToCollectionModelOpen = true;
         }
       }
+    },
+    async saveToCollection(collection) {
+      let me = this;
+      let historyItem = me.buildHistoryItemForSave();
+      let newRequestId = me.$tdUtility.newGuid();
+      if (collection && historyItem) {
+        if (!collection.requests) {
+          collection.requests = [];
+        }
+        historyItem.requestId = newRequestId;
+        collection.requests.push(historyItem);
+        await me.saveCollectionToCache();
+        me.currentRequestId = newRequestId;
+      }
+      this.closeSearchModal();
+    },
+    closeSearchModal() {
+      this.isSaveRequestToCollectionModelOpen = false;
+      this.searchQuery = "";
+      this.selectedIndex = 0;
     },
     createNewRequest() {
       let me = this;
@@ -1191,5 +1269,180 @@ export default {
 }
 .td-sub-sidebar-collaspe {
   margin-left: unset;
+}
+.td-api-request-save-collection {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+}
+.td-search-box {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: var(--bg-thirt-color);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border: 1px solid var(--focus-color);
+  }
+
+  .td-search-placeholder {
+    flex: 1;
+    font-size: 14px;
+  }
+
+  .td-search-shortcut {
+    display: flex;
+    gap: 2px;
+    span {
+      padding: 4px 6px;
+      background-color: var(--bg-layer-color);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-color-secondary);
+    }
+  }
+}
+
+.td-search-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+}
+
+.td-search-modal {
+  width: 100%;
+  max-width: 600px;
+  max-height: 70vh;
+  background-color: var(--bg-main-color);
+  border: 1px solid var(--border-color);
+  border-radius: calc(var(--border-radius) * 1.5);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+
+  .td-search-input-container {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    .td-search-icon {
+      margin-right: var(--padding);
+    }
+    .td-search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 16px;
+      color: var(--text-color);
+
+      &::placeholder {
+        color: var(--text-color-secondary);
+      }
+    }
+
+    .td-search-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      opacity: 0.6;
+      transition: all 0.2s ease;
+
+      &:hover {
+        opacity: 1;
+        background-color: var(--bg-layer-color);
+      }
+    }
+  }
+
+  .td-search-results {
+    max-height: 400px;
+    overflow-y: auto;
+
+    .td-search-section {
+      padding: 8px 0;
+
+      .td-search-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover,
+        &.td-search-item-active {
+          background-color: var(--bg-layer-color);
+        }
+
+        .td-icon {
+          width: 24px;
+          height: 24px;
+          margin-right: 12px;
+          opacity: 0.8;
+        }
+
+        .td-search-item-content {
+          flex: 1;
+
+          .td-search-item-title {
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 2px;
+          }
+
+          .td-search-item-description {
+            font-size: 12px;
+            color: var(--text-color-secondary);
+          }
+        }
+
+        .td-search-item-shortcut {
+          span {
+            padding: 2px 6px;
+            background-color: var(--bg-layer-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-color-secondary);
+          }
+        }
+      }
+    }
+  }
+
+  .td-search-empty,
+  .td-search-help {
+    padding: 40px 16px;
+    text-align: center;
+    .td-search-empty-text,
+    .td-search-help-text {
+      color: var(--text-color-secondary);
+      font-size: 14px;
+    }
+  }
 }
 </style>
