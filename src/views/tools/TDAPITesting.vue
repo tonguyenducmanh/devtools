@@ -446,12 +446,15 @@
                 class="flex td-collection-header"
                 @click="toggleCollection(collection)"
               >
-                <TDArrow
-                  :openProp="collection.openingCollection"
-                  :arrowOpenDirection="$tdEnum.Direction.bottom"
-                  :arrowDirection="$tdEnum.Direction.right"
-                />
-                <div>{{ collection.name }}</div>
+                <div class="flex">
+                  <TDArrow
+                    :openProp="collection.openingCollection"
+                    :arrowOpenDirection="$tdEnum.Direction.bottom"
+                    :arrowDirection="$tdEnum.Direction.right"
+                  />
+                  <div>{{ collection.name }}</div>
+                </div>
+                <div class="td-icon td-close-icon"></div>
               </div>
               <div
                 v-if="
@@ -471,7 +474,13 @@
                   }"
                   @click="applyRequest(request)"
                 >
-                  {{ request.requestName }}
+                  <div>
+                    {{ request.requestName }}
+                  </div>
+                  <div
+                    class="td-icon td-close-icon"
+                    @click.stop="deleteRequest(collection.name, request)"
+                  ></div>
                 </div>
               </div>
             </div>
@@ -787,6 +796,29 @@ export default {
         this.$tdToast.success(null, this.$t("i18nCommon.toastMessage.success"));
       }
       this.closeSearchModal();
+    },
+    async deleteRequest(collectionName, request) {
+      let me = this;
+      if (
+        collectionName &&
+        request &&
+        me.allCollection &&
+        me.allCollection.length > 0
+      ) {
+        let currentCollection = me.allCollection.find(
+          (x) => x.name == collectionName
+        );
+        if (
+          currentCollection &&
+          currentCollection.requests &&
+          currentCollection.requests.length > 0
+        ) {
+          currentCollection.requests = currentCollection.requests.filter(
+            (x) => x.requestId != request.requestId
+          );
+          await me.saveCollectionToCache();
+        }
+      }
     },
     closeSearchModal() {
       this.isSaveRequestToCollectionModelOpen = false;
@@ -1265,7 +1297,7 @@ export default {
             gap: var(--padding);
             padding: var(--padding);
             height: 40px;
-            justify-content: flex-start;
+            justify-content: space-between;
             width: 100%;
           }
           .td-collection-header:hover {
@@ -1277,9 +1309,9 @@ export default {
             width: 100%;
             .td-collection-request-item {
               height: 40px;
-              justify-content: flex-start;
+              justify-content: space-between;
               width: 100%;
-              padding-left: var(--padding);
+              padding: var(--padding);
               border-radius: var(--border-radius);
             }
             .td-collection-request-item:hover {
@@ -1477,5 +1509,11 @@ export default {
       font-size: 14px;
     }
   }
+}
+.td-close-icon {
+  filter: grayscale(100);
+}
+.td-close-icon:hover {
+  filter: unset;
 }
 </style>
