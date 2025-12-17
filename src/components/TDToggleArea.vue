@@ -89,6 +89,7 @@ export default {
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  outline: none;
 }
 .td-toggle-sidebar:hover {
   border-color: var(--btn-color);
