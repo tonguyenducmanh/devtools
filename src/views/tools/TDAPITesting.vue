@@ -456,18 +456,18 @@
               <div
                 v-if="
                   collection.openingCollection &&
-                  collection.request &&
-                  collection.request.length > 0
+                  collection.requests &&
+                  collection.requests.length > 0
                 "
                 class="flex flex-col td-collection-content"
               >
                 <div
-                  v-for="(request, indexRequest) in collection.request"
+                  v-for="(request, indexRequest) in collection.requests"
                   :key="indexRequest"
                   class="flex td-collection-request-item"
                   @click="applyRequest(request)"
                 >
-                  {{ request.name }}
+                  {{ request.requestName }}
                 </div>
               </div>
             </div>
