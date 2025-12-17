@@ -650,6 +650,8 @@ export default {
         };
         me.allCollection.push(blankCollection);
         await me.saveCollectionToCache();
+        // xóa tên tạm đi
+        me.newCollectionName = "";
       }
     },
     async saveCollectionToCache() {
@@ -675,6 +677,8 @@ export default {
     saveToCollection() {
       let me = this;
       if (me.requestName) {
+        let historyItem = me.buildHistoryItemForSave();
+
         // nếu đã tồn tại request thì lưu luôn
         if (me.currentRequestId) {
         } else {
@@ -794,15 +798,20 @@ export default {
         //   this.isLoading = false;
         // }, 2000); // 2000 milliseconds = 2 seconds
 
-        let historyItem = {
-          apiUrl: me.apiUrl,
-          httpMethod: me.httpMethod,
-          headersText: me.headersText,
-          bodyText: me.bodyText,
-          requestName: me.requestName || me.apiUrl,
-        };
+        let historyItem = me.buildHistoryItemForSave();
         await me.$refs.history.saveToHistory(historyItem);
       }
+    },
+    buildHistoryItemForSave() {
+      let me = this;
+      let historyItem = {
+        apiUrl: me.apiUrl,
+        httpMethod: me.httpMethod,
+        headersText: me.headersText,
+        bodyText: me.bodyText,
+        requestName: me.requestName || me.apiUrl,
+      };
+      return historyItem;
     },
     handleCancelRequest() {
       if (
