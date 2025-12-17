@@ -407,15 +407,16 @@
       </template>
     </div>
     <div
-      class="td-sub-sidebar"
+      class="flex td-sub-sidebar"
       :class="{ 'td-sub-sidebar-collaspe': !isShowSidebar }"
     >
+      <div v-if="isShowSidebar" class="divide"></div>
+      <div v-if="isShowSidebar" class="td-sub-sidebar-content"></div>
       <TDToggleArea
         :collapsed="!isShowSidebar"
         position="right"
         @toggle="toggleSidebar"
       />
-      <div v-if="isShowSidebar" class="td-sub-sidebar-content"></div>
     </div>
   </div>
 </template>
@@ -967,6 +968,12 @@ export default {
   .td-sub-sidebar-content {
     width: 250px;
     height: 100%;
+  }
+  .divide {
+    width: var(--padding);
+    height: 100%;
+    background-color: var(--bg-layer-color);
+    border-radius: var(--border-radius);
   }
 }
 .td-sub-sidebar-collaspe {
