@@ -316,6 +316,8 @@ export default {
       tutorialProModeCode:
         "//requestCURL() is a built-in function used to call APIs using CURL\n//Example:\n",
       newCollectionName: "New collection name",
+      save: "Save",
+      createNewRequest: "New",
     },
   },
 };

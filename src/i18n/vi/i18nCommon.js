@@ -314,6 +314,8 @@ export default {
       tutorialProModeCode:
         "//requestCURL() là hàm cung cấp sẵn dùng để gọi api bằng CURL\n//Ví dụ:\n",
       newCollectionName: "Tên collection mới",
+      save: "Lưu",
+      createNewRequest: "Tạo",
     },
   },
 };

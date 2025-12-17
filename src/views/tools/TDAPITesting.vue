@@ -15,6 +15,18 @@
           :noMargin="true"
           :placeHolder="$t('i18nCommon.apiTesting.requestName')"
         ></TDInput>
+        <TDButton
+          :readOnly="isLoading"
+          @click="createNewRequest"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.apiTesting.createNewRequest')"
+        ></TDButton>
+        <TDButton
+          :readOnly="isLoading || !requestName"
+          @click="saveToCollection"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.apiTesting.save')"
+        ></TDButton>
         <TDHistory
           v-if="currentAPIMode == $tdEnum.APIMode.ProMode"
           ref="historyProMode"
@@ -407,6 +419,7 @@
       </template>
     </div>
     <div
+      v-if="currentAPIMode != $tdEnum.APIMode.ProMode"
       class="flex td-sub-sidebar"
       :class="{ 'td-sub-sidebar-collaspe': !isShowSidebar }"
     >
@@ -426,16 +439,36 @@
           <div class="td-collection-body">
             <div
               v-for="(collection, index) in allCollection"
-              class="flex no-select td-collection-item"
+              class="flex flex-col no-select td-collection-item"
               :key="index"
             >
-              <div class="flex td-collection-header">
+              <div
+                class="flex td-collection-header"
+                @click="toggleCollection(collection)"
+              >
                 <TDArrow
                   :openProp="collection.openingCollection"
                   :arrowOpenDirection="$tdEnum.Direction.bottom"
                   :arrowDirection="$tdEnum.Direction.right"
                 />
                 <div>{{ collection.name }}</div>
+              </div>
+              <div
+                v-if="
+                  collection.openingCollection &&
+                  collection.request &&
+                  collection.request.length > 0
+                "
+                class="flex flex-col td-collection-content"
+              >
+                <div
+                  v-for="(request, indexRequest) in collection.request"
+                  :key="indexRequest"
+                  class="flex td-collection-request-item"
+                  @click="applyRequest(request)"
+                >
+                  {{ request.name }}
+                </div>
               </div>
             </div>
           </div>
@@ -464,6 +497,7 @@ export default {
       isShowSidebar: true,
       apiUrl: "",
       requestName: "",
+      currentRequestId: null,
       newCollectionName: "",
       allCollection: [],
       httpMethod: "GET",
@@ -622,6 +656,44 @@ export default {
           JSON.stringify(me.allCollection)
         );
       }
+    },
+    async toggleCollection(collection) {
+      let me = this;
+      if (collection) {
+        collection.openingCollection = !collection.openingCollection;
+        await me.saveCollectionToCache();
+      }
+    },
+    applyRequest(request) {
+      let me = this;
+      debugger;
+    },
+    saveToCollection() {
+      let me = this;
+      if (me.requestName) {
+        // nếu đã tồn tại request thì lưu luôn
+        if (me.currentRequestId) {
+        } else {
+          // nếu không tồn tại request thì show popup tạo mới
+        }
+      }
+    },
+    createNewRequest() {
+      let me = this;
+      me.requestName = "";
+      me.currentRequestId = null;
+      me.apiUrl = null;
+      me.httpMethod = "GET";
+      me.headersText = "Content-Type: application/json";
+      me.bodyText = "";
+      me.responseText = "";
+      me.statusCode = null;
+      me.responseTime = null;
+      me.isLoading = false;
+      me.startTime = null;
+      me.isImportingCURL = false;
+      me.currentRequest = null;
+      me.curlContent = "";
     },
     downloadExtension() {
       let me = this;
@@ -1078,6 +1150,20 @@ export default {
           .td-collection-header:hover {
             background-color: var(--bg-layer-color);
             border-radius: var(--border-radius);
+          }
+          .td-collection-content {
+            justify-content: flex-start;
+            width: 100%;
+            .td-collection-request-item {
+              height: 40px;
+              justify-content: flex-start;
+              width: 100%;
+              padding-left: var(--padding);
+            }
+            .td-collection-request-item:hover {
+              background-color: var(--bg-layer-color);
+              border-radius: var(--border-radius);
+            }
           }
         }
       }
