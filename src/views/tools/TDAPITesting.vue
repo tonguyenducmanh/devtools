@@ -452,7 +452,9 @@
                     :arrowOpenDirection="$tdEnum.Direction.bottom"
                     :arrowDirection="$tdEnum.Direction.right"
                   />
-                  <div class="text-nowrap">{{ collection.name }}</div>
+                  <div class="text-nowrap" :title="collection.name">
+                    {{ collection.name }}
+                  </div>
                 </div>
                 <div
                   class="td-icon td-close-icon"
@@ -477,7 +479,7 @@
                   }"
                   @click="applyRequest(request)"
                 >
-                  <div class="text-nowrap">
+                  <div class="text-nowrap" :title="request.requestName">
                     {{ request.requestName }}
                   </div>
                   <div
