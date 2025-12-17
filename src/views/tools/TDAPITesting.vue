@@ -15,18 +15,6 @@
           :noMargin="true"
           :placeHolder="$t('i18nCommon.apiTesting.requestName')"
         ></TDInput>
-        <TDButton
-          :readOnly="isLoading"
-          @click="createNewRequest"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.apiTesting.createNewRequest')"
-        ></TDButton>
-        <TDButton
-          :readOnly="isLoading || !requestName"
-          @click="saveRequest"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.apiTesting.save')"
-        ></TDButton>
         <TDHistory
           v-if="currentAPIMode == $tdEnum.APIMode.ProMode"
           ref="historyProMode"
@@ -490,6 +478,20 @@
               </div>
             </div>
           </div>
+        </div>
+        <div class="flex flex-col">
+          <TDButton
+            :readOnly="isLoading || !requestName"
+            @click="saveRequest"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.apiTesting.save')"
+          ></TDButton>
+          <TDButton
+            :readOnly="isLoading"
+            @click="createNewRequest"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.apiTesting.createNewRequest')"
+          ></TDButton>
         </div>
       </div>
       <TDToggleArea
