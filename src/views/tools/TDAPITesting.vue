@@ -454,7 +454,10 @@
                   />
                   <div>{{ collection.name }}</div>
                 </div>
-                <div class="td-icon td-close-icon"></div>
+                <div
+                  class="td-icon td-close-icon"
+                  @click.stop="deleteCollection(collection.name)"
+                ></div>
               </div>
               <div
                 v-if="
@@ -818,6 +821,16 @@ export default {
           );
           await me.saveCollectionToCache();
         }
+      }
+    },
+    async deleteCollection(collectionName) {
+      let me = this;
+      if (collectionName && me.allCollection && me.allCollection.length > 0) {
+        me.allCollection = me.allCollection.filter(
+          (x) => x.name != collectionName
+        );
+
+        await me.saveCollectionToCache();
       }
     },
     closeSearchModal() {
