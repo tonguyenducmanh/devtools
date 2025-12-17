@@ -23,7 +23,7 @@
         ></TDButton>
         <TDButton
           :readOnly="isLoading || !requestName"
-          @click="saveToCollection"
+          @click="saveRequest"
           :type="$tdEnum.buttonType.secondary"
           :label="$t('i18nCommon.apiTesting.save')"
         ></TDButton>
@@ -465,6 +465,10 @@
                   v-for="(request, indexRequest) in collection.requests"
                   :key="indexRequest"
                   class="flex td-collection-request-item"
+                  :class="{
+                    'td-collection-request-item-selected':
+                      request && currentRequestId == request.requestId,
+                  }"
                   @click="applyRequest(request)"
                 >
                   {{ request.requestName }}
@@ -731,13 +735,27 @@ export default {
     applyRequest(request) {
       let me = this;
       me.handleSendRequestFromHistory(request);
+      me.currentRequestId = request.requestId;
     },
-    saveToCollection() {
+    saveRequest() {
       let me = this;
-      if (me.requestName) {
+      if (me.requestName && me.allCollection && me.allCollection.length > 0) {
         // nếu đã tồn tại request thì lưu luôn
         if (me.currentRequestId) {
           let historyItem = me.buildHistoryItemForSave();
+          me.allCollection.forEach((collection) => {
+            if (
+              collection &&
+              collection.requests &&
+              collection.requests.length > 0
+            ) {
+              for (let request of collection.requests) {
+                if (request && request.requestId == me.currentRequestId) {
+                  Object.assign(request, historyItem);
+                }
+              }
+            }
+          });
         } else {
           // nếu không tồn tại request thì show popup tạo mới
           me.isSaveRequestToCollectionModelOpen = true;
@@ -1250,10 +1268,13 @@ export default {
               justify-content: flex-start;
               width: 100%;
               padding-left: var(--padding);
+              border-radius: var(--border-radius);
             }
             .td-collection-request-item:hover {
               background-color: var(--bg-layer-color);
-              border-radius: var(--border-radius);
+            }
+            .td-collection-request-item-selected {
+              background-color: var(--bg-thirt-color);
             }
           }
         }
