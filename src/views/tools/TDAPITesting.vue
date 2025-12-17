@@ -1244,6 +1244,7 @@ export default {
       }
       .td-plus-icon:hover {
         filter: unset;
+        background-color: var(--bg-layer-color);
       }
     }
     .td-collection {

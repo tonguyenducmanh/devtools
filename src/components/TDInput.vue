@@ -18,6 +18,7 @@
       spellcheck="false"
       :type="inputType"
       :name="inputId"
+      autocomplete="off"
     />
     <slot></slot>
   </div>

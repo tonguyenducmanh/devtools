@@ -23,6 +23,7 @@
       spellcheck="false"
       @keydown.tab.prevent="handleTab"
       :name="inputId"
+      autocomplete="off"
     />
   </div>
 </template>
