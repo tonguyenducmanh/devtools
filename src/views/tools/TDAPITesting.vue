@@ -413,7 +413,7 @@
       <TDToggleArea
         :collapsed="!isShowSidebar"
         position="right"
-        @toggle="isShowSidebar = !isShowSidebar"
+        @toggle="toggleSidebar"
       />
       <div v-if="isShowSidebar" class="td-sub-sidebar-content"></div>
     </div>
@@ -480,6 +480,12 @@ export default {
         me.currentAPIMode = oldData.mode;
       }
     }
+    let toggleSidebarState = await me.$tdCache.get(
+      me.$tdEnum.cacheConfig.IsShowSubSidebarAPITesting
+    );
+    if (toggleSidebarState) {
+      me.isShowSidebar = toggleSidebarState.value;
+    }
   },
   computed: {
     statusClass() {
@@ -544,6 +550,13 @@ export default {
     }
   },
   methods: {
+    async toggleSidebar() {
+      let me = this;
+      me.isShowSidebar = !me.isShowSidebar;
+      await me.$tdCache.set(me.$tdEnum.cacheConfig.IsShowSubSidebarAPITesting, {
+        value: me.isShowSidebar,
+      });
+    },
     downloadExtension() {
       let me = this;
       me.$tdUtility.goToSource("releases");
