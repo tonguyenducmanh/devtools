@@ -76,6 +76,12 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cài đặt hiển thị sidebar của tool api testing",
   },
+  APICollection: {
+    KeyFormat: "APICollection",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "collection API được lưu bởi user",
+  },
   OneTimeAuthen: {
     KeyFormat: "OneTimeAuthen_{id}",
     CacheLevel: tdEnum.cacheType.indexedDB,

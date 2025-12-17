@@ -411,7 +411,12 @@
       :class="{ 'td-sub-sidebar-collaspe': !isShowSidebar }"
     >
       <div v-if="isShowSidebar" class="divide"></div>
-      <div v-if="isShowSidebar" class="td-sub-sidebar-content"></div>
+      <div v-if="isShowSidebar" class="flex flex-col td-sub-sidebar-content">
+        <div class="td-header-collection"></div>
+        <div class="td-collection">
+          <div class="td-collection-body"></div>
+        </div>
+      </div>
       <TDToggleArea
         :collapsed="!isShowSidebar"
         position="right"
@@ -968,6 +973,26 @@ export default {
   .td-sub-sidebar-content {
     width: 250px;
     height: 100%;
+    position: relative;
+    .td-header-collection {
+      width: 100%;
+      height: 60px;
+    }
+    .td-collection {
+      height: calc(100% - 60px);
+      width: 100%;
+      overflow: auto;
+      position: relative;
+      .td-collection-body {
+        position: relative;
+        overflow: auto;
+        .td-collection-item {
+          width: 100%;
+          height: 60px;
+          margin: 10px 0;
+        }
+      }
+    }
   }
   .divide {
     width: var(--padding);
