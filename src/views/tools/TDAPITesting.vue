@@ -412,9 +412,29 @@
     >
       <div v-if="isShowSidebar" class="divide"></div>
       <div v-if="isShowSidebar" class="flex flex-col td-sub-sidebar-content">
-        <div class="td-header-collection"></div>
+        <div class="flex td-header-collection">
+          <div class="td-new-collection">
+            <TDInput
+              v-model="newCollectionName"
+              :noMargin="true"
+              :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
+            />
+          </div>
+          <div class="td-icon td-plus-icon" @click="addNewCollection"></div>
+        </div>
         <div class="td-collection">
-          <div class="td-collection-body"></div>
+          <div class="td-collection-body">
+            <div
+              v-for="(collection, index) in allCollection"
+              class="flex no-select td-collection-item"
+              :key="index"
+            >
+              <div class="flex td-collection-header">
+                <TDArrow :openProp="collection.openingCollection" />
+                <div>{{ collection.name }}</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <TDToggleArea
@@ -429,16 +449,19 @@
 <script>
 import TDCURLUtil from "@/common/api/TDCURLUtil";
 import TDToggleArea from "@/components/TDToggleArea.vue";
+import TDArrow from "@/components/TDArrow.vue";
 
 export default {
   name: "TDAPITesting",
-  components: { TDToggleArea },
+  components: { TDToggleArea, TDArrow },
 
   data() {
     return {
       isShowSidebar: true,
       apiUrl: "",
       requestName: "",
+      newCollectionName: "",
+      allCollection: [],
       httpMethod: "GET",
       headersText: "Content-Type: application/json",
       bodyText: "",
@@ -491,6 +514,12 @@ export default {
     );
     if (toggleSidebarState) {
       me.isShowSidebar = toggleSidebarState.value;
+    }
+    let allCollectionTmp = await me.$tdCache.get(
+      me.$tdEnum.cacheConfig.APICollection
+    );
+    if (allCollectionTmp) {
+      me.allCollection = JSON.parse(allCollectionTmp) || [];
     }
   },
   computed: {
@@ -562,6 +591,33 @@ export default {
       await me.$tdCache.set(me.$tdEnum.cacheConfig.IsShowSubSidebarAPITesting, {
         value: me.isShowSidebar,
       });
+    },
+    async addNewCollection() {
+      let me = this;
+      if (
+        me.allCollection &&
+        Array.isArray(me.allCollection) &&
+        me.newCollectionName
+      ) {
+        let collectionId = me.$tdUtility.newGuid();
+        let blankCollection = {
+          name: me.newCollectionName,
+          requests: [],
+          collection_id: collectionId,
+          openingCollection: false,
+        };
+        me.allCollection.push(blankCollection);
+        await me.saveCollectionToCache();
+      }
+    },
+    async saveCollectionToCache() {
+      let me = this;
+      if (me.allCollection && me.allCollection.length > 0) {
+        await me.$tdCache.set(
+          me.$tdEnum.cacheConfig.APICollection,
+          JSON.stringify(me.allCollection)
+        );
+      }
     },
     downloadExtension() {
       let me = this;
@@ -860,6 +916,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/icon.scss";
+
 .td-api-container {
   width: 100%;
   height: 100%;
@@ -974,9 +1032,23 @@ export default {
     width: 250px;
     height: 100%;
     position: relative;
+    padding-left: var(--padding);
     .td-header-collection {
       width: 100%;
-      height: 60px;
+      height: 30px;
+      margin: 0 var(--padding);
+      margin-bottom: 10px;
+      gap: var(--padding);
+      .td-new-collection {
+        flex: 1;
+      }
+      .td-plus-icon {
+        filter: grayscale(100);
+        cursor: pointer;
+      }
+      .td-plus-icon:hover {
+        filter: unset;
+      }
     }
     .td-collection {
       height: calc(100% - 60px);
@@ -987,9 +1059,22 @@ export default {
         position: relative;
         overflow: auto;
         .td-collection-item {
+          cursor: pointer;
+          justify-content: flex-start;
+          gap: var(--padding);
           width: 100%;
-          height: 60px;
-          margin: 10px 0;
+          min-height: 40px;
+          .td-collection-header {
+            gap: var(--padding);
+            padding: var(--padding);
+            height: 40px;
+            justify-content: flex-start;
+            width: 100%;
+          }
+          .td-collection-header:hover {
+            background-color: var(--bg-layer-color);
+            border-radius: var(--border-radius);
+          }
         }
       }
     }
