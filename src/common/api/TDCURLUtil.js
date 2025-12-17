@@ -109,64 +109,64 @@ class TDCURLUtil {
    */
   parseFuncContent() {
     return `
-      const strip = function(str) {
-        return str.replace(/^['"]|['"]$/g, "");
-      };
-      const parseCurl =  function (curlText) {
-        let result = {
-          url: "",
-          method: "GET",
-          headers: {},
-          body: null,
-          headersText: "",
-        };
-        let allHeaders = [];
-        // normalize
-        let tokens = curlText
-          .replace(/\\\\\\n/g, " ")
-          .replace(/\\n/g, " ")
-          .match(/'[^']*'|"[^"]*"|\\S+/g);
+const strip = function(str) {
+  return str.replace(/^['"]|['"]$/g, "");
+};
+const parseCurl =  function (curlText) {
+  let result = {
+    url: "",
+    method: "GET",
+    headers: {},
+    body: null,
+    headersText: "",
+  };
+  let allHeaders = [];
+  // normalize
+  let tokens = curlText
+    .replace(/\\\\\\n/g, " ")
+    .replace(/\\n/g, " ")
+    .match(/'[^']*'|"[^"]*"|\\S+/g);
 
-        for (let i = 0; i < tokens.length; i++) {
-          let token = tokens[i];
+  for (let i = 0; i < tokens.length; i++) {
+    let token = tokens[i];
 
-          // URL
-          if (token.startsWith("http") || token.startsWith("'http")) {
-            result.url = strip(token);
-          }
+    // URL
+    if (token.startsWith("http") || token.startsWith("'http")) {
+      result.url = strip(token);
+    }
 
-          // Method
-          if (token === "-X" || token === "--request") {
-            result.method = strip(tokens[++i]).toUpperCase();
-          }
+    // Method
+    if (token === "-X" || token === "--request") {
+      result.method = strip(tokens[++i]).toUpperCase();
+    }
 
-          // Headers
-          if (token === "-H" || token === "--header") {
-            let header = strip(tokens[++i]);
-            let [key, ...rest] = header.split(":");
-            result.headers[key.trim()] = rest.join(":").trim();
-            allHeaders.push(header);
-          }
+    // Headers
+    if (token === "-H" || token === "--header") {
+      let header = strip(tokens[++i]);
+      let [key, ...rest] = header.split(":");
+      result.headers[key.trim()] = rest.join(":").trim();
+      allHeaders.push(header);
+    }
 
-          // Body
-          if (
-            token === "--data" ||
-            token === "--data-raw" ||
-            token === "--data-binary" ||
-            token === "-d"
-          ) {
-            result.body = strip(tokens[++i]);
-            if (result.method === "GET") {
-              result.method = "POST";
-            }
-          }
-        }
+    // Body
+    if (
+      token === "--data" ||
+      token === "--data-raw" ||
+      token === "--data-binary" ||
+      token === "-d"
+    ) {
+      result.body = strip(tokens[++i]);
+      if (result.method === "GET") {
+        result.method = "POST";
+      }
+    }
+  }
 
-        if (allHeaders && allHeaders.length > 0) {
-          result.headersText = allHeaders.join("\\n");
-        }
-        return result;
-      };`;
+  if (allHeaders && allHeaders.length > 0) {
+    result.headersText = allHeaders.join("\\n");
+  }
+  return result;
+};`;
   }
 
   /**
@@ -174,43 +174,43 @@ class TDCURLUtil {
    */
   sampleCURLScript() {
     return `
-      let curlOne = \`
-          curl 'http://localhost:3000/api/get_list_item?limit=5' \\
-          --header 'Content-Type: application/json'
-      \`;
+let curlOne = \`
+    curl 'http://localhost:3000/api/get_list_item?limit=5' \\
+    --header 'Content-Type: application/json'
+\`;
 
-      let keyReplace = "##item_id##";
+let keyReplace = "##item_id##";
 
-      let curlTwo = \`
-          curl 'http://localhost:3000/api/get_detail_item' \\
-          --request POST \\
-          --header 'Content-Type: application/json' \\
-          --data '{
-          "item_id": "$\{keyReplace}"
-          }'
-      \`
+let curlTwo = \`
+    curl 'http://localhost:3000/api/get_detail_item' \\
+    --request POST \\
+    --header 'Content-Type: application/json' \\
+    --data '{
+    "item_id": "$\{keyReplace}"
+    }'
+\`
 
-      let responseOne = await requestCURL(curlOne);
+let responseOne = await requestCURL(curlOne);
 
-      if(responseOne && responseOne.status != 200){
-        return responseOne;
-      }
+if(responseOne && responseOne.status != 200){
+  return responseOne;
+}
 
-      let finalResponeArr = [];
+let finalResponeArr = [];
 
-      if(responseOne && responseOne.data && responseOne.data.length > 0){
-          for(let i = 0; i < responseOne.data.length ; i ++){
-            let item = responseOne.data[i]
-            let tempCurl = curlTwo.replace(keyReplace, item)
-            let tempRespone = await requestCURL(tempCurl);
-            finalResponeArr.push({
-                item_id: item,
-                res: tempRespone
-            })
-          }
-      }
+if(responseOne && responseOne.data && responseOne.data.length > 0){
+    for(let i = 0; i < responseOne.data.length ; i ++){
+      let item = responseOne.data[i]
+      let tempCurl = curlTwo.replace(keyReplace, item)
+      let tempRespone = await requestCURL(tempCurl);
+      finalResponeArr.push({
+          item_id: item,
+          res: tempRespone
+      })
+    }
+}
 
-      return finalResponeArr;`;
+return finalResponeArr;`;
   }
   /**
    * Đoạn code build ra script javascript động để chạy request bằng CURL
@@ -219,27 +219,27 @@ class TDCURLUtil {
   buildInjectCode(secranioCode) {
     let me = this;
     return `
-      const requestCURL = async (curlText) => {
-        ${me.parseFuncContent()}
-        ${me.fetchAgentFuncContent()}
-        const parsed = parseCurl(curlText);
+const requestCURL = async (curlText) => {
+  ${me.parseFuncContent()}
+  ${me.fetchAgentFuncContent()}
+  const parsed = parseCurl(curlText);
 
-        const requestData = {
-          apiUrl: parsed.url,
-          httpMethod: parsed.method || "GET",
-          headersText: parsed.headersText || null,
-          bodyText: parsed.body || null,
-        };
+  const requestData = {
+    apiUrl: parsed.url,
+    httpMethod: parsed.method || "GET",
+    headersText: parsed.headersText || null,
+    bodyText: parsed.body || null,
+  };
 
-        const req = fetchAgent(requestData);
-        const resp = await req.promise;
+  const req = fetchAgent(requestData);
+  const resp = await req.promise;
 
-        return resp;
-      };
+  return resp;
+};
 
-      (async () => {
-        ${secranioCode}
-      })();`;
+(async () => {
+  ${secranioCode}
+})();`;
   }
 
   /**
@@ -297,48 +297,48 @@ class TDCURLUtil {
    */
   fetchAgentFuncContent() {
     return `
-      const fetchAgent = function(request) {
-        let serverAgent = window.__env?.APITesting?.agentServer;
-        if (!serverAgent) {
-          throw new Error("Agent server not configured");
-        }
-    
-        const controller = new AbortController();
-    
-        const promise = fetch(\`\${serverAgent}/exec\`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(request),
-          signal: controller.signal,
-        }).then(async (res) => {
-            const text = await res.text();
-          let body;
-    
-          try {
-            body = JSON.parse(text);
-          } catch {
-            body = text;
-          }
-    
-          return {
-            status: res.status,
-            headers: Object.fromEntries(res.headers.entries()),
-            body,
-          };
-        }).catch((error) => {
-          throw error;
-        });
-    
-        return {
-          promise,
-          cancel() {
-            controller.abort();
-            throw new Error("Request cancelled by user");
-          },
-        };
-      }`;
+const fetchAgent = function(request) {
+  let serverAgent = window.__env?.APITesting?.agentServer;
+  if (!serverAgent) {
+    throw new Error("Agent server not configured");
+  }
+
+  const controller = new AbortController();
+
+  const promise = fetch(\`\${serverAgent}/exec\`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(request),
+    signal: controller.signal,
+  }).then(async (res) => {
+      const text = await res.text();
+    let body;
+
+    try {
+      body = JSON.parse(text);
+    } catch {
+      body = text;
+    }
+
+    return {
+      status: res.status,
+      headers: Object.fromEntries(res.headers.entries()),
+      body,
+    };
+  }).catch((error) => {
+    throw error;
+  });
+
+  return {
+    promise,
+    cancel() {
+      controller.abort();
+      throw new Error("Request cancelled by user");
+    },
+  };
+}`;
   }
 }
 
