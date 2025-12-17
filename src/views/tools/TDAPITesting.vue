@@ -519,10 +519,10 @@
           </button>
         </div>
 
-        <div class="td-search-results" v-if="allCollection.length > 0">
+        <div class="td-search-results" v-if="filteredCollection.length > 0">
           <div class="td-search-section">
             <div
-              v-for="(collection, index) in allCollection"
+              v-for="(collection, index) in filteredCollection"
               :key="collection.name"
               class="td-search-item"
               @click="saveToCollection(collection)"
@@ -533,21 +533,6 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div
-          v-else-if="searchQuery && allCollection.length === 0"
-          class="td-search-empty"
-        >
-          <div class="td-search-empty-text">
-            {{ $t("i18nCommon.search.noResults") }}
-          </div>
-        </div>
-
-        <div v-else class="td-search-help">
-          <div class="td-search-help-text">
-            {{ $t("i18nCommon.search.help") }}
           </div>
         </div>
       </div>
@@ -692,6 +677,19 @@ export default {
       return groupMap[group]
         ? `${code} ${groupMap[group]}`
         : `${code} Unknown Status`;
+    },
+    filteredCollection() {
+      let me = this;
+      if (!this.searchQuery) return me.allCollection;
+      const query = this.searchQuery.normalizeText();
+
+      return me.allCollection
+        .filter((collection) => {
+          const collectionName = collection.name.normalizeText();
+
+          return collectionName.includes(query);
+        })
+        .slice(0, 8); // Giới hạn 8 kết quả
     },
   },
   beforeUnmount() {
