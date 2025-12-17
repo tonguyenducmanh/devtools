@@ -430,7 +430,11 @@
               :key="index"
             >
               <div class="flex td-collection-header">
-                <TDArrow :openProp="collection.openingCollection" />
+                <TDArrow
+                  :openProp="collection.openingCollection"
+                  :arrowOpenDirection="$tdEnum.Direction.bottom"
+                  :arrowDirection="$tdEnum.Direction.right"
+                />
                 <div>{{ collection.name }}</div>
               </div>
             </div>
