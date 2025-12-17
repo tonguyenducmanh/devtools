@@ -53,7 +53,7 @@ export default {
       }
       switch (currentDirection) {
         case tdEnum.Direction.top:
-          currentStyleArrow.transform = "rotate(180deg)";
+          currentStyleArrow.transform = "rotate(-180deg)";
           break;
         case tdEnum.Direction.left:
           currentStyleArrow.transform = "rotate(90deg)";

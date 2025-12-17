@@ -13,4 +13,6 @@ export const EnumCacheConfig = {
   APIHistory: 11,
   APIMode: 12,
   APIPromodeHistory: 13,
+  IsShowSubSidebarAPITesting: 14,
+  APICollection: 15,
 };

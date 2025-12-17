@@ -22,7 +22,7 @@
     <TDToggleArea
       :collapsed="!isShowSidebar"
       position="left"
-      @toggle="isShowSidebar = !isShowSidebar"
+      @toggle="toggleSidebar"
     />
   </div>
 </template>

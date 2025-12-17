@@ -1,94 +1,228 @@
 <template>
-  <div class="flex flex-col container">
-    <div class="flex td-api-header-group">
-      <TDComboBox
-        :width="120"
-        v-model="currentAPIMode"
-        :options="APIModeOptions"
-        :noMargin="true"
-        :readOnly="isLoading"
-        @selected="handleSelectedAPIMode"
-      />
-      <TDInput
-        v-model="requestName"
-        :noMargin="true"
-        :placeHolder="$t('i18nCommon.apiTesting.requestName')"
-      ></TDInput>
-      <TDHistory
-        v-if="currentAPIMode == $tdEnum.APIMode.ProMode"
-        ref="historyProMode"
-        :applyFunction="handleSendRequestFromHistoryProMode"
-        titleKey="requestName"
-        :noMargin="true"
-        :positionRelative="false"
-        :cacheKey="$tdEnum.cacheConfig.APIPromodeHistory"
-        :historyContainerStyleEnum="$tdEnum.AbsolutePositionStyle.Top100Left"
-      ></TDHistory>
-      <TDHistory
-        v-else
-        ref="history"
-        :applyFunction="handleSendRequestFromHistory"
-        titleKey="requestName"
-        :noMargin="true"
-        :positionRelative="false"
-        :cacheKey="$tdEnum.cacheConfig.APIHistory"
-        :historyContainerStyleEnum="$tdEnum.AbsolutePositionStyle.Top100Left"
-      ></TDHistory>
-      <TDButton
-        @click="downloadExtension"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.apiTesting.downloadExtension')"
-      ></TDButton>
-    </div>
-    <template v-if="currentAPIMode == $tdEnum.APIMode.Normal">
-      <template v-if="isImportingCURL">
-        <TDTextarea
-          :isLabelTop="true"
-          v-model="curlContent"
-          :placeHolder="$t('i18nCommon.apiTesting.contentCURL')"
-        ></TDTextarea>
-        <div class="flex">
-          <TDButton
-            @click="importCURL"
-            :label="$t('i18nCommon.apiTesting.importCURL')"
-          ></TDButton>
-          <TDButton
-            @click="cancelImportCURL"
-            :type="$tdEnum.buttonType.secondary"
-            :label="$t('i18nCommon.apiTesting.cancel')"
-          ></TDButton>
-        </div>
-      </template>
-      <template v-else>
-        <div class="td-api-content">
-          <div class="flex td-api-info-btn">
-            <TDComboBox
-              v-model="httpMethod"
-              :options="methodOptions"
-              :noMargin="true"
-            />
-            <TDInput
-              v-model="apiUrl"
-              :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
-              :noMargin="true"
-            ></TDInput>
+  <div class="flex td-api-container">
+    <div class="flex flex-col td-api-testing">
+      <div class="flex td-api-header-group">
+        <TDComboBox
+          :width="120"
+          v-model="currentAPIMode"
+          :options="APIModeOptions"
+          :noMargin="true"
+          :readOnly="isLoading"
+          @selected="handleSelectedAPIMode"
+        />
+        <TDInput
+          v-model="requestName"
+          :noMargin="true"
+          :placeHolder="$t('i18nCommon.apiTesting.requestName')"
+        ></TDInput>
+        <TDButton
+          :readOnly="isLoading"
+          @click="createNewRequest"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.apiTesting.createNewRequest')"
+        ></TDButton>
+        <TDButton
+          :readOnly="isLoading || !requestName"
+          @click="saveRequest"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.apiTesting.save')"
+        ></TDButton>
+        <TDHistory
+          v-if="currentAPIMode == $tdEnum.APIMode.ProMode"
+          ref="historyProMode"
+          :applyFunction="handleSendRequestFromHistoryProMode"
+          titleKey="requestName"
+          :noMargin="true"
+          :positionRelative="false"
+          :cacheKey="$tdEnum.cacheConfig.APIPromodeHistory"
+          :historyContainerStyleEnum="$tdEnum.AbsolutePositionStyle.Top100Left"
+        ></TDHistory>
+        <TDHistory
+          v-else
+          ref="history"
+          :applyFunction="handleSendRequestFromHistory"
+          titleKey="requestName"
+          :noMargin="true"
+          :positionRelative="false"
+          :cacheKey="$tdEnum.cacheConfig.APIHistory"
+          :historyContainerStyleEnum="$tdEnum.AbsolutePositionStyle.Top100Left"
+        ></TDHistory>
+        <TDButton
+          @click="downloadExtension"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.apiTesting.downloadExtension')"
+        ></TDButton>
+      </div>
+      <template v-if="currentAPIMode == $tdEnum.APIMode.Normal">
+        <template v-if="isImportingCURL">
+          <TDTextarea
+            :isLabelTop="true"
+            v-model="curlContent"
+            :placeHolder="$t('i18nCommon.apiTesting.contentCURL')"
+          ></TDTextarea>
+          <div class="flex">
             <TDButton
-              @click="openFormImportCURL"
-              :type="$tdEnum.buttonType.secondary"
-              :debounceTime="100"
-              :noMargin="true"
-              :readOnly="isLoading"
+              @click="importCURL"
               :label="$t('i18nCommon.apiTesting.importCURL')"
             ></TDButton>
+            <TDButton
+              @click="cancelImportCURL"
+              :type="$tdEnum.buttonType.secondary"
+              :label="$t('i18nCommon.apiTesting.cancel')"
+            ></TDButton>
           </div>
+        </template>
+        <template v-else>
+          <div class="td-api-content">
+            <div class="flex td-api-info-btn">
+              <TDComboBox
+                v-model="httpMethod"
+                :options="methodOptions"
+                :noMargin="true"
+              />
+              <TDInput
+                v-model="apiUrl"
+                :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
+                :noMargin="true"
+              ></TDInput>
+              <TDButton
+                @click="openFormImportCURL"
+                :type="$tdEnum.buttonType.secondary"
+                :debounceTime="100"
+                :noMargin="true"
+                :readOnly="isLoading"
+                :label="$t('i18nCommon.apiTesting.importCURL')"
+              ></TDButton>
+            </div>
+            <div class="flex td-api-input-area">
+              <div class="flex flex-col td-api-request">
+                <div class="flex td-api-request-title">
+                  <TDRadioGroup
+                    v-model="currentAPIInfoOption"
+                    :options="APIInfoOptions"
+                    :noMargin="true"
+                  />
+                  <TDCheckbox
+                    v-model="wrapText"
+                    :label="$t('i18nCommon.apiTesting.wrapText')"
+                  ></TDCheckbox>
+                  <TDCheckbox
+                    v-if="!showReponse"
+                    v-model="showReponse"
+                    :label="$t('i18nCommon.apiTesting.showReponse')"
+                  ></TDCheckbox>
+                  <div
+                    class="flex loader-without-response"
+                    v-if="!showReponse && isLoading"
+                  >
+                    <div class="loader"></div>
+                    <TDButton
+                      class="btn-cancel-without-response"
+                      @click="handleCancelRequest"
+                      :label="$t('i18nCommon.apiTesting.cancel')"
+                    />
+                  </div>
+                  <div v-if="!showReponse && !isLoading">
+                    <div class="status-info" v-if="statusCode">
+                      <div class="status-badge" :class="statusClass">
+                        {{ statusText }}
+                      </div>
+                      <div class="response-time" v-if="responseTime">
+                        {{ responseTime }}ms
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <TDTextarea
+                  v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.header"
+                  :isLabelTop="true"
+                  v-model="headersText"
+                  :wrapText="wrapText"
+                  :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
+                ></TDTextarea>
+                <TDTextarea
+                  v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.body"
+                  :isLabelTop="true"
+                  v-model="bodyText"
+                  :wrapText="wrapText"
+                  :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
+                ></TDTextarea>
+              </div>
+              <div v-if="showReponse" class="flex flex-col td-api-response">
+                <div class="flex td-api-response-title">
+                  <TDCheckbox
+                    v-model="showReponse"
+                    :label="$t('i18nCommon.apiTesting.showReponse')"
+                  ></TDCheckbox>
+                  <div>
+                    <div class="status-info" v-if="statusCode">
+                      <div class="status-badge" :class="statusClass">
+                        {{ statusText }}
+                      </div>
+                      <div class="response-time" v-if="responseTime">
+                        {{ responseTime }}ms
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex flex-col response-loading" v-if="isLoading">
+                  <TDButton
+                    v-if="isLoading"
+                    @click="handleCancelRequest"
+                    :label="$t('i18nCommon.apiTesting.cancel')"
+                  />
+                  <div class="loader"></div>
+                </div>
+                <TDTextarea
+                  v-else
+                  :isLabelTop="true"
+                  :modelValue="responseText"
+                  :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
+                  :readOnly="true"
+                  :wrapText="wrapText"
+                ></TDTextarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex td-api-group-btn">
+            <TDButton
+              @click="handleSendRequest"
+              :label="$t('i18nCommon.apiTesting.send')"
+              :readOnly="isLoading"
+            ></TDButton>
+            <TDButton
+              @click="handleClear"
+              :type="$tdEnum.buttonType.secondary"
+              :label="$t('i18nCommon.apiTesting.clear')"
+            ></TDButton>
+            <div>
+              <TDButton
+                v-if="showReponse"
+                @click="handleCopyResponse"
+                :type="$tdEnum.buttonType.secondary"
+                :label="$t('i18nCommon.apiTesting.copyResponse')"
+              ></TDButton>
+              <TDButton
+                v-else
+                @click="handleDownloadReponse"
+                :type="$tdEnum.buttonType.secondary"
+                :label="$t('i18nCommon.apiTesting.downloadReponse')"
+              ></TDButton>
+            </div>
+            <TDButton
+              @click="handleCopyCurl"
+              :type="$tdEnum.buttonType.secondary"
+              :label="$t('i18nCommon.apiTesting.copyCURL')"
+            ></TDButton>
+          </div>
+        </template>
+      </template>
+      <template v-else-if="currentAPIMode == $tdEnum.APIMode.CURL">
+        <div class="td-api-content">
           <div class="flex td-api-input-area">
             <div class="flex flex-col td-api-request">
               <div class="flex td-api-request-title">
-                <TDRadioGroup
-                  v-model="currentAPIInfoOption"
-                  :options="APIInfoOptions"
-                  :noMargin="true"
-                />
                 <TDCheckbox
                   v-model="wrapText"
                   :label="$t('i18nCommon.apiTesting.wrapText')"
@@ -121,18 +255,10 @@
                 </div>
               </div>
               <TDTextarea
-                v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.header"
                 :isLabelTop="true"
-                v-model="headersText"
+                v-model="curlContent"
                 :wrapText="wrapText"
-                :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
-              ></TDTextarea>
-              <TDTextarea
-                v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.body"
-                :isLabelTop="true"
-                v-model="bodyText"
-                :wrapText="wrapText"
-                :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
+                :placeHolder="$t('i18nCommon.apiTesting.contentCURLExecute')"
               ></TDTextarea>
             </div>
             <div v-if="showReponse" class="flex flex-col td-api-response">
@@ -171,17 +297,11 @@
             </div>
           </div>
         </div>
-
         <div class="flex td-api-group-btn">
           <TDButton
-            @click="handleSendRequest"
+            @click="handleSendRequestCURL"
             :label="$t('i18nCommon.apiTesting.send')"
             :readOnly="isLoading"
-          ></TDButton>
-          <TDButton
-            @click="handleClear"
-            :type="$tdEnum.buttonType.secondary"
-            :label="$t('i18nCommon.apiTesting.clear')"
           ></TDButton>
           <div>
             <TDButton
@@ -197,224 +317,248 @@
               :label="$t('i18nCommon.apiTesting.downloadReponse')"
             ></TDButton>
           </div>
-          <TDButton
-            @click="handleCopyCurl"
-            :type="$tdEnum.buttonType.secondary"
-            :label="$t('i18nCommon.apiTesting.copyCURL')"
-          ></TDButton>
         </div>
       </template>
-    </template>
-    <template v-else-if="currentAPIMode == $tdEnum.APIMode.CURL">
-      <div class="td-api-content">
-        <div class="flex td-api-input-area">
-          <div class="flex flex-col td-api-request">
-            <div class="flex td-api-request-title">
-              <TDCheckbox
-                v-model="wrapText"
-                :label="$t('i18nCommon.apiTesting.wrapText')"
-              ></TDCheckbox>
-              <TDCheckbox
-                v-if="!showReponse"
-                v-model="showReponse"
-                :label="$t('i18nCommon.apiTesting.showReponse')"
-              ></TDCheckbox>
-              <div
-                class="flex loader-without-response"
-                v-if="!showReponse && isLoading"
-              >
-                <div class="loader"></div>
+      <template v-else-if="currentAPIMode == $tdEnum.APIMode.ProMode">
+        <div class="td-api-content">
+          <div class="flex td-api-input-area">
+            <div class="flex flex-col td-api-request">
+              <div class="flex td-api-request-title">
+                <div>
+                  {{ $t("i18nCommon.apiTesting.proModeTitle") }}
+                </div>
+                <TDCheckbox
+                  v-if="!showReponse"
+                  v-model="showReponse"
+                  :label="$t('i18nCommon.apiTesting.showReponse')"
+                ></TDCheckbox>
+                <div
+                  class="flex loader-without-response"
+                  v-if="!showReponse && isLoading"
+                >
+                  <div class="loader"></div>
+                  <TDButton
+                    class="btn-cancel-without-response"
+                    :label="$t('i18nCommon.apiTesting.cancel')"
+                  />
+                </div>
+                <div v-if="!showReponse && !isLoading">
+                  <div class="status-info" v-if="statusCode">
+                    <div class="status-badge" :class="statusClass">
+                      {{ statusText }}
+                    </div>
+                    <div class="response-time" v-if="responseTime">
+                      {{ responseTime }}ms
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <TDTextarea
+                :isLabelTop="true"
+                v-model="proModeSecranioCode"
+                :wrapText="wrapText"
+                :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
+              ></TDTextarea>
+            </div>
+            <div v-if="showReponse" class="flex flex-col td-api-response">
+              <div class="flex td-api-response-title">
+                <TDCheckbox
+                  v-model="showReponse"
+                  :label="$t('i18nCommon.apiTesting.showReponse')"
+                ></TDCheckbox>
+                <div>
+                  <div class="status-info" v-if="statusCode">
+                    <div class="status-badge" :class="statusClass">
+                      {{ statusText }}
+                    </div>
+                    <div class="response-time" v-if="responseTime">
+                      {{ responseTime }}ms
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-col response-loading" v-if="isLoading">
                 <TDButton
-                  class="btn-cancel-without-response"
-                  @click="handleCancelRequest"
+                  v-if="isLoading"
                   :label="$t('i18nCommon.apiTesting.cancel')"
                 />
-              </div>
-              <div v-if="!showReponse && !isLoading">
-                <div class="status-info" v-if="statusCode">
-                  <div class="status-badge" :class="statusClass">
-                    {{ statusText }}
-                  </div>
-                  <div class="response-time" v-if="responseTime">
-                    {{ responseTime }}ms
-                  </div>
-                </div>
-              </div>
-            </div>
-            <TDTextarea
-              :isLabelTop="true"
-              v-model="curlContent"
-              :wrapText="wrapText"
-              :placeHolder="$t('i18nCommon.apiTesting.contentCURLExecute')"
-            ></TDTextarea>
-          </div>
-          <div v-if="showReponse" class="flex flex-col td-api-response">
-            <div class="flex td-api-response-title">
-              <TDCheckbox
-                v-model="showReponse"
-                :label="$t('i18nCommon.apiTesting.showReponse')"
-              ></TDCheckbox>
-              <div>
-                <div class="status-info" v-if="statusCode">
-                  <div class="status-badge" :class="statusClass">
-                    {{ statusText }}
-                  </div>
-                  <div class="response-time" v-if="responseTime">
-                    {{ responseTime }}ms
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="flex flex-col response-loading" v-if="isLoading">
-              <TDButton
-                v-if="isLoading"
-                @click="handleCancelRequest"
-                :label="$t('i18nCommon.apiTesting.cancel')"
-              />
-              <div class="loader"></div>
-            </div>
-            <TDTextarea
-              v-else
-              :isLabelTop="true"
-              :modelValue="responseText"
-              :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
-              :readOnly="true"
-              :wrapText="wrapText"
-            ></TDTextarea>
-          </div>
-        </div>
-      </div>
-      <div class="flex td-api-group-btn">
-        <TDButton
-          @click="handleSendRequestCURL"
-          :label="$t('i18nCommon.apiTesting.send')"
-          :readOnly="isLoading"
-        ></TDButton>
-        <div>
-          <TDButton
-            v-if="showReponse"
-            @click="handleCopyResponse"
-            :type="$tdEnum.buttonType.secondary"
-            :label="$t('i18nCommon.apiTesting.copyResponse')"
-          ></TDButton>
-          <TDButton
-            v-else
-            @click="handleDownloadReponse"
-            :type="$tdEnum.buttonType.secondary"
-            :label="$t('i18nCommon.apiTesting.downloadReponse')"
-          ></TDButton>
-        </div>
-      </div>
-    </template>
-    <template v-else-if="currentAPIMode == $tdEnum.APIMode.ProMode">
-      <div class="td-api-content">
-        <div class="flex td-api-input-area">
-          <div class="flex flex-col td-api-request">
-            <div class="flex td-api-request-title">
-              <div>
-                {{ $t("i18nCommon.apiTesting.proModeTitle") }}
-              </div>
-              <TDCheckbox
-                v-if="!showReponse"
-                v-model="showReponse"
-                :label="$t('i18nCommon.apiTesting.showReponse')"
-              ></TDCheckbox>
-              <div
-                class="flex loader-without-response"
-                v-if="!showReponse && isLoading"
-              >
                 <div class="loader"></div>
-                <TDButton
-                  class="btn-cancel-without-response"
-                  :label="$t('i18nCommon.apiTesting.cancel')"
-                />
               </div>
-              <div v-if="!showReponse && !isLoading">
-                <div class="status-info" v-if="statusCode">
-                  <div class="status-badge" :class="statusClass">
-                    {{ statusText }}
-                  </div>
-                  <div class="response-time" v-if="responseTime">
-                    {{ responseTime }}ms
-                  </div>
-                </div>
-              </div>
+              <TDTextarea
+                v-else
+                :isLabelTop="true"
+                :modelValue="responseText"
+                :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
+                :readOnly="true"
+                :wrapText="wrapText"
+              ></TDTextarea>
             </div>
-            <TDTextarea
-              :isLabelTop="true"
-              v-model="proModeSecranioCode"
-              :wrapText="wrapText"
-              :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
-            ></TDTextarea>
           </div>
-          <div v-if="showReponse" class="flex flex-col td-api-response">
-            <div class="flex td-api-response-title">
-              <TDCheckbox
-                v-model="showReponse"
-                :label="$t('i18nCommon.apiTesting.showReponse')"
-              ></TDCheckbox>
-              <div>
-                <div class="status-info" v-if="statusCode">
-                  <div class="status-badge" :class="statusClass">
-                    {{ statusText }}
-                  </div>
-                  <div class="response-time" v-if="responseTime">
-                    {{ responseTime }}ms
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="flex flex-col response-loading" v-if="isLoading">
-              <TDButton
-                v-if="isLoading"
-                :label="$t('i18nCommon.apiTesting.cancel')"
-              />
-              <div class="loader"></div>
-            </div>
-            <TDTextarea
+        </div>
+        <div class="flex td-api-group-btn">
+          <TDButton
+            @click="handleSendRequestProMode"
+            :label="$t('i18nCommon.apiTesting.send')"
+            :readOnly="isLoading"
+          ></TDButton>
+          <div>
+            <TDButton
+              v-if="showReponse"
+              :type="$tdEnum.buttonType.secondary"
+              @click="handleCopyResponse"
+              :label="$t('i18nCommon.apiTesting.copyResponse')"
+            ></TDButton>
+            <TDButton
               v-else
-              :isLabelTop="true"
-              :modelValue="responseText"
-              :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
-              :readOnly="true"
-              :wrapText="wrapText"
-            ></TDTextarea>
+              :type="$tdEnum.buttonType.secondary"
+              @click="handleDownloadReponse"
+              :label="$t('i18nCommon.apiTesting.downloadReponse')"
+            ></TDButton>
+          </div>
+        </div>
+      </template>
+    </div>
+    <div
+      v-if="currentAPIMode != $tdEnum.APIMode.ProMode"
+      class="flex td-sub-sidebar"
+      :class="{ 'td-sub-sidebar-collaspe': !isShowSidebar }"
+    >
+      <div v-if="isShowSidebar" class="divide"></div>
+      <div v-if="isShowSidebar" class="flex flex-col td-sub-sidebar-content">
+        <div class="flex td-header-collection">
+          <div class="td-new-collection">
+            <TDInput
+              v-model="newCollectionName"
+              :noMargin="true"
+              :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
+            />
+          </div>
+          <div class="td-icon td-plus-icon" @click="addNewCollection"></div>
+        </div>
+        <div class="td-collection">
+          <div class="td-collection-body">
+            <div
+              v-for="(collection, index) in allCollection"
+              class="flex flex-col no-select td-collection-item"
+              :key="index"
+            >
+              <div
+                class="flex td-collection-header"
+                @click="toggleCollection(collection)"
+              >
+                <TDArrow
+                  :openProp="collection.openingCollection"
+                  :arrowOpenDirection="$tdEnum.Direction.bottom"
+                  :arrowDirection="$tdEnum.Direction.right"
+                />
+                <div>{{ collection.name }}</div>
+              </div>
+              <div
+                v-if="
+                  collection.openingCollection &&
+                  collection.requests &&
+                  collection.requests.length > 0
+                "
+                class="flex flex-col td-collection-content"
+              >
+                <div
+                  v-for="(request, indexRequest) in collection.requests"
+                  :key="indexRequest"
+                  class="flex td-collection-request-item"
+                  :class="{
+                    'td-collection-request-item-selected':
+                      request && currentRequestId == request.requestId,
+                  }"
+                  @click="applyRequest(request)"
+                >
+                  {{ request.requestName }}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="flex td-api-group-btn">
-        <TDButton
-          @click="handleSendRequestProMode"
-          :label="$t('i18nCommon.apiTesting.send')"
-          :readOnly="isLoading"
-        ></TDButton>
-        <div>
-          <TDButton
-            v-if="showReponse"
-            :type="$tdEnum.buttonType.secondary"
-            @click="handleCopyResponse"
-            :label="$t('i18nCommon.apiTesting.copyResponse')"
-          ></TDButton>
-          <TDButton
-            v-else
-            :type="$tdEnum.buttonType.secondary"
-            @click="handleDownloadReponse"
-            :label="$t('i18nCommon.apiTesting.downloadReponse')"
-          ></TDButton>
+      <TDToggleArea
+        :collapsed="!isShowSidebar"
+        position="right"
+        @toggle="toggleSidebar"
+      />
+    </div>
+    <div
+      v-if="isSaveRequestToCollectionModelOpen"
+      class="td-api-request-save-collection"
+    >
+      <div class="td-search-modal" @click.stop>
+        <div class="td-search-input-container">
+          <div class="td-icon td-search-icon"></div>
+          <input
+            ref="searchInput"
+            v-model="searchQuery"
+            type="text"
+            :placeholder="$t('i18nCommon.search.placeholder')"
+            class="td-search-input"
+          />
+          <button class="td-search-close" @click="closeSearchModal">
+            <div class="td-icon td-close-icon"></div>
+          </button>
+        </div>
+
+        <div class="td-search-results" v-if="allCollection.length > 0">
+          <div class="td-search-section">
+            <div
+              v-for="(collection, index) in allCollection"
+              :key="collection.name"
+              class="td-search-item"
+              :class="{
+                'td-search-item-active': index === selectedIndex,
+              }"
+              @click="saveToCollection(collection)"
+            >
+              <div class="td-search-item-content">
+                <div class="td-search-item-title">
+                  {{ collection.name }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          v-else-if="searchQuery && allCollection.length === 0"
+          class="td-search-empty"
+        >
+          <div class="td-search-empty-text">
+            {{ $t("i18nCommon.search.noResults") }}
+          </div>
+        </div>
+
+        <div v-else class="td-search-help">
+          <div class="td-search-help-text">
+            {{ $t("i18nCommon.search.help") }}
+          </div>
         </div>
       </div>
-    </template>
+    </div>
   </div>
 </template>
 
 <script>
 import TDCURLUtil from "@/common/api/TDCURLUtil";
+import TDToggleArea from "@/components/TDToggleArea.vue";
+import TDArrow from "@/components/TDArrow.vue";
+
 export default {
   name: "TDAPITesting",
+  components: { TDToggleArea, TDArrow },
+
   data() {
     return {
+      isShowSidebar: true,
       apiUrl: "",
       requestName: "",
+      currentRequestId: null,
+      newCollectionName: "",
+      allCollection: [],
       httpMethod: "GET",
       headersText: "Content-Type: application/json",
       bodyText: "",
@@ -429,6 +573,9 @@ export default {
       wrapText: false,
       showReponse: true,
       curlContent: "",
+      isSaveRequestToCollectionModelOpen: false,
+      searchQuery: "",
+      selectedIndex: 0,
       methodOptions: [
         { value: "GET", label: "GET" },
         { value: "POST", label: "POST" },
@@ -462,6 +609,18 @@ export default {
         me.currentAPIMode = oldData.mode;
       }
     }
+    let toggleSidebarState = await me.$tdCache.get(
+      me.$tdEnum.cacheConfig.IsShowSubSidebarAPITesting
+    );
+    if (toggleSidebarState) {
+      me.isShowSidebar = toggleSidebarState.value;
+    }
+    let allCollectionTmp = await me.$tdCache.get(
+      me.$tdEnum.cacheConfig.APICollection
+    );
+    if (allCollectionTmp) {
+      me.allCollection = JSON.parse(allCollectionTmp) || [];
+    }
   },
   computed: {
     statusClass() {
@@ -476,7 +635,11 @@ export default {
     statusText() {
       const code = Number(this.statusCode);
       if (!code) return "";
-
+      // nếu đang hiển thị thanh bên phải, thì không cho show đủ status do thiếu diện tích
+      // sau nghĩ ra thiết kế khác thì để full
+      if (this.isShowSidebar && this.showReponse) {
+        return code;
+      }
       // mapping chi tiết
       const exactMap = {
         200: "OK",
@@ -526,6 +689,116 @@ export default {
     }
   },
   methods: {
+    async toggleSidebar() {
+      let me = this;
+      me.isShowSidebar = !me.isShowSidebar;
+      await me.$tdCache.set(me.$tdEnum.cacheConfig.IsShowSubSidebarAPITesting, {
+        value: me.isShowSidebar,
+      });
+    },
+    async addNewCollection() {
+      let me = this;
+      if (
+        me.allCollection &&
+        Array.isArray(me.allCollection) &&
+        me.newCollectionName
+      ) {
+        let collectionId = me.$tdUtility.newGuid();
+        let blankCollection = {
+          name: me.newCollectionName,
+          requests: [],
+          collection_id: collectionId,
+          openingCollection: false,
+        };
+        me.allCollection.push(blankCollection);
+        await me.saveCollectionToCache();
+        // xóa tên tạm đi
+        me.newCollectionName = "";
+      }
+    },
+    async saveCollectionToCache() {
+      let me = this;
+      if (me.allCollection && me.allCollection.length > 0) {
+        await me.$tdCache.set(
+          me.$tdEnum.cacheConfig.APICollection,
+          JSON.stringify(me.allCollection)
+        );
+      }
+    },
+    async toggleCollection(collection) {
+      let me = this;
+      if (collection) {
+        collection.openingCollection = !collection.openingCollection;
+        await me.saveCollectionToCache();
+      }
+    },
+    applyRequest(request) {
+      let me = this;
+      me.handleSendRequestFromHistory(request);
+      me.currentRequestId = request.requestId;
+    },
+    saveRequest() {
+      let me = this;
+      if (me.requestName && me.allCollection && me.allCollection.length > 0) {
+        // nếu đã tồn tại request thì lưu luôn
+        if (me.currentRequestId) {
+          let historyItem = me.buildHistoryItemForSave();
+          me.allCollection.forEach((collection) => {
+            if (
+              collection &&
+              collection.requests &&
+              collection.requests.length > 0
+            ) {
+              for (let request of collection.requests) {
+                if (request && request.requestId == me.currentRequestId) {
+                  Object.assign(request, historyItem);
+                }
+              }
+            }
+          });
+        } else {
+          // nếu không tồn tại request thì show popup tạo mới
+          me.isSaveRequestToCollectionModelOpen = true;
+        }
+      }
+    },
+    async saveToCollection(collection) {
+      let me = this;
+      let historyItem = me.buildHistoryItemForSave();
+      let newRequestId = me.$tdUtility.newGuid();
+      if (collection && historyItem) {
+        if (!collection.requests) {
+          collection.requests = [];
+        }
+        historyItem.requestId = newRequestId;
+        collection.requests.push(historyItem);
+        await me.saveCollectionToCache();
+        me.currentRequestId = newRequestId;
+      }
+      this.closeSearchModal();
+    },
+    closeSearchModal() {
+      this.isSaveRequestToCollectionModelOpen = false;
+      this.searchQuery = "";
+      this.selectedIndex = 0;
+    },
+    createNewRequest() {
+      let me = this;
+      me.requestName = "";
+      me.currentRequestId = null;
+      me.apiUrl = null;
+      me.httpMethod = "GET";
+      me.headersText = "Content-Type: application/json";
+      me.bodyText = "";
+      me.responseText = "";
+      me.statusCode = null;
+      me.responseTime = null;
+      me.isLoading = false;
+      me.startTime = null;
+      me.isImportingCURL = false;
+      me.currentRequest = null;
+      me.curlContent = "";
+    },
     downloadExtension() {
       let me = this;
       me.$tdUtility.goToSource("releases");
@@ -621,15 +894,20 @@ export default {
         //   this.isLoading = false;
         // }, 2000); // 2000 milliseconds = 2 seconds
 
-        let historyItem = {
-          apiUrl: me.apiUrl,
-          httpMethod: me.httpMethod,
-          headersText: me.headersText,
-          bodyText: me.bodyText,
-          requestName: me.requestName || me.apiUrl,
-        };
+        let historyItem = me.buildHistoryItemForSave();
         await me.$refs.history.saveToHistory(historyItem);
       }
+    },
+    buildHistoryItemForSave() {
+      let me = this;
+      let historyItem = {
+        apiUrl: me.apiUrl,
+        httpMethod: me.httpMethod,
+        headersText: me.headersText,
+        bodyText: me.bodyText,
+        requestName: me.requestName || me.apiUrl,
+      };
+      return historyItem;
     },
     handleCancelRequest() {
       if (
@@ -823,13 +1101,18 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.container {
+@use "@/styles/icon.scss";
+
+.td-api-container {
   width: 100%;
   height: 100%;
   border-radius: 0;
   box-shadow: none;
 }
-
+.td-api-testing {
+  width: 100%;
+  height: 100%;
+}
 .td-api-content {
   width: 100%;
   flex: 1;
@@ -925,5 +1208,262 @@ export default {
 }
 .btn-cancel-without-response {
   margin-left: 100px;
+}
+.td-sub-sidebar {
+  height: 100%;
+  position: relative;
+  margin-left: var(--padding);
+  .td-sub-sidebar-content {
+    width: 250px;
+    height: 100%;
+    position: relative;
+    padding-left: var(--padding);
+    .td-header-collection {
+      width: 100%;
+      height: 30px;
+      margin: 0 var(--padding);
+      margin-bottom: 10px;
+      gap: var(--padding);
+      .td-new-collection {
+        flex: 1;
+      }
+      .td-plus-icon {
+        filter: grayscale(100);
+        cursor: pointer;
+      }
+      .td-plus-icon:hover {
+        filter: unset;
+      }
+    }
+    .td-collection {
+      height: calc(100% - 60px);
+      width: 100%;
+      overflow: auto;
+      position: relative;
+      .td-collection-body {
+        position: relative;
+        overflow: auto;
+        .td-collection-item {
+          cursor: pointer;
+          justify-content: flex-start;
+          gap: var(--padding);
+          width: 100%;
+          min-height: 40px;
+          .td-collection-header {
+            gap: var(--padding);
+            padding: var(--padding);
+            height: 40px;
+            justify-content: flex-start;
+            width: 100%;
+          }
+          .td-collection-header:hover {
+            background-color: var(--bg-layer-color);
+            border-radius: var(--border-radius);
+          }
+          .td-collection-content {
+            justify-content: flex-start;
+            width: 100%;
+            .td-collection-request-item {
+              height: 40px;
+              justify-content: flex-start;
+              width: 100%;
+              padding-left: var(--padding);
+              border-radius: var(--border-radius);
+            }
+            .td-collection-request-item:hover {
+              background-color: var(--bg-layer-color);
+            }
+            .td-collection-request-item-selected {
+              background-color: var(--bg-thirt-color);
+            }
+          }
+        }
+      }
+    }
+  }
+  .divide {
+    width: var(--padding);
+    height: 100%;
+    background-color: var(--bg-layer-color);
+    border-radius: var(--border-radius);
+  }
+}
+.td-sub-sidebar-collaspe {
+  margin-left: unset;
+}
+.td-api-request-save-collection {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+}
+.td-search-box {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: var(--bg-thirt-color);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border: 1px solid var(--focus-color);
+  }
+
+  .td-search-placeholder {
+    flex: 1;
+    font-size: 14px;
+  }
+
+  .td-search-shortcut {
+    display: flex;
+    gap: 2px;
+    span {
+      padding: 4px 6px;
+      background-color: var(--bg-layer-color);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-color-secondary);
+    }
+  }
+}
+
+.td-search-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+}
+
+.td-search-modal {
+  width: 100%;
+  max-width: 600px;
+  max-height: 70vh;
+  background-color: var(--bg-main-color);
+  border: 1px solid var(--border-color);
+  border-radius: calc(var(--border-radius) * 1.5);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+
+  .td-search-input-container {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    .td-search-icon {
+      margin-right: var(--padding);
+    }
+    .td-search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 16px;
+      color: var(--text-color);
+
+      &::placeholder {
+        color: var(--text-color-secondary);
+      }
+    }
+
+    .td-search-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      opacity: 0.6;
+      transition: all 0.2s ease;
+
+      &:hover {
+        opacity: 1;
+        background-color: var(--bg-layer-color);
+      }
+    }
+  }
+
+  .td-search-results {
+    max-height: 400px;
+    overflow-y: auto;
+
+    .td-search-section {
+      padding: 8px 0;
+
+      .td-search-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover,
+        &.td-search-item-active {
+          background-color: var(--bg-layer-color);
+        }
+
+        .td-icon {
+          width: 24px;
+          height: 24px;
+          margin-right: 12px;
+          opacity: 0.8;
+        }
+
+        .td-search-item-content {
+          flex: 1;
+
+          .td-search-item-title {
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 2px;
+          }
+
+          .td-search-item-description {
+            font-size: 12px;
+            color: var(--text-color-secondary);
+          }
+        }
+
+        .td-search-item-shortcut {
+          span {
+            padding: 2px 6px;
+            background-color: var(--bg-layer-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-color-secondary);
+          }
+        }
+      }
+    }
+  }
+
+  .td-search-empty,
+  .td-search-help {
+    padding: 40px 16px;
+    text-align: center;
+    .td-search-empty-text,
+    .td-search-help-text {
+      color: var(--text-color-secondary);
+      font-size: 14px;
+    }
+  }
 }
 </style>
