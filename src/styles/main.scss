@@ -246,3 +246,9 @@ html[data-theme="dark"] {
     clip-path: inset(0 -100px 0 0);
   }
 }
+
+.text-nowrap {
+  white-space: nowrap; /* không xuống dòng */
+  overflow: hidden; /* ẩn phần dư */
+  text-overflow: ellipsis; /* hiện ... */
+}

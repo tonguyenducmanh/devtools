@@ -452,7 +452,7 @@
                     :arrowOpenDirection="$tdEnum.Direction.bottom"
                     :arrowDirection="$tdEnum.Direction.right"
                   />
-                  <div>{{ collection.name }}</div>
+                  <div class="text-nowrap">{{ collection.name }}</div>
                 </div>
                 <div
                   class="td-icon td-close-icon"
@@ -477,7 +477,7 @@
                   }"
                   @click="applyRequest(request)"
                 >
-                  <div>
+                  <div class="text-nowrap">
                     {{ request.requestName }}
                   </div>
                   <div
@@ -1532,5 +1532,8 @@ export default {
 }
 .td-close-icon:hover {
   filter: unset;
+}
+.text-nowrap {
+  max-width: 170px;
 }
 </style>
