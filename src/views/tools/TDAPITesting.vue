@@ -446,7 +446,7 @@
                 class="flex td-collection-header"
                 @click="toggleCollection(collection)"
               >
-                <div class="flex">
+                <div class="flex td-collection-header-left">
                   <TDArrow
                     :openProp="collection.openingCollection"
                     :arrowOpenDirection="$tdEnum.Direction.bottom"
@@ -1312,6 +1312,9 @@ export default {
             height: 40px;
             justify-content: space-between;
             width: 100%;
+            .td-collection-header-left {
+              gap: var(--padding);
+            }
           }
           .td-collection-header:hover {
             background-color: var(--bg-layer-color);
