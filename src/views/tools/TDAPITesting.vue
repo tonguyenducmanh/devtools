@@ -1282,8 +1282,7 @@ export default {
     .td-header-collection {
       width: 100%;
       height: 30px;
-      margin: 0 var(--padding);
-      margin-bottom: 10px;
+      margin: var(--padding);
       gap: var(--padding);
       .td-new-collection {
         flex: 1;
