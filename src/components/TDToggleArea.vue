@@ -81,7 +81,7 @@ export default {
   z-index: 10;
   width: 20px;
   height: 48px;
-  background: #fff;
+  background: var(--bg-main-color);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   cursor: pointer;
@@ -92,10 +92,6 @@ export default {
 }
 .td-toggle-sidebar:hover {
   border-color: var(--btn-color);
-}
-.icon {
-  font-size: 14px;
-  transition: transform 0.2s ease;
 }
 
 /* ===== Position LEFT / RIGHT ===== */
