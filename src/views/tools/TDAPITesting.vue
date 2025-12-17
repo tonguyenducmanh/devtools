@@ -1339,7 +1339,8 @@ export default {
               background-color: var(--bg-layer-color);
             }
             .td-collection-request-item-selected {
-              background-color: var(--bg-thirt-color);
+              background-color: var(--bg-layer-color);
+              font-weight: 600;
             }
           }
         }
