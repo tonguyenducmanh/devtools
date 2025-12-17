@@ -83,12 +83,11 @@ export default {
   }
   .td-content-wrap {
     padding: var(--padding);
-    column-gap: var(--padding);
     width: 100%;
     height: calc(100% - 50px);
     .td-sidebar-wrap {
       border-radius: calc(var(--border-radius) * 1.5);
-      background-color: var(--bg-main-color);
+      // background-color: var(--bg-main-color);
       display: flex;
       flex-direction: column;
       height: 100%;

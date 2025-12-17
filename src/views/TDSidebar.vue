@@ -1,5 +1,8 @@
 <template>
-  <div class="td-sidebar-container">
+  <div
+    class="td-sidebar-container"
+    :class="{ 'td-sidebar-container-collapsed': !isShowSidebar }"
+  >
     <div v-if="isShowSidebar" class="td-sidebar">
       <div class="td-tool-group">
         <template v-for="(item, index) in routerLink">
@@ -16,15 +19,20 @@
         </template>
       </div>
     </div>
+    <TDToggleArea
+      :collapsed="!isShowSidebar"
+      position="left"
+      @toggle="isShowSidebar = !isShowSidebar"
+    />
   </div>
 </template>
 
 <script>
 import { getRouterConfig } from "@/router/router.js";
-
+import TDToggleArea from "@/components/TDToggleArea.vue";
 export default {
   name: "TDSidebar",
-  components: {},
+  components: { TDToggleArea },
   computed: {},
   created() {
     let me = this;
@@ -82,11 +90,13 @@ export default {
 
 .td-sidebar-container {
   position: relative;
-  padding-top: calc(var(--padding) * 1.5);
-  height: 100vh;
-  overflow: hidden;
+  height: 100%;
+  margin-right: var(--padding);
 }
 
+.td-sidebar-container-collapsed {
+  margin-right: unset;
+}
 .td-sidebar {
   position: relative;
   width: 250px;
@@ -100,7 +110,9 @@ export default {
   justify-content: flex-start;
   transition: transform 0.3s ease-in-out;
   overflow-x: hidden;
-
+  height: 100%;
+  padding: var(--padding);
+  border-radius: var(--border-radius);
   .td-filter-tool {
     display: flex;
     margin: var(--padding);
