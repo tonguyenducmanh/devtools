@@ -730,7 +730,7 @@ export default {
     },
     applyRequest(request) {
       let me = this;
-      debugger;
+      me.handleSendRequestFromHistory(request);
     },
     saveToCollection() {
       let me = this;
