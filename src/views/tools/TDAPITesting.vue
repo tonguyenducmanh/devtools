@@ -988,6 +988,7 @@ export default {
         me.curlContent = TDCURLUtil.stringify(me.getRequestObj());
         // lúc apply lịch sử mà gọi luôn hơi tốn server :v
         // await me.handleSendRequest();
+        me.currentRequestId = null;
       }
     },
     getRequestObj() {
