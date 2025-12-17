@@ -737,12 +737,13 @@ export default {
       me.handleSendRequestFromHistory(request);
       me.currentRequestId = request.requestId;
     },
-    saveRequest() {
+    async saveRequest() {
       let me = this;
       if (me.requestName && me.allCollection && me.allCollection.length > 0) {
         // nếu đã tồn tại request thì lưu luôn
         if (me.currentRequestId) {
           let historyItem = me.buildHistoryItemForSave();
+          let success = false;
           me.allCollection.forEach((collection) => {
             if (
               collection &&
@@ -756,11 +757,15 @@ export default {
                     null,
                     this.$t("i18nCommon.toastMessage.success")
                   );
+                  success = true;
                   break;
                 }
               }
             }
           });
+          if (success) {
+            await me.saveCollectionToCache();
+          }
         } else {
           // nếu không tồn tại request thì show popup tạo mới
           me.isSaveRequestToCollectionModelOpen = true;
