@@ -318,6 +318,7 @@ export default {
       newCollectionName: "New collection name",
       save: "Save request",
       createNewRequest: "New request",
+      beautify: "Beautify",
     },
   },
 };

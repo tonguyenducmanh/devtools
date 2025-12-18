@@ -129,13 +129,20 @@
                   :wrapText="wrapText"
                   :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
                 ></TDTextarea>
-                <TDTextarea
+                <div
+                  class="td-body"
                   v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.body"
-                  :isLabelTop="true"
-                  v-model="bodyText"
-                  :wrapText="wrapText"
-                  :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
-                ></TDTextarea>
+                >
+                  <TDTextarea
+                    :isLabelTop="true"
+                    v-model="bodyText"
+                    :wrapText="wrapText"
+                    :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
+                  ></TDTextarea>
+                  <div class="no-select td-beautify-btn" @click="formatBody">
+                    {{ $t("i18nCommon.apiTesting.beautify") }}
+                  </div>
+                </div>
               </div>
               <div v-if="showReponse" class="flex flex-col td-api-response">
                 <div class="flex td-api-response-title">
@@ -860,6 +867,12 @@ export default {
       let me = this;
       me.$tdUtility.goToSource("releases");
     },
+    formatBody() {
+      let me = this;
+      if (me.bodyText) {
+        me.bodyText = JSON.stringify(JSON.parse(me.bodyText), null, " ");
+      }
+    },
     parseHeaders(headerString) {
       let headers = {};
       if (!headerString) return headers;
@@ -1535,5 +1548,25 @@ export default {
 }
 .text-nowrap {
   max-width: 170px;
+}
+.td-body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  .td-beautify-btn {
+    position: absolute;
+    top: var(--padding);
+    right: var(--padding);
+    font-size: var(--font-size-medium);
+    border: 1px solid var(--bg-layer-color);
+    padding: var(--padding);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    background-color: var(--bg-main-color);
+  }
+  .td-beautify-btn:hover {
+    cursor: pointer;
+    color: var(--focus-color);
+  }
 }
 </style>

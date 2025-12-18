@@ -316,6 +316,7 @@ export default {
       newCollectionName: "Tên collection mới",
       save: "Lưu request",
       createNewRequest: "Tạo request",
+      beautify: "Beautify",
     },
   },
 };
