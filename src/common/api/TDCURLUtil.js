@@ -313,7 +313,7 @@ const requestCURL = async (curlText) => {
     if (TDUtility.isElectronApp()) {
       return this.fetchAgentElectron(request);
     }
-    return this.fetchAgentBrowser(request); // code cũ dùng Go
+    return this.fetchAgentBrowser(request);
   }
 
   /**
@@ -323,7 +323,36 @@ const requestCURL = async (curlText) => {
    */
   fetchAgentFuncContent() {
     return `
-const fetchAgent = function(request) {
+const uuidv4 = function() {
+  if (crypto?.randomUUID) {
+    return crypto.randomUUID()
+  }
+
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0
+    const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return v.toString(16)
+  })
+}
+const fetchAgentElectron = function(request) {
+    const signalId = uuidv4();
+
+    let cancelled = false;
+
+    const promise = window.agent.exec(request, signalId);
+
+    return {
+      promise,
+      cancel() {
+        if (cancelled) return;
+        cancelled = true;
+        window.agent.cancel(signalId);
+        throw new Error("Request cancelled by user");
+      },
+    };
+  }
+
+const fetchAgentBrowser = function(request) {
   let serverAgent = window.__env?.APITesting?.agentServer;
   if (!serverAgent) {
     throw new Error("Agent server not configured");
@@ -364,6 +393,12 @@ const fetchAgent = function(request) {
       throw new Error("Request cancelled by user");
     },
   };
+}
+const fetchAgent = function(request) {
+  if (window && window.__electron && window.__electron.isElectron) {
+    return fetchAgentElectron(request);
+  }
+  return fetchAgentBrowser(request);
 }`;
   }
 }
