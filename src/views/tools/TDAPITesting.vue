@@ -1521,9 +1521,9 @@ export default {
   height: 100%;
   .td-top-right-btn {
     position: absolute;
-    top: var(--padding);
-    right: var(--padding);
-    font-size: var(--font-size-medium);
+    top: 2px;
+    right: 2px;
+    font-size: var(--font-size-small);
     border: 1px solid var(--bg-layer-color);
     padding: var(--padding);
     border-radius: var(--border-radius);
