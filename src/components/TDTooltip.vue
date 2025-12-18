@@ -46,8 +46,7 @@ export default {
     formattedText() {
       if (!this.title) return "";
 
-      const regex = new RegExp(`(.{1,${this.maxCharsPerLine}})`, "g");
-      return this.title.match(regex).join("\n");
+      return this.title;
     },
   },
 
@@ -125,7 +124,10 @@ export default {
   line-height: 1.4;
 
   border-radius: 6px;
-  white-space: pre-line;
+  word-wrap: break-word;
+  line-break: auto;
+  white-space: normal;
+  overflow-wrap: anywhere; /* ép URL dài tự xuống dòng */
   pointer-events: none;
 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);

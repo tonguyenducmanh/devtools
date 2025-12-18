@@ -53,12 +53,17 @@
           :cacheKey="$tdEnum.cacheConfig.APIHistory"
           :historyContainerStyleEnum="$tdEnum.AbsolutePositionStyle.Top100Left"
         ></TDHistory>
-        <TDButton
-          v-if="!isElectronApp"
-          @click="downloadExtension"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.apiTesting.downloadExtension')"
-        ></TDButton>
+        <TDTooltip
+          class="no-select td-top-right-btn"
+          :title="$t('i18nCommon.apiTesting.toolTipDownloadExtension')"
+        >
+          <TDButton
+            v-if="!isElectronApp"
+            @click="downloadExtension"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.apiTesting.downloadExtension')"
+          ></TDButton>
+        </TDTooltip>
       </div>
       <template v-if="currentAPIMode == $tdEnum.APIMode.Normal">
         <template v-if="isImportingCURL">
