@@ -324,6 +324,13 @@ class TDUtility {
     // Đóng băng object cha
     return Object.freeze(obj);
   }
+
+  /**
+   * Kiểm tra xem có phải phiên bản app desktop không
+   */
+  isElectronApp() {
+    return window && window.__electron && window.__electron.isElectron;
+  }
 }
 
 export default new TDUtility();

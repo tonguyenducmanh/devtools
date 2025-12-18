@@ -36,6 +36,7 @@
           :historyContainerStyleEnum="$tdEnum.AbsolutePositionStyle.Top100Left"
         ></TDHistory>
         <TDButton
+          v-if="!isElectronApp"
           @click="downloadExtension"
           :type="$tdEnum.buttonType.secondary"
           :label="$t('i18nCommon.apiTesting.downloadExtension')"
@@ -620,6 +621,9 @@ export default {
     }
   },
   computed: {
+    isElectronApp() {
+      return this.$tdUtility.isElectronApp();
+    },
     statusClass() {
       if (!this.statusCode) return "";
       if (this.statusCode >= 200 && this.statusCode < 300) return "success";

@@ -1,6 +1,9 @@
 import { app, BrowserWindow } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
+import { injectIpcMain } from "./extension/toolAPIAgent/desktop/tool_api_agent.js";
+
+injectIpcMain();
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {

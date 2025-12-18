@@ -1,3 +1,4 @@
+import TDUtility from "@/common/TDUtility.js";
 /**
  * các method CURL dùng cho toàn bộ frontend
  * Created by tdmanh 16/12/2025
@@ -241,12 +242,29 @@ const requestCURL = async (curlText) => {
   ${secranioCode}
 })();`;
   }
+  fetchAgentElectron(request) {
+    const signalId = TDUtility.newGuid();
+
+    let cancelled = false;
+
+    const promise = window.agent.exec(request, signalId);
+
+    return {
+      promise,
+      cancel() {
+        if (cancelled) return;
+        cancelled = true;
+        window.agent.cancel(signalId);
+        throw new Error("Request cancelled by user");
+      },
+    };
+  }
 
   /**
    * Sử dụng agent để thực hiện chạy command curl gọi API,
    * không bị giới hạn bởi các tool của trình duyệt
    */
-  fetchAgent(request) {
+  fetchAgentBrowser(request) {
     let serverAgent = window.__env?.APITesting?.agentServer;
     if (!serverAgent) {
       throw new Error("Agent server not configured");
@@ -290,6 +308,14 @@ const requestCURL = async (curlText) => {
       },
     };
   }
+
+  fetchAgent(request) {
+    if (TDUtility.isElectronApp()) {
+      return this.fetchAgentElectron(request);
+    }
+    return this.fetchAgentBrowser(request); // code cũ dùng Go
+  }
+
   /**
    * Sử dụng agent để thực hiện chạy command curl gọi API,
    * không bị giới hạn bởi các tool của trình duyệt

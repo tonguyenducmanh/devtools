@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import i18nData from "@/i18n/i18nData.js";
-
+import TDUtility from "@/common/TDUtility.js";
 // cấu hình router dùng chung cho nhiều file
 const routerConfig = [
   {
@@ -240,7 +240,7 @@ export default router;
 
 export function getRouterConfig() {
   let allRoutes = [];
-  if (window && window.__electron && window.__electron.isElectron) {
+  if (TDUtility.isElectronApp()) {
     allRoutes = routerConfig.filter((x) => !x.electronNotSupport);
   } else {
     allRoutes = routerConfig;

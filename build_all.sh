@@ -2,7 +2,7 @@
 set -e
 
 APP_NAME="./out/tool-tomanh-agent"
-SRC_FILE="./src/extension/toolAPIAgent/tool_api_agent.go"
+SRC_FILE="./src/extension/toolAPIAgent/web/tool_api_agent.go"
 
 # build app desktop
 npm run electron:build
