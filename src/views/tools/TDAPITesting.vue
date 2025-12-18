@@ -15,6 +15,17 @@
           :noMargin="true"
           :placeHolder="$t('i18nCommon.apiTesting.requestName')"
         ></TDInput>
+        <TDButton
+          @click="handleSend"
+          :label="$t('i18nCommon.apiTesting.send')"
+          :readOnly="isLoading"
+        ></TDButton>
+        <TDButton
+          v-if="!showReponse"
+          @click="handleDownloadReponse"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.apiTesting.downloadReponse')"
+        ></TDButton>
         <TDHistory
           v-if="currentAPIMode == $tdEnum.APIMode.ProMode"
           ref="historyProMode"
@@ -59,6 +70,11 @@
               :type="$tdEnum.buttonType.secondary"
               :label="$t('i18nCommon.apiTesting.cancel')"
             ></TDButton>
+            <TDButton
+              @click="handleCopyCurl"
+              :type="$tdEnum.buttonType.secondary"
+              :label="$t('i18nCommon.apiTesting.copyCURL')"
+            ></TDButton>
           </div>
         </template>
         <template v-else>
@@ -80,7 +96,7 @@
                 :debounceTime="100"
                 :noMargin="true"
                 :readOnly="isLoading"
-                :label="$t('i18nCommon.apiTesting.importCURL')"
+                :label="$t('i18nCommon.apiTesting.CURL')"
               ></TDButton>
             </div>
             <div class="flex td-api-input-area">
@@ -130,7 +146,7 @@
                   :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
                 ></TDTextarea>
                 <div
-                  class="td-body"
+                  class="td-text-area-wrap"
                   v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.body"
                 >
                   <TDTextarea
@@ -139,7 +155,7 @@
                     :wrapText="wrapText"
                     :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
                   ></TDTextarea>
-                  <div class="no-select td-beautify-btn" @click="formatBody">
+                  <div class="no-select td-top-right-btn" @click="formatBody">
                     {{ $t("i18nCommon.apiTesting.beautify") }}
                   </div>
                 </div>
@@ -169,48 +185,25 @@
                   />
                   <div class="loader"></div>
                 </div>
-                <TDTextarea
-                  v-else
-                  :isLabelTop="true"
-                  :modelValue="responseText"
-                  :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
-                  :readOnly="true"
-                  :wrapText="wrapText"
-                ></TDTextarea>
+                <div v-else class="td-text-area-wrap">
+                  <TDTextarea
+                    :isLabelTop="true"
+                    :modelValue="responseText"
+                    :placeHolder="
+                      $t('i18nCommon.apiTesting.responsePlaceholder')
+                    "
+                    :readOnly="true"
+                    :wrapText="wrapText"
+                  ></TDTextarea>
+                  <div
+                    class="no-select td-top-right-btn"
+                    @click="handleCopyResponse"
+                  >
+                    {{ $t("i18nCommon.apiTesting.copyResponse") }}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div class="flex td-api-group-btn">
-            <TDButton
-              @click="handleSendRequest"
-              :label="$t('i18nCommon.apiTesting.send')"
-              :readOnly="isLoading"
-            ></TDButton>
-            <TDButton
-              @click="handleClear"
-              :type="$tdEnum.buttonType.secondary"
-              :label="$t('i18nCommon.apiTesting.clear')"
-            ></TDButton>
-            <div>
-              <TDButton
-                v-if="showReponse"
-                @click="handleCopyResponse"
-                :type="$tdEnum.buttonType.secondary"
-                :label="$t('i18nCommon.apiTesting.copyResponse')"
-              ></TDButton>
-              <TDButton
-                v-else
-                @click="handleDownloadReponse"
-                :type="$tdEnum.buttonType.secondary"
-                :label="$t('i18nCommon.apiTesting.downloadReponse')"
-              ></TDButton>
-            </div>
-            <TDButton
-              @click="handleCopyCurl"
-              :type="$tdEnum.buttonType.secondary"
-              :label="$t('i18nCommon.apiTesting.copyCURL')"
-            ></TDButton>
           </div>
         </template>
       </template>
@@ -282,36 +275,22 @@
                 />
                 <div class="loader"></div>
               </div>
-              <TDTextarea
-                v-else
-                :isLabelTop="true"
-                :modelValue="responseText"
-                :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
-                :readOnly="true"
-                :wrapText="wrapText"
-              ></TDTextarea>
+              <div v-else class="td-text-area-wrap">
+                <TDTextarea
+                  :isLabelTop="true"
+                  :modelValue="responseText"
+                  :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
+                  :readOnly="true"
+                  :wrapText="wrapText"
+                ></TDTextarea>
+                <div
+                  class="no-select td-top-right-btn"
+                  @click="handleCopyResponse"
+                >
+                  {{ $t("i18nCommon.apiTesting.copyResponse") }}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="flex td-api-group-btn">
-          <TDButton
-            @click="handleSendRequestCURL"
-            :label="$t('i18nCommon.apiTesting.send')"
-            :readOnly="isLoading"
-          ></TDButton>
-          <div>
-            <TDButton
-              v-if="showReponse"
-              @click="handleCopyResponse"
-              :type="$tdEnum.buttonType.secondary"
-              :label="$t('i18nCommon.apiTesting.copyResponse')"
-            ></TDButton>
-            <TDButton
-              v-else
-              @click="handleDownloadReponse"
-              :type="$tdEnum.buttonType.secondary"
-              :label="$t('i18nCommon.apiTesting.downloadReponse')"
-            ></TDButton>
           </div>
         </div>
       </template>
@@ -380,36 +359,22 @@
                 />
                 <div class="loader"></div>
               </div>
-              <TDTextarea
-                v-else
-                :isLabelTop="true"
-                :modelValue="responseText"
-                :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
-                :readOnly="true"
-                :wrapText="wrapText"
-              ></TDTextarea>
+              <div v-else class="td-text-area-wrap">
+                <TDTextarea
+                  :isLabelTop="true"
+                  :modelValue="responseText"
+                  :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
+                  :readOnly="true"
+                  :wrapText="wrapText"
+                ></TDTextarea>
+                <div
+                  class="no-select td-top-right-btn"
+                  @click="handleCopyResponse"
+                >
+                  {{ $t("i18nCommon.apiTesting.copyResponse") }}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="flex td-api-group-btn">
-          <TDButton
-            @click="handleSendRequestProMode"
-            :label="$t('i18nCommon.apiTesting.send')"
-            :readOnly="isLoading"
-          ></TDButton>
-          <div>
-            <TDButton
-              v-if="showReponse"
-              :type="$tdEnum.buttonType.secondary"
-              @click="handleCopyResponse"
-              :label="$t('i18nCommon.apiTesting.copyResponse')"
-            ></TDButton>
-            <TDButton
-              v-else
-              :type="$tdEnum.buttonType.secondary"
-              @click="handleDownloadReponse"
-              :label="$t('i18nCommon.apiTesting.downloadReponse')"
-            ></TDButton>
           </div>
         </div>
       </template>
@@ -870,7 +835,7 @@ export default {
     formatBody() {
       let me = this;
       if (me.bodyText) {
-        me.bodyText = JSON.stringify(JSON.parse(me.bodyText), null, " ");
+        me.bodyText = JSON.stringify(JSON.parse(me.bodyText), null, 2);
       }
     },
     parseHeaders(headerString) {
@@ -888,6 +853,19 @@ export default {
       });
 
       return headers;
+    },
+    /**
+     * Hàm wrap tất cả các thể loại gửi request
+     */
+    async handleSend() {
+      let me = this;
+      if (me.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
+        await me.handleSendRequestProMode();
+      } else if (me.currentAPIMode == me.$tdEnum.APIMode.CURL) {
+        await me.handleSendRequestCURL();
+      } else if (me.currentAPIMode == me.$tdEnum.APIMode.Normal) {
+        await me.handleSendRequest();
+      }
     },
     async handleSendRequestCURL() {
       let me = this;
@@ -1013,17 +991,6 @@ export default {
         headersText: me.headersText,
         bodyText: me.bodyText,
       };
-    },
-
-    handleClear() {
-      this.apiUrl = "";
-      this.httpMethod = "GET";
-      this.headersText = "Content-Type: application/json";
-      this.bodyText = "";
-      this.responseText = "";
-      this.statusCode = null;
-      this.responseTime = null;
-      this.curlContent = "";
     },
     handleCopyResponse() {
       if (this.responseText) {
@@ -1215,11 +1182,6 @@ export default {
       }
     }
   }
-}
-.td-api-group-btn {
-  width: 100%;
-  position: relative;
-  flex-wrap: wrap;
 }
 .status-info {
   display: flex;
@@ -1549,11 +1511,11 @@ export default {
 .text-nowrap {
   max-width: 170px;
 }
-.td-body {
+.td-text-area-wrap {
   position: relative;
   width: 100%;
   height: 100%;
-  .td-beautify-btn {
+  .td-top-right-btn {
     position: absolute;
     top: var(--padding);
     right: var(--padding);
@@ -1564,7 +1526,7 @@ export default {
     box-shadow: var(--box-shadow);
     background-color: var(--bg-main-color);
   }
-  .td-beautify-btn:hover {
+  .td-top-right-btn:hover {
     cursor: pointer;
     color: var(--focus-color);
   }
