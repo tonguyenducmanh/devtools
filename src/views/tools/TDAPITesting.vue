@@ -155,8 +155,12 @@
                     :wrapText="wrapText"
                     :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
                   ></TDTextarea>
-                  <div class="no-select td-top-right-btn" @click="formatBody">
-                    {{ $t("i18nCommon.apiTesting.beautify") }}
+                  <div
+                    class="no-select td-top-right-btn"
+                    @click="formatBody"
+                    :title="$t('i18nCommon.apiTesting.beautify')"
+                  >
+                    {}
                   </div>
                 </div>
               </div>
@@ -1524,10 +1528,11 @@ export default {
     padding: var(--padding);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
-    background-color: var(--bg-main-color);
+    background-color: rgba(255, 255, 255, 0.206);
   }
   .td-top-right-btn:hover {
     cursor: pointer;
+    background-color: var(--bg-main-color);
     color: var(--focus-color);
   }
 }
