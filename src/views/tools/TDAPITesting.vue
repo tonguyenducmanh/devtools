@@ -155,13 +155,12 @@
                     :wrapText="wrapText"
                     :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
                   ></TDTextarea>
-                  <div
+                  <TDTooltip
                     class="no-select td-top-right-btn"
-                    @click="formatBody"
                     :title="$t('i18nCommon.apiTesting.beautify')"
                   >
-                    {}
-                  </div>
+                    <div @click="formatBody">{}</div>
+                  </TDTooltip>
                 </div>
               </div>
               <div v-if="showReponse" class="flex flex-col td-api-response">
@@ -398,7 +397,12 @@
               :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
             />
           </div>
-          <div class="td-icon td-plus-icon" @click="addNewCollection"></div>
+          <TDTooltip
+            class="text-nowrap"
+            :title="$t('i18nCommon.apiTesting.add')"
+          >
+            <div class="td-icon td-plus-icon" @click="addNewCollection"></div>
+          </TDTooltip>
         </div>
         <div class="td-collection">
           <div class="td-collection-body">
@@ -417,14 +421,21 @@
                     :arrowOpenDirection="$tdEnum.Direction.bottom"
                     :arrowDirection="$tdEnum.Direction.right"
                   />
-                  <div class="text-nowrap" :title="collection.name">
-                    {{ collection.name }}
-                  </div>
+                  <TDTooltip class="text-nowrap" :title="collection.name">
+                    <div>
+                      {{ collection.name }}
+                    </div>
+                  </TDTooltip>
                 </div>
-                <div
-                  class="td-icon td-close-icon"
-                  @click.stop="deleteCollection(collection.name)"
-                ></div>
+                <TDTooltip
+                  class="text-nowrap"
+                  :title="$t('i18nCommon.apiTesting.delete')"
+                >
+                  <div
+                    class="td-icon td-close-icon"
+                    @click.stop="deleteCollection(collection.name)"
+                  ></div>
+                </TDTooltip>
               </div>
               <div
                 v-if="
@@ -444,13 +455,21 @@
                   }"
                   @click="applyRequest(request)"
                 >
-                  <div class="text-nowrap" :title="request.requestName">
-                    {{ request.requestName }}
-                  </div>
-                  <div
-                    class="td-icon td-close-icon"
-                    @click.stop="deleteRequest(collection.name, request)"
-                  ></div>
+                  <TDTooltip class="text-nowrap" :title="request.requestName">
+                    <div>
+                      {{ request.requestName }}
+                    </div>
+                  </TDTooltip>
+
+                  <TDTooltip
+                    class="text-nowrap"
+                    :title="$t('i18nCommon.apiTesting.delete')"
+                  >
+                    <div
+                      class="td-icon td-close-icon"
+                      @click.stop="deleteRequest(collection.name, request)"
+                    ></div>
+                  </TDTooltip>
                 </div>
               </div>
             </div>

@@ -320,6 +320,8 @@ export default {
       save: "Save request",
       createNewRequest: "New request",
       beautify: "Beautify",
+      delete: "Delete",
+      add: "Add",
     },
   },
 };

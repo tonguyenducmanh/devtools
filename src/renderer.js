@@ -12,6 +12,7 @@ import TDUpload from "@/components/TDUpload.vue";
 import TDRadio from "@/components/TDRadio.vue";
 import TDRadioGroup from "@/components/TDRadioGroup.vue";
 import TDComboBox from "@/components/TDComboBox.vue";
+import TDTooltip from "@/components/TDTooltip.vue";
 import TDHistory from "@/components/TDHistory.vue";
 import i18nData, { loadLocale } from "@/i18n/i18nData.js";
 import eventBus from "@/common/event/TDEventBus.js";
@@ -40,6 +41,7 @@ import TDClickOutside from "@/mixins/TDClickOutside.js";
   currentApp.component("TDRadioGroup", TDRadioGroup);
   currentApp.component("TDComboBox", TDComboBox);
   currentApp.component("TDHistory", TDHistory);
+  currentApp.component("TDTooltip", TDTooltip);
 
   // router link
   currentApp.use(router);
