@@ -15,10 +15,17 @@
           :noMargin="true"
           :placeHolder="$t('i18nCommon.apiTesting.requestName')"
         ></TDInput>
+
+        <TDButton
+          v-if="isLoading"
+          @click="handleCancelRequest"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.apiTesting.cancel')"
+        />
         <TDButton
           @click="handleSend"
           :label="$t('i18nCommon.apiTesting.send')"
-          :readOnly="isLoading"
+          v-else
         ></TDButton>
         <TDButton
           v-if="!showReponse"
@@ -121,11 +128,6 @@
                     v-if="!showReponse && isLoading"
                   >
                     <div class="loader"></div>
-                    <TDButton
-                      class="btn-cancel-without-response"
-                      @click="handleCancelRequest"
-                      :label="$t('i18nCommon.apiTesting.cancel')"
-                    />
                   </div>
                   <div v-if="!showReponse && !isLoading">
                     <div class="status-info" v-if="statusCode">
@@ -181,11 +183,6 @@
                   </div>
                 </div>
                 <div class="flex flex-col response-loading" v-if="isLoading">
-                  <TDButton
-                    v-if="isLoading"
-                    @click="handleCancelRequest"
-                    :label="$t('i18nCommon.apiTesting.cancel')"
-                  />
                   <div class="loader"></div>
                 </div>
                 <div v-else class="td-text-area-wrap">
@@ -229,11 +226,6 @@
                   v-if="!showReponse && isLoading"
                 >
                   <div class="loader"></div>
-                  <TDButton
-                    class="btn-cancel-without-response"
-                    @click="handleCancelRequest"
-                    :label="$t('i18nCommon.apiTesting.cancel')"
-                  />
                 </div>
                 <div v-if="!showReponse && !isLoading">
                   <div class="status-info" v-if="statusCode">
@@ -271,11 +263,6 @@
                 </div>
               </div>
               <div class="flex flex-col response-loading" v-if="isLoading">
-                <TDButton
-                  v-if="isLoading"
-                  @click="handleCancelRequest"
-                  :label="$t('i18nCommon.apiTesting.cancel')"
-                />
                 <div class="loader"></div>
               </div>
               <div v-else class="td-text-area-wrap">
@@ -315,10 +302,6 @@
                   v-if="!showReponse && isLoading"
                 >
                   <div class="loader"></div>
-                  <TDButton
-                    class="btn-cancel-without-response"
-                    :label="$t('i18nCommon.apiTesting.cancel')"
-                  />
                 </div>
                 <div v-if="!showReponse && !isLoading">
                   <div class="status-info" v-if="statusCode">
@@ -1259,9 +1242,6 @@ export default {
   border: 1px solid transparent;
 }
 .loader-without-response {
-  margin-left: 100px;
-}
-.btn-cancel-without-response {
   margin-left: 100px;
 }
 .td-sub-sidebar {
