@@ -374,11 +374,7 @@ const fetchAgentBrowser = function(request) {
       body = text;
     }
 
-    return {
-      status: res.status,
-      headers: Object.fromEntries(res.headers.entries()),
-      body,
-    };
+    return body;
   }).catch((error) => {
     throw error;
   });
