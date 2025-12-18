@@ -1107,13 +1107,12 @@ export default {
         const injectedCode = TDCURLUtil.buildInjectCode(me.proModeSecranioCode);
 
         // Thực thi script
-        const response = await eval(injectedCode);
+        let result = await eval(injectedCode);
 
         let endTime = performance.now();
         me.responseTime = Math.round(endTime - me.startTime);
-        me.statusCode = response.status;
-
-        let result = response.body;
+        // luồng promode có thể gọi nhiều api, check lỗi thì check console
+        me.statusCode = 200;
 
         // format output
         if (typeof result === "object") {

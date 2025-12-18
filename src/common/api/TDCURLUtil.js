@@ -193,10 +193,6 @@ let curlTwo = \`
 
 let responseOne = await requestCURL(curlOne);
 
-if(responseOne && responseOne.status != 200){
-  return responseOne;
-}
-
 let finalResponeArr = [];
 
 if(responseOne && responseOne.data && responseOne.data.length > 0){
@@ -334,23 +330,24 @@ const uuidv4 = function() {
     return v.toString(16)
   })
 }
+
 const fetchAgentElectron = function(request) {
-    const signalId = uuidv4();
+  const signalId = uuidv4();
 
-    let cancelled = false;
+  let cancelled = false;
 
-    const promise = window.agent.exec(request, signalId);
+  const promise = window.agent.exec(request, signalId);
 
-    return {
-      promise,
-      cancel() {
-        if (cancelled) return;
-        cancelled = true;
-        window.agent.cancel(signalId);
-        throw new Error("Request cancelled by user");
-      },
-    };
-  }
+  return {
+    promise,
+    cancel() {
+      if (cancelled) return;
+      cancelled = true;
+      window.agent.cancel(signalId);
+      throw new Error("Request cancelled by user");
+    },
+  };
+}
 
 const fetchAgentBrowser = function(request) {
   let serverAgent = window.__env?.APITesting?.agentServer;
@@ -394,6 +391,7 @@ const fetchAgentBrowser = function(request) {
     },
   };
 }
+
 const fetchAgent = function(request) {
   if (window && window.__electron && window.__electron.isElectron) {
     return fetchAgentElectron(request);
