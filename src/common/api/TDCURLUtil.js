@@ -176,34 +176,45 @@ const parseCurl =  function (curlText) {
   sampleCURLScript() {
     return `
 let curlOne = \`
-    curl 'http://localhost:3000/api/get_list_item?limit=5' \\
+    curl 'http://localhost:3000/api/get_list_item?limit=5' \
     --header 'Content-Type: application/json'
 \`;
 
 let keyReplace = "##item_id##";
 
 let curlTwo = \`
-    curl 'http://localhost:3000/api/get_detail_item' \\
-    --request POST \\
-    --header 'Content-Type: application/json' \\
+    curl 'http://localhost:3000/api/get_detail_item' \
+    --request POST \
+    --header 'Content-Type: application/json' \
     --data '{
-    "item_id": "$\{keyReplace}"
+    "item_id": "\${keyReplace}"
     }'
 \`
 
 let responseOne = await requestCURL(curlOne);
 
+if(!responseOne || responseOne.status != 200){
+  return responseOne;
+}
+
+let arrIds = JSON.parse(responseOne.body).data;
 let finalResponeArr = [];
 
-if(responseOne && responseOne.data && responseOne.data.length > 0){
-    for(let i = 0; i < responseOne.data.length ; i ++){
-      let item = responseOne.data[i]
+if(arrIds && arrIds.length > 0){
+    for(let i = 0; i < arrIds.length ; i ++){
+      let item = arrIds[i]
       let tempCurl = curlTwo.replace(keyReplace, item)
       let tempRespone = await requestCURL(tempCurl);
-      finalResponeArr.push({
+      if(!responseOne || responseOne.status != 200){
+        finalResponeArr.push({
           item_id: item,
           res: tempRespone
       })
+      }else{
+        finalResponeArr.push(
+          JSON.parse(tempRespone.body).data
+        )
+      }
     }
 }
 
@@ -369,17 +380,26 @@ const fetchAgentBrowser = function(request) {
     body: JSON.stringify(request),
     signal: controller.signal,
   }).then(async (res) => {
-      const text = await res.text();
-    let body;
+    const text = await res.text();
+    let data;
 
     try {
-      body = JSON.parse(text);
+      data = JSON.parse(text);
+      return {
+        status: data.status,
+        headers: data.headers,
+        body: data.body,
+      };
     } catch {
-      body = text;
+      data = text;
+      return {
+        status: 200,
+        headers: {},
+        body: data,
+      };
     }
-
-    return body;
-  }).catch((error) => {
+  })
+  .catch((error) => {
     throw error;
   });
 
