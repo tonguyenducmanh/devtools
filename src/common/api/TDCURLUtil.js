@@ -278,19 +278,23 @@ const requestCURL = async (curlText) => {
     })
       .then(async (res) => {
         const text = await res.text();
-        let body;
+        let data;
 
         try {
-          body = JSON.parse(text);
+          data = JSON.parse(text);
+          return {
+            status: data.status,
+            headers: data.headers,
+            body: data.body,
+          };
         } catch {
-          body = text;
+          data = text;
+          return {
+            status: 200,
+            headers: {},
+            body: data,
+          };
         }
-
-        return {
-          status: res.status,
-          headers: Object.fromEntries(res.headers.entries()),
-          body,
-        };
       })
       .catch((error) => {
         throw error;
