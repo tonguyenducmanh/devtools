@@ -295,7 +295,7 @@ export default {
       responsePlaceholder: "Response sẽ xuất hiện ở đây...",
       send: "Gửi",
       clear: "Xóa tất cả",
-      copyResponse: "Copy",
+      copyResponse: "Sao chép",
       copyCURL: "Sao chép CURL",
       CURL: "CURL",
       importCURL: "Nhập CURL",

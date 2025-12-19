@@ -1,51 +1,278 @@
-<svg width="564" height="200" viewBox="0 0 564 200" xmlns="http://www.w3.org/2000/svg" fill="#33a16f">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="564"
+   height="200"
+   viewBox="0 0 564 200"
+   fill="#33a16f"
+   version="1.1"
+   id="svg17"
+   sodipodi:docname="Sprite.svg"
+   inkscape:version="1.4.2 (ebf0e940, 2025-05-08)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs17" />
+  <sodipodi:namedview
+     id="namedview17"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="11.05859"
+     inkscape:cx="189.67155"
+     inkscape:cy="23.194638"
+     inkscape:window-width="1472"
+     inkscape:window-height="894"
+     inkscape:window-x="0"
+     inkscape:window-y="34"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg17"
+     showgrid="true">
+    <inkscape:grid
+       id="grid17"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="5"
+       spacingy="5"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="20"
+       enabled="true"
+       visible="true" />
+  </sodipodi:namedview>
   <!-- Menu Icon -->
-  <g transform="translate(0, 2)">
-    <rect x="0" y="0" width="20" height="2" rx="1"/>
-    <rect x="0" y="6" width="20" height="2" rx="1"/>
-    <rect x="0" y="12" width="20" height="2" rx="1"/>
+  <g
+     transform="translate(0, 2)"
+     id="g3"
+     inkscape:label="menu">
+    <rect
+       x="0"
+       y="0"
+       width="20"
+       height="2"
+       rx="1"
+       id="rect1" />
+    <rect
+       x="0"
+       y="6"
+       width="20"
+       height="2"
+       rx="1"
+       id="rect2" />
+    <rect
+       x="0"
+       y="12"
+       width="20"
+       height="2"
+       rx="1"
+       id="rect3" />
   </g>
-
   <!-- Sun Icon -->
-  <g transform="translate(26, 0)">
-    <circle cx="10" cy="10" r="4"/>
-    <line x1="10" y1="0" x2="10" y2="4" stroke="#33a16f" stroke-width="2"/>
-    <line x1="10" y1="16" x2="10" y2="20" stroke="#33a16f" stroke-width="2"/>
-    <line x1="0" y1="10" x2="4" y2="10" stroke="#33a16f" stroke-width="2"/>
-    <line x1="16" y1="10" x2="20" y2="10" stroke="#33a16f" stroke-width="2"/>
-    <line x1="3" y1="3" x2="6" y2="6" stroke="#33a16f" stroke-width="2"/>
-    <line x1="14" y1="14" x2="17" y2="17" stroke="#33a16f" stroke-width="2"/>
-    <line x1="3" y1="17" x2="6" y2="14" stroke="#33a16f" stroke-width="2"/>
-    <line x1="14" y1="6" x2="17" y2="3" stroke="#33a16f" stroke-width="2"/>
+  <g
+     transform="translate(26, 0)"
+     id="g10"
+     inkscape:label="sun_mode">
+    <circle
+       cx="10"
+       cy="10"
+       r="4"
+       id="circle3" />
+    <line
+       x1="10"
+       y1="0"
+       x2="10"
+       y2="4"
+       stroke="#33a16f"
+       stroke-width="2"
+       id="line3" />
+    <line
+       x1="10"
+       y1="16"
+       x2="10"
+       y2="20"
+       stroke="#33a16f"
+       stroke-width="2"
+       id="line4" />
+    <line
+       x1="0"
+       y1="10"
+       x2="4"
+       y2="10"
+       stroke="#33a16f"
+       stroke-width="2"
+       id="line5" />
+    <line
+       x1="16"
+       y1="10"
+       x2="20"
+       y2="10"
+       stroke="#33a16f"
+       stroke-width="2"
+       id="line6" />
+    <line
+       x1="3"
+       y1="3"
+       x2="6"
+       y2="6"
+       stroke="#33a16f"
+       stroke-width="2"
+       id="line7" />
+    <line
+       x1="14"
+       y1="14"
+       x2="17"
+       y2="17"
+       stroke="#33a16f"
+       stroke-width="2"
+       id="line8" />
+    <line
+       x1="3"
+       y1="17"
+       x2="6"
+       y2="14"
+       stroke="#33a16f"
+       stroke-width="2"
+       id="line9" />
+    <line
+       x1="14"
+       y1="6"
+       x2="17"
+       y2="3"
+       stroke="#33a16f"
+       stroke-width="2"
+       id="line10" />
   </g>
-
   <!-- Sleep Icon (Zzz) -->
-  <g transform="translate(52, 2)">
-    <path d="M3 4h6l-4 4h4v1H3l4-4H3V4z" fill="#33a16f"/>
-    <path d="M7 8h4l-2.5 2.5h2.5v1H7l2.5-2.5H7V8z" fill="#33a16f"/>
-    <path d="M10 12h3l-1.5 1.5h1.5v1h-3l1.5-1.5H10V12z" fill="#33a16f"/>
+  <g
+     transform="translate(52, 2)"
+     id="g12"
+     inkscape:label="dark_mode">
+    <path
+       d="M3 4h6l-4 4h4v1H3l4-4H3V4z"
+       fill="#33a16f"
+       id="path10" />
+    <path
+       d="M7 8h4l-2.5 2.5h2.5v1H7l2.5-2.5H7V8z"
+       fill="#33a16f"
+       id="path11" />
+    <path
+       d="M10 12h3l-1.5 1.5h1.5v1h-3l1.5-1.5H10V12z"
+       fill="#33a16f"
+       id="path12" />
   </g>
-
   <!-- GitHub Icon -->
-  <g transform="translate(76, 0)">
-    <path fill="#33a16f" transform="scale(0.8)" d="M12 .297c-6.63 0-12 5.373-12 12c0 5.303 3.438 9.8 8.205 11.385c.6.113.82-.258.82-.577c0-.285-.01-1.04-.015-2.04c-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729c1.205.084 1.838 1.236 1.838 1.236c1.07 1.835 2.809 1.305 3.495.998c.108-.776.417-1.305.76-1.605c-2.665-.3-5.466-1.332-5.466-5.93c0-1.31.465-2.38 1.235-3.22c-.135-.303-.54-1.523.105-3.176c0 0 1.005-.322 3.3 1.23c.96-.267 1.98-.399 3-.405c1.02.006 2.04.138 3 .405c2.28-1.552 3.285-1.23 3.285-1.23c.645 1.653.24 2.873.12 3.176c.765.84 1.23 1.91 1.23 3.22c0 4.61-2.805 5.625-5.475 5.92c.42.36.81 1.096.81 2.22c0 1.606-.015 2.896-.015 3.286c0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12z"/>
+  <g
+     transform="translate(76, 0)"
+     id="g13"
+     inkscape:label="github">
+    <path
+       fill="#33a16f"
+       transform="scale(0.8)"
+       d="M12 .297c-6.63 0-12 5.373-12 12c0 5.303 3.438 9.8 8.205 11.385c.6.113.82-.258.82-.577c0-.285-.01-1.04-.015-2.04c-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729c1.205.084 1.838 1.236 1.838 1.236c1.07 1.835 2.809 1.305 3.495.998c.108-.776.417-1.305.76-1.605c-2.665-.3-5.466-1.332-5.466-5.93c0-1.31.465-2.38 1.235-3.22c-.135-.303-.54-1.523.105-3.176c0 0 1.005-.322 3.3 1.23c.96-.267 1.98-.399 3-.405c1.02.006 2.04.138 3 .405c2.28-1.552 3.285-1.23 3.285-1.23c.645 1.653.24 2.873.12 3.176c.765.84 1.23 1.91 1.23 3.22c0 4.61-2.805 5.625-5.475 5.92c.42.36.81 1.096.81 2.22c0 1.606-.015 2.896-.015 3.286c0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12z"
+       id="path13" />
   </g>
-
   <!-- Search Icon -->
-  <g transform="translate(100, 0)">
-    <circle cx="8" cy="8" r="6" fill="none" stroke="#33a16f" stroke-width="2"/>
-    <line x1="12.5" y1="12.5" x2="17" y2="17" stroke="#33a16f" stroke-width="2"/>
+  <g
+     transform="translate(100, 0)"
+     id="g14"
+     inkscape:label="search">
+    <circle
+       cx="8"
+       cy="8"
+       r="6"
+       fill="none"
+       stroke="#33a16f"
+       stroke-width="2"
+       id="circle13" />
+    <line
+       x1="12.5"
+       y1="12.5"
+       x2="17"
+       y2="17"
+       stroke="#33a16f"
+       stroke-width="2"
+       id="line13" />
   </g>
-
   <!-- Close Icon (X) -->
-  <g transform="translate(124, 0)">
-    <line x1="6" y1="6" x2="14" y2="14" stroke="#33a16f" stroke-width="2"/>
-    <line x1="14" y1="6" x2="6" y2="14" stroke="#33a16f" stroke-width="2"/>
+  <g
+     transform="translate(124, 0)"
+     id="g15"
+     inkscape:label="close">
+    <line
+       x1="6"
+       y1="6"
+       x2="14"
+       y2="14"
+       stroke="#33a16f"
+       stroke-width="2"
+       id="line14" />
+    <line
+       x1="14"
+       y1="6"
+       x2="6"
+       y2="14"
+       stroke="#33a16f"
+       stroke-width="2"
+       id="line15" />
   </g>
-
   <!-- Plus Icon (+) -->
-  <g transform="translate(148, 0)">
-    <line x1="10" y1="4" x2="10" y2="16" stroke="#33a16f" stroke-width="2" stroke-linecap="round"/>
-    <line x1="4" y1="10" x2="16" y2="10" stroke="#33a16f" stroke-width="2" stroke-linecap="round"/>
+  <g
+     transform="translate(148, 0)"
+     id="g17"
+     inkscape:label="plus">
+    <line
+       x1="10"
+       y1="4"
+       x2="10"
+       y2="16"
+       stroke="#33a16f"
+       stroke-width="2"
+       stroke-linecap="round"
+       id="line16" />
+    <line
+       x1="4"
+       y1="10"
+       x2="16"
+       y2="10"
+       stroke="#33a16f"
+       stroke-width="2"
+       stroke-linecap="round"
+       id="line17" />
+  </g>
+  <g
+     id="g20"
+     inkscape:label="copy"
+     transform="translate(-1.0485365,1.6776585)">
+    <rect
+       style="fill:none;stroke:#000000;stroke-opacity:1;paint-order:markers fill stroke"
+       id="rect18"
+       width="10.295437"
+       height="13.014986"
+       x="171.17619"
+       y="3.263459"
+       ry="1.9091531" />
+    <path
+       id="rect18-7"
+       style="fill:none;stroke:#000000;stroke-opacity:1;paint-order:markers fill stroke"
+       d="m 173.6631,2.4204913 c -0.0375,-0.8885091 0.81863,-1.47673459 1.75607,-1.47673459 v 0 h 6.47713 c 1.05767,0 1.90916,0.85148229 1.90916,1.90915309 v 9.1966792 c 0,0.844637 -0.6237,1.598123 -1.34076,1.568745"
+       sodipodi:nodetypes="cscsssc" />
+  </g>
+  <g
+     id="g21"
+     inkscape:label="JSON">
+    <path
+       d="m 194.23505,17.022186 h -1.10758 q -1.32171,0 -2.14871,-0.738389 -0.81961,-0.731004 -0.81961,-2.119174 v -1.100198 q 0,-1.247878 -0.61286,-1.949346 -0.61287,-0.708853 -1.87551,-0.708853 H 187.2942 V 9.2543403 h 0.37658 q 1.26264,0 1.87551,-0.7014688 0.61286,-0.7088528 0.61286,-1.9567292 V 5.4959435 q 0,-1.3881701 0.81961,-2.1191746 0.827,-0.7383884 2.14871,-0.7383884 h 1.10758 v 1.0189759 h -0.84175 q -1.00422,0 -1.46202,0.4651848 -0.45041,0.4651846 -0.45041,1.4989284 v 1.2921796 q 0,1.0263599 -0.56856,1.7278289 -0.56857,0.6940852 -1.58015,1.1001982 v 0.177214 q 1.01158,0.4061127 1.58015,1.1075817 0.56856,0.694085 0.56856,1.720446 v 1.292179 q 0,1.033744 0.45041,1.498928 0.4578,0.465185 1.46202,0.465185 h 0.84175 z m 9.70242,-6.61596 h -0.37657 q -1.26265,0 -1.87551,0.708853 -0.61285,0.701468 -0.61285,1.949346 v 1.100198 q 0,1.38817 -0.827,2.119174 -0.81961,0.738389 -2.14133,0.738389 h -1.10758 V 16.00321 h 0.84176 q 1.0042,0 1.45463,-0.465185 0.4578,-0.465184 0.4578,-1.498928 v -1.292179 q 0,-1.026361 0.56855,-1.720446 0.56856,-0.701469 1.58016,-1.1075817 v -0.177214 q -1.0116,-0.406113 -1.58016,-1.1001982 -0.56855,-0.701469 -0.56855,-1.7278289 V 5.6214696 q 0,-1.0337438 -0.4578,-1.4989284 -0.45043,-0.4651848 -1.45463,-0.4651848 h -0.84176 V 2.6383805 h 1.10758 q 1.32172,0 2.14133,0.7383884 0.827,0.7310045 0.827,2.1191746 v 1.1001988 q 0,1.2478764 0.61285,1.9567292 0.61286,0.7014688 1.87551,0.7014688 h 0.37657 z"
+       id="text20"
+       style="fill:#000000;stroke-width:1.26018;paint-order:markers fill stroke"
+       inkscape:label="text20"
+       aria-label="{}" />
   </g>
 </svg>

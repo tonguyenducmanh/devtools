@@ -166,7 +166,7 @@
                     class="no-select td-top-right-btn"
                     :title="$t('i18nCommon.apiTesting.beautify')"
                   >
-                    <div @click="formatBody">{}</div>
+                    <div class="td-icon td-json-icon" @click="formatBody"></div>
                   </TDTooltip>
                 </div>
               </div>
@@ -200,12 +200,15 @@
                     :readOnly="true"
                     :wrapText="wrapText"
                   ></TDTextarea>
-                  <div
+                  <TDTooltip
                     class="no-select td-top-right-btn"
-                    @click="handleCopyResponse"
+                    :title="$t('i18nCommon.apiTesting.copyResponse')"
                   >
-                    {{ $t("i18nCommon.apiTesting.copyResponse") }}
-                  </div>
+                    <div
+                      class="td-icon td-copy-icon"
+                      @click="handleCopyResponse"
+                    ></div>
+                  </TDTooltip>
                 </div>
               </div>
             </div>
@@ -278,12 +281,15 @@
                   :readOnly="true"
                   :wrapText="wrapText"
                 ></TDTextarea>
-                <div
+                <TDTooltip
                   class="no-select td-top-right-btn"
-                  @click="handleCopyResponse"
+                  :title="$t('i18nCommon.apiTesting.copyResponse')"
                 >
-                  {{ $t("i18nCommon.apiTesting.copyResponse") }}
-                </div>
+                  <div
+                    class="td-icon td-copy-icon"
+                    @click="handleCopyResponse"
+                  ></div>
+                </TDTooltip>
               </div>
             </div>
           </div>
@@ -358,12 +364,15 @@
                   :readOnly="true"
                   :wrapText="wrapText"
                 ></TDTextarea>
-                <div
+                <TDTooltip
                   class="no-select td-top-right-btn"
-                  @click="handleCopyResponse"
+                  :title="$t('i18nCommon.apiTesting.copyResponse')"
                 >
-                  {{ $t("i18nCommon.apiTesting.copyResponse") }}
-                </div>
+                  <div
+                    class="td-icon td-copy-icon"
+                    @click="handleCopyResponse"
+                  ></div>
+                </TDTooltip>
               </div>
             </div>
           </div>
@@ -1527,7 +1536,6 @@ export default {
     position: absolute;
     top: 2px;
     right: 2px;
-    font-size: var(--font-size-small);
     border: 1px solid var(--bg-layer-color);
     padding: var(--padding);
     border-radius: var(--border-radius);
