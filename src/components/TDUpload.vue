@@ -1,7 +1,10 @@
 <template>
   <div
     class="td-upload"
-    :style="{ 'max-width': maxWidth, 'max-height': maxHeight }"
+    :style="{
+      'max-width': maxWidth,
+      ...borderRadiusStyle,
+    }"
     :class="{ 'td-upload-read-only': readOnly }"
   >
     <label
@@ -19,12 +22,8 @@
     </label>
     <div class="flex td-selected-group" v-if="isShowSelect">
       <template v-if="selectedFiles.length > 0">
-        <span
-          class="td-selected-item"
-          v-for="(file, index) in selectedFiles"
-          :key="index"
-        >
-          {{ file.name }} ({{ formatFileSize(file.size) }})
+        <span class="td-selected-item">
+          {{ getTitleFileSelected }}
         </span>
       </template>
       <span v-else-if="labelEmpty">{{ labelEmpty }}</span>
@@ -33,8 +32,12 @@
 </template>
 
 <script>
+import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
+
 export default {
   name: "TDUpload",
+  mixins: [TDStylePremitiveMixin],
+
   props: {
     readOnly: {
       type: Boolean,
@@ -60,15 +63,25 @@ export default {
       type: String,
       default: "100%",
     },
-    maxHeight: {
-      type: String,
-      default: "100%",
-    },
   },
   data() {
     return {
       selectedFiles: [],
     };
+  },
+  computed: {
+    getTitleFileSelected() {
+      let me = this;
+      let result = "";
+      if (me.selectedFiles && me.selectedFiles.length > 0) {
+        if (me.selectedFiles.length == 1) {
+          result = `${me.selectedFiles[0].name} (${me.formatFileSize(me.selectedFiles[0].size)})`;
+        } else {
+          result = `${me.$t("i18nCommon.fileSelected")}: ${me.selectedFiles.length}`;
+        }
+      }
+      return result;
+    },
   },
   methods: {
     handleFileSelect(event) {
@@ -115,7 +128,6 @@ export default {
   border: 1px solid var(--border-color);
   width: 100%;
   height: 100%;
-  padding: var(--padding);
   border-radius: var(--border-radius);
   background-color: var(--bg-main-color);
   color: var(--text-primary-color);

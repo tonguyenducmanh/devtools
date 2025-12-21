@@ -6,18 +6,19 @@
         {{ $t("i18nCommon.qrCodeToText.note") }}
       </div>
       <br />
-      <TDUpload
-        @dragover="handleDragOver"
-        @dragleave="handleDragLeave"
-        @drop="handleDrop"
-        ref="uploadArea"
-        class="upload-area"
-        maxHeight="60px"
-        :labelEmpty="$t('i18nCommon.qrCodeToText.dropZone.placeholder')"
-        :label="$t('i18nCommon.qrCodeToText.dropZone.label')"
-        multiple
-        @selected="convertQRCode"
-      ></TDUpload>
+      <div style="width: 100%">
+        <TDUpload
+          @dragover="handleDragOver"
+          @dragleave="handleDragLeave"
+          @drop="handleDrop"
+          ref="uploadArea"
+          class="upload-area"
+          :labelEmpty="$t('i18nCommon.qrCodeToText.dropZone.placeholder')"
+          :label="$t('i18nCommon.qrCodeToText.dropZone.label')"
+          multiple
+          @selected="convertQRCode"
+        ></TDUpload>
+      </div>
       <div class="flex button-generate">
         <TDButton
           @click="convertQRCode"

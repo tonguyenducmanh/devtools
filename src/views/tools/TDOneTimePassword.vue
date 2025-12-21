@@ -1,69 +1,89 @@
 <template>
   <div class="container">
-    <!-- <div class="title">
-      {{ $t("i18nCommon.oneTimePassword.title") }}
-    </div> -->
-    <div>
-      <TDRadioGroup
-        v-model="sourceOTPImport"
-        :label="$t('i18nCommon.oneTimePassword.sourceLabel')"
-        :options="radioImports"
-      />
-    </div>
     <div class="main-otp-container">
-      <div v-if="sourceOTPImport == 'googleqrcode'" class="flex">
-        <TDUpload
-          @dragover="handleDragOver"
-          @dragleave="handleDragLeave"
-          @drop="handleDrop"
-          @selected="convertQRCode"
-          ref="uploadArea"
-          class="upload-area"
-          maxHeight="200px"
-          :labelEmpty="$t('i18nCommon.oneTimePassword.dropZone.placeholder')"
-          :label="$t('i18nCommon.oneTimePassword.dropZone.label')"
-          multiple
-        ></TDUpload>
-        <div>
+      <div class="flex">
+        <TDComboBox
+          :width="120"
+          :noMargin="true"
+          v-model="sourceOTPImport"
+          :options="radioImports"
+          :borderRadiusPosition="[
+            $tdEnum.BorderRadiusPosition.TopLeft,
+            $tdEnum.BorderRadiusPosition.BottomLeft,
+          ]"
+        />
+        <div v-if="sourceOTPImport == 'googleqrcode'" class="flex flex-one">
+          <TDUpload
+            :noMargin="true"
+            @dragover="handleDragOver"
+            @dragleave="handleDragLeave"
+            @drop="handleDrop"
+            @selected="convertQRCode"
+            ref="uploadArea"
+            class="upload-area"
+            maxHeight="200px"
+            :labelEmpty="$t('i18nCommon.oneTimePassword.dropZone.placeholder')"
+            :label="$t('i18nCommon.oneTimePassword.dropZone.label')"
+            multiple
+            :borderRadiusPosition="[
+              $tdEnum.BorderRadiusPosition.TopRight,
+              $tdEnum.BorderRadiusPosition.BottomRight,
+            ]"
+          ></TDUpload>
+          <div>
+            <TDButton
+              :type="$tdEnum.buttonType.secondary"
+              :label="$t('i18nCommon.oneTimePassword.auth.add')"
+              @click="decodeGoogleAuth"
+            />
+          </div>
+        </div>
+        <div v-if="sourceOTPImport == 'google'" class="flex flex-one">
+          <TDInput
+            :noMargin="true"
+            v-model="migrationURL"
+            :placeHolder="$t('i18nCommon.oneTimePassword.urlPlaceholder')"
+            :borderRadiusPosition="[
+              $tdEnum.BorderRadiusPosition.TopRight,
+              $tdEnum.BorderRadiusPosition.BottomRight,
+            ]"
+          />
+          <div>
+            <TDButton
+              :type="$tdEnum.buttonType.secondary"
+              :label="$t('i18nCommon.oneTimePassword.auth.add')"
+              :readOnly="!migrationURL"
+              @click="decodeGoogleAuth"
+            />
+          </div>
+        </div>
+        <div v-if="sourceOTPImport == 'manual'" class="flex flex-one">
+          <TDInput
+            :noMargin="true"
+            :borderRadiusPosition="[
+              $tdEnum.BorderRadiusPosition.TopRight,
+              $tdEnum.BorderRadiusPosition.BottomRight,
+            ]"
+            v-model="addNewObject.issuer"
+            :placeHolder="$t('i18nCommon.oneTimePassword.inputs.issuer')"
+          />
+          <TDInput
+            v-model="addNewObject.name"
+            :placeHolder="$t('i18nCommon.oneTimePassword.inputs.name')"
+          />
+          <TDInput
+            v-model="addNewObject.secret"
+            :placeHolder="$t('i18nCommon.oneTimePassword.inputs.secret')"
+          />
           <TDButton
+            :type="$tdEnum.buttonType.secondary"
+            :readOnly="
+              !addNewObject || !addNewObject.name || !addNewObject.secret
+            "
             :label="$t('i18nCommon.oneTimePassword.auth.add')"
-            @click="decodeGoogleAuth"
+            @click="addNewTOTP"
           />
         </div>
-      </div>
-      <div v-if="sourceOTPImport == 'google'" class="flex">
-        <TDInput
-          v-model="migrationURL"
-          :placeHolder="$t('i18nCommon.oneTimePassword.urlPlaceholder')"
-        />
-        <div>
-          <TDButton
-            :label="$t('i18nCommon.oneTimePassword.auth.add')"
-            :readOnly="!migrationURL"
-            @click="decodeGoogleAuth"
-          />
-        </div>
-      </div>
-      <div v-if="sourceOTPImport == 'manual'" class="flex">
-        <TDInput
-          v-model="addNewObject.issuer"
-          :placeHolder="$t('i18nCommon.oneTimePassword.inputs.issuer')"
-        />
-        <TDInput
-          v-model="addNewObject.name"
-          :placeHolder="$t('i18nCommon.oneTimePassword.inputs.name')"
-        />
-        <TDInput
-          v-model="addNewObject.secret"
-          :placeHolder="$t('i18nCommon.oneTimePassword.inputs.secret')"
-        />
-        <TDButton
-          :readOnly="
-            !addNewObject || !addNewObject.name || !addNewObject.secret
-          "
-          :label="$t('i18nCommon.oneTimePassword.auth.add')"
-          @click="addNewTOTP"
-        />
       </div>
       <div class="flex">
         <TDInput
@@ -82,6 +102,7 @@
           @click="openAuthenSaved"
         />
         <TDButton
+          :type="$tdEnum.buttonType.secondary"
           :label="$t('i18nCommon.oneTimePassword.auth.save')"
           :readOnly="!password || !username"
           @click="saveAuthen"
@@ -668,8 +689,5 @@ export default {
       }
     }
   }
-}
-.upload-area {
-  margin-left: var(--padding);
 }
 </style>

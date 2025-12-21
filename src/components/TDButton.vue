@@ -8,6 +8,7 @@
       'td-button-no-margin': noMargin,
     }"
     :disabled="readOnly"
+    :style="borderRadiusStyle"
   >
     {{ label.capitalize() }}
   </button>
@@ -15,9 +16,11 @@
 
 <script>
 import tdEnum from "@/common/TDEnum.js";
+import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
 
 export default {
   name: "TDButton",
+  mixins: [TDStylePremitiveMixin],
   created() {
     let me = this;
     me.debouncedFunc = me.$tdUtility.debounce((e) => {
@@ -76,7 +79,7 @@ export default {
   justify-content: center;
   width: fit-content;
   height: 35px;
-  padding: var(--padding-x-medium) var(--padding-large);
+  padding: var(--padding) var(--padding-x-medium);
   margin: var(--padding);
   background-color: var(--btn-color);
   color: white;

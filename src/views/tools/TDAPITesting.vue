@@ -496,18 +496,28 @@
             </div>
           </div>
         </div>
-        <div class="flex flex-col">
-          <TDButton
-            :readOnly="isLoading || !requestName"
-            @click="saveRequest"
-            :type="$tdEnum.buttonType.secondary"
-            :label="$t('i18nCommon.apiTesting.save')"
-          ></TDButton>
+        <div class="flex">
           <TDButton
             :readOnly="isLoading"
             @click="createNewRequest"
             :type="$tdEnum.buttonType.secondary"
+            :noMargin="true"
             :label="$t('i18nCommon.apiTesting.createNewRequest')"
+            :borderRadiusPosition="[
+              $tdEnum.BorderRadiusPosition.TopLeft,
+              $tdEnum.BorderRadiusPosition.BottomLeft,
+            ]"
+          ></TDButton>
+          <TDButton
+            :readOnly="isLoading || !requestName"
+            @click="saveRequest"
+            :type="$tdEnum.buttonType.secondary"
+            :noMargin="true"
+            :label="$t('i18nCommon.apiTesting.save')"
+            :borderRadiusPosition="[
+              $tdEnum.BorderRadiusPosition.TopRight,
+              $tdEnum.BorderRadiusPosition.BottomRight,
+            ]"
           ></TDButton>
         </div>
       </div>

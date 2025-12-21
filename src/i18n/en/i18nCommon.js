@@ -8,6 +8,7 @@ export default {
     },
     deleteAll: "Delete all history",
     uploadFile: "Upload file",
+    fileSelected: "Total files selected",
     createbyAuthor: "Created by tdmanh with luv.",
     welcomeTextOne: "The",
     welcomeTextTwo: "Essential",
@@ -216,9 +217,9 @@ export default {
       title: "Time-based (TOTP) and HMAC-based (HOTP) One-Time Password!",
       sourceLabel: "Data source",
       importOptions: {
-        googleQR: "Google authenticator QR code",
-        google: "Google authenticator",
-        manual: "Manual input",
+        googleQR: "QR authen",
+        google: "Text auth",
+        manual: "Manual",
       },
       dropZone: {
         label: "Select QR code image",

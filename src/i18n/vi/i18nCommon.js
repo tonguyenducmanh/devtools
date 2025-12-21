@@ -8,6 +8,7 @@ export default {
     },
     deleteAll: "Xóa tất cả lịch sử",
     uploadFile: "Tải lên tệp",
+    fileSelected: "Tổng số file đã chọn",
     createbyAuthor: "Được tạo ra bởi tdmanh.",
     welcomeTextOne: "Bộ công cụ",
     welcomeTextTwo: "thiết yếu",
@@ -215,8 +216,8 @@ export default {
       title: "Mật khẩu một lần theo thời gian (TOTP) và theo HMAC (HOTP)!",
       sourceLabel: "Nguồn dữ liệu",
       importOptions: {
-        googleQR: "Mã QR Google authenticator",
-        google: "Google authenticator",
+        googleQR: "QR authen",
+        google: "Text auth",
         manual: "Tự nhập",
       },
       dropZone: {
