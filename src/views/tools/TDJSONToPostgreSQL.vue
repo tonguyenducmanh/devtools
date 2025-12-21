@@ -56,12 +56,18 @@
           isLabelTop
           :label="$t('i18nCommon.jsonToPostgreSQL.outputLabel')"
           :readOnly="true"
+          :enableHighlight="enableHighlight"
+          language="sql"
           :placeHolder="$t('i18nCommon.jsonToPostgreSQL.outputPlaceholder')"
           v-model="outputSQL"
         ></TDTextarea>
       </template>
     </div>
     <div class="flex">
+      <TDCheckbox
+        v-model="enableHighlight"
+        :label="$t('i18nCommon.enableHighlight')"
+      ></TDCheckbox>
       <TDCheckbox
         v-model="enableFileUpload"
         :label="$t('i18nCommon.jsonToPostgreSQL.useFileUpload')"
@@ -374,6 +380,7 @@ export default {
   },
   data() {
     return {
+      enableHighlight: true,
       STRING_JOIN: ", ",
       STRING_JOIN_BREAKLINE: ";\n",
       NULL_VALUE: "null",

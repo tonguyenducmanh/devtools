@@ -9,6 +9,7 @@ export default {
     deleteAll: "Xóa tất cả lịch sử",
     uploadFile: "Tải lên tệp",
     fileSelected: "Tổng số file đã chọn",
+    enableHighlight: "Highlight code",
     createbyAuthor: "Được tạo ra bởi tdmanh.",
     welcomeTextOne: "Bộ công cụ",
     welcomeTextTwo: "thiết yếu",

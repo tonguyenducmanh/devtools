@@ -186,7 +186,7 @@
                     :isLabelTop="true"
                     v-model="bodyText"
                     :wrapText="wrapText"
-                    :enableHighlight="true"
+                    :enableHighlight="enableHighlight"
                     language="json"
                     :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
                   ></TDTextarea>
@@ -222,7 +222,7 @@
                   <TDTextarea
                     :isLabelTop="true"
                     :modelValue="responseText"
-                    :enableHighlight="true"
+                    :enableHighlight="enableHighlight"
                     language="json"
                     :placeHolder="
                       $t('i18nCommon.apiTesting.responsePlaceholder')
@@ -280,7 +280,7 @@
                 :isLabelTop="true"
                 v-model="curlContent"
                 :wrapText="wrapText"
-                :enableHighlight="true"
+                :enableHighlight="enableHighlight"
                 language="language-bash"
                 :placeHolder="$t('i18nCommon.apiTesting.contentCURLExecute')"
               ></TDTextarea>
@@ -309,7 +309,7 @@
                 <TDTextarea
                   :isLabelTop="true"
                   :modelValue="responseText"
-                  :enableHighlight="true"
+                  :enableHighlight="enableHighlight"
                   language="json"
                   :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
                   :readOnly="true"
@@ -363,7 +363,7 @@
                 :isLabelTop="true"
                 v-model="proModeSecranioCode"
                 :wrapText="wrapText"
-                :enableHighlight="true"
+                :enableHighlight="enableHighlight"
                 :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
               ></TDTextarea>
             </div>
@@ -395,7 +395,7 @@
                 <TDTextarea
                   :isLabelTop="true"
                   :modelValue="responseText"
-                  :enableHighlight="true"
+                  :enableHighlight="enableHighlight"
                   language="json"
                   :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
                   :readOnly="true"
@@ -594,6 +594,7 @@ export default {
 
   data() {
     return {
+      enableHighlight: true,
       isShowSidebar: true,
       apiUrl: "",
       requestName: "",

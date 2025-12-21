@@ -9,6 +9,7 @@ export default {
     deleteAll: "Delete all history",
     uploadFile: "Upload file",
     fileSelected: "Total files selected",
+    enableHighlight: "Highlight code",
     createbyAuthor: "Created by tdmanh with luv.",
     welcomeTextOne: "The",
     welcomeTextTwo: "Essential",
