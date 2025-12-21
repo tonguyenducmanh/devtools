@@ -280,6 +280,8 @@
                 :isLabelTop="true"
                 v-model="curlContent"
                 :wrapText="wrapText"
+                :enableHighlight="true"
+                language="language-bash"
                 :placeHolder="$t('i18nCommon.apiTesting.contentCURLExecute')"
               ></TDTextarea>
             </div>
