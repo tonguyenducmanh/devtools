@@ -3,7 +3,7 @@ export default {
     typeInput: "Type value",
     history: {
       title: "History",
-      show: "Show History",
+      show: "History",
       hide: "Hide History",
     },
     tdheader: {
@@ -304,9 +304,9 @@ export default {
       send: "Send",
       clear: "Clear All",
       copyResponse: "Copy",
-      copyCURL: "Copy CURL",
+      copyCURL: "Copy",
       CURL: "CURL",
-      importCURL: "Import CURL",
+      importCURL: "Import",
       extensionNotAvailable: "Extension helper not installed",
       downloadExtension: "Download Agent",
       toolTipDownloadExtension:

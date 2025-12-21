@@ -3,7 +3,7 @@ export default {
     typeInput: "Nhập giá trị",
     history: {
       title: "Lịch sử",
-      show: "Xem lịch sử",
+      show: "Lịch sử",
       hide: "Ẩn lịch sử",
     },
     tdheader: {
@@ -303,9 +303,9 @@ export default {
       send: "Gửi",
       clear: "Xóa tất cả",
       copyResponse: "Sao chép",
-      copyCURL: "Sao chép CURL",
+      copyCURL: "Sao chép",
       CURL: "CURL",
-      importCURL: "Nhập CURL",
+      importCURL: "Nhập",
       extensionNotAvailable: "Extension helper chưa được cài đặt",
       downloadExtension: "Tải Agent",
       toolTipDownloadExtension:
