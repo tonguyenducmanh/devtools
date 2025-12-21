@@ -6,6 +6,11 @@ export default {
       show: "Show History",
       hide: "Hide History",
     },
+    tdheader: {
+      toggleTheme: "Change theme",
+      changeLanguage: "Change language",
+      goToSource: "Source code",
+    },
     deleteAll: "Delete all history",
     uploadFile: "Upload file",
     fileSelected: "Total files selected",

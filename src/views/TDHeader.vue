@@ -90,46 +90,54 @@
     <div>
       <div class="td-header-btn">
         <!-- Updated Dark Mode Toggle -->
-        <button
-          class="td-theme-toggle-switch"
-          @click="toggleTheme"
-          :class="{ 'td-switch-dark': isDarkTheme }"
+        <TDTooltip
+          :title="$t('i18nCommon.tdheader.toggleTheme')"
+          class="flex flex-col"
         >
-          <div class="td-switch-track">
-            <div class="td-switch-thumb">
-              <svg
-                class="td-theme-icon td-sun-icon"
-                :class="{ 'td-icon-visible': !isDarkTheme }"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                stroke="none"
-              >
-                <circle cx="12" cy="12" r="5" />
-                <path
-                  d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
-                />
-              </svg>
-              <svg
-                class="td-theme-icon td-moon-icon"
-                :class="{ 'td-icon-visible': isDarkTheme }"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                stroke="none"
-              >
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
+          <button
+            class="td-theme-toggle-switch"
+            @click="toggleTheme"
+            :class="{ 'td-switch-dark': isDarkTheme }"
+          >
+            <div class="td-switch-track">
+              <div class="td-switch-thumb">
+                <svg
+                  class="td-theme-icon td-sun-icon"
+                  :class="{ 'td-icon-visible': !isDarkTheme }"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="none"
+                >
+                  <circle cx="12" cy="12" r="5" />
+                  <path
+                    d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+                  />
+                </svg>
+                <svg
+                  class="td-theme-icon td-moon-icon"
+                  :class="{ 'td-icon-visible': isDarkTheme }"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke="none"
+                >
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              </div>
             </div>
+          </button>
+        </TDTooltip>
+        <TDTooltip :title="$t('i18nCommon.tdheader.changeLanguage')">
+          <div class="noselect language-session" @click="changeLanguage">
+            {{ currentLanguage }}
           </div>
-        </button>
-
-        <div class="noselect language-session" @click="changeLanguage">
-          {{ currentLanguage }}
-        </div>
-        <div class="td-icon tg-github" @click="goToSource"></div>
+        </TDTooltip>
+        <TDTooltip :title="$t('i18nCommon.tdheader.goToSource')">
+          <div class="td-icon tg-github" @click="goToSource"></div>
+        </TDTooltip>
       </div>
     </div>
   </div>

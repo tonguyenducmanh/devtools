@@ -7,6 +7,7 @@
           :noMargin="true"
           v-model="sourceOTPImport"
           :options="radioImports"
+          class="td-source-otp"
           :borderRadiusPosition="[
             $tdEnum.BorderRadiusPosition.TopLeft,
             $tdEnum.BorderRadiusPosition.BottomLeft,
@@ -689,5 +690,8 @@ export default {
       }
     }
   }
+}
+.td-source-otp{
+  margin-left: var(--padding);
 }
 </style>

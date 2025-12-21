@@ -6,6 +6,11 @@ export default {
       show: "Xem lịch sử",
       hide: "Ẩn lịch sử",
     },
+    tdheader: {
+      toggleTheme: "Thay đổi chủ đề",
+      changeLanguage: "Thay đổi ngôn ngữ",
+      goToSource: "Source code",
+    },
     deleteAll: "Xóa tất cả lịch sử",
     uploadFile: "Tải lên tệp",
     fileSelected: "Tổng số file đã chọn",
