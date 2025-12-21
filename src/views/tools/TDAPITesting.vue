@@ -1616,16 +1616,4 @@ export default {
     color: var(--focus-color);
   }
 }
-body[data-theme="dark"] {
-  .td-top-right-btn:hover {
-    cursor: pointer;
-    background-color: var(--bg-layer-color);
-  }
-  .td-top-right-btn {
-    border: 1px solid var(--bg-main-color);
-  }
-  .td-top-right-btn div {
-    filter: invert(100);
-  }
-}
 </style>
