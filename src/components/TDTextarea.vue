@@ -7,7 +7,10 @@
     <div class="td-label" :class="{ 'td-label-top': isLabelTop }" v-if="label">
       {{ label.capitalize() }}
     </div>
-    <div class="textarea-wrapper">
+    <div
+      class="textarea-wrapper"
+      :class="{ 'td-textarea-hightlight-wrap-text': wrapText }"
+    >
       <!-- Highlighted code overlay -->
       <pre
         v-if="enableHighlight"
@@ -313,5 +316,12 @@ export default {
 .td-textarea-read-only textarea {
   background-color: var(--bg-layer-color);
   border: 1px solid transparent;
+}
+.td-textarea-hightlight-wrap-text {
+  pre[class*="language-"],
+  code[class*="language-"] {
+    white-space: pre-wrap; /* This will do the word wrapping */
+    word-wrap: break-word; /* Ensures long words also break */
+  }
 }
 </style>
