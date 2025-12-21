@@ -77,6 +77,10 @@ export default {
       type: Number,
       default: 100,
     },
+    customStyle: {
+      type: Object,
+      default: null,
+    },
   },
   emits: ["update:modelValue", "selected"],
   data() {
@@ -100,6 +104,9 @@ export default {
           "min-width": `${me.width}px`,
         };
         Object.assign(styleDynamicCombo, currentSettingBorder);
+      }
+      if (me.customStyle) {
+        Object.assign(styleDynamicCombo, me.customStyle);
       }
       return styleDynamicCombo;
     },

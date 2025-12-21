@@ -3,6 +3,7 @@
     class="td-combobox-option"
     :class="{ selected, disabled: option.disabled }"
     @click="handleSelect"
+    :style="option.customStyle"
   >
     <slot>{{ option.label.capitalize() }}</slot>
   </div>

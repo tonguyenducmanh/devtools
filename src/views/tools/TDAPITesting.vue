@@ -111,6 +111,7 @@
                   :width="120"
                   v-model="httpMethod"
                   :options="methodOptions"
+                  :customStyle="customStyleComboMethodAPI"
                   :noMargin="true"
                   :borderRadiusPosition="[
                     $tdEnum.BorderRadiusPosition.TopLeft,
@@ -602,13 +603,17 @@ export default {
       isSaveRequestToCollectionModelOpen: false,
       searchQuery: "",
       methodOptions: [
-        { value: "GET", label: "GET" },
-        { value: "POST", label: "POST" },
-        { value: "PUT", label: "PUT" },
-        { value: "PATCH", label: "PATCH" },
-        { value: "DELETE", label: "DELETE" },
-        { value: "HEAD", label: "HEAD" },
-        { value: "OPTIONS", label: "OPTIONS" },
+        { value: "GET", label: "GET", customStyle: { color: "#5EA572" } },
+        { value: "POST", label: "POST", customStyle: { color: "#AE7D0D" } },
+        { value: "PUT", label: "PUT", customStyle: { color: "#3676C7" } },
+        { value: "PATCH", label: "PATCH", customStyle: { color: "#825DAC" } },
+        { value: "DELETE", label: "DELETE", customStyle: { color: "#A64C43" } },
+        { value: "HEAD", label: "HEAD", customStyle: { color: "#459B60" } },
+        {
+          value: "OPTIONS",
+          label: "OPTIONS",
+          customStyle: { color: "#C25E95" },
+        },
       ],
       currentAPIInfoOption: 2,
       APIInfoOptions: [
@@ -721,6 +726,15 @@ export default {
           return collectionName.includes(query);
         })
         .slice(0, 8); // Giới hạn 8 kết quả
+    },
+    customStyleComboMethodAPI() {
+      let me = this;
+      let style = me.methodOptions.find((x) => x.value == me.httpMethod);
+      if (style) {
+        return style.customStyle;
+      } else {
+        return null;
+      }
     },
   },
   beforeUnmount() {
@@ -1298,7 +1312,7 @@ export default {
   position: relative;
   margin-left: var(--padding);
   .td-sub-sidebar-content {
-    width: 250px;
+    width: 300px;
     height: 100%;
     position: relative;
     padding-left: var(--padding);
@@ -1561,7 +1575,7 @@ export default {
   filter: unset;
 }
 .text-nowrap {
-  max-width: 170px;
+  max-width: 250px;
 }
 .td-text-area-wrap {
   position: relative;
