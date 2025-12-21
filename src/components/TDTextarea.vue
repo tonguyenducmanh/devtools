@@ -45,7 +45,6 @@
 <script>
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
 import Prism from "prismjs";
-import "prismjs/themes/prism-tomorrow.css"; // Có thể thay đổi theme
 
 // Import các ngôn ngữ bạn cần
 import "prismjs/components/prism-javascript";
@@ -60,7 +59,15 @@ export default {
   name: "TDTextarea",
   mixins: [TDStylePremitiveMixin],
 
-  created() {},
+  async created() {
+    let me = this;
+    let currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
+    if (currentTheme == me.$tdEnum.theme.dark) {
+      await import("prismjs/themes/prism-tomorrow.css");
+    } else {
+      await import("prismjs/themes/prism.css");
+    }
+  },
   mounted() {
     if (this.enableHighlight) {
       this.updateHighlight();

@@ -331,6 +331,9 @@ class TDUtility {
   isElectronApp() {
     return window && window.__electron && window.__electron.isElectron;
   }
+  reloadApp() {
+    window.location.reload();
+  }
 }
 
 export default new TDUtility();

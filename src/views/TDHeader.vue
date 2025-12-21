@@ -216,6 +216,7 @@ export default {
       await me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
       me.$tdUtility.setTheme(currentTheme);
       this.$tdEventBus.emit(this.$tdEnum.eventGlobal.changeTheme, currentTheme);
+      me.$tdUtility.reloadApp();
     },
 
     goToSource() {
