@@ -253,7 +253,7 @@ export default {
     height: 100%;
     margin: 0;
     padding: var(--padding);
-    border: 1px solid transparent;
+    border: 1px solid var(--border-color);
     background-color: var(--bg-main-color);
     overflow: auto;
     pointer-events: none;
@@ -316,6 +316,12 @@ export default {
 .td-textarea-read-only textarea {
   background-color: var(--bg-layer-color);
   border: 1px solid transparent;
+}
+.td-textarea-read-only {
+  .highlight-layer {
+    background-color: var(--bg-layer-color);
+    border: 1px solid transparent;
+  }
 }
 .td-textarea-hightlight-wrap-text {
   pre[class*="language-"],

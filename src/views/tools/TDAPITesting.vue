@@ -1318,6 +1318,7 @@ export default {
   height: 100%;
   background-color: var(--bg-layer-color);
   border: 1px solid transparent;
+  border-radius: var(--border-radius);
 }
 .loader-without-response {
   margin-left: 100px;
