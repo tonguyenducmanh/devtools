@@ -444,7 +444,10 @@
                     :arrowOpenDirection="$tdEnum.Direction.bottom"
                     :arrowDirection="$tdEnum.Direction.right"
                   />
-                  <TDTooltip class="text-nowrap" :title="collection.name">
+                  <TDTooltip
+                    class="text-nowrap text-nowrap-collection"
+                    :title="collection.name"
+                  >
                     <div>
                       {{ collection.name }}
                     </div>
@@ -1573,6 +1576,9 @@ export default {
 }
 .td-close-icon:hover {
   filter: unset;
+}
+.text-nowrap-collection {
+  max-width: 225px !important;
 }
 .text-nowrap {
   max-width: 250px;
