@@ -41,9 +41,12 @@
 <script>
 import TDComboBoxOption from "./TDComboBoxOption.vue";
 import TDArrow from "./TDArrow.vue";
+import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
 export default {
   name: "TDComboBox",
   components: { TDComboBoxOption, TDArrow },
+  mixins: [TDStylePremitiveMixin],
+
   props: {
     label: {
       type: String,
@@ -90,11 +93,13 @@ export default {
       let me = this;
       let styleDynamicCombo = null;
       if (me.width) {
+        let currentSettingBorder = me.borderRadiusStyle;
         styleDynamicCombo = {
           width: `${me.width}px`,
           "max-width": `${me.width}px`,
           "min-width": `${me.width}px`,
         };
+        Object.assign(styleDynamicCombo, currentSettingBorder);
       }
       return styleDynamicCombo;
     },
@@ -140,7 +145,6 @@ export default {
       align-items: center;
       padding: var(--padding);
       border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
       cursor: pointer;
       background: var(--bg-main-color);
 

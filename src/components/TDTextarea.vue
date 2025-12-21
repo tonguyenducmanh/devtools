@@ -11,6 +11,7 @@
       :placeholder="placeHolder || $t('i18nCommon.typeInput')"
       :value="modelValue"
       :disabled="readOnly"
+      :style="borderRadiusStyle"
       @input="changeInputValue"
       @dragover="handleDragOver"
       @dragleave="handleDragLeave"
@@ -29,8 +30,12 @@
 </template>
 
 <script>
+import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
+
 export default {
   name: "TDTextarea",
+  mixins: [TDStylePremitiveMixin],
+
   created() {},
   mounted() {},
   methods: {},

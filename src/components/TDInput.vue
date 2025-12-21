@@ -18,6 +18,7 @@
       spellcheck="false"
       :type="inputType"
       :name="inputId"
+      :style="borderRadiusStyle"
       autocomplete="off"
     />
     <slot></slot>
@@ -25,8 +26,12 @@
 </template>
 
 <script>
+import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
+
 export default {
   name: "TDInput",
+  mixins: [TDStylePremitiveMixin],
+
   created() {},
   mounted() {},
   methods: {},
@@ -101,7 +106,6 @@ export default {
     border: 1px solid var(--border-color);
     width: 100%;
     padding: var(--padding);
-    border-radius: var(--border-radius);
     background-color: var(--bg-main-color);
     color: var(--text-primary-color);
     font-size: var(--font-size-medium);

@@ -53,7 +53,7 @@ body[data-theme="light"] {
   --bg-hover-color: unset;
   --text-color: #4b5563;
   --text-primary-color: rgb(0, 0, 0);
-  --text-secondary-color: rgb(33, 33, 33);
+  --text-secondary-color: rgb(93, 93, 93);
   --text-tertiary-color: rgb(44, 34, 34);
   --border-color: #e6e7eb;
   --focus-color: #33a16f;
@@ -252,4 +252,8 @@ html[data-theme="dark"] {
   white-space: nowrap; /* không xuống dòng */
   overflow: hidden; /* ẩn phần dư */
   text-overflow: ellipsis; /* hiện ... */
+}
+
+.flex-one {
+  flex: 1;
 }

@@ -2,19 +2,29 @@
   <div class="flex td-api-container">
     <div class="flex flex-col td-api-testing">
       <div class="flex td-api-header-group">
-        <TDComboBox
-          :width="120"
-          v-model="currentAPIMode"
-          :options="APIModeOptions"
-          :noMargin="true"
-          :readOnly="isLoading"
-          @selected="handleSelectedAPIMode"
-        />
-        <TDInput
-          v-model="requestName"
-          :noMargin="true"
-          :placeHolder="$t('i18nCommon.apiTesting.requestName')"
-        ></TDInput>
+        <div class="flex flex-one">
+          <TDComboBox
+            :width="120"
+            v-model="currentAPIMode"
+            :options="APIModeOptions"
+            :noMargin="true"
+            :readOnly="isLoading"
+            @selected="handleSelectedAPIMode"
+            :borderRadiusPosition="[
+              $tdEnum.BorderRadiusPosition.TopLeft,
+              $tdEnum.BorderRadiusPosition.BottomLeft,
+            ]"
+          />
+          <TDInput
+            v-model="requestName"
+            :noMargin="true"
+            :placeHolder="$t('i18nCommon.apiTesting.requestName')"
+            :borderRadiusPosition="[
+              $tdEnum.BorderRadiusPosition.TopRight,
+              $tdEnum.BorderRadiusPosition.BottomRight,
+            ]"
+          ></TDInput>
+        </div>
 
         <TDButton
           v-if="isLoading"
@@ -96,16 +106,26 @@
         <template v-else>
           <div class="td-api-content">
             <div class="flex td-api-info-btn">
-              <TDComboBox
-                v-model="httpMethod"
-                :options="methodOptions"
-                :noMargin="true"
-              />
-              <TDInput
-                v-model="apiUrl"
-                :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
-                :noMargin="true"
-              ></TDInput>
+              <div class="flex flex-one">
+                <TDComboBox
+                  v-model="httpMethod"
+                  :options="methodOptions"
+                  :noMargin="true"
+                  :borderRadiusPosition="[
+                    $tdEnum.BorderRadiusPosition.TopLeft,
+                    $tdEnum.BorderRadiusPosition.BottomLeft,
+                  ]"
+                />
+                <TDInput
+                  v-model="apiUrl"
+                  :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
+                  :noMargin="true"
+                  :borderRadiusPosition="[
+                    $tdEnum.BorderRadiusPosition.TopRight,
+                    $tdEnum.BorderRadiusPosition.BottomRight,
+                  ]"
+                ></TDInput>
+              </div>
               <TDButton
                 @click="openFormImportCURL"
                 :type="$tdEnum.buttonType.secondary"

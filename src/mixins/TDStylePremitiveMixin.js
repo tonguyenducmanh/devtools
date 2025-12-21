@@ -1,6 +1,19 @@
 import tdEnum from "@/common/TDEnum.js";
 
 export default {
+  props: {
+    borderRadiusPosition: {
+      type: Array,
+      default: null,
+    },
+  },
+  computed: {
+    borderRadiusStyle() {
+      let me = this;
+      let style = me.getBorderRadius(me.borderRadiusPosition);
+      return style;
+    },
+  },
   methods: {
     /**
      * set style động cho position absolute
@@ -77,6 +90,58 @@ export default {
         }
       }
       return style;
+    },
+    /**
+     * set style động cho border radius
+     * @param {*} styleEnums các góc border muốn cấu hình
+     * @returns style border radius
+     */
+    getBorderRadius(styleEnums) {
+      let me = this;
+      let styleBorder = "var(--border-radius)";
+      let style = {
+        "border-radius": styleBorder,
+      };
+
+      let allPostions = tdEnum.BorderRadiusPosition;
+      if (styleEnums && styleEnums.length > 0 && allPostions) {
+        let allStyles = [];
+        me.setStyleForCurrentBorder(
+          styleEnums,
+          tdEnum.BorderRadiusPosition.TopLeft,
+          allStyles
+        );
+        me.setStyleForCurrentBorder(
+          styleEnums,
+          tdEnum.BorderRadiusPosition.TopRight,
+          allStyles
+        );
+        me.setStyleForCurrentBorder(
+          styleEnums,
+          tdEnum.BorderRadiusPosition.BottomRight,
+          allStyles
+        );
+        me.setStyleForCurrentBorder(
+          styleEnums,
+          tdEnum.BorderRadiusPosition.BottomLeft,
+          allStyles
+        );
+
+        if (allStyles && allStyles.length == 4) {
+          style = {
+            "border-radius": allStyles.join(" "),
+          };
+        }
+      }
+      return style;
+    },
+    setStyleForCurrentBorder(styleEnums, currentBorder, allStyles) {
+      let styleBorder = "var(--border-radius)";
+      if (styleEnums.includes(currentBorder)) {
+        allStyles.push(styleBorder);
+      } else {
+        allStyles.push("0");
+      }
     },
   },
 };

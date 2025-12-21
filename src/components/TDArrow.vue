@@ -78,7 +78,7 @@ export default {
   .td-arrow {
     width: 12px;
     height: 12px;
-    color: var(--border-color);
+    color: var(--text-primary-color);
   }
   .td-arrow:hover {
     color: var(--btn-color);

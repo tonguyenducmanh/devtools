@@ -81,6 +81,12 @@ class TDEnum {
     Bottom100Left: 8,
     Bottom100Right: 9,
   };
+  BorderRadiusPosition = {
+    TopLeft: 1,
+    TopRight: 2,
+    BottomLeft: 3,
+    BottomRight: 4,
+  };
 }
 
 export default new TDEnum();
