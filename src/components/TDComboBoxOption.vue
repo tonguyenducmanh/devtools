@@ -40,8 +40,7 @@ export default {
   }
 
   &.selected {
-    background: var(--btn-color);
-    color: #fff;
+    background: var(--bg-layer-color);
   }
 
   &.disabled {
