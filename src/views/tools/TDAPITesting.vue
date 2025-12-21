@@ -186,6 +186,8 @@
                     :isLabelTop="true"
                     v-model="bodyText"
                     :wrapText="wrapText"
+                    :enableHighlight="true"
+                    language="json"
                     :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
                   ></TDTextarea>
                   <TDTooltip
@@ -220,6 +222,8 @@
                   <TDTextarea
                     :isLabelTop="true"
                     :modelValue="responseText"
+                    :enableHighlight="true"
+                    language="json"
                     :placeHolder="
                       $t('i18nCommon.apiTesting.responsePlaceholder')
                     "
@@ -303,6 +307,8 @@
                 <TDTextarea
                   :isLabelTop="true"
                   :modelValue="responseText"
+                  :enableHighlight="true"
+                  language="json"
                   :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
                   :readOnly="true"
                   :wrapText="wrapText"
@@ -355,6 +361,7 @@
                 :isLabelTop="true"
                 v-model="proModeSecranioCode"
                 :wrapText="wrapText"
+                :enableHighlight="true"
                 :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
               ></TDTextarea>
             </div>
@@ -386,6 +393,8 @@
                 <TDTextarea
                   :isLabelTop="true"
                   :modelValue="responseText"
+                  :enableHighlight="true"
+                  language="json"
                   :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
                   :readOnly="true"
                   :wrapText="wrapText"
