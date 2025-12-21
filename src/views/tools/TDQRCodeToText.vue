@@ -2,10 +2,6 @@
   <div class="flex flex-col container">
     <!-- <div class="title">{{ $t("i18nCommon.qrCodeToText.title") }}</div> -->
     <div class="flex flex-col qr-section">
-      <div>
-        {{ $t("i18nCommon.qrCodeToText.note") }}
-      </div>
-      <br />
       <div style="width: 100%">
         <TDUpload
           @dragover="handleDragOver"
