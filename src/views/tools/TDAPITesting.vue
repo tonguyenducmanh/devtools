@@ -18,16 +18,19 @@
 
         <TDButton
           v-if="isLoading"
+          :noMargin="true"
           @click="handleCancelRequest"
           :type="$tdEnum.buttonType.secondary"
           :label="$t('i18nCommon.apiTesting.cancel')"
         />
         <TDButton
+          :noMargin="true"
           @click="handleSend"
           :label="$t('i18nCommon.apiTesting.send')"
           v-else
         ></TDButton>
         <TDButton
+          :noMargin="true"
           v-if="!showReponse"
           @click="handleDownloadReponse"
           :type="$tdEnum.buttonType.secondary"
@@ -58,6 +61,7 @@
           :title="$t('i18nCommon.apiTesting.toolTipDownloadExtension')"
         >
           <TDButton
+            :noMargin="true"
             v-if="!isElectronApp"
             @click="downloadExtension"
             :type="$tdEnum.buttonType.secondary"

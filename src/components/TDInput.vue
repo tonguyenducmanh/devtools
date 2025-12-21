@@ -106,7 +106,9 @@ export default {
     color: var(--text-primary-color);
     font-size: var(--font-size-medium);
   }
-
+  input::placeholder {
+    color: var(--text-secondary-color);
+  }
   input:focus {
     outline: none;
     border: 1px solid var(--focus-color);

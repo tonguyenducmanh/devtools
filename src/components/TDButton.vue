@@ -75,13 +75,13 @@ export default {
   align-items: center;
   justify-content: center;
   width: fit-content;
-  height: 30px;
+  height: 35px;
   padding: var(--padding-x-medium) var(--padding-large);
   margin: var(--padding);
   background-color: var(--btn-color);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: var(--border-radius);
   cursor: pointer;
   font-size: 16px;
   transition: all 0.2s ease;
@@ -111,6 +111,14 @@ export default {
 }
 .td-button-secondary:hover {
   background-color: var(--btn-secondary-focus-color);
+}
+body[data-theme="dark"] .td-button-secondary {
+  background-color: unset;
+  border: 1px solid var(--border-color);
+}
+
+body[data-theme="dark"] .td-button-secondary:hover {
+  background-color: var(--btn-secondary-color);
 }
 
 .td-button-secondary:active {

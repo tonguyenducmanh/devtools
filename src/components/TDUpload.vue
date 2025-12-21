@@ -133,10 +133,7 @@ export default {
   padding: var(--padding);
   cursor: pointer;
   border-radius: var(--border-radius);
-  background-color: var(--btn-secondary-color);
-}
-.td-upload-button:hover {
-  background-color: var(--btn-secondary-focus-color);
+  background-color: var(--bg-layer-color);
 }
 
 .td-upload-btn-read-only {

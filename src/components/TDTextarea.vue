@@ -158,7 +158,9 @@ export default {
     color: var(--text-primary-color);
     font-size: var(--font-size-medium);
   }
-
+  textarea::placeholder {
+    color: var(--text-secondary-color);
+  }
   .td-textarea-nowrap-text {
     white-space: pre;
     overflow-x: auto; /* bật scroll ngang */
