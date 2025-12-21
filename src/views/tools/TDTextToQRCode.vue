@@ -1,11 +1,5 @@
 <template>
   <div class="container">
-    <!-- <div class="title">{{ $t("i18nCommon.textToQRCode.title") }}</div> -->
-    <TDHistory
-      ref="history"
-      :applyFunction="generateQRCode"
-      :cacheKey="$tdEnum.cacheConfig.QRHistory"
-    ></TDHistory>
     <div class="flex flex-col input-section">
       <TDTextarea
         class="input-area"

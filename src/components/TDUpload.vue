@@ -10,6 +10,7 @@
     <label
       class="td-upload-button"
       :class="{ 'td-upload-btn-read-only': readOnly }"
+      :style="borderRadiusStyle"
     >
       {{ label ? label.capitalize() : $t("i18nCommon.uploadFile") }}
       <input
