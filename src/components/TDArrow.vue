@@ -15,7 +15,6 @@
 
 <script>
 import tdEnum from "@/common/TDEnum.js";
-import { defaultDiff2HtmlConfig } from "diff2html";
 export default {
   name: "TDArrow",
   props: {
