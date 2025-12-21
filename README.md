@@ -10,6 +10,12 @@ Demo:
 
 ![alt text](img/screenshoot.png)
 
+![alt text](img/demo-one.png)
+
+![alt text](img/demo-three.png)
+
+![alt text](img/demo-two.png)
+
 To setup this project
 
 ```
