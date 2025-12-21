@@ -680,7 +680,7 @@ export default {
       border-radius: 4px;
       appearance: none;
       &::-webkit-progress-bar {
-        background-color: #eee;
+        background-color: var(--bg-layer-color);
         border-radius: 4px;
       }
       &::-webkit-progress-value {
