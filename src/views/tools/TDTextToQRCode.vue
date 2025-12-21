@@ -123,9 +123,6 @@ export default {
       // Lấy giá trị từ các input
       let text = me.getUserInput(textInput);
       let textBuild = await me.buildTextBeforeGenQR(text);
-
-      // Lưu text vào lịch sử nếu khác với lần lưu trước
-      await me.$refs.history.saveToHistory(text);
       // reset
       me.qrCodeItems = [];
 

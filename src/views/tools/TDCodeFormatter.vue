@@ -1,20 +1,12 @@
 <template>
   <div class="flex flex-col container">
-    <!-- <div class="title">{{ $t("i18nCommon.codeFormatter.title") }}</div> -->
-    <div class="flex history-wrapper">
-      <TDHistory
-        ref="history"
-        class="history-container"
-        titleKey="inputSource"
-        :applyFunction="handleFormatFromHistory"
-        :cacheKey="$tdEnum.cacheConfig.CodeFormatterHistory"
-      ></TDHistory>
+    <div class="flex tool-header">
+      <TDRadioGroup
+        v-model="currentFormatType"
+        :label="$t('i18nCommon.codeFormatter.typeOfCode')"
+        :options="formatType"
+      />
     </div>
-    <TDRadioGroup
-      v-model="currentFormatType"
-      :label="$t('i18nCommon.codeFormatter.typeOfCode')"
-      :options="formatType"
-    />
     <div class="flex input-container">
       <TDTextarea
         :placeHolder="$t('i18nCommon.codeFormatter.inputCode')"
@@ -92,15 +84,6 @@ export default {
       }
       return "postgresql"; // Mặc định là postgresql nếu không có lựa chọn
     },
-    async handleFormatFromHistory(item) {
-      let me = this;
-      if (item && item.inputSource) {
-        me.inputSource = item.inputSource;
-        me.currentFormatType =
-          item.currentFormatType || tdEnum.typeOfCode.postgresql;
-        await me.handleFormat();
-      }
-    },
     async handleFormat() {
       let me = this;
       try {
@@ -113,12 +96,7 @@ export default {
         } else {
           me.outputSource = null;
         }
-        // so sánh input và output, nếu giống nhau thì xoá output
-        let historyItem = {
-          inputSource: me.inputSource,
-          currentFormatType: me.currentFormatType,
-        };
-        await me.$refs.history.saveToHistory(historyItem);
+
         if (
           me.normalizeSQL(me.inputSource) != me.normalizeSQL(me.outputSource)
         ) {
@@ -167,12 +145,13 @@ export default {
 .input-container {
   flex: 1;
   column-gap: var(--padding);
-  width: 95%;
-}
-.history-wrapper {
-  width: 95%;
-}
-.history-container {
   width: 100%;
+}
+.tool-header {
+  width: 100%;
+  position: relative;
+
+  align-items: center;
+  justify-content: center;
 }
 </style>
