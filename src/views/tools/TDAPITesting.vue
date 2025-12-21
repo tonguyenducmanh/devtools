@@ -108,6 +108,7 @@
             <div class="flex td-api-info-btn">
               <div class="flex flex-one">
                 <TDComboBox
+                  :width="120"
                   v-model="httpMethod"
                   :options="methodOptions"
                   :noMargin="true"
@@ -601,13 +602,13 @@ export default {
       isSaveRequestToCollectionModelOpen: false,
       searchQuery: "",
       methodOptions: [
-        { value: "GET", label: "GET" },
-        { value: "POST", label: "POST" },
-        { value: "PUT", label: "PUT" },
-        { value: "PATCH", label: "PATCH" },
-        { value: "DELETE", label: "DELETE" },
-        { value: "HEAD", label: "HEAD" },
-        { value: "OPTIONS", label: "OPTIONS" },
+        { value: "GET", label: "Get" },
+        { value: "POST", label: "Post" },
+        { value: "PUT", label: "Put" },
+        { value: "PATCH", label: "Patch" },
+        { value: "DELETE", label: "Delete" },
+        { value: "HEAD", label: "Head" },
+        { value: "OPTIONS", label: "Options" },
       ],
       currentAPIInfoOption: 2,
       APIInfoOptions: [
