@@ -315,6 +315,7 @@ export default {
       contentCURLExecute: "Nội dung CURL muốn chạy",
       scriptExecute: "Kịch bản muốn chạy",
       proModeTitle: "Javascript code",
+      CURLModeTitle: "CURL cmd",
       cancel: "Hủy",
       requestName: "Tên request",
       requestCanceled: "Đã hủy request hiện tại",

@@ -316,6 +316,7 @@ export default {
       contentCURLExecute: "CURL content to execute",
       scriptExecute: "Script want to execute",
       proModeTitle: "Javascript code",
+      CURLModeTitle: "CURL cmd",
       cancel: "Cancel",
       requestName: "Request name",
       requestCanceled: "Current request canceled",

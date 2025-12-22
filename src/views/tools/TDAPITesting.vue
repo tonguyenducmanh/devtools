@@ -237,6 +237,9 @@
           <div class="flex td-api-input-area">
             <div class="flex flex-col td-api-request">
               <div class="flex td-api-request-title">
+                <div class="title-request">
+                  {{ $t("i18nCommon.apiTesting.CURLModeTitle") }}
+                </div>
                 <div
                   class="flex loader-without-response"
                   v-if="!showReponse && isLoading"
@@ -306,7 +309,7 @@
           <div class="flex td-api-input-area">
             <div class="flex flex-col td-api-request">
               <div class="flex td-api-request-title">
-                <div>
+                <div class="title-request">
                   {{ $t("i18nCommon.apiTesting.proModeTitle") }}
                 </div>
                 <div
@@ -1657,5 +1660,8 @@ body[data-theme="dark"] {
   .td-top-right-btn div {
     filter: invert(100);
   }
+}
+.title-request {
+  margin-left: var(--padding);
 }
 </style>
