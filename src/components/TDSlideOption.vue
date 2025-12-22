@@ -10,11 +10,15 @@
       {{ label.capitalize() }}
     </div>
     <div v-if="options && options.length > 0" class="flex td-slide-group-area">
+      <!-- Background slider cho selected item -->
+      <div class="td-slide-background" :style="sliderStyle"></div>
+
       <div
         class="td-slide-item"
         :class="{ 'td-slide-item-selected': option.value == modelValue }"
         v-for="(option, index) in options"
         :key="index"
+        :ref="(el) => setItemRef(el, index)"
         @click="changeSlideVal(option.value)"
       >
         <span>{{ option.label }}</span>
@@ -39,7 +43,7 @@ export default {
     },
     name: {
       type: String,
-      default: null, // Không còn là required
+      default: null,
     },
     options: {
       type: Array,
@@ -50,7 +54,7 @@ export default {
     },
     layout: {
       type: String,
-      default: tdEnum.coordinateAxes.horizontal, // Giá trị mặc định là hiển thị dọc
+      default: tdEnum.coordinateAxes.horizontal,
       validator: (value) =>
         [
           tdEnum.coordinateAxes.horizontal,
@@ -63,15 +67,68 @@ export default {
     },
   },
   emits: ["update:modelValue"],
+  data() {
+    return {
+      itemRefs: [],
+      sliderStyle: {
+        transform: "translateX(0px)",
+        width: "0px",
+      },
+    };
+  },
   computed: {
     generatedName() {
       return this.name || `td-slide-group-${this.$.uid}`;
     },
+    selectedIndex() {
+      return this.options.findIndex((opt) => opt.value === this.modelValue);
+    },
+  },
+  watch: {
+    selectedIndex: {
+      handler() {
+        this.$nextTick(() => {
+          this.updateSliderPosition();
+        });
+      },
+      immediate: true,
+    },
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.updateSliderPosition();
+    });
+    window.addEventListener("resize", this.updateSliderPosition);
+  },
+  beforeUnmount() {
+    window.removeEventListener("resize", this.updateSliderPosition);
   },
   methods: {
+    setItemRef(el, index) {
+      if (el) {
+        this.itemRefs[index] = el;
+      }
+    },
+    updateSliderPosition() {
+      if (this.selectedIndex >= 0 && this.itemRefs[this.selectedIndex]) {
+        const selectedEl = this.itemRefs[this.selectedIndex];
+        const containerEl = selectedEl.parentElement;
+
+        // Lấy vị trí tương đối so với container
+        const containerRect = containerEl.getBoundingClientRect();
+        const itemRect = selectedEl.getBoundingClientRect();
+
+        const offsetLeft = itemRect.left - containerRect.left;
+        const width = itemRect.width;
+
+        this.sliderStyle = {
+          transform: `translateX(${offsetLeft}px)`,
+          width: `${width}px`,
+        };
+      }
+    },
     changeSlideVal(e) {
-      let me = this;
-      me.$emit("update:modelValue", e);
+      this.$emit("update:modelValue", e);
     },
   },
 };
@@ -108,18 +165,39 @@ export default {
     }
   }
 }
+
 .td-slide-group-area {
+  position: relative;
   gap: var(--padding);
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
+  padding: 0; /* Đảm bảo không có padding làm lệch */
+
+  .td-slide-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: var(--focus-color);
+    border-radius: var(--border-radius);
+    transition:
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 0;
+  }
+
   .td-slide-item {
+    position: relative;
     cursor: pointer;
     padding: calc(var(--padding) / 2) var(--padding);
     border-radius: var(--border-radius);
+    z-index: 1;
+    transition: color 0.2s ease;
   }
+
   .td-slide-item-selected {
-    background-color: var(--focus-color);
-    color: var(--bg-main-color);
+    color: white;
   }
 }
 </style>
