@@ -106,7 +106,7 @@ export default {
     border: 1px solid var(--border-color);
     width: 100%;
     padding: var(--padding);
-    background-color: var(--bg-main-color);
+    background-color: var(--bg-thirt-color);
     color: var(--text-primary-color);
     font-size: var(--font-size-medium);
   }

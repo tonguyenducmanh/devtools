@@ -153,7 +153,7 @@ export default {
       padding: var(--padding);
       border: 1px solid var(--border-color);
       cursor: pointer;
-      background: var(--bg-main-color);
+      background: var(--bg-thirt-color);
 
       &:hover {
         border-color: var(--btn-color);

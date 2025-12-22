@@ -275,7 +275,7 @@ export default {
     height: 100%;
     padding: var(--padding);
     border-radius: var(--border-radius);
-    background-color: var(--bg-main-color);
+    background-color: var(--bg-thirt-color);
     color: var(--text-primary-color);
     font-size: var(--font-size-medium);
     font-family: "Consolas", "Monaco", "Courier New", monospace;

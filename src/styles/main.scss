@@ -67,25 +67,25 @@ body[data-theme="light"] {
 }
 
 body[data-theme="dark"] {
-  --bg-main-color: #1f2937;
-  --bg-layer-color: #101827;
-  --text-color: #8f95a1;
+  --bg-main-color: #302f30;
+  --bg-layer-color: #161616;
+  --text-color: #e5e5e5;
   --bg-active-color: rgb(126, 126, 126);
   --bg-focus-color: #928990;
-  --bg-thirt-color: #101827;
+  --bg-thirt-color: #252525;
   --bg-hover-color: unset;
   --text-primary-color: rgb(226, 227, 231);
   --text-secondary-color: #6a707e;
   --text-tertiary-color: rgb(217, 217, 217);
-  --border-color: #374151;
-  --focus-color: #33a16f;
-  --btn-color: #12b981;
-  --btn-secondary-color: #101827;
+  --border-color: #3c3d3d;
+  --focus-color: #515151;
+  --btn-color: #5f5f5f;
+  --btn-secondary-color: #353434;
   --btn-secondary-text-color: #8f95a1;
-  --btn-secondary-focus-color: #101827;
-  --scroll-bg-color: #374151;
-  --scroll-thumb-color: #101827;
-  --scroll-thumb-hover-color: #0b101a;
+  --btn-secondary-focus-color: #545454;
+  --scroll-bg-color: unset;
+  --scroll-thumb-color: #54545470;
+  --scroll-thumb-hover-color: #545454;
 }
 
 body {
@@ -109,8 +109,8 @@ a {
 
 /* Target the scrollbar track */
 ::-webkit-scrollbar {
-  width: 12px; /* width of vertical scrollbar */
-  height: 12px; /* height of horizontal scrollbar */
+  width: 6px; /* width of vertical scrollbar */
+  height: 6px; /* height of horizontal scrollbar */
 }
 
 /* Track */
@@ -129,6 +129,7 @@ a {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: var(--scroll-thumb-hover-color);
+  cursor: pointer;
 }
 
 ::selection {

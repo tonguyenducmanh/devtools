@@ -116,12 +116,12 @@ export default {
   background-color: var(--btn-secondary-focus-color);
 }
 body[data-theme="dark"] .td-button-secondary {
-  background-color: unset;
-  border: 1px solid var(--border-color);
+  background-color: var(--bg-thirt-color);
 }
 
 body[data-theme="dark"] .td-button-secondary:hover {
-  background-color: var(--btn-secondary-color);
+  border: 1px solid var(--border-color);
+  background-color: #303130;
 }
 
 .td-button-secondary:active {
