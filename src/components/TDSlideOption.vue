@@ -3,6 +3,7 @@
     class="td-slide-group"
     :class="{
       'layout-horizontal': layout === $tdEnum.coordinateAxes.horizontal,
+      'layout-vertical': layout === $tdEnum.coordinateAxes.vertical,
       'td-slide-group-no-margin': noMargin,
     }"
   >
@@ -73,6 +74,7 @@ export default {
       sliderStyle: {
         transform: "translateX(0px)",
         width: "0px",
+        height: "0px",
       },
     };
   },
@@ -83,6 +85,9 @@ export default {
     selectedIndex() {
       return this.options.findIndex((opt) => opt.value === this.modelValue);
     },
+    isVertical() {
+      return this.layout === tdEnum.coordinateAxes.vertical;
+    },
   },
   watch: {
     selectedIndex: {
@@ -92,6 +97,11 @@ export default {
         });
       },
       immediate: true,
+    },
+    layout() {
+      this.$nextTick(() => {
+        this.updateSliderPosition();
+      });
     },
   },
   mounted() {
@@ -114,17 +124,30 @@ export default {
         const selectedEl = this.itemRefs[this.selectedIndex];
         const containerEl = selectedEl.parentElement;
 
-        // Lấy vị trí tương đối so với container
         const containerRect = containerEl.getBoundingClientRect();
         const itemRect = selectedEl.getBoundingClientRect();
 
-        const offsetLeft = itemRect.left - containerRect.left;
-        const width = itemRect.width;
+        if (this.isVertical) {
+          // Vertical layout
+          const offsetTop = itemRect.top - containerRect.top;
+          const height = itemRect.height;
 
-        this.sliderStyle = {
-          transform: `translateX(${offsetLeft}px)`,
-          width: `${width}px`,
-        };
+          this.sliderStyle = {
+            transform: `translateY(${offsetTop}px)`,
+            width: `${itemRect.width}px`,
+            height: `${height}px`,
+          };
+        } else {
+          // Horizontal layout
+          const offsetLeft = itemRect.left - containerRect.left;
+          const width = itemRect.width;
+
+          this.sliderStyle = {
+            transform: `translateX(${offsetLeft}px)`,
+            width: `${width}px`,
+            height: `${itemRect.height}px`,
+          };
+        }
       }
     },
     changeSlideVal(e) {
@@ -153,10 +176,12 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: end;
+
   .td-slide-group-label {
     margin-bottom: 0;
     margin-right: var(--padding);
   }
+
   > div {
     margin-right: var(--padding-medium);
 
@@ -166,23 +191,32 @@ export default {
   }
 }
 
+.td-slide-group.layout-vertical {
+  display: flex;
+  flex-direction: column;
+
+  .td-slide-group-label {
+    margin-bottom: var(--padding);
+    margin-right: 0;
+  }
+}
+
 .td-slide-group-area {
   position: relative;
-  gap: var(--padding);
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
-  padding: 0; /* Đảm bảo không có padding làm lệch */
+  padding: 0;
 
   .td-slide-background {
     position: absolute;
     top: 0;
     left: 0;
-    height: 100%;
     background-color: var(--focus-color);
     border-radius: var(--border-radius);
     transition:
       transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
     z-index: 0;
   }
@@ -199,5 +233,16 @@ export default {
   .td-slide-item-selected {
     color: white;
   }
+}
+
+// Horizontal layout
+.layout-horizontal .td-slide-group-area {
+  flex-direction: row;
+}
+
+// Vertical layout
+.layout-vertical .td-slide-group-area {
+  flex-direction: column;
+  align-items: stretch;
 }
 </style>
