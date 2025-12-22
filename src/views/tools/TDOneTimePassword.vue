@@ -86,12 +86,19 @@
           />
         </div>
       </div>
-      <div class="flex">
+      <div class="flex td-second-header">
+        <TDInput
+          v-model="filterOtp"
+          :noMargin="true"
+          :placeHolder="$t('i18nCommon.oneTimePassword.filter')"
+        />
         <TDInput
           v-model="username"
+          :noMargin="true"
           :placeHolder="$t('i18nCommon.oneTimePassword.auth.username')"
         />
         <TDInput
+          :noMargin="true"
           v-model="password"
           :inputType="'password'"
           :placeHolder="$t('i18nCommon.oneTimePassword.auth.password')"
@@ -101,12 +108,14 @@
           :label="$t('i18nCommon.oneTimePassword.auth.open')"
           :readOnly="!password || !username"
           @click="openAuthenSaved"
+          :noMargin="true"
         />
         <TDButton
           :type="$tdEnum.buttonType.secondary"
           :label="$t('i18nCommon.oneTimePassword.auth.save')"
           :readOnly="!password || !username"
           @click="saveAuthen"
+          :noMargin="true"
         />
       </div>
       <div class="flex td-decoded-data">
@@ -124,7 +133,7 @@
         <progress :value="progress" max="100"></progress>
       </div>
       <div class="otp-container">
-        <template v-for="(item, index) in decodedData">
+        <template v-for="(item, index) in optShowList">
           <div class="otp-item">
             <div class="otp-left">
               <div class="otp-name">{{ item.displayName }}</div>
@@ -163,6 +172,32 @@ export default {
     me.processWhenMounted();
   },
   computed: {
+    optShowList() {
+      let me = this;
+      let allOTPVisible = [];
+      if (me.decodedData && me.decodedData.length > 0) {
+        if (!me.filterOtp) {
+          allOTPVisible = me.decodedData;
+        } else {
+          allOTPVisible = me.decodedData.filter((x) =>
+            x.displayName.includes(me.filterOtp)
+          );
+        }
+        if (!me.filterOtp) {
+          allOTPVisible = me.decodedData;
+        } else {
+          allOTPVisible = me.decodedData.filter(
+            (x) =>
+              x.displayName &&
+              x.displayName
+                .trim()
+                .toLowerCase()
+                .includes(me.filterOtp.trim().toLowerCase())
+          );
+        }
+      }
+      return allOTPVisible;
+    },
     isShowDecoded() {
       let me = this;
       let result = false;
@@ -572,6 +607,7 @@ export default {
   },
   data() {
     return {
+      filterOtp: null,
       migrationURL: null,
       decodedData: null,
       decodedDataString: null,
@@ -697,7 +733,11 @@ export default {
 
 body[data-theme="dark"] {
   .otp-value {
-    color: var(--text-color);
+    color: var(--text-color) !important;
   }
+}
+.td-second-header {
+  gap: var(--padding);
+  margin: 0 var(--padding);
 }
 </style>

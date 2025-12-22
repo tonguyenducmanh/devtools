@@ -230,9 +230,10 @@ export default {
         label: "Chọn ảnh QR code",
         placeholder: "Kéo thả ảnh hoặc tải lên",
       },
+      filter: "Lọc",
       auth: {
-        username: "Nhập tên người dùng",
-        password: "Nhập mật khẩu để lưu/mở danh sách xác thực",
+        username: "Tên người dùng",
+        password: "Nhập mật khẩu",
         open: "Mở",
         save: "Lưu",
         add: "Thêm",

@@ -231,9 +231,10 @@ export default {
         label: "Select QR code image",
         placeholder: "Drop image here or upload",
       },
+      filter: "Filter",
       auth: {
-        username: "Enter username",
-        password: "Enter password to save/load authentication list",
+        username: "Esername",
+        password: "Enter password",
         open: "Open",
         save: "Save",
         add: "Add",
