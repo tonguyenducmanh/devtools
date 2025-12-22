@@ -695,7 +695,7 @@ export default {
   margin-left: var(--padding);
 }
 
-body[data-theme="light"] {
+body[data-theme="dark"] {
   .otp-value {
     color: var(--text-color);
   }
