@@ -61,9 +61,9 @@ body[data-theme="light"] {
   --btn-secondary-color: #f1f1f1;
   --btn-secondary-text-color: #476582;
   --btn-secondary-focus-color: #e5e5e5;
-  --scroll-bg-color: #f0f0f0;
-  --scroll-thumb-color: #ababab;
-  --scroll-thumb-hover-color: #7e7e7e;
+  --scroll-bg-color: unset;
+  --scroll-thumb-color: #54545470;
+  --scroll-thumb-hover-color: #545454;
 }
 
 body[data-theme="dark"] {
