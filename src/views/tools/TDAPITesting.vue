@@ -139,7 +139,7 @@
             <div class="flex td-api-input-area">
               <div class="flex flex-col td-api-request">
                 <div class="flex td-api-request-title">
-                  <TDRadioGroup
+                  <TDSlideOption
                     v-model="currentAPIInfoOption"
                     :options="APIInfoOptions"
                     :noMargin="true"

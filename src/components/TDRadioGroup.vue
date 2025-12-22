@@ -2,7 +2,7 @@
   <div
     class="td-radio-group"
     :class="{
-      'layout-horizontal': layout === $tdEnum.radioGroupType.horizontal,
+      'layout-horizontal': layout === $tdEnum.coordinateAxes.horizontal,
       'td-radio-group-no-margin': noMargin,
     }"
   >
@@ -51,11 +51,11 @@ export default {
     },
     layout: {
       type: String,
-      default: tdEnum.radioGroupType.horizontal, // Giá trị mặc định là hiển thị dọc
+      default: tdEnum.coordinateAxes.horizontal, // Giá trị mặc định là hiển thị dọc
       validator: (value) =>
         [
-          tdEnum.radioGroupType.horizontal,
-          tdEnum.radioGroupType.vertical,
+          tdEnum.coordinateAxes.horizontal,
+          tdEnum.coordinateAxes.vertical,
         ].includes(value),
     },
     noMargin: {

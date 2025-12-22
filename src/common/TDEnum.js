@@ -23,7 +23,7 @@ class TDEnum {
     secondary: "secondary",
   };
   // loại radio option
-  radioGroupType = {
+  coordinateAxes = {
     horizontal: "horizontal",
     vertical: "vertical",
   };
