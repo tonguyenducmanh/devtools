@@ -1,8 +1,8 @@
 <template>
   <div class="flex td-header-container">
     <div class="flex td-app-name">
-      <div class="td-logo"></div>
-      <div class="td-app-title">{{ appName }}</div>
+      <div class="td-logo" @click="goToWelcome"></div>
+      <div class="td-app-title" @click="goToWelcome">{{ appName }}</div>
       <!-- Search Box -->
       <div class="td-search-container">
         <div class="td-search-box" @click="openSearchModal">
@@ -214,7 +214,10 @@ export default {
       me.isDarkTheme = currentTheme == me.$tdEnum.theme.dark;
       me.currentLanguage = await me.getCurrentLanguage();
     },
-
+    goToWelcome() {
+      let me = this;
+      me.$router.push("/");
+    },
     async toggleTheme() {
       let me = this;
       me.isDarkTheme = !me.isDarkTheme;
@@ -342,10 +345,12 @@ export default {
       height: 40px;
       background: url(@/assets/favicon.ico);
       background-size: cover;
+      cursor: pointer;
     }
     .td-app-title {
       font-size: 18px;
       font-weight: 700;
+      cursor: pointer;
     }
   }
 

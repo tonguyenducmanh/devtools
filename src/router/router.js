@@ -14,6 +14,7 @@ const routerConfig = [
     meta: {
       titleKey: "i18nCommon.feature.welcome",
     },
+    hide: true,
   },
   {
     /**
@@ -241,9 +242,9 @@ export default router;
 export function getRouterConfig() {
   let allRoutes = [];
   if (TDUtility.isElectronApp()) {
-    allRoutes = routerConfig.filter((x) => !x.electronNotSupport);
+    allRoutes = routerConfig.filter((x) => !x.electronNotSupport && !x.hide);
   } else {
-    allRoutes = routerConfig;
+    allRoutes = routerConfig.filter((x) => !x.hide);
   }
   return allRoutes;
 }
