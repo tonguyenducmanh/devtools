@@ -691,7 +691,13 @@ export default {
     }
   }
 }
-.td-source-otp{
+.td-source-otp {
   margin-left: var(--padding);
+}
+
+body[data-theme="light"] {
+  .otp-value {
+    color: var(--text-color);
+  }
 }
 </style>
