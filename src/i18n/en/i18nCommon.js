@@ -332,6 +332,11 @@ export default {
       beautify: "Beautify",
       delete: "Delete",
       add: "Add",
+      sidebarOption: {
+        collection: "Collection",
+        setting: "Setting",
+        history: "History",
+      },
     },
   },
 };

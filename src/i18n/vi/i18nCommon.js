@@ -330,6 +330,11 @@ export default {
       beautify: "Làm đẹp",
       delete: "Xoá",
       add: "Thêm",
+      sidebarOption: {
+        collection: "Bộ sưu tập",
+        setting: "Cài đặt",
+        history: "Lịch sử",
+      },
     },
   },
 };

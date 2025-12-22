@@ -144,15 +144,7 @@
                     :options="APIInfoOptions"
                     :noMargin="true"
                   />
-                  <TDCheckbox
-                    v-model="wrapText"
-                    :label="$t('i18nCommon.apiTesting.wrapText')"
-                  ></TDCheckbox>
-                  <TDCheckbox
-                    v-if="!showReponse"
-                    v-model="showReponse"
-                    :label="$t('i18nCommon.apiTesting.showReponse')"
-                  ></TDCheckbox>
+
                   <div
                     class="flex loader-without-response"
                     v-if="!showReponse && isLoading"
@@ -199,10 +191,6 @@
               </div>
               <div v-if="showReponse" class="flex flex-col td-api-response">
                 <div class="flex td-api-response-title">
-                  <TDCheckbox
-                    v-model="showReponse"
-                    :label="$t('i18nCommon.apiTesting.showReponse')"
-                  ></TDCheckbox>
                   <div>
                     <div class="status-info" v-if="statusCode">
                       <div class="status-badge" :class="statusClass">
@@ -249,15 +237,6 @@
           <div class="flex td-api-input-area">
             <div class="flex flex-col td-api-request">
               <div class="flex td-api-request-title">
-                <TDCheckbox
-                  v-model="wrapText"
-                  :label="$t('i18nCommon.apiTesting.wrapText')"
-                ></TDCheckbox>
-                <TDCheckbox
-                  v-if="!showReponse"
-                  v-model="showReponse"
-                  :label="$t('i18nCommon.apiTesting.showReponse')"
-                ></TDCheckbox>
                 <div
                   class="flex loader-without-response"
                   v-if="!showReponse && isLoading"
@@ -284,10 +263,6 @@
             </div>
             <div v-if="showReponse" class="flex flex-col td-api-response">
               <div class="flex td-api-response-title">
-                <TDCheckbox
-                  v-model="showReponse"
-                  :label="$t('i18nCommon.apiTesting.showReponse')"
-                ></TDCheckbox>
                 <div>
                   <div class="status-info" v-if="statusCode">
                     <div class="status-badge" :class="statusClass">
@@ -334,11 +309,6 @@
                 <div>
                   {{ $t("i18nCommon.apiTesting.proModeTitle") }}
                 </div>
-                <TDCheckbox
-                  v-if="!showReponse"
-                  v-model="showReponse"
-                  :label="$t('i18nCommon.apiTesting.showReponse')"
-                ></TDCheckbox>
                 <div
                   class="flex loader-without-response"
                   v-if="!showReponse && isLoading"
@@ -366,10 +336,6 @@
             </div>
             <div v-if="showReponse" class="flex flex-col td-api-response">
               <div class="flex td-api-response-title">
-                <TDCheckbox
-                  v-model="showReponse"
-                  :label="$t('i18nCommon.apiTesting.showReponse')"
-                ></TDCheckbox>
                 <div>
                   <div class="status-info" v-if="statusCode">
                     <div class="status-badge" :class="statusClass">
@@ -413,163 +379,200 @@
         </div>
       </template>
     </div>
-    <div
-      v-if="currentAPIMode != $tdEnum.APIMode.ProMode"
-      class="flex td-sub-sidebar"
-      :class="{ 'td-sub-sidebar-collaspe': !isShowSidebar }"
-    >
-      <div v-if="isShowSidebar" class="divide"></div>
-      <div v-if="isShowSidebar" class="flex flex-col td-sub-sidebar-content">
-        <div class="flex td-header-collection">
-          <div class="td-new-collection">
-            <TDInput
-              v-model="newCollectionName"
+    <div class="flex flex-col td-sub-sidebar-wrapper">
+      <div
+        class="flex td-sub-sidebar"
+        :class="{ 'td-sub-sidebar-collaspe': !isShowSidebar }"
+      >
+        <div v-if="isShowSidebar" class="divide"></div>
+        <div v-if="isShowSidebar" class="flex flex-col td-sub-sidebar-content">
+          <div class="td-sidebar-header">
+            <TDSlideOption
+              v-if="sidebarOptions && sidebarOptions.length > 1"
+              v-model="currentSidebarOption"
+              :options="sidebarOptions"
               :noMargin="true"
-              :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
             />
           </div>
-          <TDTooltip
-            class="text-nowrap"
-            :title="$t('i18nCommon.apiTesting.add')"
+          <div
+            class="flex flex-col td-sidebar-content"
+            v-if="currentSidebarOption == $tdEnum.APISidebarOption.Collection"
           >
-            <div class="td-icon td-plus-icon" @click="addNewCollection"></div>
-          </TDTooltip>
-        </div>
-        <div class="td-collection">
-          <div class="td-collection-body">
-            <div
-              v-for="(collection, index) in allCollection"
-              class="flex flex-col no-select td-collection-item"
-              :key="index"
-            >
-              <div
-                class="flex td-collection-header"
-                @click="toggleCollection(collection)"
-              >
-                <div class="flex td-collection-header-left">
-                  <TDArrow
-                    :openProp="collection.openingCollection"
-                    :arrowOpenDirection="$tdEnum.Direction.bottom"
-                    :arrowDirection="$tdEnum.Direction.right"
-                  />
-                  <TDTooltip
-                    class="text-nowrap text-nowrap-collection"
-                    :title="collection.name"
-                  >
-                    <div>
-                      {{ collection.name }}
-                    </div>
-                  </TDTooltip>
-                </div>
-                <TDTooltip
-                  class="text-nowrap"
-                  :title="$t('i18nCommon.apiTesting.delete')"
-                >
-                  <div
-                    class="td-icon td-close-icon"
-                    @click.stop="deleteCollection(collection.name)"
-                  ></div>
-                </TDTooltip>
+            <div class="flex td-header-collection">
+              <div class="td-new-collection">
+                <TDInput
+                  v-model="newCollectionName"
+                  :noMargin="true"
+                  :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
+                />
               </div>
-              <div
-                v-if="
-                  collection.openingCollection &&
-                  collection.requests &&
-                  collection.requests.length > 0
-                "
-                class="flex flex-col td-collection-content"
+              <TDTooltip
+                class="text-nowrap"
+                :title="$t('i18nCommon.apiTesting.add')"
               >
                 <div
-                  v-for="(request, indexRequest) in collection.requests"
-                  :key="indexRequest"
-                  class="flex td-collection-request-item"
-                  :class="{
-                    'td-collection-request-item-selected':
-                      request && currentRequestId == request.requestId,
-                  }"
-                  @click="applyRequest(request)"
+                  class="td-icon td-plus-icon"
+                  @click="addNewCollection"
+                ></div>
+              </TDTooltip>
+            </div>
+            <div class="td-collection">
+              <div class="td-collection-body">
+                <div
+                  v-for="(collection, index) in allCollection"
+                  class="flex flex-col no-select td-collection-item"
+                  :key="index"
                 >
-                  <TDTooltip class="text-nowrap" :title="request.requestName">
-                    <div>
-                      {{ request.requestName }}
+                  <div
+                    class="flex td-collection-header"
+                    @click="toggleCollection(collection)"
+                  >
+                    <div class="flex td-collection-header-left">
+                      <TDArrow
+                        :openProp="collection.openingCollection"
+                        :arrowOpenDirection="$tdEnum.Direction.bottom"
+                        :arrowDirection="$tdEnum.Direction.right"
+                      />
+                      <TDTooltip
+                        class="text-nowrap text-nowrap-collection"
+                        :title="collection.name"
+                      >
+                        <div>
+                          {{ collection.name }}
+                        </div>
+                      </TDTooltip>
                     </div>
-                  </TDTooltip>
-
-                  <TDTooltip
-                    class="text-nowrap"
-                    :title="$t('i18nCommon.apiTesting.delete')"
+                    <TDTooltip
+                      class="text-nowrap"
+                      :title="$t('i18nCommon.apiTesting.delete')"
+                    >
+                      <div
+                        class="td-icon td-close-icon"
+                        @click.stop="deleteCollection(collection.name)"
+                      ></div>
+                    </TDTooltip>
+                  </div>
+                  <div
+                    v-if="
+                      collection.openingCollection &&
+                      collection.requests &&
+                      collection.requests.length > 0
+                    "
+                    class="flex flex-col td-collection-content"
                   >
                     <div
-                      class="td-icon td-close-icon"
-                      @click.stop="deleteRequest(collection.name, request)"
-                    ></div>
-                  </TDTooltip>
+                      v-for="(request, indexRequest) in collection.requests"
+                      :key="indexRequest"
+                      class="flex td-collection-request-item"
+                      :class="{
+                        'td-collection-request-item-selected':
+                          request && currentRequestId == request.requestId,
+                      }"
+                      @click="applyRequest(request)"
+                    >
+                      <TDTooltip
+                        class="text-nowrap"
+                        :title="request.requestName"
+                      >
+                        <div>
+                          {{ request.requestName }}
+                        </div>
+                      </TDTooltip>
+
+                      <TDTooltip
+                        class="text-nowrap"
+                        :title="$t('i18nCommon.apiTesting.delete')"
+                      >
+                        <div
+                          class="td-icon td-close-icon"
+                          @click.stop="deleteRequest(collection.name, request)"
+                        ></div>
+                      </TDTooltip>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+            <div class="flex">
+              <TDButton
+                :readOnly="isLoading"
+                @click="createNewRequest"
+                :type="$tdEnum.buttonType.secondary"
+                :noMargin="true"
+                :label="$t('i18nCommon.apiTesting.createNewRequest')"
+                :borderRadiusPosition="[
+                  $tdEnum.BorderRadiusPosition.TopLeft,
+                  $tdEnum.BorderRadiusPosition.BottomLeft,
+                ]"
+              ></TDButton>
+              <TDButton
+                :readOnly="isLoading || !requestName"
+                @click="saveRequest"
+                :type="$tdEnum.buttonType.secondary"
+                :noMargin="true"
+                :label="$t('i18nCommon.apiTesting.save')"
+                :borderRadiusPosition="[
+                  $tdEnum.BorderRadiusPosition.TopRight,
+                  $tdEnum.BorderRadiusPosition.BottomRight,
+                ]"
+              ></TDButton>
+            </div>
+          </div>
+          <div
+            class="td-sidebar-content"
+            v-else-if="currentSidebarOption == $tdEnum.APISidebarOption.Setting"
+          >
+            <TDCheckbox
+              v-model="showReponse"
+              :label="$t('i18nCommon.apiTesting.showReponse')"
+            ></TDCheckbox>
+            <TDCheckbox
+              v-model="wrapText"
+              :label="$t('i18nCommon.apiTesting.wrapText')"
+            ></TDCheckbox>
+            <TDCheckbox
+              v-model="enableHighlight"
+              :label="$t('i18nCommon.enableHighlight')"
+            ></TDCheckbox>
           </div>
         </div>
-        <div class="flex">
-          <TDButton
-            :readOnly="isLoading"
-            @click="createNewRequest"
-            :type="$tdEnum.buttonType.secondary"
-            :noMargin="true"
-            :label="$t('i18nCommon.apiTesting.createNewRequest')"
-            :borderRadiusPosition="[
-              $tdEnum.BorderRadiusPosition.TopLeft,
-              $tdEnum.BorderRadiusPosition.BottomLeft,
-            ]"
-          ></TDButton>
-          <TDButton
-            :readOnly="isLoading || !requestName"
-            @click="saveRequest"
-            :type="$tdEnum.buttonType.secondary"
-            :noMargin="true"
-            :label="$t('i18nCommon.apiTesting.save')"
-            :borderRadiusPosition="[
-              $tdEnum.BorderRadiusPosition.TopRight,
-              $tdEnum.BorderRadiusPosition.BottomRight,
-            ]"
-          ></TDButton>
-        </div>
+        <TDToggleArea
+          :collapsed="!isShowSidebar"
+          position="right"
+          @toggle="toggleSidebar"
+        />
       </div>
-      <TDToggleArea
-        :collapsed="!isShowSidebar"
-        position="right"
-        @toggle="toggleSidebar"
-      />
-    </div>
-    <div
-      v-if="isSaveRequestToCollectionModelOpen"
-      class="td-api-request-save-collection"
-    >
-      <div class="td-search-modal" @click.stop>
-        <div class="td-search-input-container">
-          <div class="td-icon td-search-icon"></div>
-          <input
-            ref="searchInput"
-            v-model="searchQuery"
-            type="text"
-            :placeholder="$t('i18nCommon.search.placeholder')"
-            class="td-search-input"
-          />
-          <button class="td-search-close" @click="closeSearchModal">
-            <div class="td-icon td-close-icon"></div>
-          </button>
-        </div>
+      <div
+        v-if="isSaveRequestToCollectionModelOpen"
+        class="td-api-request-save-collection"
+      >
+        <div class="td-search-modal" @click.stop>
+          <div class="td-search-input-container">
+            <div class="td-icon td-search-icon"></div>
+            <input
+              ref="searchInput"
+              v-model="searchQuery"
+              type="text"
+              :placeholder="$t('i18nCommon.search.placeholder')"
+              class="td-search-input"
+            />
+            <button class="td-search-close" @click="closeSearchModal">
+              <div class="td-icon td-close-icon"></div>
+            </button>
+          </div>
 
-        <div class="td-search-results" v-if="filteredCollection.length > 0">
-          <div class="td-search-section">
-            <div
-              v-for="(collection, index) in filteredCollection"
-              :key="collection.name"
-              class="td-search-item"
-              @click="saveToCollection(collection)"
-            >
-              <div class="td-search-item-content">
-                <div class="td-search-item-title">
-                  {{ collection.name }}
+          <div class="td-search-results" v-if="filteredCollection.length > 0">
+            <div class="td-search-section">
+              <div
+                v-for="(collection, index) in filteredCollection"
+                :key="collection.name"
+                class="td-search-item"
+                @click="saveToCollection(collection)"
+              >
+                <div class="td-search-item-content">
+                  <div class="td-search-item-title">
+                    {{ collection.name }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -627,6 +630,8 @@ export default {
           customStyle: { color: "#C25E95" },
         },
       ],
+
+      currentSidebarOption: this.$tdEnum.APISidebarOption.Setting,
       currentAPIInfoOption: 2,
       APIInfoOptions: [
         { value: this.$tdEnum.APIInfoOption.header, label: "Header" },
@@ -667,6 +672,21 @@ export default {
   computed: {
     isElectronApp() {
       return this.$tdUtility.isElectronApp();
+    },
+    sidebarOptions() {
+      let me = this;
+      let options = [];
+      options.push({
+        value: this.$tdEnum.APISidebarOption.Setting,
+        label: this.$t("i18nCommon.apiTesting.sidebarOption.setting"),
+      });
+      if (me.currentAPIMode != me.$tdEnum.APIMode.ProMode) {
+        options.push({
+          value: this.$tdEnum.APISidebarOption.Collection,
+          label: this.$t("i18nCommon.apiTesting.sidebarOption.collection"),
+        });
+      }
+      return options;
     },
     statusClass() {
       if (!this.statusCode) return "";
@@ -1145,6 +1165,9 @@ export default {
       let historyAPIMode = {
         mode: me.currentAPIMode,
       };
+      if (me.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
+        me.currentSidebarOption = me.$tdEnum.APISidebarOption.Setting;
+      }
       await me.$tdCache.set(
         me.$tdEnum.cacheConfig.APIMode,
         JSON.stringify(historyAPIMode)
@@ -1320,6 +1343,9 @@ export default {
 .loader-without-response {
   margin-left: 100px;
 }
+.td-sub-sidebar-wrapper {
+  height: 100%;
+}
 .td-sub-sidebar {
   height: 100%;
   position: relative;
@@ -1329,67 +1355,74 @@ export default {
     height: 100%;
     position: relative;
     padding-left: var(--padding);
-    .td-header-collection {
-      width: 100%;
-      height: 30px;
-      margin: var(--padding);
-      gap: var(--padding);
-      .td-new-collection {
-        flex: 1;
-      }
-      .td-plus-icon {
-        filter: grayscale(100);
-        cursor: pointer;
-      }
-      .td-plus-icon:hover {
-        filter: unset;
-        background-color: var(--bg-layer-color);
-      }
+    .td-sidebar-header {
+      margin-bottom: var(--padding);
     }
-    .td-collection {
-      height: calc(100% - 60px);
+    .td-sidebar-content {
+      flex: 1;
       width: 100%;
-      overflow: auto;
-      position: relative;
-      .td-collection-body {
-        position: relative;
-        overflow: auto;
-        .td-collection-item {
+      .td-header-collection {
+        width: 100%;
+        height: 30px;
+        margin: var(--padding);
+        gap: var(--padding);
+        .td-new-collection {
+          flex: 1;
+        }
+        .td-plus-icon {
+          filter: grayscale(100);
           cursor: pointer;
-          justify-content: flex-start;
-          gap: var(--padding);
-          width: 100%;
-          min-height: 40px;
-          .td-collection-header {
-            gap: var(--padding);
-            padding: var(--padding);
-            height: 40px;
-            justify-content: space-between;
-            width: 100%;
-            .td-collection-header-left {
-              gap: var(--padding);
-            }
-          }
-          .td-collection-header:hover {
-            background-color: var(--bg-layer-color);
-            border-radius: var(--border-radius);
-          }
-          .td-collection-content {
+        }
+        .td-plus-icon:hover {
+          filter: unset;
+          background-color: var(--bg-layer-color);
+        }
+      }
+      .td-collection {
+        flex: 1;
+        width: 100%;
+        overflow: auto;
+        position: relative;
+        .td-collection-body {
+          position: relative;
+          overflow: auto;
+          .td-collection-item {
+            cursor: pointer;
             justify-content: flex-start;
+            gap: var(--padding);
             width: 100%;
-            .td-collection-request-item {
+            min-height: 40px;
+            .td-collection-header {
+              gap: var(--padding);
+              padding: var(--padding);
               height: 40px;
               justify-content: space-between;
               width: 100%;
-              padding: var(--padding);
+              .td-collection-header-left {
+                gap: var(--padding);
+              }
+            }
+            .td-collection-header:hover {
+              background-color: var(--bg-layer-color);
               border-radius: var(--border-radius);
             }
-            .td-collection-request-item:hover {
-              background-color: var(--bg-layer-color);
-            }
-            .td-collection-request-item-selected {
-              background-color: var(--bg-layer-color);
-              font-weight: 600;
+            .td-collection-content {
+              justify-content: flex-start;
+              width: 100%;
+              .td-collection-request-item {
+                height: 40px;
+                justify-content: space-between;
+                width: 100%;
+                padding: var(--padding);
+                border-radius: var(--border-radius);
+              }
+              .td-collection-request-item:hover {
+                background-color: var(--bg-layer-color);
+              }
+              .td-collection-request-item-selected {
+                background-color: var(--bg-layer-color);
+                font-weight: 600;
+              }
             }
           }
         }

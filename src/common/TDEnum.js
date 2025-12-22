@@ -87,6 +87,11 @@ class TDEnum {
     BottomLeft: 3,
     BottomRight: 4,
   };
+  APISidebarOption = {
+    Collection: 1,
+    History: 2,
+    Setting: 3,
+  };
 }
 
 export default new TDEnum();
