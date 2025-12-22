@@ -313,7 +313,7 @@ export default {
       contentCURL: "Nội dung CURL muốn import",
       contentCURLExecute: "Nội dung CURL muốn chạy",
       scriptExecute: "Kịch bản muốn chạy",
-      proModeTitle: "JavaScript logic",
+      proModeTitle: "Javascript code",
       cancel: "Hủy",
       requestName: "Tên request",
       requestCanceled: "Đã hủy request hiện tại",
