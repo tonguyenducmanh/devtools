@@ -1,0 +1,51 @@
+stages:
+  - build
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+build:macos:
+  stage: build
+  tags:
+    - macos
+  script:
+    - npm install
+    - npm run desktop:build
+    - npm run desktop:build -- --target x86_64-apple-darwin
+  artifacts:
+    paths:
+      - src-tauri/target/*/release/bundle/
+    expire_in: 1 week
+
+build:linux:
+  stage: build
+  image: ubuntu:22.04
+  before_script:
+    - apt-get update
+    - apt-get install -y curl build-essential libssl-dev libwebkit2gtk-4.1-dev
+      libayatana-appindicator3-dev librsvg2-dev
+    - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    - apt-get install -y nodejs
+    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    - export PATH="/root/.cargo/bin:$PATH"
+  script:
+    - npm install
+    - npm run desktop:build
+  artifacts:
+    paths:
+      - src-tauri/target/release/bundle/
+    expire_in: 1 week
+
+build:windows:
+  stage: build
+  tags:
+    - windows
+  before_script:
+    - choco install nodejs rust -y
+  script:
+    - npm install
+    - npm run desktop:build
+  artifacts:
+    paths:
+      - src-tauri/target/release/bundle/
+    expire_in: 1 week
