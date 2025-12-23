@@ -6,7 +6,6 @@ SRC_FILE="./src/extension/toolAPIAgent/web/tool_api_agent.go"
 
 # build app desktop
 npm run desktop:build
-npm run desktop:build_mac
 
 # build Agent
 GOOS=darwin GOARCH=amd64 go build -o ${APP_NAME}-mac-intel ${SRC_FILE}
