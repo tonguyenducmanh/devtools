@@ -329,7 +329,7 @@ class TDUtility {
    * Kiểm tra xem có phải phiên bản app desktop không
    */
   isDesktopApp() {
-    return window && window.__desktop;
+    return window && window.__TAURI_INTERNALS__;
   }
   reloadApp() {
     window.location.reload();

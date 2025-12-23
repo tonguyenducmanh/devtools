@@ -249,7 +249,7 @@ const requestCURL = async (curlText) => {
   ${secranioCode}
 })();`;
   }
-  fetchAgentElectron(request) {
+  fetchAgentDesktop(request) {
     const signalId = TDUtility.newGuid();
 
     let cancelled = false;
@@ -322,7 +322,7 @@ const requestCURL = async (curlText) => {
 
   fetchAgent(request) {
     if (TDUtility.isDesktopApp()) {
-      return this.fetchAgentElectron(request);
+      return this.fetchAgentDesktop(request);
     }
     return this.fetchAgentBrowser(request);
   }
@@ -346,7 +346,7 @@ const uuidv4 = function() {
   })
 }
 
-const fetchAgentElectron = function(request) {
+const fetchAgentDesktop = function(request) {
   const signalId = uuidv4();
 
   let cancelled = false;
@@ -413,8 +413,8 @@ const fetchAgentBrowser = function(request) {
 }
 
 const fetchAgent = function(request) {
-  if (window && window.__electron && window.__electron.isElectron) {
-    return fetchAgentElectron(request);
+  if (window && window.__TAURI_INTERNALS__) {
+    return fetchAgentDesktop(request);
   }
   return fetchAgentBrowser(request);
 }`;

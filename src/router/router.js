@@ -37,7 +37,7 @@ const routerConfig = [
     meta: {
       titleKey: "i18nCommon.feature.APITesting",
     },
-    // electronNotSupport: true,
+    // desktopNotSupport: true,
   },
   {
     /**
@@ -242,7 +242,7 @@ export default router;
 export function getRouterConfig() {
   let allRoutes = [];
   if (TDUtility.isDesktopApp()) {
-    allRoutes = routerConfig.filter((x) => !x.electronNotSupport && !x.hide);
+    allRoutes = routerConfig.filter((x) => !x.desktopNotSupport && !x.hide);
   } else {
     allRoutes = routerConfig.filter((x) => !x.hide);
   }
