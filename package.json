@@ -10,6 +10,7 @@
     "electron:dev": "electron-forge start",
     "electron:build": "electron-forge package --platform win32 --arch x64",
     "electron:build_mac": "electron-forge package",
+    "electron:build_all": "npx electron-builder -mwl",
     "lint": "echo \"No linting configured\""
   },
   "keywords": [],
