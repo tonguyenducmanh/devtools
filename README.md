@@ -6,16 +6,6 @@ Two versions are supported: web version (Vue + Vite) and app version (Electron +
 
 [https://tool.tomanh.com/](https://tool.tomanh.com/)
 
-Demo:
-
-![alt text](img/screenshoot.png)
-
-![alt text](img/demo-one.png)
-
-![alt text](img/demo-three.png)
-
-![alt text](img/demo-two.png)
-
 To setup this project
 
 ```

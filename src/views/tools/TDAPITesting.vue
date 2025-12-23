@@ -701,15 +701,10 @@ export default {
       return "";
     },
     statusText() {
-      const code = Number(this.statusCode);
+      let code = Number(this.statusCode);
       if (!code) return "";
-      // nếu đang hiển thị thanh bên phải, thì không cho show đủ status do thiếu diện tích
-      // sau nghĩ ra thiết kế khác thì để full
-      if (this.isShowSidebar && this.showReponse) {
-        return code;
-      }
       // mapping chi tiết
-      const exactMap = {
+      let exactMap = {
         200: "OK",
         201: "Created",
         202: "Accepted",
@@ -736,8 +731,8 @@ export default {
       }
 
       // fallback theo nhóm HTTP
-      const group = Math.floor(code / 100);
-      const groupMap = {
+      let group = Math.floor(code / 100);
+      let groupMap = {
         1: "Informational",
         2: "Success",
         3: "Redirection",
@@ -752,11 +747,11 @@ export default {
     filteredCollection() {
       let me = this;
       if (!this.searchQuery) return me.allCollection;
-      const query = this.searchQuery.normalizeText();
+      let query = this.searchQuery.normalizeText();
 
       return me.allCollection
         .filter((collection) => {
-          const collectionName = collection.name.normalizeText();
+          let collectionName = collection.name.normalizeText();
 
           return collectionName.includes(query);
         })
@@ -1006,7 +1001,7 @@ export default {
         // gọi API
         this.currentRequest = TDCURLUtil.fetchAgent(requestData);
 
-        const response = await this.currentRequest.promise;
+        let response = await this.currentRequest.promise;
 
         let endTime = performance.now();
         this.responseTime = Math.round(endTime - this.startTime);
@@ -1191,7 +1186,7 @@ export default {
       me.startTime = performance.now();
 
       try {
-        const injectedCode = TDCURLUtil.buildInjectCode(me.proModeSecranioCode);
+        let injectedCode = TDCURLUtil.buildInjectCode(me.proModeSecranioCode);
 
         // Thực thi script
         let result = await eval(injectedCode);
