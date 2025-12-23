@@ -241,7 +241,7 @@ export default router;
 
 export function getRouterConfig() {
   let allRoutes = [];
-  if (TDUtility.isElectronApp()) {
+  if (TDUtility.isDesktopApp()) {
     allRoutes = routerConfig.filter((x) => !x.electronNotSupport && !x.hide);
   } else {
     allRoutes = routerConfig.filter((x) => !x.hide);

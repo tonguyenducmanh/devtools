@@ -328,8 +328,8 @@ class TDUtility {
   /**
    * Kiểm tra xem có phải phiên bản app desktop không
    */
-  isElectronApp() {
-    return window && window.__electron && window.__electron.isElectron;
+  isDesktopApp() {
+    return window && window.__desktop;
   }
   reloadApp() {
     window.location.reload();

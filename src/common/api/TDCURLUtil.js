@@ -321,7 +321,7 @@ const requestCURL = async (curlText) => {
   }
 
   fetchAgent(request) {
-    if (TDUtility.isElectronApp()) {
+    if (TDUtility.isDesktopApp()) {
       return this.fetchAgentElectron(request);
     }
     return this.fetchAgentBrowser(request);
