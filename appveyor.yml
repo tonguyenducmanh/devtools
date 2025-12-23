@@ -1,0 +1,84 @@
+version: 2.0.0-{build}
+
+image:
+  - Visual Studio 2022
+  - Ubuntu2204
+
+environment:
+  nodejs_version: "20"
+  RUST_BACKTRACE: 1
+
+cache:
+  - node_modules
+  - ~/.cargo
+
+build: off
+
+for:
+  # =========================
+  # WINDOWS x64
+  # =========================
+  - matrix:
+      only:
+        - image: Visual Studio 2022
+
+    install:
+      # Node.js
+      - ps: Install-Product node $env:nodejs_version
+
+      # Rust
+      - ps: |
+          Invoke-WebRequest https://win.rustup.rs/x86_64 -OutFile rustup-init.exe
+          ./rustup-init.exe -y --default-host x86_64-pc-windows-msvc
+          $env:PATH += ";$env:USERPROFILE\.cargo\bin"
+
+      # Tauri deps
+      - npm install -g npm
+      - npm install
+
+    build_script:
+      - npm run web:build
+      - npx tauri build
+
+    artifacts:
+      - path: src-tauri\target\release\bundle\**
+        name: windows-build
+
+  # =========================
+  # LINUX x64
+  # =========================
+  - matrix:
+      only:
+        - image: Ubuntu2204
+
+    install:
+      # System deps cho Tauri
+      - sudo apt update
+      - sudo apt install -y \
+        libwebkit2gtk-4.1-dev \
+        build-essential \
+        curl \
+        wget \
+        libssl-dev \
+        libgtk-3-dev \
+        libayatana-appindicator3-dev \
+        librsvg2-dev
+
+      # Node.js
+      - curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+      - sudo apt install -y nodejs
+
+      # Rust
+      - curl https://sh.rustup.rs -sSf | sh -s -- -y
+      - source $HOME/.cargo/env
+
+      # npm deps
+      - npm install
+
+    build_script:
+      - npm run web:build
+      - npx tauri build
+
+    artifacts:
+      - path: src-tauri/target/release/bundle/**
+        name: linux-build
