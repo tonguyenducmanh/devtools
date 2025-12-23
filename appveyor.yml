@@ -5,7 +5,7 @@ image:
   - Ubuntu2204
 
 environment:
-  nodejs_version: "24.12.0"
+  nodejs_version: "24"
   RUST_BACKTRACE: 1
 
 cache:
