@@ -38,7 +38,7 @@ for:
 
     build_script:
       - npm run web:build
-      - npx tauri build
+      - npx tauri build  --ci true
 
     artifacts:
       - path: src-tauri\target\release\bundle\**
@@ -77,7 +77,7 @@ for:
 
     build_script:
       - npm run web:build
-      - npx tauri build
+      - npx tauri build  --ci true
 
     artifacts:
       - path: src-tauri/target/release/bundle/**
