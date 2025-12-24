@@ -6,13 +6,12 @@ image:
 environment:
   nodejs_version: "24"
   RUST_BACKTRACE: 1
+  CI: false
 
 cache:
   - node_modules -> package-lock.json
   - '%USERPROFILE%\.cargo' # Windows
   - '$HOME/.cargo' # Linux
-  - src-tauri\target # Windows Rust build cache
-  - src-tauri/target # Linux Rust build cache
 
 build: off
 
@@ -30,7 +29,7 @@ for:
       - node --version
       - npm --version
       
-      # Rust stable
+      # Rust
       - ps: |
           if (!(Test-Path "$env:USERPROFILE\.cargo\bin\rustc.exe")) {
             Write-Host "Installing Rust..."
@@ -46,10 +45,7 @@ for:
     
     build_script:
       - npm run web:build
-      - cmd: |
-          set CI=
-          set APPVEYOR=
-          npx tauri build
+      - npx tauri build --ci false
     
     artifacts:
       - path: src-tauri\target\release\bundle\msi\*.msi
@@ -87,7 +83,7 @@ for:
           node --version
           npm --version
       
-      # Rust stable
+      # Rust
       - sh: |
           if [ ! -d "$HOME/.cargo" ]; then
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
