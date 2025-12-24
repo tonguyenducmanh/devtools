@@ -26,8 +26,6 @@ for:
     install:
       # Node.js
       - ps: Install-Product node $env:nodejs_version x64
-      - node --version
-      - npm --version
       
       # Rust
       - ps: |
@@ -37,8 +35,6 @@ for:
             .\rustup-init.exe -y --default-toolchain stable --default-host x86_64-pc-windows-msvc
           }
           $env:PATH = "$env:USERPROFILE\.cargo\bin;$env:PATH"
-          rustc --version
-          cargo --version
       
       # Install npm dependencies
       - npm install
@@ -80,8 +76,6 @@ for:
       - sh: |
           curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
           sudo apt-get install -y nodejs
-          node --version
-          npm --version
       
       # Rust
       - sh: |
@@ -89,8 +83,6 @@ for:
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
           fi
           source $HOME/.cargo/env
-          rustc --version
-          cargo --version
       
       # Install npm dependencies
       - npm install
