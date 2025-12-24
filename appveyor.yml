@@ -1,0 +1,112 @@
+version: 2.0.0-{build}
+image:
+  - Visual Studio 2022
+  - Ubuntu2204
+
+environment:
+  nodejs_version: "24"
+  RUST_BACKTRACE: 1
+  ci: false
+
+cache:
+  - node_modules -> package-lock.json
+  - '%USERPROFILE%\.cargo' # Windows
+  - '$HOME/.cargo' # Linux
+
+build: off
+
+for:
+  # =========================
+  # WINDOWS x64
+  # =========================
+  - matrix:
+      only:
+        - image: Visual Studio 2022
+    
+    install:
+      # Node.js
+      - ps: Install-Product node $env:nodejs_version x64
+      
+      # Rust - Fix cache issue
+      - ps: |
+          $cargoPath = "$env:USERPROFILE\.cargo\bin"
+          if (!(Test-Path "$cargoPath\rustc.exe")) {
+            Write-Host "Installing Rust..."
+            Invoke-WebRequest https://win.rustup.rs/x86_64 -OutFile rustup-init.exe
+            .\rustup-init.exe -y --default-toolchain stable --default-host x86_64-pc-windows-msvc
+          } else {
+            Write-Host "Rust found in cache"
+          }
+          # Always ensure PATH and default toolchain are set
+          $env:PATH = "$cargoPath;$env:PATH"
+          & "$cargoPath\rustup.exe" default stable
+          rustc --version
+          cargo --version
+      
+      # Install npm dependencies
+      - npm install
+    
+    build_script:
+      - npm run web:build
+      - npx tauri build
+
+    artifacts:
+      - path: src-tauri\target\release\bundle\msi\*.msi
+        name: windows-msi
+      - path: src-tauri\target\release\bundle\nsis\*.exe
+        name: windows-exe
+
+  # =========================
+  # LINUX x64
+  # =========================
+  - matrix:
+      only:
+        - image: Ubuntu2204
+    
+    install:
+      # System dependencies for Tauri
+      - sh: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libgtk-3-dev
+      
+      # Node.js
+      - sh: |
+          curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+          
+      # Rust - Fix cache issue
+      - sh: |
+          # Nếu chưa có thư mục .cargo => cài mới rustup
+          if [ ! -d "$HOME/.cargo" ]; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+          fi
+          export PATH="$HOME/.cargo/bin:$PATH"
+          # Luôn thiết lập lại default toolchain
+          "$HOME/.cargo/bin/rustup" default stable
+          rustc --version
+          cargo --version
+      
+      # Install npm dependencies
+      - npm install
+    
+    build_script:
+      - sh: |
+          export PATH="$HOME/.cargo/bin:$PATH"
+          npm run web:build
+          npx tauri build
+
+    artifacts:
+      - path: src-tauri/target/release/bundle/deb/*.deb
+        name: linux-deb
+      - path: src-tauri/target/release/bundle/appimage/*.AppImage
+        name: linux-appimage

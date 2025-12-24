@@ -71,7 +71,7 @@
         >
           <TDButton
             :noMargin="true"
-            v-if="!isElectronApp"
+            v-if="!isDesktopApp"
             @click="downloadExtension"
             :type="$tdEnum.buttonType.secondary"
             :label="$t('i18nCommon.apiTesting.downloadExtension')"
@@ -673,8 +673,8 @@ export default {
     }
   },
   computed: {
-    isElectronApp() {
-      return this.$tdUtility.isElectronApp();
+    isDesktopApp() {
+      return this.$tdUtility.isDesktopApp();
     },
     sidebarOptions() {
       let me = this;

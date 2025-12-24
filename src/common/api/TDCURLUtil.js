@@ -1,4 +1,5 @@
 import TDUtility from "@/common/TDUtility.js";
+
 /**
  * các method CURL dùng cho toàn bộ frontend
  * Created by tdmanh 16/12/2025
@@ -249,80 +250,43 @@ const requestCURL = async (curlText) => {
   ${secranioCode}
 })();`;
   }
-  fetchAgentElectron(request) {
+  fetchAgentDesktop(request) {
     const signalId = TDUtility.newGuid();
-
     let cancelled = false;
 
-    const promise = window.agent.exec(request, signalId);
+    // Import Tauri invoke
+    const { invoke } = window.__TAURI_INTERNALS__;
+
+    const promise = invoke("exec", {
+      request: {
+        apiUrl: request.apiUrl,
+        httpMethod: request.httpMethod || "GET",
+        headersText: request.headersText || null,
+        bodyText: request.bodyText || null,
+      },
+      signalId,
+    });
 
     return {
       promise,
-      cancel() {
+      async cancel() {
         if (cancelled) return;
         cancelled = true;
-        window.agent.cancel(signalId);
-        throw new Error("Request cancelled by user");
-      },
-    };
-  }
-
-  /**
-   * Sử dụng agent để thực hiện chạy command curl gọi API,
-   * không bị giới hạn bởi các tool của trình duyệt
-   */
-  fetchAgentBrowser(request) {
-    let serverAgent = window.__env?.APITesting?.agentServer;
-    if (!serverAgent) {
-      throw new Error("Agent server not configured");
-    }
-
-    const controller = new AbortController();
-
-    const promise = fetch(`${serverAgent}/exec`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request),
-      signal: controller.signal,
-    })
-      .then(async (res) => {
-        const text = await res.text();
-        let data;
 
         try {
-          data = JSON.parse(text);
-          return {
-            status: data.status,
-            headers: data.headers,
-            body: data.body,
-          };
-        } catch {
-          data = text;
-          return {
-            status: 200,
-            headers: {},
-            body: data,
-          };
+          await invoke("cancel", { signalId });
+        } catch (error) {
+          console.error("Cancel failed:", error);
         }
-      })
-      .catch((error) => {
-        throw error;
-      });
 
-    return {
-      promise,
-      cancel() {
-        controller.abort();
         throw new Error("Request cancelled by user");
       },
     };
   }
 
   fetchAgent(request) {
-    if (TDUtility.isElectronApp()) {
-      return this.fetchAgentElectron(request);
+    if (TDUtility.isDesktopApp()) {
+      return this.fetchAgentDesktop(request);
     }
     return this.fetchAgentBrowser(request);
   }
@@ -346,19 +310,35 @@ const uuidv4 = function() {
   })
 }
 
-const fetchAgentElectron = function(request) {
+const fetchAgentDesktop = function(request) {
   const signalId = uuidv4();
-
   let cancelled = false;
 
-  const promise = window.agent.exec(request, signalId);
+  // Sử dụng Tauri invoke
+  const { invoke } = window.__TAURI_INTERNALS__;
+  
+  const promise = invoke('exec', { 
+    request: {
+      apiUrl: request.apiUrl,
+      httpMethod: request.httpMethod || 'GET',
+      headersText: request.headersText || null,
+      bodyText: request.bodyText || null,
+    },
+    signalId 
+  });
 
   return {
     promise,
-    cancel() {
+    async cancel() {
       if (cancelled) return;
       cancelled = true;
-      window.agent.cancel(signalId);
+      
+      try {
+        await invoke('cancel', { signalId });
+      } catch (error) {
+        console.error('Cancel failed:', error);
+      }
+      
       throw new Error("Request cancelled by user");
     },
   };
@@ -413,8 +393,8 @@ const fetchAgentBrowser = function(request) {
 }
 
 const fetchAgent = function(request) {
-  if (window && window.__electron && window.__electron.isElectron) {
-    return fetchAgentElectron(request);
+  if (window && window.__TAURI_INTERNALS__) {
+    return fetchAgentDesktop(request);
   }
   return fetchAgentBrowser(request);
 }`;
