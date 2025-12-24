@@ -283,7 +283,58 @@ const requestCURL = async (curlText) => {
       },
     };
   }
+  /**
+   * Sử dụng agent để thực hiện chạy command curl gọi API,
+   * không bị giới hạn bởi các tool của trình duyệt
+   */
+  fetchAgentBrowser(request) {
+    let serverAgent = window.__env?.APITesting?.agentServer;
+    if (!serverAgent) {
+      throw new Error("Agent server not configured");
+    }
 
+    const controller = new AbortController();
+
+    const promise = fetch(`${serverAgent}/exec`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+      signal: controller.signal,
+    })
+      .then(async (res) => {
+        const text = await res.text();
+        let data;
+
+        try {
+          data = JSON.parse(text);
+          return {
+            status: data.status,
+            headers: data.headers,
+            body: data.body,
+          };
+        } catch {
+          data = text;
+          return {
+            status: 200,
+            headers: {},
+            body: data,
+          };
+        }
+      })
+      .catch((error) => {
+        throw error;
+      });
+
+    return {
+      promise,
+      cancel() {
+        controller.abort();
+        throw new Error("Request cancelled by user");
+      },
+    };
+  }
   fetchAgent(request) {
     if (TDUtility.isDesktopApp()) {
       return this.fetchAgentDesktop(request);
