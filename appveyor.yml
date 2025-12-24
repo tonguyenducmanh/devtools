@@ -27,14 +27,21 @@ for:
       # Node.js
       - ps: Install-Product node $env:nodejs_version x64
       
-      # Rust
+      # Rust - Fix cache issue
       - ps: |
-          if (!(Test-Path "$env:USERPROFILE\.cargo\bin\rustc.exe")) {
+          $cargoPath = "$env:USERPROFILE\.cargo\bin"
+          if (!(Test-Path "$cargoPath\rustc.exe")) {
             Write-Host "Installing Rust..."
             Invoke-WebRequest https://win.rustup.rs/x86_64 -OutFile rustup-init.exe
             .\rustup-init.exe -y --default-toolchain stable --default-host x86_64-pc-windows-msvc
+          } else {
+            Write-Host "Rust found in cache"
           }
-          $env:PATH = "$env:USERPROFILE\.cargo\bin;$env:PATH"
+          # Always ensure PATH and default toolchain are set
+          $env:PATH = "$cargoPath;$env:PATH"
+          & "$cargoPath\rustup.exe" default stable
+          rustc --version
+          cargo --version
       
       # Install npm dependencies
       - npm install
@@ -42,7 +49,7 @@ for:
     build_script:
       - npm run web:build
       - npx tauri build
-    
+
     artifacts:
       - path: src-tauri\target\release\bundle\msi\*.msi
         name: windows-msi
@@ -76,23 +83,28 @@ for:
       - sh: |
           curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
           sudo apt-get install -y nodejs
-      
-      # Rust
+          
+      # Rust - Fix cache issue
       - sh: |
+          # Nếu chưa có thư mục .cargo => cài mới rustup
           if [ ! -d "$HOME/.cargo" ]; then
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
           fi
-          source $HOME/.cargo/env
+          export PATH="$HOME/.cargo/bin:$PATH"
+          # Luôn thiết lập lại default toolchain
+          "$HOME/.cargo/bin/rustup" default stable
+          rustc --version
+          cargo --version
       
       # Install npm dependencies
       - npm install
     
     build_script:
       - sh: |
-          source $HOME/.cargo/env
+          export PATH="$HOME/.cargo/bin:$PATH"
           npm run web:build
           npx tauri build
-    
+
     artifacts:
       - path: src-tauri/target/release/bundle/deb/*.deb
         name: linux-deb
