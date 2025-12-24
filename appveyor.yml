@@ -6,7 +6,7 @@ image:
 environment:
   nodejs_version: "24"
   RUST_BACKTRACE: 1
-  CI: false
+  ci: false
 
 cache:
   - node_modules -> package-lock.json
@@ -45,7 +45,7 @@ for:
     
     build_script:
       - npm run web:build
-      - npx tauri build --ci false
+      - npx tauri build
     
     artifacts:
       - path: src-tauri\target\release\bundle\msi\*.msi
