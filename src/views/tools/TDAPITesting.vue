@@ -489,19 +489,6 @@
             </div>
             <div class="flex td-api-upload-collection-area">
               <TDTooltip
-                :title="$t('i18nCommon.apiTesting.importCollectionZipTooltip')"
-                maxWidth="500px"
-              >
-                <TDUpload
-                  :label="$t('i18nCommon.apiTesting.importCollectionZip')"
-                  :accept="'.zip'"
-                  @change="importCollectionZip"
-                  ref="uploadArea"
-                  :isShowSelect="false"
-                  maxWidth="250px"
-                />
-              </TDTooltip>
-              <TDTooltip
                 :title="
                   $t('i18nCommon.apiTesting.importCollectionPostmanTooltip')
                 "
@@ -514,6 +501,19 @@
                   ref="uploadAreaPostman"
                   :isShowSelect="false"
                   :multiple="true"
+                />
+              </TDTooltip>
+              <TDTooltip
+                :title="$t('i18nCommon.apiTesting.importCollectionZipTooltip')"
+                maxWidth="500px"
+              >
+                <TDUpload
+                  :label="$t('i18nCommon.apiTesting.importCollectionZip')"
+                  :accept="'.zip'"
+                  @change="importCollectionZip"
+                  ref="uploadArea"
+                  :isShowSelect="false"
+                  maxWidth="250px"
                 />
               </TDTooltip>
             </div>
