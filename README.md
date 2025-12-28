@@ -33,3 +33,10 @@ npm run desktop:dev
 ```
 npm run desktop:build
 ```
+
+For api agent
+
+```
+cd ./src-backend/td_tool_api/
+cargo build --release
+```
