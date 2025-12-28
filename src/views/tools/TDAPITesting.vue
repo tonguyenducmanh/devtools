@@ -711,7 +711,11 @@ export default {
       me.$tdEnum.cacheConfig.APICollection
     );
     if (allCollectionTmp) {
-      me.allCollection = JSON.parse(allCollectionTmp) || [];
+      if (Array.isArray(allCollectionTmp)) {
+        me.allCollection = allCollectionTmp;
+      } else {
+        me.allCollection = JSON.parse(allCollectionTmp) || [];
+      }
     }
   },
   computed: {
@@ -845,7 +849,11 @@ export default {
     },
     async saveCollectionToCache() {
       let me = this;
-      if (me.allCollection && me.allCollection.length > 0) {
+      if (
+        me.allCollection &&
+        Array.isArray(me.allCollection) &&
+        me.allCollection.length >= 0
+      ) {
         await me.$tdCache.set(
           me.$tdEnum.cacheConfig.APICollection,
           JSON.stringify(me.allCollection)
@@ -940,7 +948,7 @@ export default {
     },
     async deleteCollection(collectionName) {
       let me = this;
-      if (collectionName && me.allCollection && me.allCollection.length > 0) {
+      if (collectionName && me.allCollection && me.allCollection.length >= 0) {
         me.allCollection = me.allCollection.filter(
           (x) => x.name != collectionName
         );
