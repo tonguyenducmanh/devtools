@@ -289,6 +289,7 @@ export default {
       help: "Gõ để tìm kiếm các tính năng, sử dụng ↑↓ để điều hướng và Enter để chọn",
     },
     apiTesting: {
+      importCollection:"Nhập collection",
       agentUrl: "Nhập url agent",
       title: "Công cụ kiểm tra API!",
       url: "URL",

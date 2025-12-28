@@ -485,6 +485,16 @@
                 </div>
               </div>
             </div>
+            <div class="td-api-upload-collection-area">
+              <TDUpload
+                :label="$t('i18nCommon.apiTesting.importCollection')"
+                :accept="'.zip'"
+                @change="importCollectionZip"
+                ref="uploadArea"
+                :isShowSelect="false"
+                maxWidth="250px"
+              />
+            </div>
             <div class="flex">
               <TDButton
                 :readOnly="isLoading"
@@ -600,6 +610,7 @@
 import TDCURLUtil from "@/common/api/TDCURLUtil";
 import TDToggleArea from "@/components/TDToggleArea.vue";
 import TDArrow from "@/components/TDArrow.vue";
+import JSZip from "jszip";
 
 export default {
   name: "TDAPITesting",
@@ -920,6 +931,72 @@ export default {
     closeSearchModal() {
       this.isSaveRequestToCollectionModelOpen = false;
       this.searchQuery = "";
+    },
+    async importCollectionZip() {
+      let me = this;
+      if (
+        me.$refs.uploadArea &&
+        typeof me.$refs.uploadArea.getFileSelected == "function" &&
+        typeof me.$refs.uploadArea.clearFileSelected == "function"
+      ) {
+        let zip = new JSZip();
+        let files = me.$refs.uploadArea.getFileSelected();
+        if (files && Array.isArray(files) && files.length > 0) {
+          let zipData = await zip.loadAsync(files[0]);
+          let newCollections = await me.buildCollectionsFromZip(zipData);
+          if (
+            newCollections &&
+            Array.isArray(newCollections) &&
+            newCollections.length > 0
+          ) {
+            if (!me.allCollection || !Array.isArray(me.allCollection)) {
+              me.allCollection = [];
+            }
+            me.allCollection = [...me.allCollection, ...newCollections];
+            await me.saveCollectionToCache();
+            me.$refs.uploadArea.clearFileSelected();
+          }
+        }
+      }
+    },
+    async buildCollectionsFromZip(zip) {
+      let me = this;
+      let collections = {};
+
+      for (let file of Object.values(zip.files)) {
+        if (file.dir) continue;
+        if (!file.name.endsWith(".txt")) continue;
+
+        // bỏ root folder
+        let parts = file.name.split("/").filter(Boolean);
+        if (parts.length < 2) continue;
+
+        let collectionName = parts[1]; // Shopee
+        let fileName = parts.at(-1); // 01_xxx.txt
+        let requestName = fileName.replace(".txt", "");
+
+        let content = await file.async("string");
+
+        if (!collections[collectionName]) {
+          collections[collectionName] = {
+            name: collectionName,
+            collection_id: me.$tdUtility.newGuid(),
+            openingCollection: false,
+            requests: [],
+          };
+        }
+        let curlConent = TDCURLUtil.parse(content);
+        collections[collectionName].requests.push({
+          requestName: requestName,
+          apiUrl: curlConent.url,
+          bodyText: JSON.stringify(JSON.parse(curlConent.body), null, 2),
+          headersText: curlConent.headersText,
+          httpMethod: curlConent.method,
+          requestId: me.$tdUtility.newGuid(),
+        });
+      }
+
+      return Object.values(collections);
     },
     createNewRequest() {
       let me = this;
@@ -1680,5 +1757,8 @@ body[data-theme="dark"] {
 .agent-url-label {
   gap: var(--padding);
   margin-bottom: var(--padding);
+}
+.td-api-upload-collection-area {
+  margin: var(--padding);
 }
 </style>
