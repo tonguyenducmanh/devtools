@@ -1,4 +1,5 @@
 version: 2.0.0-{build}
+
 image:
   - Visual Studio 2022
   - Ubuntu2204
@@ -11,23 +12,23 @@ environment:
 cache:
   - node_modules -> package-lock.json
   - '%USERPROFILE%\.cargo' # Windows
-  - '$HOME/.cargo' # Linux
+  - "$HOME/.cargo" # Linux
 
 build: off
 
+# =========================================================
+# WINDOWS x64
+# =========================================================
 for:
-  # =========================
-  # WINDOWS x64
-  # =========================
   - matrix:
       only:
         - image: Visual Studio 2022
-    
+
     install:
       # Node.js
       - ps: Install-Product node $env:nodejs_version x64
-      
-      # Rust - Fix cache issue
+
+      # Rust
       - ps: |
           $cargoPath = "$env:USERPROFILE\.cargo\bin"
           if (!(Test-Path "$cargoPath\rustc.exe")) {
@@ -37,34 +38,56 @@ for:
           } else {
             Write-Host "Rust found in cache"
           }
-          # Always ensure PATH and default toolchain are set
           $env:PATH = "$cargoPath;$env:PATH"
           & "$cargoPath\rustup.exe" default stable
           rustc --version
           cargo --version
-      
-      # Install npm dependencies
+
+      # NPM
       - npm install
-    
+
     build_script:
+      # =====================
+      # Build WEB
+      # =====================
       - npm run web:build
-      - npx tauri build
+
+      # =====================
+      # Build Rust API
+      # =====================
+      - ps: |
+          cd src-backend\td_tool_api
+          cargo build --release
+          cd ..\..\
+
+      # =====================
+      # Build Tauri Desktop
+      # =====================
+      - ps: |
+          cd src-backend\td_tool_desktop
+          npx tauri build
 
     artifacts:
-      - path: src-tauri\target\release\bundle\msi\*.msi
+      # Desktop
+      - path: src-backend\td_tool_desktop\target\release\bundle\msi\*.msi
         name: windows-msi
-      - path: src-tauri\target\release\bundle\nsis\*.exe
+
+      - path: src-backend\td_tool_desktop\target\release\bundle\nsis\*.exe
         name: windows-exe
 
-  # =========================
+      # API
+      - path: src-backend\td_tool_api\target\release\*.exe
+        name: windows-api
+
+  # =========================================================
   # LINUX x64
-  # =========================
+  # =========================================================
   - matrix:
       only:
         - image: Ubuntu2204
-    
+
     install:
-      # System dependencies for Tauri
+      # System deps for Tauri
       - sh: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -78,35 +101,55 @@ for:
             libayatana-appindicator3-dev \
             librsvg2-dev \
             libgtk-3-dev
-      
+
       # Node.js
       - sh: |
           curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
           sudo apt-get install -y nodejs
-          
-      # Rust - Fix cache issue
+
+      # Rust
       - sh: |
-          # Nếu chưa có thư mục .cargo => cài mới rustup
           if [ ! -d "$HOME/.cargo" ]; then
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
           fi
           export PATH="$HOME/.cargo/bin:$PATH"
-          # Luôn thiết lập lại default toolchain
-          "$HOME/.cargo/bin/rustup" default stable
+          rustup default stable
           rustc --version
           cargo --version
-      
-      # Install npm dependencies
+
+      # NPM
       - npm install
-    
+
     build_script:
       - sh: |
           export PATH="$HOME/.cargo/bin:$PATH"
+
+          # =====================
+          # Build WEB
+          # =====================
           npm run web:build
+
+          # =====================
+          # Build Rust API
+          # =====================
+          cd src-backend/td_tool_api
+          cargo build --release
+          cd ../../
+
+          # =====================
+          # Build Tauri Desktop
+          # =====================
+          cd src-backend/td_tool_desktop
           npx tauri build
 
     artifacts:
-      - path: src-tauri/target/release/bundle/deb/*.deb
+      # Desktop
+      - path: src-backend/td_tool_desktop/target/release/bundle/deb/*.deb
         name: linux-deb
-      - path: src-tauri/target/release/bundle/appimage/*.AppImage
+
+      - path: src-backend/td_tool_desktop/target/release/bundle/appimage/*.AppImage
         name: linux-appimage
+
+      # API
+      - path: src-backend/td_tool_api/target/release/*
+        name: linux-api

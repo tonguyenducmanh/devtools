@@ -992,10 +992,10 @@ export default {
         // let headers = this.parseHeaders(this.headersText);
 
         let requestData = {
-          apiUrl: this.apiUrl,
-          httpMethod: this.httpMethod,
-          headersText: this.headersText,
-          bodyText: this.bodyText || null,
+          api_url: this.apiUrl,
+          http_method: this.httpMethod,
+          headers_text: this.headersText,
+          body_text: this.bodyText || null,
         };
 
         // gọi API
