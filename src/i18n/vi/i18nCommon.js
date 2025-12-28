@@ -289,6 +289,7 @@ export default {
       help: "Gõ để tìm kiếm các tính năng, sử dụng ↑↓ để điều hướng và Enter để chọn",
     },
     apiTesting: {
+      agentUrl: "Nhập url agent",
       title: "Công cụ kiểm tra API!",
       url: "URL",
       urlPlaceholder: "Nhập URL",
@@ -308,7 +309,7 @@ export default {
       CURL: "CURL",
       importCURL: "Nhập",
       extensionNotAvailable: "Extension helper chưa được cài đặt",
-      downloadExtension: "Tải Agent",
+      downloadExtension: "Tải Agent và nhập URL",
       toolTipDownloadExtension:
         "Trình duyệt bị giới hạn không thể vượt CORS, tắt SSL, fake header,... nên cần Agent là 1 app desktop call API hộ",
       contentCURL: "Nội dung CURL muốn import",

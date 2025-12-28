@@ -66,17 +66,6 @@
           :cacheKey="$tdEnum.cacheConfig.APIHistory"
           :historyContainerStyleEnum="$tdEnum.AbsolutePositionStyle.Top100Left"
         ></TDHistory>
-        <TDTooltip
-          :title="$t('i18nCommon.apiTesting.toolTipDownloadExtension')"
-        >
-          <TDButton
-            :noMargin="true"
-            v-if="!isDesktopApp"
-            @click="downloadExtension"
-            :type="$tdEnum.buttonType.secondary"
-            :label="$t('i18nCommon.apiTesting.downloadExtension')"
-          ></TDButton>
-        </TDTooltip>
       </div>
       <template v-if="currentAPIMode == $tdEnum.APIMode.Normal">
         <template v-if="isImportingCURL">
@@ -537,6 +526,27 @@
               v-model="enableHighlight"
               :label="$t('i18nCommon.enableHighlight')"
             ></TDCheckbox>
+            <template v-if="!isDesktopApp"
+              ><div class="flex flex-start agent-url-label">
+                <TDTooltip
+                  :title="$t('i18nCommon.apiTesting.toolTipDownloadExtension')"
+                >
+                  <TDButton
+                    :noMargin="true"
+                    @click="downloadExtension"
+                    :type="$tdEnum.buttonType.secondary"
+                    :label="$t('i18nCommon.apiTesting.downloadExtension')"
+                  ></TDButton>
+                </TDTooltip>
+              </div>
+              <div>
+                <TDInput
+                  v-model="agentURL"
+                  :noMargin="true"
+                  :placeHolder="$t('i18nCommon.apiTesting.agentUrl')"
+                />
+              </div>
+            </template>
           </div>
         </div>
         <TDToggleArea
@@ -603,6 +613,7 @@ export default {
       requestName: "",
       currentRequestId: null,
       newCollectionName: "",
+      agentURL: window.__env?.APITesting?.agentServer,
       allCollection: [],
       httpMethod: "GET",
       headersText: "Content-Type: application/json",
@@ -958,6 +969,7 @@ export default {
      */
     async handleSend() {
       let me = this;
+      this.setGlobalInfoBeforeRequest();
       if (me.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
         await me.handleSendRequestProMode();
       } else if (me.currentAPIMode == me.$tdEnum.APIMode.CURL) {
@@ -1170,6 +1182,12 @@ export default {
         me.$tdEnum.cacheConfig.APIMode,
         JSON.stringify(historyAPIMode)
       );
+    },
+    setGlobalInfoBeforeRequest() {
+      let me = this;
+      window.__tdInfo = {
+        agentURL: me.agentURL ?? window.__env?.APITesting?.agentServer,
+      };
     },
     async handleSendRequestProMode() {
       let me = this;
@@ -1658,5 +1676,9 @@ body[data-theme="dark"] {
 }
 .title-request {
   margin-left: var(--padding);
+}
+.agent-url-label {
+  gap: var(--padding);
+  margin-bottom: var(--padding);
 }
 </style>

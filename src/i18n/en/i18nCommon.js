@@ -290,6 +290,7 @@ export default {
       help: "Type to search features, use ↑↓ to navigate and Enter to select",
     },
     apiTesting: {
+      agentUrl: "Enter url agent",
       title: "API Testing Tool!",
       url: "URL",
       urlPlaceholder: "Enter URL",
@@ -309,7 +310,7 @@ export default {
       CURL: "CURL",
       importCURL: "Import",
       extensionNotAvailable: "Extension helper not installed",
-      downloadExtension: "Download Agent",
+      downloadExtension: "Down Agent, enter URL",
       toolTipDownloadExtension:
         "The browser is limited and cannot bypass CORS, SSL is disabled, fake headers are used, etc., so an agent (a desktop app) is needed to call the API on its behalf.",
       contentCURL: "CURL import content",

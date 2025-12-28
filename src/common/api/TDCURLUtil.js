@@ -288,7 +288,7 @@ const requestCURL = async (curlText) => {
    * không bị giới hạn bởi các tool của trình duyệt
    */
   fetchAgentBrowser(request) {
-    let serverAgent = window.__env?.APITesting?.agentServer;
+    let serverAgent = window.__tdInfo?.agentURL;
     if (!serverAgent) {
       throw new Error("Agent server not configured");
     }
@@ -396,7 +396,7 @@ const fetchAgentDesktop = function(request) {
 }
 
 const fetchAgentBrowser = function(request) {
-  let serverAgent = window.__env?.APITesting?.agentServer;
+  let serverAgent = window.__tdInfo?.agentURL;
   if (!serverAgent) {
     throw new Error("Agent server not configured");
   }
