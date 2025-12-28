@@ -1491,6 +1491,8 @@ export default {
             gap: var(--padding);
             width: 100%;
             min-height: 40px;
+            margin-bottom: var(--padding);
+
             .td-collection-header {
               gap: var(--padding);
               padding: var(--padding);
