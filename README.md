@@ -40,3 +40,16 @@ For api agent
 cd ./src-backend/td_tool_api/
 cargo build --release
 ```
+
+run api_agent, replace agent_name with agent api name, default port is 7777
+
+```
+chmod 777 ./agent_name
+./agent_name
+```
+
+to run in specific port
+
+```
+./agent_name --port 1234
+```
