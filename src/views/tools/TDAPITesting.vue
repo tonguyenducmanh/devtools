@@ -440,7 +440,7 @@
                     >
                       <div
                         class="td-icon td-close-icon"
-                        @click.stop="deleteCollection(collection.name)"
+                        @click.stop="deleteCollection(collection.collection_id)"
                       ></div>
                     </TDTooltip>
                   </div>
@@ -477,7 +477,9 @@
                       >
                         <div
                           class="td-icon td-close-icon"
-                          @click.stop="deleteRequest(collection.name, request)"
+                          @click.stop="
+                            deleteRequest(collection.collection_id, request)
+                          "
                         ></div>
                       </TDTooltip>
                     </div>
@@ -923,16 +925,16 @@ export default {
       }
       this.closeSearchModal();
     },
-    async deleteRequest(collectionName, request) {
+    async deleteRequest(collectionId, request) {
       let me = this;
       if (
-        collectionName &&
+        collectionId &&
         request &&
         me.allCollection &&
         me.allCollection.length > 0
       ) {
         let currentCollection = me.allCollection.find(
-          (x) => x.name == collectionName
+          (x) => x.collection_id == collectionId
         );
         if (
           currentCollection &&
@@ -946,11 +948,11 @@ export default {
         }
       }
     },
-    async deleteCollection(collectionName) {
+    async deleteCollection(collectionId) {
       let me = this;
-      if (collectionName && me.allCollection && me.allCollection.length >= 0) {
+      if (collectionId && me.allCollection && me.allCollection.length >= 0) {
         me.allCollection = me.allCollection.filter(
-          (x) => x.name != collectionName
+          (x) => x.collection_id != collectionId
         );
 
         await me.saveCollectionToCache();
