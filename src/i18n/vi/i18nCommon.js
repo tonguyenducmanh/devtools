@@ -292,6 +292,9 @@ export default {
       importCollectionZip: "Nhập zip",
       importCollectionZipTooltip:
         'Nhập khẩu file có định dạng zip, nội dung file nên theo cấu trúc như sau:"zip_folder/", -> đây là folder cha sau khi giải nén; "zip_folder/collection_name_01/", -> folder chứa 1 collecion cụ thể; "zip_folder/collection_name_01/01_vector_embedding.txt",  -> nội dung dạng txt chứa curl api',
+      importCollectionPostman: "Nhập postman",
+      importCollectionPostmanTooltip:
+        "Nhập khẩu file có định dạng json, được export từ collection Postman, hỗ trợ nhập 1 lúc nhiều file json",
       agentUrl: "Nhập url agent",
       title: "Công cụ kiểm tra API!",
       url: "URL",

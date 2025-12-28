@@ -485,7 +485,7 @@
                 </div>
               </div>
             </div>
-            <div class="td-api-upload-collection-area">
+            <div class="flex td-api-upload-collection-area">
               <TDTooltip
                 :title="$t('i18nCommon.apiTesting.importCollectionZipTooltip')"
                 maxWidth="500px"
@@ -497,6 +497,21 @@
                   ref="uploadArea"
                   :isShowSelect="false"
                   maxWidth="250px"
+                />
+              </TDTooltip>
+              <TDTooltip
+                :title="
+                  $t('i18nCommon.apiTesting.importCollectionPostmanTooltip')
+                "
+                maxWidth="500px"
+              >
+                <TDUpload
+                  :label="$t('i18nCommon.apiTesting.importCollectionPostman')"
+                  :accept="'.json'"
+                  @change="importCollectionPostman"
+                  ref="uploadAreaPostman"
+                  :isShowSelect="false"
+                  :multiple="true"
                 />
               </TDTooltip>
             </div>
@@ -946,22 +961,26 @@ export default {
       ) {
         let zip = new JSZip();
         let files = me.$refs.uploadArea.getFileSelected();
+        me.$refs.uploadArea.clearFileSelected();
         if (files && Array.isArray(files) && files.length > 0) {
           let zipData = await zip.loadAsync(files[0]);
           let newCollections = await me.buildCollectionsFromZip(zipData);
-          if (
-            newCollections &&
-            Array.isArray(newCollections) &&
-            newCollections.length > 0
-          ) {
-            if (!me.allCollection || !Array.isArray(me.allCollection)) {
-              me.allCollection = [];
-            }
-            me.allCollection = [...me.allCollection, ...newCollections];
-            await me.saveCollectionToCache();
-            me.$refs.uploadArea.clearFileSelected();
-          }
+          await me.saveImportCollection(newCollections);
         }
+      }
+    },
+    async saveImportCollection(newCollections) {
+      let me = this;
+      if (
+        newCollections &&
+        Array.isArray(newCollections) &&
+        newCollections.length > 0
+      ) {
+        if (!me.allCollection || !Array.isArray(me.allCollection)) {
+          me.allCollection = [];
+        }
+        me.allCollection = [...me.allCollection, ...newCollections];
+        await me.saveCollectionToCache();
       }
     },
     async buildCollectionsFromZip(zip) {
@@ -1002,6 +1021,81 @@ export default {
       }
 
       return Object.values(collections);
+    },
+    async importCollectionPostman() {
+      let me = this;
+      if (
+        me.$refs.uploadAreaPostman &&
+        typeof me.$refs.uploadAreaPostman.getFileSelected == "function" &&
+        typeof me.$refs.uploadAreaPostman.clearFileSelected == "function"
+      ) {
+        let files = me.$refs.uploadAreaPostman.getFileSelected();
+        me.$refs.uploadArea.clearFileSelected();
+        if (files && Array.isArray(files) && files.length > 0) {
+          let newCollections = [];
+          for (let file of Object.values(files)) {
+            if (!file.name.endsWith(".json")) {
+              continue;
+            }
+            let temp = await me.buildCollectionsFromPostman(file, me);
+            if (
+              temp &&
+              Array.isArray(temp.requests) &&
+              temp.requests.length > 0
+            ) {
+              newCollections.push(temp);
+            }
+          }
+          await me.saveImportCollection(newCollections);
+        }
+      }
+    },
+
+    async buildCollectionsFromPostman(file, me) {
+      let contentTemp = await file.text();
+      let content = JSON.parse(contentTemp);
+      let result = null;
+      if (
+        content &&
+        content.item &&
+        content.info &&
+        Array.isArray(content.item) &&
+        content.item.length > 0 &&
+        content.info.name
+      ) {
+        let tempCollection = {
+          name: content.info.name,
+          collection_id: me.$tdUtility.newGuid(),
+          openingCollection: false,
+          requests: [],
+        };
+        content.item.forEach((item) => {
+          let bodyText = item?.request?.body?.raw;
+          let headerRaw = item?.request?.header;
+          let headerText = "";
+          if (headerRaw && Array.isArray(headerRaw) && headerRaw.length > 0) {
+            let convertHeader = [];
+            headerRaw.forEach((headerItem) => {
+              convertHeader.push(`${headerItem.key}:${headerItem.value}`);
+            });
+            if (convertHeader.length > 0) {
+              headerText = convertHeader.join("\n");
+            }
+          }
+          if (item.name && item?.request?.url?.raw) {
+            tempCollection.requests.push({
+              requestName: item.name,
+              apiUrl: item.request.url.raw,
+              bodyText: bodyText,
+              headersText: headerText,
+              httpMethod: item?.request?.url?.method,
+              requestId: me.$tdUtility.newGuid(),
+            });
+          }
+        });
+        result = tempCollection;
+      }
+      return result;
     },
     createNewRequest() {
       let me = this;
@@ -1772,5 +1866,6 @@ body[data-theme="dark"] {
 }
 .td-api-upload-collection-area {
   margin: var(--padding);
+  gap: var(--padding);
 }
 </style>
