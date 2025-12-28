@@ -48,11 +48,6 @@ for:
 
     build_script:
       # =====================
-      # Build WEB
-      # =====================
-      - npm run web:build
-
-      # =====================
       # Build Rust API
       # =====================
       - ps: |
@@ -123,11 +118,6 @@ for:
     build_script:
       - sh: |
           export PATH="$HOME/.cargo/bin:$PATH"
-
-          # =====================
-          # Build WEB
-          # =====================
-          npm run web:build
 
           # =====================
           # Build Rust API
