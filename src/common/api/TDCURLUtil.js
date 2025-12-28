@@ -259,10 +259,10 @@ const requestCURL = async (curlText) => {
 
     const promise = invoke("exec", {
       request: {
-        api_url: request.apiUrl,
-        http_method: request.httpMethod || "GET",
-        headers_text: request.headersText || null,
-        body_text: request.bodyText || null,
+        api_url: request.api_url,
+        http_method: request.http_method || "GET",
+        headers_text: request.headers_text || null,
+        body_text: request.body_text || null,
       },
       signalId,
     });
@@ -370,10 +370,10 @@ const fetchAgentDesktop = function(request) {
   
   const promise = invoke('exec', { 
     request: {
-      api_url: request.apiUrl,
-      http_method: request.httpMethod || 'GET',
-      headers_text: request.headersText || null,
-      body_text: request.bodyText || null,
+      api_url: request.api_url,
+      http_method: request.http_method || 'GET',
+      headers_text: request.headers_text || null,
+      body_text: request.body_text || null,
     },
     signalId 
   });
