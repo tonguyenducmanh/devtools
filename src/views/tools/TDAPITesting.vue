@@ -1024,7 +1024,9 @@ export default {
         collections[collectionName].requests.push({
           requestName: requestName,
           apiUrl: curlConent.url,
-          bodyText: JSON.stringify(JSON.parse(curlConent.body), null, 2),
+          bodyText: curlConent.body
+            ? JSON.stringify(JSON.parse(curlConent.body), null, 2)
+            : null,
           headersText: curlConent.headersText,
           httpMethod: curlConent.method,
           requestId: me.$tdUtility.newGuid(),
@@ -1097,7 +1099,9 @@ export default {
             tempCollection.requests.push({
               requestName: item.name,
               apiUrl: item?.request?.url?.raw,
-              bodyText: bodyText,
+              bodyText: bodyText
+                ? JSON.stringify(JSON.parse(bodyText), null, 2)
+                : null,
               headersText: headerText,
               httpMethod: item?.request?.method ?? "GET",
               requestId: me.$tdUtility.newGuid(),
@@ -1333,7 +1337,9 @@ export default {
           me.requestName = CURLParsed.url;
         }
         try {
-          me.bodyText = JSON.stringify(JSON.parse(CURLParsed.body), null, 2);
+          me.bodyText = CURLParsed.body
+            ? JSON.stringify(JSON.parse(CURLParsed.body), null, 2)
+            : null;
         } catch (ex) {
           console.log(ex);
           me.bodyText = CURLParsed.body;
