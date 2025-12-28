@@ -834,7 +834,8 @@ export default {
       if (
         me.allCollection &&
         Array.isArray(me.allCollection) &&
-        me.newCollectionName
+        me.newCollectionName &&
+        !me.allCollection.find((x) => x.name == me.newCollectionName)
       ) {
         let collectionId = me.$tdUtility.newGuid();
         let blankCollection = {
