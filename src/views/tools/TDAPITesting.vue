@@ -1085,10 +1085,10 @@ export default {
           if (item.name && item?.request?.url?.raw) {
             tempCollection.requests.push({
               requestName: item.name,
-              apiUrl: item.request.url.raw,
+              apiUrl: item?.request?.url?.raw,
               bodyText: bodyText,
               headersText: headerText,
-              httpMethod: item?.request?.url?.method,
+              httpMethod: item?.request?.method ?? "GET",
               requestId: me.$tdUtility.newGuid(),
             });
           }
