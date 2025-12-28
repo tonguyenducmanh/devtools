@@ -289,7 +289,7 @@ export default {
       help: "Gõ để tìm kiếm các tính năng, sử dụng ↑↓ để điều hướng và Enter để chọn",
     },
     apiTesting: {
-      importCollectionZip: "Nhập collection",
+      importCollectionZip: "Nhập zip",
       importCollectionZipTooltip:
         'Nhập khẩu file có định dạng zip, nội dung file nên theo cấu trúc như sau:"zip_folder/", -> đây là folder cha sau khi giải nén; "zip_folder/collection_name_01/", -> folder chứa 1 collecion cụ thể; "zip_folder/collection_name_01/01_vector_embedding.txt",  -> nội dung dạng txt chứa curl api',
       agentUrl: "Nhập url agent",

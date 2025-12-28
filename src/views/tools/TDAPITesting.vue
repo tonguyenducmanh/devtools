@@ -1454,12 +1454,12 @@ export default {
     position: relative;
     padding-left: var(--padding);
     .td-sidebar-header {
-      margin-bottom: var(--padding);
+      // margin-bottom: var(--padding);
     }
     .td-sidebar-content {
       flex: 1;
       width: 100%;
-      overflow-y: auto;
+      min-height: 0;
       .td-header-collection {
         width: 100%;
         height: 30px;
@@ -1480,11 +1480,15 @@ export default {
       .td-collection {
         flex: 1;
         width: 100%;
-        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
         position: relative;
         .td-collection-body {
           position: relative;
-          overflow: auto;
+          flex: 1;
+          min-height: 0;
+          overflow-y: auto;
           .td-collection-item {
             cursor: pointer;
             justify-content: flex-start;
@@ -1651,7 +1655,6 @@ export default {
 
   .td-search-results {
     max-height: 400px;
-    overflow-y: auto;
 
     .td-search-section {
       padding: 8px 0;

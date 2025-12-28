@@ -290,7 +290,7 @@ export default {
       help: "Type to search features, use ↑↓ to navigate and Enter to select",
     },
     apiTesting: {
-      importCollectionZip: "Import collection",
+      importCollectionZip: "Import zip",
       importCollectionZipTooltip:
         'Importing a zip file should follow this structure: "zip_folder/", -> this is the parent folder after extraction; "zip_folder/collection_name_01/", -> folder containing a specific collection; "zip_folder/collection_name_01/01_vector_embedding.txt", -> text file containing the curl API.',
       agentUrl: "Enter url agent",
