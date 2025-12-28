@@ -1,6 +1,7 @@
 export default {
   i18nCommon: {
     typeInput: "Type value",
+    edit: "Edit",
     history: {
       title: "History",
       show: "History",
@@ -326,6 +327,7 @@ export default {
       CURLModeTitle: "CURL cmd",
       cancel: "Cancel",
       requestName: "Request name",
+      collectionRename: "Enter new collecion name",
       requestCanceled: "Current request canceled",
       notpermissionExtension:
         "You have not granted permission for the extension to call the API.",

@@ -416,6 +416,21 @@
                   :key="index"
                 >
                   <div
+                    v-if="collection.is_renaming"
+                    class="td-collection-rename"
+                  >
+                    <TDInput
+                      v-model="collection.temp_name"
+                      :noMargin="true"
+                      :placeHolder="
+                        $t('i18nCommon.apiTesting.collectionRename')
+                      "
+                      @keyup.enter="saveNewCollectionName(collection)"
+                    >
+                    </TDInput>
+                  </div>
+                  <div
+                    v-else
                     class="flex td-collection-header"
                     @click="toggleCollection(collection)"
                   >
@@ -434,15 +449,28 @@
                         </div>
                       </TDTooltip>
                     </div>
-                    <TDTooltip
-                      class="text-nowrap"
-                      :title="$t('i18nCommon.apiTesting.delete')"
-                    >
-                      <div
-                        class="td-icon td-close-icon"
-                        @click.stop="deleteCollection(collection.collection_id)"
-                      ></div>
-                    </TDTooltip>
+                    <div class="flex td-collection-edit-btn">
+                      <TDTooltip
+                        class="text-nowrap"
+                        :title="$t('i18nCommon.edit')"
+                      >
+                        <div
+                          class="td-icon td-edit-icon"
+                          @click.stop="enableRenameCollection(collection)"
+                        ></div>
+                      </TDTooltip>
+                      <TDTooltip
+                        class="text-nowrap"
+                        :title="$t('i18nCommon.apiTesting.delete')"
+                      >
+                        <div
+                          class="td-icon td-close-icon"
+                          @click.stop="
+                            deleteCollection(collection.collection_id)
+                          "
+                        ></div>
+                      </TDTooltip>
+                    </div>
                   </div>
                   <div
                     v-if="
@@ -945,6 +973,22 @@ export default {
           currentCollection.requests = currentCollection.requests.filter(
             (x) => x.requestId != request.requestId
           );
+          await me.saveCollectionToCache();
+        }
+      }
+    },
+    enableRenameCollection(collection) {
+      if (collection) {
+        collection.is_renaming = true;
+        collection.temp_name = collection.name;
+      }
+    },
+    async saveNewCollectionName(collection) {
+      let me = this;
+      if (collection) {
+        delete collection.is_renaming;
+        if (collection.temp_name) {
+          collection.name = collection.temp_name;
           await me.saveCollectionToCache();
         }
       }
@@ -1883,6 +1927,12 @@ body[data-theme="dark"] {
 }
 .td-api-upload-collection-area {
   margin: var(--padding);
+  gap: var(--padding);
+}
+.td-collection-rename {
+  width: 100%;
+}
+.td-collection-edit-btn {
   gap: var(--padding);
 }
 </style>

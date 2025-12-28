@@ -1,6 +1,7 @@
 export default {
   i18nCommon: {
     typeInput: "Nhập giá trị",
+    edit: "Sửa",
     history: {
       title: "Lịch sử",
       show: "Lịch sử",
@@ -325,6 +326,7 @@ export default {
       CURLModeTitle: "CURL cmd",
       cancel: "Hủy",
       requestName: "Tên request",
+      collectionRename: "Nhập tên collecion mới",
       requestCanceled: "Đã hủy request hiện tại",
       notpermissionExtension: "Bạn chưa cấp quyền cho extension gọi api",
       wrapText: "Xuống dòng",
