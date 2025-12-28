@@ -425,6 +425,7 @@
                       :placeHolder="
                         $t('i18nCommon.apiTesting.collectionRename')
                       "
+                      :ref="collection.temp_name"
                       @keyup.enter="saveNewCollectionName(collection)"
                     >
                     </TDInput>
@@ -978,9 +979,28 @@ export default {
       }
     },
     enableRenameCollection(collection) {
+      let me = this;
       if (collection) {
         collection.is_renaming = true;
         collection.temp_name = collection.name;
+        me.allCollection.forEach((item) => {
+          if (item && item.collection_id != collection.collection_id) {
+            delete item.is_renaming;
+            delete item.temp_name;
+          }
+        });
+        this.$nextTick(() => {
+          if (me.$refs && me.$refs[collection.temp_name]) {
+            let refs = me.$refs[collection.temp_name];
+            if (refs) {
+              if (Array.isArray(refs)) {
+                refs[0].focus();
+              } else {
+                refs.focus();
+              }
+            }
+          }
+        });
       }
     },
     async saveNewCollectionName(collection) {
@@ -989,6 +1009,7 @@ export default {
         delete collection.is_renaming;
         if (collection.temp_name) {
           collection.name = collection.temp_name;
+          delete collection.temp_name;
           await me.saveCollectionToCache();
         }
       }

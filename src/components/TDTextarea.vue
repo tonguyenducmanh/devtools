@@ -38,6 +38,7 @@
         spellcheck="false"
         @keydown.tab.prevent="handleTab"
         :name="inputId"
+        :ref="inputId"
         autocomplete="off"
         ref="textarea"
       />
@@ -164,6 +165,10 @@ export default {
     },
   },
   methods: {
+    focus() {
+      let me = this;
+      me.$refs[me.inputId].focus();
+    },
     changeInputValue(e) {
       let me = this;
       me.$emit("update:modelValue", e.target.value);

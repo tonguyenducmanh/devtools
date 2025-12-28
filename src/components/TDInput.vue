@@ -18,6 +18,7 @@
       spellcheck="false"
       :type="inputType"
       :name="inputId"
+      :ref="inputId"
       :style="borderRadiusStyle"
       autocomplete="off"
     />
@@ -81,6 +82,10 @@ export default {
     changeInputValue(e) {
       let me = this;
       me.$emit("update:modelValue", e.target.value);
+    },
+    focus() {
+      let me = this;
+      me.$refs[me.inputId].focus();
     },
   },
 };
