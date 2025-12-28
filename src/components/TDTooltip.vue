@@ -8,7 +8,12 @@
   >
     <slot />
 
-    <div v-if="visible" ref="tooltip" class="td-tooltip" :style="tooltipStyle">
+    <div
+      v-if="visible && formattedText"
+      ref="tooltip"
+      class="td-tooltip"
+      :style="tooltipStyle"
+    >
       {{ formattedText }}
     </div>
   </span>
@@ -30,6 +35,10 @@ export default {
     offset: {
       type: Number,
       default: 12,
+    },
+    maxWidth: {
+      type: String,
+      default: "300px",
     },
   },
 
@@ -80,25 +89,26 @@ export default {
       let left = this.mouseX + this.offset;
       let top = this.mouseY + this.offset;
 
-      // 🚫 Tràn phải
+      // Tràn phải
       if (left + tooltipRect.width > viewportWidth) {
         left = this.mouseX - tooltipRect.width - this.offset;
       }
 
-      // 🚫 Tràn dưới
+      // Tràn dưới
       if (top + tooltipRect.height > viewportHeight) {
         top = this.mouseY - tooltipRect.height - this.offset;
       }
 
-      // 🚫 Tràn trái
+      // Tràn trái
       if (left < 0) left = this.offset;
 
-      // 🚫 Tràn trên
+      // Tràn trên
       if (top < 0) top = this.offset;
 
       this.tooltipStyle = {
         left: `${left}px`,
         top: `${top}px`,
+        "max-width": this.maxWidth,
       };
     },
   },
@@ -114,7 +124,6 @@ export default {
 .td-tooltip {
   position: fixed;
   z-index: 9999;
-  max-width: 300px;
 
   padding: 6px 10px;
   background: rgba(0, 0, 0, 0.85);

@@ -486,14 +486,19 @@
               </div>
             </div>
             <div class="td-api-upload-collection-area">
-              <TDUpload
-                :label="$t('i18nCommon.apiTesting.importCollection')"
-                :accept="'.zip'"
-                @change="importCollectionZip"
-                ref="uploadArea"
-                :isShowSelect="false"
-                maxWidth="250px"
-              />
+              <TDTooltip
+                :title="$t('i18nCommon.apiTesting.importCollectionZipTooltip')"
+                maxWidth="500px"
+              >
+                <TDUpload
+                  :label="$t('i18nCommon.apiTesting.importCollectionZip')"
+                  :accept="'.zip'"
+                  @change="importCollectionZip"
+                  ref="uploadArea"
+                  :isShowSelect="false"
+                  maxWidth="250px"
+                />
+              </TDTooltip>
             </div>
             <div class="flex">
               <TDButton

@@ -290,7 +290,7 @@ export default {
       help: "Type to search features, use ↑↓ to navigate and Enter to select",
     },
     apiTesting: {
-      importCollection: "Import collection",
+      importCollectionZip: "Import collection",
       agentUrl: "Enter url agent",
       title: "API Testing Tool!",
       url: "URL",
