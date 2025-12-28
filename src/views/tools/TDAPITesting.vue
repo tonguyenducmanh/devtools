@@ -1459,6 +1459,7 @@ export default {
     .td-sidebar-content {
       flex: 1;
       width: 100%;
+      overflow-y: auto;
       .td-header-collection {
         width: 100%;
         height: 30px;
@@ -1496,13 +1497,14 @@ export default {
               height: 40px;
               justify-content: space-between;
               width: 100%;
+              background-color: var(--bg-thirt-color);
+              border-radius: var(--border-radius);
               .td-collection-header-left {
                 gap: var(--padding);
               }
             }
             .td-collection-header:hover {
               background-color: var(--bg-layer-color);
-              border-radius: var(--border-radius);
             }
             .td-collection-content {
               justify-content: flex-start;
