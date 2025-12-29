@@ -576,6 +576,11 @@
               :label="$t('i18nCommon.enableHighlight')"
               @change="updateAPIConfigLayout"
             ></TDCheckbox>
+            <TDCheckbox
+              v-model="APIConfigLayout.splitHorizontal"
+              :label="$t('i18nCommon.splitHorizontal')"
+              @change="updateAPIConfigLayout"
+            ></TDCheckbox>
             <template v-if="!isDesktopApp"
               ><div class="flex flex-start agent-url-label">
                 <TDButton
@@ -679,6 +684,7 @@ export default {
         showReponse: true,
         enableHighlight: true,
         wrapText: false,
+        splitHorizontal: false,
       },
       curlContent: "",
       isSaveRequestToCollectionModelOpen: false,

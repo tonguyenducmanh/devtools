@@ -12,6 +12,7 @@ export default {
       changeLanguage: "Change language",
       goToSource: "Source code",
     },
+    splitHorizontal: "Split horizontal",
     deleteAll: "Delete all history",
     uploadFile: "Upload file",
     fileSelected: "Total files selected",

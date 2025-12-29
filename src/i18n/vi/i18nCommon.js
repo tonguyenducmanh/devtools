@@ -12,6 +12,7 @@ export default {
       changeLanguage: "Thay đổi ngôn ngữ",
       goToSource: "Source code",
     },
+    splitHorizontal: "Chia ngang",
     deleteAll: "Xóa tất cả lịch sử",
     uploadFile: "Tải lên tệp",
     fileSelected: "Tổng số file đã chọn",
