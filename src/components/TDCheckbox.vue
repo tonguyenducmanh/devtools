@@ -57,6 +57,7 @@ export default {
     changeInputValue(e) {
       let me = this;
       me.$emit("update:modelValue", e.target.checked);
+      me.$emit("change", e.target.checked);
     },
   },
 };

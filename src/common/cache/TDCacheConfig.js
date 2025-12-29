@@ -106,4 +106,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "chế độ API cuối cùng của user thiết lập",
   },
+  APIConfigLayout: {
+    KeyFormat: "APIConfigLayout",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache 1 số cấu hình layout",
+  },
 };

@@ -41,7 +41,7 @@
         ></TDButton>
         <TDButton
           :noMargin="true"
-          v-if="!showReponse"
+          v-if="!APIConfigLayout.showReponse"
           @click="handleDownloadReponse"
           :type="$tdEnum.buttonType.secondary"
           :label="$t('i18nCommon.apiTesting.downloadReponse')"
@@ -136,11 +136,11 @@
 
                   <div
                     class="flex loader-without-response"
-                    v-if="!showReponse && isLoading"
+                    v-if="!APIConfigLayout.showReponse && isLoading"
                   >
                     <div class="loader"></div>
                   </div>
-                  <div v-if="!showReponse && !isLoading">
+                  <div v-if="!APIConfigLayout.showReponse && !isLoading">
                     <div class="status-info" v-if="statusCode">
                       <div class="status-badge" :class="statusClass">
                         {{ statusText }}
@@ -155,7 +155,7 @@
                   v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.header"
                   :isLabelTop="true"
                   v-model="headersText"
-                  :wrapText="wrapText"
+                  :wrapText="APIConfigLayout.wrapText"
                   :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
                 ></TDTextarea>
                 <div
@@ -165,8 +165,8 @@
                   <TDTextarea
                     :isLabelTop="true"
                     v-model="bodyText"
-                    :wrapText="wrapText"
-                    :enableHighlight="enableHighlight"
+                    :wrapText="APIConfigLayout.wrapText"
+                    :enableHighlight="APIConfigLayout.enableHighlight"
                     language="json"
                     :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
                   ></TDTextarea>
@@ -179,7 +179,10 @@
                   </span>
                 </div>
               </div>
-              <div v-if="showReponse" class="flex flex-col td-api-response">
+              <div
+                v-if="APIConfigLayout.showReponse"
+                class="flex flex-col td-api-response"
+              >
                 <div class="flex td-api-response-title">
                   <div>
                     <div class="status-info" v-if="statusCode">
@@ -199,13 +202,13 @@
                   <TDTextarea
                     :isLabelTop="true"
                     :modelValue="responseText"
-                    :enableHighlight="enableHighlight"
+                    :enableHighlight="APIConfigLayout.enableHighlight"
                     language="json"
                     :placeHolder="
                       $t('i18nCommon.apiTesting.responsePlaceholder')
                     "
                     :readOnly="true"
-                    :wrapText="wrapText"
+                    :wrapText="APIConfigLayout.wrapText"
                   ></TDTextarea>
                   <span class="no-select td-top-right-btn">
                     <div
@@ -230,11 +233,11 @@
                 </div>
                 <div
                   class="flex loader-without-response"
-                  v-if="!showReponse && isLoading"
+                  v-if="!APIConfigLayout.showReponse && isLoading"
                 >
                   <div class="loader"></div>
                 </div>
-                <div v-if="!showReponse && !isLoading">
+                <div v-if="!APIConfigLayout.showReponse && !isLoading">
                   <div class="status-info" v-if="statusCode">
                     <div class="status-badge" :class="statusClass">
                       {{ statusText }}
@@ -248,11 +251,14 @@
               <TDTextarea
                 :isLabelTop="true"
                 v-model="curlContent"
-                :wrapText="wrapText"
+                :wrapText="APIConfigLayout.wrapText"
                 :placeHolder="$t('i18nCommon.apiTesting.contentCURLExecute')"
               ></TDTextarea>
             </div>
-            <div v-if="showReponse" class="flex flex-col td-api-response">
+            <div
+              v-if="APIConfigLayout.showReponse"
+              class="flex flex-col td-api-response"
+            >
               <div class="flex td-api-response-title">
                 <div>
                   <div class="status-info" v-if="statusCode">
@@ -272,11 +278,11 @@
                 <TDTextarea
                   :isLabelTop="true"
                   :modelValue="responseText"
-                  :enableHighlight="enableHighlight"
+                  :enableHighlight="APIConfigLayout.enableHighlight"
                   language="json"
                   :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
                   :readOnly="true"
-                  :wrapText="wrapText"
+                  :wrapText="APIConfigLayout.wrapText"
                 ></TDTextarea>
                 <div
                   class="td-icon td-copy-icon"
@@ -298,11 +304,11 @@
                 </div>
                 <div
                   class="flex loader-without-response"
-                  v-if="!showReponse && isLoading"
+                  v-if="!APIConfigLayout.showReponse && isLoading"
                 >
                   <div class="loader"></div>
                 </div>
-                <div v-if="!showReponse && !isLoading">
+                <div v-if="!APIConfigLayout.showReponse && !isLoading">
                   <div class="status-info" v-if="statusCode">
                     <div class="status-badge" :class="statusClass">
                       {{ statusText }}
@@ -316,12 +322,15 @@
               <TDTextarea
                 :isLabelTop="true"
                 v-model="proModeSecranioCode"
-                :wrapText="wrapText"
-                :enableHighlight="enableHighlight"
+                :wrapText="APIConfigLayout.wrapText"
+                :enableHighlight="APIConfigLayout.enableHighlight"
                 :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
               ></TDTextarea>
             </div>
-            <div v-if="showReponse" class="flex flex-col td-api-response">
+            <div
+              v-if="APIConfigLayout.showReponse"
+              class="flex flex-col td-api-response"
+            >
               <div class="flex td-api-response-title">
                 <div>
                   <div class="status-info" v-if="statusCode">
@@ -345,11 +354,11 @@
                 <TDTextarea
                   :isLabelTop="true"
                   :modelValue="responseText"
-                  :enableHighlight="enableHighlight"
+                  :enableHighlight="APIConfigLayout.enableHighlight"
                   language="json"
                   :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
                   :readOnly="true"
-                  :wrapText="wrapText"
+                  :wrapText="APIConfigLayout.wrapText"
                 ></TDTextarea>
                 <div
                   class="td-icon td-copy-icon"
@@ -549,16 +558,19 @@
             v-else-if="currentSidebarOption == $tdEnum.APISidebarOption.Setting"
           >
             <TDCheckbox
-              v-model="showReponse"
+              v-model="APIConfigLayout.showReponse"
               :label="$t('i18nCommon.apiTesting.showReponse')"
+              @change="updateAPIConfigLayout"
             ></TDCheckbox>
             <TDCheckbox
-              v-model="wrapText"
+              v-model="APIConfigLayout.wrapText"
               :label="$t('i18nCommon.apiTesting.wrapText')"
+              @change="updateAPIConfigLayout"
             ></TDCheckbox>
             <TDCheckbox
-              v-model="enableHighlight"
+              v-model="APIConfigLayout.enableHighlight"
               :label="$t('i18nCommon.enableHighlight')"
+              @change="updateAPIConfigLayout"
             ></TDCheckbox>
             <template v-if="!isDesktopApp"
               ><div class="flex flex-start agent-url-label">
@@ -641,7 +653,6 @@ export default {
 
   data() {
     return {
-      enableHighlight: true,
       isShowSidebar: true,
       apiUrl: "",
       requestName: "",
@@ -660,8 +671,11 @@ export default {
       isImportingCURL: false,
       currentAPIMode: this.$tdEnum.APIMode.Normal,
       currentRequest: null,
-      wrapText: false,
-      showReponse: true,
+      APIConfigLayout: {
+        showReponse: true,
+        enableHighlight: true,
+        wrapText: false,
+      },
       curlContent: "",
       isSaveRequestToCollectionModelOpen: false,
       searchQuery: "",
@@ -713,6 +727,15 @@ export default {
     let allCollectionTmp = await me.$tdCache.get(
       me.$tdEnum.cacheConfig.APICollection
     );
+    let tmpAPIConfigLayout = await me.$tdCache.get(
+      me.$tdEnum.cacheConfig.APIConfigLayout
+    );
+    if (tmpAPIConfigLayout) {
+      me.APIConfigLayout = Object.assign(
+        me.APIConfigLayout,
+        tmpAPIConfigLayout
+      );
+    }
     if (allCollectionTmp) {
       if (Array.isArray(allCollectionTmp)) {
         me.allCollection = allCollectionTmp;
@@ -823,6 +846,13 @@ export default {
     }
   },
   methods: {
+    async updateAPIConfigLayout() {
+      let me = this;
+      await me.$tdCache.set(
+        me.$tdEnum.cacheConfig.APIConfigLayout,
+        me.APIConfigLayout
+      );
+    },
     async toggleSidebar() {
       let me = this;
       me.isShowSidebar = !me.isShowSidebar;
