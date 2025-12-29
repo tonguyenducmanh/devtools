@@ -132,15 +132,17 @@
       <div v-if="isShowProgress" class="otp-progress-wrapper">
         <progress :value="progress" max="100"></progress>
       </div>
-      <div class="otp-container">
+      <div class="flex otp-container">
         <template v-for="(item, index) in optShowList">
-          <div class="otp-item">
+          <div class="otp-item" @click="handleCopyEvent(item.otp)">
             <div class="otp-left">
-              <div class="otp-name">{{ item.displayName }}</div>
+              <TDTooltip :title="item.displayName">
+                <div class="otp-name">{{ item.displayName }}</div>
+              </TDTooltip>
               <div class="otp-type">{{ item.type }}</div>
             </div>
             <div v-if="item.type.compareNotSentive('HOTP')">NotSupported</div>
-            <div v-else class="otp-value" @click="handleCopyEvent(item.otp)">
+            <div v-else class="otp-value">
               {{ item.otp }}
             </div>
           </div>
@@ -679,6 +681,7 @@ export default {
   .otp-item {
     position: relative;
     display: flex;
+    cursor: pointer;
     justify-content: space-between;
     align-items: center;
     min-height: 60px;
