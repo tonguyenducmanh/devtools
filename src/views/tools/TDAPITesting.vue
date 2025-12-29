@@ -5,7 +5,7 @@
         <div class="flex flex-one">
           <TDComboBox
             :width="120"
-            v-model="currentAPIMode"
+            v-model="APIConfigLayout.currentAPIMode"
             :options="APIModeOptions"
             :noMargin="true"
             :readOnly="isLoading"
@@ -47,7 +47,7 @@
           :label="$t('i18nCommon.apiTesting.downloadReponse')"
         ></TDButton>
         <TDHistory
-          v-if="currentAPIMode == $tdEnum.APIMode.ProMode"
+          v-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode"
           ref="historyProMode"
           :applyFunction="handleSendRequestFromHistoryProMode"
           titleKey="requestName"
@@ -67,7 +67,7 @@
           :historyContainerStyleEnum="$tdEnum.AbsolutePositionStyle.Top100Left"
         ></TDHistory>
       </div>
-      <template v-if="currentAPIMode == $tdEnum.APIMode.Normal">
+      <template v-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.Normal">
         <template v-if="isImportingCURL">
           <TDTextarea
             :isLabelTop="true"
@@ -226,7 +226,9 @@
           </div>
         </template>
       </template>
-      <template v-else-if="currentAPIMode == $tdEnum.APIMode.CURL">
+      <template
+        v-else-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.CURL"
+      >
         <div class="td-api-content">
           <div
             class="flex td-api-input-area"
@@ -302,7 +304,9 @@
           </div>
         </div>
       </template>
-      <template v-else-if="currentAPIMode == $tdEnum.APIMode.ProMode">
+      <template
+        v-else-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode"
+      >
         <div class="td-api-content">
           <div
             class="flex td-api-input-area"
@@ -687,13 +691,13 @@ export default {
       isLoading: false,
       startTime: null,
       isImportingCURL: false,
-      currentAPIMode: this.$tdEnum.APIMode.Normal,
       currentRequest: null,
       APIConfigLayout: {
         showReponse: true,
         enableHighlight: true,
         wrapText: false,
         splitHorizontal: true,
+        currentAPIMode: this.$tdEnum.APIMode.Normal,
       },
       curlContent: "",
       isSaveRequestToCollectionModelOpen: false,
@@ -730,13 +734,6 @@ export default {
   },
   async created() {
     let me = this;
-    let oldAPIMode = await me.$tdCache.get(me.$tdEnum.cacheConfig.APIMode);
-    if (oldAPIMode) {
-      let oldData = JSON.parse(oldAPIMode);
-      if (oldData) {
-        me.currentAPIMode = oldData.mode;
-      }
-    }
     let toggleSidebarState = await me.$tdCache.get(
       me.$tdEnum.cacheConfig.IsShowSubSidebarAPITesting
     );
@@ -774,7 +771,7 @@ export default {
         value: this.$tdEnum.APISidebarOption.Setting,
         label: this.$t("i18nCommon.apiTesting.sidebarOption.setting"),
       });
-      if (me.currentAPIMode != me.$tdEnum.APIMode.ProMode) {
+      if (me.APIConfigLayout.currentAPIMode != me.$tdEnum.APIMode.ProMode) {
         options.push({
           value: this.$tdEnum.APISidebarOption.Collection,
           label: this.$t("i18nCommon.apiTesting.sidebarOption.collection"),
@@ -1247,11 +1244,13 @@ export default {
     async handleSend() {
       let me = this;
       this.setGlobalInfoBeforeRequest();
-      if (me.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
+      if (me.APIConfigLayout.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
         await me.handleSendRequestProMode();
-      } else if (me.currentAPIMode == me.$tdEnum.APIMode.CURL) {
+      } else if (me.APIConfigLayout.currentAPIMode == me.$tdEnum.APIMode.CURL) {
         await me.handleSendRequestCURL();
-      } else if (me.currentAPIMode == me.$tdEnum.APIMode.Normal) {
+      } else if (
+        me.APIConfigLayout.currentAPIMode == me.$tdEnum.APIMode.Normal
+      ) {
         await me.handleSendRequest();
       }
     },
@@ -1451,16 +1450,7 @@ export default {
     },
     async handleSelectedAPIMode() {
       let me = this;
-      let historyAPIMode = {
-        mode: me.currentAPIMode,
-      };
-      if (me.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
-        me.currentSidebarOption = me.$tdEnum.APISidebarOption.Setting;
-      }
-      await me.$tdCache.set(
-        me.$tdEnum.cacheConfig.APIMode,
-        JSON.stringify(historyAPIMode)
-      );
+      await me.updateAPIConfigLayout();
     },
     setGlobalInfoBeforeRequest() {
       let me = this;
