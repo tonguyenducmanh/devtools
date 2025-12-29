@@ -139,11 +139,11 @@
 
                   <div
                     class="flex loader-without-response"
-                    v-if="!APIConfigLayout.showReponse && isLoading"
+                    v-if="!showinfoOnReponseAndNotHorizontal && isLoading"
                   >
                     <div class="loader"></div>
                   </div>
-                  <div v-if="!APIConfigLayout.showReponse && !isLoading">
+                  <div v-if="!showinfoOnReponseAndNotHorizontal && !isLoading">
                     <div class="status-info" v-if="statusCode">
                       <div class="status-badge" :class="statusClass">
                         {{ statusText }}
@@ -186,7 +186,10 @@
                 v-if="APIConfigLayout.showReponse"
                 class="flex flex-col td-api-response"
               >
-                <div class="flex td-api-response-title">
+                <div
+                  v-if="!APIConfigLayout.splitHorizontal"
+                  class="flex td-api-response-title"
+                >
                   <div>
                     <div class="status-info" v-if="statusCode">
                       <div class="status-badge" :class="statusClass">
@@ -241,11 +244,11 @@
                 </div>
                 <div
                   class="flex loader-without-response"
-                  v-if="!APIConfigLayout.showReponse && isLoading"
+                  v-if="!showinfoOnReponseAndNotHorizontal && isLoading"
                 >
                   <div class="loader"></div>
                 </div>
-                <div v-if="!APIConfigLayout.showReponse && !isLoading">
+                <div v-if="!showinfoOnReponseAndNotHorizontal && !isLoading">
                   <div class="status-info" v-if="statusCode">
                     <div class="status-badge" :class="statusClass">
                       {{ statusText }}
@@ -267,7 +270,10 @@
               v-if="APIConfigLayout.showReponse"
               class="flex flex-col td-api-response"
             >
-              <div class="flex td-api-response-title">
+              <div
+                v-if="!APIConfigLayout.splitHorizontal"
+                class="flex td-api-response-title"
+              >
                 <div>
                   <div class="status-info" v-if="statusCode">
                     <div class="status-badge" :class="statusClass">
@@ -319,11 +325,11 @@
                 </div>
                 <div
                   class="flex loader-without-response"
-                  v-if="!APIConfigLayout.showReponse && isLoading"
+                  v-if="!showinfoOnReponseAndNotHorizontal && isLoading"
                 >
                   <div class="loader"></div>
                 </div>
-                <div v-if="!APIConfigLayout.showReponse && !isLoading">
+                <div v-if="!showinfoOnReponseAndNotHorizontal && !isLoading">
                   <div class="status-info" v-if="statusCode">
                     <div class="status-badge" :class="statusClass">
                       {{ statusText }}
@@ -346,7 +352,10 @@
               v-if="APIConfigLayout.showReponse"
               class="flex flex-col td-api-response"
             >
-              <div class="flex td-api-response-title">
+              <div
+                v-if="!APIConfigLayout.splitHorizontal"
+                class="flex td-api-response-title"
+              >
                 <div>
                   <div class="status-info" v-if="statusCode">
                     <div class="status-badge" :class="statusClass">
@@ -758,6 +767,12 @@ export default {
     }
   },
   computed: {
+    showinfoOnReponseAndNotHorizontal() {
+      let me = this;
+      let result = true;
+      if (me.APIConfigLayout.showReponse && !me.APIConfigLayout.splitHorizontal)
+        return result;
+    },
     isDesktopApp() {
       return this.$tdUtility.isDesktopApp();
     },
