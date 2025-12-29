@@ -132,9 +132,10 @@
               <div class="flex flex-col td-api-request">
                 <div class="flex td-api-request-title">
                   <TDSlideOption
-                    v-model="currentAPIInfoOption"
+                    v-model="APIConfigLayout.currentAPIInfoOption"
                     :options="APIInfoOptions"
                     :noMargin="true"
+                    @change="updateAPIConfigLayout"
                   />
 
                   <div
@@ -155,7 +156,10 @@
                   </div>
                 </div>
                 <TDTextarea
-                  v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.header"
+                  v-if="
+                    APIConfigLayout.currentAPIInfoOption ==
+                    $tdEnum.APIInfoOption.header
+                  "
                   :isLabelTop="true"
                   v-model="headersText"
                   :wrapText="APIConfigLayout.wrapText"
@@ -163,7 +167,10 @@
                 ></TDTextarea>
                 <div
                   class="td-text-area-wrap"
-                  v-if="currentAPIInfoOption == $tdEnum.APIInfoOption.body"
+                  v-if="
+                    APIConfigLayout.currentAPIInfoOption ==
+                    $tdEnum.APIInfoOption.body
+                  "
                 >
                   <TDTextarea
                     :isLabelTop="true"
@@ -410,14 +417,18 @@
           <div class="td-sidebar-header">
             <TDSlideOption
               v-if="sidebarOptions && sidebarOptions.length > 1"
-              v-model="currentSidebarOption"
+              v-model="APIConfigLayout.currentSidebarOption"
               :options="sidebarOptions"
               :noMargin="true"
+              @change="updateAPIConfigLayout"
             />
           </div>
           <div
             class="flex flex-col td-sidebar-content"
-            v-if="currentSidebarOption == $tdEnum.APISidebarOption.Collection"
+            v-if="
+              APIConfigLayout.currentSidebarOption ==
+              $tdEnum.APISidebarOption.Collection
+            "
           >
             <div class="flex td-header-collection">
               <div class="td-new-collection">
@@ -584,7 +595,10 @@
           </div>
           <div
             class="td-sidebar-content"
-            v-else-if="currentSidebarOption == $tdEnum.APISidebarOption.Setting"
+            v-else-if="
+              APIConfigLayout.currentSidebarOption ==
+              $tdEnum.APISidebarOption.Setting
+            "
           >
             <TDCheckbox
               v-model="APIConfigLayout.showReponse"
@@ -710,6 +724,8 @@ export default {
         splitHorizontal: true,
         currentAPIMode: this.$tdEnum.APIMode.Normal,
         isShowSidebar: true,
+        currentSidebarOption: this.$tdEnum.APISidebarOption.Setting,
+        currentAPIInfoOption: this.$tdEnum.APIInfoOption.body,
       },
       curlContent: "",
       isSaveRequestToCollectionModelOpen: false,
@@ -727,9 +743,6 @@ export default {
           customStyle: { color: "#C25E95" },
         },
       ],
-
-      currentSidebarOption: this.$tdEnum.APISidebarOption.Setting,
-      currentAPIInfoOption: 2,
       APIInfoOptions: [
         { value: this.$tdEnum.APIInfoOption.header, label: "Header" },
         { value: this.$tdEnum.APIInfoOption.body, label: "Body" },

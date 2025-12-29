@@ -67,7 +67,7 @@ export default {
       default: false,
     },
   },
-  emits: ["update:modelValue"],
+  emits: ["update:modelValue", "change"],
   data() {
     return {
       itemRefs: [],
@@ -152,6 +152,7 @@ export default {
     },
     changeSlideVal(e) {
       this.$emit("update:modelValue", e);
+      this.$emit("change", e);
     },
   },
 };
@@ -213,8 +214,7 @@ export default {
     left: 0;
     background-color: var(--focus-color);
     border-radius: var(--border-radius);
-    transition:
-      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
       width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
       height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
