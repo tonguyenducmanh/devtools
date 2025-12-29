@@ -427,6 +427,7 @@
                       "
                       :ref="collection.temp_name"
                       @keyup.enter="saveNewCollectionName(collection)"
+                      @clickOutSide="saveNewCollectionName(collection)"
                     >
                     </TDInput>
                   </div>

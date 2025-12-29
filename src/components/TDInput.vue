@@ -21,6 +21,7 @@
       :ref="inputId"
       :style="borderRadiusStyle"
       autocomplete="off"
+      v-click-outside="handleInputClickOutSide"
     />
     <slot></slot>
   </div>
@@ -82,6 +83,10 @@ export default {
     changeInputValue(e) {
       let me = this;
       me.$emit("update:modelValue", e.target.value);
+    },
+    handleInputClickOutSide() {
+      let me = this;
+      me.$emit("clickOutSide");
     },
     focus() {
       let me = this;
