@@ -68,6 +68,7 @@ export default {
 </script>
 <style lang="scss">
 @use "@/styles/main.scss";
+@use "@/styles/tooltip.scss";
 .td-container {
   display: flex;
   flex-direction: column;

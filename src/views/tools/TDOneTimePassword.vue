@@ -134,18 +134,20 @@
       </div>
       <div class="flex otp-container">
         <template v-for="(item, index) in optShowList">
-          <TDTooltip :title="item.displayName">
-            <div class="otp-item" @click="handleCopyEvent(item.otp)">
-              <div class="otp-left">
-                <div class="otp-name">{{ item.displayName }}</div>
-                <div class="otp-type">{{ item.type }}</div>
-              </div>
-              <div v-if="item.type.compareNotSentive('HOTP')">NotSupported</div>
-              <div v-else class="otp-value">
-                {{ item.otp }}
-              </div>
+          <div
+            class="otp-item"
+            @click="handleCopyEvent(item.otp)"
+            v-tooltip="item.displayName"
+          >
+            <div class="otp-left">
+              <div class="otp-name">{{ item.displayName }}</div>
+              <div class="otp-type">{{ item.type }}</div>
             </div>
-          </TDTooltip>
+            <div v-if="item.type.compareNotSentive('HOTP')">NotSupported</div>
+            <div v-else class="otp-value">
+              {{ item.otp }}
+            </div>
+          </div>
         </template>
       </div>
     </div>

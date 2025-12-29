@@ -170,12 +170,11 @@
                     language="json"
                     :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
                   ></TDTextarea>
-                  <TDTooltip
-                    class="no-select td-top-right-btn"
-                    :title="$t('i18nCommon.apiTesting.beautify')"
-                  >
-                    <div class="td-icon td-json-icon" @click="formatBody"></div>
-                  </TDTooltip>
+                  <div
+                    class="td-icon td-json-icon"
+                    @click="formatBody"
+                    v-tooltip="$t('i18nCommon.apiTesting.beautify')"
+                  ></div>
                 </div>
               </div>
               <div v-if="showReponse" class="flex flex-col td-api-response">
@@ -206,15 +205,11 @@
                     :readOnly="true"
                     :wrapText="wrapText"
                   ></TDTextarea>
-                  <TDTooltip
-                    class="no-select td-top-right-btn"
-                    :title="$t('i18nCommon.apiTesting.copyResponse')"
-                  >
-                    <div
-                      class="td-icon td-copy-icon"
-                      @click="handleCopyResponse"
-                    ></div>
-                  </TDTooltip>
+                  <div
+                    class="td-icon td-copy-icon"
+                    @click="handleCopyResponse"
+                    v-tooltip="$t('i18nCommon.apiTesting.copyResponse')"
+                  ></div>
                 </div>
               </div>
             </div>
@@ -279,15 +274,11 @@
                   :readOnly="true"
                   :wrapText="wrapText"
                 ></TDTextarea>
-                <TDTooltip
-                  class="no-select td-top-right-btn"
-                  :title="$t('i18nCommon.apiTesting.copyResponse')"
-                >
-                  <div
-                    class="td-icon td-copy-icon"
-                    @click="handleCopyResponse"
-                  ></div>
-                </TDTooltip>
+                <div
+                  class="td-icon td-copy-icon"
+                  @click="handleCopyResponse"
+                  v-tooltip="$t('i18nCommon.apiTesting.copyResponse')"
+                ></div>
               </div>
             </div>
           </div>
@@ -356,15 +347,11 @@
                   :readOnly="true"
                   :wrapText="wrapText"
                 ></TDTextarea>
-                <TDTooltip
-                  class="no-select td-top-right-btn"
-                  :title="$t('i18nCommon.apiTesting.copyResponse')"
-                >
-                  <div
-                    class="td-icon td-copy-icon"
-                    @click="handleCopyResponse"
-                  ></div>
-                </TDTooltip>
+                <div
+                  class="td-icon td-copy-icon"
+                  v-tooltip="$t('i18nCommon.apiTesting.copyResponse')"
+                  @click="handleCopyResponse"
+                ></div>
               </div>
             </div>
           </div>
@@ -398,15 +385,11 @@
                   :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
                 />
               </div>
-              <TDTooltip
-                class="text-nowrap"
-                :title="$t('i18nCommon.apiTesting.add')"
-              >
-                <div
-                  class="td-icon td-plus-icon"
-                  @click="addNewCollection"
-                ></div>
-              </TDTooltip>
+              <div
+                class="td-icon td-plus-icon"
+                @click="addNewCollection"
+                v-tooltip="$t('i18nCommon.apiTesting.add')"
+              ></div>
             </div>
             <div class="td-collection">
               <div class="td-collection-body">
@@ -442,36 +425,21 @@
                         :arrowOpenDirection="$tdEnum.Direction.bottom"
                         :arrowDirection="$tdEnum.Direction.right"
                       />
-                      <TDTooltip
-                        class="text-nowrap text-nowrap-collection"
-                        :title="collection.name"
-                      >
-                        <div>
-                          {{ collection.name }}
-                        </div>
-                      </TDTooltip>
+                      <div v-tooltip="collection.name">
+                        {{ collection.name }}
+                      </div>
                     </div>
                     <div class="flex td-collection-edit-btn">
-                      <TDTooltip
-                        class="text-nowrap"
-                        :title="$t('i18nCommon.edit')"
-                      >
-                        <div
-                          class="td-icon td-edit-icon"
-                          @click.stop="enableRenameCollection(collection)"
-                        ></div>
-                      </TDTooltip>
-                      <TDTooltip
-                        class="text-nowrap"
-                        :title="$t('i18nCommon.apiTesting.delete')"
-                      >
-                        <div
-                          class="td-icon td-close-icon"
-                          @click.stop="
-                            deleteCollection(collection.collection_id)
-                          "
-                        ></div>
-                      </TDTooltip>
+                      <div
+                        class="td-icon td-edit-icon"
+                        v-tooltip="$t('i18nCommon.edit')"
+                        @click.stop="enableRenameCollection(collection)"
+                      ></div>
+                      <div
+                        v-tooltip="$t('i18nCommon.apiTesting.delete')"
+                        class="td-icon td-close-icon"
+                        @click.stop="deleteCollection(collection.collection_id)"
+                      ></div>
                     </div>
                   </div>
                   <div
@@ -492,60 +460,44 @@
                       }"
                       @click="applyRequest(request)"
                     >
-                      <TDTooltip
-                        class="text-nowrap"
-                        :title="request.requestName"
-                      >
-                        <div>
-                          {{ request.requestName }}
-                        </div>
-                      </TDTooltip>
-
-                      <TDTooltip
-                        class="text-nowrap"
-                        :title="$t('i18nCommon.apiTesting.delete')"
-                      >
-                        <div
-                          class="td-icon td-close-icon"
-                          @click.stop="
-                            deleteRequest(collection.collection_id, request)
-                          "
-                        ></div>
-                      </TDTooltip>
+                      <div v-tooltip="request.requestName">
+                        {{ request.requestName }}
+                      </div>
+                      <div
+                        class="td-icon td-close-icon"
+                        v-tooltip="$t('i18nCommon.apiTesting.delete')"
+                        @click.stop="
+                          deleteRequest(collection.collection_id, request)
+                        "
+                      ></div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             <div class="flex td-api-upload-collection-area">
-              <TDTooltip
-                :title="
+              <TDUpload
+                v-tooltip="
                   $t('i18nCommon.apiTesting.importCollectionPostmanTooltip')
                 "
-                maxWidth="500px"
-              >
-                <TDUpload
-                  :label="$t('i18nCommon.apiTesting.importCollectionPostman')"
-                  :accept="'.json'"
-                  @change="importCollectionPostman"
-                  ref="uploadAreaPostman"
-                  :isShowSelect="false"
-                  :multiple="true"
-                />
-              </TDTooltip>
-              <TDTooltip
-                :title="$t('i18nCommon.apiTesting.importCollectionZipTooltip')"
-                maxWidth="500px"
-              >
-                <TDUpload
-                  :label="$t('i18nCommon.apiTesting.importCollectionZip')"
-                  :accept="'.zip'"
-                  @change="importCollectionZip"
-                  ref="uploadArea"
-                  :isShowSelect="false"
-                  maxWidth="250px"
-                />
-              </TDTooltip>
+                :label="$t('i18nCommon.apiTesting.importCollectionPostman')"
+                :accept="'.json'"
+                @change="importCollectionPostman"
+                ref="uploadAreaPostman"
+                :isShowSelect="false"
+                :multiple="true"
+              />
+              <TDUpload
+                v-tooltip="
+                  $t('i18nCommon.apiTesting.importCollectionZipTooltip')
+                "
+                :label="$t('i18nCommon.apiTesting.importCollectionZip')"
+                :accept="'.zip'"
+                @change="importCollectionZip"
+                ref="uploadArea"
+                :isShowSelect="false"
+                maxWidth="250px"
+              />
             </div>
             <div class="flex">
               <TDButton
@@ -590,16 +542,15 @@
             ></TDCheckbox>
             <template v-if="!isDesktopApp"
               ><div class="flex flex-start agent-url-label">
-                <TDTooltip
-                  :title="$t('i18nCommon.apiTesting.toolTipDownloadExtension')"
-                >
-                  <TDButton
-                    :noMargin="true"
-                    @click="downloadExtension"
-                    :type="$tdEnum.buttonType.secondary"
-                    :label="$t('i18nCommon.apiTesting.downloadExtension')"
-                  ></TDButton>
-                </TDTooltip>
+                <TDButton
+                  v-tooltip="
+                    $t('i18nCommon.apiTesting.toolTipDownloadExtension')
+                  "
+                  :noMargin="true"
+                  @click="downloadExtension"
+                  :type="$tdEnum.buttonType.secondary"
+                  :label="$t('i18nCommon.apiTesting.downloadExtension')"
+                ></TDButton>
               </div>
               <div>
                 <TDInput

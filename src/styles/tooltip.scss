@@ -1,0 +1,30 @@
+.td-tooltip {
+  z-index: 9999;
+
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+
+  font-size: 12px;
+  line-height: 1.4;
+
+  border-radius: 6px;
+  word-wrap: break-word;
+  line-break: auto;
+  white-space: normal;
+  overflow-wrap: anywhere;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: td-tooltip-fade 0.15s ease;
+}
+
+@keyframes td-tooltip-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
