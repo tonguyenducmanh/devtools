@@ -170,11 +170,13 @@
                     language="json"
                     :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
                   ></TDTextarea>
-                  <div
-                    class="td-icon td-json-icon"
-                    @click="formatBody"
-                    v-tooltip="$t('i18nCommon.apiTesting.beautify')"
-                  ></div>
+                  <span class="no-select td-top-right-btn">
+                    <div
+                      class="td-icon td-json-icon"
+                      @click="formatBody"
+                      v-tooltip="$t('i18nCommon.apiTesting.beautify')"
+                    ></div>
+                  </span>
                 </div>
               </div>
               <div v-if="showReponse" class="flex flex-col td-api-response">
@@ -205,11 +207,13 @@
                     :readOnly="true"
                     :wrapText="wrapText"
                   ></TDTextarea>
-                  <div
-                    class="td-icon td-copy-icon"
-                    @click="handleCopyResponse"
-                    v-tooltip="$t('i18nCommon.apiTesting.copyResponse')"
-                  ></div>
+                  <span class="no-select td-top-right-btn">
+                    <div
+                      class="td-icon td-copy-icon"
+                      @click="handleCopyResponse"
+                      v-tooltip="$t('i18nCommon.apiTesting.copyResponse')"
+                    ></div>
+                  </span>
                 </div>
               </div>
             </div>
@@ -476,28 +480,32 @@
               </div>
             </div>
             <div class="flex td-api-upload-collection-area">
-              <TDUpload
-                v-tooltip="
-                  $t('i18nCommon.apiTesting.importCollectionPostmanTooltip')
-                "
-                :label="$t('i18nCommon.apiTesting.importCollectionPostman')"
-                :accept="'.json'"
-                @change="importCollectionPostman"
-                ref="uploadAreaPostman"
-                :isShowSelect="false"
-                :multiple="true"
-              />
-              <TDUpload
-                v-tooltip="
-                  $t('i18nCommon.apiTesting.importCollectionZipTooltip')
-                "
-                :label="$t('i18nCommon.apiTesting.importCollectionZip')"
-                :accept="'.zip'"
-                @change="importCollectionZip"
-                ref="uploadArea"
-                :isShowSelect="false"
-                maxWidth="250px"
-              />
+              <span>
+                <TDUpload
+                  v-tooltip="
+                    $t('i18nCommon.apiTesting.importCollectionPostmanTooltip')
+                  "
+                  :label="$t('i18nCommon.apiTesting.importCollectionPostman')"
+                  :accept="'.json'"
+                  @change="importCollectionPostman"
+                  ref="uploadAreaPostman"
+                  :isShowSelect="false"
+                  :multiple="true"
+                />
+              </span>
+              <span>
+                <TDUpload
+                  v-tooltip="
+                    $t('i18nCommon.apiTesting.importCollectionZipTooltip')
+                  "
+                  :label="$t('i18nCommon.apiTesting.importCollectionZip')"
+                  :accept="'.zip'"
+                  @change="importCollectionZip"
+                  ref="uploadArea"
+                  :isShowSelect="false"
+                  maxWidth="250px"
+                />
+              </span>
             </div>
             <div class="flex">
               <TDButton
