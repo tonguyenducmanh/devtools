@@ -391,10 +391,13 @@
     <div class="flex flex-col td-sub-sidebar-wrapper">
       <div
         class="flex td-sub-sidebar"
-        :class="{ 'td-sub-sidebar-collaspe': !isShowSidebar }"
+        :class="{ 'td-sub-sidebar-collaspe': !APIConfigLayout.isShowSidebar }"
       >
-        <div v-if="isShowSidebar" class="divide"></div>
-        <div v-if="isShowSidebar" class="flex flex-col td-sub-sidebar-content">
+        <div v-if="APIConfigLayout.isShowSidebar" class="divide"></div>
+        <div
+          v-if="APIConfigLayout.isShowSidebar"
+          class="flex flex-col td-sub-sidebar-content"
+        >
           <div class="td-sidebar-header">
             <TDSlideOption
               v-if="sidebarOptions && sidebarOptions.length > 1"
@@ -617,7 +620,7 @@
           </div>
         </div>
         <TDToggleArea
-          :collapsed="!isShowSidebar"
+          :collapsed="!APIConfigLayout.isShowSidebar"
           position="right"
           @toggle="toggleSidebar"
         />
@@ -675,7 +678,6 @@ export default {
 
   data() {
     return {
-      isShowSidebar: true,
       apiUrl: "",
       requestName: "",
       currentRequestId: null,
@@ -698,6 +700,7 @@ export default {
         wrapText: false,
         splitHorizontal: true,
         currentAPIMode: this.$tdEnum.APIMode.Normal,
+        isShowSidebar: true,
       },
       curlContent: "",
       isSaveRequestToCollectionModelOpen: false,
@@ -734,12 +737,6 @@ export default {
   },
   async created() {
     let me = this;
-    let toggleSidebarState = await me.$tdCache.get(
-      me.$tdEnum.cacheConfig.IsShowSubSidebarAPITesting
-    );
-    if (toggleSidebarState) {
-      me.isShowSidebar = toggleSidebarState.value;
-    }
     let allCollectionTmp = await me.$tdCache.get(
       me.$tdEnum.cacheConfig.APICollection
     );
@@ -871,10 +868,8 @@ export default {
     },
     async toggleSidebar() {
       let me = this;
-      me.isShowSidebar = !me.isShowSidebar;
-      await me.$tdCache.set(me.$tdEnum.cacheConfig.IsShowSubSidebarAPITesting, {
-        value: me.isShowSidebar,
-      });
+      me.APIConfigLayout.isShowSidebar = !me.APIConfigLayout.isShowSidebar;
+      await me.updateAPIConfigLayout();
     },
     async addNewCollection() {
       let me = this;
