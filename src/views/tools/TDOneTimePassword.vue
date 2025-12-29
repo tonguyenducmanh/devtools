@@ -134,18 +134,18 @@
       </div>
       <div class="flex otp-container">
         <template v-for="(item, index) in optShowList">
-          <div class="otp-item" @click="handleCopyEvent(item.otp)">
-            <div class="otp-left">
-              <TDTooltip :title="item.displayName">
+          <TDTooltip :title="item.displayName">
+            <div class="otp-item" @click="handleCopyEvent(item.otp)">
+              <div class="otp-left">
                 <div class="otp-name">{{ item.displayName }}</div>
-              </TDTooltip>
-              <div class="otp-type">{{ item.type }}</div>
+                <div class="otp-type">{{ item.type }}</div>
+              </div>
+              <div v-if="item.type.compareNotSentive('HOTP')">NotSupported</div>
+              <div v-else class="otp-value">
+                {{ item.otp }}
+              </div>
             </div>
-            <div v-if="item.type.compareNotSentive('HOTP')">NotSupported</div>
-            <div v-else class="otp-value">
-              {{ item.otp }}
-            </div>
-          </div>
+          </TDTooltip>
         </template>
       </div>
     </div>
@@ -670,18 +670,18 @@ export default {
   }
   .otp-container {
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
     gap: calc(var(--padding) / 2);
-    justify-content: center;
-    align-items: stretch;
-    display: flex;
-    flex-direction: column;
     width: 100%;
+    padding: var(--padding);
   }
 
   .otp-item {
     position: relative;
     display: flex;
     cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
     justify-content: space-between;
     align-items: center;
     min-height: 60px;
@@ -690,11 +690,16 @@ export default {
     border: 1px solid var(--border-color);
     margin: var(--padding);
     .otp-left {
+      display: flex;
+      flex-direction: column;
+      min-width: 0; /* CỰC KỲ QUAN TRỌNG */
+      flex: 1;
       .otp-name {
         font-weight: bold;
-        overflow-wrap: normal; /* Allows breaking long words */
-        word-break: keep-all; /* For wider browser support */
-        white-space: nowrap; /* Ensure wrapping is enabled */
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .otp-type {
         font-size: 12px;
