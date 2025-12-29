@@ -488,9 +488,12 @@
             <div class="flex td-api-upload-collection-area">
               <span>
                 <TDUpload
-                  v-tooltip="
-                    $t('i18nCommon.apiTesting.importCollectionPostmanTooltip')
-                  "
+                  v-tooltip="{
+                    text: $t(
+                      'i18nCommon.apiTesting.importCollectionPostmanTooltip'
+                    ),
+                    maxWidth: '500px',
+                  }"
                   :label="$t('i18nCommon.apiTesting.importCollectionPostman')"
                   :accept="'.json'"
                   @change="importCollectionPostman"
@@ -501,9 +504,12 @@
               </span>
               <span>
                 <TDUpload
-                  v-tooltip="
-                    $t('i18nCommon.apiTesting.importCollectionZipTooltip')
-                  "
+                  v-tooltip="{
+                    text: $t(
+                      'i18nCommon.apiTesting.importCollectionZipTooltip'
+                    ),
+                    maxWidth: '500px',
+                  }"
                   :label="$t('i18nCommon.apiTesting.importCollectionZip')"
                   :accept="'.zip'"
                   @change="importCollectionZip"
