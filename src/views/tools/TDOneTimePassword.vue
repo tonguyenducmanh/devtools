@@ -671,8 +671,8 @@ export default {
     padding: var(--padding);
   }
   .otp-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: calc(var(--padding) / 2);
     width: 100%;
     padding: var(--padding);

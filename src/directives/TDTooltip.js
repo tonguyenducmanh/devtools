@@ -1,5 +1,6 @@
 let activeTooltip = null;
-
+let rafId = null;
+let lastEvent = null;
 function insertIntoBodyFirst(el) {
   const body = document.body;
   if (body.firstChild) {
@@ -42,9 +43,7 @@ function updatePosition(el, e, offset = 12) {
 export default {
   mounted(el, binding) {
     const getText = () =>
-      typeof binding.value === "string"
-        ? binding.value
-        : binding.value?.text;
+      typeof binding.value === "string" ? binding.value : binding.value?.text;
 
     const getOffset = () =>
       typeof binding.value === "object" && binding.value.offset != null
@@ -73,9 +72,18 @@ export default {
     };
 
     const onMove = (e) => {
-      if (activeTooltip) {
-        updatePosition(activeTooltip, e, getOffset());
-      }
+      if (!activeTooltip) return;
+
+      lastEvent = e;
+
+      if (rafId) return;
+
+      rafId = requestAnimationFrame(() => {
+        if (activeTooltip && lastEvent) {
+          updatePosition(activeTooltip, lastEvent, getOffset());
+        }
+        rafId = null;
+      });
     };
 
     const onLeave = () => {
@@ -83,8 +91,12 @@ export default {
         activeTooltip.remove();
         activeTooltip = null;
       }
-    };
 
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    };
     el.__tdTooltip__ = { onEnter, onMove, onLeave };
 
     el.addEventListener("mouseenter", onEnter);
