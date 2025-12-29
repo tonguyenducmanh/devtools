@@ -125,7 +125,10 @@
                 :label="$t('i18nCommon.apiTesting.CURL')"
               ></TDButton>
             </div>
-            <div class="flex td-api-input-area">
+            <div
+              class="flex td-api-input-area"
+              :class="{ 'flex-col': APIConfigLayout.splitHorizontal }"
+            >
               <div class="flex flex-col td-api-request">
                 <div class="flex td-api-request-title">
                   <TDSlideOption
@@ -225,7 +228,10 @@
       </template>
       <template v-else-if="currentAPIMode == $tdEnum.APIMode.CURL">
         <div class="td-api-content">
-          <div class="flex td-api-input-area">
+          <div
+            class="flex td-api-input-area"
+            :class="{ 'flex-col': APIConfigLayout.splitHorizontal }"
+          >
             <div class="flex flex-col td-api-request">
               <div class="flex td-api-request-title">
                 <div class="title-request">
@@ -298,7 +304,10 @@
       </template>
       <template v-else-if="currentAPIMode == $tdEnum.APIMode.ProMode">
         <div class="td-api-content">
-          <div class="flex td-api-input-area">
+          <div
+            class="flex td-api-input-area"
+            :class="{ 'flex-col': APIConfigLayout.splitHorizontal }"
+          >
             <div class="flex flex-col td-api-request">
               <div class="flex td-api-request-title">
                 <div class="title-request">
@@ -684,7 +693,7 @@ export default {
         showReponse: true,
         enableHighlight: true,
         wrapText: false,
-        splitHorizontal: false,
+        splitHorizontal: true,
       },
       curlContent: "",
       isSaveRequestToCollectionModelOpen: false,
