@@ -1566,7 +1566,7 @@ export default {
       height: 100%;
       .td-api-request-title {
         width: 100%;
-        justify-content: flex-start;
+        justify-content: space-between;
         height: 40px;
         align-items: center;
       }
