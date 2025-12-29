@@ -284,11 +284,13 @@
                   :readOnly="true"
                   :wrapText="APIConfigLayout.wrapText"
                 ></TDTextarea>
-                <div
-                  class="td-icon td-copy-icon"
-                  @click="handleCopyResponse"
-                  v-tooltip="$t('i18nCommon.apiTesting.copyResponse')"
-                ></div>
+                <span class="no-select td-top-right-btn">
+                  <div
+                    class="td-icon td-copy-icon"
+                    @click="handleCopyResponse"
+                    v-tooltip="$t('i18nCommon.apiTesting.copyResponse')"
+                  ></div>
+                </span>
               </div>
             </div>
           </div>
@@ -360,11 +362,13 @@
                   :readOnly="true"
                   :wrapText="APIConfigLayout.wrapText"
                 ></TDTextarea>
-                <div
-                  class="td-icon td-copy-icon"
-                  v-tooltip="$t('i18nCommon.apiTesting.copyResponse')"
-                  @click="handleCopyResponse"
-                ></div>
+                <span class="no-select td-top-right-btn">
+                  <div
+                    class="td-icon td-copy-icon"
+                    v-tooltip="$t('i18nCommon.apiTesting.copyResponse')"
+                    @click="handleCopyResponse"
+                  ></div>
+                </span>
               </div>
             </div>
           </div>
