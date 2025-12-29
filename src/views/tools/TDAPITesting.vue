@@ -423,13 +423,15 @@
                     class="flex td-collection-header"
                     @click="toggleCollection(collection)"
                   >
-                    <div class="flex td-collection-header-left">
+                    <div
+                      class="flex text-nowrap-collection td-collection-header-left"
+                    >
                       <TDArrow
                         :openProp="collection.openingCollection"
                         :arrowOpenDirection="$tdEnum.Direction.bottom"
                         :arrowDirection="$tdEnum.Direction.right"
                       />
-                      <div v-tooltip="collection.name">
+                      <div class="" v-tooltip="collection.name">
                         {{ collection.name }}
                       </div>
                     </div>
@@ -464,16 +466,20 @@
                       }"
                       @click="applyRequest(request)"
                     >
-                      <div v-tooltip="request.requestName">
-                        {{ request.requestName }}
-                      </div>
-                      <div
-                        class="td-icon td-close-icon"
-                        v-tooltip="$t('i18nCommon.apiTesting.delete')"
-                        @click.stop="
-                          deleteRequest(collection.collection_id, request)
-                        "
-                      ></div>
+                      <span class="text-nowrap">
+                        <div v-tooltip="request.requestName">
+                          {{ request.requestName }}
+                        </div>
+                      </span>
+                      <span class="text-nowrap">
+                        <div
+                          class="td-icon td-close-icon"
+                          v-tooltip="$t('i18nCommon.apiTesting.delete')"
+                          @click.stop="
+                            deleteRequest(collection.collection_id, request)
+                          "
+                        ></div>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -1862,10 +1868,20 @@ export default {
   filter: unset;
 }
 .text-nowrap-collection {
-  max-width: 225px !important;
+  max-width: 215px !important;
+  div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 .text-nowrap {
   max-width: 250px;
+  div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 .td-text-area-wrap {
   position: relative;
