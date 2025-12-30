@@ -618,7 +618,6 @@
               @change="updateAPIConfigLayout"
             ></TDCheckbox>
             <TDCheckbox
-              v-if="!APIConfigLayout.enableHighlight"
               v-model="APIConfigLayout.wrapText"
               :label="$t('i18nCommon.apiTesting.wrapText')"
               @change="updateAPIConfigLayout"

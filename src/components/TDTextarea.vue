@@ -55,12 +55,11 @@ export default {
   name: "TDTextarea",
   mixins: [TDStylePremitiveMixin],
 
-  async created() {
+  created() {},
+  mounted() {
     let me = this;
-    me.currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
     this.updateHighlight();
   },
-  mounted() {},
   computed: {
     styleComputed() {
       let style = "";
@@ -131,10 +130,12 @@ export default {
   },
   watch: {
     modelValue(newVal, oldVal) {
-      let me = this;
-      me.updateEditorVal();
+      this.updateEditorVal();
     },
-    enableHighlight(value) {
+    enableHighlight(value, oldVal) {
+      this.updateHighlight();
+    },
+    wrapText(value, oldVal) {
       this.updateHighlight();
     },
   },
@@ -179,19 +180,26 @@ export default {
       });
     },
     handleScroll(e) {},
-    updateHighlight() {
+    async updateHighlight() {
       let me = this;
       if (me.enableHighlight) {
+        me.currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
         monaco.languages.register({ id: me.language });
         me.tm = monaco.editor.createModel(me.modelValue, me.language);
-        me.editor = monaco.editor.create(me.$refs.textareaWrap, {
+        let configObject = {
           model: me.tm,
           language: me.language,
           theme: me.currentTheme == me.$tdEnum.theme.dark ? "vs-dark" : "vs",
           fontSize: 16,
           readOnly: me.readOnly,
           automaticLayout: true,
-        });
+        };
+        if (me.wrapText) {
+          configObject.wordWrap = "on";
+          configObject.wordWrapColumn = 0;
+          configObject.wrappingIndent = "none";
+        }
+        me.editor = monaco.editor.create(me.$refs.textareaWrap, configObject);
         me.editor.onDidBlurEditorWidget((e) => {
           me.updateValToEditor();
         });
