@@ -199,7 +199,7 @@ export default {
     },
     updateEditorVal: TDUtility.debounce(function () {
       if (this.editor) {
-        this.editor.setValue(this.modelValue);
+        this.editor.setValue(this.modelValue || "");
       }
     }, 100),
     updateValueFromEditor() {
