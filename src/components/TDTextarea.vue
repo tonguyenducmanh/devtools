@@ -261,6 +261,8 @@ export default {
     height: 100%;
     margin: 0;
     border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
   }
 
   textarea {
