@@ -49,6 +49,8 @@
 <script>
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
 import * as monaco from "monaco-editor";
+import TDUtility from "@/common/TDUtility.js";
+
 export default {
   name: "TDTextarea",
   mixins: [TDStylePremitiveMixin],
@@ -56,7 +58,6 @@ export default {
   async created() {
     let me = this;
     me.currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
-    me.debouncedFunc = me.$tdUtility.debounce(me.updateEditorVal, 100);
   },
   mounted() {
     this.updateHighlight();
@@ -132,19 +133,13 @@ export default {
   watch: {
     modelValue() {
       let me = this;
-      me.debouncedFunc();
+      me.updateEditorVal();
     },
     enableHighlight(value) {
       this.updateHighlight();
     },
   },
   methods: {
-    updateEditorVal() {
-      let me = this;
-      if (me.editor) {
-        me.editor.setValue(me.value);
-      }
-    },
     focus() {
       let me = this;
       me.$refs[me.inputId].focus();
@@ -195,16 +190,28 @@ export default {
           language: me.language,
           theme: me.theme == "dark" ? "vs-dark" : "vs",
           fontSize: 16,
+          readOnly: me.readOnly,
         });
       } else {
         me.unmountEditor();
       }
     },
-    unmountEditor() {
+    updateEditorVal: TDUtility.debounce(function () {
+      if (this.editor) {
+        this.editor.setValue(this.modelValue);
+      }
+    }, 100),
+    updateValueFromEditor() {
       let me = this;
       if (me.editor) {
         let editorVal = me.editor.getValue();
         me.$emit("update:modelValue", editorVal);
+      }
+    },
+    unmountEditor() {
+      let me = this;
+      if (me.editor) {
+        me.updateValueFromEditor();
         me.editor.dispose();
       }
     },
