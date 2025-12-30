@@ -276,6 +276,8 @@
                 :isLabelTop="true"
                 v-model="curlContent"
                 :wrapText="APIConfigLayout.wrapText"
+                :enableHighlight="APIConfigLayout.enableHighlight"
+                language="shell"
                 :placeHolder="$t('i18nCommon.apiTesting.contentCURLExecute')"
               ></TDTextarea>
             </div>
