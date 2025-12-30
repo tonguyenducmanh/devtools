@@ -58,10 +58,9 @@ export default {
   async created() {
     let me = this;
     me.currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
-  },
-  mounted() {
     this.updateHighlight();
   },
+  mounted() {},
   computed: {
     styleComputed() {
       let style = "";
@@ -188,7 +187,7 @@ export default {
         me.editor = monaco.editor.create(me.$refs.textareaWrap, {
           model: me.tm,
           language: me.language,
-          theme: me.theme == "dark" ? "vs-dark" : "vs",
+          theme: me.currentTheme == me.$tdEnum.theme.dark ? "vs-dark" : "vs",
           fontSize: 16,
           readOnly: me.readOnly,
           automaticLayout: true,
