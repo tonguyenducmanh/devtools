@@ -239,10 +239,12 @@ export default {
       if (me.editor) {
         me.updateValueFromEditor();
         me.editor.dispose();
-        me.editorModel.dispose();
-        me.editor = null;
-        me.editorModel = null;
       }
+      if (me.editorModel) {
+        me.editorModel.dispose();
+      }
+      me.editor = null;
+      me.editorModel = null;
     },
   },
   beforeUnmount() {
