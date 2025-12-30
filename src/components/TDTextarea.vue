@@ -184,14 +184,22 @@ export default {
       });
     },
     handleScroll(e) {},
+    getDefaultModelValueForEditor() {
+      let me = this;
+      let editorVal = me.modelValue;
+      return editorVal;
+    },
     async updateHighlight() {
       let me = this;
       if (me.enableHighlight) {
         me.currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
         monaco.languages.register({ id: me.language });
-        me.editorModel = monaco.editor.createModel(me.modelValue, me.language);
+        me.editorModel = monaco.editor.createModel(
+          me.getDefaultModelValueForEditor(),
+          me.language
+        );
         let configObject = {
-          model: me.tm,
+          model: me.editorModel,
           language: me.language,
           theme: me.currentTheme == me.$tdEnum.theme.dark ? "vs-dark" : "vs",
           fontSize: 16,
@@ -213,7 +221,7 @@ export default {
     },
     updateEditorVal: TDUtility.debounce(function () {
       if (this.editor) {
-        this.editor.setValue(this.modelValue || "");
+        this.editor.setValue(this.modelValue ? this.modelValue : "");
       }
     }, 100),
     updateValToEditor: TDUtility.debounce(function () {
