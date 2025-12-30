@@ -191,6 +191,7 @@ export default {
           theme: me.theme == "dark" ? "vs-dark" : "vs",
           fontSize: 16,
           readOnly: me.readOnly,
+          automaticLayout: true,
         });
       } else {
         me.unmountEditor();
