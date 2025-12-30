@@ -11,8 +11,15 @@
       class="textarea-wrapper"
       :class="{ 'td-textarea-hightlight-wrap-text': wrapText }"
     >
+      <!-- Editor area -->
+      <div
+        v-if="enableHighlight"
+        class="highlight-layer"
+        ref="textareaWrap"
+      ></div>
       <!-- Actual textarea -->
       <textarea
+        v-if="!enableHighlight"
         :placeholder="placeHolder || $t('i18nCommon.typeInput')"
         :value="modelValue"
         :disabled="readOnly"
@@ -41,19 +48,18 @@
 
 <script>
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
-
+import * as monaco from "monaco-editor";
 export default {
   name: "TDTextarea",
   mixins: [TDStylePremitiveMixin],
 
   async created() {
     let me = this;
-    let currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
+    me.currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
+    me.debouncedFunc = me.$tdUtility.debounce(me.updateEditorVal, 100);
   },
   mounted() {
-    if (this.enableHighlight) {
-      this.updateHighlight();
-    }
+    this.updateHighlight();
   },
   computed: {
     styleComputed() {
@@ -125,12 +131,20 @@ export default {
   },
   watch: {
     modelValue() {
-      if (this.enableHighlight) {
-        this.updateHighlight();
-      }
+      let me = this;
+      me.debouncedFunc();
+    },
+    enableHighlight(value) {
+      this.updateHighlight();
     },
   },
   methods: {
+    updateEditorVal() {
+      let me = this;
+      if (me.editor) {
+        me.editor.setValue(me.value);
+      }
+    },
     focus() {
       let me = this;
       me.$refs[me.inputId].focus();
@@ -170,24 +184,33 @@ export default {
         el.selectionStart = el.selectionEnd = start + TAB_SIZE.length;
       });
     },
-    handleScroll(e) {
-      const pre = this.$el.querySelector(".highlight-layer");
-      if (pre) {
-        pre.scrollTop = e.target.scrollTop;
-        pre.scrollLeft = e.target.scrollLeft;
+    handleScroll(e) {},
+    updateHighlight() {
+      let me = this;
+      if (me.enableHighlight) {
+        monaco.languages.register({ id: me.language });
+        me.tm = monaco.editor.createModel(me.modelValue, me.language);
+        me.editor = monaco.editor.create(me.$refs.textareaWrap, {
+          model: me.tm,
+          language: me.language,
+          theme: me.theme == "dark" ? "vs-dark" : "vs",
+          fontSize: 16,
+        });
+      } else {
+        me.unmountEditor();
       }
     },
-    updateHighlight() {
-      this.$nextTick(() => {
-        // Sync scroll position after update
-        const textarea = this.$refs.textarea;
-        const pre = this.$el.querySelector(".highlight-layer");
-        if (textarea && pre) {
-          pre.scrollTop = textarea.scrollTop;
-          pre.scrollLeft = textarea.scrollLeft;
-        }
-      });
+    unmountEditor() {
+      let me = this;
+      if (me.editor) {
+        let editorVal = me.editor.getValue();
+        me.$emit("update:modelValue", editorVal);
+        me.editor.dispose();
+      }
     },
+  },
+  beforeUnmount() {
+    this.unmountEditor();
   },
 };
 </script>
@@ -223,20 +246,7 @@ export default {
     width: 100%;
     height: 100%;
     margin: 0;
-    padding: var(--padding);
     border: 1px solid var(--border-color);
-    background-color: var(--bg-main-color);
-    overflow: auto;
-    pointer-events: none;
-    white-space: pre;
-    word-wrap: normal;
-
-    code {
-      display: block;
-      font-family: "Consolas", "Monaco", "Courier New", monospace;
-      font-size: var(--font-size-medium);
-      line-height: 1.5;
-    }
   }
 
   textarea {
@@ -251,12 +261,6 @@ export default {
     font-size: var(--font-size-medium);
     font-family: "Consolas", "Monaco", "Courier New", monospace;
     line-height: 1.5;
-
-    &.with-highlight {
-      // background-color: transparent;
-      // color: transparent;
-      // caret-color: var(--text-primary-color);
-    }
   }
 
   textarea::placeholder {

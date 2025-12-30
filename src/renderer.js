@@ -19,6 +19,7 @@ import eventBus from "@/common/event/TDEventBus.js";
 import ToastPlugin from "@/common/TDToastUtil.js";
 import TDClickOutside from "@/directives/TDClickOutside.js";
 import TDTooltip from "@/directives/TDTooltip.js";
+import "@/common/TDMonacoEditor.js";
 // Async IIFE
 (async () => {
   const currentApp = createApp(App);
