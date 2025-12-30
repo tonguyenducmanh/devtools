@@ -11,13 +11,6 @@
       class="textarea-wrapper"
       :class="{ 'td-textarea-hightlight-wrap-text': wrapText }"
     >
-      <!-- Highlighted code overlay -->
-      <pre
-        v-if="enableHighlight"
-        class="highlight-layer"
-        :style="borderRadiusStyle"
-      ><code :class="`language-${language}`" v-html="highlightedCode"></code></pre>
-
       <!-- Actual textarea -->
       <textarea
         :placeholder="placeHolder || $t('i18nCommon.typeInput')"
@@ -48,16 +41,6 @@
 
 <script>
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
-import Prism from "prismjs";
-
-// Import các ngôn ngữ bạn cần
-import "prismjs/components/prism-javascript";
-import "prismjs/components/prism-css";
-import "prismjs/components/prism-markup";
-import "prismjs/components/prism-python";
-import "prismjs/components/prism-java";
-import "prismjs/components/prism-json";
-import "prismjs/components/prism-sql";
 
 export default {
   name: "TDTextarea",
@@ -66,11 +49,6 @@ export default {
   async created() {
     let me = this;
     let currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
-    if (currentTheme == me.$tdEnum.theme.dark) {
-      await import("prismjs/themes/prism-tomorrow.css");
-    } else {
-      await import("prismjs/themes/prism.css");
-    }
   },
   mounted() {
     if (this.enableHighlight) {
@@ -91,18 +69,6 @@ export default {
     },
     inputId() {
       return `td-text-area-${this.$.uid}`;
-    },
-    highlightedCode() {
-      if (!this.modelValue || !this.enableHighlight) return "";
-      try {
-        return Prism.highlight(
-          this.modelValue,
-          Prism.languages[this.language] || Prism.languages.javascript,
-          this.language
-        );
-      } catch (e) {
-        return this.modelValue;
-      }
     },
   },
   props: {
@@ -287,9 +253,9 @@ export default {
     line-height: 1.5;
 
     &.with-highlight {
-      background-color: transparent;
-      color: transparent;
-      caret-color: var(--text-primary-color);
+      // background-color: transparent;
+      // color: transparent;
+      // caret-color: var(--text-primary-color);
     }
   }
 
@@ -326,13 +292,6 @@ export default {
   .highlight-layer {
     background-color: var(--bg-layer-color);
     border: 1px solid transparent;
-  }
-}
-.td-textarea-hightlight-wrap-text {
-  pre[class*="language-"],
-  code[class*="language-"] {
-    white-space: pre-wrap; /* This will do the word wrapping */
-    word-wrap: break-word; /* Ensures long words also break */
   }
 }
 </style>
