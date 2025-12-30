@@ -189,7 +189,7 @@ export default {
       if (me.enableHighlight) {
         me.currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
         monaco.languages.register({ id: me.language });
-        me.tm = monaco.editor.createModel(me.modelValue, me.language);
+        me.editorModel = monaco.editor.createModel(me.modelValue, me.language);
         let configObject = {
           model: me.tm,
           language: me.language,
@@ -231,6 +231,9 @@ export default {
       if (me.editor) {
         me.updateValueFromEditor();
         me.editor.dispose();
+        me.editorModel.dispose();
+        me.editor = null;
+        me.editorModel = null;
       }
     },
   },
