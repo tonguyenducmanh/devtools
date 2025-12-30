@@ -235,9 +235,9 @@ const requestCURL = async (curlText) => {
 
   const requestData = {
     api_url: parsed.url,
-    body_text: parsed.method || "GET",
+    http_method: parsed.method || "GET",
     headers_text: parsed.headersText || null,
-    http_method: parsed.body || null,
+    body_text: parsed.body || null,
   };
 
   const req = fetchAgent(requestData);
