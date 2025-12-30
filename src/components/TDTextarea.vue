@@ -193,7 +193,7 @@ export default {
           readOnly: me.readOnly,
           automaticLayout: true,
         });
-        me.editor.onDidChangeModelContent((e) => {
+        me.editor.onDidBlurEditorWidget((e) => {
           me.updateValToEditor();
         });
       } else {
