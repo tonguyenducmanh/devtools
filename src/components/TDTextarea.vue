@@ -11,8 +11,15 @@
       class="textarea-wrapper"
       :class="{ 'td-textarea-hightlight-wrap-text': wrapText }"
     >
+      <!-- Editor area -->
+      <div
+        v-show="enableHighlight"
+        class="highlight-layer"
+        ref="textareaWrap"
+      ></div>
       <!-- Actual textarea -->
       <textarea
+        v-if="!enableHighlight"
         :placeholder="placeHolder || $t('i18nCommon.typeInput')"
         :value="modelValue"
         :disabled="readOnly"
@@ -41,19 +48,17 @@
 
 <script>
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
+import * as monaco from "monaco-editor";
+import TDUtility from "@/common/TDUtility.js";
 
 export default {
   name: "TDTextarea",
   mixins: [TDStylePremitiveMixin],
 
-  async created() {
-    let me = this;
-    let currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
-  },
+  created() {},
   mounted() {
-    if (this.enableHighlight) {
-      this.updateHighlight();
-    }
+    let me = this;
+    this.updateHighlight();
   },
   computed: {
     styleComputed() {
@@ -124,9 +129,17 @@ export default {
     };
   },
   watch: {
-    modelValue() {
-      if (this.enableHighlight) {
-        this.updateHighlight();
+    modelValue(newVal, oldVal) {
+      this.updateEditorVal();
+    },
+    enableHighlight(value, oldVal) {
+      this.updateHighlight();
+    },
+    wrapText(value, oldVal) {
+      if (this.editor) {
+        this.editor.updateOptions({
+          wordWrap: value ? "on" : "off",
+        });
       }
     },
   },
@@ -170,24 +183,59 @@ export default {
         el.selectionStart = el.selectionEnd = start + TAB_SIZE.length;
       });
     },
-    handleScroll(e) {
-      const pre = this.$el.querySelector(".highlight-layer");
-      if (pre) {
-        pre.scrollTop = e.target.scrollTop;
-        pre.scrollLeft = e.target.scrollLeft;
+    handleScroll(e) {},
+    async updateHighlight() {
+      let me = this;
+      if (me.enableHighlight) {
+        me.currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
+        monaco.languages.register({ id: me.language });
+        me.tm = monaco.editor.createModel(me.modelValue, me.language);
+        let configObject = {
+          model: me.tm,
+          language: me.language,
+          theme: me.currentTheme == me.$tdEnum.theme.dark ? "vs-dark" : "vs",
+          fontSize: 16,
+          readOnly: me.readOnly,
+          automaticLayout: true,
+        };
+        if (me.wrapText) {
+          configObject.wordWrap = "on";
+          configObject.wordWrapColumn = 0;
+          configObject.wrappingIndent = "none";
+        }
+        me.editor = monaco.editor.create(me.$refs.textareaWrap, configObject);
+        me.editor.onDidBlurEditorWidget((e) => {
+          me.updateValToEditor();
+        });
+      } else {
+        me.unmountEditor();
       }
     },
-    updateHighlight() {
-      this.$nextTick(() => {
-        // Sync scroll position after update
-        const textarea = this.$refs.textarea;
-        const pre = this.$el.querySelector(".highlight-layer");
-        if (textarea && pre) {
-          pre.scrollTop = textarea.scrollTop;
-          pre.scrollLeft = textarea.scrollLeft;
-        }
-      });
+    updateEditorVal: TDUtility.debounce(function () {
+      if (this.editor) {
+        this.editor.setValue(this.modelValue || "");
+      }
+    }, 100),
+    updateValToEditor: TDUtility.debounce(function () {
+      this.updateValueFromEditor(true);
+    }, 100),
+    updateValueFromEditor(fromEditor = false) {
+      let me = this;
+      if (me.editor) {
+        let editorVal = me.editor.getValue();
+        me.$emit("update:modelValue", editorVal);
+      }
     },
+    unmountEditor() {
+      let me = this;
+      if (me.editor) {
+        me.updateValueFromEditor();
+        me.editor.dispose();
+      }
+    },
+  },
+  beforeUnmount() {
+    this.unmountEditor();
   },
 };
 </script>
@@ -223,20 +271,9 @@ export default {
     width: 100%;
     height: 100%;
     margin: 0;
-    padding: var(--padding);
     border: 1px solid var(--border-color);
-    background-color: var(--bg-main-color);
-    overflow: auto;
-    pointer-events: none;
-    white-space: pre;
-    word-wrap: normal;
-
-    code {
-      display: block;
-      font-family: "Consolas", "Monaco", "Courier New", monospace;
-      font-size: var(--font-size-medium);
-      line-height: 1.5;
-    }
+    border-radius: var(--border-radius);
+    overflow: hidden;
   }
 
   textarea {
@@ -251,12 +288,6 @@ export default {
     font-size: var(--font-size-medium);
     font-family: "Consolas", "Monaco", "Courier New", monospace;
     line-height: 1.5;
-
-    &.with-highlight {
-      // background-color: transparent;
-      // color: transparent;
-      // caret-color: var(--text-primary-color);
-    }
   }
 
   textarea::placeholder {

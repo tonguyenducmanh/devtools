@@ -180,7 +180,10 @@
                     language="json"
                     :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
                   ></TDTextarea>
-                  <span class="no-select td-top-right-btn">
+                  <span
+                    v-if="!APIConfigLayout.enableHighlight"
+                    class="no-select td-top-right-btn"
+                  >
                     <div
                       class="td-icon td-json-icon"
                       @click="formatBody"
@@ -223,7 +226,10 @@
                     :readOnly="true"
                     :wrapText="APIConfigLayout.wrapText"
                   ></TDTextarea>
-                  <span class="no-select td-top-right-btn">
+                  <span
+                    v-if="!APIConfigLayout.enableHighlight"
+                    class="no-select td-top-right-btn"
+                  >
                     <div
                       class="td-icon td-copy-icon"
                       @click="handleCopyResponse"
@@ -305,7 +311,10 @@
                   :readOnly="true"
                   :wrapText="APIConfigLayout.wrapText"
                 ></TDTextarea>
-                <span class="no-select td-top-right-btn">
+                <span
+                  v-if="!APIConfigLayout.enableHighlight"
+                  class="no-select td-top-right-btn"
+                >
                   <div
                     class="td-icon td-copy-icon"
                     @click="handleCopyResponse"
@@ -391,7 +400,10 @@
                   :readOnly="true"
                   :wrapText="APIConfigLayout.wrapText"
                 ></TDTextarea>
-                <span class="no-select td-top-right-btn">
+                <span
+                  v-if="!APIConfigLayout.enableHighlight"
+                  class="no-select td-top-right-btn"
+                >
                   <div
                     class="td-icon td-copy-icon"
                     v-tooltip="$t('i18nCommon.apiTesting.copyResponse')"
