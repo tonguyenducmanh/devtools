@@ -131,7 +131,7 @@ export default {
     };
   },
   watch: {
-    modelValue() {
+    modelValue(newVal, oldVal) {
       let me = this;
       me.updateEditorVal();
     },
@@ -193,6 +193,9 @@ export default {
           readOnly: me.readOnly,
           automaticLayout: true,
         });
+        me.editor.onDidChangeModelContent((e) => {
+          me.updateValToEditor();
+        });
       } else {
         me.unmountEditor();
       }
@@ -202,7 +205,10 @@ export default {
         this.editor.setValue(this.modelValue || "");
       }
     }, 100),
-    updateValueFromEditor() {
+    updateValToEditor: TDUtility.debounce(function () {
+      this.updateValueFromEditor(true);
+    }, 100),
+    updateValueFromEditor(fromEditor = false) {
       let me = this;
       if (me.editor) {
         let editorVal = me.editor.getValue();
