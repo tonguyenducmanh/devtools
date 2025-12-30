@@ -136,6 +136,7 @@ export default {
       this.updateHighlight();
     },
     wrapText(value, oldVal) {
+      this.unmountEditor();
       this.updateHighlight();
     },
   },
