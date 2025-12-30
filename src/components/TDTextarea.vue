@@ -13,7 +13,7 @@
     >
       <!-- Editor area -->
       <div
-        v-if="enableHighlight"
+        v-show="enableHighlight"
         class="highlight-layer"
         ref="textareaWrap"
       ></div>
