@@ -136,8 +136,11 @@ export default {
       this.updateHighlight();
     },
     wrapText(value, oldVal) {
-      this.unmountEditor();
-      this.updateHighlight();
+      if (this.editor) {
+        this.editor.updateOptions({
+          wordWrap: value ? "on" : "off",
+        });
+      }
     },
   },
   methods: {
