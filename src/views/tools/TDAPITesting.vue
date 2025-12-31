@@ -163,7 +163,7 @@
                     <div class="loader"></div>
                   </div>
                   <!-- phần hiển thị status code và thời gian chạy request -->
-                  <div v-if="!APIConfigLayout.showReponse && !isLoading">
+                  <div v-if="APIConfigLayout.splitHorizontal && !isLoading">
                     <div class="status-info" v-if="statusCode">
                       <div class="status-badge" :class="statusClass">
                         {{ statusText }}
@@ -289,7 +289,7 @@
                 >
                   <div class="loader"></div>
                 </div>
-                <div v-if="!APIConfigLayout.showReponse && !isLoading">
+                <div v-if="APIConfigLayout.splitHorizontal && !isLoading">
                   <div class="status-info" v-if="statusCode">
                     <div class="status-badge" :class="statusClass">
                       {{ statusText }}
@@ -377,7 +377,7 @@
                 >
                   <div class="loader"></div>
                 </div>
-                <div v-if="!APIConfigLayout.showReponse && !isLoading">
+                <div v-if="APIConfigLayout.splitHorizontal && !isLoading">
                   <div class="status-info" v-if="statusCode">
                     <div class="status-badge" :class="statusClass">
                       {{ statusText }}
