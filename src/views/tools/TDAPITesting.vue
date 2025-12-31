@@ -141,6 +141,7 @@
                 :label="$t('i18nCommon.apiTesting.CURL')"
               ></TDButton>
             </div>
+            <!-- phần nội dung  -->
             <div
               class="flex td-api-input-area"
               :class="{ 'flex-col': APIConfigLayout.splitHorizontal }"
@@ -154,12 +155,14 @@
                     @change="updateAPIConfigLayout"
                   />
 
+                  <!-- phần hiển thị loader nếu như không chọn show reponse -->
                   <div
                     class="flex loader-without-response"
                     v-if="!showinfoOnReponseAndNotHorizontal && isLoading"
                   >
                     <div class="loader"></div>
                   </div>
+                  <!-- phần hiển thị status code và thời gian chạy request -->
                   <div v-if="!showinfoOnReponseAndNotHorizontal && !isLoading">
                     <div class="status-info" v-if="statusCode">
                       <div class="status-badge" :class="statusClass">
@@ -171,6 +174,7 @@
                     </div>
                   </div>
                 </div>
+                <!-- phần cấu hình header api -->
                 <TDTextarea
                   v-if="
                     APIConfigLayout.currentAPIInfoOption ==
@@ -183,6 +187,7 @@
                   :wrapText="APIConfigLayout.wrapText"
                   :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
                 ></TDTextarea>
+                <!-- phần cấu hình body api -->
                 <div
                   class="td-text-area-wrap"
                   v-if="
@@ -210,10 +215,12 @@
                   </span>
                 </div>
               </div>
+              <!-- phần response API -->
               <div
                 v-if="APIConfigLayout.showReponse"
                 class="flex flex-col td-api-response"
               >
+                <!-- phần hiển thị httpstatus bên trên response -->
                 <div
                   v-if="!APIConfigLayout.splitHorizontal"
                   class="flex td-api-response-title"
@@ -229,9 +236,11 @@
                     </div>
                   </div>
                 </div>
+                <!-- phần hiển thị loading -->
                 <div class="flex flex-col response-loading" v-if="isLoading">
                   <div class="loader"></div>
                 </div>
+                <!-- phần response -->
                 <div v-else class="td-text-area-wrap">
                   <TDTextarea
                     :isLabelTop="true"
