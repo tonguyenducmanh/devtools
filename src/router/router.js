@@ -33,7 +33,7 @@ const routerConfig = [
      */
     path: "/apitesting",
     name: "apitesting",
-    component: () => import("@/views/tools/TDAPITesting.vue"),
+    component: () => import("@/views/tools/APITesting/TDAPITesting.vue"),
     meta: {
       titleKey: "i18nCommon.feature.APITesting",
     },

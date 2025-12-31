@@ -163,16 +163,11 @@
                     <div class="loader"></div>
                   </div>
                   <!-- phần hiển thị status code và thời gian chạy request -->
-                  <div v-if="APIConfigLayout.splitHorizontal && !isLoading">
-                    <div class="status-info" v-if="statusCode">
-                      <div class="status-badge" :class="statusClass">
-                        {{ statusText }}
-                      </div>
-                      <div class="response-time" v-if="responseTime">
-                        {{ responseTime }}ms
-                      </div>
-                    </div>
-                  </div>
+                  <TDAPIResponseStatus
+                    v-if="APIConfigLayout.splitHorizontal && !isLoading"
+                    :statusCode="statusCode"
+                    :responseTime="responseTime"
+                  />
                 </div>
                 <!-- phần cấu hình header api -->
                 <TDTextarea
@@ -221,21 +216,12 @@
                 class="flex flex-col td-api-response"
               >
                 <!-- phần hiển thị httpstatus bên trên response -->
-                <div
-                  v-if="!APIConfigLayout.splitHorizontal"
+                <TDAPIResponseStatus
                   class="flex td-api-response-title"
-                >
-                  <div>
-                    <div class="status-info" v-if="statusCode">
-                      <div class="status-badge" :class="statusClass">
-                        {{ statusText }}
-                      </div>
-                      <div class="response-time" v-if="responseTime">
-                        {{ responseTime }}ms
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  v-if="!APIConfigLayout.splitHorizontal"
+                  :statusCode="statusCode"
+                  :responseTime="responseTime"
+                />
                 <!-- phần hiển thị loading -->
                 <div class="flex flex-col response-loading" v-if="isLoading">
                   <div class="loader"></div>
@@ -289,16 +275,11 @@
                 >
                   <div class="loader"></div>
                 </div>
-                <div v-if="APIConfigLayout.splitHorizontal && !isLoading">
-                  <div class="status-info" v-if="statusCode">
-                    <div class="status-badge" :class="statusClass">
-                      {{ statusText }}
-                    </div>
-                    <div class="response-time" v-if="responseTime">
-                      {{ responseTime }}ms
-                    </div>
-                  </div>
-                </div>
+                <TDAPIResponseStatus
+                  v-if="APIConfigLayout.splitHorizontal && !isLoading"
+                  :statusCode="statusCode"
+                  :responseTime="responseTime"
+                />
               </div>
               <TDTextarea
                 :isLabelTop="true"
@@ -313,21 +294,12 @@
               v-if="APIConfigLayout.showReponse"
               class="flex flex-col td-api-response"
             >
-              <div
-                v-if="!APIConfigLayout.splitHorizontal"
+              <TDAPIResponseStatus
                 class="flex td-api-response-title"
-              >
-                <div>
-                  <div class="status-info" v-if="statusCode">
-                    <div class="status-badge" :class="statusClass">
-                      {{ statusText }}
-                    </div>
-                    <div class="response-time" v-if="responseTime">
-                      {{ responseTime }}ms
-                    </div>
-                  </div>
-                </div>
-              </div>
+                v-if="!APIConfigLayout.splitHorizontal"
+                :statusCode="statusCode"
+                :responseTime="responseTime"
+              />
               <div class="flex flex-col response-loading" v-if="isLoading">
                 <div class="loader"></div>
               </div>
@@ -377,16 +349,11 @@
                 >
                   <div class="loader"></div>
                 </div>
-                <div v-if="APIConfigLayout.splitHorizontal && !isLoading">
-                  <div class="status-info" v-if="statusCode">
-                    <div class="status-badge" :class="statusClass">
-                      {{ statusText }}
-                    </div>
-                    <div class="response-time" v-if="responseTime">
-                      {{ responseTime }}ms
-                    </div>
-                  </div>
-                </div>
+                <TDAPIResponseStatus
+                  v-if="APIConfigLayout.splitHorizontal && !isLoading"
+                  :statusCode="statusCode"
+                  :responseTime="responseTime"
+                />
               </div>
               <!-- phần nội dung code pro mode -->
               <TDTextarea
@@ -401,21 +368,12 @@
               v-if="APIConfigLayout.showReponse"
               class="flex flex-col td-api-response"
             >
-              <div
-                v-if="!APIConfigLayout.splitHorizontal"
+              <TDAPIResponseStatus
                 class="flex td-api-response-title"
-              >
-                <div>
-                  <div class="status-info" v-if="statusCode">
-                    <div class="status-badge" :class="statusClass">
-                      {{ statusText }}
-                    </div>
-                    <div class="response-time" v-if="responseTime">
-                      {{ responseTime }}ms
-                    </div>
-                  </div>
-                </div>
-              </div>
+                v-if="!APIConfigLayout.splitHorizontal"
+                :statusCode="statusCode"
+                :responseTime="responseTime"
+              />
               <div class="flex flex-col response-loading" v-if="isLoading">
                 <TDButton
                   v-if="isLoading"
@@ -759,10 +717,10 @@ import TDCURLUtil from "@/common/api/TDCURLUtil";
 import TDToggleArea from "@/components/TDToggleArea.vue";
 import TDArrow from "@/components/TDArrow.vue";
 import JSZip from "jszip";
-
+import TDAPIResponseStatus from "@/views/tools/APITesting/TDAPIResponseStatus.vue";
 export default {
   name: "TDAPITesting",
-  components: { TDToggleArea, TDArrow },
+  components: { TDToggleArea, TDArrow, TDAPIResponseStatus },
 
   data() {
     return {
@@ -862,59 +820,6 @@ export default {
         });
       }
       return options;
-    },
-    statusClass() {
-      if (!this.statusCode) return "";
-      if (this.statusCode >= 200 && this.statusCode < 300) return "success";
-      if (this.statusCode >= 300 && this.statusCode < 400) return "redirect";
-      if (this.statusCode >= 400 && this.statusCode < 500)
-        return "client-error";
-      if (this.statusCode >= 500) return "server-error";
-      return "";
-    },
-    statusText() {
-      let code = Number(this.statusCode);
-      if (!code) return "";
-      // mapping chi tiết
-      let exactMap = {
-        200: "OK",
-        201: "Created",
-        202: "Accepted",
-        204: "No Content",
-        301: "Moved Permanently",
-        302: "Found",
-        304: "Not Modified",
-        400: "Bad Request",
-        401: "Unauthorized",
-        403: "Forbidden",
-        404: "Not Found",
-        408: "Request Timeout",
-        409: "Conflict",
-        429: "Too Many Requests",
-        500: "Internal Server Error",
-        502: "Bad Gateway",
-        503: "Service Unavailable",
-        504: "Gateway Timeout",
-      };
-
-      // ưu tiên exact
-      if (exactMap[code]) {
-        return `${code} ${exactMap[code]}`;
-      }
-
-      // fallback theo nhóm HTTP
-      let group = Math.floor(code / 100);
-      let groupMap = {
-        1: "Informational",
-        2: "Success",
-        3: "Redirection",
-        4: "Client Error",
-        5: "Server Error",
-      };
-
-      return groupMap[group]
-        ? `${code} ${groupMap[group]}`
-        : `${code} Unknown Status`;
     },
     filteredCollection() {
       let me = this;
@@ -1653,41 +1558,6 @@ export default {
       }
     }
   }
-}
-.status-info {
-  display: flex;
-  align-items: center;
-  gap: var(--padding);
-  background-color: var(--bg-secondary);
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-}
-
-.status-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 0.25rem;
-  font-weight: 600;
-  color: white;
-}
-
-.status-badge.success {
-  background-color: #10b981;
-}
-
-.status-badge.redirect {
-  background-color: #3b82f6;
-}
-
-.status-badge.client-error {
-  background-color: #f59e0b;
-}
-
-.status-badge.server-error {
-  background-color: #ef4444;
-}
-
-.response-time {
-  color: var(--text-secondary);
 }
 .td-api-header-group {
   gap: var(--padding);
