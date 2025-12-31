@@ -1,7 +1,10 @@
 <template>
   <div class="flex td-api-container">
+    <!-- phần thao tác chính của tool -->
     <div class="flex flex-col td-api-testing">
+      <!-- danh sách các nút ở đầu api -->
       <div class="flex td-api-header-group">
+        <!-- lựa chọn chế độ api và tên request-->
         <div class="flex flex-one">
           <TDComboBox
             :width="120"
@@ -25,7 +28,7 @@
             ]"
           ></TDInput>
         </div>
-
+        <!-- nút gửi hoặc hủy request -->
         <TDButton
           v-if="isLoading"
           :noMargin="true"
@@ -34,18 +37,19 @@
           :label="$t('i18nCommon.apiTesting.cancel')"
         />
         <TDButton
+          v-else
           :noMargin="true"
           @click="handleSend"
           :label="$t('i18nCommon.apiTesting.send')"
-          v-else
         ></TDButton>
+        <!-- nút tải xuống response -->
         <TDButton
           :noMargin="true"
-          v-if="!APIConfigLayout.showReponse"
           @click="handleDownloadReponse"
           :type="$tdEnum.buttonType.secondary"
           :label="$t('i18nCommon.apiTesting.downloadReponse')"
         ></TDButton>
+        <!-- nút lịch sử reqeust -->
         <TDHistory
           v-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode"
           ref="historyProMode"
@@ -67,6 +71,9 @@
           :historyContainerStyleEnum="$tdEnum.AbsolutePositionStyle.Top100Left"
         ></TDHistory>
       </div>
+      <!-- hết phần danh sách nút đầu của api -->
+      <!-- phần nội dung tùy thuộc vào từng loại api -->
+      <!-- phần api truyền thống -->
       <template v-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.Normal">
         <template v-if="isImportingCURL">
           <TDTextarea
@@ -244,6 +251,7 @@
           </div>
         </template>
       </template>
+      <!-- phần api dạng curl -->
       <template
         v-else-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.CURL"
       >
@@ -330,6 +338,7 @@
           </div>
         </div>
       </template>
+      <!-- phần api promode, xử lý nhiều kịch bản bằng javascript -->
       <template
         v-else-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode"
       >
@@ -419,17 +428,22 @@
           </div>
         </div>
       </template>
+      <!-- hết phần nội dung tùy thuộc vào từng loại api -->
     </div>
+    <!-- phần sidebar của tool -->
     <div class="flex flex-col td-sub-sidebar-wrapper">
+      <!-- phần nội dung sidebar -->
       <div
         class="flex td-sub-sidebar"
         :class="{ 'td-sub-sidebar-collaspe': !APIConfigLayout.isShowSidebar }"
       >
+        <!-- phần thanh border ngăn cách main area và sidebar area -->
         <div v-if="APIConfigLayout.isShowSidebar" class="divide"></div>
         <div
           v-if="APIConfigLayout.isShowSidebar"
           class="flex flex-col td-sub-sidebar-content"
         >
+          <!-- slide tùy chọn như cài đặt hoặc collection -->
           <div class="td-sidebar-header">
             <TDSlideOption
               v-if="sidebarOptions && sidebarOptions.length > 1"
@@ -439,6 +453,7 @@
               @change="updateAPIConfigLayout"
             />
           </div>
+          <!-- phần bộ sưu tập các request -->
           <div
             class="flex flex-col td-sidebar-content"
             v-if="
@@ -446,6 +461,7 @@
               $tdEnum.APISidebarOption.Collection
             "
           >
+            <!-- phần header của bộ sưu tập request -->
             <div class="flex td-header-collection">
               <div class="td-new-collection">
                 <TDInput
@@ -460,6 +476,7 @@
                 v-tooltip="$t('i18nCommon.apiTesting.add')"
               ></div>
             </div>
+            <!-- phần danh sách các request đã lưu theo thư mục -->
             <div class="td-collection">
               <div class="td-collection-body">
                 <div
@@ -467,6 +484,7 @@
                   class="flex flex-col no-select td-collection-item"
                   :key="index"
                 >
+                  <!-- phần sửa nhanh tên thư mục request nếu đang ở chế độ edit -->
                   <div
                     v-if="collection.is_renaming"
                     class="td-collection-rename"
@@ -483,6 +501,7 @@
                     >
                     </TDInput>
                   </div>
+                  <!-- phần tên thư mục -->
                   <div
                     v-else
                     class="flex td-collection-header"
@@ -513,6 +532,7 @@
                       ></div>
                     </div>
                   </div>
+                  <!-- danh sách các request có trong 1 thư mục, chỉ render khi đang mở thư mục -->
                   <div
                     v-if="
                       collection.openingCollection &&
@@ -550,7 +570,9 @@
                 </div>
               </div>
             </div>
+            <!-- phần upload hàng loạt request -->
             <div class="flex td-api-upload-collection-area">
+              <!-- phần upload request từ postman -->
               <span>
                 <TDUpload
                   v-tooltip="{
@@ -567,6 +589,7 @@
                   :multiple="true"
                 />
               </span>
+              <!-- phần upload request từ zip collection curl -->
               <span>
                 <TDUpload
                   v-tooltip="{
@@ -584,7 +607,9 @@
                 />
               </span>
             </div>
+            <!-- phần danh sách các nút khác ở chân sidebar -->
             <div class="flex">
+              <!-- nút thêm request mới -->
               <TDButton
                 :readOnly="isLoading"
                 @click="createNewRequest"
@@ -596,6 +621,7 @@
                   $tdEnum.BorderRadiusPosition.BottomLeft,
                 ]"
               ></TDButton>
+              <!-- nút lưu request -->
               <TDButton
                 :readOnly="isLoading || !requestName"
                 @click="saveRequest"
@@ -609,6 +635,7 @@
               ></TDButton>
             </div>
           </div>
+          <!-- phần sidebar nếu đang tùy chọn thiết lập api -->
           <div
             class="td-sidebar-content"
             v-else-if="
@@ -664,6 +691,8 @@
           @toggle="toggleSidebar"
         />
       </div>
+      <!-- hết phần nội dung sidebar -->
+      <!-- phần giả popup lưu request vào 1 thư mục có sẵn -->
       <div
         v-if="isSaveRequestToCollectionModelOpen"
         class="td-api-request-save-collection"
