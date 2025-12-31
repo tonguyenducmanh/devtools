@@ -222,34 +222,11 @@
                   :statusCode="statusCode"
                   :responseTime="responseTime"
                 />
-                <!-- phần hiển thị loading -->
-                <div class="flex flex-col response-loading" v-if="isLoading">
-                  <div class="loader"></div>
-                </div>
-                <!-- phần response -->
-                <div v-else class="td-text-area-wrap">
-                  <TDTextarea
-                    :isLabelTop="true"
-                    :modelValue="responseText"
-                    :enableHighlight="APIConfigLayout.enableHighlight"
-                    language="json"
-                    :placeHolder="
-                      $t('i18nCommon.apiTesting.responsePlaceholder')
-                    "
-                    :readOnly="true"
-                    :wrapText="APIConfigLayout.wrapText"
-                  ></TDTextarea>
-                  <span
-                    v-if="!APIConfigLayout.enableHighlight"
-                    class="no-select td-top-right-btn"
-                  >
-                    <div
-                      class="td-icon td-copy-icon"
-                      @click="handleCopyResponse"
-                      v-tooltip="$t('i18nCommon.apiTesting.copyResponse')"
-                    ></div>
-                  </span>
-                </div>
+                <TDAPIResponse
+                  :isLoading="isLoading"
+                  :responseText="responseText"
+                  :APIConfigLayout="APIConfigLayout"
+                />
               </div>
             </div>
           </div>
@@ -300,30 +277,11 @@
                 :statusCode="statusCode"
                 :responseTime="responseTime"
               />
-              <div class="flex flex-col response-loading" v-if="isLoading">
-                <div class="loader"></div>
-              </div>
-              <div v-else class="td-text-area-wrap">
-                <TDTextarea
-                  :isLabelTop="true"
-                  :modelValue="responseText"
-                  :enableHighlight="APIConfigLayout.enableHighlight"
-                  language="json"
-                  :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
-                  :readOnly="true"
-                  :wrapText="APIConfigLayout.wrapText"
-                ></TDTextarea>
-                <span
-                  v-if="!APIConfigLayout.enableHighlight"
-                  class="no-select td-top-right-btn"
-                >
-                  <div
-                    class="td-icon td-copy-icon"
-                    @click="handleCopyResponse"
-                    v-tooltip="$t('i18nCommon.apiTesting.copyResponse')"
-                  ></div>
-                </span>
-              </div>
+              <TDAPIResponse
+                :isLoading="isLoading"
+                :responseText="responseText"
+                :APIConfigLayout="APIConfigLayout"
+              />
             </div>
           </div>
         </div>
@@ -374,34 +332,11 @@
                 :statusCode="statusCode"
                 :responseTime="responseTime"
               />
-              <div class="flex flex-col response-loading" v-if="isLoading">
-                <TDButton
-                  v-if="isLoading"
-                  :label="$t('i18nCommon.apiTesting.cancel')"
-                />
-                <div class="loader"></div>
-              </div>
-              <div v-else class="td-text-area-wrap">
-                <TDTextarea
-                  :isLabelTop="true"
-                  :modelValue="responseText"
-                  :enableHighlight="APIConfigLayout.enableHighlight"
-                  language="json"
-                  :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
-                  :readOnly="true"
-                  :wrapText="APIConfigLayout.wrapText"
-                ></TDTextarea>
-                <span
-                  v-if="!APIConfigLayout.enableHighlight"
-                  class="no-select td-top-right-btn"
-                >
-                  <div
-                    class="td-icon td-copy-icon"
-                    v-tooltip="$t('i18nCommon.apiTesting.copyResponse')"
-                    @click="handleCopyResponse"
-                  ></div>
-                </span>
-              </div>
+              <TDAPIResponse
+                :isLoading="isLoading"
+                :responseText="responseText"
+                :APIConfigLayout="APIConfigLayout"
+              />
             </div>
           </div>
         </div>
@@ -718,9 +653,10 @@ import TDToggleArea from "@/components/TDToggleArea.vue";
 import TDArrow from "@/components/TDArrow.vue";
 import JSZip from "jszip";
 import TDAPIResponseStatus from "@/views/tools/APITesting/TDAPIResponseStatus.vue";
+import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
 export default {
   name: "TDAPITesting",
-  components: { TDToggleArea, TDArrow, TDAPIResponseStatus },
+  components: { TDToggleArea, TDArrow, TDAPIResponse, TDAPIResponseStatus },
 
   data() {
     return {
@@ -1366,11 +1302,6 @@ export default {
         bodyText: me.bodyText,
       };
     },
-    handleCopyResponse() {
-      if (this.responseText) {
-        this.$tdUtility.copyToClipboard(this.responseText);
-      }
-    },
     handleDownloadReponse() {
       let me = this;
       if (me.responseText) {
@@ -1570,13 +1501,7 @@ export default {
 .td-api-info-btn {
   gap: var(--padding);
 }
-.response-loading {
-  width: 100%;
-  height: 100%;
-  background-color: var(--bg-layer-color);
-  border: 1px solid transparent;
-  border-radius: var(--border-radius);
-}
+
 .loader-without-response {
   margin-left: 100px;
 }
