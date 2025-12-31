@@ -27,6 +27,10 @@
         @click="handleFormat"
         :label="$t('i18nCommon.codeFormatter.formatCode')"
       ></TDButton>
+      <TDCheckbox
+        v-model="enableHighlight"
+        :label="$t('i18nCommon.enableHighlight')"
+      ></TDCheckbox>
       <TDButton
         @click="applyMock"
         :type="$tdEnum.buttonType.secondary"
