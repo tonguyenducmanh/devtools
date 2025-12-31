@@ -2,7 +2,7 @@
   <div class="flex flex-col container">
     <div class="flex">
       <TDComboBox
-        :width="120"
+        :width="200"
         v-model="language"
         :options="methodOptions"
         @selected="compare"
@@ -106,12 +106,21 @@ export default {
       language: "text/plan",
       methodOptions: [
         { value: "text/plan", label: "text/plan" },
-        { value: "javascript", label: "javascript" },
-        { value: "typescript", label: "typescript" },
+        { value: "sql", label: "sql" },
+        { value: "pgsql", label: "Postgres SQL" },
+        { value: "mysql", label: "MySql" },
         { value: "json", label: "json" },
         { value: "css", label: "css" },
+        { value: "javascript", label: "javascript" },
+        { value: "typescript", label: "typescript" },
+        { value: "csharp", label: "C#" },
+        { value: "cpp", label: "C++" },
+        { value: "rust", label: "Rust" },
         { value: "shell", label: "shell" },
-        { value: "sql", label: "sql" },
+        { value: "xml", label: "XML" },
+        { value: "yaml", label: "YAML" },
+        { value: "powershell", label: "Powershell" },
+        { value: "markdown", label: "Markdown" },
       ],
     };
   },
