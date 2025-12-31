@@ -162,6 +162,8 @@
                   "
                   :isLabelTop="true"
                   v-model="headersText"
+                  :enableHighlight="APIConfigLayout.enableHighlight"
+                  language="text/plan"
                   :wrapText="APIConfigLayout.wrapText"
                   :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
                 ></TDTextarea>
