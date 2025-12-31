@@ -1,7 +1,12 @@
 <template>
   <div class="flex flex-col container">
     <div class="flex">
-      <TDComboBox :width="120" v-model="language" :options="methodOptions" />
+      <TDComboBox
+        :width="120"
+        v-model="language"
+        :options="methodOptions"
+        @selected="compare"
+      />
       <TDButton
         @click="applyMock"
         :type="$tdEnum.buttonType.secondary"
@@ -57,11 +62,11 @@ export default {
         }
         me.originalModel = monaco.editor.createModel(
           me.firstCodeFile,
-          "text/plain"
+          me.language
         );
         me.modifiedModel = monaco.editor.createModel(
           me.secondCodeFile,
-          "text/plain"
+          me.language
         );
 
         me.editor = monaco.editor.createDiffEditor(
@@ -98,9 +103,13 @@ export default {
       isCompareSideBySide: true,
       oldTitle: "old.txt",
       newTitle: "new.txt",
-      language: "javascript",
+      language: "text/plan",
       methodOptions: [
+        { value: "text/plan", label: "text/plan" },
         { value: "javascript", label: "javascript" },
+        { value: "typescript", label: "typescript" },
+        { value: "json", label: "json" },
+        { value: "css", label: "css" },
         { value: "shell", label: "shell" },
         { value: "sql", label: "sql" },
       ],
