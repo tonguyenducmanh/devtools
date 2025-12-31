@@ -1,36 +1,12 @@
 <template>
-  <div>
-    <div class="container">
-      <!-- <div class="title">{{ $t("i18nCommon.compareCode.title") }}</div> -->
-      <div class="flex flex-wrap td-compare-box">
-        <TDTextarea
-          :placeHolder="$t('i18nCommon.compareCode.firstFile')"
-          v-model="firstCodeFile"
-          :label="oldTitle"
-          isLabelTop
-          height="400px"
-          width="500px"
-        ></TDTextarea>
-        <TDTextarea
-          :placeHolder="$t('i18nCommon.compareCode.secondFile')"
-          v-model="secondCodeFile"
-          :label="newTitle"
-          isLabelTop
-          height="400px"
-          width="500px"
-        ></TDTextarea>
-      </div>
-      <div class="flex">
-        <TDButton
-          @click="compare"
-          :label="$t('i18nCommon.compareCode.compare')"
-        ></TDButton>
-        <TDButton
-          @click="applyMock"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.compareCode.example')"
-        ></TDButton>
-      </div>
+  <div class="flex flex-col container">
+    <div class="flex">
+      <TDComboBox :width="120" v-model="language" :options="methodOptions" />
+      <TDButton
+        @click="applyMock"
+        :type="$tdEnum.buttonType.secondary"
+        :label="$t('i18nCommon.compareCode.example')"
+      ></TDButton>
     </div>
     <div class="highlight-layer" ref="textareaWrap"></div>
   </div>
@@ -47,28 +23,32 @@ export default {
   beforeUnmount() {
     let me = this;
   },
-  mounted() {},
+  mounted() {
+    this.compare();
+  },
   methods: {
     async applyMock() {
+      let me = this;
       // Lazy-load module
       const { TDMockCompareCode } = await import(
         /* webpackChunkName: "mock-compare-code" */
         "@/common/mock/TDMockCompareCode.js"
       );
       this.$tdUtility.applyMock(this, TDMockCompareCode);
+      await me.compare();
     },
     async compare() {
       let me = this;
+      me.unmountEditor();
       if (me.firstCodeFile && me.secondCodeFile) {
         let me = this;
         me.currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
         monaco.languages.register({ id: me.language });
         let configObject = {
-          model: me.editorModel,
           language: me.language,
           theme: me.currentTheme == me.$tdEnum.theme.dark ? "vs-dark" : "vs",
           fontSize: 16,
-          readOnly: me.readOnly,
+          originalEditable: true,
           automaticLayout: true,
         };
         if (me.wrapText) {
@@ -85,10 +65,10 @@ export default {
           "text/plain"
         );
 
-        me.editor = monaco.editor.createDiffEditor(me.$refs.textareaWrap, {
-          originalEditable: true,
-          automaticLayout: true,
-        });
+        me.editor = monaco.editor.createDiffEditor(
+          me.$refs.textareaWrap,
+          configObject
+        );
         me.editor.setModel({
           original: me.originalModel,
           modified: me.modifiedModel,
@@ -119,6 +99,12 @@ export default {
       isCompareSideBySide: true,
       oldTitle: "old.txt",
       newTitle: "new.txt",
+      language: "javascript",
+      methodOptions: [
+        { value: "javascript", label: "javascript" },
+        { value: "shell", label: "shell" },
+        { value: "sql", label: "sql" },
+      ],
     };
   },
   beforeUnmount() {
@@ -129,19 +115,15 @@ export default {
 <style scoped>
 .container {
   width: 100%;
-  padding: 2rem;
+  height: 100%;
   border-radius: 0;
   box-shadow: none;
-}
-.td-checkbox-sibe-by-side {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 .td-compare-box {
   column-gap: var(--padding);
 }
 .highlight-layer {
+  flex: 1;
   width: 100%;
   height: 100%;
   margin: 0;
