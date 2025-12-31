@@ -14,6 +14,7 @@ import TDRadioGroup from "@/components/TDRadioGroup.vue";
 import TDSlideOption from "@/components/TDSlideOption.vue";
 import TDComboBox from "@/components/TDComboBox.vue";
 import TDHistory from "@/components/TDHistory.vue";
+import TDPopup from "@/components/TDPopup.vue";
 import i18nData, { loadLocale } from "@/i18n/i18nData.js";
 import eventBus from "@/common/event/TDEventBus.js";
 import ToastPlugin from "@/common/TDToastUtil.js";
@@ -45,6 +46,7 @@ import "@/common/TDMonacoEditor.js";
   currentApp.component("TDSlideOption", TDSlideOption);
   currentApp.component("TDComboBox", TDComboBox);
   currentApp.component("TDHistory", TDHistory);
+  currentApp.component("TDPopup", TDPopup);
 
   // router link
   currentApp.use(router);

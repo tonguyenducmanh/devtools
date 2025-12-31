@@ -605,44 +605,6 @@
         />
       </div>
       <!-- hết phần nội dung sidebar -->
-      <!-- phần giả popup lưu request vào 1 thư mục có sẵn -->
-      <div
-        v-if="isSaveRequestToCollectionModelOpen"
-        class="td-api-request-save-collection"
-      >
-        <div class="td-search-modal" @click.stop>
-          <div class="td-search-input-container">
-            <div class="td-icon td-search-icon"></div>
-            <input
-              ref="searchInput"
-              v-model="searchQuery"
-              type="text"
-              :placeholder="$t('i18nCommon.search.placeholder')"
-              class="td-search-input"
-            />
-            <button class="td-search-close" @click="closeSearchModal">
-              <div class="td-icon td-close-icon"></div>
-            </button>
-          </div>
-
-          <div class="td-search-results" v-if="filteredCollection.length > 0">
-            <div class="td-search-section">
-              <div
-                v-for="(collection, index) in filteredCollection"
-                :key="collection.name"
-                class="td-search-item"
-                @click="saveToCollection(collection)"
-              >
-                <div class="td-search-item-content">
-                  <div class="td-search-item-title">
-                    {{ collection.name }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -654,6 +616,7 @@ import TDArrow from "@/components/TDArrow.vue";
 import JSZip from "jszip";
 import TDAPIResponseStatus from "@/views/tools/APITesting/TDAPIResponseStatus.vue";
 import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
+import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil";
 export default {
   name: "TDAPITesting",
   components: { TDToggleArea, TDArrow, TDAPIResponse, TDAPIResponseStatus },
@@ -687,8 +650,6 @@ export default {
         currentAPIInfoOption: this.$tdEnum.APIInfoOption.body,
       },
       curlContent: "",
-      isSaveRequestToCollectionModelOpen: false,
-      searchQuery: "",
       methodOptions: [
         { value: "GET", label: "GET", customStyle: { color: "#5EA572" } },
         { value: "POST", label: "POST", customStyle: { color: "#AE7D0D" } },
@@ -756,19 +717,6 @@ export default {
         });
       }
       return options;
-    },
-    filteredCollection() {
-      let me = this;
-      if (!this.searchQuery) return me.allCollection;
-      let query = this.searchQuery.normalizeText();
-
-      return me.allCollection
-        .filter((collection) => {
-          let collectionName = collection.name.normalizeText();
-
-          return collectionName.includes(query);
-        })
-        .slice(0, 8); // Giới hạn 8 kết quả
     },
     customStyleComboMethodAPI() {
       let me = this;
@@ -876,7 +824,13 @@ export default {
           }
         } else {
           // nếu không tồn tại request thì show popup tạo mới
-          me.isSaveRequestToCollectionModelOpen = true;
+          TDDialogUtil.show({
+            dialogType: TDDialogEnum.TDAPISaveToCollectionPopup,
+            ownerForm: this,
+            props: {
+              allCollection: me.allCollection,
+            },
+          });
         }
       }
     },
@@ -895,6 +849,9 @@ export default {
         this.$tdToast.success(null, this.$t("i18nCommon.toastMessage.success"));
       }
       this.closeSearchModal();
+    },
+    closeSearchModal() {
+      this.searchQuery = "";
     },
     async deleteRequest(collectionId, request) {
       let me = this;
@@ -965,10 +922,7 @@ export default {
         await me.saveCollectionToCache();
       }
     },
-    closeSearchModal() {
-      this.isSaveRequestToCollectionModelOpen = false;
-      this.searchQuery = "";
-    },
+
     async importCollectionZip() {
       let me = this;
       if (
