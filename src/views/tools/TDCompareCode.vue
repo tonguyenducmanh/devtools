@@ -20,12 +20,6 @@
           width="500px"
         ></TDTextarea>
       </div>
-      <TDCheckbox
-        v-model="isCompareSideBySide"
-        :label="$t('i18nCommon.compareCode.compareStyle')"
-        @input="compare"
-        class="td-checkbox-sibe-by-side"
-      ></TDCheckbox>
       <div class="flex">
         <TDButton
           @click="compare"
@@ -38,13 +32,13 @@
         ></TDButton>
       </div>
     </div>
-    <div class="diff-output" v-html="diffOutputHtml"></div>
+    <div class="highlight-layer" ref="textareaWrap"></div>
   </div>
 </template>
+
 <script>
-import * as Diff2Html from "diff2html";
-import "diff2html/bundles/css/diff2html.min.css";
-import { createTwoFilesPatch } from "diff";
+import * as monaco from "monaco-editor";
+
 export default {
   name: "TDCompareCode",
   created() {
@@ -63,24 +57,58 @@ export default {
       );
       this.$tdUtility.applyMock(this, TDMockCompareCode);
     },
-    compare() {
+    async compare() {
       let me = this;
       if (me.firstCodeFile && me.secondCodeFile) {
-        let diff = createTwoFilesPatch(
-          me.oldTitle,
-          me.newTitle,
+        let me = this;
+        me.currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
+        monaco.languages.register({ id: me.language });
+        let configObject = {
+          model: me.editorModel,
+          language: me.language,
+          theme: me.currentTheme == me.$tdEnum.theme.dark ? "vs-dark" : "vs",
+          fontSize: 16,
+          readOnly: me.readOnly,
+          automaticLayout: true,
+        };
+        if (me.wrapText) {
+          configObject.wordWrap = "on";
+          configObject.wordWrapColumn = 0;
+          configObject.wrappingIndent = "none";
+        }
+        me.originalModel = monaco.editor.createModel(
           me.firstCodeFile,
-          me.secondCodeFile
+          "text/plain"
         );
-        me.diffOutputHtml = Diff2Html.html(diff, {
-          inputFormat: "diff",
-          showFiles: true,
-          matching: "lines",
-          outputFormat: me.isCompareSideBySide
-            ? "side-by-side"
-            : "line-by-line",
+        me.modifiedModel = monaco.editor.createModel(
+          me.secondCodeFile,
+          "text/plain"
+        );
+
+        me.editor = monaco.editor.createDiffEditor(me.$refs.textareaWrap, {
+          originalEditable: true,
+          automaticLayout: true,
+        });
+        me.editor.setModel({
+          original: me.originalModel,
+          modified: me.modifiedModel,
         });
       }
+    },
+    unmountEditor() {
+      let me = this;
+      if (me.editor) {
+        me.editor.dispose();
+      }
+      if (me.originalModel) {
+        me.originalModel.dispose();
+      }
+      if (me.modifiedModel) {
+        me.modifiedModel.dispose();
+      }
+      me.editor = null;
+      me.originalModel = null;
+      me.modifiedModel = null;
     },
   },
   data() {
@@ -92,6 +120,9 @@ export default {
       oldTitle: "old.txt",
       newTitle: "new.txt",
     };
+  },
+  beforeUnmount() {
+    this.unmountEditor();
   },
 };
 </script>
@@ -110,8 +141,12 @@ export default {
 .td-compare-box {
   column-gap: var(--padding);
 }
-.diff-output {
-  display: block;
+.highlight-layer {
   width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
 }
 </style>
