@@ -356,6 +356,7 @@
             class="flex td-api-input-area"
             :class="{ 'flex-col': APIConfigLayout.splitHorizontal }"
           >
+            <!-- phần 1 số info header promode như title và respone http -->
             <div class="flex flex-col td-api-request">
               <div class="flex td-api-request-title">
                 <div class="title-request">
@@ -378,6 +379,7 @@
                   </div>
                 </div>
               </div>
+              <!-- phần nội dung code pro mode -->
               <TDTextarea
                 :isLabelTop="true"
                 v-model="proModeSecranioCode"
