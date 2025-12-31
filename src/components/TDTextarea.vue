@@ -142,6 +142,13 @@ export default {
         });
       }
     },
+    language(value, oldVal) {
+      if (this.editor && value && oldVal && value != oldVal) {
+        this.editor.updateOptions({
+          language: value,
+        });
+      }
+    },
   },
   methods: {
     focus() {

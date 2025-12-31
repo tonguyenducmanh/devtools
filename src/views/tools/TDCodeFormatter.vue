@@ -1,11 +1,7 @@
 <template>
   <div class="flex flex-col container">
     <div class="flex tool-header">
-      <TDRadioGroup
-        v-model="currentFormatType"
-        :label="$t('i18nCommon.codeFormatter.typeOfCode')"
-        :options="formatType"
-      />
+      <TDComboBox :width="200" v-model="language" :options="methodOptions" />
     </div>
     <div class="flex input-container">
       <TDTextarea
@@ -13,12 +9,17 @@
         v-model="inputSource"
         height="100%"
         width="50%"
+        :enableHighlight="enableHighlight"
+        :language="language"
       ></TDTextarea>
       <TDTextarea
         :placeHolder="$t('i18nCommon.codeFormatter.outputCode')"
         v-model="outputSource"
         height="100%"
         width="50%"
+        :enableHighlight="enableHighlight"
+        :language="language"
+        :readOnly="true"
       ></TDTextarea>
     </div>
     <div class="flex">
@@ -56,7 +57,8 @@ export default {
   methods: {
     async applyMock() {
       try {
-        if (this.currentFormatType === tdEnum.typeOfCode.postgresql) {
+        let me = this;
+        if (me.language === "pgsql") {
           // Lazy-load module PostgreSQL
           const { TDMockPostgreSQLFormatter } = await import(
             /* webpackChunkName: "mock-postgresql-formatter" */
@@ -77,9 +79,9 @@ export default {
     },
     getCurrentFormatSQL() {
       let me = this;
-      if (me.currentFormatType === tdEnum.typeOfCode.postgresql) {
+      if (me.language === "pgsql") {
         return "postgresql";
-      } else if (me.currentFormatType === tdEnum.typeOfCode.mysql) {
+      } else if (me.language === "mysql") {
         return "mysql";
       }
       return "postgresql"; // Mặc định là postgresql nếu không có lựa chọn
@@ -128,10 +130,11 @@ export default {
     return {
       inputSource: null,
       outputSource: null,
-      currentFormatType: tdEnum.typeOfCode.postgresql,
-      formatType: [
-        { value: tdEnum.typeOfCode.postgresql, label: "PostgreSQL" },
-        { value: tdEnum.typeOfCode.mysql, label: "MySQL" },
+      enableHighlight: true,
+      language: "pgsql",
+      methodOptions: [
+        { value: "pgsql", label: "Postgres SQL" },
+        { value: "mysql", label: "MySql" },
       ],
     };
   },
