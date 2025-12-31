@@ -7,6 +7,11 @@
         :options="methodOptions"
         @selected="compare"
       />
+      <TDCheckbox
+        v-model="wrapText"
+        :label="$t('i18nCommon.apiTesting.wrapText')"
+        @change="updateLayout"
+      ></TDCheckbox>
       <TDButton
         @click="applyMock"
         :type="$tdEnum.buttonType.secondary"
@@ -79,6 +84,14 @@ export default {
         });
       }
     },
+    updateLayout() {
+      let me = this;
+      if (me.editor) {
+        me.editor.updateOptions({
+          wordWrap: me.wrapText ? "on" : "off",
+        });
+      }
+    },
     unmountEditor() {
       let me = this;
       if (me.editor) {
@@ -104,6 +117,7 @@ export default {
       oldTitle: "old.txt",
       newTitle: "new.txt",
       language: "text/plan",
+      wrapText: true,
       methodOptions: [
         { value: "text/plan", label: "text/plan" },
         { value: "sql", label: "sql" },
