@@ -24,7 +24,7 @@ export default {
     let me = this;
   },
   mounted() {
-    this.compare();
+    this.applyMock();
   },
   methods: {
     async applyMock() {
@@ -45,7 +45,6 @@ export default {
         me.currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
         monaco.languages.register({ id: me.language });
         let configObject = {
-          language: me.language,
           theme: me.currentTheme == me.$tdEnum.theme.dark ? "vs-dark" : "vs",
           fontSize: 16,
           originalEditable: true,
