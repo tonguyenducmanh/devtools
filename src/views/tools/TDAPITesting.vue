@@ -75,12 +75,16 @@
       <!-- phần nội dung tùy thuộc vào từng loại api -->
       <!-- phần api truyền thống -->
       <template v-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.Normal">
+        <!-- phần nhập khẩu curl để build ra api -->
         <template v-if="isImportingCURL">
           <TDTextarea
             :isLabelTop="true"
             v-model="curlContent"
+            :enableHighlight="APIConfigLayout.enableHighlight"
+            language="shell"
             :placeHolder="$t('i18nCommon.apiTesting.contentCURL')"
           ></TDTextarea>
+          <!-- các nút dưới ô nhập curl -->
           <div class="flex">
             <TDButton
               @click="importCURL"
@@ -98,10 +102,13 @@
             ></TDButton>
           </div>
         </template>
+        <!-- phần nội dung mode api bình thường -->
         <template v-else>
           <div class="td-api-content">
             <div class="flex td-api-info-btn">
+              <!-- dòng header bổ trợ 1 số thông tin cho mode api thường -->
               <div class="flex flex-one">
+                <!-- combo chọn method http -->
                 <TDComboBox
                   :width="120"
                   v-model="httpMethod"
@@ -113,6 +120,7 @@
                     $tdEnum.BorderRadiusPosition.BottomLeft,
                   ]"
                 />
+                <!-- nhập url endpoint api -->
                 <TDInput
                   v-model="apiUrl"
                   :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
@@ -123,6 +131,7 @@
                   ]"
                 ></TDInput>
               </div>
+              <!-- nút mở chế độ api import curl -->
               <TDButton
                 @click="openFormImportCURL"
                 :type="$tdEnum.buttonType.secondary"
