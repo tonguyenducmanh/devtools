@@ -158,12 +158,12 @@
                   <!-- phần hiển thị loader nếu như không chọn show reponse -->
                   <div
                     class="flex loader-without-response"
-                    v-if="!showinfoOnReponseAndNotHorizontal && isLoading"
+                    v-if="!APIConfigLayout.showReponse && isLoading"
                   >
                     <div class="loader"></div>
                   </div>
                   <!-- phần hiển thị status code và thời gian chạy request -->
-                  <div v-if="!showinfoOnReponseAndNotHorizontal && !isLoading">
+                  <div v-if="!APIConfigLayout.showReponse && !isLoading">
                     <div class="status-info" v-if="statusCode">
                       <div class="status-badge" :class="statusClass">
                         {{ statusText }}
@@ -285,11 +285,11 @@
                 </div>
                 <div
                   class="flex loader-without-response"
-                  v-if="!showinfoOnReponseAndNotHorizontal && isLoading"
+                  v-if="!APIConfigLayout.showReponse && isLoading"
                 >
                   <div class="loader"></div>
                 </div>
-                <div v-if="!showinfoOnReponseAndNotHorizontal && !isLoading">
+                <div v-if="!APIConfigLayout.showReponse && !isLoading">
                   <div class="status-info" v-if="statusCode">
                     <div class="status-badge" :class="statusClass">
                       {{ statusText }}
@@ -373,11 +373,11 @@
                 </div>
                 <div
                   class="flex loader-without-response"
-                  v-if="!showinfoOnReponseAndNotHorizontal && isLoading"
+                  v-if="!APIConfigLayout.showReponse && isLoading"
                 >
                   <div class="loader"></div>
                 </div>
-                <div v-if="!showinfoOnReponseAndNotHorizontal && !isLoading">
+                <div v-if="!APIConfigLayout.showReponse && !isLoading">
                   <div class="status-info" v-if="statusCode">
                     <div class="status-badge" :class="statusClass">
                       {{ statusText }}
@@ -845,12 +845,6 @@ export default {
     }
   },
   computed: {
-    showinfoOnReponseAndNotHorizontal() {
-      let me = this;
-      let result = true;
-      if (me.APIConfigLayout.showReponse && !me.APIConfigLayout.splitHorizontal)
-        return result;
-    },
     isDesktopApp() {
       return this.$tdUtility.isDesktopApp();
     },
