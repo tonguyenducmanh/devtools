@@ -1,7 +1,7 @@
 <template>
   <div class="flex container">
     <div class="flex flex-col main-area">
-      <div class="flex io-section">
+      <div class="flex io-section" :class="{ 'flex-col': splitHorizontal }">
         <template v-if="!enableFileUpload">
           <TDTextarea
             isLabelTop
@@ -10,6 +10,7 @@
             :label="$t('i18nCommon.jsonToPostgreSQL.inputLabel')"
             :placeHolder="$t('i18nCommon.jsonToPostgreSQL.inputPlaceholder')"
             v-model="inputJSON"
+            :wrapText="wrapText"
           ></TDTextarea>
         </template>
         <template v-else>
@@ -30,6 +31,7 @@
             language="sql"
             :placeHolder="$t('i18nCommon.jsonToPostgreSQL.outputPlaceholder')"
             v-model="outputSQL"
+            :wrapText="wrapText"
           ></TDTextarea>
         </template>
       </div>
@@ -80,6 +82,16 @@
           :variant="$tdEnum.checkboxType.switch"
           v-model="enableDeleteScript"
           :label="$t('i18nCommon.jsonToPostgreSQL.deleteOld')"
+        ></TDCheckbox>
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="splitHorizontal"
+          :label="$t('i18nCommon.splitHorizontal')"
+        ></TDCheckbox>
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="wrapText"
+          :label="$t('i18nCommon.apiTesting.wrapText')"
         ></TDCheckbox>
         <div class="flex flex-col group-info">
           <TDInput
@@ -353,6 +365,8 @@ export default {
     return {
       isShowSidebar: true,
       enableHighlight: true,
+      splitHorizontal: true,
+      wrapText: true,
       STRING_JOIN: ", ",
       STRING_JOIN_BREAKLINE: ";\n",
       NULL_VALUE: "null",
@@ -377,8 +391,8 @@ export default {
 }
 .io-section {
   flex: 1;
-  column-gap: var(--padding);
-  width: 95%;
+  gap: var(--padding);
+  width: 100%;
 }
 .upload-container {
   width: 100%;
@@ -402,7 +416,7 @@ export default {
   height: 100%;
   justify-content: flex-start;
 }
-.group-info{
+.group-info {
   width: 100%;
 }
 </style>
