@@ -325,6 +325,7 @@ export default {
 .main-tool {
   flex: 1;
   height: 100%;
+  overflow: auto;
 }
 
 .input-section {
@@ -335,6 +336,7 @@ export default {
 
 .input-area {
   min-height: 100px;
+  height: 200px;
   padding: 0.5rem;
   border-radius: 5px;
   resize: vertical;
@@ -359,42 +361,17 @@ export default {
 .qrcode-section {
   margin: var(--padding);
 }
-
 .qrcode-box {
-  display: grid;
-  gap: 3rem;
-  justify-content: center;
-  align-items: start;
+  display: flex;
+  flex-wrap: wrap; /* cho phép xuống hàng */
+  gap: var(--padding);
+  justify-content: flex-start; /* hoặc center nếu muốn */
+  align-items: flex-start;
 }
-
-/* Grid responsive cho các mã QR */
-@media screen and (max-width: 900px) {
-  .qrcode-box {
-    grid-template-columns: 1fr;
-    gap: 4rem;
-  }
-}
-
-@media screen and (min-width: 901px) and (max-width: 1400px) {
-  .qrcode-box {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media screen and (min-width: 1401px) and (max-width: 2100px) {
-  .qrcode-box {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media screen and (min-width: 2101px) {
-  .qrcode-box {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
 /* Style cho container của từng mã QR */
 .qr-container {
+  width: 300px;
+  height: 350px;
   display: flex;
   flex-direction: column;
   align-items: center;
