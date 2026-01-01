@@ -63,6 +63,28 @@ const routerConfig = [
   },
   {
     /**
+     * chuyển đổi json thành câu lệnh insert postgresql
+     */
+    path: "/jsontopostgresql",
+    name: "jsontopostgresql",
+    component: () => import("@/views/tools/TDJSONToPostgreSQL.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.JSONToPostgreSQL",
+    },
+  },
+  {
+    /**
+     * so sánh code giữa 2 file
+     */
+    path: "/comparecode",
+    name: "comparecode",
+    component: () => import("@/views/tools/TDCompareCode.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.compareCode",
+    },
+  },
+  {
+    /**
      * Nén text bằng 1 số thuật toán phổ biến
      */
     path: "/TDTextCompress",
@@ -81,17 +103,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDTextManipulation.vue"),
     meta: {
       titleKey: "i18nCommon.feature.textManipulation",
-    },
-  },
-  {
-    /**
-     * so sánh code giữa 2 file
-     */
-    path: "/comparecode",
-    name: "comparecode",
-    component: () => import("@/views/tools/TDCompareCode.vue"),
-    meta: {
-      titleKey: "i18nCommon.feature.compareCode",
     },
   },
   {
@@ -125,17 +136,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDCosinSimilarity.vue"),
     meta: {
       titleKey: "i18nCommon.feature.cosinSimilarity",
-    },
-  },
-  {
-    /**
-     * chuyển đổi json thành câu lệnh insert postgresql
-     */
-    path: "/jsontopostgresql",
-    name: "jsontopostgresql",
-    component: () => import("@/views/tools/TDJSONToPostgreSQL.vue"),
-    meta: {
-      titleKey: "i18nCommon.feature.JSONToPostgreSQL",
     },
   },
   {

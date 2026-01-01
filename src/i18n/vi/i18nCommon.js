@@ -44,7 +44,7 @@ export default {
       textCompress: "Nén văn bản",
       compareCode: "So sánh mã",
       colorPicker: "Chọn màu",
-      JSONToPostgreSQL: "JSON sang SQL",
+      JSONToPostgreSQL: "JSON sang Postgres",
       JSONMapping: "JSON Mapping",
       JSONToExcel: "JSON sang Excel",
       CodeFormatter: "Định dạng mã",

@@ -44,7 +44,7 @@ export default {
       textCompress: "Text Compress",
       compareCode: "Compare code",
       colorPicker: "Color picker",
-      JSONToPostgreSQL: "JSON to SQL",
+      JSONToPostgreSQL: "JSON to Postgres",
       JSONMapping: "JSON Mapping",
       JSONToExcel: "JSON to Excel",
       CodeFormatter: "Code formatter",
