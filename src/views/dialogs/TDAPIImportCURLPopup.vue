@@ -69,8 +69,10 @@ export default {
 
     async importCURL() {
       let me = this;
-      me.ownerForm.curlContent = me.curlContent;
-      me.ownerForm.importCURL();
+      if (me.curlContent) {
+        me.ownerForm.curlContent = me.curlContent;
+        me.ownerForm.importCURL();
+      }
       me.handleClose();
     },
   },
