@@ -348,6 +348,7 @@ export default {
         setting: "Setting",
         history: "History",
       },
+      FindCollectionTitle: "Find collection for save request",
     },
   },
 };

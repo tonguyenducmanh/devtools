@@ -346,6 +346,7 @@ export default {
         setting: "Cài đặt",
         history: "Lịch sử",
       },
+      FindCollectionTitle: "Tìm tên bộ sưu tập để lưu request",
     },
   },
 };

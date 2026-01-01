@@ -1,12 +1,12 @@
 <template>
-  <TDPopup :visible="true" title="Lưu vào Collection" @close="handleClose">
+  <TDPopup :visible="true" :showHeader="false" @close="handleClose">
     <div class="td-search-modal">
       <div class="td-search-input-container">
         <div class="td-icon td-search-icon"></div>
         <input
           v-model="searchQuery"
           class="td-search-input"
-          :placeholder="$t('i18nCommon.search.placeholder')"
+          :placeholder="$t('i18nCommon.apiTesting.FindCollectionTitle')"
         />
       </div>
 
@@ -16,7 +16,7 @@
             v-for="(collection, index) in filteredCollection"
             :key="collection.name"
             class="td-search-item"
-            @click="saveToCollection(collection)"
+            @click="save(collection)"
           >
             <div class="td-search-item-content">
               <div class="td-search-item-title">
@@ -81,11 +81,10 @@ export default {
 };
 </script>
 <style scoped lang="scss">
-
 .td-search-modal {
   width: 100%;
   max-width: 600px;
-  height: 70vh;
+  height: 50vh;
   background-color: var(--bg-main-color);
   border: 1px solid var(--border-color);
   border-radius: calc(var(--border-radius) * 1.5);
@@ -131,6 +130,7 @@ export default {
 
   .td-search-results {
     max-height: 400px;
+    overflow: auto;
 
     .td-search-section {
       padding: 8px 0;
