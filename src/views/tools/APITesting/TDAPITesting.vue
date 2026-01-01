@@ -849,10 +849,6 @@ export default {
         me.currentRequestId = newRequestId;
         this.$tdToast.success(null, this.$t("i18nCommon.toastMessage.success"));
       }
-      this.closeSearchModal();
-    },
-    closeSearchModal() {
-      this.searchQuery = "";
     },
     async deleteRequest(collectionId, request) {
       let me = this;
