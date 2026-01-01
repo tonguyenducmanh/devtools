@@ -95,7 +95,12 @@ export default {
         .slice(0, 8); // Giới hạn 8 kết quả
     },
   },
-
+  mounted() {
+    let me = this;
+    if (me.$refs.searchInput) {
+      me.$refs.searchInput.focus();
+    }
+  },
   methods: {
     show(param) {
       let me = this;

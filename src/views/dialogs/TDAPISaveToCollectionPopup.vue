@@ -4,6 +4,7 @@
       <div class="td-search-input-container">
         <div class="td-icon td-search-icon"></div>
         <input
+          ref="searchInput"
           v-model="searchQuery"
           class="td-search-input"
           :placeholder="$t('i18nCommon.apiTesting.FindCollectionTitle')"
@@ -66,7 +67,12 @@ export default {
         .slice(0, 8); // Giới hạn 8 kết quả
     },
   },
-
+  mounted() {
+    let me = this;
+    if (me.$refs.searchInput) {
+      me.$refs.searchInput.focus();
+    }
+  },
   methods: {
     show(param) {
       let me = this;
