@@ -361,7 +361,7 @@ export default {
   },
 };
 </script>
-<style scope lang="scss">
+<style scoped lang="scss">
 .container {
   display: flex;
   width: 100%;
