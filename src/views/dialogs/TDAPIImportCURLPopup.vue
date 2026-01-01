@@ -1,5 +1,10 @@
 <template>
-  <TDPopup :visible="true" :showHeader="false" @close="handleClose" width="800px">
+  <TDPopup
+    :visible="true"
+    :showHeader="false"
+    @close="handleClose"
+    width="800px"
+  >
     <div class="flex flex-col td-api-import-curl">
       <TDTextarea
         :isLabelTop="true"
@@ -19,11 +24,6 @@
           @click="handleClose"
           :type="$tdEnum.buttonType.secondary"
           :label="$t('i18nCommon.apiTesting.cancel')"
-        ></TDButton>
-        <TDButton
-          @click="handleCopyCurl"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.apiTesting.copyCURL')"
         ></TDButton>
       </div>
     </div>
@@ -72,10 +72,6 @@ export default {
       me.ownerForm.curlContent = me.curlContent;
       me.ownerForm.importCURL();
       me.handleClose();
-    },
-    handleCopyCurl() {
-      let me = this;
-      me.$tdUtility.copyToClipboard(me.curlContent);
     },
   },
 };
