@@ -617,7 +617,7 @@ import TDArrow from "@/components/TDArrow.vue";
 import JSZip from "jszip";
 import TDAPIResponseStatus from "@/views/tools/APITesting/TDAPIResponseStatus.vue";
 import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
-import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil";
+import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 export default {
   name: "TDAPITesting",
   components: { TDToggleArea, TDArrow, TDAPIResponse, TDAPIResponseStatus },

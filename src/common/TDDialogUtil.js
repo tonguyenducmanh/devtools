@@ -5,6 +5,7 @@ import { createApp } from "vue";
  */
 export const TDDialogEnum = {
   TDAPISaveToCollectionPopup: 1,
+  TDGoToToolPopup: 2,
 };
 
 /**
@@ -14,6 +15,8 @@ export const TDDialogEnum = {
 const DialogComponentMap = {
   [TDDialogEnum.TDAPISaveToCollectionPopup]: () =>
     import("@/views/dialogs/TDAPISaveToCollectionPopup.vue"),
+  [TDDialogEnum.TDGoToToolPopup]: () =>
+    import("@/views/dialogs/TDGoToToolPopup.vue"),
 };
 
 class TDDialogUtil {
