@@ -73,7 +73,7 @@ class TDDialogUtil {
     }
 
     app.mount(container);
-    const instance = app._instance?.proxy;
+    const instance = app._component.methods;
     if (instance?.show && param !== undefined) {
       instance.show(param);
     } else {
