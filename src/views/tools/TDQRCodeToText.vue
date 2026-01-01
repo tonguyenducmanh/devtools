@@ -1,55 +1,64 @@
 <template>
-  <div class="flex flex-col container">
-    <!-- <div class="title">{{ $t("i18nCommon.qrCodeToText.title") }}</div> -->
-    <div class="flex flex-col qr-section">
-      <div style="width: 100%">
-        <TDUpload
-          @dragover="handleDragOver"
-          @dragleave="handleDragLeave"
-          @drop="handleDrop"
-          ref="uploadArea"
-          class="upload-area"
-          :labelEmpty="$t('i18nCommon.qrCodeToText.dropZone.placeholder')"
-          :label="$t('i18nCommon.qrCodeToText.dropZone.label')"
-          multiple
-          @selected="convertQRCode"
-        ></TDUpload>
+  <div class="flex container">
+    <div class="main-tool">
+      <div class="flex flex-col qr-section">
+        <div style="width: 100%">
+          <TDUpload
+            @dragover="handleDragOver"
+            @dragleave="handleDragLeave"
+            @drop="handleDrop"
+            ref="uploadArea"
+            class="upload-area"
+            :labelEmpty="$t('i18nCommon.qrCodeToText.dropZone.placeholder')"
+            :label="$t('i18nCommon.qrCodeToText.dropZone.label')"
+            multiple
+            @selected="convertQRCode"
+          ></TDUpload>
+        </div>
+        <div class="flex button-generate">
+          <TDButton
+            @click="convertQRCode"
+            :label="$t('i18nCommon.qrCodeToText.convert')"
+          ></TDButton>
+          <TDButton
+            @click="copyResult"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.qrCodeToText.copy')"
+          ></TDButton>
+        </div>
+        <TDTextarea
+          class="input-area"
+          :placeHolder="$t('i18nCommon.qrCodeToText.result')"
+          v-model="textOutput"
+          :readOnly="true"
+        ></TDTextarea>
       </div>
-      <div class="flex button-generate">
-        <TDButton
-          @click="convertQRCode"
-          :label="$t('i18nCommon.qrCodeToText.convert')"
-        ></TDButton>
-        <TDButton
-          @click="copyResult"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.qrCodeToText.copy')"
-        ></TDButton>
+    </div>
+    <TDSubSidebar v-model="isShowSidebar">
+      <div class="flex flex-col td-sub-sidebar">
         <TDCheckbox
           v-model="isCompressText"
+          :variant="$tdEnum.checkboxType.switch"
           :label="$t('i18nCommon.qrCodeToText.compressText')"
           @input="convertQRCode"
         ></TDCheckbox>
         <TDCheckbox
           v-model="hasHeaderInQR"
+          :variant="$tdEnum.checkboxType.switch"
           :label="$t('i18nCommon.qrCodeToText.hasHeaderInQR')"
           @input="convertQRCode"
         ></TDCheckbox>
       </div>
-      <TDTextarea
-        class="input-area"
-        :placeHolder="$t('i18nCommon.qrCodeToText.result')"
-        v-model="textOutput"
-        :readOnly="true"
-      ></TDTextarea>
-    </div>
+    </TDSubSidebar>
   </div>
 </template>
 <script>
 import TDCompress from "@/common/compress/TDCompress.js";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
 
 export default {
   name: "TDQRCodeToText",
+  components: { TDSubSidebar },
   created() {
     let me = this;
     document.addEventListener("paste", me.handlePasteEvent);
@@ -212,6 +221,7 @@ export default {
   },
   data() {
     return {
+      isShowSidebar: true,
       textOutput: null,
       isRemoveEmpty: false,
       historyItems: [],
@@ -245,5 +255,13 @@ export default {
 
 .input-area {
   flex: 1;
+}
+.main-tool {
+  flex: 1;
+  height: 100%;
+}
+.td-sub-sidebar {
+  height: 100%;
+  justify-content: flex-start;
 }
 </style>

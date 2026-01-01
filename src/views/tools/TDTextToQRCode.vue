@@ -1,84 +1,94 @@
 <template>
-  <div class="container">
-    <div class="flex flex-col input-section">
-      <TDTextarea
-        class="input-area"
-        :placeHolder="$t('i18nCommon.textToQRCode.input.placeholder')"
-        v-model="textGenQR"
-      ></TDTextarea>
-      <div class="flex button-generate">
-        <TDButton
-          :readOnly="!textGenQR"
-          @click="generateQRCode(null)"
-          :label="$t('i18nCommon.textToQRCode.buttons.generate')"
-        ></TDButton>
-        <TDButton
-          @click="downloadAllQRCodes"
-          :type="$tdEnum.buttonType.secondary"
-          :readOnly="!qrCodeItems || !qrCodeItems.length"
-          :label="$t('i18nCommon.textToQRCode.buttons.downloadAll')"
-          class="download-all-btn"
-        ></TDButton>
-        <TDButton
-          @click="applyMock"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.textToQRCode.buttons.example')"
-        ></TDButton>
-        <TDInput
-          v-model="maxLengthUserConfig"
-          :inputType="'number'"
-          class="max-length-input"
-          :placeHolder="$t('i18nCommon.textToQRCode.input.maxLength')"
-        />
+  <div class="flex container">
+    <div class="main-tool">
+      <div class="flex flex-col input-section">
+        <TDTextarea
+          class="input-area"
+          :placeHolder="$t('i18nCommon.textToQRCode.input.placeholder')"
+          v-model="textGenQR"
+        ></TDTextarea>
+        <div class="flex button-generate">
+          <TDButton
+            :readOnly="!textGenQR"
+            @click="generateQRCode(null)"
+            :label="$t('i18nCommon.textToQRCode.buttons.generate')"
+          ></TDButton>
+          <TDButton
+            @click="downloadAllQRCodes"
+            :type="$tdEnum.buttonType.secondary"
+            :readOnly="!qrCodeItems || !qrCodeItems.length"
+            :label="$t('i18nCommon.textToQRCode.buttons.downloadAll')"
+            class="download-all-btn"
+          ></TDButton>
+          <TDButton
+            @click="applyMock"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.textToQRCode.buttons.example')"
+          ></TDButton>
+          <TDInput
+            v-model="maxLengthUserConfig"
+            :inputType="'number'"
+            class="max-length-input"
+            :placeHolder="$t('i18nCommon.textToQRCode.input.maxLength')"
+          />
+        </div>
+      </div>
+      <div v-if="textGenQR" class="qrcode-section">
+        <div class="qrcode-box">
+          <template v-for="(item, index) in qrCodeItems">
+            <div class="qr-container">
+              <div class="qr-header">
+                <span>{{
+                  $t("i18nCommon.textToQRCode.part", [
+                    index + 1,
+                    qrCodeItems.length,
+                  ])
+                }}</span>
+                <TDButton
+                  @click="copyQRCode(item.src, index)"
+                  :type="$tdEnum.buttonType.secondary"
+                  :label="$t('i18nCommon.textToQRCode.buttons.copyImage')"
+                  class="download-btn"
+                ></TDButton>
+                <TDButton
+                  @click="downloadQRCode(item.src, index)"
+                  :type="$tdEnum.buttonType.secondary"
+                  :label="$t('i18nCommon.textToQRCode.buttons.download')"
+                  class="download-btn"
+                ></TDButton>
+              </div>
+              <img :src="item.src" />
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+    <TDSubSidebar v-model="isShowSidebar">
+      <div class="flex flex-col td-sub-sidebar">
         <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
           v-model="isCompressText"
           :label="$t('i18nCommon.textToQRCode.compressText')"
           @input="toggleCompressText"
         ></TDCheckbox>
         <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
           v-model="addHeaderToQR"
           :label="$t('i18nCommon.textToQRCode.addHeaderToQR')"
         ></TDCheckbox>
       </div>
-    </div>
-    <div v-if="textGenQR" class="qrcode-section">
-      <div class="qrcode-box">
-        <template v-for="(item, index) in qrCodeItems">
-          <div class="qr-container">
-            <div class="qr-header">
-              <span>{{
-                $t("i18nCommon.textToQRCode.part", [
-                  index + 1,
-                  qrCodeItems.length,
-                ])
-              }}</span>
-              <TDButton
-                @click="copyQRCode(item.src, index)"
-                :type="$tdEnum.buttonType.secondary"
-                :label="$t('i18nCommon.textToQRCode.buttons.copyImage')"
-                class="download-btn"
-              ></TDButton>
-              <TDButton
-                @click="downloadQRCode(item.src, index)"
-                :type="$tdEnum.buttonType.secondary"
-                :label="$t('i18nCommon.textToQRCode.buttons.download')"
-                class="download-btn"
-              ></TDButton>
-            </div>
-            <img :src="item.src" />
-          </div>
-        </template>
-      </div>
-    </div>
+    </TDSubSidebar>
   </div>
 </template>
 <script>
 import QRCode from "qrcode";
 import JSZip from "jszip";
 import TDCompress from "@/common/compress/TDCompress.js";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
 
 export default {
   name: "TDTextToQRCode",
+  components: { TDSubSidebar },
   created() {
     let me = this;
   },
@@ -293,6 +303,7 @@ export default {
   },
   data() {
     return {
+      isShowSidebar: true,
       textGenQR: null,
       qrCodeItems: [],
       maxLengthUserConfig: null,
@@ -308,10 +319,12 @@ export default {
 <style scoped>
 .container {
   display: flex;
-  flex-direction: column;
   width: 100%;
   height: 100%;
-  overflow: auto;
+}
+.main-tool {
+  flex: 1;
+  height: 100%;
 }
 
 .input-section {
@@ -409,5 +422,9 @@ export default {
 }
 .title {
   margin-bottom: unset;
+}
+.td-sub-sidebar {
+  height: 100%;
+  justify-content: flex-start;
 }
 </style>
