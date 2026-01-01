@@ -313,280 +313,253 @@
       </template>
       <!-- hết phần nội dung tùy thuộc vào từng loại api -->
     </div>
-    <!-- phần sidebar của tool -->
-    <div class="flex flex-col td-sub-sidebar-wrapper">
-      <!-- phần nội dung sidebar -->
+    <!-- phần nội dung sidebar -->
+    <TDSubSidebar v-model="APIConfigLayout.isShowSidebar">
+      <!-- slide tùy chọn như cài đặt hoặc collection -->
+      <div class="td-sidebar-header">
+        <TDSlideOption
+          v-if="sidebarOptions && sidebarOptions.length > 1"
+          v-model="APIConfigLayout.currentSidebarOption"
+          :options="sidebarOptions"
+          :noMargin="true"
+          @change="updateAPIConfigLayout"
+        />
+      </div>
+      <!-- phần bộ sưu tập các request -->
       <div
-        class="flex td-sub-sidebar"
-        :class="{ 'td-sub-sidebar-collaspe': !APIConfigLayout.isShowSidebar }"
+        class="flex flex-col td-sidebar-content"
+        v-if="
+          APIConfigLayout.currentSidebarOption ==
+          $tdEnum.APISidebarOption.Collection
+        "
       >
-        <!-- phần thanh border ngăn cách main area và sidebar area -->
-        <div v-if="APIConfigLayout.isShowSidebar" class="divide"></div>
-        <div
-          v-if="APIConfigLayout.isShowSidebar"
-          class="flex flex-col td-sub-sidebar-content"
-        >
-          <!-- slide tùy chọn như cài đặt hoặc collection -->
-          <div class="td-sidebar-header">
-            <TDSlideOption
-              v-if="sidebarOptions && sidebarOptions.length > 1"
-              v-model="APIConfigLayout.currentSidebarOption"
-              :options="sidebarOptions"
+        <!-- phần header của bộ sưu tập request -->
+        <div class="flex td-header-collection">
+          <div class="td-new-collection">
+            <TDInput
+              v-model="newCollectionName"
               :noMargin="true"
-              @change="updateAPIConfigLayout"
+              :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
             />
           </div>
-          <!-- phần bộ sưu tập các request -->
           <div
-            class="flex flex-col td-sidebar-content"
-            v-if="
-              APIConfigLayout.currentSidebarOption ==
-              $tdEnum.APISidebarOption.Collection
-            "
-          >
-            <!-- phần header của bộ sưu tập request -->
-            <div class="flex td-header-collection">
-              <div class="td-new-collection">
+            class="td-icon td-plus-icon"
+            @click="addNewCollection"
+            v-tooltip="$t('i18nCommon.apiTesting.add')"
+          ></div>
+        </div>
+        <!-- phần danh sách các request đã lưu theo thư mục -->
+        <div class="td-collection">
+          <div class="td-collection-body">
+            <div
+              v-for="(collection, index) in allCollection"
+              class="flex flex-col no-select td-collection-item"
+              :key="index"
+            >
+              <!-- phần sửa nhanh tên thư mục request nếu đang ở chế độ edit -->
+              <div v-if="collection.is_renaming" class="td-collection-rename">
                 <TDInput
-                  v-model="newCollectionName"
+                  v-model="collection.temp_name"
                   :noMargin="true"
-                  :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
-                />
-              </div>
-              <div
-                class="td-icon td-plus-icon"
-                @click="addNewCollection"
-                v-tooltip="$t('i18nCommon.apiTesting.add')"
-              ></div>
-            </div>
-            <!-- phần danh sách các request đã lưu theo thư mục -->
-            <div class="td-collection">
-              <div class="td-collection-body">
-                <div
-                  v-for="(collection, index) in allCollection"
-                  class="flex flex-col no-select td-collection-item"
-                  :key="index"
+                  :placeHolder="$t('i18nCommon.apiTesting.collectionRename')"
+                  :ref="collection.temp_name"
+                  @keyup.enter="saveNewCollectionName(collection)"
+                  @clickOutSide="saveNewCollectionName(collection)"
                 >
-                  <!-- phần sửa nhanh tên thư mục request nếu đang ở chế độ edit -->
+                </TDInput>
+              </div>
+              <!-- phần tên thư mục -->
+              <div
+                v-else
+                class="flex td-collection-header"
+                @click="toggleCollection(collection)"
+              >
+                <div
+                  class="flex text-nowrap-collection td-collection-header-left"
+                >
+                  <TDArrow
+                    :openProp="collection.openingCollection"
+                    :arrowOpenDirection="$tdEnum.Direction.bottom"
+                    :arrowDirection="$tdEnum.Direction.right"
+                  />
+                  <div class="" v-tooltip="collection.name">
+                    {{ collection.name }}
+                  </div>
+                </div>
+                <div class="flex td-collection-edit-btn">
                   <div
-                    v-if="collection.is_renaming"
-                    class="td-collection-rename"
-                  >
-                    <TDInput
-                      v-model="collection.temp_name"
-                      :noMargin="true"
-                      :placeHolder="
-                        $t('i18nCommon.apiTesting.collectionRename')
+                    class="td-icon td-edit-icon"
+                    v-tooltip="$t('i18nCommon.edit')"
+                    @click.stop="enableRenameCollection(collection)"
+                  ></div>
+                  <div
+                    v-tooltip="$t('i18nCommon.apiTesting.delete')"
+                    class="td-icon td-close-icon"
+                    @click.stop="deleteCollection(collection.collection_id)"
+                  ></div>
+                </div>
+              </div>
+              <!-- danh sách các request có trong 1 thư mục, chỉ render khi đang mở thư mục -->
+              <div
+                v-if="
+                  collection.openingCollection &&
+                  collection.requests &&
+                  collection.requests.length > 0
+                "
+                class="flex flex-col td-collection-content"
+              >
+                <div
+                  v-for="(request, indexRequest) in collection.requests"
+                  :key="indexRequest"
+                  class="flex td-collection-request-item"
+                  :class="{
+                    'td-collection-request-item-selected':
+                      request && currentRequestId == request.requestId,
+                  }"
+                  @click="applyRequest(request)"
+                >
+                  <span class="text-nowrap">
+                    <div v-tooltip="request.requestName">
+                      {{ request.requestName }}
+                    </div>
+                  </span>
+                  <span class="text-nowrap">
+                    <div
+                      class="td-icon td-close-icon"
+                      v-tooltip="$t('i18nCommon.apiTesting.delete')"
+                      @click.stop="
+                        deleteRequest(collection.collection_id, request)
                       "
-                      :ref="collection.temp_name"
-                      @keyup.enter="saveNewCollectionName(collection)"
-                      @clickOutSide="saveNewCollectionName(collection)"
-                    >
-                    </TDInput>
-                  </div>
-                  <!-- phần tên thư mục -->
-                  <div
-                    v-else
-                    class="flex td-collection-header"
-                    @click="toggleCollection(collection)"
-                  >
-                    <div
-                      class="flex text-nowrap-collection td-collection-header-left"
-                    >
-                      <TDArrow
-                        :openProp="collection.openingCollection"
-                        :arrowOpenDirection="$tdEnum.Direction.bottom"
-                        :arrowDirection="$tdEnum.Direction.right"
-                      />
-                      <div class="" v-tooltip="collection.name">
-                        {{ collection.name }}
-                      </div>
-                    </div>
-                    <div class="flex td-collection-edit-btn">
-                      <div
-                        class="td-icon td-edit-icon"
-                        v-tooltip="$t('i18nCommon.edit')"
-                        @click.stop="enableRenameCollection(collection)"
-                      ></div>
-                      <div
-                        v-tooltip="$t('i18nCommon.apiTesting.delete')"
-                        class="td-icon td-close-icon"
-                        @click.stop="deleteCollection(collection.collection_id)"
-                      ></div>
-                    </div>
-                  </div>
-                  <!-- danh sách các request có trong 1 thư mục, chỉ render khi đang mở thư mục -->
-                  <div
-                    v-if="
-                      collection.openingCollection &&
-                      collection.requests &&
-                      collection.requests.length > 0
-                    "
-                    class="flex flex-col td-collection-content"
-                  >
-                    <div
-                      v-for="(request, indexRequest) in collection.requests"
-                      :key="indexRequest"
-                      class="flex td-collection-request-item"
-                      :class="{
-                        'td-collection-request-item-selected':
-                          request && currentRequestId == request.requestId,
-                      }"
-                      @click="applyRequest(request)"
-                    >
-                      <span class="text-nowrap">
-                        <div v-tooltip="request.requestName">
-                          {{ request.requestName }}
-                        </div>
-                      </span>
-                      <span class="text-nowrap">
-                        <div
-                          class="td-icon td-close-icon"
-                          v-tooltip="$t('i18nCommon.apiTesting.delete')"
-                          @click.stop="
-                            deleteRequest(collection.collection_id, request)
-                          "
-                        ></div>
-                      </span>
-                    </div>
-                  </div>
+                    ></div>
+                  </span>
                 </div>
               </div>
             </div>
-            <!-- phần upload hàng loạt request -->
-            <div class="flex td-api-upload-collection-area">
-              <!-- phần upload request từ postman -->
-              <span>
-                <TDUpload
-                  v-tooltip="{
-                    text: $t(
-                      'i18nCommon.apiTesting.importCollectionPostmanTooltip'
-                    ),
-                    maxWidth: '500px',
-                  }"
-                  :label="$t('i18nCommon.apiTesting.importCollectionPostman')"
-                  :accept="'.json'"
-                  @change="importCollectionPostman"
-                  ref="uploadAreaPostman"
-                  :isShowSelect="false"
-                  :multiple="true"
-                />
-              </span>
-              <!-- phần upload request từ zip collection curl -->
-              <span>
-                <TDUpload
-                  v-tooltip="{
-                    text: $t(
-                      'i18nCommon.apiTesting.importCollectionZipTooltip'
-                    ),
-                    maxWidth: '500px',
-                  }"
-                  :label="$t('i18nCommon.apiTesting.importCollectionZip')"
-                  :accept="'.zip'"
-                  @change="importCollectionZip"
-                  ref="uploadArea"
-                  :isShowSelect="false"
-                  maxWidth="250px"
-                />
-              </span>
-            </div>
-            <!-- phần danh sách các nút khác ở chân sidebar -->
-            <div class="flex">
-              <!-- nút thêm request mới -->
-              <TDButton
-                :readOnly="isLoading"
-                @click="createNewRequest"
-                :type="$tdEnum.buttonType.secondary"
-                :noMargin="true"
-                :label="$t('i18nCommon.apiTesting.createNewRequest')"
-                :borderRadiusPosition="[
-                  $tdEnum.BorderRadiusPosition.TopLeft,
-                  $tdEnum.BorderRadiusPosition.BottomLeft,
-                ]"
-              ></TDButton>
-              <!-- nút lưu request -->
-              <TDButton
-                v-tooltip="$t('i18nCommon.apiTesting.NeedRequestName')"
-                :readOnly="isLoading || !requestName"
-                @click="saveRequest"
-                :type="$tdEnum.buttonType.secondary"
-                :noMargin="true"
-                :label="$t('i18nCommon.apiTesting.save')"
-                :borderRadiusPosition="[
-                  $tdEnum.BorderRadiusPosition.TopRight,
-                  $tdEnum.BorderRadiusPosition.BottomRight,
-                ]"
-              ></TDButton>
-            </div>
-          </div>
-          <!-- phần sidebar nếu đang tùy chọn thiết lập api -->
-          <div
-            class="td-sidebar-content"
-            v-else-if="
-              APIConfigLayout.currentSidebarOption ==
-              $tdEnum.APISidebarOption.Setting
-            "
-          >
-            <TDCheckbox
-              :variant="$tdEnum.checkboxType.switch"
-              v-model="APIConfigLayout.showReponse"
-              :label="$t('i18nCommon.apiTesting.showReponse')"
-              @change="updateAPIConfigLayout"
-            ></TDCheckbox>
-            <TDCheckbox
-              :variant="$tdEnum.checkboxType.switch"
-              v-model="APIConfigLayout.wrapText"
-              :label="$t('i18nCommon.apiTesting.wrapText')"
-              @change="updateAPIConfigLayout"
-            ></TDCheckbox>
-            <TDCheckbox
-              :variant="$tdEnum.checkboxType.switch"
-              v-model="APIConfigLayout.enableHighlight"
-              :label="$t('i18nCommon.enableHighlight')"
-              @change="updateAPIConfigLayout"
-            ></TDCheckbox>
-            <TDCheckbox
-              :variant="$tdEnum.checkboxType.switch"
-              v-model="APIConfigLayout.splitHorizontal"
-              :label="$t('i18nCommon.splitHorizontal')"
-              @change="updateAPIConfigLayout"
-            ></TDCheckbox>
-            <template v-if="!isDesktopApp"
-              ><div class="flex flex-start agent-url-label">
-                <TDButton
-                  v-tooltip="
-                    $t('i18nCommon.apiTesting.toolTipDownloadExtension')
-                  "
-                  :noMargin="true"
-                  @click="downloadExtension"
-                  :type="$tdEnum.buttonType.secondary"
-                  :label="$t('i18nCommon.apiTesting.downloadExtension')"
-                ></TDButton>
-              </div>
-              <div>
-                <TDInput
-                  v-model="agentURL"
-                  :noMargin="true"
-                  :placeHolder="$t('i18nCommon.apiTesting.agentUrl')"
-                />
-              </div>
-            </template>
           </div>
         </div>
-        <TDToggleArea
-          :collapsed="!APIConfigLayout.isShowSidebar"
-          position="right"
-          @toggle="toggleSidebar"
-        />
+        <!-- phần upload hàng loạt request -->
+        <div class="flex td-api-upload-collection-area">
+          <!-- phần upload request từ postman -->
+          <span>
+            <TDUpload
+              v-tooltip="{
+                text: $t(
+                  'i18nCommon.apiTesting.importCollectionPostmanTooltip'
+                ),
+                maxWidth: '500px',
+              }"
+              :label="$t('i18nCommon.apiTesting.importCollectionPostman')"
+              :accept="'.json'"
+              @change="importCollectionPostman"
+              ref="uploadAreaPostman"
+              :isShowSelect="false"
+              :multiple="true"
+            />
+          </span>
+          <!-- phần upload request từ zip collection curl -->
+          <span>
+            <TDUpload
+              v-tooltip="{
+                text: $t('i18nCommon.apiTesting.importCollectionZipTooltip'),
+                maxWidth: '500px',
+              }"
+              :label="$t('i18nCommon.apiTesting.importCollectionZip')"
+              :accept="'.zip'"
+              @change="importCollectionZip"
+              ref="uploadArea"
+              :isShowSelect="false"
+              maxWidth="250px"
+            />
+          </span>
+        </div>
+        <!-- phần danh sách các nút khác ở chân sidebar -->
+        <div class="flex">
+          <!-- nút thêm request mới -->
+          <TDButton
+            :readOnly="isLoading"
+            @click="createNewRequest"
+            :type="$tdEnum.buttonType.secondary"
+            :noMargin="true"
+            :label="$t('i18nCommon.apiTesting.createNewRequest')"
+            :borderRadiusPosition="[
+              $tdEnum.BorderRadiusPosition.TopLeft,
+              $tdEnum.BorderRadiusPosition.BottomLeft,
+            ]"
+          ></TDButton>
+          <!-- nút lưu request -->
+          <TDButton
+            v-tooltip="$t('i18nCommon.apiTesting.NeedRequestName')"
+            :readOnly="isLoading || !requestName"
+            @click="saveRequest"
+            :type="$tdEnum.buttonType.secondary"
+            :noMargin="true"
+            :label="$t('i18nCommon.apiTesting.save')"
+            :borderRadiusPosition="[
+              $tdEnum.BorderRadiusPosition.TopRight,
+              $tdEnum.BorderRadiusPosition.BottomRight,
+            ]"
+          ></TDButton>
+        </div>
       </div>
-      <!-- hết phần nội dung sidebar -->
-    </div>
+      <!-- phần sidebar nếu đang tùy chọn thiết lập api -->
+      <div
+        class="td-sidebar-content"
+        v-else-if="
+          APIConfigLayout.currentSidebarOption ==
+          $tdEnum.APISidebarOption.Setting
+        "
+      >
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="APIConfigLayout.showReponse"
+          :label="$t('i18nCommon.apiTesting.showReponse')"
+          @change="updateAPIConfigLayout"
+        ></TDCheckbox>
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="APIConfigLayout.wrapText"
+          :label="$t('i18nCommon.apiTesting.wrapText')"
+          @change="updateAPIConfigLayout"
+        ></TDCheckbox>
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="APIConfigLayout.enableHighlight"
+          :label="$t('i18nCommon.enableHighlight')"
+          @change="updateAPIConfigLayout"
+        ></TDCheckbox>
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="APIConfigLayout.splitHorizontal"
+          :label="$t('i18nCommon.splitHorizontal')"
+          @change="updateAPIConfigLayout"
+        ></TDCheckbox>
+        <template v-if="!isDesktopApp"
+          ><div class="flex flex-start agent-url-label">
+            <TDButton
+              v-tooltip="$t('i18nCommon.apiTesting.toolTipDownloadExtension')"
+              :noMargin="true"
+              @click="downloadExtension"
+              :type="$tdEnum.buttonType.secondary"
+              :label="$t('i18nCommon.apiTesting.downloadExtension')"
+            ></TDButton>
+          </div>
+          <div>
+            <TDInput
+              v-model="agentURL"
+              :noMargin="true"
+              :placeHolder="$t('i18nCommon.apiTesting.agentUrl')"
+            />
+          </div>
+        </template>
+      </div>
+    </TDSubSidebar>
+    <!-- hết phần nội dung sidebar -->
   </div>
 </template>
 
 <script>
 import TDCURLUtil from "@/common/api/TDCURLUtil";
-import TDToggleArea from "@/components/TDToggleArea.vue";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDArrow from "@/components/TDArrow.vue";
 import JSZip from "jszip";
 import TDAPIResponseStatus from "@/views/tools/APITesting/TDAPIResponseStatus.vue";
@@ -594,7 +567,7 @@ import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 export default {
   name: "TDAPITesting",
-  components: { TDToggleArea, TDArrow, TDAPIResponse, TDAPIResponseStatus },
+  components: { TDSubSidebar, TDArrow, TDAPIResponse, TDAPIResponseStatus },
 
   data() {
     return {
@@ -1421,109 +1394,86 @@ export default {
 .loader-without-response {
   margin-left: 100px;
 }
-.td-sub-sidebar-wrapper {
-  height: 100%;
+.td-header-collection {
+  width: 100%;
+  height: 30px;
+  margin: var(--padding);
+  gap: var(--padding);
+  .td-new-collection {
+    flex: 1;
+  }
+  .td-plus-icon {
+    filter: grayscale(100);
+    cursor: pointer;
+  }
+  .td-plus-icon:hover {
+    filter: unset;
+    background-color: var(--bg-layer-color);
+  }
 }
-.td-sub-sidebar {
-  height: 100%;
+.td-collection {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   position: relative;
-  margin-left: var(--padding);
-  .td-sub-sidebar-content {
-    width: 300px;
-    height: 100%;
+  .td-collection-body {
     position: relative;
-    padding-left: var(--padding);
-    .td-sidebar-header {
-      // margin-bottom: var(--padding);
-    }
-    .td-sidebar-content {
-      flex: 1;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    .td-collection-item {
+      cursor: pointer;
+      justify-content: flex-start;
+      gap: var(--padding);
       width: 100%;
-      min-height: 0;
-      .td-header-collection {
-        width: 100%;
-        height: 30px;
-        margin: var(--padding);
+      min-height: 40px;
+      margin-bottom: var(--padding);
+
+      .td-collection-header {
         gap: var(--padding);
-        .td-new-collection {
-          flex: 1;
+        padding: var(--padding);
+        height: 40px;
+        justify-content: space-between;
+        width: 100%;
+        background-color: var(--bg-thirt-color);
+        border-radius: var(--border-radius);
+        .td-collection-header-left {
+          gap: var(--padding);
         }
-        .td-plus-icon {
-          filter: grayscale(100);
-          cursor: pointer;
+      }
+      .td-collection-header:hover {
+        background-color: var(--bg-layer-color);
+      }
+      .td-collection-content {
+        justify-content: flex-start;
+        width: 100%;
+        .td-collection-request-item {
+          height: 40px;
+          justify-content: space-between;
+          width: 100%;
+          padding: var(--padding);
+          border-radius: var(--border-radius);
         }
-        .td-plus-icon:hover {
-          filter: unset;
+        .td-collection-request-item:hover {
           background-color: var(--bg-layer-color);
         }
-      }
-      .td-collection {
-        flex: 1;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
-        position: relative;
-        .td-collection-body {
-          position: relative;
-          flex: 1;
-          min-height: 0;
-          overflow-y: auto;
-          .td-collection-item {
-            cursor: pointer;
-            justify-content: flex-start;
-            gap: var(--padding);
-            width: 100%;
-            min-height: 40px;
-            margin-bottom: var(--padding);
-
-            .td-collection-header {
-              gap: var(--padding);
-              padding: var(--padding);
-              height: 40px;
-              justify-content: space-between;
-              width: 100%;
-              background-color: var(--bg-thirt-color);
-              border-radius: var(--border-radius);
-              .td-collection-header-left {
-                gap: var(--padding);
-              }
-            }
-            .td-collection-header:hover {
-              background-color: var(--bg-layer-color);
-            }
-            .td-collection-content {
-              justify-content: flex-start;
-              width: 100%;
-              .td-collection-request-item {
-                height: 40px;
-                justify-content: space-between;
-                width: 100%;
-                padding: var(--padding);
-                border-radius: var(--border-radius);
-              }
-              .td-collection-request-item:hover {
-                background-color: var(--bg-layer-color);
-              }
-              .td-collection-request-item-selected {
-                background-color: var(--bg-layer-color);
-                font-weight: 600;
-              }
-            }
-          }
+        .td-collection-request-item-selected {
+          background-color: var(--bg-layer-color);
+          font-weight: 600;
         }
       }
     }
   }
-  .divide {
-    width: var(--padding);
-    height: 100%;
-    background-color: var(--bg-layer-color);
-    border-radius: var(--border-radius);
-  }
 }
-.td-sub-sidebar-collaspe {
-  margin-left: unset;
+.td-sidebar-header {
+  // margin-bottom: var(--padding);
+}
+.td-sidebar-content {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
 }
 .td-api-request-save-collection {
   position: fixed;
