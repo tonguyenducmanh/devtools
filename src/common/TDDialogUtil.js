@@ -4,7 +4,7 @@ import { createApp } from "vue";
  * Enum định nghĩa các loại dialog
  */
 export const TDDialogEnum = {
-  TDAPISaveToCollectionPopup: "TDAPISaveToCollectionPopup",
+  TDAPISaveToCollectionPopup: 1,
 };
 
 /**
@@ -42,7 +42,8 @@ class TDDialogUtil {
    */
   async show({ dialogType, ownerForm, props = {} }, callback) {
     const component = await this.loadComponent(dialogType);
-    const dialogId = `td-dialog-${++this.dialogCounter}`;
+    const dialogId = `td-dialog-${TDAPISaveToCollectionPopup}-${++this
+      .dialogCounter}`;
 
     const container = document.createElement("div");
     container.id = dialogId;

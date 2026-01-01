@@ -329,7 +329,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use "@/styles/icon.scss";
 
 .td-header-container {
   width: 100%;

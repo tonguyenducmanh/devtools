@@ -86,7 +86,6 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@use "@/styles/icon.scss";
 
 .td-sidebar-container {
   position: relative;

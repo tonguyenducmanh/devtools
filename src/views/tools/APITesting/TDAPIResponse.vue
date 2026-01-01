@@ -56,7 +56,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@use "@/styles/icon.scss";
 
 .response-loading {
   width: 100%;
