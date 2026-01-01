@@ -1,56 +1,67 @@
 <template>
-  <div class="container">
-    <!-- <div class="title">{{ $t("i18nCommon.jsonToExcel.title") }}</div> -->
-    <div class="flex">
-      <TDHistory
-        ref="history"
-        class="history-container"
-        :applyFunction="convertToExcelFromHistory"
-        :cacheKey="$tdEnum.cacheConfig.JSONToExcelHistory"
-      ></TDHistory>
+  <div class="flex container">
+    <div class="flex flex-col main-tool">
+      <div class="input-area">
+        <TDTextarea
+          isLabelTop
+          :label="$t('i18nCommon.jsonToExcel.inputLabel')"
+          :placeHolder="$t('i18nCommon.jsonToExcel.inputPlaceholder')"
+          :wrapText="wrapText"
+          :enableHighlight="enableHighlight"
+          language="json"
+          v-model="jsonSource"
+        ></TDTextarea>
+      </div>
+
+      <div class="flex">
+        <TDButton
+          :label="$t('i18nCommon.jsonToExcel.convert')"
+          @click="convertToExcel"
+        ></TDButton>
+        <TDButton
+          @click="applyMock"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.jsonToExcel.example')"
+        ></TDButton>
+      </div>
     </div>
-    <div class="flex">
-      <TDTextarea
-        isLabelTop
-        :label="$t('i18nCommon.jsonToExcel.inputLabel')"
-        :placeHolder="$t('i18nCommon.jsonToExcel.inputPlaceholder')"
-        height="400px"
-        width="95%"
-        v-model="jsonSource"
-      ></TDTextarea>
-    </div>
-    <div class="flex">
-      <TDCheckbox
-        v-model="isBoldColName"
-        :label="$t('i18nCommon.jsonToExcel.boldColumns')"
-      ></TDCheckbox>
-      <TDCheckbox
-        v-model="isFitColWidth"
-        :label="$t('i18nCommon.jsonToExcel.fitColumns')"
-      ></TDCheckbox>
-      <TDCheckbox
-        v-model="isFreezeFirstRow"
-        :label="$t('i18nCommon.jsonToExcel.freezeRow')"
-      ></TDCheckbox>
-    </div>
-    <div class="flex">
-      <TDButton
-        :label="$t('i18nCommon.jsonToExcel.convert')"
-        @click="convertToExcel"
-      ></TDButton>
-      <TDButton
-        @click="applyMock"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.jsonToExcel.example')"
-      ></TDButton>
-    </div>
+    <TDSubSidebar v-model="isShowSidebar">
+      <div class="flex flex-col td-sidebar">
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="wrapText"
+          :label="$t('i18nCommon.apiTesting.wrapText')"
+        ></TDCheckbox>
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="enableHighlight"
+          :label="$t('i18nCommon.enableHighlight')"
+        ></TDCheckbox>
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="isBoldColName"
+          :label="$t('i18nCommon.jsonToExcel.boldColumns')"
+        ></TDCheckbox>
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="isFitColWidth"
+          :label="$t('i18nCommon.jsonToExcel.fitColumns')"
+        ></TDCheckbox>
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="isFreezeFirstRow"
+          :label="$t('i18nCommon.jsonToExcel.freezeRow')"
+        ></TDCheckbox>
+      </div>
+    </TDSubSidebar>
   </div>
 </template>
 <script>
 import ExcelJS from "exceljs";
-
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
 export default {
   name: "TDJSONToExcel",
+  components: { TDSubSidebar },
   created() {
     let me = this;
   },
@@ -223,6 +234,10 @@ export default {
   },
   data() {
     return {
+      isShowSidebar: true,
+      enableHighlight: true,
+      splitHorizontal: true,
+      wrapText: true,
       jsonSource: "",
       isBoldColName: true,
       isFitColWidth: true,
@@ -233,7 +248,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .container {
   width: 100%;
   height: 100%;
@@ -241,7 +256,16 @@ export default {
 .io-section {
   column-gap: 20px;
 }
-.history-container {
-  width: 95%;
+.main-tool {
+  flex: 1;
+  height: 100%;
+  .input-area {
+    flex: 1;
+    width: 100%;
+  }
+}
+.td-sidebar {
+  justify-content: flex-start;
+  height: 100%;
 }
 </style>
