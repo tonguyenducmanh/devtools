@@ -825,7 +825,7 @@ export default {
           }
         } else {
           // nếu không tồn tại request thì show popup tạo mới
-          TDDialogUtil.show({
+          TDDialogUtil.showPopup({
             dialogType: TDDialogEnum.TDAPISaveToCollectionPopup,
             ownerForm: this,
             props: {

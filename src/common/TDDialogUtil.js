@@ -43,7 +43,7 @@ class TDDialogUtil {
    * Hiển thị dialog
    * @returns dialogId
    */
-  async show({ dialogType, ownerForm, props = {}, param = {}, callback }) {
+  async showPopup({ dialogType, ownerForm, props = {}, param = {}, callback }) {
     const component = await this.loadComponent(dialogType);
     const dialogId = `td-dialog-${dialogType}-${++this.dialogCounter}`;
 

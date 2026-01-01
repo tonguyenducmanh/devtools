@@ -183,7 +183,7 @@ export default {
     // Search methods
     openSearchModal() {
       // nếu không tồn tại request thì show popup tạo mới
-      TDDialogUtil.show({
+      TDDialogUtil.showPopup({
         dialogType: TDDialogEnum.TDGoToToolPopup,
         ownerForm: this,
       });
