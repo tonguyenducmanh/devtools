@@ -27,6 +27,14 @@
           </div>
         </div>
       </div>
+      <div
+        v-else-if="searchQuery && filteredCollection.length === 0"
+        class="td-search-empty"
+      >
+        <div class="td-search-empty-text">
+          {{ $t("i18nCommon.search.noResults") }}
+        </div>
+      </div>
     </div>
   </TDPopup>
 </template>
