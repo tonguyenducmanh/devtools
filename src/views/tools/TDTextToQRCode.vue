@@ -25,18 +25,12 @@
             :type="$tdEnum.buttonType.secondary"
             :label="$t('i18nCommon.textToQRCode.buttons.example')"
           ></TDButton>
-          <TDInput
-            v-model="maxLengthUserConfig"
-            :inputType="'number'"
-            class="max-length-input"
-            :placeHolder="$t('i18nCommon.textToQRCode.input.maxLength')"
-          />
         </div>
       </div>
       <div v-if="textGenQR" class="qrcode-section">
         <div class="qrcode-box">
           <template v-for="(item, index) in qrCodeItems">
-            <div class="qr-container">
+            <div class="qr-container" :style="QRImageStyle">
               <div class="qr-header">
                 <span>{{
                   $t("i18nCommon.textToQRCode.part", [
@@ -76,6 +70,44 @@
           v-model="addHeaderToQR"
           :label="$t('i18nCommon.textToQRCode.addHeaderToQR')"
         ></TDCheckbox>
+        <div class="flex flex-col input-config">
+          <div class="flex input-config-item">
+            <span class="title-input-config">{{
+              $t("i18nCommon.textToQRCode.input.maxLength")
+            }}</span>
+            <TDInput
+              v-model="maxLengthUserConfig"
+              :inputType="'number'"
+              class="value-input-config max-length-input"
+              :placeHolder="'1000'"
+              :noMargin="true"
+            />
+          </div>
+          <div class="flex input-config-item">
+            <span class="title-input-config">{{
+              $t("i18nCommon.textToQRCode.QRWidthSize")
+            }}</span>
+            <TDInput
+              v-model="QRWidthSize"
+              :inputType="'number'"
+              class="value-input-config max-length-input"
+              :placeHolder="'300'"
+              :noMargin="true"
+            />
+          </div>
+          <div class="flex input-config-item">
+            <span class="title-input-config">{{
+              $t("i18nCommon.textToQRCode.QRHeightSize")
+            }}</span>
+            <TDInput
+              v-model="QRHeightSize"
+              :inputType="'number'"
+              class="value-input-config max-length-input"
+              :placeHolder="'350'"
+              :noMargin="true"
+            />
+          </div>
+        </div>
       </div>
     </TDSubSidebar>
   </div>
@@ -301,12 +333,24 @@ export default {
       return timestamp;
     },
   },
+  computed: {
+    QRImageStyle() {
+      let me = this;
+      let style = {
+        width: `${me.QRWidthSize}px`,
+        height: `${me.QRHeightSize}px`,
+      };
+      return style;
+    },
+  },
   data() {
     return {
       isShowSidebar: true,
       textGenQR: null,
       qrCodeItems: [],
-      maxLengthUserConfig: null,
+      maxLengthUserConfig: window.__env.textToQRConfig.maxTextOneChunk,
+      QRWidthSize: 300,
+      QRHeightSize: 350,
       isCompressText:
         window.__env &&
         window.__env.textToQRConfig &&
@@ -316,7 +360,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scope lang="scss">
 .container {
   display: flex;
   width: 100%;
@@ -404,5 +448,21 @@ export default {
   height: 100%;
   justify-content: flex-start;
   width: 100%;
+}
+.input-config {
+  width: 100%;
+  gap: var(--padding);
+  .input-config-item {
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 var(--padding);
+    box-sizing: border-box;
+    .title-input-config {
+      flex: 1;
+    }
+    .value-input-config {
+      width: 100px;
+    }
+  }
 }
 </style>

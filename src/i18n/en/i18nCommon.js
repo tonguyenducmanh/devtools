@@ -192,10 +192,12 @@ export default {
       popupTitle: "HTML Preview",
     },
     textToQRCode: {
+      QRWidthSize: "QR width",
+      QRHeightSize: "QR height",
       title: "Text To QRCode tool!",
       input: {
         placeholder: "Enter text to generate QR code...",
-        maxLength: "Maximum characters per QR code",
+        maxLength: "Max char QR",
       },
       buttons: {
         generate: "Generate QR Code",
