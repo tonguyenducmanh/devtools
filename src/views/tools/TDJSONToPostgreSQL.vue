@@ -37,6 +37,8 @@
       <template v-if="!enableFileUpload">
         <TDTextarea
           isLabelTop
+          :enableHighlight="enableHighlight"
+          language="json"
           :label="$t('i18nCommon.jsonToPostgreSQL.inputLabel')"
           :placeHolder="$t('i18nCommon.jsonToPostgreSQL.inputPlaceholder')"
           v-model="inputJSON"
