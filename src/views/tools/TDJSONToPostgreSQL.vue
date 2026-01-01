@@ -1,119 +1,112 @@
 <template>
-  <div class="flex flex-col container">
-    <!-- <div class="title">{{ $t("i18nCommon.jsonToPostgreSQL.title") }}</div> -->
-    <div class="flex history-wrapper">
-      <TDHistory
-        ref="history"
-        class="history-container"
-        titleKey="inputJSON"
-        :applyFunction="convertToPostgresSQLFromHistory"
-        :cacheKey="$tdEnum.cacheConfig.JSONToPostgreSQLHistory"
-      ></TDHistory>
+  <div class="flex container">
+    <div class="flex flex-col main-area">
+      <div class="flex io-section">
+        <template v-if="!enableFileUpload">
+          <TDTextarea
+            isLabelTop
+            :enableHighlight="enableHighlight"
+            language="json"
+            :label="$t('i18nCommon.jsonToPostgreSQL.inputLabel')"
+            :placeHolder="$t('i18nCommon.jsonToPostgreSQL.inputPlaceholder')"
+            v-model="inputJSON"
+          ></TDTextarea>
+        </template>
+        <template v-else>
+          <div class="upload-container">
+            <TDUpload
+              :label="$t('i18nCommon.jsonToPostgreSQL.uploadLabel')"
+              :accept="'.json'"
+              @change="handleFileUpload"
+            />
+          </div>
+        </template>
+        <template v-if="!enableFileUpload">
+          <TDTextarea
+            isLabelTop
+            :label="$t('i18nCommon.jsonToPostgreSQL.outputLabel')"
+            :readOnly="true"
+            :enableHighlight="enableHighlight"
+            language="sql"
+            :placeHolder="$t('i18nCommon.jsonToPostgreSQL.outputPlaceholder')"
+            v-model="outputSQL"
+          ></TDTextarea>
+        </template>
+      </div>
+      <div class="flex">
+        <template v-if="!enableFileUpload">
+          <TDButton
+            :label="$t('i18nCommon.jsonToPostgreSQL.convert')"
+            @click="convertToPostgresSQL"
+          ></TDButton>
+          <TDButton
+            @click="haddleCopyEvent"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.jsonToPostgreSQL.copy')"
+          ></TDButton>
+        </template>
+        <template v-else>
+          <TDButton
+            :label="$t('i18nCommon.jsonToPostgreSQL.downloadSQL')"
+            @click="downloadSQLFile"
+            :disabled="!outputSQL"
+          ></TDButton>
+        </template>
+        <TDButton
+          @click="applyMock"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.jsonToPostgreSQL.example')"
+        ></TDButton>
+      </div>
     </div>
-    <div class="flex flex-wrap metadata-inputs">
-      <div>
-        <TDInput
-          :label="$t('i18nCommon.jsonToPostgreSQL.schemaName')"
-          type="text"
-          v-model="schemaName"
-        />
-      </div>
-      <div>
-        <TDInput
-          :label="$t('i18nCommon.jsonToPostgreSQL.tableName')"
-          type="text"
-          v-model="tableName"
-        />
-      </div>
-      <div>
-        <TDInput
-          :label="$t('i18nCommon.jsonToPostgreSQL.primaryKey')"
-          type="text"
-          v-model="primaryKeyField"
-        />
-      </div>
-    </div>
-    <div class="flex io-section">
-      <template v-if="!enableFileUpload">
-        <TDTextarea
-          isLabelTop
-          :enableHighlight="enableHighlight"
-          language="json"
-          :label="$t('i18nCommon.jsonToPostgreSQL.inputLabel')"
-          :placeHolder="$t('i18nCommon.jsonToPostgreSQL.inputPlaceholder')"
-          v-model="inputJSON"
-        ></TDTextarea>
-      </template>
-      <template v-else>
-        <div class="upload-container">
-          <TDUpload
-            :label="$t('i18nCommon.jsonToPostgreSQL.uploadLabel')"
-            :accept="'.json'"
-            @change="handleFileUpload"
+    <TDSubSidebar v-model="isShowSidebar">
+      <div class="flex flex-col td-sidebar-content">
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="enableHighlight"
+          :label="$t('i18nCommon.enableHighlight')"
+        ></TDCheckbox>
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="enableFileUpload"
+          :label="$t('i18nCommon.jsonToPostgreSQL.useFileUpload')"
+        ></TDCheckbox>
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="enableCreateTable"
+          :label="$t('i18nCommon.jsonToPostgreSQL.createTable')"
+        ></TDCheckbox>
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="enableDeleteScript"
+          :label="$t('i18nCommon.jsonToPostgreSQL.deleteOld')"
+        ></TDCheckbox>
+        <div class="flex flex-col group-info">
+          <TDInput
+            :placeHolder="$t('i18nCommon.jsonToPostgreSQL.schemaName')"
+            type="text"
+            v-model="schemaName"
+          />
+          <TDInput
+            :placeHolder="$t('i18nCommon.jsonToPostgreSQL.tableName')"
+            type="text"
+            v-model="tableName"
+          />
+          <TDInput
+            :placeHolder="$t('i18nCommon.jsonToPostgreSQL.primaryKey')"
+            type="text"
+            v-model="primaryKeyField"
           />
         </div>
-      </template>
-      <template v-if="!enableFileUpload">
-        <TDTextarea
-          isLabelTop
-          :label="$t('i18nCommon.jsonToPostgreSQL.outputLabel')"
-          :readOnly="true"
-          :enableHighlight="enableHighlight"
-          language="sql"
-          :placeHolder="$t('i18nCommon.jsonToPostgreSQL.outputPlaceholder')"
-          v-model="outputSQL"
-        ></TDTextarea>
-      </template>
-    </div>
-    <div class="flex">
-      <TDCheckbox
-        v-model="enableHighlight"
-        :label="$t('i18nCommon.enableHighlight')"
-      ></TDCheckbox>
-      <TDCheckbox
-        v-model="enableFileUpload"
-        :label="$t('i18nCommon.jsonToPostgreSQL.useFileUpload')"
-      ></TDCheckbox>
-      <TDCheckbox
-        v-model="enableCreateTable"
-        :label="$t('i18nCommon.jsonToPostgreSQL.createTable')"
-      ></TDCheckbox>
-      <TDCheckbox
-        v-model="enableDeleteScript"
-        :label="$t('i18nCommon.jsonToPostgreSQL.deleteOld')"
-      ></TDCheckbox>
-    </div>
-
-    <div class="flex">
-      <template v-if="!enableFileUpload">
-        <TDButton
-          :label="$t('i18nCommon.jsonToPostgreSQL.convert')"
-          @click="convertToPostgresSQL"
-        ></TDButton>
-        <TDButton
-          @click="haddleCopyEvent"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.jsonToPostgreSQL.copy')"
-        ></TDButton>
-      </template>
-      <template v-else>
-        <TDButton
-          :label="$t('i18nCommon.jsonToPostgreSQL.downloadSQL')"
-          @click="downloadSQLFile"
-          :disabled="!outputSQL"
-        ></TDButton>
-      </template>
-      <TDButton
-        @click="applyMock"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.jsonToPostgreSQL.example')"
-      ></TDButton>
-    </div>
+      </div>
+    </TDSubSidebar>
   </div>
 </template>
 <script>
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
 export default {
   name: "TDJSONToPostgreSQL",
+  components: { TDSubSidebar },
   created() {
     let me = this;
   },
@@ -129,20 +122,6 @@ export default {
         "@/common/mock/TDMockJSONToPostgreSQL.js"
       );
       this.$tdUtility.applyMock(this, TDMockJSONToPostgreSQL);
-    },
-
-    async convertToPostgresSQLFromHistory(item) {
-      let me = this;
-      let historyItem = item || {};
-      if (historyItem && historyItem.inputJSON) {
-        me.inputJSON = historyItem.inputJSON;
-        me.tableName = historyItem.tableName;
-        me.schemaName = historyItem.schemaName;
-        me.primaryKeyField = historyItem.primaryKeyField;
-        me.enableCreateTable = historyItem.enableCreateTable;
-        me.enableDeleteScript = historyItem.enableDeleteScript;
-        await me.convertToPostgresSQL();
-      }
     },
     async convertToPostgresSQL() {
       let me = this;
@@ -162,16 +141,6 @@ export default {
           config.enableDeleteScript = me.enableDeleteScript;
           config.enableCreateTable = me.enableCreateTable;
           me.outputSQL = me.buildScriptPostgreSQLScript(input, config);
-          // Lưu text vào lịch sử nếu khác với lần lưu trước
-          let historyItem = {
-            inputJSON: me.inputJSON,
-            tableName: me.tableName,
-            schemaName: me.schemaName,
-            primaryKeyField: me.primaryKeyField,
-            enableCreateTable: me.enableCreateTable,
-            enableDeleteScript: me.enableDeleteScript,
-          };
-          await me.$refs.history.saveToHistory(historyItem);
           me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
         }
       } catch (error) {
@@ -382,6 +351,7 @@ export default {
   },
   data() {
     return {
+      isShowSidebar: true,
       enableHighlight: true,
       STRING_JOIN: ", ",
       STRING_JOIN_BREAKLINE: ";\n",
@@ -410,12 +380,6 @@ export default {
   column-gap: var(--padding);
   width: 95%;
 }
-.history-wrapper {
-  width: 95%;
-}
-.history-container {
-  width: 100%;
-}
 .upload-container {
   width: 100%;
   display: flex;
@@ -428,5 +392,17 @@ export default {
 }
 .mb-4 {
   margin-bottom: 1rem;
+}
+.main-area {
+  flex: 1;
+  height: 100%;
+}
+.td-sidebar-content {
+  width: 100%;
+  height: 100%;
+  justify-content: flex-start;
+}
+.group-info{
+  width: 100%;
 }
 </style>
