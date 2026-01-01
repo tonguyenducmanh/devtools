@@ -45,7 +45,7 @@
 
     <!-- Sidebar -->
     <TDSubSidebar v-model="isShowSidebar">
-      <div class="flex flex-col td-sidebar">
+      <div class="flex flex-col td-sub-sidebar">
         <TDCheckbox
           :variant="$tdEnum.checkboxType.switch"
           v-model="wrapText"
@@ -263,8 +263,9 @@ export default {
   justify-content: center;
 }
 
-.td-sidebar {
-  justify-content: flex-start;
+.td-sub-sidebar {
   height: 100%;
+  justify-content: flex-start;
+  width: 100%;
 }
 </style>

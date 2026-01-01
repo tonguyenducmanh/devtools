@@ -205,7 +205,7 @@ export default {
         example: "Example",
       },
       part: "Part {0}/{1}",
-      compressText: "Compress text (gzip)",
+      compressText: "Compress text",
       addHeaderToQR: "Use QR header",
     },
     qrCodeToText: {
@@ -218,7 +218,7 @@ export default {
       convert: "Convert",
       copy: "Copy",
       result: "Result will appear after pasting image",
-      compressText: "Is Compressed text (gzip)",
+      compressText: "Compress text",
       hasHeaderInQR: "Use QR header",
     },
     oneTimePassword: {

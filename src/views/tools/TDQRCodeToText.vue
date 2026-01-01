@@ -264,5 +264,6 @@ export default {
 .td-sub-sidebar {
   height: 100%;
   justify-content: flex-start;
+  width: 100%;
 }
 </style>
