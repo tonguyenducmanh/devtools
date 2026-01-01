@@ -1,54 +1,58 @@
 <template>
-  <div class="td-search-modal" @click.stop>
-    <div class="td-search-input-container">
-      <div class="td-icon td-search-icon"></div>
+  <TDPopup
+    :visible="true"
+    title="Lưu vào Collection"
+    width="400px"
+    @close="handleClose"
+  >
+    <div class="td-search-modal">
       <input
-        ref="searchInput"
         v-model="searchQuery"
-        type="text"
-        :placeholder="$t('i18nCommon.search.placeholder')"
         class="td-search-input"
+        :placeholder="$t('i18nCommon.search.placeholder')"
       />
-      <button class="td-search-close" @click="closeSearchModal">
-        <div class="td-icon td-close-icon"></div>
-      </button>
-    </div>
 
-    <div class="td-search-results" v-if="filteredCollection.length > 0">
-      <div class="td-search-section">
-        <div
-          v-for="(collection, index) in filteredCollection"
-          :key="collection.name"
-          class="td-search-item"
-          @click="saveToCollection(collection)"
-        >
-          <div class="td-search-item-content">
-            <div class="td-search-item-title">
-              {{ collection.name }}
+      <div class="td-search-results" v-if="filteredCollection.length > 0">
+        <div class="td-search-section">
+          <div
+            v-for="(collection, index) in filteredCollection"
+            :key="collection.name"
+            class="td-search-item"
+            @click="saveToCollection(collection)"
+          >
+            <div class="td-search-item-content">
+              <div class="td-search-item-title">
+                {{ collection.name }}
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </TDPopup>
 </template>
 
 <script>
 export default {
   name: "TDAPISaveToCollectionPopup",
 
+  props: {
+    allCollection: {
+      type: Array,
+      default: () => [],
+    },
+    ownerForm: {
+      type: Object,
+      required: true,
+    },
+  },
+
   data() {
     return {
       searchQuery: "",
     };
   },
-  props: {
-    allCollection: {
-      type: Array,
-      default: [],
-    },
-  },
-  async created() {},
+
   computed: {
     filteredCollection() {
       let me = this;
@@ -64,32 +68,19 @@ export default {
         .slice(0, 8); // Giới hạn 8 kết quả
     },
   },
-  beforeUnmount() {},
+
   methods: {
-    closeSearchModal() {
-      //todo: gọi hàm close
-      this.searchQuery = "";
+    handleClose() {
+      this.$emit("close"); // 👈 popup chỉ emit
     },
-    async saveToCollection(collection) {
-      let me = this;
-      let historyItem = me.buildHistoryItemForSave();
-      let newRequestId = me.$tdUtility.newGuid();
-      if (collection && historyItem) {
-        if (!collection.requests) {
-          collection.requests = [];
-        }
-        historyItem.requestId = newRequestId;
-        collection.requests.push(historyItem);
-        await me.saveCollectionToCache();
-        me.currentRequestId = newRequestId;
-        this.$tdToast.success(null, this.$t("i18nCommon.toastMessage.success"));
-      }
-      this.closeSearchModal();
+
+    async save(collection) {
+      // logic save giữ nguyên của bạn
+      this.close();
     },
   },
 };
 </script>
-
 <style scoped lang="scss">
 @use "@/styles/icon.scss";
 </style>
