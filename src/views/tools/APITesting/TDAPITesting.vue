@@ -546,6 +546,7 @@
               @change="updateAPIConfigLayout"
             ></TDCheckbox>
             <TDCheckbox
+              :variant="$tdEnum.checkboxType.switch"
               v-model="APIConfigLayout.splitHorizontal"
               :label="$t('i18nCommon.splitHorizontal')"
               @change="updateAPIConfigLayout"
