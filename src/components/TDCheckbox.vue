@@ -14,15 +14,25 @@
         :disabled="readOnly"
         :name="inputId"
       />
-      <span class="td-checkbox">
-        <span v-if="modelValue" class="td-checkbox-active"></span>
+      <span v-if="variant == $tdEnum.checkboxType.checkbox" class="flex td-checkbox-visible">
+        <span class="td-checkbox">
+          <span v-if="modelValue" class="td-checkbox-active"></span>
+        </span>
+        <span class="td-label-content">{{ label.capitalize() }}</span>
       </span>
-      <span class="td-label-content">{{ label.capitalize() }}</span>
+      <span v-else-if="variant == $tdEnum.checkboxType.switch" class="flex td-checkbox-visible">
+        <span class="td-label-content">{{ label.capitalize() }}</span>
+        <span class="td-checkbox">
+          <span v-if="modelValue" class="td-checkbox-active"></span>
+        </span>
+      </span>
     </label>
   </span>
 </template>
 
 <script>
+import tdEnum from "@/common/TDEnum.js";
+
 export default {
   name: "TDCheckbox",
   created() {},
@@ -46,6 +56,14 @@ export default {
       type: String,
       default: null,
     },
+    variant: {
+      type: Number,
+      default: tdEnum.checkboxType.checkbox,
+    },
+    width: {
+      type: String,
+      default: "100%",
+    },
   },
   data() {
     return {
@@ -67,8 +85,11 @@ export default {
   position: relative;
   display: flex;
   align-items: center;
-  margin: var(--padding);
+  padding: var(--padding);
+  box-sizing: border-box;
+  width: 100%;
   .td-label {
+    width: 100%;
     justify-content: flex-start;
     position: relative;
     display: flex;
@@ -97,9 +118,12 @@ export default {
     border: 1px solid var(--border-color);
     background: var(--bg-main-color);
   }
+  .td-checkbox-visible {
+    justify-content: space-between;
+    width: 100%;
+  }
   .td-label-content {
     white-space: nowrap;
-    padding-left: var(--padding);
   }
 }
 

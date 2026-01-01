@@ -528,16 +528,19 @@
             "
           >
             <TDCheckbox
+              :variant="$tdEnum.checkboxType.switch"
               v-model="APIConfigLayout.showReponse"
               :label="$t('i18nCommon.apiTesting.showReponse')"
               @change="updateAPIConfigLayout"
             ></TDCheckbox>
             <TDCheckbox
+              :variant="$tdEnum.checkboxType.switch"
               v-model="APIConfigLayout.wrapText"
               :label="$t('i18nCommon.apiTesting.wrapText')"
               @change="updateAPIConfigLayout"
             ></TDCheckbox>
             <TDCheckbox
+              :variant="$tdEnum.checkboxType.switch"
               v-model="APIConfigLayout.enableHighlight"
               :label="$t('i18nCommon.enableHighlight')"
               @change="updateAPIConfigLayout"

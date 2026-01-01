@@ -43,6 +43,10 @@ class TDEnum {
     vi: "vi",
     en: "en",
   };
+  checkboxType = {
+    checkbox: 1,
+    switch: 2,
+  };
   /**
    * Thông tin info của câu lệnh
    */
