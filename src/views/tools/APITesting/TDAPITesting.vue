@@ -1212,6 +1212,9 @@ export default {
     },
     buildHistoryItemForSave() {
       let me = this;
+      if (!me.apiUrl && me.curlContent) {
+        me.importCURL(true);
+      }
       let historyItem = {
         apiUrl: me.apiUrl,
         httpMethod: me.httpMethod,
@@ -1399,7 +1402,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
 .td-api-container {
   width: 100%;
   height: 100%;
