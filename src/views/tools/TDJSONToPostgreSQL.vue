@@ -65,6 +65,11 @@
       <div class="flex flex-col td-sidebar-content">
         <TDCheckbox
           :variant="$tdEnum.checkboxType.switch"
+          v-model="wrapText"
+          :label="$t('i18nCommon.apiTesting.wrapText')"
+        ></TDCheckbox>
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
           v-model="enableHighlight"
           :label="$t('i18nCommon.enableHighlight')"
         ></TDCheckbox>
@@ -87,11 +92,6 @@
           :variant="$tdEnum.checkboxType.switch"
           v-model="splitHorizontal"
           :label="$t('i18nCommon.splitHorizontal')"
-        ></TDCheckbox>
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="wrapText"
-          :label="$t('i18nCommon.apiTesting.wrapText')"
         ></TDCheckbox>
         <div class="flex flex-col group-info">
           <TDInput

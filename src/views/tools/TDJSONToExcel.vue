@@ -39,6 +39,11 @@
         ></TDCheckbox>
         <TDCheckbox
           :variant="$tdEnum.checkboxType.switch"
+          v-model="enableFileUpload"
+          :label="$t('i18nCommon.jsonToPostgreSQL.useFileUpload')"
+        ></TDCheckbox>
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
           v-model="isBoldColName"
           :label="$t('i18nCommon.jsonToExcel.boldColumns')"
         ></TDCheckbox>
@@ -237,6 +242,7 @@ export default {
       isShowSidebar: true,
       enableHighlight: true,
       splitHorizontal: true,
+      enableFileUpload: false,
       wrapText: true,
       jsonSource: "",
       isBoldColName: true,

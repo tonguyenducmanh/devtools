@@ -74,6 +74,17 @@ const routerConfig = [
   },
   {
     /**
+     * convert JSON sang Excel
+     */
+    path: "/jsontoexcel",
+    name: "jsontoexcel",
+    component: () => import("@/views/tools/TDJSONToExcel.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.JSONToExcel",
+    },
+  },
+  {
+    /**
      * so sánh code giữa 2 file
      */
     path: "/comparecode",
@@ -147,17 +158,6 @@ const routerConfig = [
     component: () => import("@/views/tools/TDMappingJSON.vue"),
     meta: {
       titleKey: "i18nCommon.feature.JSONMapping",
-    },
-  },
-  {
-    /**
-     * convert JSON sang Excel
-     */
-    path: "/jsontoexcel",
-    name: "jsontoexcel",
-    component: () => import("@/views/tools/TDJSONToExcel.vue"),
-    meta: {
-      titleKey: "i18nCommon.feature.JSONToExcel",
     },
   },
   {
