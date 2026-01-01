@@ -2,11 +2,12 @@
   <div class="flex container">
     <div class="main-tool">
       <div class="flex flex-col input-section">
-        <TDTextarea
-          class="input-area"
-          :placeHolder="$t('i18nCommon.textToQRCode.input.placeholder')"
-          v-model="textGenQR"
-        ></TDTextarea>
+        <div class="input-area">
+          <TDTextarea
+            :placeHolder="$t('i18nCommon.textToQRCode.input.placeholder')"
+            v-model="textGenQR"
+          ></TDTextarea>
+        </div>
         <div class="flex button-generate">
           <TDButton
             :readOnly="!textGenQR"
@@ -379,11 +380,8 @@ export default {
 }
 
 .input-area {
-  min-height: 100px;
+  width: 100%;
   height: 200px;
-  padding: 0.5rem;
-  border-radius: 5px;
-  resize: vertical;
 }
 .checkbox-wrapper {
   display: flex;
