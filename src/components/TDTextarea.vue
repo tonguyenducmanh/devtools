@@ -153,7 +153,9 @@ export default {
   methods: {
     focus() {
       let me = this;
-      me.$refs[me.inputId].focus();
+      if (me.$refs[me.inputId]) {
+        me.$refs[me.inputId].focus();
+      }
     },
     changeInputValue(e) {
       let me = this;

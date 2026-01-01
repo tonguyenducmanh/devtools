@@ -75,162 +75,132 @@
       <!-- phần nội dung tùy thuộc vào từng loại api -->
       <!-- phần api truyền thống -->
       <template v-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.Normal">
-        <!-- phần nhập khẩu curl để build ra api -->
-        <template v-if="isImportingCURL">
-          <TDTextarea
-            :isLabelTop="true"
-            v-model="curlContent"
-            :enableHighlight="APIConfigLayout.enableHighlight"
-            language="shell"
-            :placeHolder="$t('i18nCommon.apiTesting.contentCURL')"
-          ></TDTextarea>
-          <!-- các nút dưới ô nhập curl -->
-          <div class="flex">
+        <div class="td-api-content">
+          <div class="flex td-api-info-btn">
+            <!-- dòng header bổ trợ 1 số thông tin cho mode api thường -->
+            <div class="flex flex-one">
+              <!-- combo chọn method http -->
+              <TDComboBox
+                :width="120"
+                v-model="httpMethod"
+                :options="methodOptions"
+                :customStyle="customStyleComboMethodAPI"
+                :noMargin="true"
+                :borderRadiusPosition="[
+                  $tdEnum.BorderRadiusPosition.TopLeft,
+                  $tdEnum.BorderRadiusPosition.BottomLeft,
+                ]"
+              />
+              <!-- nhập url endpoint api -->
+              <TDInput
+                v-model="apiUrl"
+                :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
+                :noMargin="true"
+                :borderRadiusPosition="[
+                  $tdEnum.BorderRadiusPosition.TopRight,
+                  $tdEnum.BorderRadiusPosition.BottomRight,
+                ]"
+              ></TDInput>
+            </div>
+            <!-- nút mở chế độ api import curl -->
             <TDButton
-              @click="importCURL"
-              :label="$t('i18nCommon.apiTesting.importCURL')"
-            ></TDButton>
-            <TDButton
-              @click="cancelImportCURL"
+              @click="openFormImportCURL"
               :type="$tdEnum.buttonType.secondary"
-              :label="$t('i18nCommon.apiTesting.cancel')"
-            ></TDButton>
-            <TDButton
-              @click="handleCopyCurl"
-              :type="$tdEnum.buttonType.secondary"
-              :label="$t('i18nCommon.apiTesting.copyCURL')"
+              :debounceTime="100"
+              :noMargin="true"
+              :readOnly="isLoading"
+              :label="$t('i18nCommon.apiTesting.CURL')"
             ></TDButton>
           </div>
-        </template>
-        <!-- phần nội dung mode api bình thường -->
-        <template v-else>
-          <div class="td-api-content">
-            <div class="flex td-api-info-btn">
-              <!-- dòng header bổ trợ 1 số thông tin cho mode api thường -->
-              <div class="flex flex-one">
-                <!-- combo chọn method http -->
-                <TDComboBox
-                  :width="120"
-                  v-model="httpMethod"
-                  :options="methodOptions"
-                  :customStyle="customStyleComboMethodAPI"
+          <!-- phần nội dung  -->
+          <div
+            class="flex td-api-input-area"
+            :class="{ 'flex-col': APIConfigLayout.splitHorizontal }"
+          >
+            <div class="flex flex-col td-api-request">
+              <div class="flex td-api-request-title">
+                <TDSlideOption
+                  v-model="APIConfigLayout.currentAPIInfoOption"
+                  :options="APIInfoOptions"
                   :noMargin="true"
-                  :borderRadiusPosition="[
-                    $tdEnum.BorderRadiusPosition.TopLeft,
-                    $tdEnum.BorderRadiusPosition.BottomLeft,
-                  ]"
+                  @change="updateAPIConfigLayout"
                 />
-                <!-- nhập url endpoint api -->
-                <TDInput
-                  v-model="apiUrl"
-                  :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
-                  :noMargin="true"
-                  :borderRadiusPosition="[
-                    $tdEnum.BorderRadiusPosition.TopRight,
-                    $tdEnum.BorderRadiusPosition.BottomRight,
-                  ]"
-                ></TDInput>
-              </div>
-              <!-- nút mở chế độ api import curl -->
-              <TDButton
-                @click="openFormImportCURL"
-                :type="$tdEnum.buttonType.secondary"
-                :debounceTime="100"
-                :noMargin="true"
-                :readOnly="isLoading"
-                :label="$t('i18nCommon.apiTesting.CURL')"
-              ></TDButton>
-            </div>
-            <!-- phần nội dung  -->
-            <div
-              class="flex td-api-input-area"
-              :class="{ 'flex-col': APIConfigLayout.splitHorizontal }"
-            >
-              <div class="flex flex-col td-api-request">
-                <div class="flex td-api-request-title">
-                  <TDSlideOption
-                    v-model="APIConfigLayout.currentAPIInfoOption"
-                    :options="APIInfoOptions"
-                    :noMargin="true"
-                    @change="updateAPIConfigLayout"
-                  />
 
-                  <!-- phần hiển thị loader nếu như không chọn show reponse -->
-                  <div
-                    class="flex loader-without-response"
-                    v-if="!APIConfigLayout.showReponse && isLoading"
-                  >
-                    <div class="loader"></div>
-                  </div>
-                  <!-- phần hiển thị status code và thời gian chạy request -->
-                  <TDAPIResponseStatus
-                    v-if="APIConfigLayout.splitHorizontal && !isLoading"
-                    :statusCode="statusCode"
-                    :responseTime="responseTime"
-                  />
-                </div>
-                <!-- phần cấu hình header api -->
-                <TDTextarea
-                  v-if="
-                    APIConfigLayout.currentAPIInfoOption ==
-                    $tdEnum.APIInfoOption.header
-                  "
-                  :isLabelTop="true"
-                  v-model="headersText"
-                  :enableHighlight="APIConfigLayout.enableHighlight"
-                  language="text/plan"
-                  :wrapText="APIConfigLayout.wrapText"
-                  :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
-                ></TDTextarea>
-                <!-- phần cấu hình body api -->
+                <!-- phần hiển thị loader nếu như không chọn show reponse -->
                 <div
-                  class="td-text-area-wrap"
-                  v-if="
-                    APIConfigLayout.currentAPIInfoOption ==
-                    $tdEnum.APIInfoOption.body
-                  "
+                  class="flex loader-without-response"
+                  v-if="!APIConfigLayout.showReponse && isLoading"
                 >
-                  <TDTextarea
-                    :isLabelTop="true"
-                    v-model="bodyText"
-                    :wrapText="APIConfigLayout.wrapText"
-                    :enableHighlight="APIConfigLayout.enableHighlight"
-                    language="json"
-                    :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
-                  ></TDTextarea>
-                  <span
-                    v-if="!APIConfigLayout.enableHighlight"
-                    class="no-select td-top-right-btn"
-                  >
-                    <div
-                      class="td-icon td-json-icon"
-                      @click="formatBody"
-                      v-tooltip="$t('i18nCommon.apiTesting.beautify')"
-                    ></div>
-                  </span>
+                  <div class="loader"></div>
                 </div>
-              </div>
-              <!-- phần response API -->
-              <div
-                v-if="APIConfigLayout.showReponse"
-                class="flex flex-col td-api-response"
-              >
-                <!-- phần hiển thị httpstatus bên trên response -->
+                <!-- phần hiển thị status code và thời gian chạy request -->
                 <TDAPIResponseStatus
-                  class="flex td-api-response-title"
-                  v-if="!APIConfigLayout.splitHorizontal"
+                  v-if="APIConfigLayout.splitHorizontal && !isLoading"
                   :statusCode="statusCode"
                   :responseTime="responseTime"
                 />
-                <TDAPIResponse
-                  :isLoading="isLoading"
-                  :responseText="responseText"
-                  :APIConfigLayout="APIConfigLayout"
-                />
+              </div>
+              <!-- phần cấu hình header api -->
+              <TDTextarea
+                v-if="
+                  APIConfigLayout.currentAPIInfoOption ==
+                  $tdEnum.APIInfoOption.header
+                "
+                :isLabelTop="true"
+                v-model="headersText"
+                :enableHighlight="APIConfigLayout.enableHighlight"
+                language="text/plan"
+                :wrapText="APIConfigLayout.wrapText"
+                :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
+              ></TDTextarea>
+              <!-- phần cấu hình body api -->
+              <div
+                class="td-text-area-wrap"
+                v-if="
+                  APIConfigLayout.currentAPIInfoOption ==
+                  $tdEnum.APIInfoOption.body
+                "
+              >
+                <TDTextarea
+                  :isLabelTop="true"
+                  v-model="bodyText"
+                  :wrapText="APIConfigLayout.wrapText"
+                  :enableHighlight="APIConfigLayout.enableHighlight"
+                  language="json"
+                  :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
+                ></TDTextarea>
+                <span
+                  v-if="!APIConfigLayout.enableHighlight"
+                  class="no-select td-top-right-btn"
+                >
+                  <div
+                    class="td-icon td-json-icon"
+                    @click="formatBody"
+                    v-tooltip="$t('i18nCommon.apiTesting.beautify')"
+                  ></div>
+                </span>
               </div>
             </div>
+            <!-- phần response API -->
+            <div
+              v-if="APIConfigLayout.showReponse"
+              class="flex flex-col td-api-response"
+            >
+              <!-- phần hiển thị httpstatus bên trên response -->
+              <TDAPIResponseStatus
+                class="flex td-api-response-title"
+                v-if="!APIConfigLayout.splitHorizontal"
+                :statusCode="statusCode"
+                :responseTime="responseTime"
+              />
+              <TDAPIResponse
+                :isLoading="isLoading"
+                :responseText="responseText"
+                :APIConfigLayout="APIConfigLayout"
+              />
+            </div>
           </div>
-        </template>
+        </div>
       </template>
       <!-- phần api dạng curl -->
       <template
@@ -638,7 +608,6 @@ export default {
       responseTime: null,
       isLoading: false,
       startTime: null,
-      isImportingCURL: false,
       currentRequest: null,
       APIConfigLayout: {
         showReponse: true,
@@ -1082,7 +1051,6 @@ export default {
       me.responseTime = null;
       me.isLoading = false;
       me.startTime = null;
-      me.isImportingCURL = false;
       me.currentRequest = null;
       me.curlContent = "";
     },
@@ -1271,18 +1239,15 @@ export default {
         );
       }
     },
-    handleCopyCurl() {
-      let me = this;
-      let curlBuilded = TDCURLUtil.stringify(me.getRequestObj());
-      if (curlBuilded) {
-        me.$tdUtility.copyToClipboard(curlBuilded);
-      } else {
-        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
-      }
-    },
     openFormImportCURL() {
       let me = this;
-      me.isImportingCURL = true;
+      TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDAPIImportCURLPopup,
+        ownerForm: this,
+        props: {
+          APIConfigLayout: me.APIConfigLayout,
+        },
+      });
     },
     importCURL(isSilence = false) {
       let me = this;
@@ -1306,7 +1271,6 @@ export default {
         }
         me.httpMethod = CURLParsed.method;
         me.headersText = CURLParsed.headersText;
-        me.isImportingCURL = false;
         result = true;
       } else {
         if (!isSilence) {
@@ -1315,10 +1279,6 @@ export default {
         result = false;
       }
       return result;
-    },
-    cancelImportCURL() {
-      let me = this;
-      me.isImportingCURL = false;
     },
     async handleSelectedAPIMode() {
       let me = this;
