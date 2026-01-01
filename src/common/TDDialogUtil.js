@@ -40,7 +40,7 @@ class TDDialogUtil {
    * Hiển thị dialog
    * @returns dialogId
    */
-  async show({ dialogType, ownerForm, props = {} }, callback) {
+  async show({ dialogType, ownerForm, props = {}, param = {}, callback }) {
     const component = await this.loadComponent(dialogType);
     const dialogId = `td-dialog-${dialogType}-${++this.dialogCounter}`;
 
@@ -67,7 +67,12 @@ class TDDialogUtil {
     }
 
     app.mount(container);
-
+    const instance = app._instance?.proxy;
+    if (instance?.show && param !== undefined) {
+      instance.show(param);
+    } else {
+      throw new Error(`DialogType "${dialogType}" chưa triển khai hàm show`);
+    }
     this.activeDialogs.set(dialogId, {
       app,
       container,

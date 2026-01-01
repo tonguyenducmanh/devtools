@@ -68,6 +68,9 @@ export default {
   },
 
   methods: {
+    show(param) {
+      let me = this;
+    },
     handleClose() {
       this.$emit("close"); // popup chỉ emit
     },
