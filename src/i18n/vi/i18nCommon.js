@@ -347,6 +347,7 @@ export default {
         history: "Lịch sử",
       },
       FindCollectionTitle: "Tìm tên bộ sưu tập để lưu request",
+      NeedRequestName: "Cần điền tên request trước khi lưu",
     },
   },
 };

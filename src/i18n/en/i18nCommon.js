@@ -349,6 +349,7 @@ export default {
         history: "History",
       },
       FindCollectionTitle: "Find collection for save request",
+      NeedRequestName: "Need request name before save",
     },
   },
 };

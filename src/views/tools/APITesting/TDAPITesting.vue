@@ -536,6 +536,7 @@
               ></TDButton>
               <!-- nút lưu request -->
               <TDButton
+                v-tooltip="$t('i18nCommon.apiTesting.NeedRequestName')"
                 :readOnly="isLoading || !requestName"
                 @click="saveRequest"
                 :type="$tdEnum.buttonType.secondary"
