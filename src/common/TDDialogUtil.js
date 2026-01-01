@@ -42,8 +42,7 @@ class TDDialogUtil {
    */
   async show({ dialogType, ownerForm, props = {} }, callback) {
     const component = await this.loadComponent(dialogType);
-    const dialogId = `td-dialog-${TDAPISaveToCollectionPopup}-${++this
-      .dialogCounter}`;
+    const dialogId = `td-dialog-${dialogType}-${++this.dialogCounter}`;
 
     const container = document.createElement("div");
     container.id = dialogId;
