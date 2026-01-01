@@ -6,25 +6,27 @@ import { createApp } from "vue";
 export const TDDialogEnum = {
   TDAPISaveToCollectionPopup: "TDAPISaveToCollectionPopup",
 };
+
 /**
  * Map DialogType với component tương ứng
- * CHỈ ĐƯỢC QUẢN LÝ TRONG FILE NÀY
+ * CHỈ QUẢN LÝ TRONG FILE NÀY
  */
 const DialogComponentMap = {
   [TDDialogEnum.TDAPISaveToCollectionPopup]: () =>
     import("@/views/dialogs/TDAPISaveToCollectionPopup.vue"),
 };
-/**
- * TDDialogUtil - Utility quản lý popup động
- */
+
 class TDDialogUtil {
   constructor() {
+    /**
+     * activeDialogs:
+     * key   : dialogId
+     * value : { app, container }
+     */
     this.activeDialogs = new Map();
     this.dialogCounter = 0;
   }
-  /**
-   * Load component từ DialogType
-   */
+
   async loadComponent(dialogType) {
     const loader = DialogComponentMap[dialogType];
     if (!loader) {
@@ -34,35 +36,81 @@ class TDDialogUtil {
     return module.default || module;
   }
 
-  async show({ dialogType, ownerForm, props = {} }, callback = null) {
+  /**
+   * Hiển thị dialog
+   * @returns dialogId
+   */
+  async show({ dialogType, ownerForm, props = {} }, callback) {
     const component = await this.loadComponent(dialogType);
     const dialogId = `td-dialog-${++this.dialogCounter}`;
+
     const container = document.createElement("div");
     container.id = dialogId;
     document.body.appendChild(container);
 
-    let appInstance;
+    let app;
 
-    const closeDialog = (callbackObj) => {
-      appInstance?.unmount();
-      el.remove();
-      if (callback && typeof callback == "functions") {
-        callback(callbackObj);
-      }
+    const close = (payload) => {
+      this.closeById(dialogId, payload);
+      callback?.(payload);
     };
 
-    appInstance = createApp(component, {
+    app = createApp(component, {
       ...props,
       ownerForm,
-      onClose: closeDialog,
+      onClose: close, // popup con chỉ emit close
     });
 
-    // copy appContext
+    // kế thừa appContext (i18n, store, directive…)
     if (ownerForm?.$?.appContext) {
       Object.assign(app._context, ownerForm.$.appContext);
     }
 
-    appInstance.mount(el);
+    app.mount(container);
+
+    this.activeDialogs.set(dialogId, {
+      app,
+      container,
+    });
+
+    return dialogId;
+  }
+
+  /**
+   * Đóng popup theo id
+   */
+  closeById(dialogId, payload) {
+    const dialog = this.activeDialogs.get(dialogId);
+    if (!dialog) return false;
+
+    dialog.app.unmount();
+    dialog.container.remove();
+
+    this.activeDialogs.delete(dialogId);
+    return true;
+  }
+
+  /**
+   * Đóng toàn bộ popup
+   */
+  closeAll() {
+    for (const dialogId of this.activeDialogs.keys()) {
+      this.closeById(dialogId);
+    }
+  }
+
+  /**
+   * Có popup nào đang mở không
+   */
+  hasAnyOpen() {
+    return this.activeDialogs.size > 0;
+  }
+
+  /**
+   * (Optional) Lấy danh sách id popup đang mở
+   */
+  getActiveIds() {
+    return Array.from(this.activeDialogs.keys());
   }
 }
 
