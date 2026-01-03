@@ -1470,7 +1470,7 @@ export default {
 }
 
 .loader-without-response {
-  margin-left: 100px;
+  margin-right: 100px;
 }
 .td-header-collection {
   width: 100%;
