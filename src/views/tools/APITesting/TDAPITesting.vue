@@ -543,32 +543,30 @@
           "
         >
           <!-- nút lịch sử reqeust -->
-          <TDHistory
+          <TDHistorySidebar
             v-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode"
             ref="historyProMode"
             :applyFunction="handleSendRequestFromHistoryProMode"
             titleKey="requestName"
             :noMargin="true"
             :positionRelative="false"
-            :allwayShowHistory="true"
             :cacheKey="$tdEnum.cacheConfig.APIPromodeHistory"
             :historyContainerStyleEnum="
               $tdEnum.AbsolutePositionStyle.Top100Left
             "
-          ></TDHistory>
-          <TDHistory
+          ></TDHistorySidebar>
+          <TDHistorySidebar
             v-else
             ref="history"
             :applyFunction="handleSendRequestFromHistory"
             titleKey="requestName"
             :noMargin="true"
             :positionRelative="false"
-            :allwayShowHistory="true"
             :cacheKey="$tdEnum.cacheConfig.APIHistory"
             :historyContainerStyleEnum="
               $tdEnum.AbsolutePositionStyle.Top100Left
             "
-          ></TDHistory>
+          ></TDHistorySidebar>
         </div>
       </template>
     </TDSubSidebar>
@@ -582,11 +580,18 @@ import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDArrow from "@/components/TDArrow.vue";
 import JSZip from "jszip";
 import TDAPIResponseStatus from "@/views/tools/APITesting/TDAPIResponseStatus.vue";
+import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 export default {
   name: "TDAPITesting",
-  components: { TDSubSidebar, TDArrow, TDAPIResponse, TDAPIResponseStatus },
+  components: {
+    TDSubSidebar,
+    TDArrow,
+    TDAPIResponse,
+    TDAPIResponseStatus,
+    TDHistorySidebar,
+  },
 
   data() {
     return {
