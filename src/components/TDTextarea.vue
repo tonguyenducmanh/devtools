@@ -223,6 +223,8 @@ export default {
           language: me.language,
           theme: myThemeName,
           fontSize: 16,
+          fontFamily:
+            'ui-monospace, "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
           readOnly: me.readOnly,
           automaticLayout: true,
         };
