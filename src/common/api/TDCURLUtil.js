@@ -194,6 +194,7 @@ const fetchAgent = function(request) {
   fetchAgent(request) {
     let me = this;
     let result = null;
+    // inject động function có tham số
     let contentFn = `${me.fetchAgentFuncContent()}; return fetchAgent(request)`;
     let fetchFn = new Function("request", contentFn);
     result = fetchFn(request);
