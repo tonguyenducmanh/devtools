@@ -21,7 +21,7 @@
     </div>
     <TDToggleArea
       :collapsed="!isShowSidebar"
-      position="left"
+      edge="left"
       @toggle="toggleSidebar"
     />
   </div>
@@ -86,7 +86,6 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-
 .td-sidebar-container {
   position: relative;
   height: 100%;

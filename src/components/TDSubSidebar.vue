@@ -15,7 +15,7 @@
       </div>
       <TDToggleArea
         :collapsed="!modelValue"
-        position="right"
+        edge="right"
         @toggle="toggleSidebar"
       />
     </div>
@@ -74,7 +74,7 @@ export default {
   }
 }
 .td-sub-sidebar-collaspe {
-  margin-left: unset;
+  margin-left: var(--padding);
 }
 .td-sidebar-menu {
   width: 100%;
