@@ -72,6 +72,7 @@ export default {
 .td-history-container {
   min-height: 0;
   flex: 1;
+  overflow-x: auto;
   justify-content: flex-start;
   width: 100%;
   .td-history {
@@ -92,7 +93,7 @@ export default {
   cursor: pointer;
 }
 .text-nowrap {
-  max-width: 250px;
+  max-width: 230px;
   div {
     overflow: hidden;
     text-overflow: ellipsis;
