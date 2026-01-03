@@ -21,7 +21,7 @@
           <TDInput
             v-model="requestName"
             :noMargin="true"
-            :placeHolder="$t('i18nCommon.apiTesting.requestName')"
+            :placeHolder="requestNameBuild"
             :borderRadiusPosition="[
               $tdEnum.BorderRadiusPosition.TopRight,
               $tdEnum.BorderRadiusPosition.BottomRight,
@@ -671,6 +671,14 @@ export default {
     }
   },
   computed: {
+    requestNameBuild() {
+      let me = this;
+      let title = me.$t("i18nCommon.apiTesting.requestName");
+      if (me.APIConfigLayout.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
+        title = me.$t("i18nCommon.apiTesting.scriptName");
+      }
+      return title;
+    },
     isDesktopApp() {
       return this.$tdUtility.isDesktopApp();
     },
