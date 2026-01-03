@@ -2,7 +2,8 @@ export default [
   {
     scriptName: "01 demo request promode",
     content: `let curlOne = \`
-    curl 'http://localhost:3000/api/get_list_item?limit=5'
+    curl 'http://localhost:3000/api/get_list_item?limit=5'\\
+         --header 'Content-Type: application/json
 \`;
 
 let responseOne = await requestCURL(curlOne);
@@ -11,11 +12,13 @@ return responseOne;`,
   {
     scriptName: "02 multiple curl",
     content: `let curlOne = \`
-    curl 'http://localhost:3000/api/get_list_item?limit=5'
+    curl 'http://localhost:3000/api/get_list_item?limit=5'\\
+         --header 'Content-Type: application/json
 \`;
 let keyReplace = "##item_id##";
 let curlTwo = \`
-    curl 'http://localhost:3000/api/get_detail_item?item_id=$\{keyReplace}'
+    curl 'http://localhost:3000/api/get_detail_item?item_id=$\{keyReplace}'\\
+         --header 'Content-Type: application/json
 \`
 let responseOne = await requestCURL(curlOne);
 let finalResponeArr = [];
@@ -36,7 +39,8 @@ return finalResponeArr;`,
     scriptName: "03 run batch promiss all",
     content: `function makeCurlRequest(index) {
   let curl = \`
-    curl 'http://localhost:3000/api/get_list_item?limit=5'
+    curl 'http://localhost:3000/api/get_list_item?limit=5'\\
+         --header 'Content-Type: application/json
 \`;
   return curl;
 }
@@ -49,7 +53,32 @@ async function concurrentRequests() {
   let results = await Promise.all(promises);
   return results;
 }
-await concurrentRequests();  
-`,
+return await concurrentRequests();`,
+  },
+  {
+    scriptName: "04 retry time",
+    content: `async function requestWithRetry(curlStr, maxRetries = 3) {
+  for(let i = 0; i < maxRetries; i++){
+    try {
+      let response = await requestCURL(curlStr);
+      if(response && !response.error){
+        return response;
+      }
+    } catch(error) {
+      console.log(\`Attempt $\{i + 1} failed\`);
+      if(i === maxRetries - 1) {
+        return { error: "Max retries reached", details: error };
+      }
+      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+    }
+  }
+}
+
+let curl = \`
+    curl 'http://localhost:3000/api/unstable_endpoint'\\
+         --header 'Content-Type: application/json
+\`;
+
+return await requestWithRetry(curl);`,
   },
 ];
