@@ -84,25 +84,25 @@ return await requestWithRetry(curl);`,
   {
     scriptName: "05 auto pagination",
     content: `async function fetchAllPages(baseUrl) {
-    let allData = [];
-    let page = 1;
-    let limit = 20;
-    let hasNext = true;
+  let allData = [];
+  let page = 1;
+  let limit = 20;
+  let hasNext = true;
 
-    while (hasNext) {
-      let curl = \`curl '$\{baseUrl}?page=$\{page}&limit=$\{limit}'\`;
-      let res = await requestCURL(curl);
-      
-      if (res && res.data && res.data.length > 0) {
-        allData.push(...res.data);
-        page++;
-      } else {
-        hasNext = false;
-      }
-      await new Promise(r => setTimeout(r, 200));
+  while (hasNext) {
+    let curl = \`curl '$\{baseUrl}?page=$\{page}&limit=$\{limit}'\`;
+    let res = await requestCURL(curl);
+    
+    if (res && res.data && res.data.length > 0) {
+      allData.push(...res.data);
+      page++;
+    } else {
+      hasNext = false;
     }
-    return allData;
+    await new Promise(r => setTimeout(r, 200));
   }
-  return await fetchAllPages('http://localhost:3000/api/products');`,
+  return allData;
+}
+return await fetchAllPages('http://localhost:3000/api/products');`,
   },
 ];
