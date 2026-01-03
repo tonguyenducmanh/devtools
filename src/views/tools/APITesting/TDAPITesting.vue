@@ -316,173 +316,203 @@
             $tdEnum.APISidebarOption.Collection
           "
         >
-          <!-- phần header của bộ sưu tập request -->
-          <div class="flex td-header-collection">
-            <div class="td-new-collection">
-              <TDInput
-                v-model="newCollectionName"
-                :noMargin="true"
-                :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
-              />
-            </div>
+          <template
+            v-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode"
+          >
             <div
-              class="td-icon td-plus-icon"
-              @click="addNewCollection"
-              v-tooltip="$t('i18nCommon.apiTesting.add')"
-            ></div>
-          </div>
-          <!-- phần danh sách các request đã lưu theo thư mục -->
-          <div class="td-collection">
-            <div class="td-collection-body">
+              v-if="proModeTemplate && proModeTemplate.length > 0"
+              class="flex flex-col td-template-content"
+            >
               <div
-                v-for="(collection, index) in allCollection"
-                class="flex flex-col no-select td-collection-item"
-                :key="index"
+                v-for="(template, indexRequest) in proModeTemplate"
+                :key="indexRequest"
+                class="flex td-template-item"
+                @click="applyRequestProMode(template)"
               >
-                <!-- phần sửa nhanh tên thư mục request nếu đang ở chế độ edit -->
-                <div v-if="collection.is_renaming" class="td-collection-rename">
-                  <TDInput
-                    v-model="collection.temp_name"
-                    :noMargin="true"
-                    :placeHolder="$t('i18nCommon.apiTesting.collectionRename')"
-                    :ref="collection.temp_name"
-                    @keyup.enter="saveNewCollectionName(collection)"
-                    @clickOutSide="saveNewCollectionName(collection)"
-                  >
-                  </TDInput>
-                </div>
-                <!-- phần tên thư mục -->
+                <span class="no-select text-nowrap">
+                  <div v-tooltip="template.content">
+                    {{ template.scriptName }}
+                  </div>
+                </span>
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <!-- phần header của bộ sưu tập request -->
+            <div class="flex td-header-collection">
+              <div class="td-new-collection">
+                <TDInput
+                  v-model="newCollectionName"
+                  :noMargin="true"
+                  :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
+                />
+              </div>
+              <div
+                class="td-icon td-plus-icon"
+                @click="addNewCollection"
+                v-tooltip="$t('i18nCommon.apiTesting.add')"
+              ></div>
+            </div>
+            <!-- phần danh sách các request đã lưu theo thư mục -->
+            <div class="td-collection">
+              <div class="td-collection-body">
                 <div
-                  v-else
-                  class="flex td-collection-header"
-                  @click="toggleCollection(collection)"
+                  v-for="(collection, index) in allCollection"
+                  class="flex flex-col no-select td-collection-item"
+                  :key="index"
                 >
+                  <!-- phần sửa nhanh tên thư mục request nếu đang ở chế độ edit -->
                   <div
-                    class="flex text-nowrap-collection td-collection-header-left"
+                    v-if="collection.is_renaming"
+                    class="td-collection-rename"
                   >
-                    <TDArrow
-                      :openProp="collection.openingCollection"
-                      :arrowOpenDirection="$tdEnum.Direction.bottom"
-                      :arrowDirection="$tdEnum.Direction.right"
-                    />
-                    <div class="" v-tooltip="collection.name">
-                      {{ collection.name }}
+                    <TDInput
+                      v-model="collection.temp_name"
+                      :noMargin="true"
+                      :placeHolder="
+                        $t('i18nCommon.apiTesting.collectionRename')
+                      "
+                      :ref="collection.temp_name"
+                      @keyup.enter="saveNewCollectionName(collection)"
+                      @clickOutSide="saveNewCollectionName(collection)"
+                    >
+                    </TDInput>
+                  </div>
+                  <!-- phần tên thư mục -->
+                  <div
+                    v-else
+                    class="flex td-collection-header"
+                    @click="toggleCollection(collection)"
+                  >
+                    <div
+                      class="flex text-nowrap-collection td-collection-header-left"
+                    >
+                      <TDArrow
+                        :openProp="collection.openingCollection"
+                        :arrowOpenDirection="$tdEnum.Direction.bottom"
+                        :arrowDirection="$tdEnum.Direction.right"
+                      />
+                      <div class="" v-tooltip="collection.name">
+                        {{ collection.name }}
+                      </div>
+                    </div>
+                    <div class="flex td-collection-edit-btn">
+                      <div
+                        class="td-icon td-edit-icon"
+                        v-tooltip="$t('i18nCommon.edit')"
+                        @click.stop="enableRenameCollection(collection)"
+                      ></div>
+                      <div
+                        v-tooltip="$t('i18nCommon.apiTesting.delete')"
+                        class="td-icon td-close-icon"
+                        @click.stop="deleteCollection(collection.collection_id)"
+                      ></div>
                     </div>
                   </div>
-                  <div class="flex td-collection-edit-btn">
-                    <div
-                      class="td-icon td-edit-icon"
-                      v-tooltip="$t('i18nCommon.edit')"
-                      @click.stop="enableRenameCollection(collection)"
-                    ></div>
-                    <div
-                      v-tooltip="$t('i18nCommon.apiTesting.delete')"
-                      class="td-icon td-close-icon"
-                      @click.stop="deleteCollection(collection.collection_id)"
-                    ></div>
-                  </div>
-                </div>
-                <!-- danh sách các request có trong 1 thư mục, chỉ render khi đang mở thư mục -->
-                <div
-                  v-if="
-                    collection.openingCollection &&
-                    collection.requests &&
-                    collection.requests.length > 0
-                  "
-                  class="flex flex-col td-collection-content"
-                >
+                  <!-- danh sách các request có trong 1 thư mục, chỉ render khi đang mở thư mục -->
                   <div
-                    v-for="(request, indexRequest) in collection.requests"
-                    :key="indexRequest"
-                    class="flex td-collection-request-item"
-                    :class="{
-                      'td-collection-request-item-selected':
-                        request && currentRequestId == request.requestId,
-                    }"
-                    @click="applyRequest(request)"
+                    v-if="
+                      collection.openingCollection &&
+                      collection.requests &&
+                      collection.requests.length > 0
+                    "
+                    class="flex flex-col td-collection-content"
                   >
-                    <span class="text-nowrap">
-                      <div v-tooltip="request.requestName">
-                        {{ request.requestName }}
-                      </div>
-                    </span>
-                    <span class="text-nowrap">
-                      <div
-                        class="td-icon td-close-icon"
-                        v-tooltip="$t('i18nCommon.apiTesting.delete')"
-                        @click.stop="
-                          deleteRequest(collection.collection_id, request)
-                        "
-                      ></div>
-                    </span>
+                    <div
+                      v-for="(request, indexRequest) in collection.requests"
+                      :key="indexRequest"
+                      class="flex td-collection-request-item"
+                      :class="{
+                        'td-collection-request-item-selected':
+                          request && currentRequestId == request.requestId,
+                      }"
+                      @click="applyRequest(request)"
+                    >
+                      <span class="text-nowrap">
+                        <div v-tooltip="request.requestName">
+                          {{ request.requestName }}
+                        </div>
+                      </span>
+                      <span class="text-nowrap">
+                        <div
+                          class="td-icon td-close-icon"
+                          v-tooltip="$t('i18nCommon.apiTesting.delete')"
+                          @click.stop="
+                            deleteRequest(collection.collection_id, request)
+                          "
+                        ></div>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <!-- phần upload hàng loạt request -->
-          <div class="flex td-api-upload-collection-area">
-            <!-- phần upload request từ postman -->
-            <span>
-              <TDUpload
-                v-tooltip="{
-                  text: $t(
-                    'i18nCommon.apiTesting.importCollectionPostmanTooltip'
-                  ),
-                  maxWidth: '500px',
-                }"
-                :label="$t('i18nCommon.apiTesting.importCollectionPostman')"
-                :accept="'.json'"
-                @change="importCollectionPostman"
-                ref="uploadAreaPostman"
-                :isShowSelect="false"
-                :multiple="true"
-              />
-            </span>
-            <!-- phần upload request từ zip collection curl -->
-            <span>
-              <TDUpload
-                v-tooltip="{
-                  text: $t('i18nCommon.apiTesting.importCollectionZipTooltip'),
-                  maxWidth: '500px',
-                }"
-                :label="$t('i18nCommon.apiTesting.importCollectionZip')"
-                :accept="'.zip'"
-                @change="importCollectionZip"
-                ref="uploadArea"
-                :isShowSelect="false"
-                maxWidth="250px"
-              />
-            </span>
-          </div>
-          <!-- phần danh sách các nút khác ở chân sidebar -->
-          <div class="flex">
-            <!-- nút thêm request mới -->
-            <TDButton
-              :readOnly="isLoading"
-              @click="createNewRequest"
-              :type="$tdEnum.buttonType.secondary"
-              :noMargin="true"
-              :label="$t('i18nCommon.apiTesting.createNewRequest')"
-              :borderRadiusPosition="[
-                $tdEnum.BorderRadiusPosition.TopLeft,
-                $tdEnum.BorderRadiusPosition.BottomLeft,
-              ]"
-            ></TDButton>
-            <!-- nút lưu request -->
-            <TDButton
-              v-tooltip="$t('i18nCommon.apiTesting.NeedRequestName')"
-              :readOnly="isLoading || !requestName"
-              @click="saveRequest"
-              :type="$tdEnum.buttonType.secondary"
-              :noMargin="true"
-              :label="$t('i18nCommon.apiTesting.save')"
-              :borderRadiusPosition="[
-                $tdEnum.BorderRadiusPosition.TopRight,
-                $tdEnum.BorderRadiusPosition.BottomRight,
-              ]"
-            ></TDButton>
-          </div>
+            <!-- phần upload hàng loạt request -->
+            <div class="flex td-api-upload-collection-area">
+              <!-- phần upload request từ postman -->
+              <span>
+                <TDUpload
+                  v-tooltip="{
+                    text: $t(
+                      'i18nCommon.apiTesting.importCollectionPostmanTooltip'
+                    ),
+                    maxWidth: '500px',
+                  }"
+                  :label="$t('i18nCommon.apiTesting.importCollectionPostman')"
+                  :accept="'.json'"
+                  @change="importCollectionPostman"
+                  ref="uploadAreaPostman"
+                  :isShowSelect="false"
+                  :multiple="true"
+                />
+              </span>
+              <!-- phần upload request từ zip collection curl -->
+              <span>
+                <TDUpload
+                  v-tooltip="{
+                    text: $t(
+                      'i18nCommon.apiTesting.importCollectionZipTooltip'
+                    ),
+                    maxWidth: '500px',
+                  }"
+                  :label="$t('i18nCommon.apiTesting.importCollectionZip')"
+                  :accept="'.zip'"
+                  @change="importCollectionZip"
+                  ref="uploadArea"
+                  :isShowSelect="false"
+                  maxWidth="250px"
+                />
+              </span>
+            </div>
+            <!-- phần danh sách các nút khác ở chân sidebar -->
+            <div class="flex">
+              <!-- nút thêm request mới -->
+              <TDButton
+                :readOnly="isLoading"
+                @click="createNewRequest"
+                :type="$tdEnum.buttonType.secondary"
+                :noMargin="true"
+                :label="$t('i18nCommon.apiTesting.createNewRequest')"
+                :borderRadiusPosition="[
+                  $tdEnum.BorderRadiusPosition.TopLeft,
+                  $tdEnum.BorderRadiusPosition.BottomLeft,
+                ]"
+              ></TDButton>
+              <!-- nút lưu request -->
+              <TDButton
+                v-tooltip="$t('i18nCommon.apiTesting.NeedRequestName')"
+                :readOnly="isLoading || !requestName"
+                @click="saveRequest"
+                :type="$tdEnum.buttonType.secondary"
+                :noMargin="true"
+                :label="$t('i18nCommon.apiTesting.save')"
+                :borderRadiusPosition="[
+                  $tdEnum.BorderRadiusPosition.TopRight,
+                  $tdEnum.BorderRadiusPosition.BottomRight,
+                ]"
+              ></TDButton>
+            </div>
+          </template>
         </div>
         <!-- phần sidebar nếu đang tùy chọn thiết lập api -->
         <div
@@ -583,6 +613,7 @@ import TDAPIResponseStatus from "@/views/tools/APITesting/TDAPIResponseStatus.vu
 import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
+import TDMockAPIProMode from "@/common/mock/TDMockAPIProMode.js";
 export default {
   name: "TDAPITesting",
   components: {
@@ -645,7 +676,8 @@ export default {
       ],
       proModeSecranioCode:
         this.$t("i18nCommon.apiTesting.tutorialProModeCode") +
-        TDCURLUtil.sampleCURLScript(),
+        TDMockAPIProMode[0].content,
+      proModeTemplate: TDMockAPIProMode,
     };
   },
   async created() {
@@ -1229,6 +1261,14 @@ export default {
         me.currentRequestId = null;
       }
     },
+    applyRequestProMode(template) {
+      let me = this;
+      if (template && template.scriptName && template.content) {
+        me.requestName = template.scriptName;
+        me.proModeSecranioCode =
+          me.$t("i18nCommon.apiTesting.tutorialProModeCode") + template.content;
+      }
+    },
     getRequestObj() {
       let me = this;
       return {
@@ -1627,5 +1667,22 @@ body[data-theme="dark"] {
 }
 .td-collection-edit-btn {
   gap: var(--padding);
+}
+.td-template-content {
+  height: 100%;
+  width: 100%;
+  justify-content: flex-start;
+  margin: var(--padding);
+  .td-template-item {
+    cursor: pointer;
+    height: 40px;
+    width: 100%;
+    padding: var(--padding);
+    border-radius: var(--border-radius);
+    justify-content: flex-start;
+  }
+  .td-template-item:hover {
+    background-color: var(--bg-layer-color);
+  }
 }
 </style>

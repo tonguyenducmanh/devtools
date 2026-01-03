@@ -339,7 +339,7 @@ export default {
       showReponse: "Show response",
       downloadReponse: "Download response",
       tutorialProModeCode:
-        "//requestCURL() is a built-in function used to call APIs using CURL\n//Example:\n",
+        "//requestCURL() is a built-in function used to call APIs using CURL\n",
       newCollectionName: "New collection name",
       save: "Save request",
       createNewRequest: "New request",

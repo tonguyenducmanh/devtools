@@ -241,19 +241,6 @@ const fetchAgent = function(request) {
   }
 
   /**
-   * Đoạn code inject demo việc dùng nhiều CURL theo kịch bản custom gọi API
-   */
-  sampleCURLScript() {
-    return `
-let curlOne = \`
-    curl 'http://localhost:3000/api/get_list_item?limit=5' \
-    --header 'Content-Type: application/json'
-\`;
-
-let responseOne = await requestCURL(curlOne);
-return responseOne;`;
-  }
-  /**
    * Đoạn code build ra script javascript động để chạy request bằng CURL
    * theo kịch bản người dùng tự viết
    */
