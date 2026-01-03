@@ -74,7 +74,7 @@ export default {
   }
 }
 .td-sub-sidebar-collaspe {
-  margin-left: var(--padding);
+  margin-left: unset;
 }
 .td-sidebar-menu {
   width: 100%;

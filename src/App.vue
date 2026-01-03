@@ -103,13 +103,13 @@ export default {
       height: 100%;
     }
     .td-main {
+      overflow: unset;
       padding: var(--padding);
       flex: 1;
       display: flex;
       flex-direction: column;
       width: 100%;
       height: 100%;
-      overflow: auto;
       position: relative;
       border-radius: calc(var(--border-radius) * 1.5);
       background-color: var(--bg-main-color);
