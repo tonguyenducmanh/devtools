@@ -30,6 +30,7 @@
       </div>
     </div>
     <TDButton
+      v-if="historyItems && historyItems.length > 0"
       @click="clearAllHistory"
       :type="$tdEnum.buttonType.secondary"
       :label="$t('i18nCommon.deleteAll')"
@@ -66,16 +67,20 @@ export default {
 </script>
 <style lang="scss" scoped>
 .td-history-wrapper {
+  min-height: 0;
+  width: 100%;
   height: 100%;
-  margin: var(--padding);
+  margin-top: var(--padding);
 }
 .td-history-container {
+  position: relative;
   min-height: 0;
   flex: 1;
-  overflow-x: auto;
+  overflow-y: auto;
   justify-content: flex-start;
   width: 100%;
   .td-history {
+    width: 100%;
     .td-history-item {
       cursor: pointer;
       height: 40px;
