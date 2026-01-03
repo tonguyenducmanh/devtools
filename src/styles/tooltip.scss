@@ -2,13 +2,14 @@
   z-index: 9999;
 
   padding: 6px 10px;
-  background: rgba(0, 0, 0, 0.85);
-  color: #fff;
+  background: var(--bg-tooltip-color);
+  border: 1px solid var(--bg-tooltip-border-color);
+  color: var(--tooltip-color);
 
   font-size: 12px;
   line-height: 1.4;
 
-  border-radius: 6px;
+  border-radius: var(--border-radius);
   word-wrap: break-word;
   line-break: auto;
   white-space: normal;

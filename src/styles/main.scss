@@ -65,6 +65,9 @@ body[data-theme="light"] {
   --scroll-bg-color: unset;
   --scroll-thumb-color: #54545470;
   --scroll-thumb-hover-color: #545454;
+  --bg-tooltip-color: #f3f3f3;
+  --bg-tooltip-border-color: #c8c8c8;
+  --tooltip-color: #616161;
 }
 
 body[data-theme="dark"] {
@@ -87,6 +90,9 @@ body[data-theme="dark"] {
   --scroll-bg-color: unset;
   --scroll-thumb-color: #54545470;
   --scroll-thumb-hover-color: #545454;
+  --bg-tooltip-color: #252526;
+  --bg-tooltip-border-color: #454545;
+  --tooltip-color: #cccccc;
 }
 
 body {
