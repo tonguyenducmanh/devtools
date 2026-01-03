@@ -1285,7 +1285,8 @@ export default {
         let injectedCode = TDCURLUtil.buildInjectCode(me.proModeSecranioCode);
 
         // Thực thi script
-        let result = await eval(injectedCode);
+        let userFn = new Function(injectedCode);
+        let result = await userFn();
 
         let endTime = performance.now();
         me.responseTime = Math.round(endTime - me.startTime);

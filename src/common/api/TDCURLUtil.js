@@ -245,10 +245,11 @@ const requestCURL = async (curlText) => {
 
   return resp;
 };
-
+let result = 
 (async () => {
   ${secranioCode}
-})();`;
+})();
+return result;`;
   }
   fetchAgentDesktop(request) {
     const signalId = TDUtility.newGuid();
