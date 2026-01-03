@@ -289,10 +289,11 @@ export default {
     },
     search: {
       placeholder: "Tìm kiếm",
-      noResults: "Không tìm thấy kết quả nào",
+      noResults: "Không có kết quả nào",
       help: "Gõ để tìm kiếm các tính năng, sử dụng ↑↓ để điều hướng và Enter để chọn",
     },
     apiTesting: {
+      saveForNewCollection:"Lưu vào bộ sưu tập {collectionName}",
       scriptName: "Tên script",
       importCollectionZip: "Nhập zip",
       importCollectionZipTooltip:
@@ -349,7 +350,7 @@ export default {
         setting: "Cài đặt",
         history: "Lịch sử",
       },
-      FindCollectionTitle: "Tìm tên bộ sưu tập để lưu request",
+      FindCollectionTitle: "Nhập tên bộ sưu tập",
       NeedRequestName: "Cần điền tên request trước khi lưu",
     },
   },

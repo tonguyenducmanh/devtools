@@ -763,8 +763,11 @@ export default {
       me.APIConfigLayout.isShowSidebar = !me.APIConfigLayout.isShowSidebar;
       await me.updateAPIConfigLayout();
     },
-    async addNewCollection() {
+    async addNewCollection(collectionName) {
       let me = this;
+      if (typeof collectionName == "string") {
+        me.newCollectionName = collectionName;
+      }
       if (
         me.allCollection &&
         Array.isArray(me.allCollection) &&
@@ -782,6 +785,7 @@ export default {
         await me.saveCollectionToCache();
         // xóa tên tạm đi
         me.newCollectionName = "";
+        return blankCollection;
       }
     },
     async saveCollectionToCache() {

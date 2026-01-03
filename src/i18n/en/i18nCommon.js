@@ -290,10 +290,11 @@ export default {
     },
     search: {
       placeholder: "Search",
-      noResults: "No results found",
+      noResults: "No results",
       help: "Type to search features, use ↑↓ to navigate and Enter to select",
     },
     apiTesting: {
+      saveForNewCollection: "Save in collection {collectionName}",
       scriptName: "Script name",
       importCollectionZip: "Import zip",
       importCollectionZipTooltip:
@@ -351,7 +352,7 @@ export default {
         setting: "Setting",
         history: "History",
       },
-      FindCollectionTitle: "Find collection for save request",
+      FindCollectionTitle: "Enter collection name",
       NeedRequestName: "Need request name before save",
     },
   },

@@ -10,8 +10,22 @@
           :placeholder="$t('i18nCommon.apiTesting.FindCollectionTitle')"
         />
       </div>
-
-      <div class="td-search-results" v-if="filteredCollection.length > 0">
+      <div
+        v-if="filteredCollection.length === 0"
+        class="flex flex-col td-search-empty"
+      >
+        <div class="td-search-empty-text">
+          {{ $t("i18nCommon.search.noResults") }}
+        </div>
+        <TDButton
+          :label="buttonName"
+          :type="$tdEnum.buttonType.secondary"
+          :readOnly="!searchQuery"
+          @click="addNewCollection"
+        >
+        </TDButton>
+      </div>
+      <div class="td-search-results" v-else>
         <div class="td-search-section">
           <div
             v-for="(collection, index) in filteredCollection"
@@ -25,14 +39,6 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div
-        v-else-if="searchQuery && filteredCollection.length === 0"
-        class="td-search-empty"
-      >
-        <div class="td-search-empty-text">
-          {{ $t("i18nCommon.search.noResults") }}
         </div>
       </div>
     </div>
@@ -74,6 +80,13 @@ export default {
         })
         .slice(0, 8); // Giới hạn 8 kết quả
     },
+    buttonName() {
+      let me = this;
+      let title = me.$t("i18nCommon.apiTesting.saveForNewCollection", {
+        collectionName: me.searchQuery,
+      });
+      return title;
+    },
   },
   mounted() {
     let me = this;
@@ -92,6 +105,14 @@ export default {
     async save(collection) {
       // logic save giữ nguyên của bạn
       this.ownerForm.saveToCollection(collection);
+      this.handleClose();
+    },
+    async addNewCollection() {
+      let me = this;
+      let collection = await this.ownerForm.addNewCollection(me.searchQuery);
+      if (collection) {
+        this.ownerForm.saveToCollection(collection);
+      }
       this.handleClose();
     },
   },
