@@ -218,7 +218,7 @@ export default {
 .td-slide-group-area {
   position: relative;
   border-radius: var(--border-radius);
-  border: 1px solid var(--border-color);
+  // border: 1px solid var(--border-color);
   padding: 0;
 
   .td-slide-background {

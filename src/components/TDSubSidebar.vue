@@ -1,8 +1,5 @@
 <template>
   <div class="flex flex-col td-sub-sidebar-wrapper">
-    <div v-if="$slots.menu" class="td-sidebar-menu">
-      <slot name="menu" />
-    </div>
     <!-- phần nội dung sidebar -->
     <div
       class="flex td-sub-sidebar"
@@ -11,6 +8,9 @@
       <!-- phần thanh border ngăn cách main area và sidebar area -->
       <div v-if="modelValue" class="divide"></div>
       <div v-if="modelValue" class="flex flex-col td-sub-sidebar-content">
+        <div v-if="$slots.menu" class="td-sidebar-menu">
+          <slot name="menu" />
+        </div>
         <slot name="main" />
       </div>
       <TDToggleArea
@@ -77,6 +77,7 @@ export default {
   margin-left: unset;
 }
 .td-sidebar-menu {
+  width: 100%;
   background-color: var(--bg-layer-color);
   border-radius: var(--border-radius);
 }
