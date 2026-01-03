@@ -1481,12 +1481,7 @@ export default {
     flex: 1;
   }
   .td-plus-icon {
-    filter: grayscale(100);
     cursor: pointer;
-  }
-  .td-plus-icon:hover {
-    filter: unset;
-    background-color: var(--bg-layer-color);
   }
 }
 .td-collection {
@@ -1598,10 +1593,8 @@ export default {
 }
 
 .td-close-icon {
-  filter: grayscale(100);
 }
 .td-close-icon:hover {
-  filter: unset;
 }
 .text-nowrap-collection {
   max-width: 215px !important;

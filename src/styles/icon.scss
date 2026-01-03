@@ -3,6 +3,12 @@
   height: 20px;
   background: url("@/assets/Sprite.svg") no-repeat;
 }
+body[data-theme="dark"] {
+  .td-icon {
+    filter: invert(100);
+  }
+}
+
 .td-close-icon {
   background-position: -124px 0px;
 }
