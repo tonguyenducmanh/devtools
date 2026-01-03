@@ -49,27 +49,6 @@
           :type="$tdEnum.buttonType.secondary"
           :label="$t('i18nCommon.apiTesting.downloadReponse')"
         ></TDButton>
-        <!-- nút lịch sử reqeust -->
-        <TDHistory
-          v-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode"
-          ref="historyProMode"
-          :applyFunction="handleSendRequestFromHistoryProMode"
-          titleKey="requestName"
-          :noMargin="true"
-          :positionRelative="false"
-          :cacheKey="$tdEnum.cacheConfig.APIPromodeHistory"
-          :historyContainerStyleEnum="$tdEnum.AbsolutePositionStyle.Top100Left"
-        ></TDHistory>
-        <TDHistory
-          v-else
-          ref="history"
-          :applyFunction="handleSendRequestFromHistory"
-          titleKey="requestName"
-          :noMargin="true"
-          :positionRelative="false"
-          :cacheKey="$tdEnum.cacheConfig.APIHistory"
-          :historyContainerStyleEnum="$tdEnum.AbsolutePositionStyle.Top100Left"
-        ></TDHistory>
       </div>
       <!-- hết phần danh sách nút đầu của api -->
       <!-- phần nội dung tùy thuộc vào từng loại api -->
@@ -314,7 +293,7 @@
       <!-- hết phần nội dung tùy thuộc vào từng loại api -->
     </div>
     <!-- phần nội dung sidebar -->
-    <TDSubSidebar v-model="APIConfigLayout.isShowSidebar">
+    <TDSubSidebar ref="subSidebar" v-model="APIConfigLayout.isShowSidebar">
       <!-- slide tùy chọn như cài đặt hoặc collection -->
       <template v-slot:menu>
         <div class="td-sidebar-menu">
@@ -555,6 +534,41 @@
               />
             </div>
           </template>
+        </div>
+        <div
+          class="td-sidebar-content"
+          v-else-if="
+            APIConfigLayout.currentSidebarOption ==
+            $tdEnum.APISidebarOption.History
+          "
+        >
+          <!-- nút lịch sử reqeust -->
+          <TDHistory
+            v-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode"
+            ref="historyProMode"
+            :applyFunction="handleSendRequestFromHistoryProMode"
+            titleKey="requestName"
+            :noMargin="true"
+            :positionRelative="false"
+            :allwayShowHistory="true"
+            :cacheKey="$tdEnum.cacheConfig.APIPromodeHistory"
+            :historyContainerStyleEnum="
+              $tdEnum.AbsolutePositionStyle.Top100Left
+            "
+          ></TDHistory>
+          <TDHistory
+            v-else
+            ref="history"
+            :applyFunction="handleSendRequestFromHistory"
+            titleKey="requestName"
+            :noMargin="true"
+            :positionRelative="false"
+            :allwayShowHistory="true"
+            :cacheKey="$tdEnum.cacheConfig.APIHistory"
+            :historyContainerStyleEnum="
+              $tdEnum.AbsolutePositionStyle.Top100Left
+            "
+          ></TDHistory>
         </div>
       </template>
     </TDSubSidebar>

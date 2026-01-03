@@ -11,6 +11,7 @@
       }"
     >
       <TDButton
+        v-if="!allwayShowHistory"
         @click="toggleHistory"
         :type="$tdEnum.buttonType.secondary"
         :label="
@@ -28,7 +29,11 @@
     </div>
 
     <div
-      v-if="isHistoryVisible && historyItems && historyItems.length > 0"
+      v-if="
+        (isHistoryVisible || allwayShowHistory) &&
+        historyItems &&
+        historyItems.length > 0
+      "
       class="td-history-container"
       :style="styleHistoryContainer"
     >
@@ -67,6 +72,10 @@ export default {
   },
   methods: {},
   props: {
+    allwayShowHistory: {
+      type: Boolean,
+      default: false,
+    },
     /**
      * function được dùng sau khi click vào item history
      */
