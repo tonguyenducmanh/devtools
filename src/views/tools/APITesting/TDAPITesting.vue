@@ -311,7 +311,7 @@
         <!-- phần bộ sưu tập các request -->
         <div
           class="flex flex-col td-sidebar-content"
-          v-if="
+          v-show="
             APIConfigLayout.currentSidebarOption ==
             $tdEnum.APISidebarOption.Collection
           "
@@ -487,7 +487,7 @@
         <!-- phần sidebar nếu đang tùy chọn thiết lập api -->
         <div
           class="td-sidebar-content"
-          v-else-if="
+          v-show="
             APIConfigLayout.currentSidebarOption ==
             $tdEnum.APISidebarOption.Setting
           "
@@ -537,7 +537,7 @@
         </div>
         <div
           class="td-sidebar-content"
-          v-else-if="
+          v-show="
             APIConfigLayout.currentSidebarOption ==
             $tdEnum.APISidebarOption.History
           "

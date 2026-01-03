@@ -15,6 +15,7 @@
               <span
                 class="text-nowrap"
                 :style="{ 'max-width': maxWidthHistory }"
+                v-tooltip="item.textContent"
                 >{{ item.textContent }}</span
               >
             </div>
