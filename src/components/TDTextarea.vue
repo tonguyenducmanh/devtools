@@ -203,6 +203,17 @@ export default {
       if (me.enableHighlight) {
         me.currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
         monaco.languages.register({ id: me.language });
+        let isDarkTheme = me.currentTheme == me.$tdEnum.theme.dark;
+        let myThemeName = "my-theme";
+        monaco.editor.defineTheme(myThemeName, {
+          base: isDarkTheme ? "vs-dark" : "vs",
+          inherit: true,
+          rules: [],
+          colors: {
+            "editor.background": isDarkTheme ? "#252525" : "#f6f6f7", // background chính
+          },
+        });
+        monaco.editor.setTheme(myThemeName);
         me.editorModel = monaco.editor.createModel(
           me.getDefaultModelValueForEditor(),
           me.language
@@ -210,7 +221,7 @@ export default {
         let configObject = {
           model: me.editorModel,
           language: me.language,
-          theme: me.currentTheme == me.$tdEnum.theme.dark ? "vs-dark" : "vs",
+          theme: myThemeName,
           fontSize: 16,
           readOnly: me.readOnly,
           automaticLayout: true,
