@@ -22,7 +22,16 @@
         :ref="(el) => setItemRef(el, index)"
         @click="changeSlideVal(option.value)"
       >
-        <span>{{ option.label }}</span>
+        <div
+          v-if="showIcon"
+          class="td-icon"
+          :class="{
+            [option.icon]: option.icon,
+            'td-selected-icon': option.value == modelValue,
+          }"
+          v-tooltip="option.label"
+        ></div>
+        <span v-else>{{ option.label }}</span>
       </div>
     </div>
   </div>
@@ -34,6 +43,10 @@ import tdEnum from "@/common/TDEnum.js";
 export default {
   name: "TDslideGroup",
   props: {
+    showIcon: {
+      type: Boolean,
+      default: false,
+    },
     label: {
       type: String,
       default: null,
@@ -244,5 +257,13 @@ export default {
 .layout-vertical .td-slide-group-area {
   flex-direction: column;
   align-items: stretch;
+}
+
+body[data-theme="dark"] .td-icon {
+  filter: invert(20);
+}
+
+.td-selected-icon {
+  filter: invert(100);
 }
 </style>

@@ -62,55 +62,57 @@
       </div>
     </div>
     <TDSubSidebar v-model="isShowSidebar">
-      <div class="flex flex-col td-sidebar-content">
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="wrapText"
-          :label="$t('i18nCommon.apiTesting.wrapText')"
-        ></TDCheckbox>
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="enableHighlight"
-          :label="$t('i18nCommon.enableHighlight')"
-        ></TDCheckbox>
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="enableFileUpload"
-          :label="$t('i18nCommon.jsonToPostgreSQL.useFileUpload')"
-        ></TDCheckbox>
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="enableCreateTable"
-          :label="$t('i18nCommon.jsonToPostgreSQL.createTable')"
-        ></TDCheckbox>
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="enableDeleteScript"
-          :label="$t('i18nCommon.jsonToPostgreSQL.deleteOld')"
-        ></TDCheckbox>
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="splitHorizontal"
-          :label="$t('i18nCommon.splitHorizontal')"
-        ></TDCheckbox>
-        <div class="flex flex-col group-info">
-          <TDInput
-            :placeHolder="$t('i18nCommon.jsonToPostgreSQL.schemaName')"
-            type="text"
-            v-model="schemaName"
-          />
-          <TDInput
-            :placeHolder="$t('i18nCommon.jsonToPostgreSQL.tableName')"
-            type="text"
-            v-model="tableName"
-          />
-          <TDInput
-            :placeHolder="$t('i18nCommon.jsonToPostgreSQL.primaryKey')"
-            type="text"
-            v-model="primaryKeyField"
-          />
+      <template v-slot:main>
+        <div class="flex flex-col td-sidebar-content">
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="wrapText"
+            :label="$t('i18nCommon.apiTesting.wrapText')"
+          ></TDCheckbox>
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="enableHighlight"
+            :label="$t('i18nCommon.enableHighlight')"
+          ></TDCheckbox>
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="enableFileUpload"
+            :label="$t('i18nCommon.jsonToPostgreSQL.useFileUpload')"
+          ></TDCheckbox>
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="enableCreateTable"
+            :label="$t('i18nCommon.jsonToPostgreSQL.createTable')"
+          ></TDCheckbox>
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="enableDeleteScript"
+            :label="$t('i18nCommon.jsonToPostgreSQL.deleteOld')"
+          ></TDCheckbox>
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="splitHorizontal"
+            :label="$t('i18nCommon.splitHorizontal')"
+          ></TDCheckbox>
+          <div class="flex flex-col group-info">
+            <TDInput
+              :placeHolder="$t('i18nCommon.jsonToPostgreSQL.schemaName')"
+              type="text"
+              v-model="schemaName"
+            />
+            <TDInput
+              :placeHolder="$t('i18nCommon.jsonToPostgreSQL.tableName')"
+              type="text"
+              v-model="tableName"
+            />
+            <TDInput
+              :placeHolder="$t('i18nCommon.jsonToPostgreSQL.primaryKey')"
+              type="text"
+              v-model="primaryKeyField"
+            />
+          </div>
         </div>
-      </div>
+      </template>
     </TDSubSidebar>
   </div>
 </template>

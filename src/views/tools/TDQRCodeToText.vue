@@ -35,20 +35,22 @@
       </div>
     </div>
     <TDSubSidebar v-model="isShowSidebar">
-      <div class="flex flex-col td-sub-sidebar">
-        <TDCheckbox
-          v-model="isCompressText"
-          :variant="$tdEnum.checkboxType.switch"
-          :label="$t('i18nCommon.qrCodeToText.compressText')"
-          @input="convertQRCode"
-        ></TDCheckbox>
-        <TDCheckbox
-          v-model="hasHeaderInQR"
-          :variant="$tdEnum.checkboxType.switch"
-          :label="$t('i18nCommon.qrCodeToText.hasHeaderInQR')"
-          @input="convertQRCode"
-        ></TDCheckbox>
-      </div>
+      <template v-slot:main>
+        <div class="flex flex-col td-sub-sidebar">
+          <TDCheckbox
+            v-model="isCompressText"
+            :variant="$tdEnum.checkboxType.switch"
+            :label="$t('i18nCommon.qrCodeToText.compressText')"
+            @input="convertQRCode"
+          ></TDCheckbox>
+          <TDCheckbox
+            v-model="hasHeaderInQR"
+            :variant="$tdEnum.checkboxType.switch"
+            :label="$t('i18nCommon.qrCodeToText.hasHeaderInQR')"
+            @input="convertQRCode"
+          ></TDCheckbox>
+        </div>
+      </template>
     </TDSubSidebar>
   </div>
 </template>

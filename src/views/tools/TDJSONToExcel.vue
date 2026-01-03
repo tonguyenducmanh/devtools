@@ -45,38 +45,40 @@
 
     <!-- Sidebar -->
     <TDSubSidebar v-model="isShowSidebar">
-      <div class="flex flex-col td-sub-sidebar">
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="wrapText"
-          :label="$t('i18nCommon.apiTesting.wrapText')"
-        />
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="enableHighlight"
-          :label="$t('i18nCommon.enableHighlight')"
-        />
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="enableFileUpload"
-          :label="$t('i18nCommon.jsonToPostgreSQL.useFileUpload')"
-        />
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="isBoldColName"
-          :label="$t('i18nCommon.jsonToExcel.boldColumns')"
-        />
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="isFitColWidth"
-          :label="$t('i18nCommon.jsonToExcel.fitColumns')"
-        />
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="isFreezeFirstRow"
-          :label="$t('i18nCommon.jsonToExcel.freezeRow')"
-        />
-      </div>
+      <template v-slot:main>
+        <div class="flex flex-col td-sub-sidebar">
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="wrapText"
+            :label="$t('i18nCommon.apiTesting.wrapText')"
+          />
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="enableHighlight"
+            :label="$t('i18nCommon.enableHighlight')"
+          />
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="enableFileUpload"
+            :label="$t('i18nCommon.jsonToPostgreSQL.useFileUpload')"
+          />
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="isBoldColName"
+            :label="$t('i18nCommon.jsonToExcel.boldColumns')"
+          />
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="isFitColWidth"
+            :label="$t('i18nCommon.jsonToExcel.fitColumns')"
+          />
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="isFreezeFirstRow"
+            :label="$t('i18nCommon.jsonToExcel.freezeRow')"
+          />
+        </div>
+      </template>
     </TDSubSidebar>
   </div>
 </template>

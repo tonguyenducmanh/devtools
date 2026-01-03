@@ -59,57 +59,59 @@
       </div>
     </div>
     <TDSubSidebar v-model="isShowSidebar">
-      <div class="flex flex-col td-sub-sidebar">
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="isCompressText"
-          :label="$t('i18nCommon.textToQRCode.compressText')"
-          @input="toggleCompressText"
-        ></TDCheckbox>
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="addHeaderToQR"
-          :label="$t('i18nCommon.textToQRCode.addHeaderToQR')"
-        ></TDCheckbox>
-        <div class="flex flex-col input-config">
-          <div class="flex input-config-item">
-            <span class="title-input-config">{{
-              $t("i18nCommon.textToQRCode.input.maxLength")
-            }}</span>
-            <TDInput
-              v-model="maxLengthUserConfig"
-              :inputType="'number'"
-              class="value-input-config max-length-input"
-              :placeHolder="'1000'"
-              :noMargin="true"
-            />
-          </div>
-          <div class="flex input-config-item">
-            <span class="title-input-config">{{
-              $t("i18nCommon.textToQRCode.QRWidthSize")
-            }}</span>
-            <TDInput
-              v-model="QRWidthSize"
-              :inputType="'number'"
-              class="value-input-config max-length-input"
-              :placeHolder="'300'"
-              :noMargin="true"
-            />
-          </div>
-          <div class="flex input-config-item">
-            <span class="title-input-config">{{
-              $t("i18nCommon.textToQRCode.QRHeightSize")
-            }}</span>
-            <TDInput
-              v-model="QRHeightSize"
-              :inputType="'number'"
-              class="value-input-config max-length-input"
-              :placeHolder="'350'"
-              :noMargin="true"
-            />
+      <template v-slot:main>
+        <div class="flex flex-col td-sub-sidebar">
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="isCompressText"
+            :label="$t('i18nCommon.textToQRCode.compressText')"
+            @input="toggleCompressText"
+          ></TDCheckbox>
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="addHeaderToQR"
+            :label="$t('i18nCommon.textToQRCode.addHeaderToQR')"
+          ></TDCheckbox>
+          <div class="flex flex-col input-config">
+            <div class="flex input-config-item">
+              <span class="title-input-config">{{
+                $t("i18nCommon.textToQRCode.input.maxLength")
+              }}</span>
+              <TDInput
+                v-model="maxLengthUserConfig"
+                :inputType="'number'"
+                class="value-input-config max-length-input"
+                :placeHolder="'1000'"
+                :noMargin="true"
+              />
+            </div>
+            <div class="flex input-config-item">
+              <span class="title-input-config">{{
+                $t("i18nCommon.textToQRCode.QRWidthSize")
+              }}</span>
+              <TDInput
+                v-model="QRWidthSize"
+                :inputType="'number'"
+                class="value-input-config max-length-input"
+                :placeHolder="'300'"
+                :noMargin="true"
+              />
+            </div>
+            <div class="flex input-config-item">
+              <span class="title-input-config">{{
+                $t("i18nCommon.textToQRCode.QRHeightSize")
+              }}</span>
+              <TDInput
+                v-model="QRHeightSize"
+                :inputType="'number'"
+                class="value-input-config max-length-input"
+                :placeHolder="'350'"
+                :noMargin="true"
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </template>
     </TDSubSidebar>
   </div>
 </template>
