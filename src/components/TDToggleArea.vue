@@ -52,8 +52,7 @@ export default {
     arrowOpenDirection() {
       if (this.position === "left") {
         return tdEnum.Direction.right;
-      } else;
-      {
+      } else {
         return tdEnum.Direction.left;
       }
     },
