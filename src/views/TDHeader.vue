@@ -375,7 +375,6 @@ export default {
 
     .language-session {
       cursor: pointer;
-      color: var(--btn-color);
       text-transform: uppercase;
       font-weight: 600;
       padding: 2px 8px;
