@@ -97,7 +97,7 @@ export default {
      */
     arrowOpenDirection() {
       const directionMap = {
-        top: tdEnum.Direction.left, // Xoay 90° => phải thành xuống
+        top: tdEnum.Direction.right, // Xoay 90° => phải thành xuống
         right: tdEnum.Direction.left,
         bottom: tdEnum.Direction.right, // Xoay 90° => phải thành lên
         left: tdEnum.Direction.right,

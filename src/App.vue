@@ -5,8 +5,13 @@
         <div class="loader"></div>
       </div>
     </transition>
-    <div class="td-header-wrap">
-      <TDHeader />
+    <div class="td-header-wrap" :class="{ 'td-header-hidden': !showHeader }">
+      <TDHeader v-show="showHeader" />
+      <TDToggleArea
+        :collapsed="!showHeader"
+        edge="top"
+        @toggle="toggleHeader"
+      />
     </div>
     <div class="flex td-content-wrap">
       <div class="td-sidebar-wrap">
@@ -24,8 +29,10 @@ import TDHeader from "@/views/TDHeader.vue";
 import TDSidebar from "@/views/TDSidebar.vue";
 import "@/common/TDPrototype.js";
 import TDAppStartup from "@/common/TDAppStartup.js";
+import TDToggleArea from "@/components/TDToggleArea.vue";
+
 export default {
-  components: { TDHeader, TDSidebar },
+  components: { TDHeader, TDSidebar, TDToggleArea },
   created() {
     let me = this;
     me.logSomeInfo();
@@ -34,6 +41,7 @@ export default {
   data() {
     return {
       appLoading: true,
+      showHeader: true,
     };
   },
   async mounted() {
@@ -47,6 +55,13 @@ export default {
   },
 
   methods: {
+    async toggleHeader() {
+      let me = this;
+      me.showHeader = !me.showHeader;
+      await me.$tdCache.set(me.$tdEnum.cacheConfig.IsShowHeader, {
+        value: me.showHeader,
+      });
+    },
     logSomeInfo() {
       let me = this;
     },
@@ -59,6 +74,12 @@ export default {
       if (!currentTheme) {
         currentTheme = window.__env.defaultValue.theme;
         await me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
+      }
+      let toggleHeader = await me.$tdCache.get(
+        me.$tdEnum.cacheConfig.IsShowHeader
+      );
+      if (toggleHeader) {
+        me.showHeader = toggleHeader.value;
       }
       me.$tdUtility.setTheme(currentTheme);
       await TDAppStartup.initialize();
@@ -87,14 +108,19 @@ export default {
     background-color: var(--bg-main-color);
   }
   .td-header-wrap {
+    position: relative;
     border-radius: calc(var(--border-radius) * 1.5);
     width: 100%;
     height: 50px;
   }
+  .td-header-hidden {
+    height: 1px;
+  }
   .td-content-wrap {
     padding: var(--padding);
     width: 100%;
-    height: calc(100% - 50px);
+    min-height: 0;
+    flex: 1;
     .td-sidebar-wrap {
       border-radius: calc(var(--border-radius) * 1.5);
       // background-color: var(--bg-main-color);

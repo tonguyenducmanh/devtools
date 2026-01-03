@@ -14,4 +14,5 @@ export const EnumCacheConfig = {
   APIPromodeHistory: 13,
   APICollection: 15,
   APIConfigLayout: 16,
+  IsShowHeader: 17,
 };
