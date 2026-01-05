@@ -29,7 +29,7 @@ export default {
      */
     minSize: {
       type: Number,
-      default: 15,
+      default: 5,
     },
 
     /**
@@ -37,7 +37,7 @@ export default {
      */
     maxSize: {
       type: Number,
-      default: 85,
+      default: 95,
     },
   },
 

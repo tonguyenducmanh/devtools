@@ -293,7 +293,8 @@ export default {
       help: "Gõ để tìm kiếm các tính năng, sử dụng ↑↓ để điều hướng và Enter để chọn",
     },
     apiTesting: {
-      saveForNewCollection:"Lưu vào bộ sưu tập {collectionName}",
+      copyCURLFromAPI: "Sao chép CURL",
+      saveForNewCollection: "Lưu vào bộ sưu tập {collectionName}",
       scriptName: "Tên script",
       importCollectionZip: "Nhập zip",
       importCollectionZipTooltip:
@@ -318,7 +319,7 @@ export default {
       clear: "Xóa tất cả",
       copyResponse: "Sao chép",
       copyCURL: "Sao chép",
-      CURL: "CURL",
+      CURL: "Nhập CURL",
       importCURL: "Nhập",
       extensionNotAvailable: "Extension helper chưa được cài đặt",
       downloadExtension: "Tải Agent và nhập URL",

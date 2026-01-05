@@ -294,6 +294,7 @@ export default {
       help: "Type to search features, use ↑↓ to navigate and Enter to select",
     },
     apiTesting: {
+      copyCURLFromAPI: "Copy CURL",
       saveForNewCollection: "Save in collection {collectionName}",
       scriptName: "Script name",
       importCollectionZip: "Import zip",
@@ -319,7 +320,7 @@ export default {
       clear: "Clear All",
       copyResponse: "Copy",
       copyCURL: "Copy",
-      CURL: "CURL",
+      CURL: "Import CURL",
       importCURL: "Import",
       extensionNotAvailable: "Extension helper not installed",
       downloadExtension: "Down Agent, enter URL",
