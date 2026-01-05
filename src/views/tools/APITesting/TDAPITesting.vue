@@ -96,7 +96,10 @@
             class="flex td-api-input-area"
             :class="{ 'flex-col': APIConfigLayout.splitHorizontal }"
           >
-            <div class="flex flex-col td-api-request">
+            <div
+              class="flex flex-col td-api-request"
+              :style="requestSectionSizeStyle"
+            >
               <div class="flex td-api-request-title">
                 <TDSlideOption
                   v-model="APIConfigLayout.currentAPIInfoOption"
@@ -160,10 +163,19 @@
                 </span>
               </div>
             </div>
+            <!-- Resizer -->
+            <TDResizer
+              v-if="APIConfigLayout.showReponse"
+              :direction="
+                APIConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
+              "
+              @resize="handleResize"
+            />
             <!-- phần response API -->
             <div
               v-if="APIConfigLayout.showReponse"
               class="flex flex-col td-api-response"
+              :style="responseSectionSizeStyle"
             >
               <!-- phần hiển thị httpstatus bên trên response -->
               <TDAPIResponseStatus
@@ -190,7 +202,10 @@
             class="flex td-api-input-area"
             :class="{ 'flex-col': APIConfigLayout.splitHorizontal }"
           >
-            <div class="flex flex-col td-api-request">
+            <div
+              class="flex flex-col td-api-request"
+              :style="requestSectionSizeStyle"
+            >
               <div class="flex td-api-request-title">
                 <div class="title-request">
                   {{ $t("i18nCommon.apiTesting.CURLModeTitle") }}
@@ -216,9 +231,18 @@
                 :placeHolder="$t('i18nCommon.apiTesting.contentCURLExecute')"
               ></TDTextarea>
             </div>
+            <!-- Resizer -->
+            <TDResizer
+              v-if="APIConfigLayout.showReponse"
+              :direction="
+                APIConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
+              "
+              @resize="handleResize"
+            />
             <div
               v-if="APIConfigLayout.showReponse"
               class="flex flex-col td-api-response"
+              :style="responseSectionSizeStyle"
             >
               <TDAPIResponseStatus
                 class="flex td-api-response-title"
@@ -245,7 +269,10 @@
             :class="{ 'flex-col': APIConfigLayout.splitHorizontal }"
           >
             <!-- phần 1 số info header promode như title và respone http -->
-            <div class="flex flex-col td-api-request">
+            <div
+              class="flex flex-col td-api-request"
+              :style="requestSectionSizeStyle"
+            >
               <div class="flex td-api-request-title">
                 <div class="title-request">
                   {{ $t("i18nCommon.apiTesting.proModeTitle") }}
@@ -271,9 +298,18 @@
                 :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
               ></TDTextarea>
             </div>
+            <!-- Resizer -->
+            <TDResizer
+              v-if="APIConfigLayout.showReponse"
+              :direction="
+                APIConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
+              "
+              @resize="handleResize"
+            />
             <div
               v-if="APIConfigLayout.showReponse"
               class="flex flex-col td-api-response"
+              :style="responseSectionSizeStyle"
             >
               <TDAPIResponseStatus
                 class="flex td-api-response-title"
@@ -608,6 +644,7 @@
 import TDCURLUtil from "@/common/api/TDCURLUtil";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDArrow from "@/components/TDArrow.vue";
+import TDResizer from "@/components/TDResizer.vue";
 import JSZip from "jszip";
 import TDAPIResponseStatus from "@/views/tools/APITesting/TDAPIResponseStatus.vue";
 import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
@@ -622,6 +659,7 @@ export default {
     TDAPIResponse,
     TDAPIResponseStatus,
     TDHistorySidebar,
+    TDResizer,
   },
 
   data() {
@@ -678,6 +716,8 @@ export default {
         this.$t("i18nCommon.apiTesting.tutorialProModeCode") +
         TDMockAPIProMode[0].content,
       proModeTemplate: TDMockAPIProMode,
+      requestSectionSize: 50, // Phần request chiếm 50%
+      responseSectionSize: 50, // Phần response chiếm 50%
     };
   },
   async created() {
@@ -703,6 +743,42 @@ export default {
     }
   },
   computed: {
+    /**
+     * Tính toán style động cho request area
+     */
+    requestSectionSizeStyle() {
+      let me = this;
+      let style = {};
+      // nếu hiển thị response thì mới ưu tiên tính toán
+      if (me.APIConfigLayout.showReponse) {
+        if (me.APIConfigLayout.splitHorizontal) {
+          style = { height: `${me.requestSectionSize}%` };
+        } else {
+          style = { width: `${me.requestSectionSize}%` };
+        }
+      } else {
+        if (me.APIConfigLayout.splitHorizontal) {
+          style = { height: `100%` };
+        } else {
+          style = { width: `100%` };
+        }
+      }
+
+      return style;
+    },
+    /**
+     * Tính toán style động cho response area
+     */
+    responseSectionSizeStyle() {
+      let me = this;
+      let style = {};
+      if (me.APIConfigLayout.splitHorizontal) {
+        style = { height: `${me.responseSectionSize}%` };
+      } else {
+        style = { width: `${me.responseSectionSize}%` };
+      }
+      return style;
+    },
     requestNameBuild() {
       let me = this;
       let title = me.$t("i18nCommon.apiTesting.requestName");
@@ -751,6 +827,10 @@ export default {
     }
   },
   methods: {
+    handleResize(sizes) {
+      this.requestSectionSize = sizes.leftSize;
+      this.responseSectionSize = sizes.rightSize;
+    },
     async updateAPIConfigLayout() {
       let me = this;
       await me.$tdCache.set(
@@ -1438,7 +1518,7 @@ export default {
     width: 100%;
   }
   .td-api-input-area {
-    gap: var(--padding);
+    // gap: var(--padding);
     flex: 1;
     .td-api-request {
       width: 100%;
@@ -1594,11 +1674,6 @@ export default {
       color: var(--text-color-secondary);
     }
   }
-}
-
-.td-close-icon {
-}
-.td-close-icon:hover {
 }
 .text-nowrap-collection {
   max-width: 215px !important;
