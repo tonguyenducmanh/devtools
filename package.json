@@ -25,7 +25,6 @@
   },
   "dependencies": {
     "@zxing/library": "^0.21.3",
-    "axios": "^1.13.2",
     "crypto-js": "^4.2.0",
     "exceljs": "^4.4.0",
     "hi-base32": "^0.5.1",
