@@ -1,4 +1,3 @@
-import JSON5 from "json5";
 import { toast } from "@/common/TDToastUtil.js";
 import i18nData from "@/i18n/i18nData.js";
 import * as _ from "lodash";
@@ -190,11 +189,7 @@ class TDUtility {
     try {
       obj = JSON.parse(source);
     } catch (error) {
-      try {
-        obj = JSON5.parse(source);
-      } catch (errorSub) {
-        console.error("Không thể try parse được bằng JSON5" + errorSub);
-      }
+      console.error("Không thể try parse được bằng JSON" + errorSub);
     }
     return obj;
   }
