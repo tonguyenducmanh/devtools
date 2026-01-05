@@ -90,6 +90,14 @@
               :readOnly="isLoading"
               :label="$t('i18nCommon.apiTesting.CURL')"
             ></TDButton>
+            <TDButton
+              @click="copyCURLFromNormalMode"
+              :type="$tdEnum.buttonType.secondary"
+              :debounceTime="100"
+              :noMargin="true"
+              :readOnly="!(apiUrl && httpMethod) || isLoading"
+              :label="$t('i18nCommon.apiTesting.copyCURLFromAPI')"
+            ></TDButton>
           </div>
           <!-- phần nội dung  -->
           <div
@@ -1386,6 +1394,11 @@ export default {
           APIConfigLayout: me.APIConfigLayout,
         },
       });
+    },
+    copyCURLFromNormalMode() {
+      let me = this;
+      me.curlContent = TDCURLUtil.stringify(me.getRequestObj());
+      me.$tdUtility.copyToClipboard(me.curlContent);
     },
     importCURL(isSilence = false) {
       let me = this;
