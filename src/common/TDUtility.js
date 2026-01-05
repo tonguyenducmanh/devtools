@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import JSON5 from "json5";
 import { toast } from "@/common/TDToastUtil.js";
 import i18nData from "@/i18n/i18nData.js";
@@ -112,7 +111,15 @@ class TDUtility {
    * @returns uuid
    */
   newGuid() {
-    return uuidv4();
+    if (crypto?.randomUUID) {
+      return crypto.randomUUID();
+    }
+
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
   }
 
   /**
