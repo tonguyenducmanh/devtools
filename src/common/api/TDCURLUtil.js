@@ -12,6 +12,9 @@ const strip = function(str) {
   return str.replace(/^['"]|['"]$/g, "");
 };
 const parseCurl =  function (curlText) {
+  const strip = str => str.replace(/^['"]|['"]$/g, "");
+  // Tách từng dòng
+  const lines = curlText.split(/\\?\n/);
   let result = {
     url: "",
     method: "GET",
@@ -20,49 +23,45 @@ const parseCurl =  function (curlText) {
     headersText: "",
   };
   let allHeaders = [];
-  // normalize
-  let tokens = curlText
-    .replace(/\\\\\\n/g, " ")
-    .replace(/\\n/g, " ")
-    .match(/'[^']*'|"[^"]*"|\\S+/g);
-
-  for (let i = 0; i < tokens.length; i++) {
-    let token = tokens[i];
-
-    // URL
-    if (token.startsWith("http") || token.startsWith("'http")) {
-      result.url = strip(token);
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i].trim();
+    if (!line) continue;
+    // URL (tìm ở dòng đầu)
+    if (i === 0 && (line.startsWith("curl ") || line.startsWith("curl"))) {
+      let match = line.match(/curl\s+'([^']+)'|curl\s+"([^"]+)"|curl\s+(\S+)/);
+      if (match) result.url = match[1] || match[2] || match[3];
     }
-
     // Method
-    if (token === "-X" || token === "--request") {
-      result.method = strip(tokens[++i]).toUpperCase();
+    if (line.includes("--request") || line.includes("-X")) {
+      let method = line.match(/(--request|-X)\s*(\w+)/);
+      if (method) result.method = method[2].toUpperCase();
     }
-
-    // Headers
-    if (token === "-H" || token === "--header") {
-      let header = strip(tokens[++i]);
-      let [key, ...rest] = header.split(":");
-      result.headers[key.trim()] = rest.join(":").trim();
-      allHeaders.push(header);
-    }
-
-    // Body
-    if (
-      token === "--data" ||
-      token === "--data-raw" ||
-      token === "--data-binary" ||
-      token === "-d"
-    ) {
-      result.body = strip(tokens[++i]);
-      if (result.method === "GET") {
-        result.method = "POST";
+    // Header
+    if (line.includes("--header") || line.includes("-H")) {
+      let header = line.match(/(--header|-H)\s*'([^']+)'/);
+      let headerVal = header ? header[2] : line.match(/(--header|-H)\s*"([^"]+)"/)?.[2];
+      if (headerVal) {
+        let [key, ...rest] = headerVal.split(":");
+        result.headers[key.trim()] = rest.join(":").trim();
+        allHeaders.push(headerVal);
       }
     }
+    // Body
+    if (line.includes("--data") || line.includes("--data-raw") || line.includes("--data-binary") || line.includes("-d")) {
+      let dataMatch = line.match(/(--data(--raw|--binary)?|-d)\s*'((?:.|\n)*)'$/);
+      let data = dataMatch ? dataMatch[3] : line.match(/(--data(--raw|--binary)?|-d)\s*"((?:.|\n)*)"/)?.[3];
+      // Nếu chưa lấy được, lấy phần tiếp theo luôn (nếu body xuống dòng)
+      if (!data) {
+        let idx = line.indexOf("--data");
+        if (idx === -1) idx = line.indexOf("-d");
+        data = strip(line.slice(idx + 6).trim());
+      }
+      result.body = data;
+      if (result.method === "GET") result.method = "POST";
+    }
   }
-
-  if (allHeaders && allHeaders.length > 0) {
-    result.headersText = allHeaders.join("\\n");
+  if (allHeaders.length > 0) {
+    result.headersText = allHeaders.join("\n");
   }
   return result;
 };`;
