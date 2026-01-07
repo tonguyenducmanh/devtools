@@ -1084,7 +1084,7 @@ export default {
             requests: [],
           };
         }
-        let curlConent = TDCURLUtil.parse(content);
+        let curlConent = TDCURLUtil.parseCurl(content);
         collections[collectionName].requests.push({
           requestName: requestName,
           apiUrl: curlConent.url,
@@ -1347,7 +1347,7 @@ export default {
         me.bodyText = item.bodyText;
         me.requestName = item.requestName;
         // build luôn CURL
-        me.curlContent = TDCURLUtil.stringify(me.getRequestObj());
+        me.curlContent = TDCURLUtil.stringifyCURL(me.getRequestObj());
         // lúc apply lịch sử mà gọi luôn hơi tốn server :v
         // await me.handleSendRequest();
         me.currentRequestId = null;
@@ -1397,7 +1397,7 @@ export default {
     },
     copyCURLFromNormalMode() {
       let me = this;
-      me.curlContent = TDCURLUtil.stringify(me.getRequestObj());
+      me.curlContent = TDCURLUtil.stringifyCURL(me.getRequestObj());
       me.$tdUtility.copyToClipboard(me.curlContent);
     },
     importCURL(isSilence = false) {
@@ -1409,17 +1409,7 @@ export default {
         if (!isSilence) {
           me.requestName = CURLParsed.url;
         }
-        try {
-          me.bodyText = CURLParsed.body
-            ? JSON.stringify(JSON.parse(CURLParsed.body), null, 2)
-            : null;
-        } catch (ex) {
-          console.log(ex);
-          me.bodyText = CURLParsed.body;
-        }
-        if (me.bodyText == "null") {
-          me.bodyText = null;
-        }
+        me.bodyText = CURLParsed.bodyText;
         me.httpMethod = CURLParsed.method;
         me.headersText = CURLParsed.headersText;
         result = true;
@@ -1439,7 +1429,7 @@ export default {
       let me = this;
       window.__tdInfo = {
         agentURL: me.agentURL ?? window.__env?.APITesting?.agentServer,
-        parseCurl: TDCURLUtil.parse,
+        parseCurl: TDCURLUtil.parseCurl,
         fetchAgent: TDCURLUtil.fetchAgent,
       };
     },
