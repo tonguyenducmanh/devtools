@@ -208,7 +208,7 @@ const requestCURL = async (curlText) => {
     api_url: parsed.url,
     http_method: parsed.method || "GET",
     headers_text: parsed.headersText || null,
-    body_text: parsed.body || null,
+    body_text: parsed.bodyText || null,
   };
 
   const req = window.__tdInfo.fetchAgent(requestData);
