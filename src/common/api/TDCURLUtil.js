@@ -103,7 +103,7 @@ class TDCURLUtil {
    * Đọc nội dung CURL
    * @param {string} curlText
    */
-  parseCurl(curlText) {
+  parseCURL(curlText) {
     let me = this;
     let result = null;
     let data = insomniaCURL.convert(curlText);
@@ -202,7 +202,7 @@ class TDCURLUtil {
     let me = this;
     return `
 const requestCURL = async (curlText) => {
-  const parsed = window.__tdInfo.parseCurl(curlText);
+  const parsed = window.__tdInfo.parseCURL(curlText);
 
   const requestData = {
     api_url: parsed.url,
