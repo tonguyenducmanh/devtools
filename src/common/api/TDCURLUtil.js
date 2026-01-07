@@ -1,3 +1,4 @@
+import * as insomniaCURL from "./insomnia/curl.ts";
 /**
  * các method CURL dùng cho toàn bộ frontend
  * Created by tdmanh 16/12/2025
@@ -184,10 +185,39 @@ const fetchAgent = function(request) {
   parse(curlText) {
     let me = this;
     let result = null;
-    // inject động function có tham số
-    let contentFn = `${me.parseFuncContent()}; return parseCurl(curlText);`;
-    let parseFn = new Function("curlText", contentFn);
-    result = parseFn(curlText);
+    let data = insomniaCURL.convert(curlText);
+    let dataParse = null;
+    if (data) {
+      if (Array.isArray(data) && data.length > 0) {
+        dataParse = data[0];
+      } else {
+        dataParse = data;
+      }
+    }
+    if (dataParse) {
+      result = {
+        url: dataParse.url,
+        method: dataParse.method,
+        headers: {},
+        body: "",
+        headersText: "",
+      };
+      if (Array.isArray(dataParse.headers) && dataParse.headers.length > 0) {
+        let allHeaders = [];
+        dataParse.headers.forEach((header) => {
+          if (header && header.name && header.value) {
+            result.headers[header.name] = header.value;
+            allHeaders.push(`${header.name}:${header.value}`);
+          }
+        });
+        if (allHeaders && allHeaders.length > 0) {
+          result.headersText = allHeaders.join("\n");
+        }
+      }
+      if (dataParse?.body?.text) {
+        result.body = dataParse.body.text;
+      }
+    }
     return result;
   }
 
