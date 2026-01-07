@@ -7,7 +7,7 @@ export default [
 \`;
 
 let responseOne = await requestCURL(curlOne);
-return responseOne;`,
+return responseOne.body;`,
   },
   {
     scriptName: "02 multiple curl",
