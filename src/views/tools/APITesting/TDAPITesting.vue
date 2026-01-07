@@ -1084,7 +1084,7 @@ export default {
             requests: [],
           };
         }
-        let curlConent = TDCURLUtil.parseCurl(content);
+        let curlConent = TDCURLUtil.parseCURL(content);
         collections[collectionName].requests.push({
           requestName: requestName,
           apiUrl: curlConent.url,
@@ -1402,7 +1402,7 @@ export default {
     },
     importCURL(isSilence = false) {
       let me = this;
-      let CURLParsed = TDCURLUtil.parse(me.curlContent);
+      let CURLParsed = TDCURLUtil.parseCURL(me.curlContent);
       let result = false;
       if (CURLParsed) {
         me.apiUrl = CURLParsed.url;
@@ -1429,7 +1429,7 @@ export default {
       let me = this;
       window.__tdInfo = {
         agentURL: me.agentURL ?? window.__env?.APITesting?.agentServer,
-        parseCurl: TDCURLUtil.parseCurl,
+        parseCURL: TDCURLUtil.parseCURL,
         fetchAgent: TDCURLUtil.fetchAgent,
       };
     },
