@@ -1439,6 +1439,7 @@ export default {
       let me = this;
       window.__tdInfo = {
         agentURL: me.agentURL ?? window.__env?.APITesting?.agentServer,
+        parseCurl: TDCURLUtil.parse,
       };
     },
     async handleSendRequestProMode() {
