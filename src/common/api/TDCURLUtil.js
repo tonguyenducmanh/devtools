@@ -23,7 +23,7 @@ class TDCURLUtil {
         request: {
           api_url: request.api_url,
           http_method: request.http_method || "GET",
-          headers_text: request.headers_text || null,
+          headers_text: request.headers_text || "",
           body_text: request.body_text || null,
         },
         signalId,
