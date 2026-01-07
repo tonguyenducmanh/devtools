@@ -207,7 +207,7 @@ const requestCURL = async (curlText) => {
   const requestData = {
     api_url: parsed.url,
     http_method: parsed.method || "GET",
-    headers_text: parsed.headersText || null,
+    headers_text: parsed.headersText || "",
     body_text: parsed.bodyText || null,
   };
 
