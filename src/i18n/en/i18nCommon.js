@@ -341,7 +341,7 @@ export default {
       showReponse: "Show response",
       downloadReponse: "Download response",
       tutorialProModeCode:
-        "//requestCURL() is a built-in function used to call APIs using CURL\n//if curl text contain keyword \\ then change to \\\\ \n//if text contain keyword ' then change to '\\'' \n",
+        "//requestCURL() is a built-in function used to call APIs using CURL\n//if curl text contain keyword \\ then change to \\\\ \n//if text contain keyword ' then change to '\\\\'' \n",
       newCollectionName: "New collection name",
       save: "Save request",
       createNewRequest: "New request",
