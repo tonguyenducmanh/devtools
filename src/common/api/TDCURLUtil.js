@@ -103,7 +103,7 @@ class TDCURLUtil {
    * Đọc nội dung CURL
    * @param {string} curlText
    */
-  parse(curlText) {
+  parseCurl(curlText) {
     let me = this;
     let result = null;
     let data = insomniaCURL.convert(curlText);
@@ -138,6 +138,19 @@ class TDCURLUtil {
       if (dataParse?.body?.text) {
         result.body = dataParse.body.text;
       }
+
+      if (result.body == "null") {
+        result.body = null;
+      } else {
+        try {
+          result.bodyText = result.body
+            ? JSON.stringify(JSON.parse(result.body), null, 2)
+            : null;
+        } catch (ex) {
+          console.log(ex);
+          result.bodyText = result.body;
+        }
+      }
     }
     return result;
   }
@@ -145,7 +158,7 @@ class TDCURLUtil {
   /**
    * Build ra CURL dạng text
    */
-  stringify(request) {
+  stringifyCURL(request) {
     let me = this;
     if (!request?.apiUrl) throw new Error("apiUrl is required");
 
