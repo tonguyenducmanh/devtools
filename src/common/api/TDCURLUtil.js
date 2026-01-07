@@ -1,73 +1,9 @@
+import * as insomniaCURL from "./insomnia/curl.ts";
 /**
  * các method CURL dùng cho toàn bộ frontend
  * Created by tdmanh 16/12/2025
  */
 class TDCURLUtil {
-  /**
-   * Đọc nội dung CURL (dạng text code để inject động)
-   */
-  parseFuncContent() {
-    return `
-const strip = function(str) {
-  return str.replace(/^['"]|['"]$/g, "");
-};
-const parseCurl =  function (curlText) {
-  let result = {
-    url: "",
-    method: "GET",
-    headers: {},
-    body: null,
-    headersText: "",
-  };
-  let allHeaders = [];
-  // normalize
-  let tokens = curlText
-    .replace(/\\\\\\n/g, " ")
-    .replace(/\\n/g, " ")
-    .match(/'[^']*'|"[^"]*"|\\S+/g);
-
-  for (let i = 0; i < tokens.length; i++) {
-    let token = tokens[i];
-
-    // URL
-    if (token.startsWith("http") || token.startsWith("'http")) {
-      result.url = strip(token);
-    }
-
-    // Method
-    if (token === "-X" || token === "--request") {
-      result.method = strip(tokens[++i]).toUpperCase();
-    }
-
-    // Headers
-    if (token === "-H" || token === "--header") {
-      let header = strip(tokens[++i]);
-      let [key, ...rest] = header.split(":");
-      result.headers[key.trim()] = rest.join(":").trim();
-      allHeaders.push(header);
-    }
-
-    // Body
-    if (
-      token === "--data" ||
-      token === "--data-raw" ||
-      token === "--data-binary" ||
-      token === "-d"
-    ) {
-      result.body = strip(tokens[++i]);
-      if (result.method === "GET") {
-        result.method = "POST";
-      }
-    }
-  }
-
-  if (allHeaders && allHeaders.length > 0) {
-    result.headersText = allHeaders.join("\\n");
-  }
-  return result;
-};`;
-  }
-
   /**
    * Sử dụng agent để thực hiện chạy command curl gọi API,
    * không bị giới hạn bởi các tool của trình duyệt
@@ -184,10 +120,39 @@ const fetchAgent = function(request) {
   parse(curlText) {
     let me = this;
     let result = null;
-    // inject động function có tham số
-    let contentFn = `${me.parseFuncContent()}; return parseCurl(curlText);`;
-    let parseFn = new Function("curlText", contentFn);
-    result = parseFn(curlText);
+    let data = insomniaCURL.convert(curlText);
+    let dataParse = null;
+    if (data) {
+      if (Array.isArray(data) && data.length > 0) {
+        dataParse = data[0];
+      } else {
+        dataParse = data;
+      }
+    }
+    if (dataParse) {
+      result = {
+        url: dataParse.url,
+        method: dataParse.method,
+        headers: {},
+        body: "",
+        headersText: "",
+      };
+      if (Array.isArray(dataParse.headers) && dataParse.headers.length > 0) {
+        let allHeaders = [];
+        dataParse.headers.forEach((header) => {
+          if (header && header.name && header.value) {
+            result.headers[header.name] = header.value;
+            allHeaders.push(`${header.name}:${header.value}`);
+          }
+        });
+        if (allHeaders && allHeaders.length > 0) {
+          result.headersText = allHeaders.join("\n");
+        }
+      }
+      if (dataParse?.body?.text) {
+        result.body = dataParse.body.text;
+      }
+    }
     return result;
   }
 
@@ -248,9 +213,8 @@ const fetchAgent = function(request) {
     let me = this;
     return `
 const requestCURL = async (curlText) => {
-  ${me.parseFuncContent()}
   ${me.fetchAgentFuncContent()}
-  const parsed = parseCurl(curlText);
+  const parsed = window.__tdInfo.parseCurl(curlText);
 
   const requestData = {
     api_url: parsed.url,
