@@ -1,4 +1,6 @@
 import * as insomniaCURL from "./insomnia/curl.ts";
+import TDUtility from "@/common/TDUtility.js";
+
 /**
  * các method CURL dùng cho toàn bộ frontend
  * Created by tdmanh 16/12/2025
@@ -9,108 +11,92 @@ class TDCURLUtil {
    * không bị giới hạn bởi các tool của trình duyệt
    * (dạng text code để inject động)
    */
-  fetchAgentFuncContent() {
-    return `
-const uuidv4 = function() {
-  if (crypto?.randomUUID) {
-    return crypto.randomUUID()
-  }
+  fetchAgent(request) {
+    const fetchAgentDesktop = function (request) {
+      const signalId = TDUtility.newGuid();
+      let cancelled = false;
 
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    const r = Math.random() * 16 | 0
-    const v = c === 'x' ? r : (r & 0x3 | 0x8)
-    return v.toString(16)
-  })
-}
+      // Sử dụng Tauri invoke
+      const { invoke } = window.__TAURI_INTERNALS__;
 
-const fetchAgentDesktop = function(request) {
-  const signalId = uuidv4();
-  let cancelled = false;
+      const promise = invoke("exec", {
+        request: {
+          api_url: request.api_url,
+          http_method: request.http_method || "GET",
+          headers_text: request.headers_text || null,
+          body_text: request.body_text || null,
+        },
+        signalId,
+      });
 
-  // Sử dụng Tauri invoke
-  const { invoke } = window.__TAURI_INTERNALS__;
-  
-  const promise = invoke('exec', { 
-    request: {
-      api_url: request.api_url,
-      http_method: request.http_method || 'GET',
-      headers_text: request.headers_text || null,
-      body_text: request.body_text || null,
-    },
-    signalId 
-  });
+      return {
+        promise,
+        async cancel() {
+          if (cancelled) return;
+          cancelled = true;
 
-  return {
-    promise,
-    async cancel() {
-      if (cancelled) return;
-      cancelled = true;
-      
-      try {
-        await invoke('cancel', { signalId });
-      } catch (error) {
-        console.error('Cancel failed:', error);
+          try {
+            await invoke("cancel", { signalId });
+          } catch (error) {
+            console.error("Cancel failed:", error);
+          }
+
+          throw new Error("Request cancelled by user");
+        },
+      };
+    };
+    const fetchAgentBrowser = function (request) {
+      let serverAgent = window.__tdInfo?.agentURL;
+      if (!serverAgent) {
+        throw new Error("Agent server not configured");
       }
-      
-      throw new Error("Request cancelled by user");
-    },
-  };
-}
 
-const fetchAgentBrowser = function(request) {
-  let serverAgent = window.__tdInfo?.agentURL;
-  if (!serverAgent) {
-    throw new Error("Agent server not configured");
-  }
+      const controller = new AbortController();
 
-  const controller = new AbortController();
+      const promise = fetch(`${serverAgent}/exec`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+        signal: controller.signal,
+      })
+        .then(async (res) => {
+          const text = await res.text();
+          let data;
 
-  const promise = fetch(\`\${serverAgent}/exec\`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(request),
-    signal: controller.signal,
-  }).then(async (res) => {
-    const text = await res.text();
-    let data;
+          try {
+            data = JSON.parse(text);
+            return {
+              status: data.status,
+              headers: data.headers,
+              body: data.body,
+            };
+          } catch {
+            data = text;
+            return {
+              status: 200,
+              headers: {},
+              body: data,
+            };
+          }
+        })
+        .catch((error) => {
+          throw error;
+        });
 
-    try {
-      data = JSON.parse(text);
       return {
-        status: data.status,
-        headers: data.headers,
-        body: data.body,
+        promise,
+        cancel() {
+          controller.abort();
+          throw new Error("Request cancelled by user");
+        },
       };
-    } catch {
-      data = text;
-      return {
-        status: 200,
-        headers: {},
-        body: data,
-      };
+    };
+    if (window && window.__TAURI_INTERNALS__) {
+      return fetchAgentDesktop(request);
     }
-  })
-  .catch((error) => {
-    throw error;
-  });
-
-  return {
-    promise,
-    cancel() {
-      controller.abort();
-      throw new Error("Request cancelled by user");
-    },
-  };
-}
-
-const fetchAgent = function(request) {
-  if (window && window.__TAURI_INTERNALS__) {
-    return fetchAgentDesktop(request);
-  }
-  return fetchAgentBrowser(request);
-}`;
+    return fetchAgentBrowser(request);
   }
 
   /**
@@ -153,16 +139,6 @@ const fetchAgent = function(request) {
         result.body = dataParse.body.text;
       }
     }
-    return result;
-  }
-
-  fetchAgent(request) {
-    let me = this;
-    let result = null;
-    // inject động function có tham số
-    let contentFn = `${me.fetchAgentFuncContent()}; return fetchAgent(request)`;
-    let fetchFn = new Function("request", contentFn);
-    result = fetchFn(request);
     return result;
   }
 
@@ -213,7 +189,6 @@ const fetchAgent = function(request) {
     let me = this;
     return `
 const requestCURL = async (curlText) => {
-  ${me.fetchAgentFuncContent()}
   const parsed = window.__tdInfo.parseCurl(curlText);
 
   const requestData = {
@@ -223,7 +198,7 @@ const requestCURL = async (curlText) => {
     body_text: parsed.body || null,
   };
 
-  const req = fetchAgent(requestData);
+  const req = window.__tdInfo.fetchAgent(requestData);
   const resp = await req.promise;
 
   return resp;
