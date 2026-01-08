@@ -356,12 +356,12 @@ export default {
       FindCollectionTitle: "Enter collection name",
       NeedRequestName: "Need request name before save",
       DemoRequestPromode: "Call a single API",
-      MultipleCurl: "Call multiple APIs sequentially",
+      MultipleCurl: "Call multiple APIs",
       RunBatchPromiseAll:
-        "Create a batch of identical APIs to call simultaneously",
-      APIBatchSequency: "Create a batch of identical APIs to call sequentially",
-      RetryAPIDelay: "Call an API with a retry",
-      AutoPagination: "Call to retrieve paging data until completion",
+        "Batch API concurency",
+      APIBatchSequency: "Batch API sequency",
+      RetryAPIDelay: "Call API with retry",
+      AutoPagination: "Call API paging",
     },
   },
 };
