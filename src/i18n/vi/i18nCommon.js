@@ -353,6 +353,12 @@ export default {
       },
       FindCollectionTitle: "Nhập tên bộ sưu tập",
       NeedRequestName: "Cần điền tên request trước khi lưu",
+      DemoRequestPromode: "Gọi 1 api đơn giản",
+      MultipleCurl: "Gọi nhiều api tuần tự",
+      RunBatchPromiseAll: "Tạo lô api giống nhau gọi đồng thời",
+      APIBatchSequency: "Tạo lô api giống nhau gọi tuần tự",
+      RetryAPIDelay: "Gọi api có retry",
+      AutoPagination: "Gọi lấy dữ liệu paging đến hết",
     },
   },
 };
