@@ -221,7 +221,7 @@ const requestCURL = async (curlText) => {
       body: {
         message: msgErr,
         ex: ex.toString(),
-        stackTrace: ex.stack
+        stackTrace:ex.stack ? ex.stack.split("\\n"): []
       }
     };
   }
