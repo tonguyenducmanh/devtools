@@ -1360,8 +1360,8 @@ export default {
     },
     applyRequestProMode(template) {
       let me = this;
-      if (template && template.scriptName && template.content) {
-        me.requestName = template.scriptName;
+      if (template && template.tooltipKey && template.content) {
+        me.requestName = me.$t(`i18nCommon.apiTesting.${template.tooltipKey}`);
         me.proModeSecranioCode =
           me.$t("i18nCommon.apiTesting.tutorialProModeCode") + template.content;
       }
