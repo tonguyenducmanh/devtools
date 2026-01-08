@@ -1085,16 +1085,21 @@ export default {
           };
         }
         let curlConent = TDCURLUtil.parseCURL(content);
-        collections[collectionName].requests.push({
-          requestName: requestName,
-          apiUrl: curlConent.url,
-          bodyText: curlConent.body
-            ? JSON.stringify(JSON.parse(curlConent.body), null, 2)
-            : null,
-          headersText: curlConent.headersText,
-          httpMethod: curlConent.method,
-          requestId: me.$tdUtility.newGuid(),
-        });
+        if (curlConent) {
+          collections[collectionName].requests.push({
+            requestName: requestName,
+            apiUrl: curlConent.url,
+            bodyText: curlConent.body
+              ? JSON.stringify(JSON.parse(curlConent.body), null, 2)
+              : null,
+            headersText: curlConent.headersText,
+            httpMethod: curlConent.method,
+            requestId: me.$tdUtility.newGuid(),
+          });
+        } else {
+          // log lại để biết ông nào gây lỗi không parse được
+          console.log("parse error" + content);
+        }
       }
 
       return Object.values(collections);
