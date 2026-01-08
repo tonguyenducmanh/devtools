@@ -202,19 +202,29 @@ class TDCURLUtil {
     let me = this;
     return `
 const requestCURL = async (curlText) => {
-  const parsed = window.__tdInfo.parseCURL(curlText);
-
-  const requestData = {
-    api_url: parsed.url,
-    http_method: parsed.method || "GET",
-    headers_text: parsed.headersText || "",
-    body_text: parsed.bodyText || null,
-  };
-
-  const req = window.__tdInfo.fetchAgent(requestData);
-  const resp = await req.promise;
-
-  return resp;
+  try{
+    const parsed = window.__tdInfo.parseCURL(curlText);
+    const requestData = {
+      api_url: parsed.url,
+      http_method: parsed.method || "GET",
+      headers_text: parsed.headersText || "",
+      body_text: parsed.bodyText || null,
+    };
+    const req = window.__tdInfo.fetchAgent(requestData);
+    const resp = await req.promise;
+    return resp;
+  }catch(ex){
+    let msgErr = "requestCURL call api error";
+    console.log(msgErr + ex);
+    return {
+      status: 599,
+      body: {
+        message: msgErr,
+        ex: ex.toString(),
+        stackTrace: ex.stack
+      }
+    };
+  }
 };
 let result = 
 (async () => {
