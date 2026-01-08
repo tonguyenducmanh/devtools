@@ -195,37 +195,50 @@ class TDCURLUtil {
   }
 
   /**
+   * Hàm chính thực hiện việc gọi API thông qua CURL
+   */
+  async requestCURL(curlText) {
+    try {
+      let parsed = window.__tdInfo.parseCURL(curlText);
+      let requestData = {
+        api_url: parsed.url,
+        http_method: parsed.method || "GET",
+        headers_text: parsed.headersText || "",
+        body_text: parsed.bodyText || null,
+      };
+      let req = window.__tdInfo.fetchAgent(requestData);
+      let resp = await req.promise;
+      return resp;
+    } catch (ex) {
+      let msgErr = "requestCURL call api error";
+      console.log(msgErr + ex);
+      return {
+        status: 599,
+        body: {
+          message: msgErr,
+          ex: ex.toString(),
+          stackTrace: ex.stack ? ex.stack.split("\n") : [],
+        },
+      };
+    }
+  }
+  setGlobalInfoBeforeRequest(options) {
+    let me = this;
+    window.__tdInfo = {
+      agentURL: options.agentURL ?? window.__env?.APITesting?.agentServer,
+      requestCURL: me.requestCURL,
+      parseCURL: me.parseCURL,
+      fetchAgent: me.fetchAgent,
+    };
+  }
+  /**
    * Đoạn code build ra script javascript động để chạy request bằng CURL
    * theo kịch bản người dùng tự viết
    */
   buildInjectCode(secranioCode) {
     let me = this;
     return `
-const requestCURL = async (curlText) => {
-  try{
-    const parsed = window.__tdInfo.parseCURL(curlText);
-    const requestData = {
-      api_url: parsed.url,
-      http_method: parsed.method || "GET",
-      headers_text: parsed.headersText || "",
-      body_text: parsed.bodyText || null,
-    };
-    const req = window.__tdInfo.fetchAgent(requestData);
-    const resp = await req.promise;
-    return resp;
-  }catch(ex){
-    let msgErr = "requestCURL call api error";
-    console.log(msgErr + ex);
-    return {
-      status: 599,
-      body: {
-        message: msgErr,
-        ex: ex.toString(),
-        stackTrace:ex.stack ? ex.stack.split("\\n"): []
-      }
-    };
-  }
-};
+const requestCURL = window.__tdInfo.requestCURL;
 let result = 
 (async () => {
   ${secranioCode}
