@@ -1,6 +1,7 @@
 export default [
   {
-    scriptName: "01 demo request promode",
+    scriptName: "Demo request",
+    tooltipKey: "DemoRequestPromode",
     content: `let curlOne = \`
     curl 'http://localhost:3000/api/get_list_item?limit=5'\\
          --header 'Content-Type: application/json
@@ -10,7 +11,8 @@ let responseOne = await requestCURL(curlOne);
 return responseOne.body;`,
   },
   {
-    scriptName: "02 multiple curl",
+    scriptName: "Multiple curl",
+    tooltipKey: "MultipleCurl",
     content: `let curlOne = \`
     curl 'http://localhost:3000/api/get_list_item?limit=5'\\
          --header 'Content-Type: application/json
@@ -36,7 +38,8 @@ if(responseOne && responseOne.data && responseOne.data.length > 0){
 return finalResponeArr;`,
   },
   {
-    scriptName: "03 run batch promiss all",
+    scriptName: "Run API batch concurrent",
+    tooltipKey: "RunBatchPromiseAll",
     content: `function makeCurlRequest(index) {
   let curl = \`
     curl 'http://localhost:3000/api/get_list_item?limit=5'\\
@@ -56,7 +59,49 @@ async function concurrentRequests() {
 return await concurrentRequests();`,
   },
   {
-    scriptName: "04 retry time",
+    scriptName: "Run API batch sequency",
+    tooltipKey: "APIBatchSequency",
+    content: `
+function makeCurlRequest(tenant_id_list_str) {
+    let curl = \`
+      curl -X POST \\
+          http://localhost:3000/api/standardized_data_multiple\\
+          -H 'Content-Type: application/json' \\
+          -H 'cache-control: no-cache' \\
+          -d '
+              {
+                  "tenant_id_list": [
+                    \${tenant_id_list_str}
+                  ]
+              }
+          '
+      \`;
+    return curl;
+}
+
+async function batchRequests() {
+  let allResults = [];
+  let tenantIds = [
+    "4763ca99-956c-474f-b2fb-a6fea76e9333","18643e98-39e7-4a74-a478-88f38709cc49","7bb9f351-ab46-4c21-98a0-46b45624e9c5"
+  ];
+  let batchSize = 2;
+  for (let i = 0; i < tenantIds.length; i += batchSize) {
+    let batchTenantIds = tenantIds.slice(i, i + batchSize);
+    let tenant_id_list_str = batchTenantIds.map(id => \`"\${id}"\`).join(',');
+    const curlStr = makeCurlRequest(tenant_id_list_str);
+    const result = await requestCURL(curlStr);
+    allResults.push(result);
+    if (i + batchSize < tenantIds.length) {
+      await new Promise(r => setTimeout(r, 5000));
+    }
+  }
+  return allResults;
+}
+return await batchRequests();`,
+  },
+  {
+    scriptName: "Retry API delay",
+    tooltipKey: "RetryAPIDelay",
     content: `async function requestWithRetry(curlStr, maxRetries = 3) {
   for(let i = 0; i < maxRetries; i++){
     try {
@@ -82,7 +127,8 @@ let curl = \`
 return await requestWithRetry(curl);`,
   },
   {
-    scriptName: "05 auto pagination",
+    scriptName: "API Auto pagination",
+    tooltipKey: "AutoPagination",
     content: `async function fetchAllPages(baseUrl) {
   let allData = [];
   let page = 1;

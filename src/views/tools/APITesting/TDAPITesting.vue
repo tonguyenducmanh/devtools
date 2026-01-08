@@ -374,7 +374,11 @@
                 @click="applyRequestProMode(template)"
               >
                 <span class="no-select text-nowrap">
-                  <div v-tooltip="template.content">
+                  <div
+                    v-tooltip="
+                      $t(`i18nCommon.apiTesting.${template.tooltipKey}`)
+                    "
+                  >
                     {{ template.scriptName }}
                   </div>
                 </span>
