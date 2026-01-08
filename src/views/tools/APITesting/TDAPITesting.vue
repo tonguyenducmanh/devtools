@@ -1228,7 +1228,9 @@ export default {
      */
     async handleSend() {
       let me = this;
-      this.setGlobalInfoBeforeRequest();
+      TDCURLUtil.setGlobalInfoBeforeRequest({
+        agentURL: me.agentURL,
+      });
       if (me.APIConfigLayout.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
         await me.handleSendRequestProMode();
       } else if (me.APIConfigLayout.currentAPIMode == me.$tdEnum.APIMode.CURL) {
@@ -1429,14 +1431,6 @@ export default {
     async handleSelectedAPIMode() {
       let me = this;
       await me.updateAPIConfigLayout();
-    },
-    setGlobalInfoBeforeRequest() {
-      let me = this;
-      window.__tdInfo = {
-        agentURL: me.agentURL ?? window.__env?.APITesting?.agentServer,
-        parseCURL: TDCURLUtil.parseCURL,
-        fetchAgent: TDCURLUtil.fetchAgent,
-      };
     },
     async handleSendRequestProMode() {
       let me = this;
