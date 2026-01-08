@@ -1,6 +1,5 @@
 export default [
   {
-    scriptName: "Demo request",
     tooltipKey: "DemoRequestPromode",
     content: `let curlOne = \`
     curl 'http://localhost:3000/api/get_list_item?limit=5'\\
@@ -11,7 +10,6 @@ let responseOne = await requestCURL(curlOne);
 return responseOne.body;`,
   },
   {
-    scriptName: "Multiple curl",
     tooltipKey: "MultipleCurl",
     content: `let curlOne = \`
     curl 'http://localhost:3000/api/get_list_item?limit=5'\\
@@ -38,7 +36,6 @@ if(responseOne && responseOne.data && responseOne.data.length > 0){
 return finalResponeArr;`,
   },
   {
-    scriptName: "Run API batch concurrent",
     tooltipKey: "RunBatchPromiseAll",
     content: `function makeCurlRequest(index) {
   let curl = \`
@@ -59,7 +56,6 @@ async function concurrentRequests() {
 return await concurrentRequests();`,
   },
   {
-    scriptName: "Run API batch sequency",
     tooltipKey: "APIBatchSequency",
     content: `
 function makeCurlRequest(tenant_id_list_str) {
@@ -100,7 +96,6 @@ async function batchRequests() {
 return await batchRequests();`,
   },
   {
-    scriptName: "Retry API delay",
     tooltipKey: "RetryAPIDelay",
     content: `async function requestWithRetry(curlStr, maxRetries = 3) {
   for(let i = 0; i < maxRetries; i++){
@@ -127,7 +122,6 @@ let curl = \`
 return await requestWithRetry(curl);`,
   },
   {
-    scriptName: "API Auto pagination",
     tooltipKey: "AutoPagination",
     content: `async function fetchAllPages(baseUrl) {
   let allData = [];
