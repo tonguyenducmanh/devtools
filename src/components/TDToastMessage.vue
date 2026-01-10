@@ -94,7 +94,7 @@ export default {
         duration: toast.duration || 3000,
       };
 
-      this.toasts.unshift(newToast);
+      this.toasts.push(newToast);
 
       // Tự động xóa toast sau thời gian đã định
       setTimeout(() => {
@@ -138,7 +138,7 @@ export default {
 <style scoped>
 .td-toast-container {
   position: fixed;
-  top: 20px;
+  bottom: 20px;
   right: 20px;
   z-index: 9999;
   display: flex;
@@ -255,28 +255,5 @@ export default {
 
 .td-toast-move {
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-  .td-toast-container {
-    top: 10px;
-    right: 10px;
-    left: 10px;
-    width: auto;
-    max-width: none;
-  }
-
-  .toast {
-    padding: 12px;
-  }
-
-  .td-toast-title {
-    font-size: 13px;
-  }
-
-  .td-toast-text {
-    font-size: 12px;
-  }
 }
 </style>
