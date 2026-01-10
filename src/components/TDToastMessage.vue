@@ -91,7 +91,7 @@ export default {
         type: toast.type || "info",
         title: toast.title || me.$t("i18nCommon.toastMessage.notiTitle"),
         message: toast.message || "",
-        duration: toast.duration || 3000,
+        duration: toast.duration || 1500,
       };
 
       this.toasts.push(newToast);
