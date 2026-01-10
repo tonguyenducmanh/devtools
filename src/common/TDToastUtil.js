@@ -30,8 +30,6 @@ class ToastManager {
 
     const config = {
       type: options.type || "info",
-      title:
-        options.title || i18nData.global.t("i18nCommon.toastMessage.notiTitle"),
       message: options.message || "",
       duration: options.duration || 1500,
     };
@@ -40,37 +38,33 @@ class ToastManager {
   }
 
   // Các phương thức tiện ích
-  success(title, message, duration) {
+  success(message, duration) {
     return this.show({
       type: "success",
-      title,
       message,
       duration,
     });
   }
 
-  error(title, message, duration) {
+  error(message, duration) {
     return this.show({
       type: "error",
-      title,
       message,
       duration,
     });
   }
 
-  warning(title, message, duration) {
+  warning(message, duration) {
     return this.show({
       type: "warning",
-      title,
       message,
       duration,
     });
   }
 
-  info(title, message, duration) {
+  info(message, duration) {
     return this.show({
       type: "info",
-      title,
       message,
       duration,
     });

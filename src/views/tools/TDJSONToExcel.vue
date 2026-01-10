@@ -108,7 +108,7 @@ export default {
         if (!file) return;
 
         if (!file.name.endsWith(".json")) {
-          me.$tdToast.error(null, "Chỉ hỗ trợ file JSON");
+          me.$tdToast.error("Chỉ hỗ trợ file JSON");
           return;
         }
 
@@ -119,13 +119,13 @@ export default {
             await me.convertToExcel();
           } catch (err) {
             console.error("JSON parse error:", err);
-            me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+            me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
           }
         };
         reader.readAsText(file);
       } catch (error) {
         console.error("File upload error:", error);
-        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
 
@@ -214,10 +214,10 @@ export default {
           me.fileName
         );
 
-        me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
+        me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
       } catch (error) {
         console.error("Convert excel error:", error);
-        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
   },

@@ -115,12 +115,12 @@ export default {
           };
           await me.$refs.history.saveToHistory(historyItem);
           if (!me.isFullscreenPreview) {
-            me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
+            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
           }
         }
       } catch (error) {
         console.error("Error previewing HTML:", error);
-        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
     handleCopyEvent(value) {

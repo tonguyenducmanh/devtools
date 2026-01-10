@@ -63,9 +63,9 @@ export default {
       let me = this;
       try {
         me.srcImg = me.base64Result;
-        me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
+        me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
       } catch (error) {
-        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
     handleDownloadImage() {

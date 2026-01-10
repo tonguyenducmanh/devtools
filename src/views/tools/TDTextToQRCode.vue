@@ -185,7 +185,7 @@ export default {
       chunks.forEach((chunk) => {
         me.generateQRCodeJS(chunk);
       });
-      me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
+      me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
     },
 
     /**

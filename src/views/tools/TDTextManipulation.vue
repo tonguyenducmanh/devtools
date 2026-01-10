@@ -163,9 +163,9 @@ export default {
             me.outputSource = arrResult.join(me.outputRowSeperatorActual);
           }
         }
-        me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
+        me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
       } catch (error) {
-        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
     manipulateByRow(inputItem) {

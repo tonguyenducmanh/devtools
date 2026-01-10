@@ -161,7 +161,6 @@ class TDUtility {
         vm.$data[key] = value;
       }
       toast.success(
-        null,
         i18nData.global.t("i18nCommon.toastMessage.applyMockSuccess")
       );
     }

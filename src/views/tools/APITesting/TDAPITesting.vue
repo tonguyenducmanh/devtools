@@ -918,7 +918,6 @@ export default {
                 if (request && request.requestId == me.currentRequestId) {
                   Object.assign(request, historyItem);
                   this.$tdToast.success(
-                    null,
                     this.$t("i18nCommon.toastMessage.success")
                   );
                   success = true;
@@ -954,7 +953,7 @@ export default {
         collection.requests.push(historyItem);
         await me.saveCollectionToCache();
         me.currentRequestId = newRequestId;
-        this.$tdToast.success(null, this.$t("i18nCommon.toastMessage.success"));
+        this.$tdToast.success(this.$t("i18nCommon.toastMessage.success"));
       }
     },
     async deleteRequest(collectionId, request) {
@@ -1247,14 +1246,14 @@ export default {
       if (parseCURLSuccess) {
         await me.handleSendRequest();
       } else {
-        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
     async handleSendRequest() {
       let me = this;
 
       if (!this.apiUrl) {
-        this.$tdToast.error(null, this.$t("i18nCommon.apiTesting.urlRequired"));
+        this.$tdToast.error(this.$t("i18nCommon.apiTesting.urlRequired"));
         return;
       }
 
@@ -1297,17 +1296,16 @@ export default {
           this.responseText = String(response.body);
         }
 
-        this.$tdToast.success(null, this.$t("i18nCommon.toastMessage.success"));
+        this.$tdToast.success(this.$t("i18nCommon.toastMessage.success"));
       } catch (error) {
         if (error.message === "Request cancelled by user") {
           this.responseText = this.$t("i18nCommon.apiTesting.requestCanceled");
           this.$tdToast.success(
-            null,
             this.$t("i18nCommon.apiTesting.requestCanceled")
           );
         } else {
           this.responseText = `Error: ${error.message}`;
-          this.$tdToast.error(null, error.message);
+          this.$tdToast.error(error.message);
         }
       } finally {
         this.isLoading = false;
@@ -1422,7 +1420,7 @@ export default {
         result = true;
       } else {
         if (!isSilence) {
-          me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
         }
         result = false;
       }
@@ -1436,7 +1434,7 @@ export default {
       let me = this;
 
       if (!me.proModeSecranioCode) {
-        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
         return;
       }
 
@@ -1473,10 +1471,10 @@ export default {
           me.responseText = "// Script executed successfully (no return)";
         }
 
-        me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
+        me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
       } catch (error) {
         me.responseText = `ProMode Error: ${error.message}`;
-        me.$tdToast.error(null, error.message);
+        me.$tdToast.error(error.message);
       } finally {
         me.isLoading = false;
         if (me.proModeSecranioCode) {

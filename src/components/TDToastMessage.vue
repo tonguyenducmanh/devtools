@@ -52,7 +52,6 @@
               </svg>
             </div>
             <div class="td-toast-message">
-              <div class="td-toast-title">{{ toast.title }}</div>
               <div v-if="toast.message" class="td-toast-text">
                 {{ toast.message }}
               </div>
@@ -80,7 +79,6 @@ export default {
       const newToast = {
         id,
         type: toast.type || "info",
-        title: toast.title || me.$t("i18nCommon.toastMessage.notiTitle"),
         message: toast.message || "",
         duration: toast.duration || 1500,
       };

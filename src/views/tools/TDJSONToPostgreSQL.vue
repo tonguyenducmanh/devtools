@@ -155,11 +155,11 @@ export default {
           config.enableDeleteScript = me.enableDeleteScript;
           config.enableCreateTable = me.enableCreateTable;
           me.outputSQL = me.buildScriptPostgreSQLScript(input, config);
-          me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
+          me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
         }
       } catch (error) {
         console.error("Error in convertToPostgresSQL:", error);
-        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
     haddleCopyEvent() {
@@ -178,14 +178,14 @@ export default {
               await me.convertToPostgresSQL();
             } catch (error) {
               console.error("Error processing JSON file:", error);
-              me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+              me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
             }
           };
           reader.readAsText(file);
         }
       } catch (error) {
         console.error("Error handling file upload:", error);
-        me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
     downloadSQLFile() {

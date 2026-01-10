@@ -152,10 +152,10 @@ export default {
               me.textOutput = finalOutput;
             }
           }
-          me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.converted"));
+          me.$tdToast.success(me.$t("i18nCommon.toastMessage.converted"));
         } catch (error) {
           console.error("Error in convertQRCode:", error);
-          me.$tdToast.error(null, me.$t("i18nCommon.toastMessage.error"));
+          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
         }
       }
     },
