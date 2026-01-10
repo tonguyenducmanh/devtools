@@ -460,7 +460,7 @@ export default {
           me.password
         );
         await me.saveUsername();
-        me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.saved"));
+        me.$tdToast.success(me.$t("i18nCommon.toastMessage.saved"));
       }
     },
     async openAuthenSaved() {
@@ -485,7 +485,7 @@ export default {
           await me.saveUsername();
         }
       }
-      me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.opened"));
+      me.$tdToast.success(me.$t("i18nCommon.toastMessage.opened"));
     },
     /**
      * Google Authenticator uses protobuff to encode the 2fa data.
@@ -557,7 +557,7 @@ export default {
         let clonedObject = me.$tdUtility.cloneDeep(toRaw(me.addNewObject));
         if (clonedObject) {
           me.decodedData.push(clonedObject);
-          me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
+          me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
           me.buildData();
           me.addNewObject = {
             issuer: null,
@@ -594,7 +594,7 @@ export default {
         if (me.password && me.username && me.autoSave) {
           me.saveAuthen();
         }
-        me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.removed"));
+        me.$tdToast.success(me.$t("i18nCommon.toastMessage.removed"));
       }
     },
     startProgressTimer() {

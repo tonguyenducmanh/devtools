@@ -35,7 +35,7 @@ export default {
     handleGenerate() {
       let me = this;
       me.uuidv4Result = me.$tdUtility.newGuid();
-      me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
+      me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
     },
     haddleCopyEvent() {
       let me = this;

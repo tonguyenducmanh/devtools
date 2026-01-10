@@ -109,7 +109,7 @@ export default {
         );
       }
       me.outputSource = result;
-      me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
+      me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
     },
     async handleDempress() {
       let me = this;
@@ -121,7 +121,7 @@ export default {
         );
       }
       me.inputSource = result;
-      me.$tdToast.success(null, me.$t("i18nCommon.toastMessage.success"));
+      me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
     },
   },
   data() {
