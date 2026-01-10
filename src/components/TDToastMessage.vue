@@ -94,7 +94,7 @@ export default {
         duration: toast.duration || 1500,
       };
 
-      this.toasts.push(newToast);
+      this.toasts.unshift(newToast);
 
       // Tự động xóa toast sau thời gian đã định
       setTimeout(() => {
