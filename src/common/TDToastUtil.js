@@ -33,7 +33,7 @@ class ToastManager {
       title:
         options.title || i18nData.global.t("i18nCommon.toastMessage.notiTitle"),
       message: options.message || "",
-      duration: options.duration || 3000,
+      duration: options.duration || 1500,
     };
 
     return this.toastInstance.addToast(config);
