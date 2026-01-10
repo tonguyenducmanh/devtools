@@ -4,8 +4,8 @@
     <div class="td-toast-container">
       <transition-group name="td-toast" tag="div">
         <div
-          v-for="(toast, index) in toasts"
-          :key="index"
+          v-for="toast in toasts"
+          :key="toast.id"
           :class="['toast', `td-toast-${toast.type}`]"
         >
           <div class="td-toast-content">
@@ -74,18 +74,18 @@
 </template>
 
 <script>
-import TDUtility from "@/common/TDUtility.js";
 export default {
   name: "TDToastMessage",
   data() {
     return {
       toasts: [],
+      toastIdCounter: 0,
     };
   },
   methods: {
     addToast(toast) {
       let me = this;
-      const id = TDUtility.newGuid();
+      const id = ++this.toastIdCounter;
       const newToast = {
         id,
         type: toast.type || "info",
