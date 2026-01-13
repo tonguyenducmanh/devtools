@@ -1,6 +1,6 @@
 import * as insomniaCURL from "./insomnia/curl.ts";
 import TDUtility from "@/common/TDUtility.js";
-
+import * as curlReader from "./curlReader/index.ts";
 /**
  * các method CURL dùng cho toàn bộ frontend
  * Created by tdmanh 16/12/2025
@@ -123,18 +123,7 @@ class TDCURLUtil {
         body: "",
         headersText: "",
       };
-      if (Array.isArray(dataParse.headers) && dataParse.headers.length > 0) {
-        let allHeaders = [];
-        dataParse.headers.forEach((header) => {
-          if (header && header.name && header.value) {
-            result.headers[header.name] = header.value;
-            allHeaders.push(`${header.name}:${header.value}`);
-          }
-        });
-        if (allHeaders && allHeaders.length > 0) {
-          result.headersText = allHeaders.join("\n");
-        }
-      }
+      this.buildHeaderText(dataParse, result, "name");
       if (dataParse?.body?.text) {
         result.body = dataParse.body.text;
       }
@@ -147,12 +136,43 @@ class TDCURLUtil {
             ? JSON.stringify(JSON.parse(result.body), null, 2)
             : null;
         } catch (ex) {
+          console.log("Không parse được curl, thử cách khác");
           console.log(ex);
-          result.bodyText = result.body;
+          // nếu như sử dụng parse thư viện không được thì dùng parse truyền thống
+          let dataParseCustom = curlReader.parse(curlText);
+          if (dataParseCustom) {
+            result = {
+              url: dataParseCustom.url,
+              method: dataParseCustom.method,
+              headers: dataParseCustom.headers,
+              body: dataParseCustom.body,
+            };
+            if (result.body) {
+              result.bodyText = result.body
+                ? JSON.stringify(JSON.parse(result.body), null, 2)
+                : null;
+            }
+            this.buildHeaderText(dataParseCustom, result, "key");
+          }
         }
       }
     }
     return result;
+  }
+
+  buildHeaderText(dataParse, result, field = "key") {
+    if (Array.isArray(dataParse.headers) && dataParse.headers.length > 0) {
+      let allHeaders = [];
+      dataParse.headers.forEach((header) => {
+        if (header && header[field] && header.value) {
+          result.headers[header[field]] = header.value;
+          allHeaders.push(`${header[field]}:${header.value}`);
+        }
+      });
+      if (allHeaders && allHeaders.length > 0) {
+        result.headersText = allHeaders.join("\n");
+      }
+    }
   }
 
   /**
