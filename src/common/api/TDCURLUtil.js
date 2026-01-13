@@ -109,6 +109,7 @@ class TDCURLUtil {
     let buildSuccess = false;
     // build ra chuỗi header dạng text
     let buildHeaderText = function (dataParse, result, field = "key") {
+      result.headers = {};
       if (Array.isArray(dataParse.headers) && dataParse.headers.length > 0) {
         let allHeaders = [];
         dataParse.headers.forEach((header) => {
@@ -147,7 +148,6 @@ class TDCURLUtil {
       result = {
         url: dataParse.url,
         method: dataParse.method,
-        headers: {},
         body: dataParse.body.text,
       };
       buildHeaderText(dataParse, result, "name");
@@ -161,7 +161,6 @@ class TDCURLUtil {
         result = {
           url: dataParseCustom.url,
           method: dataParseCustom.method,
-          headers: dataParseCustom.headers,
           body: dataParseCustom.body,
         };
         buildHeaderText(dataParseCustom, result, "key");
