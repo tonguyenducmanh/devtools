@@ -337,7 +337,11 @@
       <!-- hết phần nội dung tùy thuộc vào từng loại api -->
     </div>
     <!-- phần nội dung sidebar -->
-    <TDSubSidebar ref="subSidebar" v-model="APIConfigLayout.isShowSidebar">
+    <TDSubSidebar
+      ref="subSidebar"
+      v-model="APIConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <!-- slide tùy chọn như cài đặt hoặc collection -->
       <template v-slot:menu>
         <div class="td-sidebar-menu">
@@ -848,7 +852,6 @@ export default {
     },
     async toggleSidebar() {
       let me = this;
-      me.APIConfigLayout.isShowSidebar = !me.APIConfigLayout.isShowSidebar;
       await me.updateAPIConfigLayout();
     },
     async addNewCollection(collectionName) {
