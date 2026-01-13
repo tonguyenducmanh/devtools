@@ -6,9 +6,9 @@
       :class="{ 'td-sub-sidebar-collaspe': !modelValue }"
     >
       <!-- phần thanh border ngăn cách main area và sidebar area -->
-      <div v-if="modelValue" class="divide"></div>
-      <div v-if="modelValue" class="flex flex-col td-sub-sidebar-content">
-        <div v-if="$slots.menu" class="td-sidebar-menu">
+      <div v-show="modelValue" class="divide"></div>
+      <div v-show="modelValue" class="flex flex-col td-sub-sidebar-content">
+        <div v-show="$slots.menu" class="td-sidebar-menu">
           <slot name="menu" />
         </div>
         <slot name="main" />
