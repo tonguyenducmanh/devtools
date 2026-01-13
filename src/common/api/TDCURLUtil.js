@@ -104,9 +104,9 @@ class TDCURLUtil {
    * @param {string} curlText
    */
   parseCURL(curlText) {
-    let me = this;
     let result = null;
     let dataParse = null;
+    let buildSuccess = false;
     // build ra chuỗi header dạng text
     let buildHeaderText = function (dataParse, result, field = "key") {
       if (Array.isArray(dataParse.headers) && dataParse.headers.length > 0) {
@@ -122,54 +122,50 @@ class TDCURLUtil {
         }
       }
     };
-    let data = insomniaCURL.convert(curlText);
-    if (data) {
-      if (Array.isArray(data) && data.length > 0) {
-        dataParse = data[0];
+    // build ra body theo data truyền vào
+    let buildBody = function (result) {
+      let parseSuccess = false;
+      if (result.body == "null") {
+        result.body = null;
       } else {
-        dataParse = data;
+        try {
+          if (result.body) {
+            result.bodyText = result.body
+              ? JSON.stringify(JSON.parse(result.body), null, 2)
+              : null;
+          }
+          parseSuccess = true;
+        } catch (ex) {
+          console.log(ex);
+        }
       }
-    }
+      return parseSuccess;
+    };
+    let data = insomniaCURL.convert(curlText);
+    dataParse = Array.isArray(data) ? data[0] : data;
     if (dataParse) {
       result = {
         url: dataParse.url,
         method: dataParse.method,
         headers: {},
-        body: "",
-        headersText: "",
+        body: dataParse.body.text,
       };
       buildHeaderText(dataParse, result, "name");
-      if (dataParse?.body?.text) {
-        result.body = dataParse.body.text;
-      }
-
-      if (result.body == "null") {
-        result.body = null;
-      } else {
-        try {
-          result.bodyText = result.body
-            ? JSON.stringify(JSON.parse(result.body), null, 2)
-            : null;
-        } catch (ex) {
-          console.log("Không parse được curl, thử cách khác");
-          console.log(ex);
-          // nếu như sử dụng parse thư viện không được thì dùng parse truyền thống
-          let dataParseCustom = curlReader.parse(curlText);
-          if (dataParseCustom) {
-            result = {
-              url: dataParseCustom.url,
-              method: dataParseCustom.method,
-              headers: dataParseCustom.headers,
-              body: dataParseCustom.body,
-            };
-            if (result.body) {
-              result.bodyText = result.body
-                ? JSON.stringify(JSON.parse(result.body), null, 2)
-                : null;
-            }
-            buildHeaderText(dataParseCustom, result, "key");
-          }
-        }
+      buildSuccess = buildBody(result);
+    }
+    if (!buildSuccess) {
+      console.log("Không parse được curl, thử cách khác");
+      // nếu như sử dụng parse thư viện không được thì dùng parse truyền thống
+      let dataParseCustom = curlReader.parse(curlText);
+      if (dataParseCustom) {
+        result = {
+          url: dataParseCustom.url,
+          method: dataParseCustom.method,
+          headers: dataParseCustom.headers,
+          body: dataParseCustom.body,
+        };
+        buildHeaderText(dataParseCustom, result, "key");
+        buildBody(result);
       }
     }
     return result;
