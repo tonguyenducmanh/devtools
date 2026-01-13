@@ -3,7 +3,7 @@ export default [
     tooltipKey: "DemoRequestPromode",
     content: `let curlOne = \`
     curl 'http://localhost:3000/api/get_list_item?limit=5'\\
-         --header 'Content-Type: application/json
+         --header 'Content-Type: application/json'
 \`;
 
 let responseOne = await requestCURL(curlOne);
@@ -13,12 +13,12 @@ return responseOne.body;`,
     tooltipKey: "MultipleCurl",
     content: `let curlOne = \`
     curl 'http://localhost:3000/api/get_list_item?limit=5'\\
-         --header 'Content-Type: application/json
+         --header 'Content-Type: application/json'
 \`;
 let keyReplace = "##item_id##";
 let curlTwo = \`
     curl 'http://localhost:3000/api/get_detail_item?item_id=$\{keyReplace}'\\
-         --header 'Content-Type: application/json
+         --header 'Content-Type: application/json'
 \`
 let responseOne = await requestCURL(curlOne);
 let finalResponeArr = [];
@@ -40,7 +40,7 @@ return finalResponeArr;`,
     content: `function makeCurlRequest(index) {
   let curl = \`
     curl 'http://localhost:3000/api/get_list_item?limit=5'\\
-         --header 'Content-Type: application/json
+         --header 'Content-Type: application/json'
 \`;
   return curl;
 }
@@ -116,7 +116,7 @@ return await batchRequests();`,
 
 let curl = \`
     curl 'http://localhost:3000/api/unstable_endpoint'\\
-         --header 'Content-Type: application/json
+         --header 'Content-Type: application/json'
 \`;
 
 return await requestWithRetry(curl);`,
