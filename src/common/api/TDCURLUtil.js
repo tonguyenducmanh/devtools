@@ -106,8 +106,23 @@ class TDCURLUtil {
   parseCURL(curlText) {
     let me = this;
     let result = null;
-    let data = insomniaCURL.convert(curlText);
     let dataParse = null;
+    // build ra chuỗi header dạng text
+    let buildHeaderText = function (dataParse, result, field = "key") {
+      if (Array.isArray(dataParse.headers) && dataParse.headers.length > 0) {
+        let allHeaders = [];
+        dataParse.headers.forEach((header) => {
+          if (header && header[field] && header.value) {
+            result.headers[header[field]] = header.value;
+            allHeaders.push(`${header[field]}:${header.value}`);
+          }
+        });
+        if (allHeaders && allHeaders.length > 0) {
+          result.headersText = allHeaders.join("\n");
+        }
+      }
+    };
+    let data = insomniaCURL.convert(curlText);
     if (data) {
       if (Array.isArray(data) && data.length > 0) {
         dataParse = data[0];
@@ -123,7 +138,7 @@ class TDCURLUtil {
         body: "",
         headersText: "",
       };
-      this.buildHeaderText(dataParse, result, "name");
+      buildHeaderText(dataParse, result, "name");
       if (dataParse?.body?.text) {
         result.body = dataParse.body.text;
       }
@@ -152,27 +167,12 @@ class TDCURLUtil {
                 ? JSON.stringify(JSON.parse(result.body), null, 2)
                 : null;
             }
-            this.buildHeaderText(dataParseCustom, result, "key");
+            buildHeaderText(dataParseCustom, result, "key");
           }
         }
       }
     }
     return result;
-  }
-
-  buildHeaderText(dataParse, result, field = "key") {
-    if (Array.isArray(dataParse.headers) && dataParse.headers.length > 0) {
-      let allHeaders = [];
-      dataParse.headers.forEach((header) => {
-        if (header && header[field] && header.value) {
-          result.headers[header[field]] = header.value;
-          allHeaders.push(`${header[field]}:${header.value}`);
-        }
-      });
-      if (allHeaders && allHeaders.length > 0) {
-        result.headersText = allHeaders.join("\n");
-      }
-    }
   }
 
   /**
