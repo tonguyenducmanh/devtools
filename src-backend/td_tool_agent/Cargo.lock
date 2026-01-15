@@ -1016,7 +1016,6 @@ name = "td_tool_agent"
 version = "0.1.0"
 dependencies = [
  "reqwest",
- "serde",
  "serde_json",
  "td_tool_model",
  "tokio",
