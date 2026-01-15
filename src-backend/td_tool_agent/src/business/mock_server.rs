@@ -7,11 +7,8 @@ use tokio::task::JoinHandle;
 
 #[derive(Clone, Debug)]
 pub struct MockRoute {
-    pub request_match: String,
-    pub method: String,
-    pub response: String,
-    pub status: u16,
-    pub headers: String,
+    request_match: String,
+    response: String,
 }
 
 #[derive(Clone)]
@@ -38,7 +35,7 @@ impl MockServer {
         println!("Mock server '{}' started on {}", self.name, addr);
 
         let routes = Arc::clone(&self.routes);
-        let _name = self.name.clone();
+        let name = self.name.clone();
         let port = self.port;
 
         let task = tokio::spawn(async move {
@@ -62,16 +59,9 @@ impl MockServer {
                                     drop(routes_lock); // Giải phóng lock ngay
 
                                     if let Some(route) = matched_route {
-                                        let mut response_headers = route.headers.clone();
-                                        if !response_headers.is_empty() && !response_headers.ends_with("\r\n") {
-                                            response_headers.push_str("\r\n");
-                                        }
-                                        
                                         let http_response = format!(
-                                            "HTTP/1.1 {} OK\r\nContent-Length: {}\r\nContent-Type: application/json\r\n{}\r\n{}",
-                                            route.status,
+                                            "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nContent-Type: text/plain\r\n\r\n{}",
                                             route.response.len(),
-                                            response_headers,
                                             route.response
                                         );
                                         let _ = socket.write_all(http_response.as_bytes()).await;
@@ -95,13 +85,8 @@ impl MockServer {
 
     async fn add_routes(&self, new_routes: Vec<MockRoute>) {
         let mut routes = self.routes.lock().await;
-        let count = new_routes.len();
         routes.extend(new_routes);
-        println!(
-            "Added {} new routes to server '{}'",
-            count,
-            self.name
-        );
+        println!("Added {} new routes to server '{}'", routes.len(), self.name);
     }
 
     async fn stop(&self) {
@@ -127,7 +112,7 @@ impl MockServerManager {
         &self,
         name: String,
         port: u16,
-        routes: Vec<(String, String, String, u16, String)>, // (request_match, method, response, status, headers)
+        routes: Vec<(String, String)>, // Vec của (request_match, response)
     ) -> Result<(), Box<dyn std::error::Error>> {
         let mut servers = self.servers.lock().await;
 
@@ -136,12 +121,9 @@ impl MockServerManager {
             // Server đã tồn tại, thêm routes mới vào
             let mock_routes: Vec<MockRoute> = routes
                 .into_iter()
-                .map(|(req, method, res, status, headers)| MockRoute {
+                .map(|(req, res)| MockRoute {
                     request_match: req,
-                    method,
                     response: res,
-                    status,
-                    headers,
                 })
                 .collect();
 
@@ -151,12 +133,9 @@ impl MockServerManager {
             // Tạo server mới
             let mock_routes: Vec<MockRoute> = routes
                 .into_iter()
-                .map(|(req, method, res, status, headers)| MockRoute {
+                .map(|(req, res)| MockRoute {
                     request_match: req,
-                    method,
                     response: res,
-                    status,
-                    headers,
                 })
                 .collect();
 
@@ -189,15 +168,20 @@ impl MockServerManager {
         println!("All servers removed");
     }
 
-    pub async fn list_servers(&self) -> Vec<(String, u16, usize)> {
+    pub async fn list_servers(&self) {
         let servers = self.servers.lock().await;
-        let mut server_list = Vec::new();
 
-        for (name, server) in servers.iter() {
-            let routes = server.routes.lock().await;
-            server_list.push((name.clone(), server.port, routes.len()));
+        if servers.is_empty() {
+            println!("No active servers");
+        } else {
+            println!("Active servers:");
+            for (name, server) in servers.iter() {
+                let routes = server.routes.lock().await;
+                println!("  '{}' on port {} with {} routes:", name, server.port, routes.len());
+                for (i, route) in routes.iter().enumerate() {
+                    println!("    [{}] '{}' -> '{}'", i + 1, route.request_match, route.response);
+                }
+            }
         }
-
-        server_list
     }
 }
