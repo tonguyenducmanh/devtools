@@ -1092,6 +1092,7 @@ name = "td_tool_agent"
 version = "0.1.0"
 dependencies = [
  "reqwest",
+ "serde",
  "serde_json",
  "td_tool_model",
  "tokio",
@@ -1102,6 +1103,7 @@ name = "td_tool_api"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "serde",
  "td_tool_agent",
  "td_tool_model",
  "tokio",
