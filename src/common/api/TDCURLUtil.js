@@ -107,65 +107,70 @@ class TDCURLUtil {
     let result = null;
     let dataParse = null;
     let buildSuccess = false;
-    // build ra chuỗi header dạng text
-    let buildHeaderText = function (dataParse, result, field = "key") {
-      result.headers = {};
-      if (Array.isArray(dataParse.headers) && dataParse.headers.length > 0) {
-        let allHeaders = [];
-        dataParse.headers.forEach((header) => {
-          if (header && header[field] && header.value) {
-            result.headers[header[field]] = header.value;
-            allHeaders.push(`${header[field]}:${header.value}`);
+    try {
+      // build ra chuỗi header dạng text
+      let buildHeaderText = function (dataParse, result, field = "key") {
+        result.headers = {};
+        if (Array.isArray(dataParse.headers) && dataParse.headers.length > 0) {
+          let allHeaders = [];
+          dataParse.headers.forEach((header) => {
+            if (header && header[field] && header.value) {
+              result.headers[header[field]] = header.value;
+              allHeaders.push(`${header[field]}:${header.value}`);
+            }
+          });
+          if (allHeaders && allHeaders.length > 0) {
+            result.headersText = allHeaders.join("\n");
           }
-        });
-        if (allHeaders && allHeaders.length > 0) {
-          result.headersText = allHeaders.join("\n");
         }
-      }
-    };
-    // build ra body theo data truyền vào
-    let buildBody = function (result) {
-      let parseSuccess = false;
-      if (result.body == "null") {
-        result.body = null;
-      } else {
-        try {
-          if (result.body) {
-            result.bodyText = result.body
-              ? JSON.stringify(JSON.parse(result.body), null, 2)
-              : null;
-          }
-          parseSuccess = true;
-        } catch (ex) {
-          console.log(ex);
-        }
-      }
-      return parseSuccess;
-    };
-    let data = insomniaCURL.convert(curlText);
-    dataParse = Array.isArray(data) ? data[0] : data;
-    if (dataParse) {
-      result = {
-        url: dataParse.url,
-        method: dataParse.method,
-        body: dataParse.body.text,
       };
-      buildHeaderText(dataParse, result, "name");
-      buildSuccess = buildBody(result);
-    }
-    if (!buildSuccess) {
-      console.log("Không parse được curl, thử cách khác");
-      // nếu như sử dụng parse thư viện không được thì dùng parse truyền thống
-      let dataParseCustom = curlReader.parse(curlText);
-      if (dataParseCustom) {
+      // build ra body theo data truyền vào
+      let buildBody = function (result) {
+        let parseSuccess = false;
+        if (result.body == "null") {
+          result.body = null;
+        } else {
+          try {
+            if (result.body) {
+              result.bodyText = result.body
+                ? JSON.stringify(JSON.parse(result.body), null, 2)
+                : null;
+            }
+            parseSuccess = true;
+          } catch (ex) {
+            console.log(ex);
+          }
+        }
+        return parseSuccess;
+      };
+      let data = insomniaCURL.convert(curlText);
+      dataParse = Array.isArray(data) ? data[0] : data;
+      if (dataParse) {
         result = {
-          url: dataParseCustom.url,
-          method: dataParseCustom.method,
-          body: dataParseCustom.body,
+          url: dataParse.url,
+          method: dataParse.method,
+          body: dataParse.body.text,
         };
-        buildHeaderText(dataParseCustom, result, "key");
-        buildBody(result);
+        buildHeaderText(dataParse, result, "name");
+        buildSuccess = buildBody(result);
       }
+      if (!buildSuccess) {
+        console.log("Không parse được curl, thử cách khác");
+        // nếu như sử dụng parse thư viện không được thì dùng parse truyền thống
+        let dataParseCustom = curlReader.parse(curlText);
+        if (dataParseCustom) {
+          result = {
+            url: dataParseCustom.url,
+            method: dataParseCustom.method,
+            body: dataParseCustom.body,
+          };
+          buildHeaderText(dataParseCustom, result, "key");
+          buildSuccess = buildBody(result);
+        }
+      }
+    } catch (errorTotal) {
+      // đảm bảo phải log lại tránh lỗi effect bên ngoài
+      console.log(errorTotal);
     }
     return result;
   }
