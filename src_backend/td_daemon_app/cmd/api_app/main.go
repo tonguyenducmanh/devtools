@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	apiApp "td_api_service/external/api_app"
+	apiApp "td_core_service/external/api_app"
 )
 
 func main() {

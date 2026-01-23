@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"strings"
 
-	"td_api_service/internal/model"
+	"td_core_service/internal/model"
 )
 
 type TDAPITestingService interface {
