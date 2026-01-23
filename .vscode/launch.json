@@ -23,9 +23,9 @@
       "cwd": "${workspaceFolder}",
       "args": [
         "-api-port=7777",
-        "-api-trace=true",
+        "-api-trace=false",
         "-web-port=8080",
-        "-web-trace=true"
+        "-web-trace=false"
       ],
       "env": {
         "GO_ENV": "development"
