@@ -12,9 +12,6 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 
-// AppState (placeholder giống Rust)
-const appState = {};
-
 // Health check
 app.get("/", (req, res) => {
   res.send("Ok");
