@@ -49,5 +49,7 @@ GOOS=windows GOARCH=amd64 \
 go build -o "$OUTPUT_DIR/$OUTPUT_NAME.exe" .
 
 rm -rf "$FRONTEND_DIST"
+rm -rf "$WEB_APP_DIR"
+
 
 echo "Build thành công!"
