@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import minimist from "minimist";
-import { executeRequest } from "./src/common/executeRequest.js";
+import { tdAPITesting } from "./src/business/TDAPITesting.js";
 
 const args = minimist(process.argv.slice(2));
 const port = args.port || 7777;
@@ -24,7 +24,7 @@ app.get("/", (req, res) => {
 app.post("/exec", async (req, res) => {
   try {
     console.log("Đã nhận được request" + JSON.stringify(req.body));
-    const result = await executeRequest(req.body);
+    const result = await tdAPITesting.executeRequest(req.body);
     res.json(result);
     console.log("Đã nhận được response" + result.body);
   } catch (err) {
