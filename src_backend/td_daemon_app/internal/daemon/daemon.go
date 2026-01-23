@@ -2,7 +2,7 @@ package daemon
 
 import (
 	"flag"
-	"td_api_service/external/api_app"
+	apiApp "td_api_service/external/api_app"
 )
 
 /**
@@ -13,5 +13,5 @@ func RunDaemon() {
 	trace := flag.Bool("api-trace", false, "Hiển thị log chi tiết cho Web server")
 
 	flag.Parse()
-	api_app.BuildAPIRoute(api_port, trace)
+	apiApp.BuildAPIRoute(api_port, trace)
 }

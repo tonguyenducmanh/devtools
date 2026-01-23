@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 	"td_daemon_app/internal/daemon"
-	"td_daemon_app/internal/web_app"
+	webApp "td_daemon_app/internal/web_app"
 )
 
 const banner = `
@@ -31,7 +31,7 @@ func main() {
 
 	go func() {
 		defer wg.Done()
-		web_app.RunWebApp()
+		webApp.RunWebApp()
 	}()
 
 	wg.Wait() // chờ 2 service chạy xong
