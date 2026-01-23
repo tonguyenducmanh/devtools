@@ -8,19 +8,16 @@ import (
 	"td_api_service/internal/service"
 )
 
+/**
+ * build ra api route
+ */
 func BuildAPIRoute(port *int, trace *bool) {
-
-	// Khởi tạo router của thư viện chuẩn (Go 1.22+)
 	mux := http.NewServeMux()
 
 	apiSvc := service.NewAPITestService()
 	apiCtrl := controller.NewAPIController(apiSvc, trace)
 
-	// Routing cực gọn
-	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "Ok")
-	})
-	mux.HandleFunc("POST /exec", apiCtrl.Execute)
+	addRoute(mux, apiCtrl)
 
 	// Xâu chuỗi Middlewares: CORS -> Router
 	finalHandler := middleware.CORS(mux)
@@ -31,4 +28,14 @@ func BuildAPIRoute(port *int, trace *bool) {
 	if err := http.ListenAndServe(addr, finalHandler); err != nil {
 		panic(err)
 	}
+}
+
+/**
+ * thêm các route xử lý nghiệp vụ
+ */
+func addRoute(mux *http.ServeMux, apiCtrl *controller.APIController) {
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "Ok")
+	})
+	mux.HandleFunc("POST /exec", apiCtrl.Execute)
 }
