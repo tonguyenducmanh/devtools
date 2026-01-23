@@ -70,8 +70,8 @@ func (s *apiTestService) ExecuteRequest(reqData model.ExecuteRequest, trace *boo
 
 	if *trace {
 		reqDataText, _ := json.Marshal(reqData)
-		fmt.Sprintln("Call api request: " + string(reqDataText))
-		fmt.Sprintln("Call api response: " + string(respBody))
+		fmt.Printf("Call api request: %s", string(reqDataText))
+		fmt.Printf("Call api response: %s", string(respBody))
 	}
 
 	// Ép kiểu headers về JSON string như code cũ
