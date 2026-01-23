@@ -3,8 +3,8 @@ package api_app
 import (
 	"fmt"
 	"net/http"
-	"td_api_service/internal/middleware"
-	"td_api_service/internal/service"
+	"td_core_service/internal/middleware"
+	"td_core_service/internal/service"
 )
 
 /**
