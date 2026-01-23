@@ -3,7 +3,6 @@ package api_app
 import (
 	"fmt"
 	"net/http"
-	"td_api_service/internal/controller"
 	"td_api_service/internal/middleware"
 	"td_api_service/internal/service"
 )
@@ -12,15 +11,12 @@ import (
  * build ra api route
  */
 func BuildAPIRoute(port *int, trace *bool) {
-	mux := http.NewServeMux()
+	app := http.NewServeMux()
 
-	apiSvc := service.GetTDAPITestService()
-	apiCtrl := controller.NewAPIController(apiSvc, trace)
-
-	addRoute(mux, apiCtrl)
+	addRoute(app)
 
 	// Xâu chuỗi Middlewares: CORS -> Router
-	finalHandler := middleware.CORS(mux)
+	finalHandler := middleware.CORS(app)
 
 	addr := fmt.Sprintf(":%d", *port)
 	fmt.Printf("Server API đang chạy tại http://localhost%s\n", addr)
@@ -33,9 +29,9 @@ func BuildAPIRoute(port *int, trace *bool) {
 /**
  * thêm các route xử lý nghiệp vụ
  */
-func addRoute(mux *http.ServeMux, apiCtrl *controller.APIController) {
-	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+func addRoute(app *http.ServeMux) {
+	app.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Ok")
 	})
-	mux.HandleFunc("POST /exec", apiCtrl.Execute)
+	app.HandleFunc("POST /exec", service.GetTDAPITestService().Execute)
 }

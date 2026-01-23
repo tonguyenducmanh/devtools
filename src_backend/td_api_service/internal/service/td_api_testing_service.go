@@ -13,7 +13,7 @@ import (
 )
 
 type TDAPITestingService interface {
-	ExecuteRequest(req model.TDAPITestingParam, trace *bool) (*model.TDAPITestingResponse, error)
+	Execute(w http.ResponseWriter, r *http.Request)
 }
 
 type tdAPITestingService struct{}
@@ -25,7 +25,7 @@ func GetTDAPITestService() TDAPITestingService {
 /**
  * parse header được stringify từ frontend
  */
-func (s *tdAPITestingService) parseHeaders(text string) map[string]string {
+func (e *tdAPITestingService) parseHeaders(text string) map[string]string {
 	headers := make(map[string]string)
 	lines := strings.Split(text, "\n")
 	for _, line := range lines {
@@ -42,9 +42,31 @@ func (s *tdAPITestingService) parseHeaders(text string) map[string]string {
 }
 
 /**
+ * thực hiện request
+ */
+func (e *tdAPITestingService) Execute(w http.ResponseWriter, r *http.Request) {
+	var req model.TDAPITestingParam
+
+	// Thay thế binding của Gin bằng json.Decoder
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
+		return
+	}
+
+	result, err := e.ExecuteRequest(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
+}
+
+/**
  * thực hiện gọi nối api cho frontend
  */
-func (s *tdAPITestingService) ExecuteRequest(reqData model.TDAPITestingParam, trace *bool) (*model.TDAPITestingResponse, error) {
+func (e *tdAPITestingService) ExecuteRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingResponse, error) {
 	// Cấu hình Client bỏ qua SSL (tương đương rejectUnauthorized: false)
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -58,7 +80,7 @@ func (s *tdAPITestingService) ExecuteRequest(reqData model.TDAPITestingParam, tr
 	}
 
 	// Thêm headers
-	headers := s.parseHeaders(reqData.HeadersText)
+	headers := e.parseHeaders(reqData.HeadersText)
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
@@ -72,12 +94,6 @@ func (s *tdAPITestingService) ExecuteRequest(reqData model.TDAPITestingParam, tr
 
 	// Đọc body trả về
 	respBody, _ := io.ReadAll(resp.Body)
-
-	if *trace {
-		reqDataText, _ := json.Marshal(reqData)
-		fmt.Printf("Call api request: %s", string(reqDataText))
-		fmt.Printf("Call api response: %s", string(respBody))
-	}
 
 	// Ép kiểu headers về JSON string như code cũ
 	headerJson, _ := json.Marshal(resp.Header)
