@@ -6,9 +6,3 @@ type ExecuteRequest struct {
 	HeadersText string `json:"headers_text"`
 	BodyText    string `json:"body_text"`
 }
-
-type ExecuteResponse struct {
-	Status  int    `json:"status"`
-	Headers string `json:"headers"`
-	Body    string `json:"body"`
-}
