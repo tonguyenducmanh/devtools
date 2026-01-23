@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 	"td_daemon_app/internal/daemon"
 	"td_daemon_app/internal/web_app"
 )
@@ -20,6 +21,18 @@ From TDManh with luv
 func main() {
 	fmt.Print(banner)
 
-	daemon.RunDaemon()
-	web_app.RunWebApp()
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		daemon.RunDaemon()
+	}()
+
+	go func() {
+		defer wg.Done()
+		web_app.RunWebApp()
+	}()
+
+	wg.Wait() // chờ 2 service chạy xong
 }

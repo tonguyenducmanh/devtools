@@ -161,7 +161,7 @@ class TDUtility {
         vm.$data[key] = value;
       }
       toast.success(
-        i18nData.global.t("i18nCommon.toastMessage.applyMockSuccess")
+        i18nData.global.t("i18nCommon.toastMessage.applyMockSuccess"),
       );
     }
   }
@@ -186,7 +186,7 @@ class TDUtility {
 
     return keys.reduce(
       (acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined),
-      obj
+      obj,
     );
   }
 
@@ -242,7 +242,7 @@ class TDUtility {
    */
   createFileDownloadName(
     input,
-    { ext = "", maxLength = 120, fallback = "download" } = {}
+    { ext = "", maxLength = 120, fallback = "download" } = {},
   ) {
     if (typeof input !== "string") {
       input = fallback;
@@ -351,7 +351,7 @@ class TDUtility {
    * Kiểm tra xem có phải phiên bản app desktop không
    */
   isDesktopApp() {
-    return window && window.__TAURI_INTERNALS__;
+    return false;
   }
   reloadApp() {
     window.location.reload();
