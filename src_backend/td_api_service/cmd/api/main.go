@@ -29,7 +29,7 @@ func main() {
 	finalHandler := middleware.Logger(middleware.CORS(mux))
 
 	addr := fmt.Sprintf(":%d", *port)
-	fmt.Printf("🚀 Server Native Go đang chạy tại %s\n", addr)
+	fmt.Printf("Server API đang chạy tại %s\n", addr)
 
 	if err := http.ListenAndServe(addr, finalHandler); err != nil {
 		panic(err)
