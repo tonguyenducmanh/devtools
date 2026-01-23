@@ -16,10 +16,6 @@ OUTPUT_NAME="tool-tomanh-daemon"
 echo "Đang build Go daemon..."
 cd "$DAEMON_DIR"
 
-echo "Building for Mac Intel..."
-GOOS=darwin GOARCH=amd64 \
-go build -o "$OUTPUT_DIR/$OUTPUT_NAME-mac-intel" .
-
 echo "Building for Mac Apple Silicon..."
 GOOS=darwin GOARCH=arm64 \
 go build -o "$OUTPUT_DIR/$OUTPUT_NAME-mac-arm" .
