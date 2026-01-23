@@ -1,4 +1,6 @@
-chmod 777 ./build_api.sh
-chmod 777 ./build_daemon.sh
-./build_api.sh
-./build_daemon.sh
+chmod 777 ./scripts/build_api.sh
+chmod 777 ./scripts/build_web_for_daemon.sh
+chmod 777 ./scripts/build_daemon.sh
+./scripts/build_api.sh
+./scripts/build_web_for_daemon.sh
+./scripts/build_daemon.sh
