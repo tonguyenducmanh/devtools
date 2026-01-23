@@ -8,5 +8,6 @@ import (
 func main() {
 	port := flag.Int("port", 7777, "Port to run the server")
 	flag.Parse()
-	api_app.BuildAPIRoute(port)
+	var trace bool = false
+	api_app.BuildAPIRoute(port, &trace)
 }

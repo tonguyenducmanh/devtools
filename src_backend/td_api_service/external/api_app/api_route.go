@@ -8,13 +8,13 @@ import (
 	"td_api_service/internal/service"
 )
 
-func BuildAPIRoute(port *int) {
+func BuildAPIRoute(port *int, trace *bool) {
 
 	// Khởi tạo router của thư viện chuẩn (Go 1.22+)
 	mux := http.NewServeMux()
 
 	apiSvc := service.NewAPITestService()
-	apiCtrl := controller.NewAPIController(apiSvc)
+	apiCtrl := controller.NewAPIController(apiSvc, trace)
 
 	// Routing cực gọn
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
@@ -22,8 +22,8 @@ func BuildAPIRoute(port *int) {
 	})
 	mux.HandleFunc("POST /exec", apiCtrl.Execute)
 
-	// Xâu chuỗi Middlewares: Logger -> CORS -> Router
-	finalHandler := middleware.Logger(middleware.CORS(mux))
+	// Xâu chuỗi Middlewares: CORS -> Router
+	finalHandler := middleware.CORS(mux)
 
 	addr := fmt.Sprintf(":%d", *port)
 	fmt.Printf("Server API đang chạy tại http://localhost%s\n", addr)
