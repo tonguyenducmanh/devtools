@@ -10,15 +10,15 @@ cd $MODULE_DIR
 
 # Build cho các nền tảng
 echo "Building for Mac Intel..."
-GOOS=darwin GOARCH=amd64 go build -o ../../${APP_NAME}-mac-intel ./cmd/api/main.go
+GOOS=darwin GOARCH=amd64 go build -o ../../${APP_NAME}-mac-intel ./cmd/main.go
 
 echo "Building for Mac M1/M2/M3..."
-GOOS=darwin GOARCH=arm64 go build -o ../../${APP_NAME}-mac-arm ./cmd/api/main.go
+GOOS=darwin GOARCH=arm64 go build -o ../../${APP_NAME}-mac-arm ./cmd/main.go
 
 echo "Building for Linux..."
-GOOS=linux GOARCH=amd64 go build -o ../../${APP_NAME}-linux ./cmd/api/main.go
+GOOS=linux GOARCH=amd64 go build -o ../../${APP_NAME}-linux ./cmd/main.go
 
 echo "Building for Windows..."
-GOOS=windows GOARCH=amd64 go build -o ../../${APP_NAME}.exe ./cmd/api/main.go
+GOOS=windows GOARCH=amd64 go build -o ../../${APP_NAME}.exe ./cmd/main.go
 
 echo "Build thành công!"
