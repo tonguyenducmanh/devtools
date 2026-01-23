@@ -14,7 +14,7 @@ import (
 )
 
 type APITestService interface {
-	ExecuteRequest(req model.ExecuteRequest) (*model.ExecuteResponse, error)
+	ExecuteRequest(req model.ExecuteRequest, trace *bool) (*model.ExecuteResponse, error)
 }
 
 type apiTestService struct{}
@@ -39,7 +39,7 @@ func (s *apiTestService) parseHeaders(text string) map[string]string {
 	return headers
 }
 
-func (s *apiTestService) ExecuteRequest(reqData model.ExecuteRequest) (*model.ExecuteResponse, error) {
+func (s *apiTestService) ExecuteRequest(reqData model.ExecuteRequest, trace *bool) (*model.ExecuteResponse, error) {
 	// Cấu hình Client bỏ qua SSL (tương đương rejectUnauthorized: false)
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -67,6 +67,12 @@ func (s *apiTestService) ExecuteRequest(reqData model.ExecuteRequest) (*model.Ex
 
 	// Đọc body trả về
 	respBody, _ := io.ReadAll(resp.Body)
+
+	if *trace {
+		reqDataText, _ := json.Marshal(reqData)
+		fmt.Sprintln("Call api request: " + string(reqDataText))
+		fmt.Sprintln("Call api response: " + string(respBody))
+	}
 
 	// Ép kiểu headers về JSON string như code cũ
 	headerJson, _ := json.Marshal(resp.Header)

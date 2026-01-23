@@ -8,11 +8,12 @@ import (
 )
 
 type APIController struct {
-	svc service.APITestService
+	svc   service.APITestService
+	trace *bool
 }
 
-func NewAPIController(svc service.APITestService) *APIController {
-	return &APIController{svc: svc}
+func NewAPIController(svc service.APITestService, trace *bool) *APIController {
+	return &APIController{svc: svc, trace: trace}
 }
 
 func (c *APIController) Execute(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +25,7 @@ func (c *APIController) Execute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := c.svc.ExecuteRequest(req)
+	result, err := c.svc.ExecuteRequest(req, c.trace)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
