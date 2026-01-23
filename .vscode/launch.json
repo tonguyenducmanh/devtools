@@ -1,0 +1,36 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug td_tool_api",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/src_backend/td_api_service/cmd/main.go",
+      "cwd": "${workspaceFolder}",
+      "args": ["-port=7777", "-trace=true"],
+      "env": {
+        "GO_ENV": "development"
+      },
+      "showLog": true
+    },
+    {
+      "name": "Debug td_tool_daemon",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/src_backend/td_daemon_app/cmd/main.go",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-api-port=7777",
+        "-api-trace=true",
+        "-web-port=8080",
+        "-web-trace=true"
+      ],
+      "env": {
+        "GO_ENV": "development"
+      },
+      "showLog": true
+    }
+  ]
+}
