@@ -19,7 +19,7 @@ func RunWebApp() {
 	// Web flags
 	port := flag.Int("web-port", 8080, "Port cho Web server")
 	trace := flag.Bool("web-trace", false, "Hiển thị log chi tiết cho Web server")
-
+	flag.Parse()
 	// Create a sub-filesystem from the embedded "dist" directory
 	publicFS, err := fs.Sub(embeddedFiles, "dist")
 	if err != nil {
