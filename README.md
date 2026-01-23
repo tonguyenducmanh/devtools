@@ -35,6 +35,7 @@ api flag
 
 ```
 -port=1234: port for api agent
+-trace=true; enable trace for api agent
 ```
 
 deamon flag
