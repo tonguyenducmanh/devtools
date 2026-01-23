@@ -2,12 +2,13 @@
 set -e
 
 echo "--- Bắt đầu quy trình daemon ---"
+ROOT_DIR=$(pwd)
 
 # 1. Cấu hình đường dẫn
-DAEMON_DIR="./src_backend/td_daemon_app/cmd"
-WEB_APP_DIR="./src_backend/td_daemon_app/internal/web_app/dist"
-FRONTEND_DIST="./dist"
-OUTPUT_DIR="./out"
+DAEMON_DIR="$ROOT_DIR/src_backend/td_daemon_app/cmd"
+WEB_APP_DIR="$ROOT_DIR/src_backend/td_daemon_app/internal/web_app/dist"
+FRONTEND_DIST="$ROOT_DIR/dist"
+OUTPUT_DIR="$ROOT_DIR/out"
 OUTPUT_NAME="tool-tomanh-daemon"
 
 # Đảm bảo thư mục output tồn tại
@@ -33,18 +34,18 @@ cd "$DAEMON_DIR"
 
 echo "Building for Mac Intel..."
 GOOS=darwin GOARCH=amd64 \
-go build -o "../../$OUTPUT_DIR/$OUTPUT_NAME-mac-intel" .
+go build -o "$OUTPUT_DIR/$OUTPUT_NAME-mac-intel" .
 
 echo "Building for Mac Apple Silicon..."
 GOOS=darwin GOARCH=arm64 \
-go build -o "../../$OUTPUT_DIR/$OUTPUT_NAME-mac-arm" .
+go build -o "$OUTPUT_DIR/$OUTPUT_NAME-mac-arm" .
 
 echo "Building for Linux..."
 GOOS=linux GOARCH=amd64 \
-go build -o "../../$OUTPUT_DIR/$OUTPUT_NAME-linux" .
+go build -o "$OUTPUT_DIR/$OUTPUT_NAME-linux" .
 
 echo "Building for Windows..."
 GOOS=windows GOARCH=amd64 \
-go build -o "../../$OUTPUT_DIR/$OUTPUT_NAME.exe" .
+go build -o "$OUTPUT_DIR/$OUTPUT_NAME.exe" .
 
 echo "Build thành công!"
