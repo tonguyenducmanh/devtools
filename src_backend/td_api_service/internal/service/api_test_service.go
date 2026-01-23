@@ -23,6 +23,9 @@ func NewAPITestService() APITestService {
 	return &apiTestService{}
 }
 
+/**
+ * parse header được stringify từ frontend
+ */
 func (s *apiTestService) parseHeaders(text string) map[string]string {
 	headers := make(map[string]string)
 	lines := strings.Split(text, "\n")
@@ -39,6 +42,9 @@ func (s *apiTestService) parseHeaders(text string) map[string]string {
 	return headers
 }
 
+/**
+ * thực hiện gọi nối api cho frontend
+ */
 func (s *apiTestService) ExecuteRequest(reqData model.ExecuteRequest, trace *bool) (*model.ExecuteResponse, error) {
 	// Cấu hình Client bỏ qua SSL (tương đương rejectUnauthorized: false)
 	tr := &http.Transport{
