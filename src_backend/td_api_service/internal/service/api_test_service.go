@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"strings"
-	"time"
 
 	"td_api_service/internal/model"
 )
@@ -50,7 +49,7 @@ func (s *apiTestService) ExecuteRequest(reqData model.ExecuteRequest, trace *boo
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
-	client := &http.Client{Transport: tr, Timeout: 30 * time.Second}
+	client := &http.Client{Transport: tr}
 
 	// Tạo request
 	req, err := http.NewRequest(strings.ToUpper(reqData.HttpMethod), reqData.ApiURL, bytes.NewBufferString(reqData.BodyText))
