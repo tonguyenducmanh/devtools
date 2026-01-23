@@ -34,14 +34,14 @@ chmod 777 ./build_all.sh
 api flag
 
 ```
---port: port for api agent
+-port=1234: port for api agent
 ```
 
 deamon flag
 
 ```
---api-port: port for api agent
---api-trace: enable trace for api agent
---web-port: port for web app
---web-trace: enable trace for web app
+-api-port=1234: port for api agent
+-api-trace=true: enable trace for api agent
+-web-port=8080: port for web app
+-web-trace=true: enable trace for web app
 ```
