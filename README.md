@@ -24,9 +24,9 @@ npm run web:dev
 npm run web:build
 ```
 
-To Build api app
+To build api/daemon app
 
 ```
-chmod 777 build_api.sh
-./build_api.sh
+chmod 777 ./build_all.sh
+./build_all.sh
 ```
