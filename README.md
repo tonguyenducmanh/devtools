@@ -23,3 +23,10 @@ npm run web:dev
 ```
 npm run web:build
 ```
+
+To Build api app
+
+```
+chmod 777 build_api.sh
+./build_api.sh
+```
