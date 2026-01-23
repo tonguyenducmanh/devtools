@@ -1,5 +1,4 @@
-// utils/parseHeaders.js
-function parseHeaders(text) {
+export function parseHeaders(text) {
   const headers = {};
 
   if (!text) return headers;
@@ -22,5 +21,3 @@ function parseHeaders(text) {
 
   return headers;
 }
-
-module.exports = parseHeaders;

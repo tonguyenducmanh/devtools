@@ -1,9 +1,8 @@
-// services/executeRequest.js
-const axios = require("axios");
-const https = require("https");
-const parseHeaders = require("./parseHeaders.js");
+import axios from "axios";
+import https from "https";
+import { parseHeaders } from "./parseHeaders.js";
 
-async function executeRequest(body) {
+export async function executeRequest(body) {
   const { api_url, http_method, headers_text, body_text } = body;
 
   const headers = parseHeaders(headers_text);
@@ -15,7 +14,7 @@ async function executeRequest(body) {
       headers,
       data: body_text ?? undefined,
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false, // giống danger_accept_invalid_certs(true)
+        rejectUnauthorized: false,
       }),
       validateStatus: () => true, // không throw khi status != 2xx
     });
@@ -32,5 +31,3 @@ async function executeRequest(body) {
     throw new Error(`Request failed: ${err.message}`);
   }
 }
-
-module.exports = executeRequest;

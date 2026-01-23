@@ -1,8 +1,7 @@
-// index.js
-const express = require("express");
-const cors = require("cors");
-const minimist = require("minimist");
-const executeRequest = require("./src/common/executeRequest.js");
+import express from "express";
+import cors from "cors";
+import minimist from "minimist";
+import { executeRequest } from "./src/common/executeRequest.js";
 
 const args = minimist(process.argv.slice(2));
 const port = args.port || 7777;
