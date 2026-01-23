@@ -30,3 +30,18 @@ To build api/daemon app
 chmod 777 ./build_all.sh
 ./build_all.sh
 ```
+
+api flag
+
+```
+--port: port for api agent
+```
+
+deamon flag
+
+```
+--api-port: port for api agent
+--api-trace: enable trace for api agent
+--web-port: port for web app
+--web-trace: enable trace for web app
+```
