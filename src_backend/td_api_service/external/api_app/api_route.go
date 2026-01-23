@@ -14,7 +14,7 @@ import (
 func BuildAPIRoute(port *int, trace *bool) {
 	mux := http.NewServeMux()
 
-	apiSvc := service.NewAPITestService()
+	apiSvc := service.GetTDAPITestService()
 	apiCtrl := controller.NewAPIController(apiSvc, trace)
 
 	addRoute(mux, apiCtrl)
