@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -8,10 +10,19 @@ import (
 )
 
 func main() {
+	// ===== Parse flags =====
+	port := flag.Int("port", 7777, "port to run server on")
+	flag.Parse()
+
+	addr := fmt.Sprintf("127.0.0.1:%d", *port)
+
+	// ===== Logging =====
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+	log.Println("Agent running at http://" + addr)
 
-	log.Println("Agent running at http://127.0.0.1:7777")
-
+	// ===== Routes =====
 	http.HandleFunc("/exec", handler.ExecHandler)
-	log.Fatal(http.ListenAndServe("127.0.0.1:7777", nil))
+
+	// ===== Start server =====
+	log.Fatal(http.ListenAndServe(addr, nil))
 }
