@@ -18,7 +18,14 @@ func main() {
 	port := flag.Int("port", 7777, "Port to run the server")
 	flag.Parse()
 
-	r := gin.Default()
+	// Dùng gin.New() thay vì Default() để không bị dính Logger mặc định
+	r := gin.New()
+
+	// Sử dụng Logger với cấu hình custom của bạn
+	r.Use(gin.LoggerWithConfig(gin.LoggerConfig{
+		Formatter: middleware.CustomLogFormatter,
+		Output:    gin.DefaultWriter, // Hoặc os.Stdout
+	}))
 
 	r.Use(middleware.CORSMiddleware())
 
