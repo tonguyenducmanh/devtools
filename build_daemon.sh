@@ -48,4 +48,6 @@ echo "Building for Windows..."
 GOOS=windows GOARCH=amd64 \
 go build -o "$OUTPUT_DIR/$OUTPUT_NAME.exe" .
 
+rm -rf "$FRONTEND_DIST"
+
 echo "Build thành công!"
