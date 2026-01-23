@@ -12,39 +12,6 @@ class TDCURLUtil {
    * (dạng text code để inject động)
    */
   fetchAgent(request) {
-    const fetchAgentDesktop = function (request) {
-      const signalId = TDUtility.newGuid();
-      let cancelled = false;
-
-      // Sử dụng Tauri invoke
-      const { invoke } = window.__TAURI_INTERNALS__;
-
-      const promise = invoke("exec", {
-        request: {
-          api_url: request.api_url,
-          http_method: request.http_method || "GET",
-          headers_text: request.headers_text || "",
-          body_text: request.body_text || null,
-        },
-        signalId,
-      });
-
-      return {
-        promise,
-        async cancel() {
-          if (cancelled) return;
-          cancelled = true;
-
-          try {
-            await invoke("cancel", { signalId });
-          } catch (error) {
-            console.error("Cancel failed:", error);
-          }
-
-          throw new Error("Request cancelled by user");
-        },
-      };
-    };
     const fetchAgentBrowser = function (request) {
       let serverAgent = window.__tdInfo?.agentURL;
       if (!serverAgent) {
@@ -93,9 +60,6 @@ class TDCURLUtil {
         },
       };
     };
-    if (window && window.__TAURI_INTERNALS__) {
-      return fetchAgentDesktop(request);
-    }
     return fetchAgentBrowser(request);
   }
 
