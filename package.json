@@ -6,10 +6,7 @@
   "main": ".vite/build/main.js",
   "scripts": {
     "web:dev": "vite",
-    "web:build": "vite build",
-    "desktop:dev": "npx tauri dev",
-    "desktop:build": "npx tauri build",
-    "lint": "echo \"No linting configured\""
+    "web:build": "vite build"
   },
   "keywords": [],
   "author": {
