@@ -8,16 +8,16 @@ import (
 )
 
 type APIController struct {
-	svc   service.APITestService
+	svc   service.TDAPITestingService
 	trace *bool
 }
 
-func NewAPIController(svc service.APITestService, trace *bool) *APIController {
+func NewAPIController(svc service.TDAPITestingService, trace *bool) *APIController {
 	return &APIController{svc: svc, trace: trace}
 }
 
 func (c *APIController) Execute(w http.ResponseWriter, r *http.Request) {
-	var req model.ExecuteRequest
+	var req model.TDAPITestingParam
 
 	// Thay thế binding của Gin bằng json.Decoder
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

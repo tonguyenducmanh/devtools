@@ -12,20 +12,20 @@ import (
 	"td_api_service/internal/model"
 )
 
-type APITestService interface {
-	ExecuteRequest(req model.ExecuteRequest, trace *bool) (*model.ExecuteResponse, error)
+type TDAPITestingService interface {
+	ExecuteRequest(req model.TDAPITestingParam, trace *bool) (*model.TDAPITestingResponse, error)
 }
 
-type apiTestService struct{}
+type tdAPITestingService struct{}
 
-func NewAPITestService() APITestService {
-	return &apiTestService{}
+func GetTDAPITestService() TDAPITestingService {
+	return &tdAPITestingService{}
 }
 
 /**
  * parse header được stringify từ frontend
  */
-func (s *apiTestService) parseHeaders(text string) map[string]string {
+func (s *tdAPITestingService) parseHeaders(text string) map[string]string {
 	headers := make(map[string]string)
 	lines := strings.Split(text, "\n")
 	for _, line := range lines {
@@ -44,7 +44,7 @@ func (s *apiTestService) parseHeaders(text string) map[string]string {
 /**
  * thực hiện gọi nối api cho frontend
  */
-func (s *apiTestService) ExecuteRequest(reqData model.ExecuteRequest, trace *bool) (*model.ExecuteResponse, error) {
+func (s *tdAPITestingService) ExecuteRequest(reqData model.TDAPITestingParam, trace *bool) (*model.TDAPITestingResponse, error) {
 	// Cấu hình Client bỏ qua SSL (tương đương rejectUnauthorized: false)
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -82,7 +82,7 @@ func (s *apiTestService) ExecuteRequest(reqData model.ExecuteRequest, trace *boo
 	// Ép kiểu headers về JSON string như code cũ
 	headerJson, _ := json.Marshal(resp.Header)
 
-	return &model.ExecuteResponse{
+	return &model.TDAPITestingResponse{
 		Status:  resp.StatusCode,
 		Headers: string(headerJson),
 		Body:    string(respBody),
