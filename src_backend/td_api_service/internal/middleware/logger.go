@@ -1,32 +1,16 @@
 package middleware
 
 import (
-	"fmt"
+	"log"
+	"net/http"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
-// CustomLogFormatter định dạng lại dòng log của Gin
-var CustomLogFormatter = func(param gin.LogFormatterParams) string {
-	var statusColor, methodColor, resetColor string
-	if param.IsOutputColor() {
-		statusColor = param.StatusCodeColor()
-		methodColor = param.MethodColor()
-		resetColor = param.ResetColor()
-	}
-
-	if param.Latency > time.Minute {
-		param.Latency = param.Latency.Truncate(time.Second)
-	}
-
-	// Tùy chỉnh text ở đây: [Thời gian] | Status | Latency | Method | Path
-	return fmt.Sprintf("[TOMANH-API] %v |%s %3d %s| %13v | %s %-7s %s %#v\n%s",
-		param.TimeStamp.Format("2006/01/02 - 15:04:05"),
-		statusColor, param.StatusCode, resetColor,
-		param.Latency,
-		methodColor, param.Method, resetColor,
-		param.Path,
-		param.ErrorMessage,
-	)
+// Middleware bọc lấy Handler chuẩn
+func Logger(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		next.ServeHTTP(w, r)
+		log.Printf("[TOMANH-API] %s %s | %v", r.Method, r.URL.Path, time.Since(start))
+	})
 }
