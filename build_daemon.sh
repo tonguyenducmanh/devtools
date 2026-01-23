@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-echo "--- Bắt đầu quy trình Build All ---"
+echo "--- Bắt đầu quy trình daemon ---"
 
 # 1. Cấu hình đường dẫn
 DAEMON_DIR="./src_backend/td_daemon_app/cmd"
@@ -47,4 +47,4 @@ echo "Building for Windows..."
 GOOS=windows GOARCH=amd64 \
 go build -o "../../$OUTPUT_DIR/$OUTPUT_NAME.exe" .
 
-echo "🎉 Build thành công!"
+echo "Build thành công!"

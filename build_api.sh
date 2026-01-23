@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+echo "--- Bắt đầu quy trình build api ---"
+
 # Đường dẫn tuyệt đối hoặc tương đối tính từ thư mục chạy script
 MODULE_DIR="./src_backend/td_api_service"
 APP_NAME="./out/tool-tomanh-api"
