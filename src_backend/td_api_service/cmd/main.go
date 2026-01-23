@@ -7,7 +7,7 @@ import (
 
 func main() {
 	port := flag.Int("port", 7777, "Port to run the server")
+	trace := flag.Bool("api-trace", false, "Hiển thị log chi tiết cho Web server")
 	flag.Parse()
-	var trace bool = false
-	api_app.BuildAPIRoute(port, &trace)
+	api_app.BuildAPIRoute(port, trace)
 }
