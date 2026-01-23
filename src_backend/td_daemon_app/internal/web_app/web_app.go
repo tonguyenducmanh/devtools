@@ -30,7 +30,7 @@ func RunWebApp() {
 
 	logDirectory(trace, publicFS)
 
-	handler := spaHandler(publicFS, trace)
+	handler := spaHandler(publicFS)
 
 	addr := fmt.Sprintf(":%d", *port)
 	fmt.Printf("Server Web đang chạy tại http://localhost%s\n", addr)
@@ -62,7 +62,7 @@ func logDirectory(trace *bool, publicFS fs.FS) {
 /**
  * hàm handler xử lý single page application
  */
-func spaHandler(fsys fs.FS, trace *bool) http.HandlerFunc {
+func spaHandler(fsys fs.FS) http.HandlerFunc {
 	fileServer := http.FileServer(http.FS(fsys))
 
 	return func(w http.ResponseWriter, r *http.Request) {
