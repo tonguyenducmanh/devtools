@@ -9,5 +9,5 @@ func main() {
 	port := flag.Int("port", 7777, "Port to run the server")
 	trace := flag.Bool("trace", false, "Hiển thị log chi tiết cho Web server")
 	flag.Parse()
-	apiApp.BuildAPIRoute(port, trace)
+	apiApp.RunAPIApp(port, trace)
 }

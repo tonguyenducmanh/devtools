@@ -8,9 +8,9 @@ import (
 )
 
 /**
- * build ra api route
+ * khởi chạy api app
  */
-func BuildAPIRoute(port *int, trace *bool) {
+func RunAPIApp(port *int, trace *bool) {
 	app := http.NewServeMux()
 
 	addRoute(app)

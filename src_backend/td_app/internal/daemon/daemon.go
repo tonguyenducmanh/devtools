@@ -13,5 +13,5 @@ func RunDaemon() {
 	trace := flag.Bool("api-trace", false, "Hiển thị log chi tiết cho Web server")
 
 	flag.Parse()
-	apiApp.BuildAPIRoute(api_port, trace)
+	apiApp.RunAPIApp(api_port, trace)
 }
