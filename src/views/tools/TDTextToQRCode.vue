@@ -34,10 +34,10 @@
             <div class="qr-container" :style="QRImageStyle">
               <div class="qr-header">
                 <span>{{
-                  $t("i18nCommon.textToQRCode.part", [
+                  $t("i18nCommon.textToQRCode.part").format(
                     index + 1,
                     qrCodeItems.length,
-                  ])
+                  )
                 }}</span>
                 <TDButton
                   @click="copyQRCode(item.src, index)"
@@ -152,7 +152,7 @@ export default {
     async generateQRCode(textInput) {
       let me = this;
       let maxTextOneChunk = Number(
-        me.maxLengthUserConfig ?? window.__env.textToQRConfig.maxTextOneChunk
+        me.maxLengthUserConfig ?? window.__env.textToQRConfig.maxTextOneChunk,
       );
       if (!maxTextOneChunk || isNaN(maxTextOneChunk) || maxTextOneChunk <= 0) {
         maxTextOneChunk = 1000; // fallback mặc định
@@ -179,7 +179,7 @@ export default {
         textBuild,
         effectiveMaxTextOneChunk,
         me.addHeaderToQR,
-        timestamp
+        timestamp,
       );
       // Tạo QR code cho từng phần
       chunks.forEach((chunk) => {
@@ -218,7 +218,7 @@ export default {
       if (me.isCompressText && textTransformed) {
         textTransformed = await TDCompress.compressText(
           text,
-          me.$tdEnum.compressType.gzip
+          me.$tdEnum.compressType.gzip,
         );
       }
       return textTransformed;
@@ -307,7 +307,7 @@ export default {
       // Tạo blob và mở popup tải file
       me.$tdUtility.createDownloadFileFromUrl(
         dataUrl,
-        `qrcode-part-${index + 1}.png`
+        `qrcode-part-${index + 1}.png`,
       );
     },
     /**

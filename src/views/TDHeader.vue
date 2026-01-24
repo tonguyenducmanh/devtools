@@ -168,10 +168,7 @@ export default {
         me.currentLanguage
       );
       await loadLocale(me.currentLanguage);
-      this.$tdEventBus.emit(
-        this.$tdEnum.eventGlobal.changeLanguageFromSidebar,
-        me.currentLanguage
-      );
+      me.$tdUtility.reloadApp();
     },
 
     changeLangFromEvent(data, options) {
