@@ -12,55 +12,52 @@ class TDCURLUtil {
    * (dạng text code để inject động)
    */
   fetchAgent(request) {
-    const fetchAgentBrowser = function (request) {
-      let serverAgent = window.__tdInfo?.agentURL;
-      if (!serverAgent) {
-        throw new Error("Agent server not configured");
-      }
+    let serverAgent = window.__tdInfo?.agentURL;
+    if (!serverAgent) {
+      throw new Error("Agent server not configured");
+    }
 
-      const controller = new AbortController();
+    const controller = new AbortController();
 
-      const promise = fetch(`${serverAgent}/exec`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(request),
-        signal: controller.signal,
+    const promise = fetch(`${serverAgent}/exec`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+      signal: controller.signal,
+    })
+      .then(async (res) => {
+        const text = await res.text();
+        let data;
+
+        try {
+          data = JSON.parse(text);
+          return {
+            status: data.status,
+            headers: data.headers,
+            body: data.body,
+          };
+        } catch {
+          data = text;
+          return {
+            status: 200,
+            headers: {},
+            body: data,
+          };
+        }
       })
-        .then(async (res) => {
-          const text = await res.text();
-          let data;
+      .catch((error) => {
+        throw error;
+      });
 
-          try {
-            data = JSON.parse(text);
-            return {
-              status: data.status,
-              headers: data.headers,
-              body: data.body,
-            };
-          } catch {
-            data = text;
-            return {
-              status: 200,
-              headers: {},
-              body: data,
-            };
-          }
-        })
-        .catch((error) => {
-          throw error;
-        });
-
-      return {
-        promise,
-        cancel() {
-          controller.abort();
-          throw new Error("Request cancelled by user");
-        },
-      };
+    return {
+      promise,
+      cancel() {
+        controller.abort();
+        throw new Error("Request cancelled by user");
+      },
     };
-    return fetchAgentBrowser(request);
   }
 
   /**
