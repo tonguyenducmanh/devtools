@@ -36,7 +36,7 @@ func GetConfigGlobal() *TDCenterConfig {
  * tìm ra file config đang nằm ở thư mục nào
  */
 func findConfigUpwards() (string, error) {
-	dir, err := os.Getwd()
+	dir, err := os.Executable()
 	if err != nil {
 		return "", err
 	}
