@@ -33,5 +33,5 @@ func addRoute(app *http.ServeMux) {
 	app.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Ok")
 	})
-	app.HandleFunc("POST /exec", service.GetTDAPITestService().Execute)
+	app.HandleFunc("POST /exec", service.Execute)
 }
