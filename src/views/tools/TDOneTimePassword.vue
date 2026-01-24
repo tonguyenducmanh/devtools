@@ -164,7 +164,6 @@
 
 <script>
 import protobuf from "protobufjs";
-import base32 from "hi-base32";
 import { Buffer } from "buffer";
 import * as OTPAuth from "otpauth";
 import { toRaw } from "vue";
@@ -184,7 +183,7 @@ export default {
           allOTPVisible = me.decodedData;
         } else {
           allOTPVisible = me.decodedData.filter((x) =>
-            x.displayName.includes(me.filterOtp)
+            x.displayName.includes(me.filterOtp),
           );
         }
         if (!me.filterOtp) {
@@ -196,7 +195,7 @@ export default {
               x.displayName
                 .trim()
                 .toLowerCase()
-                .includes(me.filterOtp.trim().toLowerCase())
+                .includes(me.filterOtp.trim().toLowerCase()),
           );
         }
       }
@@ -216,9 +215,9 @@ export default {
     },
     placeHolderRemove() {
       let me = this;
-      let result = me.$t("i18nCommon.oneTimePassword.remove.filter", [
-        me.removeAllKey,
-      ]);
+      let result = me
+        .$t("i18nCommon.oneTimePassword.remove.filter")
+        .format(me.removeAllKey);
       return result;
     },
     isShowProgress() {
@@ -270,7 +269,7 @@ export default {
       e.preventDefault();
       let me = this;
       const files = Array.from(e.dataTransfer.files).filter((file) =>
-        file.type.includes("image")
+        file.type.includes("image"),
       );
 
       if (files.length) {
@@ -314,18 +313,18 @@ export default {
     async processWhenMounted() {
       let me = this;
       let lastUserName = await me.$tdCache.get(
-        me.$tdEnum.cacheConfig.LastOneTimeAuthenUserName
+        me.$tdEnum.cacheConfig.LastOneTimeAuthenUserName,
       );
       if (lastUserName) {
         me.username = lastUserName;
         let lastAuthen = await me.$tdCache.get(
-          me.$tdEnum.cacheConfig.LastOneTimeAuthenPassword
+          me.$tdEnum.cacheConfig.LastOneTimeAuthenPassword,
         );
         if (lastAuthen && lastAuthen.userName == lastUserName) {
           // load luôn danh sách user theo tài khoản, mật khẩu cuối cùng lưu được trong mem
           await me.openAuthenSavedByUser(
             lastAuthen.userName,
-            lastAuthen.password
+            lastAuthen.password,
           );
         }
       }
@@ -335,7 +334,7 @@ export default {
       if (me.username) {
         await me.$tdCache.set(
           me.$tdEnum.cacheConfig.LastOneTimeAuthenUserName,
-          me.username
+          me.username,
         );
         // lưu tạm vào mem sau đỡ phải dùng
         if (me.password) {
@@ -344,7 +343,7 @@ export default {
             {
               userName: me.username,
               password: me.password,
-            }
+            },
           );
         }
       }
@@ -457,7 +456,7 @@ export default {
           {
             id: me.username,
           },
-          me.password
+          me.password,
         );
         await me.saveUsername();
         me.$tdToast.success(me.$t("i18nCommon.toastMessage.saved"));
@@ -475,7 +474,7 @@ export default {
           {
             id: username,
           },
-          password
+          password,
         );
         if (result) {
           me.decodedData = result;
@@ -516,9 +515,36 @@ export default {
      * @returns RFC3548 compliant base32 string
      */
     toBase32(base64String) {
-      let me = this;
-      let raw = Buffer.from(base64String, "base64");
-      return base32.encode(raw);
+      const raw = Buffer.from(base64String, "base64");
+      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+      let output = "";
+      let val = 0;
+      let len = 0;
+
+      for (let i = 0; i < raw.length; i++) {
+        // Đẩy byte hiện tại vào bộ đệm giá trị
+        val = (val << 8) | raw[i];
+        len += 8;
+
+        // Cứ mỗi khi đủ 5 bit, lấy ra một ký tự Base32
+        while (len >= 5) {
+          output += alphabet[(val >>> (len - 5)) & 31];
+          len -= 5;
+        }
+      }
+
+      // Xử lý các bit dư thừa còn lại
+      if (len > 0) {
+        output += alphabet[(val << (5 - len)) & 31];
+      }
+
+      // Thêm Padding để đúng chuẩn RFC (Độ dài phải là bội số của 8)
+      while (output.length % 8 !== 0) {
+        output += "=";
+      }
+
+      return output;
     },
     /**
      * The data in the URI from Google Authenticator
