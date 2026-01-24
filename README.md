@@ -46,3 +46,15 @@ deamon flag
 -web-port=8080: port for web app
 -web-trace=true: enable trace for web app
 ```
+
+config UI:
+
+```
+public/cfg/config.js
+```
+
+config backend:
+
+```
+config/config.json
+```
