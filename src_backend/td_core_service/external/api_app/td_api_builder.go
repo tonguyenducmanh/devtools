@@ -30,8 +30,6 @@ func RunAPIApp(port *int, trace *bool) {
  * thêm các route xử lý nghiệp vụ
  */
 func addRoute(app *http.ServeMux) {
-	app.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "Ok")
-	})
+	app.HandleFunc("GET /", service.HeathCheck)
 	app.HandleFunc("POST /exec", service.Execute)
 }
