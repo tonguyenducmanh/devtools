@@ -123,7 +123,7 @@ class TDUtility {
   copyToClipboard(value) {
     let me = this;
     navigator.clipboard.writeText(value);
-    toast.success(null, i18nData.global.t("i18nCommon.toastMessage.copy"));
+    toast.success(i18nData.global.t("i18nCommon.toastMessage.copy"));
   }
 
   /**
@@ -223,10 +223,10 @@ class TDUtility {
       const blob = await response.blob();
 
       await this.copyImageFromBlob(blob);
-      toast.success(null, i18nData.global.t("i18nCommon.toastMessage.copy"));
+      toast.success(i18nData.global.t("i18nCommon.toastMessage.copy"));
     } catch (error) {
       console.error("❌ Lỗi khi copy ảnh:", error);
-      toast.error(null, i18nData.global.t("i18nCommon.toastMessage.error"));
+      toast.error(i18nData.global.t("i18nCommon.toastMessage.error"));
     }
   }
   /**
