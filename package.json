@@ -23,7 +23,6 @@
   "dependencies": {
     "@zxing/library": "^0.21.3",
     "exceljs": "^4.4.0",
-    "hi-base32": "^0.5.1",
     "jsqr": "^1.4.0",
     "jszip": "^3.10.1",
     "monaco-editor": "^0.55.1",
