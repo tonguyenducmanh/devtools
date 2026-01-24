@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"sync"
-	"td_app/internal/daemon"
+	apiApp "td_app/internal/api_app"
 	webApp "td_app/internal/web_app"
 )
 
@@ -26,7 +26,7 @@ func main() {
 
 	go func() {
 		defer wg.Done()
-		daemon.RunDaemon()
+		apiApp.RunAPIApp()
 	}()
 
 	go func() {
