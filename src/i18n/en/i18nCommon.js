@@ -56,7 +56,7 @@ export default {
       UUIDV4Generator: "UUIDv4 generator",
       HTMLPreview: "HTML Preview",
       textManipulation: "Text manipulation",
-      APITesting: "API develop",
+      APITesting: "API testing",
     },
     example: "example",
     base64ToImage: {
