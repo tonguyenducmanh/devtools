@@ -45,7 +45,7 @@ export default {
   methods: {
     async getCurrentLanguage() {
       let currentLanguage = await this.$tdCache.get(
-        this.$tdEnum.cacheConfig.Language
+        this.$tdEnum.cacheConfig.Language,
       );
       if (currentLanguage) {
         return currentLanguage;
@@ -58,13 +58,10 @@ export default {
         this.currentLanguage = lang;
         await this.$tdCache.set(
           this.$tdEnum.cacheConfig.Language,
-          this.currentLanguage
+          this.currentLanguage,
         );
         await loadLocale(this.currentLanguage);
-        this.$tdEventBus.emit(
-          this.$tdEnum.eventGlobal.changeLanguage,
-          this.currentLanguage
-        );
+        this.$tdUtility.reloadApp();
       }
     },
     changeLangFromEvent(data, options) {
@@ -76,13 +73,13 @@ export default {
   mounted() {
     this.$tdEventBus.on(
       this.$tdEnum.eventGlobal.changeLanguageFromSidebar,
-      this.changeLangFromEvent
+      this.changeLangFromEvent,
     );
   },
   beforeUnmount() {
     this.$tdEventBus.off(
       this.$tdEnum.eventGlobal.changeLanguageFromSidebar,
-      this.changeLangFromEvent
+      this.changeLangFromEvent,
     );
   },
 };
