@@ -6,7 +6,7 @@
       "type": "go",
       "request": "launch",
       "mode": "debug",
-      "program": "${workspaceFolder}/src_backend/td_core_service/cmd/main.go",
+      "program": "${workspaceFolder}/src_backend/td_daemon_app/cmd/api_app/main.go",
       "cwd": "${workspaceFolder}",
       "args": ["-port=7777", "-trace=true"],
       "env": {
@@ -19,7 +19,7 @@
       "type": "go",
       "request": "launch",
       "mode": "debug",
-      "program": "${workspaceFolder}/src_backend/td_daemon_app/cmd/main.go",
+      "program": "${workspaceFolder}/src_backend/td_daemon_app/cmd/daemon_app/main.go",
       "cwd": "${workspaceFolder}",
       "args": [
         "-api-port=7777",
