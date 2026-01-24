@@ -82,9 +82,9 @@ export default {
     },
     buttonName() {
       let me = this;
-      let title = me.$t("i18nCommon.apiTesting.saveForNewCollection", {
-        collectionName: me.searchQuery,
-      });
+      let title = me
+        .$t("i18nCommon.apiTesting.saveForNewCollection")
+        .format(me.searchQuery);
       return title;
     },
   },
