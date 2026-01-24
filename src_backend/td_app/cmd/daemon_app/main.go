@@ -12,7 +12,7 @@ func main() {
 	banner.PrintBanner()
 	apiPort := flag.Int("api-port", 7777, "Port to run the server")
 	apiTrace := flag.Bool("api-trace", false, "Hiển thị log chi tiết cho Web server")
-	webPort := flag.Int("web-port", 8080, "Port cho Web server")
+	webPort := flag.Int("web-port", 1403, "Port cho Web server")
 	webTrace := flag.Bool("web-trace", false, "Hiển thị log chi tiết cho Web server")
 	flag.Parse()
 
