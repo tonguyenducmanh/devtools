@@ -6,14 +6,17 @@ import (
 	apiApp "td_app/internal/api_app"
 	"td_app/internal/banner"
 	webApp "td_app/internal/web_app"
+	configGlobal "td_core_service/external/config"
 )
 
 func main() {
+	config := configGlobal.GetConfigGlobal()
+
 	banner.PrintBanner()
-	apiPort := flag.Int("api-port", 7777, "Port to run the server")
-	apiTrace := flag.Bool("api-trace", false, "Hiển thị log chi tiết cho Web server")
-	webPort := flag.Int("web-port", 1403, "Port cho Web server")
-	webTrace := flag.Bool("web-trace", false, "Hiển thị log chi tiết cho Web server")
+	apiPort := flag.Int("api-port", config.APIConfig.Port, "Port to run the server")
+	apiTrace := flag.Bool("api-trace", config.APIConfig.EnableTrace, "Hiển thị log chi tiết cho Web server")
+	webPort := flag.Int("web-port", config.WebConfig.Port, "Port cho Web server")
+	webTrace := flag.Bool("web-trace", config.WebConfig.EnableTrace, "Hiển thị log chi tiết cho Web server")
 	flag.Parse()
 
 	var wg sync.WaitGroup

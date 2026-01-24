@@ -8,7 +8,6 @@
       "mode": "debug",
       "program": "${workspaceFolder}/src_backend/td_app/cmd/api_app/main.go",
       "cwd": "${workspaceFolder}",
-      "args": ["-port=7777", "-trace=true"],
       "env": {
         "GO_ENV": "development"
       },
@@ -21,12 +20,6 @@
       "mode": "debug",
       "program": "${workspaceFolder}/src_backend/td_app/cmd/daemon_app/main.go",
       "cwd": "${workspaceFolder}",
-      "args": [
-        "-api-port=7777",
-        "-api-trace=false",
-        "-web-port=8080",
-        "-web-trace=false"
-      ],
       "env": {
         "GO_ENV": "development"
       },
