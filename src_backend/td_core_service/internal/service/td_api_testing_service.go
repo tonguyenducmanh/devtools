@@ -12,39 +12,10 @@ import (
 	"td_core_service/internal/model"
 )
 
-type TDAPITestingService interface {
-	Execute(w http.ResponseWriter, r *http.Request)
-}
-
-type tdAPITestingService struct{}
-
-func GetTDAPITestService() TDAPITestingService {
-	return &tdAPITestingService{}
-}
-
-/**
- * parse header được stringify từ frontend
- */
-func (e *tdAPITestingService) parseHeaders(text string) map[string]string {
-	headers := make(map[string]string)
-	lines := strings.Split(text, "\n")
-	for _, line := range lines {
-		trimmed := strings.TrimSpace(line)
-		if trimmed == "" {
-			continue
-		}
-		parts := strings.SplitN(trimmed, ":", 2)
-		if len(parts) == 2 {
-			headers[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
-		}
-	}
-	return headers
-}
-
 /**
  * thực hiện request
  */
-func (e *tdAPITestingService) Execute(w http.ResponseWriter, r *http.Request) {
+func Execute(w http.ResponseWriter, r *http.Request) {
 	var req model.TDAPITestingParam
 
 	// Thay thế binding của Gin bằng json.Decoder
@@ -53,7 +24,7 @@ func (e *tdAPITestingService) Execute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := e.ExecuteRequest(req)
+	result, err := executeRequest(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -66,7 +37,7 @@ func (e *tdAPITestingService) Execute(w http.ResponseWriter, r *http.Request) {
 /**
  * thực hiện gọi nối api cho frontend
  */
-func (e *tdAPITestingService) ExecuteRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingResponse, error) {
+func executeRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingResponse, error) {
 	// Cấu hình Client bỏ qua SSL (tương đương rejectUnauthorized: false)
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -80,7 +51,7 @@ func (e *tdAPITestingService) ExecuteRequest(reqData model.TDAPITestingParam) (*
 	}
 
 	// Thêm headers
-	headers := e.parseHeaders(reqData.HeadersText)
+	headers := parseHeaders(reqData.HeadersText)
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
@@ -103,4 +74,23 @@ func (e *tdAPITestingService) ExecuteRequest(reqData model.TDAPITestingParam) (*
 		Headers: string(headerJson),
 		Body:    string(respBody),
 	}, nil
+}
+
+/**
+ * parse header được stringify từ frontend
+ */
+func parseHeaders(text string) map[string]string {
+	headers := make(map[string]string)
+	lines := strings.Split(text, "\n")
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" {
+			continue
+		}
+		parts := strings.SplitN(trimmed, ":", 2)
+		if len(parts) == 2 {
+			headers[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+		}
+	}
+	return headers
 }
