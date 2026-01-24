@@ -294,7 +294,7 @@ export default {
     },
     apiTesting: {
       copyCURLFromAPI: "Sao chép CURL",
-      saveForNewCollection: "Lưu vào bộ sưu tập {collectionName}",
+      saveForNewCollection: "Lưu vào bộ sưu tập {0}",
       scriptName: "Tên script",
       importCollectionZip: "Nhập zip",
       importCollectionZipTooltip:

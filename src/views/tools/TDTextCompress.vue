@@ -70,19 +70,21 @@ export default {
         ratio = this.inputSource.length / this.outputSource.length;
       }
       let percentRatio = Math.round(ratio * 100).toFixed(2);
-      return this.$t("i18nCommon.textCompress.stats.ratio", [percentRatio]);
+      return this.$t("i18nCommon.textCompress.stats.ratio").format(
+        percentRatio,
+      );
     },
     inputLengthText() {
       let sourceLength = this.inputSource ? this.inputSource.length : 0;
-      return this.$t("i18nCommon.textCompress.stats.inputLength", [
+      return this.$t("i18nCommon.textCompress.stats.inputLength").format(
         sourceLength,
-      ]);
+      );
     },
     outputLengthText() {
       let sourceLength = this.outputSource ? this.outputSource.length : 0;
-      return this.$t("i18nCommon.textCompress.stats.outputLength", [
+      return this.$t("i18nCommon.textCompress.stats.outputLength").format(
         sourceLength,
-      ]);
+      );
     },
   },
   mounted() {},
@@ -105,7 +107,7 @@ export default {
       if (me.inputSource) {
         result = await TDCompress.compressText(
           me.inputSource,
-          me.compressAlgorithms
+          me.compressAlgorithms,
         );
       }
       me.outputSource = result;
@@ -117,7 +119,7 @@ export default {
       if (me.outputSource) {
         result = await TDCompress.decompressText(
           me.outputSource,
-          me.compressAlgorithms
+          me.compressAlgorithms,
         );
       }
       me.inputSource = result;

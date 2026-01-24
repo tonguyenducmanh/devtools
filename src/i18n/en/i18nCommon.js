@@ -295,7 +295,7 @@ export default {
     },
     apiTesting: {
       copyCURLFromAPI: "Copy CURL",
-      saveForNewCollection: "Save in collection {collectionName}",
+      saveForNewCollection: "Save in collection {0}",
       scriptName: "Script name",
       importCollectionZip: "Import zip",
       importCollectionZipTooltip:
