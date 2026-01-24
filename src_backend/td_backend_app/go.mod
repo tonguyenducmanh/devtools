@@ -1,4 +1,4 @@
-module td_daemon_app
+module td_backend_app
 
 go 1.25.6
 
