@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"sync"
-	"td_backend_app/internal/daemon"
-	webApp "td_backend_app/internal/web_app"
+	"td_app/internal/daemon"
+	webApp "td_app/internal/web_app"
 )
 
 const banner = `

@@ -5,8 +5,8 @@ echo "--- Bắt đầu quy trình daemon ---"
 ROOT_DIR=$(pwd)
 
 # 1. Cấu hình đường dẫn
-DAEMON_DIR="$ROOT_DIR/src_backend/td_backend_app/cmd"
-WEB_APP_DIR="$ROOT_DIR/src_backend/td_backend_app/internal/web_app/dist"
+DAEMON_DIR="$ROOT_DIR/src_backend/td_app/cmd"
+WEB_APP_DIR="$ROOT_DIR/src_backend/td_app/internal/web_app/dist"
 FRONTEND_DIST="$ROOT_DIR/dist"
 OUTPUT_DIR="$ROOT_DIR/out"
 OUTPUT_NAME="tool-tomanh-daemon"

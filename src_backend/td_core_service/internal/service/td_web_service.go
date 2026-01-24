@@ -1,8 +1,7 @@
-package web_app
+package service
 
 import (
 	"embed"
-	"flag"
 	"fmt"
 	"io/fs"
 	"log"
@@ -17,11 +16,7 @@ var embeddedFiles embed.FS
 /**
  * Chạy web app
  */
-func RunWebApp() {
-	// Web flags
-	port := flag.Int("web-port", 8080, "Port cho Web server")
-	trace := flag.Bool("web-trace", false, "Hiển thị log chi tiết cho Web server")
-	flag.Parse()
+func RunWebApp(port *int, trace *bool) {
 
 	publicFS, err := fs.Sub(embeddedFiles, "dist")
 	if err != nil {

@@ -1,4 +1,4 @@
-module td_backend_app
+module td_app
 
 go 1.25.6
 
