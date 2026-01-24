@@ -16,7 +16,7 @@ func RunAPIApp(port *int, trace *bool) {
 	addRoute(app)
 
 	// Xâu chuỗi Middlewares: CORS -> Router
-	finalHandler := middleware.CORS(app)
+	finalHandler := middleware.ApplyCORS(app)
 
 	addr := fmt.Sprintf(":%d", *port)
 	fmt.Printf("Server API đang chạy tại http://localhost%s\n", addr)
