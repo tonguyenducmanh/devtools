@@ -3,12 +3,15 @@ package main
 import (
 	"flag"
 	"td_app/internal/banner"
+	startUp "td_app/internal/common"
 	apiApp "td_core_service/external/api_app"
-	configGlobal "td_core_service/external/config"
 )
 
+/**
+ * khởi chạy api app
+ */
 func main() {
-	config := configGlobal.GetConfigGlobal()
+	config := startUp.HandleStartUpLogic()
 	banner.PrintBanner()
 	port := flag.Int("port", config.APIConfig.Port, "Port to run the server")
 	trace := flag.Bool("trace", config.APIConfig.EnableTrace, "Hiển thị log chi tiết cho Web server")

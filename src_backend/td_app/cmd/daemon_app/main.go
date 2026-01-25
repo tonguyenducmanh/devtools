@@ -4,15 +4,15 @@ import (
 	"flag"
 	"sync"
 	apiApp "td_app/internal/api_app"
-	"td_app/internal/banner"
+	startUp "td_app/internal/common"
 	webApp "td_app/internal/web_app"
-	configGlobal "td_core_service/external/config"
 )
 
+/**
+ * khởi chạy api app + web app
+ */
 func main() {
-	config := configGlobal.GetConfigGlobal()
-
-	banner.PrintBanner()
+	config := startUp.HandleStartUpLogic()
 	apiPort := flag.Int("api-port", config.APIConfig.Port, "Port to run the server")
 	apiTrace := flag.Bool("api-trace", config.APIConfig.EnableTrace, "Hiển thị log chi tiết cho Web server")
 	webPort := flag.Int("web-port", config.WebConfig.Port, "Port cho Web server")
