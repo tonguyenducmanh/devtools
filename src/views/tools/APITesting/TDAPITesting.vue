@@ -502,7 +502,7 @@
                 <TDUpload
                   v-tooltip="{
                     text: $t(
-                      'i18nCommon.apiTesting.importCollectionPostmanTooltip'
+                      'i18nCommon.apiTesting.importCollectionPostmanTooltip',
                     ),
                     maxWidth: '500px',
                   }"
@@ -519,7 +519,7 @@
                 <TDUpload
                   v-tooltip="{
                     text: $t(
-                      'i18nCommon.apiTesting.importCollectionZipTooltip'
+                      'i18nCommon.apiTesting.importCollectionZipTooltip',
                     ),
                     maxWidth: '500px',
                   }"
@@ -594,24 +594,22 @@
             :label="$t('i18nCommon.splitHorizontal')"
             @change="updateAPIConfigLayout"
           ></TDCheckbox>
-          <template v-if="!isDesktopApp"
-            ><div class="flex flex-start agent-url-label">
-              <TDButton
-                v-tooltip="$t('i18nCommon.apiTesting.toolTipDownloadExtension')"
-                :noMargin="true"
-                @click="downloadExtension"
-                :type="$tdEnum.buttonType.secondary"
-                :label="$t('i18nCommon.apiTesting.downloadExtension')"
-              ></TDButton>
-            </div>
-            <div>
-              <TDInput
-                v-model="agentURL"
-                :noMargin="true"
-                :placeHolder="$t('i18nCommon.apiTesting.agentUrl')"
-              />
-            </div>
-          </template>
+          <div class="flex flex-start agent-url-label">
+            <TDButton
+              v-tooltip="$t('i18nCommon.apiTesting.toolTipDownloadExtension')"
+              :noMargin="true"
+              @click="downloadExtension"
+              :type="$tdEnum.buttonType.secondary"
+              :label="$t('i18nCommon.apiTesting.downloadExtension')"
+            ></TDButton>
+          </div>
+          <div>
+            <TDInput
+              v-model="agentURL"
+              :noMargin="true"
+              :placeHolder="$t('i18nCommon.apiTesting.agentUrl')"
+            />
+          </div>
         </div>
         <div
           class="td-sidebar-content"
@@ -735,15 +733,15 @@ export default {
   async created() {
     let me = this;
     let allCollectionTmp = await me.$tdCache.get(
-      me.$tdEnum.cacheConfig.APICollection
+      me.$tdEnum.cacheConfig.APICollection,
     );
     let tmpAPIConfigLayout = await me.$tdCache.get(
-      me.$tdEnum.cacheConfig.APIConfigLayout
+      me.$tdEnum.cacheConfig.APIConfigLayout,
     );
     if (tmpAPIConfigLayout) {
       me.APIConfigLayout = Object.assign(
         me.APIConfigLayout,
-        tmpAPIConfigLayout
+        tmpAPIConfigLayout,
       );
     }
     if (allCollectionTmp) {
@@ -799,9 +797,6 @@ export default {
       }
       return title;
     },
-    isDesktopApp() {
-      return this.$tdUtility.isDesktopApp();
-    },
     sidebarOptions() {
       let me = this;
       let options = [];
@@ -847,7 +842,7 @@ export default {
       let me = this;
       await me.$tdCache.set(
         me.$tdEnum.cacheConfig.APIConfigLayout,
-        me.APIConfigLayout
+        me.APIConfigLayout,
       );
     },
     async toggleSidebar() {
@@ -888,7 +883,7 @@ export default {
       ) {
         await me.$tdCache.set(
           me.$tdEnum.cacheConfig.APICollection,
-          JSON.stringify(me.allCollection)
+          JSON.stringify(me.allCollection),
         );
       }
     },
@@ -921,7 +916,7 @@ export default {
                 if (request && request.requestId == me.currentRequestId) {
                   Object.assign(request, historyItem);
                   this.$tdToast.success(
-                    this.$t("i18nCommon.toastMessage.success")
+                    this.$t("i18nCommon.toastMessage.success"),
                   );
                   success = true;
                   break;
@@ -968,7 +963,7 @@ export default {
         me.allCollection.length > 0
       ) {
         let currentCollection = me.allCollection.find(
-          (x) => x.collection_id == collectionId
+          (x) => x.collection_id == collectionId,
         );
         if (
           currentCollection &&
@@ -976,7 +971,7 @@ export default {
           currentCollection.requests.length > 0
         ) {
           currentCollection.requests = currentCollection.requests.filter(
-            (x) => x.requestId != request.requestId
+            (x) => x.requestId != request.requestId,
           );
           await me.saveCollectionToCache();
         }
@@ -1022,7 +1017,7 @@ export default {
       let me = this;
       if (collectionId && me.allCollection && me.allCollection.length >= 0) {
         me.allCollection = me.allCollection.filter(
-          (x) => x.collection_id != collectionId
+          (x) => x.collection_id != collectionId,
         );
 
         await me.saveCollectionToCache();
@@ -1304,7 +1299,7 @@ export default {
         if (error.message === "Request cancelled by user") {
           this.responseText = this.$t("i18nCommon.apiTesting.requestCanceled");
           this.$tdToast.success(
-            this.$t("i18nCommon.apiTesting.requestCanceled")
+            this.$t("i18nCommon.apiTesting.requestCanceled"),
           );
         } else {
           this.responseText = `Error: ${error.message}`;
@@ -1389,7 +1384,7 @@ export default {
         me.$tdUtility.createDownloadFileFromBuffer(
           buffer,
           "text/plain;charset=utf-8",
-          fileName
+          fileName,
         );
       }
     },

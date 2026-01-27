@@ -346,13 +346,6 @@ class TDUtility {
     // Đóng băng object cha
     return Object.freeze(obj);
   }
-
-  /**
-   * Kiểm tra xem có phải phiên bản app desktop không
-   */
-  isDesktopApp() {
-    return false;
-  }
   reloadApp() {
     window.location.reload();
   }

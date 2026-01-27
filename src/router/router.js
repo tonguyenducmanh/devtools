@@ -240,11 +240,6 @@ router.beforeEach((to, from, next) => {
 export default router;
 
 export function getRouterConfig() {
-  let allRoutes = [];
-  if (TDUtility.isDesktopApp()) {
-    allRoutes = routerConfig.filter((x) => !x.desktopNotSupport && !x.hide);
-  } else {
-    allRoutes = routerConfig.filter((x) => !x.hide);
-  }
+  let allRoutes = routerConfig.filter((x) => !x.hide);
   return allRoutes;
 }
