@@ -85,7 +85,16 @@ class TDBaseAPI {
 
       // Kiểm tra response status
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        // Thử parse error response
+        let errorData;
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+          errorData = await response.json().catch(() => ({}));
+        } else {
+          errorData = await response.text().catch(() => "");
+        }
+
         throw {
           status: response.status,
           statusText: response.statusText,
@@ -93,13 +102,23 @@ class TDBaseAPI {
         };
       }
 
-      // Parse response JSON
-      const data = await response.json();
+      // Parse response dựa trên Content-Type
+      const contentType = response.headers.get("content-type");
+      let data;
+
+      if (contentType && contentType.includes("application/json")) {
+        // Response là JSON
+        data = await response.json();
+      } else {
+        // Response là text hoặc các loại khác
+        data = await response.text();
+      }
 
       return {
         success: true,
         status: response.status,
         data: data,
+        contentType: contentType,
       };
     } catch (error) {
       console.error("API Request Error:", error);
