@@ -65,7 +65,11 @@ export default {
       me.handleChangeAgentURL();
       try {
         let res = await new TDAgentAPI().heathCheck();
-        me.$tdToast.success(res);
+        if (res && res.success && res.data) {
+          me.$tdToast.success(res.data);
+        } else {
+          me.$tdToast.success(res);
+        }
       } catch (ex) {
         me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
