@@ -23,6 +23,13 @@ class TDAgentAPI extends TDBaseAPI {
   async heathCheck() {
     return await this.get("/");
   }
+
+  /**
+   * Xử lý gọi nối api
+   */
+  async executeRequest(request, signal) {
+    return await this.post("/exec", request, null, signal);
+  }
 }
 
 export default TDAgentAPI;

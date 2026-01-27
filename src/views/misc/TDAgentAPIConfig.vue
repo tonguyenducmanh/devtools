@@ -31,6 +31,7 @@ export default {
   computed: {},
   created() {
     let me = this;
+    me.handleChangeAgentURL();
   },
   mounted() {},
   beforeUnmount() {},
