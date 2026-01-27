@@ -2,6 +2,7 @@
   <div class="flex td-agent-download">
     <TDInput
       v-model="agentURL"
+      v-tooltip="$t('i18nCommon.apiTesting.tooltipUrlAgent')"
       :noMargin="true"
       :placeHolder="$t('i18nCommon.apiTesting.agentUrl')"
     />

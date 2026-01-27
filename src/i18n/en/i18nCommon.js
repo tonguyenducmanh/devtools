@@ -324,6 +324,7 @@ export default {
       importCURL: "Import",
       extensionNotAvailable: "Extension helper not installed",
       downloadAgent: "Download Agent",
+      tooltipUrlAgent:"Url of agent app",
       toolTipDownloadAgent:
         "The browser is limited and cannot bypass CORS, SSL is disabled, fake headers are used, etc., so an agent (a desktop app) is needed to call the API on its behalf.",
       contentCURL: "CURL import content",
