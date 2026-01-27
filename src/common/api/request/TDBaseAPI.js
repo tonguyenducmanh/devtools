@@ -46,9 +46,10 @@ class TDBaseAPI {
    * @param {string} method - HTTP method (GET, POST, PUT, PATCH, DELETE, OPTIONS)
    * @param {Object} param - Request parameters hoặc body data
    * @param {Object} headers - Custom headers (optional)
+   * @param {AbortSignal} signal - AbortController signal for cancellation (optional)
    * @returns {Promise<Object>} - Response data
    */
-  async request(url, method = "GET", param = {}, headers = {}) {
+  async request(url, method = "GET", param = {}, headers = {}, signal = null) {
     try {
       let response;
       const upperMethod = method.toUpperCase();
@@ -56,27 +57,27 @@ class TDBaseAPI {
       // Gọi method tương ứng từ TDHttpClient
       switch (upperMethod) {
         case "GET":
-          response = await TDHttpClient.get(url, param, headers);
+          response = await TDHttpClient.get(url, param, headers, signal);
           break;
 
         case "POST":
-          response = await TDHttpClient.post(url, param, headers);
+          response = await TDHttpClient.post(url, param, headers, signal);
           break;
 
         case "PUT":
-          response = await TDHttpClient.put(url, param, headers);
+          response = await TDHttpClient.put(url, param, headers, signal);
           break;
 
         case "PATCH":
-          response = await TDHttpClient.patch(url, param, headers);
+          response = await TDHttpClient.patch(url, param, headers, signal);
           break;
 
         case "DELETE":
-          response = await TDHttpClient.delete(url, headers);
+          response = await TDHttpClient.delete(url, headers, signal);
           break;
 
         case "OPTIONS":
-          response = await TDHttpClient.options(url, headers);
+          response = await TDHttpClient.options(url, headers, signal);
           break;
 
         default:
@@ -121,6 +122,18 @@ class TDBaseAPI {
         contentType: contentType,
       };
     } catch (error) {
+      // Xử lý riêng cho AbortError
+      if (error.name === "AbortError") {
+        console.log("Request was aborted");
+        return {
+          success: false,
+          status: 0,
+          statusText: "Aborted",
+          error: "Request was cancelled",
+          aborted: true,
+        };
+      }
+
       console.error("API Request Error:", error);
 
       return {
@@ -135,34 +148,34 @@ class TDBaseAPI {
   /**
    * Convenience methods - có thể sử dụng trực tiếp
    */
-  async get(endpoint, param = {}, headers = {}) {
+  async get(endpoint, param = {}, headers = {}, signal = null) {
     const url = this.getURLRequest(endpoint);
-    return await this.request(url, "GET", param, headers);
+    return await this.request(url, "GET", param, headers, signal);
   }
 
-  async post(endpoint, param = {}, headers = {}) {
+  async post(endpoint, param = {}, headers = {}, signal = null) {
     const url = this.getURLRequest(endpoint);
-    return await this.request(url, "POST", param, headers);
+    return await this.request(url, "POST", param, headers, signal);
   }
 
-  async put(endpoint, param = {}, headers = {}) {
+  async put(endpoint, param = {}, headers = {}, signal = null) {
     const url = this.getURLRequest(endpoint);
-    return await this.request(url, "PUT", param, headers);
+    return await this.request(url, "PUT", param, headers, signal);
   }
 
-  async patch(endpoint, param = {}, headers = {}) {
+  async patch(endpoint, param = {}, headers = {}, signal = null) {
     const url = this.getURLRequest(endpoint);
-    return await this.request(url, "PATCH", param, headers);
+    return await this.request(url, "PATCH", param, headers, signal);
   }
 
-  async delete(endpoint, headers = {}) {
+  async delete(endpoint, headers = {}, signal = null) {
     const url = this.getURLRequest(endpoint);
-    return await this.request(url, "DELETE", {}, headers);
+    return await this.request(url, "DELETE", {}, headers, signal);
   }
 
-  async options(endpoint, headers = {}) {
+  async options(endpoint, headers = {}, signal = null) {
     const url = this.getURLRequest(endpoint);
-    return await this.request(url, "OPTIONS", {}, headers);
+    return await this.request(url, "OPTIONS", {}, headers, signal);
   }
 }
 

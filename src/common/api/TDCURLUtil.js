@@ -1,5 +1,5 @@
 import * as insomniaCURL from "./insomnia/curl.ts";
-import TDUtility from "@/common/TDUtility.js";
+import TDAgentAPI from "@/common/api/request/AgentAPI/TDAgentAPI.js";
 import * as curlReader from "./curlReader/index.ts";
 /**
  * các method CURL dùng cho toàn bộ frontend
@@ -18,28 +18,20 @@ class TDCURLUtil {
     }
 
     const controller = new AbortController();
-
-    const promise = fetch(`${serverAgent}/exec`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request),
-      signal: controller.signal,
-    })
+    // thực hiện gọi api vào agent
+    let promise = new TDAgentAPI()
+      .executeRequest(request, controller.signal)
       .then(async (res) => {
-        const text = await res.text();
-        let data;
+        const data = await res.data;
 
         try {
-          data = JSON.parse(text);
           return {
             status: data.status,
             headers: data.headers,
             body: data.body,
           };
         } catch {
-          data = text;
+          data = data;
           return {
             status: 200,
             headers: {},

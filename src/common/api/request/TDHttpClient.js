@@ -13,9 +13,10 @@ class TDHttpClient {
    * @param {string} url - API endpoint
    * @param {Object} params - Query parameters
    * @param {Object} headers - Custom headers
+   * @param {AbortSignal} signal - AbortController signal for cancellation
    * @returns {Promise}
    */
-  static async get(url, params = {}, headers = {}) {
+  static async get(url, params = {}, headers = {}, signal = null) {
     // Build query string from params
     const queryString =
       Object.keys(params).length > 0
@@ -32,6 +33,11 @@ class TDHttpClient {
       },
     };
 
+    // Thêm signal nếu có
+    if (signal) {
+      options.signal = signal;
+    }
+
     return await fetch(fullUrl, options);
   }
 
@@ -40,9 +46,10 @@ class TDHttpClient {
    * @param {string} url - API endpoint
    * @param {Object} data - Request body
    * @param {Object} headers - Custom headers
+   * @param {AbortSignal} signal - AbortController signal for cancellation
    * @returns {Promise}
    */
-  static async post(url, data = {}, headers = {}) {
+  static async post(url, data = {}, headers = {}, signal = null) {
     const options = {
       method: "POST",
       headers: {
@@ -52,6 +59,11 @@ class TDHttpClient {
       body: JSON.stringify(data),
     };
 
+    // Thêm signal nếu có
+    if (signal) {
+      options.signal = signal;
+    }
+
     return await fetch(url, options);
   }
 
@@ -60,9 +72,10 @@ class TDHttpClient {
    * @param {string} url - API endpoint
    * @param {Object} data - Request body
    * @param {Object} headers - Custom headers
+   * @param {AbortSignal} signal - AbortController signal for cancellation
    * @returns {Promise}
    */
-  static async put(url, data = {}, headers = {}) {
+  static async put(url, data = {}, headers = {}, signal = null) {
     const options = {
       method: "PUT",
       headers: {
@@ -72,6 +85,11 @@ class TDHttpClient {
       body: JSON.stringify(data),
     };
 
+    // Thêm signal nếu có
+    if (signal) {
+      options.signal = signal;
+    }
+
     return await fetch(url, options);
   }
 
@@ -80,9 +98,10 @@ class TDHttpClient {
    * @param {string} url - API endpoint
    * @param {Object} data - Request body
    * @param {Object} headers - Custom headers
+   * @param {AbortSignal} signal - AbortController signal for cancellation
    * @returns {Promise}
    */
-  static async patch(url, data = {}, headers = {}) {
+  static async patch(url, data = {}, headers = {}, signal = null) {
     const options = {
       method: "PATCH",
       headers: {
@@ -92,6 +111,11 @@ class TDHttpClient {
       body: JSON.stringify(data),
     };
 
+    // Thêm signal nếu có
+    if (signal) {
+      options.signal = signal;
+    }
+
     return await fetch(url, options);
   }
 
@@ -99,9 +123,10 @@ class TDHttpClient {
    * DELETE request
    * @param {string} url - API endpoint
    * @param {Object} headers - Custom headers
+   * @param {AbortSignal} signal - AbortController signal for cancellation
    * @returns {Promise}
    */
-  static async delete(url, headers = {}) {
+  static async delete(url, headers = {}, signal = null) {
     const options = {
       method: "DELETE",
       headers: {
@@ -110,6 +135,11 @@ class TDHttpClient {
       },
     };
 
+    // Thêm signal nếu có
+    if (signal) {
+      options.signal = signal;
+    }
+
     return await fetch(url, options);
   }
 
@@ -117,9 +147,10 @@ class TDHttpClient {
    * OPTIONS request
    * @param {string} url - API endpoint
    * @param {Object} headers - Custom headers
+   * @param {AbortSignal} signal - AbortController signal for cancellation
    * @returns {Promise}
    */
-  static async options(url, headers = {}) {
+  static async options(url, headers = {}, signal = null) {
     const options = {
       method: "OPTIONS",
       headers: {
@@ -127,6 +158,11 @@ class TDHttpClient {
         ...headers,
       },
     };
+
+    // Thêm signal nếu có
+    if (signal) {
+      options.signal = signal;
+    }
 
     return await fetch(url, options);
   }
