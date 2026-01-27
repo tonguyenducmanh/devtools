@@ -1,11 +1,5 @@
 <template>
   <div class="flex td-agent-download">
-    <TDInput
-      v-model="agentURL"
-      v-tooltip="$t('i18nCommon.apiTesting.tooltipUrlAgent')"
-      :noMargin="true"
-      :placeHolder="$t('i18nCommon.apiTesting.agentUrl')"
-    />
     <TDButton
       v-tooltip="$t('i18nCommon.apiTesting.toolTipDownloadAgent')"
       :noMargin="true"
@@ -13,6 +7,12 @@
       :type="$tdEnum.buttonType.secondary"
       :label="$t('i18nCommon.apiTesting.downloadAgent')"
     ></TDButton>
+    <TDInput
+      v-model="agentURL"
+      v-tooltip="$t('i18nCommon.apiTesting.tooltipUrlAgent')"
+      :noMargin="true"
+      :placeHolder="$t('i18nCommon.apiTesting.agentUrl')"
+    />
     <TDButton
       :noMargin="true"
       @click="heathCheck"
