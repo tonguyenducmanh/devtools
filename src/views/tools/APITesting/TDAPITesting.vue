@@ -594,22 +594,6 @@
             :label="$t('i18nCommon.splitHorizontal')"
             @change="updateAPIConfigLayout"
           ></TDCheckbox>
-          <div class="flex flex-start agent-url-label">
-            <TDButton
-              v-tooltip="$t('i18nCommon.apiTesting.toolTipDownloadExtension')"
-              :noMargin="true"
-              @click="downloadExtension"
-              :type="$tdEnum.buttonType.secondary"
-              :label="$t('i18nCommon.apiTesting.downloadExtension')"
-            ></TDButton>
-          </div>
-          <div>
-            <TDInput
-              v-model="agentURL"
-              :noMargin="true"
-              :placeHolder="$t('i18nCommon.apiTesting.agentUrl')"
-            />
-          </div>
         </div>
         <div
           class="td-sidebar-content"
@@ -678,7 +662,6 @@ export default {
       requestName: "",
       currentRequestId: null,
       newCollectionName: "",
-      agentURL: window.__env?.APITesting?.agentServer,
       allCollection: [],
       httpMethod: "GET",
       headersText: "Content-Type: application/json",
@@ -1194,10 +1177,6 @@ export default {
       me.currentRequest = null;
       me.curlContent = "";
     },
-    downloadExtension() {
-      let me = this;
-      me.$tdUtility.goToSource("releases");
-    },
     formatBody() {
       let me = this;
       if (me.bodyText) {
@@ -1225,9 +1204,7 @@ export default {
      */
     async handleSend() {
       let me = this;
-      TDCURLUtil.setGlobalInfoBeforeRequest({
-        agentURL: me.agentURL,
-      });
+
       if (me.APIConfigLayout.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
         await me.handleSendRequestProMode();
       } else if (me.APIConfigLayout.currentAPIMode == me.$tdEnum.APIMode.CURL) {

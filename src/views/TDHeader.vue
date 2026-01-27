@@ -17,7 +17,7 @@
         </div>
       </div>
     </div>
-
+    <TDAgentAPIConfig />
     <div>
       <div class="td-header-btn">
         <!-- Updated Dark Mode Toggle -->
@@ -77,10 +77,10 @@
 <script>
 import { loadLocale } from "@/i18n/i18nData.js";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
-
+import TDAgentAPIConfig from "@/views/misc/TDAgentAPIConfig.vue";
 export default {
   name: "TDHeader",
-  components: {},
+  components: { TDAgentAPIConfig },
   computed: {
     appName() {
       return window.__env.appName;
@@ -96,7 +96,7 @@ export default {
 
     this.$tdEventBus.on(
       this.$tdEnum.eventGlobal.changeLanguage,
-      this.changeLangFromEvent
+      this.changeLangFromEvent,
     );
   },
   beforeUnmount() {
@@ -104,7 +104,7 @@ export default {
 
     this.$tdEventBus.off(
       this.$tdEnum.eventGlobal.changeLanguage,
-      this.changeLangFromEvent
+      this.changeLangFromEvent,
     );
   },
   props: {},
@@ -150,7 +150,7 @@ export default {
 
     async getCurrentLanguage() {
       let currentLanguage = await this.$tdCache.get(
-        this.$tdEnum.cacheConfig.Language
+        this.$tdEnum.cacheConfig.Language,
       );
       if (currentLanguage) {
         return currentLanguage;
@@ -165,7 +165,7 @@ export default {
       me.currentLanguage = me.languageList[nextIndex];
       await me.$tdCache.set(
         me.$tdEnum.cacheConfig.Language,
-        me.currentLanguage
+        me.currentLanguage,
       );
       await loadLocale(me.currentLanguage);
       me.$tdUtility.reloadApp();
@@ -176,7 +176,6 @@ export default {
         this.currentLanguage = data;
       }
     },
-
     // Search methods
     openSearchModal() {
       // nếu không tồn tại request thì show popup tạo mới
