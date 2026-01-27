@@ -13,12 +13,18 @@
       :type="$tdEnum.buttonType.secondary"
       :label="$t('i18nCommon.apiTesting.downloadAgent')"
     ></TDButton>
+    <TDButton
+      :noMargin="true"
+      @click="heathCheck"
+      :type="$tdEnum.buttonType.secondary"
+      :label="$t('i18nCommon.ping')"
+    ></TDButton>
   </div>
 </template>
 
 <script>
 import TDCURLUtil from "@/common/api/TDCURLUtil";
-
+import TDAgentAPI from "@/common/api/request/AgentAPI/TDAgentAPI.js";
 export default {
   name: "TDAgentAPIConfig",
   components: {},
@@ -53,6 +59,16 @@ export default {
     downloadAgent() {
       let me = this;
       me.$tdUtility.goToSource("releases");
+    },
+    async heathCheck() {
+      let me = this;
+      me.handleChangeAgentURL();
+      try {
+        let res = await new TDAgentAPI().heathCheck();
+        me.$tdToast.success(res);
+      } catch (ex) {
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+      }
     },
   },
 };
