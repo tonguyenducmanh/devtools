@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import TDCURLUtil from "@/common/api/TDCURLUtil";
+import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
 import TDAgentAPI from "@/common/api/request/AgentAPI/TDAgentAPI.js";
 export default {
   name: "TDAgentAPIConfig",
