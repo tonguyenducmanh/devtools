@@ -322,8 +322,8 @@ export default {
       CURL: "Nhập CURL",
       importCURL: "Nhập",
       extensionNotAvailable: "Extension helper chưa được cài đặt",
-      downloadExtension: "Tải Agent và nhập URL",
-      toolTipDownloadExtension:
+      downloadAgent: "Tải Agent",
+      toolTipDownloadAgent:
         "Trình duyệt bị giới hạn không thể vượt CORS, tắt SSL, fake header,... nên cần Agent là 1 app desktop call API hộ",
       contentCURL: "Nội dung CURL muốn import",
       contentCURLExecute: "Nội dung CURL muốn chạy",

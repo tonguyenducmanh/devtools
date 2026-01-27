@@ -323,8 +323,8 @@ export default {
       CURL: "Import CURL",
       importCURL: "Import",
       extensionNotAvailable: "Extension helper not installed",
-      downloadExtension: "Down Agent, enter URL",
-      toolTipDownloadExtension:
+      downloadAgent: "Download Agent",
+      toolTipDownloadAgent:
         "The browser is limited and cannot bypass CORS, SSL is disabled, fake headers are used, etc., so an agent (a desktop app) is needed to call the API on its behalf.",
       contentCURL: "CURL import content",
       contentCURLExecute: "CURL content to execute",
@@ -357,8 +357,7 @@ export default {
       NeedRequestName: "Need request name before save",
       DemoRequestPromode: "Call a single API",
       MultipleCurl: "Call multiple APIs",
-      RunBatchPromiseAll:
-        "Batch API concurency",
+      RunBatchPromiseAll: "Batch API concurency",
       APIBatchSequency: "Batch API sequency",
       RetryAPIDelay: "Call API with retry",
       AutoPagination: "Call API paging",
