@@ -2,6 +2,7 @@ export default {
   i18nCommon: {
     typeInput: "Nhập giá trị",
     edit: "Sửa",
+    ping: "Ping",
     history: {
       title: "Lịch sử",
       show: "Lịch sử",
