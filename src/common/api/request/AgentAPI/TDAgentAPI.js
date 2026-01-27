@@ -10,7 +10,7 @@ class TDAgentAPI extends TDBaseAPI {
    * @param {string} baseUrl - Base URL của API (vd: https://api.example.com)
    * @param {string} controllerName - Tên controller (vd: agents, users, products)
    */
-  constructor(baseUrl, controllerName = "agents") {
+  constructor(baseUrl, controllerName = "") {
     super(baseUrl, controllerName);
   }
   getBaseUrl() {
