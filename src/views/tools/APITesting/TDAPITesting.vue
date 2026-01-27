@@ -635,7 +635,7 @@
 </template>
 
 <script>
-import TDCURLUtil from "@/common/api/TDCURLUtil";
+import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDArrow from "@/components/TDArrow.vue";
 import TDResizer from "@/components/TDResizer.vue";
