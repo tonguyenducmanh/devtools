@@ -359,5 +359,10 @@ export default {
       RetryAPIDelay: "Gọi api có retry",
       AutoPagination: "Gọi lấy dữ liệu paging",
     },
+    APIMocking: {
+      endpoint: "Nhập endpoint",
+      bodyPlaceholder: "Nhập body mock api",
+      responsePlaceholder: "Nhập response mock api",
+    },
   },
 };

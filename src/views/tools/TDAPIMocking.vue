@@ -18,7 +18,7 @@
         <!-- nhập url endpoint api -->
         <TDInput
           v-model="apiUrl"
-          :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
+          :placeHolder="$t('i18nCommon.APIMocking.endpoint')"
           :noMargin="true"
           :borderRadiusPosition="[
             $tdEnum.BorderRadiusPosition.TopRight,
@@ -36,7 +36,7 @@
           :wrapText="currentConfigLayout.wrapText"
           :enableHighlight="currentConfigLayout.enableHighlight"
           language="json"
-          :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
+          :placeHolder="$t('i18nCommon.APIMocking.bodyPlaceholder')"
           :style="requestSectionSizeStyle"
         ></TDTextarea>
         <TDResizer
@@ -51,7 +51,7 @@
           :wrapText="currentConfigLayout.wrapText"
           :enableHighlight="currentConfigLayout.enableHighlight"
           language="json"
-          :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
+          :placeHolder="$t('i18nCommon.APIMocking.responsePlaceholder')"
           :style="responseSectionSizeStyle"
         ></TDTextarea>
       </div>
