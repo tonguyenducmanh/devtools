@@ -365,6 +365,10 @@ export default {
       endpoint: "Enter endpoint",
       bodyPlaceholder: "Enter body mock api",
       responsePlaceholder: "Enter response mock api",
+      requestName: "Enter request",
+      save: "Save",
+      addNew: "Add new",
+      groupName: "Group name",
     },
   },
 };

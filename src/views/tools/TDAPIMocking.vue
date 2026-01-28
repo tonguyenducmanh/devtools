@@ -2,6 +2,30 @@
   <div class="flex td-mocking-container">
     <!-- phần thao tác chính của tool -->
     <div class="flex flex-col td-mockding-main">
+      <div class="flex td-mocking-header-first">
+        <TDInput
+          v-model="requestName"
+          :placeHolder="$t('i18nCommon.APIMocking.requestName')"
+          :noMargin="true"
+        ></TDInput>
+        <TDInput
+          v-model="groupName"
+          :placeHolder="$t('i18nCommon.APIMocking.groupName')"
+          :noMargin="true"
+        ></TDInput>
+        <TDButton
+          :noMargin="true"
+          @click="saveRequest"
+          :label="$t('i18nCommon.APIMocking.save')"
+        />
+        <TDButton
+          v-if="!requestId"
+          :noMargin="true"
+          @click="saveRequest"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.APIMocking.addNew')"
+        />
+      </div>
       <div class="flex td-mocking-header">
         <!-- combo chọn method http -->
         <TDComboBox
@@ -132,6 +156,7 @@ export default {
       keyCacheLayout: this.$tdEnum.cacheConfig.APIMockConfigLayout,
       apiUrl: "",
       requestName: "",
+      groupName: "",
       httpMethod: "GET",
       bodyText: "",
       responseText: "",
@@ -223,6 +248,7 @@ export default {
       let me = this;
       await me.updateConfigLayout();
     },
+    saveRequest() {},
   },
 };
 </script>
@@ -237,6 +263,10 @@ export default {
     width: 100%;
     height: 100%;
     gap: var(--padding);
+    .td-mocking-header-first {
+      width: 100%;
+      gap: var(--padding);
+    }
     .td-mocking-header {
       width: 100%;
     }
