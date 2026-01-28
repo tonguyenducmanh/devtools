@@ -363,6 +363,10 @@ export default {
       endpoint: "Nhập endpoint",
       bodyPlaceholder: "Nhập body mock api",
       responsePlaceholder: "Nhập response mock api",
+      requestName: "Nhập tên request",
+      save: "Lưu",
+      addNew: "Thêm mới",
+      groupName: "Tên nhóm",
     },
   },
 };
