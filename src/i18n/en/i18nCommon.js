@@ -176,12 +176,8 @@ export default {
     },
     uuidGenerator: {
       title: "UUIDv4 generator tool!",
-      input: {
-        result: "Result",
-      },
       buttons: {
         generate: "Generate",
-        copy: "Copy",
       },
     },
     htmlPreview: {
