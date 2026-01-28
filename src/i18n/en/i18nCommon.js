@@ -58,6 +58,7 @@ export default {
       HTMLPreview: "HTML Preview",
       textManipulation: "Text manipulation",
       APITesting: "API testing",
+      APIMocking: "API mocking",
     },
     example: "example",
     base64ToImage: {
