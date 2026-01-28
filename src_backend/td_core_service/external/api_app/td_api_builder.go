@@ -32,4 +32,8 @@ func RunAPIApp(port *int, trace *bool) {
 func addRoute(app *http.ServeMux) {
 	app.HandleFunc("GET /", service.HeathCheck)
 	app.HandleFunc("POST /exec", service.Execute)
+	app.HandleFunc("POST /mock_api/create_mock", service.CreateMockAPI)
+	app.HandleFunc("GET /mock_api/get_all_mock", service.GetAllMockAPI)
+	app.HandleFunc("DELETE /mock_api/delete_mock", service.RemoveMockAPI)
+
 }
