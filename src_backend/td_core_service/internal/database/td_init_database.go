@@ -5,7 +5,7 @@ import (
 	"log"
 	configGlobal "td_core_service/external/config"
 
-	_ "modernc.org/sqlite" // Đăng ký driver sqlite
+	_ "github.com/mattn/go-sqlite3"
 )
 
 /**
@@ -13,7 +13,7 @@ import (
  */
 func GetConnectionDB() (*sql.DB, error) {
 	// 1. Mở kết nối (Tên driver là "sqlite")
-	db, err := sql.Open("sqlite", configGlobal.GetConfigGlobal().DatabaseName)
+	db, err := sql.Open("sqlite3", configGlobal.GetConfigGlobal().DatabaseName)
 	return db, err
 }
 
