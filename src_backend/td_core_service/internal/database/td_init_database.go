@@ -3,17 +3,31 @@ package database
 import (
 	"database/sql"
 	"log"
+	"os"
+	"path/filepath"
 	configGlobal "td_core_service/external/config"
 
 	_ "github.com/mattn/go-sqlite3"
 )
+
+func executableDir() string {
+	exe, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	return filepath.Dir(exe)
+}
+func dbPath() string {
+	dir := executableDir()
+	return filepath.Join(dir, configGlobal.GetConfigGlobal().DatabaseName)
+}
 
 /**
  * Lấy ra thông tin kết nối
  */
 func GetConnectionDB() (*sql.DB, error) {
 	// 1. Mở kết nối (Tên driver là "sqlite")
-	db, err := sql.Open("sqlite3", configGlobal.GetConfigGlobal().DatabaseName)
+	db, err := sql.Open("sqlite3", dbPath())
 	return db, err
 }
 
