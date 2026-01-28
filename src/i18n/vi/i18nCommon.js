@@ -175,12 +175,8 @@ export default {
     },
     uuidGenerator: {
       title: "Công cụ tạo UUIDv4!",
-      input: {
-        result: "Kết quả",
-      },
       buttons: {
         generate: "Tạo mã",
-        copy: "Sao chép",
       },
     },
     htmlPreview: {
