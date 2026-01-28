@@ -17,15 +17,15 @@ echo "Đang build Go daemon..."
 cd "$DAEMON_DIR"
 
 echo "Building for Mac Apple Silicon..."
-GOOS=darwin GOARCH=arm64 \
+GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 \
 go build -o "$OUTPUT_DIR/$OUTPUT_NAME-mac-arm" .
 
 echo "Building for Linux..."
-GOOS=linux GOARCH=amd64 \
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
 go build -o "$OUTPUT_DIR/$OUTPUT_NAME-linux" .
 
 echo "Building for Windows..."
-GOOS=windows GOARCH=amd64 \
+GOOS=windows GOARCH=amd64 CGO_ENABLED=0 \
 go build -o "$OUTPUT_DIR/$OUTPUT_NAME.exe" .
 
 rm -rf "$FRONTEND_DIST"

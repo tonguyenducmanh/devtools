@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	configGlobal "td_core_service/external/config"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 func executableDir() string {
@@ -27,7 +27,7 @@ func dbPath() string {
  */
 func GetConnectionDB() (*sql.DB, error) {
 	// 1. Mở kết nối (Tên driver là "sqlite")
-	db, err := sql.Open("sqlite3", dbPath())
+	db, err := sql.Open("sqlite", dbPath())
 	return db, err
 }
 
