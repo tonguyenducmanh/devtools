@@ -525,3 +525,6 @@ FodyWeavers.xsd
 # will have compiled files and executables
 /target/
 /gen/schemas
+
+
+*.db

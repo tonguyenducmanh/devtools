@@ -3,6 +3,7 @@ package api_app
 import (
 	"fmt"
 	"net/http"
+	"td_core_service/internal/database"
 	"td_core_service/internal/middleware"
 	"td_core_service/internal/service"
 )
@@ -11,6 +12,9 @@ import (
  * khởi chạy api app
  */
 func RunAPIApp(port *int, trace *bool) {
+
+	database.InitDatabase()
+
 	app := http.NewServeMux()
 
 	addRoute(app)
