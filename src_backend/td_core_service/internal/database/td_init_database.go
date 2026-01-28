@@ -8,9 +8,21 @@ import (
 	_ "modernc.org/sqlite" // Đăng ký driver sqlite
 )
 
-func InitDatabase() {
+/**
+ * Lấy ra thông tin kết nối
+ */
+func GetConnectionDB() (*sql.DB, error) {
 	// 1. Mở kết nối (Tên driver là "sqlite")
 	db, err := sql.Open("sqlite", configGlobal.GetConfigGlobal().DatabaseName)
+	return db, err
+}
+
+/**
+ * Khởi tạo database nếu chưa có
+ */
+func InitDatabase() {
+	// 1. Mở kết nối (Tên driver là "sqlite")
+	db, err := GetConnectionDB()
 	if err != nil {
 		log.Fatal(err)
 	}
