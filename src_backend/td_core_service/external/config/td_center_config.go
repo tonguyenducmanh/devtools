@@ -4,8 +4,9 @@ package config
  * kiểu dữ liệu config chung
  */
 type TDCenterConfig struct {
-	APIConfig APIConfig `json:"api_config"`
-	WebConfig WebConfig `json:"web_config"`
+	APIConfig    APIConfig `json:"api_config"`
+	WebConfig    WebConfig `json:"web_config"`
+	DatabaseName string    `json:"database_name"`
 }
 
 type APIConfig struct {
@@ -31,5 +32,6 @@ func DefaultConfig() TDCenterConfig {
 			Port:        1403,
 			EnableTrace: false,
 		},
+		DatabaseName: "tool_tomanh.db",
 	}
 }

@@ -3,13 +3,14 @@ package database
 import (
 	"database/sql"
 	"log"
+	configGlobal "td_core_service/external/config"
 
 	_ "modernc.org/sqlite" // Đăng ký driver sqlite
 )
 
 func InitDatabase() {
 	// 1. Mở kết nối (Tên driver là "sqlite")
-	db, err := sql.Open("sqlite", "tool_tomanh.db")
+	db, err := sql.Open("sqlite", configGlobal.GetConfigGlobal().DatabaseName)
 	if err != nil {
 		log.Fatal(err)
 	}
