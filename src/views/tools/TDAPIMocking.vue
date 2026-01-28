@@ -28,28 +28,28 @@
       </div>
       <div
         class="flex td-mocking-content"
-        :class="{ 'flex-col': APIConfigLayout.splitHorizontal }"
+        :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
       >
         <TDTextarea
           :isLabelTop="true"
           v-model="bodyText"
-          :wrapText="APIConfigLayout.wrapText"
-          :enableHighlight="APIConfigLayout.enableHighlight"
+          :wrapText="currentConfigLayout.wrapText"
+          :enableHighlight="currentConfigLayout.enableHighlight"
           language="json"
           :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
           :style="requestSectionSizeStyle"
         ></TDTextarea>
         <TDResizer
           :direction="
-            APIConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
+            currentConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
           "
           @resize="handleResize"
         />
         <TDTextarea
           :isLabelTop="true"
           v-model="responseText"
-          :wrapText="APIConfigLayout.wrapText"
-          :enableHighlight="APIConfigLayout.enableHighlight"
+          :wrapText="currentConfigLayout.wrapText"
+          :enableHighlight="currentConfigLayout.enableHighlight"
           language="json"
           :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
           :style="responseSectionSizeStyle"
@@ -60,7 +60,7 @@
     <!-- phần nội dung sidebar -->
     <TDSubSidebar
       ref="subSidebar"
-      v-model="APIConfigLayout.isShowSidebar"
+      v-model="currentConfigLayout.isShowSidebar"
       @toggleSidebar="toggleSidebar"
     >
       <!-- slide tùy chọn như cài đặt hoặc collection -->
@@ -69,10 +69,10 @@
           <TDSlideOption
             :showIcon="true"
             v-if="sidebarOptions && sidebarOptions.length > 1"
-            v-model="APIConfigLayout.currentSidebarOption"
+            v-model="currentConfigLayout.currentSidebarOption"
             :options="sidebarOptions"
             :noMargin="true"
-            @change="updateAPIConfigLayout"
+            @change="updateConfigLayout"
           />
         </div>
       </template>
@@ -81,7 +81,7 @@
         <div
           class="flex flex-col td-sidebar-content"
           v-show="
-            APIConfigLayout.currentSidebarOption ==
+            currentConfigLayout.currentSidebarOption ==
             $tdEnum.APISidebarOption.Collection
           "
         ></div>
@@ -89,27 +89,27 @@
         <div
           class="td-sidebar-content"
           v-show="
-            APIConfigLayout.currentSidebarOption ==
+            currentConfigLayout.currentSidebarOption ==
             $tdEnum.APISidebarOption.Setting
           "
         >
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="APIConfigLayout.wrapText"
+            v-model="currentConfigLayout.wrapText"
             :label="$t('i18nCommon.apiTesting.wrapText')"
-            @change="updateAPIConfigLayout"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="APIConfigLayout.enableHighlight"
+            v-model="currentConfigLayout.enableHighlight"
             :label="$t('i18nCommon.enableHighlight')"
-            @change="updateAPIConfigLayout"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="APIConfigLayout.splitHorizontal"
+            v-model="currentConfigLayout.splitHorizontal"
             :label="$t('i18nCommon.splitHorizontal')"
-            @change="updateAPIConfigLayout"
+            @change="updateConfigLayout"
           ></TDCheckbox>
         </div>
       </template>
@@ -121,13 +121,15 @@
 <script>
 import TDResizer from "@/components/TDResizer.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
-
+import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
 export default {
   name: "TDAPIMocking",
   components: { TDResizer, TDSubSidebar },
+  mixins: [TDLayoutConfigMixin],
 
   data() {
     return {
+      keyCacheLayout: this.$tdEnum.cacheConfig.APIMockConfigLayout,
       apiUrl: "",
       requestName: "",
       httpMethod: "GET",
@@ -146,7 +148,7 @@ export default {
           customStyle: { color: "#C25E95" },
         },
       ],
-      APIConfigLayout: {
+      currentConfigLayout: {
         enableHighlight: true,
         wrapText: false,
         splitHorizontal: true,
@@ -190,7 +192,7 @@ export default {
       let me = this;
       let style = {};
       // nếu hiển thị response thì mới ưu tiên tính toán
-      if (me.APIConfigLayout.splitHorizontal) {
+      if (me.currentConfigLayout.splitHorizontal) {
         style = { height: `${me.requestSectionSize}%` };
       } else {
         style = { width: `${me.requestSectionSize}%` };
@@ -203,7 +205,7 @@ export default {
     responseSectionSizeStyle() {
       let me = this;
       let style = {};
-      if (me.APIConfigLayout.splitHorizontal) {
+      if (me.currentConfigLayout.splitHorizontal) {
         style = { height: `${me.responseSectionSize}%` };
       } else {
         style = { width: `${me.responseSectionSize}%` };
@@ -219,9 +221,8 @@ export default {
     },
     async toggleSidebar() {
       let me = this;
-      await me.updateAPIConfigLayout();
+      await me.updateConfigLayout();
     },
-    async updateAPIConfigLayout() {},
   },
 };
 </script>
