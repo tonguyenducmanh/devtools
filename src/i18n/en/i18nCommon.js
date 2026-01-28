@@ -361,5 +361,10 @@ export default {
       RetryAPIDelay: "Call API with retry",
       AutoPagination: "Call API paging",
     },
+    APIMocking: {
+      endpoint: "Enter endpoint",
+      bodyPlaceholder: "Enter body mock api",
+      responsePlaceholder: "Enter response mock api",
+    },
   },
 };
