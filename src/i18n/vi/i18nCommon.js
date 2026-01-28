@@ -58,6 +58,7 @@ export default {
       HTMLPreview: "Xem trước HTML",
       textManipulation: "Xử lý văn bản",
       APITesting: "API testing",
+      APIMocking: "API mocking",
     },
     example: "ví dụ",
     base64ToImage: {
