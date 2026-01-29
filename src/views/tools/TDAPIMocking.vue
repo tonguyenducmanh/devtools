@@ -16,14 +16,7 @@
         <TDButton
           :noMargin="true"
           @click="saveRequest"
-          :label="$t('i18nCommon.APIMocking.save')"
-        />
-        <TDButton
-          v-if="!currentMockId"
-          :noMargin="true"
-          @click="saveRequest"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.APIMocking.addNew')"
+          :label="currentMockId ? $t('i18nCommon.APIMocking.save') : $t('i18nCommon.APIMocking.addNew')"
         />
       </div>
       <div class="flex td-mocking-header">
