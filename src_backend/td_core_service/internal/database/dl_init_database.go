@@ -60,4 +60,18 @@ func InitDatabase() {
 		log.Printf("%q: %s\n", err, sqlStmt)
 		return
 	}
+
+	// 3. Tạo bảng nhóm mock api
+	sqlStmtGroup := `
+	CREATE TABLE IF NOT EXISTS td_api_mock_group (
+		id TEXT PRIMARY KEY NOT NULL,
+		name TEXT NOT NULL,
+		created_date DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+	`
+	_, err = db.Exec(sqlStmtGroup)
+	if err != nil {
+		log.Printf("%q: %s\n", err, sqlStmtGroup)
+		return
+	}
 }

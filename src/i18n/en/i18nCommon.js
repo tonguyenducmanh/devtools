@@ -378,6 +378,11 @@ export default {
       saveMockErr: "Error saving mock API",
       deleteMockSuccess: "Delete mock API success",
       deleteMockErr: "Error deleting mock API",
+      delete: "Delete",
+      createGroupSuccess: "Create group success",
+      createGroupErr: "Error creating group",
+      deleteGroupSuccess: "Delete group success",
+      deleteGroupErr: "Error deleting group",
       wrapText: "Wrap text",
       sidebarOption:{
         setting: "Setting",

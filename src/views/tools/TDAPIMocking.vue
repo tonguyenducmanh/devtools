@@ -8,11 +8,14 @@
           :placeHolder="$t('i18nCommon.APIMocking.requestName')"
           :noMargin="true"
         ></TDInput>
-        <TDInput
+        <TDComboBox
           v-model="groupName"
           :placeHolder="$t('i18nCommon.APIMocking.groupName')"
+          :options="allGroupOptions"
           :noMargin="true"
-        ></TDInput>
+          :width="200"
+          :isEditable="true"
+        ></TDComboBox>
         <TDButton
           :noMargin="true"
           @click="saveRequest"
@@ -102,6 +105,21 @@
             $tdEnum.APISidebarOption.Collection
           "
         >
+          <!-- phần header của bộ sưu tập request (Quản lý nhóm) -->
+          <div class="flex td-header-collection">
+            <div class="td-new-collection">
+              <TDInput
+                v-model="newGroupName"
+                :noMargin="true"
+                :placeHolder="$t('i18nCommon.APIMocking.groupName')"
+              />
+            </div>
+            <div
+              class="td-icon td-plus-icon"
+              @click="addNewGroup"
+              v-tooltip="$t('i18nCommon.apiTesting.add')"
+            ></div>
+          </div>
           <!-- danh sách các mock API được nhóm theo group_name -->
           <div class="td-collection">
             <div class="flex flex-col response-loading" v-if="isLoading">
@@ -129,6 +147,13 @@
                     <div class="" v-tooltip="groupName || 'Ungrouped'">
                       {{ groupName || "Ungrouped" }}
                     </div>
+                  </div>
+                  <div class="flex td-collection-edit-btn" v-if="groupName">
+                    <div
+                      v-tooltip="$t('i18nCommon.APIMocking.delete')"
+                      class="td-icon td-close-icon"
+                      @click.stop="deleteGroupByName(groupName)"
+                    ></div>
                   </div>
                 </div>
                 <!-- danh sách các mock API trong nhóm -->
@@ -264,6 +289,8 @@ export default {
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.APISidebarOption.Collection,
       },
+      newGroupName: "",
+      allGroups: [],
       requestSectionSize: 50,
       responseSectionSize: 50,
       agentAPI: null,
@@ -289,6 +316,12 @@ export default {
         icon: "td-folder-icon",
       });
       return options;
+    },
+    allGroupOptions() {
+      return this.allGroups.map((g) => ({
+        value: g.name,
+        label: g.name,
+      }));
     },
     customStyleComboMethodAPI() {
       let me = this;
@@ -371,23 +404,72 @@ export default {
       let me = this;
       me.isLoading = true;
       try {
-        let response = await me.agentAPI.getAllMockAPIs();
-        
-        // Response có cấu trúc: { success, status, data: { success, data: [...] } }
-        let mockData = response?.data?.data;
-        
-        if (response && response.success && Array.isArray(mockData)) {
-          // Sử dụng splice để trigger reactivity
-          me.allMockAPIs.splice(0, me.allMockAPIs.length, ...mockData);
-        } else {
-          me.allMockAPIs.splice(0, me.allMockAPIs.length);
-        }
+        // Tải cả danh sách nhóm và danh sách mock
+        await Promise.all([me.loadAllGroups(), me.loadMockData()]);
       } catch (error) {
         console.error("Lỗi tải mock APIs:", error);
-        me.allMockAPIs.splice(0, me.allMockAPIs.length);
-        me.$tdToast.error(me.$t("i18nCommon.APIMocking.loadMockErr"));
       } finally {
         me.isLoading = false;
+      }
+    },
+    async loadMockData() {
+      let me = this;
+      let response = await me.agentAPI.getAllMockAPIs();
+      let mockData = response?.data?.data;
+      if (response && response.success && Array.isArray(mockData)) {
+        me.allMockAPIs.splice(0, me.allMockAPIs.length, ...mockData);
+      } else {
+        me.allMockAPIs.splice(0, me.allMockAPIs.length);
+      }
+    },
+    async loadAllGroups() {
+      let me = this;
+      try {
+        let response = await me.agentAPI.getAllMockGroups();
+        let groupData = response?.data?.data;
+        if (response && response.success && Array.isArray(groupData)) {
+          me.allGroups.splice(0, me.allGroups.length, ...groupData);
+        }
+      } catch (error) {
+        console.error("Lỗi tải nhóm:", error);
+      }
+    },
+    /**
+     * Thêm nhóm mới
+     */
+    async addNewGroup() {
+      let me = this;
+      if (!me.newGroupName) return;
+
+      try {
+        let response = await me.agentAPI.createMockGroup({
+          name: me.newGroupName,
+        });
+        if (response && response.success && response.data?.success) {
+          me.$tdToast.success(me.$t("i18nCommon.APIMocking.createGroupSuccess"));
+          me.newGroupName = "";
+          await me.loadAllGroups();
+        }
+      } catch (error) {
+        me.$tdToast.error(me.$t("i18nCommon.APIMocking.createGroupErr"));
+      }
+    },
+    /**
+     * Xóa nhóm theo tên
+     */
+    async deleteGroupByName(groupName) {
+      let me = this;
+      let group = me.allGroups.find((g) => g.name === groupName);
+      if (!group) return;
+
+      try {
+        let response = await me.agentAPI.deleteMockGroup(group.id);
+        if (response && response.success && response.data?.success) {
+          me.$tdToast.success(me.$t("i18nCommon.APIMocking.deleteGroupSuccess"));
+          await me.loadAllMockAPIs();
+        }
+      } catch (error) {
+        me.$tdToast.error(me.$t("i18nCommon.APIMocking.deleteGroupErr"));
       }
     },
     /**
@@ -574,6 +656,25 @@ export default {
   flex: 1;
   width: 100%;
   min-height: 0;
+}
+
+.td-header-collection {
+  gap: var(--padding);
+  width: 100%;
+  margin-top: var(--padding);
+  .td-new-collection {
+    flex: 1;
+  }
+}
+.td-collection-edit-btn {
+  display: flex;
+  gap: var(--padding);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.td-collection-header:hover .td-collection-edit-btn {
+  opacity: 1;
 }
 
 .text-nowrap-collection {

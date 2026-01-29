@@ -108,7 +108,9 @@ func CreateMockAPI(mock *model.TDAPIMockItem) error {
 			body_text, 
 			response_text
 		)
-		VALUES (?, ?, ?, ?, ?, ?, ?)
+		VALUES (
+			?, ?, ?, ?, ?, ?, ?
+		)
 	`
 	_, err = db.Exec(sqlQuery, mock.ID, mock.RequestName, mock.GroupName, mock.Method, mock.Endpoint, mock.BodyText, mock.ResponeText)
 
@@ -159,11 +161,130 @@ func DeleteMockAPI(id string) (int64, error) {
 	}
 	defer db.Close()
 
-	sqlQuery := `DELETE FROM td_api_mock WHERE id = ?`
+	sqlQuery := `
+		DELETE FROM 
+			td_api_mock 
+		WHERE 
+			id = ?
+	`
 	result, err := db.Exec(sqlQuery, id)
 	if err != nil {
 		return 0, err
 	}
 
 	return result.RowsAffected()
+}
+
+/**
+ * Lấy tất cả nhóm mock API từ database
+ */
+func GetAllMockGroups() ([]model.TDAPIMockGroup, error) {
+	db, err := GetConnectionDB()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	sqlQuery := `
+		SELECT 
+			id, 
+			name 
+		FROM 
+			td_api_mock_group 
+		ORDER BY 
+			created_date DESC
+	`
+	rows, err := db.Query(sqlQuery)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var groups []model.TDAPIMockGroup
+	for rows.Next() {
+		var group model.TDAPIMockGroup
+		err := rows.Scan(&group.ID, &group.Name)
+		if err != nil {
+			continue
+		}
+		groups = append(groups, group)
+	}
+
+	return groups, nil
+}
+
+/**
+ * Tạo nhóm mock API mới
+ */
+func CreateMockGroup(group *model.TDAPIMockGroup) error {
+	db, err := GetConnectionDB()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	sqlQuery := `
+		INSERT INTO td_api_mock_group (
+			id, 
+			name
+		) 
+		VALUES (
+			?, ?
+		)
+	`
+	_, err = db.Exec(sqlQuery, group.ID, group.Name)
+
+	return err
+}
+
+/**
+ * Xóa nhóm mock API và tất cả mock API thuộc nhóm đó
+ */
+func DeleteMockGroup(id string) error {
+	db, err := GetConnectionDB()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	// Sử dụng transaction để đảm bảo xóa sạch cả 2
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+
+	// 1. Xóa các mock api thuộc nhóm bằng subquery (Xử lý hoàn toàn ở SQL)
+	sqlDeleteItems := `
+		DELETE FROM 
+			td_api_mock 
+		WHERE 
+			group_name = (
+				SELECT 
+					name 
+				FROM 
+					td_api_mock_group 
+				WHERE 
+					id = ?
+			)
+	`
+	_, err = tx.Exec(sqlDeleteItems, id)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// 2. Xóa nhóm
+	sqlDeleteGroup := `
+		DELETE FROM 
+			td_api_mock_group 
+		WHERE 
+			id = ?
+	`
+	_, err = tx.Exec(sqlDeleteGroup, id)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }
