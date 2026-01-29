@@ -369,6 +369,8 @@ export default {
       save: "Save",
       addNew: "Add new",
       groupName: "Group name",
+      createNew: "Create new",
+      refresh: "Refresh",
     },
   },
 };

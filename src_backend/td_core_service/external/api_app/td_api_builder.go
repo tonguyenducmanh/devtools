@@ -19,6 +19,9 @@ func RunAPIApp(port *int, trace *bool) {
 
 	addRoute(app)
 
+	// Khởi tạo mock API service và tự động start tất cả mock APIs
+	service.InitMockAPIService(app)
+
 	// Xâu chuỗi Middlewares: CORS -> Router
 	finalHandler := middleware.ApplyCORS(app)
 
@@ -38,6 +41,7 @@ func addRoute(app *http.ServeMux) {
 	app.HandleFunc("POST /exec", service.Execute)
 	app.HandleFunc("POST /mock_api/create_mock", service.CreateMockAPI)
 	app.HandleFunc("GET /mock_api/get_all_mock", service.GetAllMockAPI)
+	app.HandleFunc("PUT /mock_api/update_mock", service.UpdateMockAPI)
 	app.HandleFunc("DELETE /mock_api/delete_mock", service.RemoveMockAPI)
 
 }

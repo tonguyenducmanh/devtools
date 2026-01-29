@@ -30,6 +30,34 @@ class TDAgentAPI extends TDBaseAPI {
   async executeRequest(request, signal) {
     return await this.post("/exec", request, null, signal);
   }
+
+  /**
+   * Tạo mock API mới
+   */
+  async createMockAPI(mockData) {
+    return await this.post("/mock_api/create_mock", mockData);
+  }
+
+  /**
+   * Lấy tất cả mock APIs
+   */
+  async getAllMockAPIs() {
+    return await this.get("/mock_api/get_all_mock");
+  }
+
+  /**
+   * Cập nhật mock API
+   */
+  async updateMockAPI(mockData) {
+    return await this.put("/mock_api/update_mock", mockData);
+  }
+
+  /**
+   * Xóa mock API
+   */
+  async deleteMockAPI(id) {
+    return await this.delete(`/mock_api/delete_mock?id=${id}`);
+  }
 }
 
 export default TDAgentAPI;

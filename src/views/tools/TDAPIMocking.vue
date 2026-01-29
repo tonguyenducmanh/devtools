@@ -19,7 +19,7 @@
           :label="$t('i18nCommon.APIMocking.save')"
         />
         <TDButton
-          v-if="!requestId"
+          v-if="!currentMockId"
           :noMargin="true"
           @click="saveRequest"
           :type="$tdEnum.buttonType.secondary"
@@ -108,7 +108,89 @@
             currentConfigLayout.currentSidebarOption ==
             $tdEnum.APISidebarOption.Collection
           "
-        ></div>
+        >
+          <!-- danh sách các mock API được nhóm theo group_name -->
+          <div class="td-collection">
+            <div class="td-collection-body">
+              <div
+                v-for="(group, groupName) in groupedMockAPIs"
+                class="flex flex-col no-select td-collection-item"
+                :key="groupName"
+              >
+                <!-- phần tên nhóm -->
+                <div
+                  class="flex td-collection-header"
+                  @click="toggleGroup(groupName)"
+                >
+                  <div
+                    class="flex text-nowrap-collection td-collection-header-left"
+                  >
+                    <TDArrow
+                      :openProp="openGroups[groupName]"
+                      :arrowOpenDirection="$tdEnum.Direction.bottom"
+                      :arrowDirection="$tdEnum.Direction.right"
+                    />
+                    <div class="" v-tooltip="groupName || 'Ungrouped'">
+                      {{ groupName || "Ungrouped" }}
+                    </div>
+                  </div>
+                </div>
+                <!-- danh sách các mock API trong nhóm -->
+                <div
+                  v-if="openGroups[groupName] && group && group.length > 0"
+                  class="flex flex-col td-collection-content"
+                >
+                  <div
+                    v-for="(mock, index) in group"
+                    :key="index"
+                    class="flex td-collection-request-item"
+                    :class="{
+                      'td-collection-request-item-selected':
+                        mock && currentMockId == mock.id,
+                    }"
+                    @click="loadMockAPI(mock)"
+                  >
+                    <span class="text-nowrap">
+                      <div v-tooltip="mock.request_name">
+                        {{ mock.request_name }}
+                      </div>
+                    </span>
+                    <span class="text-nowrap">
+                      <div
+                        class="td-icon td-close-icon"
+                        v-tooltip="$t('i18nCommon.apiTesting.delete')"
+                        @click.stop="deleteMockAPI(mock.id)"
+                      ></div>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- nút tạo mới và làm mới danh sách -->
+          <div class="flex">
+            <TDButton
+              @click="createNewMock"
+              :type="$tdEnum.buttonType.secondary"
+              :noMargin="true"
+              :label="$t('i18nCommon.APIMocking.createNew')"
+              :borderRadiusPosition="[
+                $tdEnum.BorderRadiusPosition.TopLeft,
+                $tdEnum.BorderRadiusPosition.BottomLeft,
+              ]"
+            ></TDButton>
+            <TDButton
+              @click="loadAllMockAPIs"
+              :type="$tdEnum.buttonType.secondary"
+              :noMargin="true"
+              :label="$t('i18nCommon.APIMocking.refresh')"
+              :borderRadiusPosition="[
+                $tdEnum.BorderRadiusPosition.TopRight,
+                $tdEnum.BorderRadiusPosition.BottomRight,
+              ]"
+            ></TDButton>
+          </div>
+        </div>
         <!-- phần sidebar nếu đang tùy chọn thiết lập api -->
         <div
           class="td-sidebar-content"
@@ -145,10 +227,13 @@
 <script>
 import TDResizer from "@/components/TDResizer.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDArrow from "@/components/TDArrow.vue";
 import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
+import TDAgentAPI from "@/common/api/request/AgentAPI/TDAgentAPI.js";
+
 export default {
   name: "TDAPIMocking",
-  components: { TDResizer, TDSubSidebar },
+  components: { TDResizer, TDSubSidebar, TDArrow },
   mixins: [TDLayoutConfigMixin],
 
   data() {
@@ -160,6 +245,9 @@ export default {
       httpMethod: "GET",
       bodyText: "",
       responseText: "",
+      currentMockId: null,
+      allMockAPIs: [],
+      openGroups: {},
       methodOptions: [
         { value: "GET", label: "GET", customStyle: { color: "#5EA572" } },
         { value: "POST", label: "POST", customStyle: { color: "#AE7D0D" } },
@@ -178,13 +266,17 @@ export default {
         wrapText: false,
         splitHorizontal: true,
         isShowSidebar: true,
-        currentSidebarOption: this.$tdEnum.APISidebarOption.Setting,
+        currentSidebarOption: this.$tdEnum.APISidebarOption.Collection,
       },
-      requestSectionSize: 50, // Phần request chiếm 50%
-      responseSectionSize: 50, // Phần response chiếm 50%
+      requestSectionSize: 50,
+      responseSectionSize: 50,
+      agentAPI: null,
     };
   },
-  async created() {},
+  async mounted() {
+    this.agentAPI = new TDAgentAPI();
+    await this.loadAllMockAPIs();
+  },
   computed: {
     sidebarOptions() {
       let me = this;
@@ -211,12 +303,32 @@ export default {
       }
     },
     /**
+     * Nhóm các mock API theo group_name
+     */
+    groupedMockAPIs() {
+      let me = this;
+      let grouped = {};
+      // Đảm bảo allMockAPIs là array
+      if (!Array.isArray(me.allMockAPIs)) {
+        return grouped;
+      }
+      me.allMockAPIs.forEach((mock) => {
+        let groupName = mock.group_name || "";
+        if (!grouped[groupName]) {
+          grouped[groupName] = [];
+          // Tự động mở nhóm (Vue 3 không cần $set)
+          me.openGroups[groupName] = true;
+        }
+        grouped[groupName].push(mock);
+      });
+      return grouped;
+    },
+    /**
      * Tính toán style động cho request area
      */
     requestSectionSizeStyle() {
       let me = this;
       let style = {};
-      // nếu hiển thị response thì mới ưu tiên tính toán
       if (me.currentConfigLayout.splitHorizontal) {
         style = { height: `${me.requestSectionSize}%` };
       } else {
@@ -248,7 +360,134 @@ export default {
       let me = this;
       await me.updateConfigLayout();
     },
-    saveRequest() {},
+    /**
+     * Toggle mở/đóng nhóm
+     */
+    toggleGroup(groupName) {
+      let me = this;
+      me.openGroups[groupName] = !me.openGroups[groupName];
+    },
+    /**
+     * Tải tất cả mock APIs từ server
+     */
+    async loadAllMockAPIs() {
+      let me = this;
+      try {
+        let response = await me.agentAPI.getAllMockAPIs();
+        
+        // Response có cấu trúc: { success, status, data: { success, data: [...] } }
+        let mockData = response?.data?.data;
+        
+        if (response && response.success && Array.isArray(mockData)) {
+          // Sử dụng splice để trigger reactivity
+          me.allMockAPIs.splice(0, me.allMockAPIs.length, ...mockData);
+        } else {
+          me.allMockAPIs.splice(0, me.allMockAPIs.length);
+        }
+      } catch (error) {
+        console.error("Lỗi tải mock APIs:", error);
+        me.allMockAPIs.splice(0, me.allMockAPIs.length);
+        me.$tdToast.error("Lỗi tải danh sách mock APIs");
+      }
+    },
+    /**
+     * Tải thông tin mock API vào form
+     */
+    loadMockAPI(mock) {
+      let me = this;
+      me.currentMockId = mock.id;
+      me.requestName = mock.request_name;
+      me.groupName = mock.group_name;
+      me.httpMethod = mock.method;
+      me.apiUrl = mock.end_point;
+      me.bodyText = mock.body_text;
+      me.responseText = mock.response_text;
+    },
+    /**
+     * Tạo mới mock API
+     */
+    createNewMock() {
+      let me = this;
+      me.currentMockId = null;
+      me.requestName = "";
+      me.groupName = "";
+      me.httpMethod = "GET";
+      me.apiUrl = "";
+      me.bodyText = "";
+      me.responseText = "";
+    },
+    /**
+     * Lưu hoặc cập nhật mock API
+     */
+    async saveRequest() {
+      let me = this;
+      
+      if (!me.requestName || !me.apiUrl) {
+        me.$tdToast.warning("Vui lòng nhập tên request và endpoint");
+        return;
+      }
+
+      let mockData = {
+        request_name: me.requestName,
+        group_name: me.groupName,
+        method: me.httpMethod,
+        end_point: me.apiUrl,
+        body_text: me.bodyText,
+        response_text: me.responseText,
+      };
+
+      try {
+        if (me.currentMockId) {
+          // Cập nhật
+          mockData.id = me.currentMockId;
+          let response = await me.agentAPI.updateMockAPI(mockData);
+          if (response && response.success && response.data?.success) {
+            me.$tdToast.success("Cập nhật mock API thành công");
+            await me.loadAllMockAPIs();
+          }
+        } else {
+          // Tạo mới
+          let response = await me.agentAPI.createMockAPI(mockData);
+          if (response && response.success && response.data?.success) {
+            me.$tdToast.success("Tạo mock API thành công");
+            me.currentMockId = response.data?.data?.id;
+            await me.loadAllMockAPIs();
+          }
+        }
+      } catch (error) {
+        console.error("Lỗi lưu mock API:", error);
+        me.$tdToast.error("Lỗi lưu mock API");
+      }
+    },
+    /**
+     * Xóa mock API
+     */
+    async deleteMockAPI(id) {
+      let me = this;
+      
+      let confirmed = await me.$tdDialog.confirm({
+        title: "Xác nhận xóa",
+        message: "Bạn có chắc chắn muốn xóa mock API này?",
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        let response = await me.agentAPI.deleteMockAPI(id);
+        if (response && response.success && response.data?.success) {
+          me.$tdToast.success("Xóa mock API thành công");
+          if (me.currentMockId === id) {
+            me.createNewMock();
+          }
+          await me.loadAllMockAPIs();
+        }
+      } catch (error) {
+        console.error("Lỗi xóa mock API:", error);
+        me.$tdToast.error("Lỗi xóa mock API");
+      }
+    },
   },
 };
 </script>
@@ -280,5 +519,71 @@ export default {
   flex: 1;
   width: 100%;
   min-height: 0;
+  overflow: auto;
+  
+  .td-collection {
+    flex: 1;
+    overflow: auto;
+    
+    .td-collection-body {
+      .td-collection-item {
+        margin-bottom: var(--padding);
+        
+        .td-collection-header {
+          padding: calc(var(--padding) / 2);
+          background-color: var(--background-color-secondary);
+          border-radius: var(--border-radius);
+          cursor: pointer;
+          gap: calc(var(--padding) / 2);
+          
+          &:hover {
+            background-color: var(--background-color-hover);
+          }
+          
+          .td-collection-header-left {
+            flex: 1;
+            gap: calc(var(--padding) / 2);
+            overflow: hidden;
+          }
+        }
+        
+        .td-collection-content {
+          margin-top: calc(var(--padding) / 2);
+          gap: calc(var(--padding) / 4);
+          
+          .td-collection-request-item {
+            padding: calc(var(--padding) / 2);
+            padding-left: calc(var(--padding) * 1.5);
+            background-color: var(--background-color-secondary);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            justify-content: space-between;
+            align-items: center;
+            
+            &:hover {
+              background-color: var(--background-color-hover);
+            }
+            
+            &.td-collection-request-item-selected {
+              background-color: var(--primary-color);
+              color: var(--text-color-inverse);
+            }
+            
+            .text-nowrap {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.text-nowrap-collection {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
