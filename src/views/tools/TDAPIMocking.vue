@@ -104,7 +104,10 @@
         >
           <!-- danh sách các mock API được nhóm theo group_name -->
           <div class="td-collection">
-            <div class="td-collection-body">
+            <div class="flex flex-col response-loading" v-if="isLoading">
+              <div class="loader"></div>
+            </div>
+            <div class="td-collection-body" v-else>
               <div
                 v-for="(group, groupName) in groupedMockAPIs"
                 class="flex flex-col no-select td-collection-item"
@@ -264,6 +267,7 @@ export default {
       requestSectionSize: 50,
       responseSectionSize: 50,
       agentAPI: null,
+      isLoading: false,
     };
   },
   async mounted() {
@@ -365,6 +369,7 @@ export default {
      */
     async loadAllMockAPIs() {
       let me = this;
+      me.isLoading = true;
       try {
         let response = await me.agentAPI.getAllMockAPIs();
         
@@ -381,6 +386,8 @@ export default {
         console.error("Lỗi tải mock APIs:", error);
         me.allMockAPIs.splice(0, me.allMockAPIs.length);
         me.$tdToast.error(me.$t("i18nCommon.APIMocking.loadMockErr"));
+      } finally {
+        me.isLoading = false;
       }
     },
     /**
@@ -497,6 +504,13 @@ export default {
       width: 100%;
     }
   }
+}
+.response-loading {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-layer-color);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
 }
 .td-collection {
   flex: 1;
