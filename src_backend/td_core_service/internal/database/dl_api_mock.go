@@ -7,7 +7,7 @@ import (
 /**
  * Lấy tất cả mock API từ database
  */
-func GetAllMockAPIs() ([]model.TDAPIMockParam, error) {
+func GetAllMockAPIs() ([]model.TDAPIMockItem, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
 		return nil, err
@@ -34,9 +34,9 @@ func GetAllMockAPIs() ([]model.TDAPIMockParam, error) {
 	}
 	defer rows.Close()
 
-	var mocks []model.TDAPIMockParam
+	var mocks []model.TDAPIMockItem
 	for rows.Next() {
-		var mock model.TDAPIMockParam
+		var mock model.TDAPIMockItem
 		err := rows.Scan(&mock.ID, &mock.RequestName, &mock.GroupName, &mock.Method, &mock.Endpoint, &mock.BodyText, &mock.ResponeText)
 		if err != nil {
 			continue
@@ -50,7 +50,7 @@ func GetAllMockAPIs() ([]model.TDAPIMockParam, error) {
 /**
  * Lấy tất cả mock API để auto start (không sắp xếp)
  */
-func GetAllMockAPIsForAutoStart() ([]model.TDAPIMockParam, error) {
+func GetAllMockAPIsForAutoStart() ([]model.TDAPIMockItem, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
 		return nil, err
@@ -75,9 +75,9 @@ func GetAllMockAPIsForAutoStart() ([]model.TDAPIMockParam, error) {
 	}
 	defer rows.Close()
 
-	var mocks []model.TDAPIMockParam
+	var mocks []model.TDAPIMockItem
 	for rows.Next() {
-		var mock model.TDAPIMockParam
+		var mock model.TDAPIMockItem
 		err := rows.Scan(&mock.ID, &mock.RequestName, &mock.GroupName, &mock.Method, &mock.Endpoint, &mock.BodyText, &mock.ResponeText)
 		if err != nil {
 			continue
@@ -91,7 +91,7 @@ func GetAllMockAPIsForAutoStart() ([]model.TDAPIMockParam, error) {
 /**
  * Tạo mock API mới trong database
  */
-func CreateMockAPI(mock *model.TDAPIMockParam) error {
+func CreateMockAPI(mock *model.TDAPIMockItem) error {
 	db, err := GetConnectionDB()
 	if err != nil {
 		return err
@@ -118,7 +118,7 @@ func CreateMockAPI(mock *model.TDAPIMockParam) error {
 /**
  * Cập nhật mock API trong database
  */
-func UpdateMockAPI(mock *model.TDAPIMockParam) (int64, error) {
+func UpdateMockAPI(mock *model.TDAPIMockItem) (int64, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
 		return 0, err
