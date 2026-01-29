@@ -387,7 +387,7 @@ export default {
       } catch (error) {
         console.error("Lỗi tải mock APIs:", error);
         me.allMockAPIs.splice(0, me.allMockAPIs.length);
-        me.$tdToast.error("Lỗi tải danh sách mock APIs");
+        me.$tdToast.error(me.$t("i18nCommon.apiTesting.loadMockErr"));
       }
     },
     /**
@@ -423,7 +423,7 @@ export default {
       let me = this;
       
       if (!me.requestName || !me.apiUrl) {
-        me.$tdToast.warning("Vui lòng nhập tên request và endpoint");
+        me.$tdToast.warning(me.$t("i18nCommon.apiTesting.requestNameAndApiUrlRequired"));
         return;
       }
 
@@ -442,21 +442,21 @@ export default {
           mockData.id = me.currentMockId;
           let response = await me.agentAPI.updateMockAPI(mockData);
           if (response && response.success && response.data?.success) {
-            me.$tdToast.success("Cập nhật mock API thành công");
+            me.$tdToast.success(me.$t("i18nCommon.apiTesting.updateMockSuccess"));
             await me.loadAllMockAPIs();
           }
         } else {
           // Tạo mới
           let response = await me.agentAPI.createMockAPI(mockData);
           if (response && response.success && response.data?.success) {
-            me.$tdToast.success("Tạo mock API thành công");
+            me.$tdToast.success(me.$t("i18nCommon.apiTesting.createMockSuccess"));
             me.currentMockId = response.data?.data?.id;
             await me.loadAllMockAPIs();
           }
         }
       } catch (error) {
-        console.error("Lỗi lưu mock API:", error);
-        me.$tdToast.error("Lỗi lưu mock API");
+        console.error(me.$t("i18nCommon.apiTesting.saveMockErr"), error);
+        me.$tdToast.error(me.$t("i18nCommon.apiTesting.saveMockErr"));
       }
     },
     /**
@@ -464,28 +464,18 @@ export default {
      */
     async deleteMockAPI(id) {
       let me = this;
-      
-      let confirmed = await me.$tdDialog.confirm({
-        title: "Xác nhận xóa",
-        message: "Bạn có chắc chắn muốn xóa mock API này?",
-      });
-
-      if (!confirmed) {
-        return;
-      }
-
       try {
         let response = await me.agentAPI.deleteMockAPI(id);
         if (response && response.success && response.data?.success) {
-          me.$tdToast.success("Xóa mock API thành công");
+          me.$tdToast.success(me.$t("i18nCommon.apiTesting.deleteMockSuccess"));
           if (me.currentMockId === id) {
             me.createNewMock();
           }
           await me.loadAllMockAPIs();
         }
       } catch (error) {
-        console.error("Lỗi xóa mock API:", error);
-        me.$tdToast.error("Lỗi xóa mock API");
+        console.error(me.$t("i18nCommon.apiTesting.deleteMockErr"), error);
+        me.$tdToast.error(me.$t("i18nCommon.apiTesting.deleteMockErr"));
       }
     },
   },

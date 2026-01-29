@@ -369,6 +369,13 @@ export default {
       groupName: "Tên nhóm",
       createNew: "Tạo mới",
       refresh: "Làm mới",
+      loadMockErr: "Lỗi tải danh sách mock APIs",
+      requestNameAndApiUrlRequired: "Vui lòng nhập tên request và endpoint",
+      updateMockSuccess: "Cập nhật mock API thành công",
+      createMockSuccess: "Tạo mock API thành công",
+      saveMockErr: "Lỗi lưu mock API",
+      deleteMockSuccess: "Xóa mock API thành công",
+      deleteMockErr: "Lỗi xóa mock API",
     },
   },
 };
