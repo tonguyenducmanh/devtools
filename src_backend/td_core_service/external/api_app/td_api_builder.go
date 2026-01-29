@@ -11,7 +11,7 @@ import (
 /**
  * khởi chạy api app
  */
-func RunAPIApp(port *int, trace *bool) {
+func RunAPIApp(port *int, mockPort *int, trace *bool) {
 
 	database.InitDatabase()
 
@@ -19,8 +19,8 @@ func RunAPIApp(port *int, trace *bool) {
 
 	addRoute(app)
 
-	// Khởi tạo mock API service và tự động start tất cả mock APIs
-	service.InitMockAPIService(app)
+	// Khởi tạo mock API service trên port riêng và tự động start tất cả mock APIs
+	service.InitMockAPIService(*mockPort)
 
 	// Xâu chuỗi Middlewares: CORS -> Router
 	finalHandler := middleware.ApplyCORS(app)

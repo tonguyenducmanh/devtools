@@ -1,62 +1,78 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 	"td_core_service/internal/database"
 	"td_core_service/internal/model"
-
-	"strings"
+	"time"
 
 	"github.com/google/uuid"
 )
 
-// Map lưu trữ các handler động cho mock API
-var mockHandlers = make(map[string]http.HandlerFunc)
-var mockHandlersMutex sync.RWMutex
-
-// Biến lưu trữ mux chính để có thể đăng ký route động
-var mainMux *http.ServeMux
+var (
+	mockServer      *http.Server
+	mockServerMutex sync.Mutex
+	mockPort        int
+)
 
 /**
- * Khởi tạo mock API service với mux
+ * Khởi tạo mock API service với port riêng
  */
-func InitMockAPIService(mux *http.ServeMux) {
-	mainMux = mux
-	// Tự động load và start tất cả mock API khi khởi động
-	AutoStartAllMockAPIs()
+func InitMockAPIService(port int) {
+	mockPort = port
+	RestartMockServer()
 }
 
 /**
- * Tự động start tất cả mock API từ database
+ * Khởi động lại server mock API
  */
-func AutoStartAllMockAPIs() {
+func RestartMockServer() {
+	mockServerMutex.Lock()
+	defer mockServerMutex.Unlock()
+
+	// Tắt server cũ nếu đang chạy
+	if mockServer != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		mockServer.Shutdown(ctx)
+		fmt.Printf("Đã dừng Mock API Server tại port %d để cập nhật cấu hình\n", mockPort)
+	}
+
+	// Tạo mux mới và đăng ký lại tất cả routes từ database
+	mux := http.NewServeMux()
 	mocks, err := database.GetAllMockAPIsForAutoStart()
 	if err != nil {
 		fmt.Printf("Lỗi query mock APIs: %v\n", err)
-		return
+	} else {
+		for i := range mocks {
+			registerMockRouteOnMux(mux, &mocks[i])
+		}
 	}
 
-	count := 0
-	for i := range mocks {
-		// Đăng ký route cho mock API
-		registerMockRoute(&mocks[i])
-		count++
+	// Tạo server mới
+	mockServer = &http.Server{
+		Addr:    fmt.Sprintf(":%d", mockPort),
+		Handler: mux,
 	}
 
-	fmt.Printf("Đã tự động start %d mock APIs\n", count)
+	// Chạy server trong goroutine
+	go func() {
+		fmt.Printf("Mock API Server đang chạy tại http://localhost:%d\n", mockPort)
+		if err := mockServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			fmt.Printf("Lỗi Mock API Server: %v\n", err)
+		}
+	}()
 }
 
 /**
- * Đăng ký route động cho mock API
+ * Đăng ký route vào mux cụ thể
  */
-func registerMockRoute(mock *model.TDAPIMockParam) {
-	if mainMux == nil {
-		return
-	}
-
+func registerMockRouteOnMux(mux *http.ServeMux, mock *model.TDAPIMockParam) {
 	endpoint := mock.Endpoint
 	if !strings.HasPrefix(endpoint, "/") {
 		endpoint = "/" + endpoint
@@ -64,30 +80,24 @@ func registerMockRoute(mock *model.TDAPIMockParam) {
 
 	pattern := fmt.Sprintf("%s %s", mock.Method, endpoint)
 
-	// Tạo handler cho mock API
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+		// Thêm CORS cho mock API
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(mock.ResponeText))
 	}
 
-	// Lưu handler vào map
-	mockHandlersMutex.Lock()
-	mockHandlers[mock.ID] = handler
-	mockHandlersMutex.Unlock()
-
-	// Đăng ký route
-	mainMux.HandleFunc(pattern, handler)
-	fmt.Printf("Đã đăng ký mock API: %s %s\n", mock.Method, mock.Endpoint)
-}
-
-/**
- * Hủy đăng ký route (lưu ý: http.ServeMux không hỗ trợ xóa route, cần restart server)
- */
-func unregisterMockRoute(mockID string) {
-	mockHandlersMutex.Lock()
-	delete(mockHandlers, mockID)
-	mockHandlersMutex.Unlock()
+	mux.HandleFunc(pattern, handler)
+	fmt.Printf("Đã đăng ký mock API: %s\n", pattern)
 }
 
 /**
@@ -101,30 +111,26 @@ func CreateMockAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate dữ liệu
 	if req.RequestName == "" || req.Endpoint == "" {
 		http.Error(w, "request_name và end_point là bắt buộc", http.StatusBadRequest)
 		return
 	}
 
-	// Tạo ID mới
 	req.ID = uuid.New().String()
 
-	// Insert vào database
 	err := database.CreateMockAPI(&req)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Lỗi lưu mock API: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	// Đăng ký route động
-	registerMockRoute(&req)
+	// Restart server để áp dụng thay đổi
+	go RestartMockServer()
 
-	// Trả về response
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
-		"message": "Tạo mock API thành công",
+		"message": "Tạo mock API thành công và đang khởi động lại server mock",
 		"data":    req,
 	})
 }
@@ -162,7 +168,6 @@ func UpdateMockAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Update database
 	rowsAffected, err := database.UpdateMockAPI(&req)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Lỗi cập nhật: %v", err), http.StatusInternalServerError)
@@ -174,14 +179,13 @@ func UpdateMockAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Hủy route cũ và đăng ký lại
-	unregisterMockRoute(req.ID)
-	registerMockRoute(&req)
+	// Restart server để áp dụng thay đổi
+	go RestartMockServer()
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
-		"message": "Cập nhật mock API thành công",
+		"message": "Cập nhật mock API thành công và đang khởi động lại server mock",
 	})
 }
 
@@ -189,14 +193,12 @@ func UpdateMockAPI(w http.ResponseWriter, r *http.Request) {
  * thực hiện xóa api mock
  */
 func RemoveMockAPI(w http.ResponseWriter, r *http.Request) {
-	// Lấy ID từ query parameter
 	id := r.URL.Query().Get("id")
 	if id == "" {
 		http.Error(w, "ID là bắt buộc", http.StatusBadRequest)
 		return
 	}
 
-	// Xóa khỏi database
 	rowsAffected, err := database.DeleteMockAPI(id)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Lỗi xóa: %v", err), http.StatusInternalServerError)
@@ -208,12 +210,12 @@ func RemoveMockAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Hủy đăng ký route
-	unregisterMockRoute(id)
+	// Restart server để áp dụng thay đổi
+	go RestartMockServer()
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
-		"message": "Xóa mock API thành công",
+		"message": "Xóa mock API thành công và đang khởi động lại server mock",
 	})
 }

@@ -7,7 +7,7 @@ import (
 /**
  * Chạy api app
  */
-func RunAPIApp(apiPort *int, apiTrace *bool) {
+func RunAPIApp(apiPort *int, mockPort *int, apiTrace *bool) {
 
-	apiApp.RunAPIApp(apiPort, apiTrace)
+	apiApp.RunAPIApp(apiPort, mockPort, apiTrace)
 }
