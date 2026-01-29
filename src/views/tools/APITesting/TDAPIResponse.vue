@@ -6,14 +6,14 @@
     <TDTextarea
       :isLabelTop="true"
       :modelValue="responseText"
-      :enableHighlight="APIConfigLayout.enableHighlight"
+      :enableHighlight="currentConfigLayout.enableHighlight"
       language="json"
       :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
       :readOnly="true"
-      :wrapText="APIConfigLayout.wrapText"
+      :wrapText="currentConfigLayout.wrapText"
     ></TDTextarea>
     <span
-      v-if="!APIConfigLayout.enableHighlight"
+      v-if="!currentConfigLayout.enableHighlight"
       class="no-select td-top-right-btn"
     >
       <div
@@ -39,7 +39,7 @@ export default {
       type: String,
       default: null,
     },
-    APIConfigLayout: {
+    currentConfigLayout: {
       type: Object,
       default: {},
     },
