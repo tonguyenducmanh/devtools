@@ -58,6 +58,27 @@ class TDAgentAPI extends TDBaseAPI {
   async deleteMockAPI(id) {
     return await this.delete(`/mock_api/delete_mock?id=${id}`);
   }
+
+  /**
+   * Lấy tất cả nhóm mock API
+   */
+  async getAllMockGroups() {
+    return await this.get("/mock_api/get_all_group");
+  }
+
+  /**
+   * Tạo nhóm mock API mới
+   */
+  async createMockGroup(groupData) {
+    return await this.post("/mock_api/create_group", groupData);
+  }
+
+  /**
+   * Xóa nhóm mock API
+   */
+  async deleteMockGroup(id) {
+    return await this.delete(`/mock_api/delete_group?id=${id}`);
+  }
 }
 
 export default TDAgentAPI;

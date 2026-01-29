@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"td_core_service/internal/database"
 	"td_core_service/internal/middleware"
+	"td_core_service/internal/router"
 	"td_core_service/internal/service"
 )
 
@@ -37,11 +38,8 @@ func RunAPIApp(port *int, mockPort *int, trace *bool) {
  * thêm các route xử lý nghiệp vụ
  */
 func addRoute(app *http.ServeMux) {
-	app.HandleFunc("GET /", service.HeathCheck)
-	app.HandleFunc("POST /exec", service.Execute)
-	app.HandleFunc("POST /mock_api/create_mock", service.CreateMockAPI)
-	app.HandleFunc("GET /mock_api/get_all_mock", service.GetAllMockAPI)
-	app.HandleFunc("PUT /mock_api/update_mock", service.UpdateMockAPI)
-	app.HandleFunc("DELETE /mock_api/delete_mock", service.RemoveMockAPI)
-
+	// Inject router cho từng nghiệp vụ
+	router.InjectCommonRouter(app)
+	router.InjectExecAPIRouter(app)
+	router.InjectMockAPIRouter(app)
 }

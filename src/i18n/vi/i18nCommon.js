@@ -376,6 +376,11 @@ export default {
       saveMockErr: "Lỗi lưu mock API",
       deleteMockSuccess: "Xóa mock API thành công",
       deleteMockErr: "Lỗi xóa mock API",
+      delete: "Xóa",
+      createGroupSuccess: "Thêm nhóm thành công",
+      createGroupErr: "Lỗi thêm nhóm",
+      deleteGroupSuccess: "Xóa nhóm thành công",
+      deleteGroupErr: "Lỗi xóa nhóm",
       wrapText: "Xuống dòng",
       sidebarOption:{
         setting: "Cài đặt",
