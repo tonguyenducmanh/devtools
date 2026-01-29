@@ -10,8 +10,6 @@ import (
 	"td_core_service/internal/database"
 	"td_core_service/internal/model"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 var (
@@ -72,7 +70,7 @@ func RestartMockServer() {
 /**
  * Đăng ký route vào mux cụ thể
  */
-func registerMockRouteOnMux(mux *http.ServeMux, mock *model.TDAPIMockParam) {
+func registerMockRouteOnMux(mux *http.ServeMux, mock *model.TDAPIMockItem) {
 	endpoint := mock.Endpoint
 	if !strings.HasPrefix(endpoint, "/") {
 		endpoint = "/" + endpoint
@@ -104,7 +102,7 @@ func registerMockRouteOnMux(mux *http.ServeMux, mock *model.TDAPIMockParam) {
  * thực hiện tạo api mock
  */
 func CreateMockAPI(w http.ResponseWriter, r *http.Request) {
-	var req model.TDAPIMockParam
+	var req model.TDAPIMockItem
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
@@ -116,7 +114,7 @@ func CreateMockAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.ID = uuid.New().String()
+	req.ID = GenUUID()
 
 	err := database.CreateMockAPI(&req)
 	if err != nil {
@@ -156,7 +154,7 @@ func GetAllMockAPI(w http.ResponseWriter, r *http.Request) {
  * thực hiện cập nhật api mock
  */
 func UpdateMockAPI(w http.ResponseWriter, r *http.Request) {
-	var req model.TDAPIMockParam
+	var req model.TDAPIMockItem
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)

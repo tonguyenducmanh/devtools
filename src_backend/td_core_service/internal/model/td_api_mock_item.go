@@ -3,7 +3,7 @@ package model
 /**
  * param api mock muốn tạo
  */
-type TDAPIMockParam struct {
+type TDAPIMockItem struct {
 	ID          string `json:"id"`
 	RequestName string `json:"request_name"`
 	GroupName   string `json:"group_name"`
