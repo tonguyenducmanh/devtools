@@ -8,6 +8,8 @@ import (
 	"td_core_service/internal/database"
 	"td_core_service/internal/model"
 
+	"strings"
+
 	"github.com/google/uuid"
 )
 
@@ -55,7 +57,12 @@ func registerMockRoute(mock *model.TDAPIMockParam) {
 		return
 	}
 
-	pattern := fmt.Sprintf("%s %s", mock.Method, mock.Endpoint)
+	endpoint := mock.Endpoint
+	if !strings.HasPrefix(endpoint, "/") {
+		endpoint = "/" + endpoint
+	}
+
+	pattern := fmt.Sprintf("%s %s", mock.Method, endpoint)
 
 	// Tạo handler cho mock API
 	handler := func(w http.ResponseWriter, r *http.Request) {
