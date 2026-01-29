@@ -371,6 +371,13 @@ export default {
       groupName: "Group name",
       createNew: "Create new",
       refresh: "Refresh",
+      loadMockErr: "Error loading mock APIs",
+      requestNameAndApiUrlRequired: "Please enter request name and endpoint",
+      updateMockSuccess: "Update mock API success",
+      createMockSuccess: "Create mock API success",
+      saveMockErr: "Error saving mock API",
+      deleteMockSuccess: "Delete mock API success",
+      deleteMockErr: "Error deleting mock API",
     },
   },
 };
