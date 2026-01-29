@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"sync"
@@ -47,8 +49,10 @@ func RestartMockServer() {
 	if err != nil {
 		fmt.Printf("Lỗi query mock APIs: %v\n", err)
 	} else {
-		for i := range mocks {
-			registerMockRouteOnMux(mux, &mocks[i])
+		// Nhóm các mock theo endpoint và method
+		mocksByRoute := groupMocksByRoute(mocks)
+		for routeKey, routeMocks := range mocksByRoute {
+			registerMockRouteOnMux(mux, routeKey, routeMocks)
 		}
 	}
 
@@ -68,16 +72,27 @@ func RestartMockServer() {
 }
 
 /**
- * Đăng ký route vào mux cụ thể
+ * Nhóm các mock theo endpoint và method
  */
-func registerMockRouteOnMux(mux *http.ServeMux, mock *model.TDAPIMockItem) {
-	endpoint := mock.Endpoint
-	if !strings.HasPrefix(endpoint, "/") {
-		endpoint = "/" + endpoint
+func groupMocksByRoute(mocks []model.TDAPIMockItem) map[string][]model.TDAPIMockItem {
+	mocksByRoute := make(map[string][]model.TDAPIMockItem)
+
+	for i := range mocks {
+		endpoint := mocks[i].Endpoint
+		if !strings.HasPrefix(endpoint, "/") {
+			endpoint = "/" + endpoint
+		}
+		routeKey := fmt.Sprintf("%s %s", mocks[i].Method, endpoint)
+		mocksByRoute[routeKey] = append(mocksByRoute[routeKey], mocks[i])
 	}
 
-	pattern := fmt.Sprintf("%s %s", mock.Method, endpoint)
+	return mocksByRoute
+}
 
+/**
+ * Đăng ký route vào mux cụ thể với hỗ trợ nhiều response theo body
+ */
+func registerMockRouteOnMux(mux *http.ServeMux, pattern string, mocks []model.TDAPIMockItem) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		// Thêm CORS cho mock API
@@ -90,12 +105,88 @@ func registerMockRouteOnMux(mux *http.ServeMux, mock *model.TDAPIMockItem) {
 			return
 		}
 
+		// Đọc body của request
+		bodyBytes, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Lỗi đọc request body", http.StatusBadRequest)
+			return
+		}
+		defer r.Body.Close()
+
+		// Tìm mock phù hợp dựa trên body
+		selectedMock := findMatchingMock(mocks, bodyBytes)
+
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(mock.ResponeText))
+		w.Write([]byte(selectedMock.ResponeText))
 	}
 
 	mux.HandleFunc(pattern, handler)
-	fmt.Printf("Đã đăng ký mock API: %s\n", pattern)
+	fmt.Printf("Đã đăng ký mock API: %s với %d variants\n", pattern, len(mocks))
+}
+
+/**
+ * Tìm mock phù hợp dựa trên request body
+ */
+func findMatchingMock(mocks []model.TDAPIMockItem, BodyText []byte) *model.TDAPIMockItem {
+	BodyTextStr := string(BodyText)
+
+	// Trường hợp 1: Tìm mock có BodyText khớp chính xác (so sánh JSON)
+	for i := range mocks {
+		if mocks[i].BodyText != "" {
+			if jsonEqual(mocks[i].BodyText, BodyTextStr) {
+				fmt.Printf("✓ Matched exact body for mock: %s\n", mocks[i].RequestName)
+				return &mocks[i]
+			}
+		}
+	}
+
+	// Trường hợp 2: Tìm mock có BodyText trống hoặc null (dùng làm default)
+	for i := range mocks {
+		if mocks[i].BodyText == "" || mocks[i].BodyText == "null" {
+			fmt.Printf("✓ Using default mock: %s\n", mocks[i].RequestName)
+			return &mocks[i]
+		}
+	}
+
+	// Trường hợp 3: Nếu không tìm thấy, dùng mock đầu tiên
+	fmt.Printf("⚠ No matching body found, using first mock: %s\n", mocks[0].RequestName)
+	return &mocks[0]
+}
+
+/**
+ * So sánh 2 JSON string có bằng nhau không (bỏ qua thứ tự key)
+ */
+func jsonEqual(json1, json2 string) bool {
+	// Nếu cả 2 đều rỗng
+	if strings.TrimSpace(json1) == "" && strings.TrimSpace(json2) == "" {
+		return true
+	}
+
+	// Parse JSON
+	var obj1, obj2 interface{}
+
+	if err := json.Unmarshal([]byte(json1), &obj1); err != nil {
+		// Nếu không phải JSON, so sánh string thông thường
+		return strings.TrimSpace(json1) == strings.TrimSpace(json2)
+	}
+
+	if err := json.Unmarshal([]byte(json2), &obj2); err != nil {
+		return false
+	}
+
+	// So sánh bằng cách serialize lại (chuẩn hóa)
+	bytes1, _ := json.Marshal(obj1)
+	bytes2, _ := json.Marshal(obj2)
+
+	return string(bytes1) == string(bytes2)
+}
+
+/**
+ * Hash body để so sánh nhanh (dự phòng)
+ */
+func hashBody(body string) string {
+	hash := md5.Sum([]byte(strings.TrimSpace(body)))
+	return fmt.Sprintf("%x", hash)
 }
 
 /**
