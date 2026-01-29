@@ -685,4 +685,7 @@ export default {
     white-space: nowrap;
   }
 }
+.td-plus-icon{
+  cursor: pointer;
+}
 </style>
