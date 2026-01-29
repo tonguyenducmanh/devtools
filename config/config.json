@@ -1,10 +1,15 @@
 {
+  "database_name": "tool_tomanh.db",
   "api_config": {
     "port": 7777,
     "enable_trace": false
   },
   "web_config": {
     "port": 1403,
+    "enable_trace": false
+  },
+  "mock_api_config": {
+    "port": 8888,
     "enable_trace": false
   }
 }

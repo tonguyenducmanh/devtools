@@ -58,6 +58,7 @@ export default {
       HTMLPreview: "HTML Preview",
       textManipulation: "Text manipulation",
       APITesting: "API testing",
+      APIMocking: "API mocking",
     },
     example: "example",
     base64ToImage: {
@@ -359,6 +360,30 @@ export default {
       APIBatchSequency: "Batch API sequency",
       RetryAPIDelay: "Call API with retry",
       AutoPagination: "Call API paging",
+    },
+    APIMocking: {
+      endpoint: "Enter endpoint",
+      bodyPlaceholder: "Enter body mock api",
+      responsePlaceholder: "Enter response mock api",
+      requestName: "Enter request",
+      save: "Save",
+      addNew: "Add new",
+      groupName: "Group name",
+      createNew: "Create new",
+      refresh: "Refresh",
+      loadMockErr: "Error loading mock APIs",
+      requestNameAndApiUrlRequired: "Please enter request name and endpoint",
+      updateMockSuccess: "Update mock API success",
+      createMockSuccess: "Create mock API success",
+      saveMockErr: "Error saving mock API",
+      deleteMockSuccess: "Delete mock API success",
+      deleteMockErr: "Error deleting mock API",
+      wrapText: "Wrap text",
+      sidebarOption:{
+        setting: "Setting",
+        collection: "Collection",
+        history: "History",
+      }
     },
   },
 };

@@ -12,7 +12,8 @@ import (
 func main() {
 	config := startUp.HandleStartUpLogic()
 	port := flag.Int("port", config.APIConfig.Port, "Port to run the server")
+	mockPort := flag.Int("mock_port", config.MockAPIConfig.Port, "Port to run the mock API server")
 	trace := flag.Bool("trace", config.APIConfig.EnableTrace, "Hiển thị log chi tiết cho Web server")
 	flag.Parse()
-	apiApp.RunAPIApp(port, trace)
+	apiApp.RunAPIApp(port, mockPort, trace)
 }

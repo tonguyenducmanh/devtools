@@ -37,7 +37,17 @@ const routerConfig = [
     meta: {
       titleKey: "i18nCommon.feature.APITesting",
     },
-    // desktopNotSupport: true,
+  },
+  {
+    /**
+     * API Mocking Tool
+     */
+    path: "/apimocking",
+    name: "apimocking",
+    component: () => import("@/views/tools/TDAPIMocking.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.APIMocking",
+    },
   },
   {
     /**
