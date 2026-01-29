@@ -158,7 +158,7 @@
                     <span class="text-nowrap">
                       <div
                         class="td-icon td-close-icon"
-                        v-tooltip="$t('i18nCommon.apiTesting.delete')"
+                        v-tooltip="$t('i18nCommon.APIMocking.delete')"
                         @click.stop="deleteMockAPI(mock.id)"
                       ></div>
                     </span>
@@ -202,7 +202,7 @@
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
             v-model="currentConfigLayout.wrapText"
-            :label="$t('i18nCommon.apiTesting.wrapText')"
+            :label="$t('i18nCommon.APIMocking.wrapText')"
             @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
@@ -283,12 +283,12 @@ export default {
       let options = [];
       options.push({
         value: this.$tdEnum.APISidebarOption.Setting,
-        label: this.$t("i18nCommon.apiTesting.sidebarOption.setting"),
+        label: this.$t("i18nCommon.APIMocking.sidebarOption.setting"),
         icon: "td-setting-icon",
       });
       options.push({
         value: this.$tdEnum.APISidebarOption.Collection,
-        label: this.$t("i18nCommon.apiTesting.sidebarOption.collection"),
+        label: this.$t("i18nCommon.APIMocking.sidebarOption.collection"),
         icon: "td-folder-icon",
       });
       return options;
@@ -387,7 +387,7 @@ export default {
       } catch (error) {
         console.error("Lỗi tải mock APIs:", error);
         me.allMockAPIs.splice(0, me.allMockAPIs.length);
-        me.$tdToast.error(me.$t("i18nCommon.apiTesting.loadMockErr"));
+        me.$tdToast.error(me.$t("i18nCommon.APIMocking.loadMockErr"));
       }
     },
     /**
@@ -423,7 +423,7 @@ export default {
       let me = this;
       
       if (!me.requestName || !me.apiUrl) {
-        me.$tdToast.warning(me.$t("i18nCommon.apiTesting.requestNameAndApiUrlRequired"));
+        me.$tdToast.warning(me.$t("i18nCommon.APIMocking.requestNameAndApiUrlRequired"));
         return;
       }
 
@@ -442,21 +442,21 @@ export default {
           mockData.id = me.currentMockId;
           let response = await me.agentAPI.updateMockAPI(mockData);
           if (response && response.success && response.data?.success) {
-            me.$tdToast.success(me.$t("i18nCommon.apiTesting.updateMockSuccess"));
+            me.$tdToast.success(me.$t("i18nCommon.APIMocking.updateMockSuccess"));
             await me.loadAllMockAPIs();
           }
         } else {
           // Tạo mới
           let response = await me.agentAPI.createMockAPI(mockData);
           if (response && response.success && response.data?.success) {
-            me.$tdToast.success(me.$t("i18nCommon.apiTesting.createMockSuccess"));
+            me.$tdToast.success(me.$t("i18nCommon.APIMocking.createMockSuccess"));
             me.currentMockId = response.data?.data?.id;
             await me.loadAllMockAPIs();
           }
         }
       } catch (error) {
-        console.error(me.$t("i18nCommon.apiTesting.saveMockErr"), error);
-        me.$tdToast.error(me.$t("i18nCommon.apiTesting.saveMockErr"));
+        console.error(me.$t("i18nCommon.APIMocking.saveMockErr"), error);
+        me.$tdToast.error(me.$t("i18nCommon.APIMocking.saveMockErr"));
       }
     },
     /**
@@ -467,15 +467,15 @@ export default {
       try {
         let response = await me.agentAPI.deleteMockAPI(id);
         if (response && response.success && response.data?.success) {
-          me.$tdToast.success(me.$t("i18nCommon.apiTesting.deleteMockSuccess"));
+          me.$tdToast.success(me.$t("i18nCommon.APIMocking.deleteMockSuccess"));
           if (me.currentMockId === id) {
             me.createNewMock();
           }
           await me.loadAllMockAPIs();
         }
       } catch (error) {
-        console.error(me.$t("i18nCommon.apiTesting.deleteMockErr"), error);
-        me.$tdToast.error(me.$t("i18nCommon.apiTesting.deleteMockErr"));
+        console.error(me.$t("i18nCommon.APIMocking.deleteMockErr"), error);
+        me.$tdToast.error(me.$t("i18nCommon.APIMocking.deleteMockErr"));
       }
     },
   },
