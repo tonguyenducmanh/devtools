@@ -683,7 +683,7 @@ export default {
       currentConfigLayout: {
         showReponse: true,
         enableHighlight: true,
-        wrapText: false,
+        wrapText: true,
         splitHorizontal: true,
         currentAPIMode: this.$tdEnum.APIMode.Normal,
         isShowSidebar: true,
