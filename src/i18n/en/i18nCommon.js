@@ -378,6 +378,7 @@ export default {
       saveMockErr: "Error saving mock API",
       deleteMockSuccess: "Delete mock API success",
       deleteMockErr: "Error deleting mock API",
+      wrapText: "Wrap text",
       sidebarOption:{
         setting: "Setting",
         collection: "Collection",

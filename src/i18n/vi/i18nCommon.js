@@ -376,6 +376,7 @@ export default {
       saveMockErr: "Lỗi lưu mock API",
       deleteMockSuccess: "Xóa mock API thành công",
       deleteMockErr: "Lỗi xóa mock API",
+      wrapText: "Xuống dòng",
       sidebarOption:{
         setting: "Cài đặt",
         collection: "Bộ sưu tập",
