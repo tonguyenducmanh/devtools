@@ -104,6 +104,12 @@ export const TDCacheConfig = {
     KeyFormat: "APIConfigLayout",
     CacheLevel: tdEnum.cacheType.local,
     ExpireTime: 0,
-    Note: "cache 1 số cấu hình layout",
+    Note: "cache cấu hình layout tool api",
+  },
+  APIMockConfigLayout: {
+    KeyFormat: "APIMockConfigLayout",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool mock api",
   },
 };

@@ -58,6 +58,7 @@ export default {
       HTMLPreview: "Xem trước HTML",
       textManipulation: "Xử lý văn bản",
       APITesting: "API testing",
+      APIMocking: "API mocking",
     },
     example: "ví dụ",
     base64ToImage: {
@@ -357,6 +358,30 @@ export default {
       APIBatchSequency: "Tạo lô api gọi tuần tự",
       RetryAPIDelay: "Gọi api có retry",
       AutoPagination: "Gọi lấy dữ liệu paging",
+    },
+    APIMocking: {
+      endpoint: "Nhập endpoint",
+      bodyPlaceholder: "Nhập body mock api",
+      responsePlaceholder: "Nhập response mock api",
+      requestName: "Nhập tên request",
+      save: "Lưu",
+      addNew: "Thêm mới",
+      groupName: "Tên nhóm",
+      createNew: "Tạo mới",
+      refresh: "Làm mới",
+      loadMockErr: "Lỗi tải danh sách mock APIs",
+      requestNameAndApiUrlRequired: "Vui lòng nhập tên request và endpoint",
+      updateMockSuccess: "Cập nhật mock API thành công",
+      createMockSuccess: "Tạo mock API thành công",
+      saveMockErr: "Lỗi lưu mock API",
+      deleteMockSuccess: "Xóa mock API thành công",
+      deleteMockErr: "Lỗi xóa mock API",
+      wrapText: "Xuống dòng",
+      sidebarOption:{
+        setting: "Cài đặt",
+        collection: "Bộ sưu tập",
+        history: "Lịch sử",
+      }
     },
   },
 };

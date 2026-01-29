@@ -8,7 +8,7 @@
         <div class="flex flex-one">
           <TDComboBox
             :width="120"
-            v-model="APIConfigLayout.currentAPIMode"
+            v-model="currentConfigLayout.currentAPIMode"
             :options="APIModeOptions"
             :noMargin="true"
             :readOnly="isLoading"
@@ -53,7 +53,9 @@
       <!-- hết phần danh sách nút đầu của api -->
       <!-- phần nội dung tùy thuộc vào từng loại api -->
       <!-- phần api truyền thống -->
-      <template v-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.Normal">
+      <template
+        v-if="currentConfigLayout.currentAPIMode == $tdEnum.APIMode.Normal"
+      >
         <div class="td-api-content">
           <div class="flex td-api-info-btn">
             <!-- dòng header bổ trợ 1 số thông tin cho mode api thường -->
@@ -102,7 +104,7 @@
           <!-- phần nội dung  -->
           <div
             class="flex td-api-input-area"
-            :class="{ 'flex-col': APIConfigLayout.splitHorizontal }"
+            :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
           >
             <div
               class="flex flex-col td-api-request"
@@ -110,22 +112,22 @@
             >
               <div class="flex td-api-request-title">
                 <TDSlideOption
-                  v-model="APIConfigLayout.currentAPIInfoOption"
+                  v-model="currentConfigLayout.currentAPIInfoOption"
                   :options="APIInfoOptions"
                   :noMargin="true"
-                  @change="updateAPIConfigLayout"
+                  @change="updateConfigLayout"
                 />
 
                 <!-- phần hiển thị loader nếu như không chọn show reponse -->
                 <div
                   class="flex loader-without-response"
-                  v-if="!APIConfigLayout.showReponse && isLoading"
+                  v-if="!currentConfigLayout.showReponse && isLoading"
                 >
                   <div class="loader"></div>
                 </div>
                 <!-- phần hiển thị status code và thời gian chạy request -->
                 <TDAPIResponseStatus
-                  v-if="APIConfigLayout.splitHorizontal && !isLoading"
+                  v-if="currentConfigLayout.splitHorizontal && !isLoading"
                   :statusCode="statusCode"
                   :responseTime="responseTime"
                 />
@@ -133,34 +135,34 @@
               <!-- phần cấu hình header api -->
               <TDTextarea
                 v-if="
-                  APIConfigLayout.currentAPIInfoOption ==
+                  currentConfigLayout.currentAPIInfoOption ==
                   $tdEnum.APIInfoOption.header
                 "
                 :isLabelTop="true"
                 v-model="headersText"
-                :enableHighlight="APIConfigLayout.enableHighlight"
+                :enableHighlight="currentConfigLayout.enableHighlight"
                 language="text/plan"
-                :wrapText="APIConfigLayout.wrapText"
+                :wrapText="currentConfigLayout.wrapText"
                 :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
               ></TDTextarea>
               <!-- phần cấu hình body api -->
               <div
                 class="td-text-area-wrap"
                 v-if="
-                  APIConfigLayout.currentAPIInfoOption ==
+                  currentConfigLayout.currentAPIInfoOption ==
                   $tdEnum.APIInfoOption.body
                 "
               >
                 <TDTextarea
                   :isLabelTop="true"
                   v-model="bodyText"
-                  :wrapText="APIConfigLayout.wrapText"
-                  :enableHighlight="APIConfigLayout.enableHighlight"
+                  :wrapText="currentConfigLayout.wrapText"
+                  :enableHighlight="currentConfigLayout.enableHighlight"
                   language="json"
                   :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
                 ></TDTextarea>
                 <span
-                  v-if="!APIConfigLayout.enableHighlight"
+                  v-if="!currentConfigLayout.enableHighlight"
                   class="no-select td-top-right-btn"
                 >
                   <div
@@ -173,29 +175,29 @@
             </div>
             <!-- Resizer -->
             <TDResizer
-              v-if="APIConfigLayout.showReponse"
+              v-if="currentConfigLayout.showReponse"
               :direction="
-                APIConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
+                currentConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
               "
               @resize="handleResize"
             />
             <!-- phần response API -->
             <div
-              v-if="APIConfigLayout.showReponse"
+              v-if="currentConfigLayout.showReponse"
               class="flex flex-col td-api-response"
               :style="responseSectionSizeStyle"
             >
               <!-- phần hiển thị httpstatus bên trên response -->
               <TDAPIResponseStatus
                 class="flex td-api-response-title"
-                v-if="!APIConfigLayout.splitHorizontal"
+                v-if="!currentConfigLayout.splitHorizontal"
                 :statusCode="statusCode"
                 :responseTime="responseTime"
               />
               <TDAPIResponse
                 :isLoading="isLoading"
                 :responseText="responseText"
-                :APIConfigLayout="APIConfigLayout"
+                :currentConfigLayout="currentConfigLayout"
               />
             </div>
           </div>
@@ -203,12 +205,12 @@
       </template>
       <!-- phần api dạng curl -->
       <template
-        v-else-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.CURL"
+        v-else-if="currentConfigLayout.currentAPIMode == $tdEnum.APIMode.CURL"
       >
         <div class="td-api-content">
           <div
             class="flex td-api-input-area"
-            :class="{ 'flex-col': APIConfigLayout.splitHorizontal }"
+            :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
           >
             <div
               class="flex flex-col td-api-request"
@@ -220,12 +222,12 @@
                 </div>
                 <div
                   class="flex loader-without-response"
-                  v-if="!APIConfigLayout.showReponse && isLoading"
+                  v-if="!currentConfigLayout.showReponse && isLoading"
                 >
                   <div class="loader"></div>
                 </div>
                 <TDAPIResponseStatus
-                  v-if="APIConfigLayout.splitHorizontal && !isLoading"
+                  v-if="currentConfigLayout.splitHorizontal && !isLoading"
                   :statusCode="statusCode"
                   :responseTime="responseTime"
                 />
@@ -233,35 +235,35 @@
               <TDTextarea
                 :isLabelTop="true"
                 v-model="curlContent"
-                :wrapText="APIConfigLayout.wrapText"
-                :enableHighlight="APIConfigLayout.enableHighlight"
+                :wrapText="currentConfigLayout.wrapText"
+                :enableHighlight="currentConfigLayout.enableHighlight"
                 language="shell"
                 :placeHolder="$t('i18nCommon.apiTesting.contentCURLExecute')"
               ></TDTextarea>
             </div>
             <!-- Resizer -->
             <TDResizer
-              v-if="APIConfigLayout.showReponse"
+              v-if="currentConfigLayout.showReponse"
               :direction="
-                APIConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
+                currentConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
               "
               @resize="handleResize"
             />
             <div
-              v-if="APIConfigLayout.showReponse"
+              v-if="currentConfigLayout.showReponse"
               class="flex flex-col td-api-response"
               :style="responseSectionSizeStyle"
             >
               <TDAPIResponseStatus
                 class="flex td-api-response-title"
-                v-if="!APIConfigLayout.splitHorizontal"
+                v-if="!currentConfigLayout.splitHorizontal"
                 :statusCode="statusCode"
                 :responseTime="responseTime"
               />
               <TDAPIResponse
                 :isLoading="isLoading"
                 :responseText="responseText"
-                :APIConfigLayout="APIConfigLayout"
+                :currentConfigLayout="currentConfigLayout"
               />
             </div>
           </div>
@@ -269,12 +271,14 @@
       </template>
       <!-- phần api promode, xử lý nhiều kịch bản bằng javascript -->
       <template
-        v-else-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode"
+        v-else-if="
+          currentConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode
+        "
       >
         <div class="td-api-content">
           <div
             class="flex td-api-input-area"
-            :class="{ 'flex-col': APIConfigLayout.splitHorizontal }"
+            :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
           >
             <!-- phần 1 số info header promode như title và respone http -->
             <div
@@ -287,12 +291,12 @@
                 </div>
                 <div
                   class="flex loader-without-response"
-                  v-if="!APIConfigLayout.showReponse && isLoading"
+                  v-if="!currentConfigLayout.showReponse && isLoading"
                 >
                   <div class="loader"></div>
                 </div>
                 <TDAPIResponseStatus
-                  v-if="APIConfigLayout.splitHorizontal && !isLoading"
+                  v-if="currentConfigLayout.splitHorizontal && !isLoading"
                   :statusCode="statusCode"
                   :responseTime="responseTime"
                 />
@@ -301,34 +305,34 @@
               <TDTextarea
                 :isLabelTop="true"
                 v-model="proModeSecranioCode"
-                :wrapText="APIConfigLayout.wrapText"
-                :enableHighlight="APIConfigLayout.enableHighlight"
+                :wrapText="currentConfigLayout.wrapText"
+                :enableHighlight="currentConfigLayout.enableHighlight"
                 :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
               ></TDTextarea>
             </div>
             <!-- Resizer -->
             <TDResizer
-              v-if="APIConfigLayout.showReponse"
+              v-if="currentConfigLayout.showReponse"
               :direction="
-                APIConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
+                currentConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
               "
               @resize="handleResize"
             />
             <div
-              v-if="APIConfigLayout.showReponse"
+              v-if="currentConfigLayout.showReponse"
               class="flex flex-col td-api-response"
               :style="responseSectionSizeStyle"
             >
               <TDAPIResponseStatus
                 class="flex td-api-response-title"
-                v-if="!APIConfigLayout.splitHorizontal"
+                v-if="!currentConfigLayout.splitHorizontal"
                 :statusCode="statusCode"
                 :responseTime="responseTime"
               />
               <TDAPIResponse
                 :isLoading="isLoading"
                 :responseText="responseText"
-                :APIConfigLayout="APIConfigLayout"
+                :currentConfigLayout="currentConfigLayout"
               />
             </div>
           </div>
@@ -339,7 +343,7 @@
     <!-- phần nội dung sidebar -->
     <TDSubSidebar
       ref="subSidebar"
-      v-model="APIConfigLayout.isShowSidebar"
+      v-model="currentConfigLayout.isShowSidebar"
       @toggleSidebar="toggleSidebar"
     >
       <!-- slide tùy chọn như cài đặt hoặc collection -->
@@ -348,10 +352,10 @@
           <TDSlideOption
             :showIcon="true"
             v-if="sidebarOptions && sidebarOptions.length > 1"
-            v-model="APIConfigLayout.currentSidebarOption"
+            v-model="currentConfigLayout.currentSidebarOption"
             :options="sidebarOptions"
             :noMargin="true"
-            @change="updateAPIConfigLayout"
+            @change="updateConfigLayout"
           />
         </div>
       </template>
@@ -360,12 +364,12 @@
         <div
           class="flex flex-col td-sidebar-content"
           v-show="
-            APIConfigLayout.currentSidebarOption ==
+            currentConfigLayout.currentSidebarOption ==
             $tdEnum.APISidebarOption.Collection
           "
         >
           <template
-            v-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode"
+            v-if="currentConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode"
           >
             <div
               v-if="proModeTemplate && proModeTemplate.length > 0"
@@ -566,45 +570,45 @@
         <div
           class="td-sidebar-content"
           v-show="
-            APIConfigLayout.currentSidebarOption ==
+            currentConfigLayout.currentSidebarOption ==
             $tdEnum.APISidebarOption.Setting
           "
         >
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="APIConfigLayout.wrapText"
+            v-model="currentConfigLayout.wrapText"
             :label="$t('i18nCommon.apiTesting.wrapText')"
-            @change="updateAPIConfigLayout"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="APIConfigLayout.enableHighlight"
+            v-model="currentConfigLayout.enableHighlight"
             :label="$t('i18nCommon.enableHighlight')"
-            @change="updateAPIConfigLayout"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="APIConfigLayout.showReponse"
+            v-model="currentConfigLayout.showReponse"
             :label="$t('i18nCommon.apiTesting.showReponse')"
-            @change="updateAPIConfigLayout"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="APIConfigLayout.splitHorizontal"
+            v-model="currentConfigLayout.splitHorizontal"
             :label="$t('i18nCommon.splitHorizontal')"
-            @change="updateAPIConfigLayout"
+            @change="updateConfigLayout"
           ></TDCheckbox>
         </div>
         <div
           class="td-sidebar-content"
           v-show="
-            APIConfigLayout.currentSidebarOption ==
+            currentConfigLayout.currentSidebarOption ==
             $tdEnum.APISidebarOption.History
           "
         >
           <!-- nút lịch sử reqeust -->
           <TDHistorySidebar
-            v-if="APIConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode"
+            v-if="currentConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode"
             ref="historyProMode"
             :applyFunction="handleSendRequestFromHistoryProMode"
             titleKey="requestName"
@@ -645,8 +649,11 @@ import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDMockAPIProMode from "@/common/mock/TDMockAPIProMode.js";
+import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
+
 export default {
   name: "TDAPITesting",
+  mixins: [TDLayoutConfigMixin],
   components: {
     TDSubSidebar,
     TDArrow,
@@ -658,6 +665,7 @@ export default {
 
   data() {
     return {
+      keyCacheLayout: this.$tdEnum.cacheConfig.APIConfigLayout,
       apiUrl: "",
       requestName: "",
       currentRequestId: null,
@@ -672,7 +680,7 @@ export default {
       isLoading: false,
       startTime: null,
       currentRequest: null,
-      APIConfigLayout: {
+      currentConfigLayout: {
         showReponse: true,
         enableHighlight: true,
         wrapText: false,
@@ -718,15 +726,6 @@ export default {
     let allCollectionTmp = await me.$tdCache.get(
       me.$tdEnum.cacheConfig.APICollection,
     );
-    let tmpAPIConfigLayout = await me.$tdCache.get(
-      me.$tdEnum.cacheConfig.APIConfigLayout,
-    );
-    if (tmpAPIConfigLayout) {
-      me.APIConfigLayout = Object.assign(
-        me.APIConfigLayout,
-        tmpAPIConfigLayout,
-      );
-    }
     if (allCollectionTmp) {
       if (Array.isArray(allCollectionTmp)) {
         me.allCollection = allCollectionTmp;
@@ -743,14 +742,14 @@ export default {
       let me = this;
       let style = {};
       // nếu hiển thị response thì mới ưu tiên tính toán
-      if (me.APIConfigLayout.showReponse) {
-        if (me.APIConfigLayout.splitHorizontal) {
+      if (me.currentConfigLayout.showReponse) {
+        if (me.currentConfigLayout.splitHorizontal) {
           style = { height: `${me.requestSectionSize}%` };
         } else {
           style = { width: `${me.requestSectionSize}%` };
         }
       } else {
-        if (me.APIConfigLayout.splitHorizontal) {
+        if (me.currentConfigLayout.splitHorizontal) {
           style = { height: `100%` };
         } else {
           style = { width: `100%` };
@@ -765,7 +764,7 @@ export default {
     responseSectionSizeStyle() {
       let me = this;
       let style = {};
-      if (me.APIConfigLayout.splitHorizontal) {
+      if (me.currentConfigLayout.splitHorizontal) {
         style = { height: `${me.responseSectionSize}%` };
       } else {
         style = { width: `${me.responseSectionSize}%` };
@@ -775,7 +774,7 @@ export default {
     requestNameBuild() {
       let me = this;
       let title = me.$t("i18nCommon.apiTesting.requestName");
-      if (me.APIConfigLayout.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
+      if (me.currentConfigLayout.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
         title = me.$t("i18nCommon.apiTesting.scriptName");
       }
       return title;
@@ -821,16 +820,9 @@ export default {
       this.requestSectionSize = sizes.leftSize;
       this.responseSectionSize = sizes.rightSize;
     },
-    async updateAPIConfigLayout() {
-      let me = this;
-      await me.$tdCache.set(
-        me.$tdEnum.cacheConfig.APIConfigLayout,
-        me.APIConfigLayout,
-      );
-    },
     async toggleSidebar() {
       let me = this;
-      await me.updateAPIConfigLayout();
+      await me.updateConfigLayout();
     },
     async addNewCollection(collectionName) {
       let me = this;
@@ -1205,12 +1197,14 @@ export default {
     async handleSend() {
       let me = this;
 
-      if (me.APIConfigLayout.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
+      if (me.currentConfigLayout.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
         await me.handleSendRequestProMode();
-      } else if (me.APIConfigLayout.currentAPIMode == me.$tdEnum.APIMode.CURL) {
+      } else if (
+        me.currentConfigLayout.currentAPIMode == me.$tdEnum.APIMode.CURL
+      ) {
         await me.handleSendRequestCURL();
       } else if (
-        me.APIConfigLayout.currentAPIMode == me.$tdEnum.APIMode.Normal
+        me.currentConfigLayout.currentAPIMode == me.$tdEnum.APIMode.Normal
       ) {
         await me.handleSendRequest();
       }
@@ -1371,7 +1365,7 @@ export default {
         dialogType: TDDialogEnum.TDAPIImportCURLPopup,
         ownerForm: this,
         props: {
-          APIConfigLayout: me.APIConfigLayout,
+          currentConfigLayout: me.currentConfigLayout,
         },
       });
     },
@@ -1403,7 +1397,7 @@ export default {
     },
     async handleSelectedAPIMode() {
       let me = this;
-      await me.updateAPIConfigLayout();
+      await me.updateConfigLayout();
     },
     async handleSendRequestProMode() {
       let me = this;
