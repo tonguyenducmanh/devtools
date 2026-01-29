@@ -14,7 +14,21 @@ func GetAllMockAPIs() ([]model.TDAPIMockParam, error) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT id, request_name, group_name, method, end_point, body_text, response_text FROM td_api_mock ORDER BY group_name, request_name")
+	sqlQuery := `
+		SELECT 
+			id, 
+			request_name, 
+			group_name, 
+			method, 
+			end_point, 
+			body_text, 
+			response_text 
+		FROM 
+			td_api_mock 
+		ORDER BY 
+			created_date DESC
+	`
+	rows, err := db.Query(sqlQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +57,19 @@ func GetAllMockAPIsForAutoStart() ([]model.TDAPIMockParam, error) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT id, request_name, group_name, method, end_point, body_text, response_text FROM td_api_mock")
+	sqlQuery := `
+		SELECT 
+			id, 
+			request_name, 
+			group_name, 
+			method, 
+			end_point, 
+			body_text, 
+			response_text 
+		FROM 
+			td_api_mock
+	`
+	rows, err := db.Query(sqlQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -72,10 +98,19 @@ func CreateMockAPI(mock *model.TDAPIMockParam) error {
 	}
 	defer db.Close()
 
-	_, err = db.Exec(`
-		INSERT INTO td_api_mock (id, request_name, group_name, method, end_point, body_text, response_text)
+	sqlQuery := `
+		INSERT INTO td_api_mock (
+			id, 
+			request_name, 
+			group_name, 
+			method, 
+			end_point, 
+			body_text, 
+			response_text
+		)
 		VALUES (?, ?, ?, ?, ?, ?, ?)
-	`, mock.ID, mock.RequestName, mock.GroupName, mock.Method, mock.Endpoint, mock.BodyText, mock.ResponeText)
+	`
+	_, err = db.Exec(sqlQuery, mock.ID, mock.RequestName, mock.GroupName, mock.Method, mock.Endpoint, mock.BodyText, mock.ResponeText)
 
 	return err
 }
@@ -90,11 +125,22 @@ func UpdateMockAPI(mock *model.TDAPIMockParam) (int64, error) {
 	}
 	defer db.Close()
 
-	result, err := db.Exec(`
-		UPDATE td_api_mock 
-		SET request_name = ?, group_name = ?, method = ?, end_point = ?, body_text = ?, response_text = ?, modififed_date = CURRENT_TIMESTAMP
-		WHERE id = ?
-	`, mock.RequestName, mock.GroupName, mock.Method, mock.Endpoint, mock.BodyText, mock.ResponeText, mock.ID)
+	sqlQuery := `
+		UPDATE 
+			td_api_mock 
+		SET 
+			request_name = ?, 
+			group_name = ?, 
+			method = ?, 
+			end_point = ?, 
+			body_text = ?, 
+			response_text = ?, 
+			modififed_date = CURRENT_TIMESTAMP
+		WHERE 
+			id = ?
+	`
+
+	result, err := db.Exec(sqlQuery, mock.RequestName, mock.GroupName, mock.Method, mock.Endpoint, mock.BodyText, mock.ResponeText, mock.ID)
 
 	if err != nil {
 		return 0, err
@@ -113,7 +159,8 @@ func DeleteMockAPI(id string) (int64, error) {
 	}
 	defer db.Close()
 
-	result, err := db.Exec("DELETE FROM td_api_mock WHERE id = ?", id)
+	sqlQuery := `DELETE FROM td_api_mock WHERE id = ?`
+	result, err := db.Exec(sqlQuery, id)
 	if err != nil {
 		return 0, err
 	}
