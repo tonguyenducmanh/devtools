@@ -55,7 +55,10 @@ export default {
   name: "TDTextarea",
   mixins: [TDStylePremitiveMixin],
 
-  created() {},
+  created() {
+    this.updateEditorVal = TDUtility.debounce(this.updateEditorVal, 100);
+    this.updateValToEditor = TDUtility.debounce(this.updateValToEditor, 100);
+  },
   mounted() {
     let me = this;
     this.updateHighlight();
@@ -241,14 +244,15 @@ export default {
         me.unmountEditor();
       }
     },
-    updateEditorVal: TDUtility.debounce(function () {
+    updateEditorVal() {
       if (this.editor) {
         this.editor.setValue(this.modelValue ? this.modelValue : "");
       }
-    }, 100),
-    updateValToEditor: TDUtility.debounce(function () {
+    },
+    updateValToEditor() {
       this.updateValueFromEditor(true);
-    }, 100),
+    },
+
     updateValueFromEditor(fromEditor = false) {
       let me = this;
       if (me.editor) {

@@ -78,21 +78,7 @@ class TDUtility {
     }
   }
 
-  /**
-   * hoãn việc chạy function khau khi người dùng thao tác lặp đi lặp lại liên tục
-   * @param {*} func function sẽ chạy sau 1 khoảng thời gian
-   * @param {*} delay thời gian delay
-   * @returns
-   */
-  debounce(func, delay) {
-    let timeoutId;
-    return function (...args) {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        func.apply(this, args);
-      }, delay);
-    };
-  }
+
 
   /**
    * định dạng ngày tháng
