@@ -367,6 +367,8 @@ export default {
       save: "Lưu",
       addNew: "Thêm mới",
       groupName: "Tên nhóm",
+      createNew: "Tạo mới",
+      refresh: "Làm mới",
     },
   },
 };
