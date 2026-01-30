@@ -9,7 +9,7 @@
       <TDTextarea
         :isLabelTop="true"
         v-model="curlContent"
-        :enableHighlight="APIConfigLayout.enableHighlight"
+        :enableHighlight="currentConfigLayout.enableHighlight"
         language="shell"
         ref="inputCURL"
         :placeHolder="$t('i18nCommon.apiTesting.contentCURL')"
@@ -39,7 +39,7 @@ export default {
       type: Object,
       required: true,
     },
-    APIConfigLayout: {
+    currentConfigLayout: {
       type: Object,
       default: {},
     },
