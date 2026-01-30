@@ -26,7 +26,7 @@ go build -o "$OUTPUT_DIR/$OUTPUT_NAME-linux" .
 
 echo "Building for Windows..."
 GOOS=windows GOARCH=amd64  \
-go build -o "$OUTPUT_DIR/$OUTPUT_NAME.exe" .
+go build -o "$OUTPUT_DIR/$OUTPUT_NAME-window.exe" .
 
 rm -rf "$FRONTEND_DIST"
 
