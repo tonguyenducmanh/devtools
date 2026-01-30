@@ -74,4 +74,38 @@ func InitDatabase() {
 		log.Printf("%q: %s\n", err, sqlStmtGroup)
 		return
 	}
+
+	// 4. Tạo bảng api testing
+	sqlStmtTesting := `
+	CREATE TABLE IF NOT EXISTS td_api_testing (
+		id TEXT PRIMARY KEY NOT NULL,
+		request_name TEXT NOT NULL,
+		group_name TEXT,
+		method TEXT,
+		end_point TEXT NOT NULL,
+		headers_text TEXT,
+		body_text TEXT,
+		created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+		modififed_date DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+	`
+	_, err = db.Exec(sqlStmtTesting)
+	if err != nil {
+		log.Printf("%q: %s\n", err, sqlStmtTesting)
+		return
+	}
+
+	// 5. Tạo bảng nhóm api testing
+	sqlStmtTestingGroup := `
+	CREATE TABLE IF NOT EXISTS td_api_testing_group (
+		id TEXT PRIMARY KEY NOT NULL,
+		name TEXT NOT NULL,
+		created_date DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+	`
+	_, err = db.Exec(sqlStmtTestingGroup)
+	if err != nil {
+		log.Printf("%q: %s\n", err, sqlStmtTestingGroup)
+		return
+	}
 }

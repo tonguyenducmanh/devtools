@@ -407,7 +407,10 @@
             </div>
             <!-- phần danh sách các request đã lưu theo thư mục -->
             <div class="td-collection">
-              <div class="td-collection-body">
+              <div class="flex flex-col response-loading" v-if="isLoadingData">
+                <div class="loader"></div>
+              </div>
+              <div class="td-collection-body" v-else>
                 <div
                   v-for="(collection, index) in allCollection"
                   class="flex flex-col no-select td-collection-item"
@@ -540,7 +543,7 @@
             <div class="flex">
               <!-- nút thêm request mới -->
               <TDButton
-                :readOnly="isLoading"
+                :readOnly="isLoadingData"
                 @click="createNewRequest"
                 :type="$tdEnum.buttonType.secondary"
                 :noMargin="true"
@@ -553,7 +556,7 @@
               <!-- nút lưu request -->
               <TDButton
                 v-tooltip="$t('i18nCommon.apiTesting.NeedRequestName')"
-                :readOnly="isLoading || !requestName"
+                :readOnly="isLoadingData || !requestName"
                 @click="saveRequest"
                 :type="$tdEnum.buttonType.secondary"
                 :noMargin="true"
@@ -650,6 +653,7 @@ import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDMockAPIProMode from "@/common/mock/TDMockAPIProMode.js";
 import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
+import TDAgentAPI from "@/common/api/request/AgentAPI/TDAgentAPI.js";
 
 export default {
   name: "TDAPITesting",
@@ -719,20 +723,13 @@ export default {
       proModeTemplate: TDMockAPIProMode,
       requestSectionSize: 50, // Phần request chiếm 50%
       responseSectionSize: 50, // Phần response chiếm 50%
+      agentAPI: null,
+      isLoadingData: false,
     };
   },
-  async created() {
-    let me = this;
-    let allCollectionTmp = await me.$tdCache.get(
-      me.$tdEnum.cacheConfig.APICollection,
-    );
-    if (allCollectionTmp) {
-      if (Array.isArray(allCollectionTmp)) {
-        me.allCollection = allCollectionTmp;
-      } else {
-        me.allCollection = JSON.parse(allCollectionTmp) || [];
-      }
-    }
+  async mounted() {
+    this.agentAPI = new TDAgentAPI();
+    await this.loadAllTestingData();
   },
   computed: {
     /**
@@ -829,44 +826,86 @@ export default {
       if (typeof collectionName == "string") {
         me.newCollectionName = collectionName;
       }
-      if (
-        me.allCollection &&
-        Array.isArray(me.allCollection) &&
-        me.newCollectionName &&
-        !me.allCollection.find((x) => x.name == me.newCollectionName)
-      ) {
-        let collectionId = me.$tdUtility.newGuid();
-        let blankCollection = {
-          name: me.newCollectionName,
-          requests: [],
-          collection_id: collectionId,
-          openingCollection: false,
-        };
-        me.allCollection.push(blankCollection);
-        await me.saveCollectionToCache();
-        // xóa tên tạm đi
-        me.newCollectionName = "";
-        return blankCollection;
+      if (me.newCollectionName) {
+        try {
+          let response = await me.agentAPI.createTestingGroup({
+            name: me.newCollectionName,
+          });
+          if (response && response.success && response.data?.success) {
+            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+            me.newCollectionName = "";
+            await me.loadAllTestingData();
+          }
+        } catch (error) {
+          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+        }
       }
     },
     async saveCollectionToCache() {
-      let me = this;
-      if (
-        me.allCollection &&
-        Array.isArray(me.allCollection) &&
-        me.allCollection.length >= 0
-      ) {
-        await me.$tdCache.set(
-          me.$tdEnum.cacheConfig.APICollection,
-          JSON.stringify(me.allCollection),
-        );
-      }
+      // Deprecated: Use API calls instead
     },
     async toggleCollection(collection) {
       let me = this;
       if (collection) {
         collection.openingCollection = !collection.openingCollection;
-        await me.saveCollectionToCache();
+      }
+    },
+    /**
+     * Tải tất cả dữ liệu từ server và map vào cấu trúc allCollection
+     */
+    async loadAllTestingData() {
+      let me = this;
+      me.isLoadingData = true;
+      try {
+        let [groupsParams, testsParams] = await Promise.all([
+          me.agentAPI.getAllTestingGroups(),
+          me.agentAPI.getAllTestingAPIs(),
+        ]);
+
+        let groups = groupsParams?.data?.data || [];
+        let tests = testsParams?.data?.data || [];
+
+        // Build allCollection structure
+        // Map groups to collection objects
+        let collections = groups.map((g) => ({
+          name: g.name,
+          collection_id: g.id,
+          openingCollection: false, // Default closed
+          requests: [],
+          is_renaming: false,
+        }));
+
+        // Assign tests to collections
+        tests.forEach((t) => {
+          let collection = collections.find((c) => c.name === t.group_name);
+          if (collection) {
+            collection.requests.push({
+              requestName: t.request_name,
+              method: t.method,
+              apiUrl: t.end_point,
+              headersText: t.headers_text,
+              bodyText: t.body_text,
+              requestId: t.id,
+            });
+          }
+        });
+
+        // Preserve opening state if re-loading
+        if (me.allCollection && me.allCollection.length > 0) {
+            collections.forEach(newCol => {
+                let oldCol = me.allCollection.find(c => c.collection_id === newCol.collection_id);
+                if (oldCol) {
+                    newCol.openingCollection = oldCol.openingCollection;
+                }
+            });
+        }
+
+        me.allCollection = collections;
+
+      } catch (error) {
+        console.error("Lỗi tải dữ liệu testing:", error);
+      } finally {
+        me.isLoadingData = false;
       }
     },
     applyRequest(request) {
@@ -877,31 +916,31 @@ export default {
     async saveRequest() {
       let me = this;
       if (me.requestName && me.allCollection && me.allCollection.length > 0) {
-        // nếu đã tồn tại request thì lưu luôn
+        // Find existing Request to update
         if (me.currentRequestId) {
-          let historyItem = me.buildHistoryItemForSave();
-          let success = false;
-          me.allCollection.forEach((collection) => {
-            if (
-              collection &&
-              collection.requests &&
-              collection.requests.length > 0
-            ) {
-              for (let request of collection.requests) {
-                if (request && request.requestId == me.currentRequestId) {
-                  Object.assign(request, historyItem);
-                  this.$tdToast.success(
-                    this.$t("i18nCommon.toastMessage.success"),
-                  );
-                  success = true;
-                  break;
-                }
-              }
-            }
-          });
-          if (success) {
-            await me.saveCollectionToCache();
-          }
+           // Tim xem request nay thuoc collection nao
+           let currentCollection = me.allCollection.find(c => c.requests.find(r => r.requestId == me.currentRequestId));
+           if (currentCollection) {
+               // Update logic
+               let testData = {
+                id: me.currentRequestId,
+                request_name: me.requestName,
+                group_name: currentCollection.name,
+                method: me.httpMethod,
+                end_point: me.apiUrl,
+                headers_text: me.headersText,
+                body_text: me.bodyText,
+              };
+               try {
+                    let response = await me.agentAPI.updateTestingAPI(testData);
+                    if (response && response.success && response.data?.success) {
+                        me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+                        await me.loadAllTestingData();
+                    }
+               } catch (e) {
+                   me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+               }
+           }
         } else {
           // nếu không tồn tại request thì show popup tạo mới
           TDDialogUtil.showPopup({
@@ -916,40 +955,39 @@ export default {
     },
     async saveToCollection(collection) {
       let me = this;
-      let historyItem = me.buildHistoryItemForSave();
-      let newRequestId = me.$tdUtility.newGuid();
-      if (collection && historyItem) {
-        if (!collection.requests) {
-          collection.requests = [];
+      
+      let testData = {
+        request_name: me.requestName || me.apiUrl, // Ensure name
+        group_name: collection.name,
+        method: me.httpMethod,
+        end_point: me.apiUrl,
+        headers_text: me.headersText,
+        body_text: me.bodyText,
+      };
+
+      try {
+        let response = await me.agentAPI.createTestingAPI(testData);
+        if (response && response.success && response.data?.success) {
+            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+            me.currentRequestId = response.data.data.id;
+            await me.loadAllTestingData();
         }
-        historyItem.requestId = newRequestId;
-        collection.requests.push(historyItem);
-        await me.saveCollectionToCache();
-        me.currentRequestId = newRequestId;
-        this.$tdToast.success(this.$t("i18nCommon.toastMessage.success"));
+      } catch (e) {
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
     async deleteRequest(collectionId, request) {
       let me = this;
-      if (
-        collectionId &&
-        request &&
-        me.allCollection &&
-        me.allCollection.length > 0
-      ) {
-        let currentCollection = me.allCollection.find(
-          (x) => x.collection_id == collectionId,
-        );
-        if (
-          currentCollection &&
-          currentCollection.requests &&
-          currentCollection.requests.length > 0
-        ) {
-          currentCollection.requests = currentCollection.requests.filter(
-            (x) => x.requestId != request.requestId,
-          );
-          await me.saveCollectionToCache();
-        }
+      if (request && request.requestId) {
+          try {
+            let response = await me.agentAPI.deleteTestingAPI(request.requestId);
+             if (response && response.success && response.data?.success) {
+                me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+                await me.loadAllTestingData(); // Reload to reflect changes
+            }
+          } catch(e) {
+              me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+          }
       }
     },
     enableRenameCollection(collection) {
@@ -957,12 +995,7 @@ export default {
       if (collection) {
         collection.is_renaming = true;
         collection.temp_name = collection.name;
-        me.allCollection.forEach((item) => {
-          if (item && item.collection_id != collection.collection_id) {
-            delete item.is_renaming;
-            delete item.temp_name;
-          }
-        });
+        // Focus logic...
         this.$nextTick(() => {
           if (me.$refs && me.$refs[collection.temp_name]) {
             let refs = me.$refs[collection.temp_name];
@@ -981,21 +1014,35 @@ export default {
       let me = this;
       if (collection) {
         delete collection.is_renaming;
-        if (collection.temp_name) {
-          collection.name = collection.temp_name;
-          delete collection.temp_name;
-          await me.saveCollectionToCache();
+        if (collection.temp_name && collection.temp_name !== collection.name) {
+            // Call API update
+            try {
+                let response = await me.agentAPI.updateTestingGroup({
+                    id: collection.collection_id,
+                    name: collection.temp_name
+                });
+                if (response && response.success && response.data?.success) {
+                    me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+                    await me.loadAllTestingData();
+                }
+            } catch (e) {
+                 me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+            }
         }
       }
     },
     async deleteCollection(collectionId) {
       let me = this;
-      if (collectionId && me.allCollection && me.allCollection.length >= 0) {
-        me.allCollection = me.allCollection.filter(
-          (x) => x.collection_id != collectionId,
-        );
-
-        await me.saveCollectionToCache();
+      if (collectionId) {
+          try {
+            let response = await me.agentAPI.deleteTestingGroup(collectionId);
+            if (response && response.success && response.data?.success) {
+                me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+                await me.loadAllTestingData();
+            }
+          } catch (e) {
+              me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+          }
       }
     },
 
@@ -1018,16 +1065,43 @@ export default {
     },
     async saveImportCollection(newCollections) {
       let me = this;
-      if (
-        newCollections &&
-        Array.isArray(newCollections) &&
-        newCollections.length > 0
-      ) {
-        if (!me.allCollection || !Array.isArray(me.allCollection)) {
-          me.allCollection = [];
+      if (!newCollections || newCollections.length === 0) return;
+
+      let groups = [];
+      let items = [];
+
+      newCollections.forEach((col) => {
+        groups.push({
+          id: col.collection_id,
+          name: col.name,
+        });
+
+        if (col.requests && col.requests.length > 0) {
+          col.requests.forEach((req) => {
+            items.push({
+              id: req.requestId,
+              request_name: req.requestName,
+              group_name: col.name,
+              method: req.httpMethod,
+              end_point: req.apiUrl,
+              headers_text: req.headersText,
+              body_text: req.bodyText,
+            });
+          });
         }
-        me.allCollection = [...me.allCollection, ...newCollections];
-        await me.saveCollectionToCache();
+      });
+
+      try {
+        let response = await me.agentAPI.importTestingDataBatch({
+          groups: groups,
+          items: items,
+        });
+        if (response && response.success && response.data?.success) {
+          me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+          await me.loadAllTestingData();
+        }
+      } catch (e) {
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
     async buildCollectionsFromZip(zip) {
@@ -1156,6 +1230,7 @@ export default {
     createNewRequest() {
       let me = this;
       me.requestName = "";
+      me.groupName = "";
       me.currentRequestId = null;
       me.apiUrl = null;
       me.httpMethod = "GET";
@@ -1593,6 +1668,32 @@ export default {
         }
       }
     }
+  }
+}
+.response-loading {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-layer-color);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+}
+.td-collection-edit-btn {
+  display: flex;
+  gap: var(--padding);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.td-collection-header:hover .td-collection-edit-btn {
+  opacity: 1;
+}
+
+.text-nowrap-collection {
+  max-width: 215px !important;
+  div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 .td-sidebar-content {

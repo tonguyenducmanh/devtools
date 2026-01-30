@@ -40,6 +40,6 @@ func RunAPIApp(port *int, mockPort *int, trace *bool) {
 func addRoute(app *http.ServeMux) {
 	// Inject router cho từng nghiệp vụ
 	router.InjectCommonRouter(app)
-	router.InjectExecAPIRouter(app)
+	router.InjectAPITestingRouter(app)
 	router.InjectMockAPIRouter(app)
 }
