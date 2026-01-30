@@ -877,7 +877,7 @@ export default {
 
         // Assign tests to collections
         tests.forEach((t) => {
-          let collection = collections.find((c) => c.name === t.group_name);
+          let collection = collections.find((c) => c.collection_id === t.group_id);
           if (collection) {
             collection.requests.push({
               requestName: t.request_name,
@@ -925,7 +925,7 @@ export default {
                let testData = {
                 id: me.currentRequestId,
                 request_name: me.requestName,
-                group_name: currentCollection.name,
+                group_id: currentCollection.collection_id,
                 method: me.httpMethod,
                 end_point: me.apiUrl,
                 headers_text: me.headersText,
@@ -958,7 +958,7 @@ export default {
       
       let testData = {
         request_name: me.requestName || me.apiUrl, // Ensure name
-        group_name: collection.name,
+        group_id: collection.collection_id,
         method: me.httpMethod,
         end_point: me.apiUrl,
         headers_text: me.headersText,
@@ -1081,7 +1081,7 @@ export default {
             items.push({
               id: req.requestId,
               request_name: req.requestName,
-              group_name: col.name,
+              group_id: col.collection_id,
               method: req.httpMethod,
               end_point: req.apiUrl,
               headers_text: req.headersText,

@@ -9,12 +9,12 @@
           :noMargin="true"
         ></TDInput>
         <TDComboBox
-          v-model="groupName"
+          v-model="groupId"
           :placeHolder="$t('i18nCommon.APIMocking.groupName')"
           :options="allGroupOptions"
           :noMargin="true"
           :width="200"
-          :isEditable="true"
+          :isEditable="false"
         ></TDComboBox>
         <TDButton
           :noMargin="true"
@@ -127,42 +127,42 @@
             </div>
             <div class="td-collection-body" v-else>
               <div
-                v-for="(group, groupName) in groupedMockAPIs"
+                v-for="(group, index) in groupedMockAPIs"
                 class="flex flex-col no-select td-collection-item"
-                :key="groupName"
+                :key="index"
               >
                 <!-- phần tên nhóm -->
                 <div
                   class="flex td-collection-header"
-                  @click="toggleGroup(groupName)"
+                  @click="toggleGroup(group.name)"
                 >
                   <div
                     class="flex text-nowrap-collection td-collection-header-left"
                   >
                     <TDArrow
-                      :openProp="openGroups[groupName]"
+                      :openProp="openGroups[group.name]"
                       :arrowOpenDirection="$tdEnum.Direction.bottom"
                       :arrowDirection="$tdEnum.Direction.right"
                     />
-                    <div class="" v-tooltip="groupName || 'Ungrouped'">
-                      {{ groupName || "Ungrouped" }}
+                    <div class="" v-tooltip="group.name || 'Ungrouped'">
+                      {{ group.name || "Ungrouped" }}
                     </div>
                   </div>
-                  <div class="flex td-collection-edit-btn" v-if="groupName">
+                  <div class="flex td-collection-edit-btn" v-if="group.name">
                     <div
                       v-tooltip="$t('i18nCommon.APIMocking.delete')"
                       class="td-icon td-close-icon"
-                      @click.stop="deleteGroupByName(groupName)"
+                      @click.stop="deleteGroupByName(group.name)"
                     ></div>
                   </div>
                 </div>
                 <!-- danh sách các mock API trong nhóm -->
                 <div
-                  v-if="openGroups[groupName] && group && group.length > 0"
+                  v-if="openGroups[group.name] && group.items && group.items.length > 0"
                   class="flex flex-col td-collection-content"
                 >
                   <div
-                    v-for="(mock, index) in group"
+                    v-for="(mock, index) in group.items"
                     :key="index"
                     class="flex td-collection-request-item"
                     :class="{
@@ -262,7 +262,7 @@ export default {
       keyCacheLayout: this.$tdEnum.cacheConfig.APIMockConfigLayout,
       apiUrl: "",
       requestName: "",
-      groupName: "",
+      groupId: "",
       httpMethod: "GET",
       bodyText: "",
       responseText: "",
@@ -319,7 +319,7 @@ export default {
     },
     allGroupOptions() {
       return this.allGroups.map((g) => ({
-        value: g.name,
+        value: g.id,
         label: g.name,
       }));
     },
@@ -337,21 +337,28 @@ export default {
      */
     groupedMockAPIs() {
       let me = this;
-      let grouped = {};
-      // Đảm bảo allMockAPIs là array
-      if (!Array.isArray(me.allMockAPIs)) {
-        return grouped;
+      let groups = me.allGroups.map(g => ({
+          ...g,
+          items: []
+      }));
+      // Add 'Ungrouped'
+      groups.push({ id: "", name: "", items: [] });
+      
+      if (Array.isArray(me.allMockAPIs)) {
+         me.allMockAPIs.forEach(mock => {
+             let group = groups.find(g => g.id === mock.group_id);
+             if (group) {
+                 group.items.push(mock);
+             } else {
+                 // Fallback to ungrouped if ID not found
+                 let ungrouped = groups.find(g => g.id === "");
+                 if (ungrouped) ungrouped.items.push(mock);
+             }
+         });
       }
-      me.allMockAPIs.forEach((mock) => {
-        let groupName = mock.group_name || "";
-        if (!grouped[groupName]) {
-          grouped[groupName] = [];
-          // Tự động mở nhóm (Vue 3 không cần $set)
-          me.openGroups[groupName] = true;
-        }
-        grouped[groupName].push(mock);
-      });
-      return grouped;
+      // Filter out empty groups if desired, or keep them. 
+      // For now, let's keep groups that have items or are real groups (not ungrouped fallback if empty)
+      return groups.filter(g => g.id !== "" || g.items.length > 0);
     },
     /**
      * Tính toán style động cho request area
@@ -479,7 +486,7 @@ export default {
       let me = this;
       me.currentMockId = mock.id;
       me.requestName = mock.request_name;
-      me.groupName = mock.group_name;
+      me.groupId = mock.group_id;
       me.httpMethod = mock.method;
       me.apiUrl = mock.end_point;
       me.bodyText = mock.body_text;
@@ -492,7 +499,7 @@ export default {
       let me = this;
       me.currentMockId = null;
       me.requestName = "";
-      me.groupName = "";
+      me.groupId = "";
       me.httpMethod = "GET";
       me.apiUrl = "";
       me.bodyText = "";
@@ -511,7 +518,7 @@ export default {
 
       let mockData = {
         request_name: me.requestName,
-        group_name: me.groupName,
+        group_id: me.groupId,
         method: me.httpMethod,
         end_point: me.apiUrl,
         body_text: me.bodyText,

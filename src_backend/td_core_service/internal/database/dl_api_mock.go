@@ -18,7 +18,7 @@ func GetAllMockAPIs() ([]model.TDAPIMockItem, error) {
 		SELECT 
 			id, 
 			request_name, 
-			group_name, 
+			group_id, 
 			method, 
 			end_point, 
 			body_text, 
@@ -37,7 +37,7 @@ func GetAllMockAPIs() ([]model.TDAPIMockItem, error) {
 	var mocks []model.TDAPIMockItem
 	for rows.Next() {
 		var mock model.TDAPIMockItem
-		err := rows.Scan(&mock.ID, &mock.RequestName, &mock.GroupName, &mock.Method, &mock.Endpoint, &mock.BodyText, &mock.ResponeText)
+		err := rows.Scan(&mock.ID, &mock.RequestName, &mock.GroupID, &mock.Method, &mock.Endpoint, &mock.BodyText, &mock.ResponeText)
 		if err != nil {
 			continue
 		}
@@ -61,7 +61,7 @@ func GetAllMockAPIsForAutoStart() ([]model.TDAPIMockItem, error) {
 		SELECT 
 			id, 
 			request_name, 
-			group_name, 
+			group_id, 
 			method, 
 			end_point, 
 			body_text, 
@@ -78,7 +78,7 @@ func GetAllMockAPIsForAutoStart() ([]model.TDAPIMockItem, error) {
 	var mocks []model.TDAPIMockItem
 	for rows.Next() {
 		var mock model.TDAPIMockItem
-		err := rows.Scan(&mock.ID, &mock.RequestName, &mock.GroupName, &mock.Method, &mock.Endpoint, &mock.BodyText, &mock.ResponeText)
+		err := rows.Scan(&mock.ID, &mock.RequestName, &mock.GroupID, &mock.Method, &mock.Endpoint, &mock.BodyText, &mock.ResponeText)
 		if err != nil {
 			continue
 		}
@@ -102,7 +102,7 @@ func CreateMockAPI(mock *model.TDAPIMockItem) error {
 		INSERT INTO td_api_mock (
 			id, 
 			request_name, 
-			group_name, 
+			group_id, 
 			method, 
 			end_point, 
 			body_text, 
@@ -112,7 +112,7 @@ func CreateMockAPI(mock *model.TDAPIMockItem) error {
 			?, ?, ?, ?, ?, ?, ?
 		)
 	`
-	_, err = db.Exec(sqlQuery, mock.ID, mock.RequestName, mock.GroupName, mock.Method, mock.Endpoint, mock.BodyText, mock.ResponeText)
+	_, err = db.Exec(sqlQuery, mock.ID, mock.RequestName, mock.GroupID, mock.Method, mock.Endpoint, mock.BodyText, mock.ResponeText)
 
 	return err
 }
@@ -132,7 +132,7 @@ func UpdateMockAPI(mock *model.TDAPIMockItem) (int64, error) {
 			td_api_mock 
 		SET 
 			request_name = ?, 
-			group_name = ?, 
+			group_id = ?, 
 			method = ?, 
 			end_point = ?, 
 			body_text = ?, 
@@ -142,7 +142,7 @@ func UpdateMockAPI(mock *model.TDAPIMockItem) (int64, error) {
 			id = ?
 	`
 
-	result, err := db.Exec(sqlQuery, mock.RequestName, mock.GroupName, mock.Method, mock.Endpoint, mock.BodyText, mock.ResponeText, mock.ID)
+	result, err := db.Exec(sqlQuery, mock.RequestName, mock.GroupID, mock.Method, mock.Endpoint, mock.BodyText, mock.ResponeText, mock.ID)
 
 	if err != nil {
 		return 0, err

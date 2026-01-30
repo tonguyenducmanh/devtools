@@ -6,7 +6,7 @@ package model
 type TDAPITestingItem struct {
 	ID          string `json:"id"`
 	RequestName string `json:"request_name"`
-	GroupName   string `json:"group_name"`
+	GroupID     string `json:"group_id"`
 	Method      string `json:"method"`
 	Endpoint    string `json:"end_point"`
 	HeadersText string `json:"headers_text"`
