@@ -19,7 +19,11 @@
         <TDButton
           :noMargin="true"
           @click="saveRequest"
-          :label="currentMockId ? $t('i18nCommon.APIMocking.save') : $t('i18nCommon.APIMocking.addNew')"
+          :label="
+            currentMockId
+              ? $t('i18nCommon.APIMocking.save')
+              : $t('i18nCommon.APIMocking.addNew')
+          "
         />
       </div>
       <div class="flex td-mocking-header">
@@ -158,7 +162,11 @@
                 </div>
                 <!-- danh sách các mock API trong nhóm -->
                 <div
-                  v-if="openGroups[group.name] && group.items && group.items.length > 0"
+                  v-if="
+                    openGroups[group.name] &&
+                    group.items &&
+                    group.items.length > 0
+                  "
                   class="flex flex-col td-collection-content"
                 >
                   <div
@@ -337,28 +345,28 @@ export default {
      */
     groupedMockAPIs() {
       let me = this;
-      let groups = me.allGroups.map(g => ({
-          ...g,
-          items: []
+      let groups = me.allGroups.map((g) => ({
+        ...g,
+        items: [],
       }));
       // Add 'Ungrouped'
       groups.push({ id: "", name: "", items: [] });
-      
+
       if (Array.isArray(me.allMockAPIs)) {
-         me.allMockAPIs.forEach(mock => {
-             let group = groups.find(g => g.id === mock.group_id);
-             if (group) {
-                 group.items.push(mock);
-             } else {
-                 // Fallback to ungrouped if ID not found
-                 let ungrouped = groups.find(g => g.id === "");
-                 if (ungrouped) ungrouped.items.push(mock);
-             }
-         });
+        me.allMockAPIs.forEach((mock) => {
+          let group = groups.find((g) => g.id === mock.group_id);
+          if (group) {
+            group.items.push(mock);
+          } else {
+            // Fallback to ungrouped if ID not found
+            let ungrouped = groups.find((g) => g.id === "");
+            if (ungrouped) ungrouped.items.push(mock);
+          }
+        });
       }
-      // Filter out empty groups if desired, or keep them. 
+      // Filter out empty groups if desired, or keep them.
       // For now, let's keep groups that have items or are real groups (not ungrouped fallback if empty)
-      return groups.filter(g => g.id !== "" || g.items.length > 0);
+      return groups.filter((g) => g.id !== "" || g.items.length > 0);
     },
     /**
      * Tính toán style động cho request area
@@ -422,7 +430,7 @@ export default {
     async loadMockData() {
       let me = this;
       let response = await me.agentAPI.getAllMockAPIs();
-      let mockData = response?.data?.data;
+      let mockData = response?.data?.data ?? [];
       if (response && response.success && Array.isArray(mockData)) {
         me.allMockAPIs.splice(0, me.allMockAPIs.length, ...mockData);
       } else {
@@ -433,7 +441,7 @@ export default {
       let me = this;
       try {
         let response = await me.agentAPI.getAllMockGroups();
-        let groupData = response?.data?.data;
+        let groupData = response?.data?.data ?? [];
         if (response && response.success && Array.isArray(groupData)) {
           me.allGroups.splice(0, me.allGroups.length, ...groupData);
         }
@@ -453,7 +461,9 @@ export default {
           name: me.newGroupName,
         });
         if (response && response.success && response.data?.success) {
-          me.$tdToast.success(me.$t("i18nCommon.APIMocking.createGroupSuccess"));
+          me.$tdToast.success(
+            me.$t("i18nCommon.APIMocking.createGroupSuccess"),
+          );
           me.newGroupName = "";
           await me.loadAllGroups();
         }
@@ -472,7 +482,9 @@ export default {
       try {
         let response = await me.agentAPI.deleteMockGroup(group.id);
         if (response && response.success && response.data?.success) {
-          me.$tdToast.success(me.$t("i18nCommon.APIMocking.deleteGroupSuccess"));
+          me.$tdToast.success(
+            me.$t("i18nCommon.APIMocking.deleteGroupSuccess"),
+          );
           await me.loadAllMockAPIs();
         }
       } catch (error) {
@@ -510,9 +522,11 @@ export default {
      */
     async saveRequest() {
       let me = this;
-      
+
       if (!me.requestName || !me.apiUrl) {
-        me.$tdToast.warning(me.$t("i18nCommon.APIMocking.requestNameAndApiUrlRequired"));
+        me.$tdToast.warning(
+          me.$t("i18nCommon.APIMocking.requestNameAndApiUrlRequired"),
+        );
         return;
       }
 
@@ -531,14 +545,18 @@ export default {
           mockData.id = me.currentMockId;
           let response = await me.agentAPI.updateMockAPI(mockData);
           if (response && response.success && response.data?.success) {
-            me.$tdToast.success(me.$t("i18nCommon.APIMocking.updateMockSuccess"));
+            me.$tdToast.success(
+              me.$t("i18nCommon.APIMocking.updateMockSuccess"),
+            );
             await me.loadAllMockAPIs();
           }
         } else {
           // Tạo mới
           let response = await me.agentAPI.createMockAPI(mockData);
           if (response && response.success && response.data?.success) {
-            me.$tdToast.success(me.$t("i18nCommon.APIMocking.createMockSuccess"));
+            me.$tdToast.success(
+              me.$t("i18nCommon.APIMocking.createMockSuccess"),
+            );
             me.currentMockId = response.data?.data?.id;
             await me.loadAllMockAPIs();
           }
@@ -692,7 +710,7 @@ export default {
     white-space: nowrap;
   }
 }
-.td-plus-icon{
+.td-plus-icon {
   cursor: pointer;
 }
 </style>
