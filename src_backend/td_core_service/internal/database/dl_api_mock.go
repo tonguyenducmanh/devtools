@@ -258,14 +258,7 @@ func DeleteMockGroup(id string) error {
 		DELETE FROM 
 			td_api_mock 
 		WHERE 
-			group_name = (
-				SELECT 
-					name 
-				FROM 
-					td_api_mock_group 
-				WHERE 
-					id = ?
-			)
+			group_id = ?
 	`
 	_, err = tx.Exec(sqlDeleteItems, id)
 	if err != nil {
