@@ -46,7 +46,7 @@ func InitDatabase() {
 	CREATE TABLE IF NOT EXISTS td_api_mock (
 		id TEXT PRIMARY KEY NOT NULL,
 		request_name TEXT NOT NULL,
-		group_name TEXT,
+		group_id TEXT,
 		method TEXT,
 		end_point TEXT NOT NULL,
 		body_text TEXT,
@@ -80,7 +80,7 @@ func InitDatabase() {
 	CREATE TABLE IF NOT EXISTS td_api_testing (
 		id TEXT PRIMARY KEY NOT NULL,
 		request_name TEXT NOT NULL,
-		group_name TEXT,
+		group_id TEXT,
 		method TEXT,
 		end_point TEXT NOT NULL,
 		headers_text TEXT,

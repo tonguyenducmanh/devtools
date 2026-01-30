@@ -18,7 +18,7 @@ func GetAllTestingAPIs() ([]model.TDAPITestingItem, error) {
 		SELECT 
 			id, 
 			request_name, 
-			group_name, 
+			group_id, 
 			method, 
 			end_point, 
 			headers_text, 
@@ -37,7 +37,7 @@ func GetAllTestingAPIs() ([]model.TDAPITestingItem, error) {
 	var tests []model.TDAPITestingItem
 	for rows.Next() {
 		var test model.TDAPITestingItem
-		err := rows.Scan(&test.ID, &test.RequestName, &test.GroupName, &test.Method, &test.Endpoint, &test.HeadersText, &test.BodyText)
+		err := rows.Scan(&test.ID, &test.RequestName, &test.GroupID, &test.Method, &test.Endpoint, &test.HeadersText, &test.BodyText)
 		if err != nil {
 			continue
 		}
@@ -61,7 +61,7 @@ func CreateTestingAPI(test *model.TDAPITestingItem) error {
 		INSERT INTO td_api_testing (
 			id, 
 			request_name, 
-			group_name, 
+			group_id, 
 			method, 
 			end_point, 
 			headers_text, 
@@ -71,7 +71,7 @@ func CreateTestingAPI(test *model.TDAPITestingItem) error {
 			?, ?, ?, ?, ?, ?, ?
 		)
 	`
-	_, err = db.Exec(sqlQuery, test.ID, test.RequestName, test.GroupName, test.Method, test.Endpoint, test.HeadersText, test.BodyText)
+	_, err = db.Exec(sqlQuery, test.ID, test.RequestName, test.GroupID, test.Method, test.Endpoint, test.HeadersText, test.BodyText)
 
 	return err
 }
@@ -91,7 +91,7 @@ func UpdateTestingAPI(test *model.TDAPITestingItem) (int64, error) {
 			td_api_testing 
 		SET 
 			request_name = ?, 
-			group_name = ?, 
+			group_id = ?, 
 			method = ?, 
 			end_point = ?, 
 			headers_text = ?, 
@@ -101,7 +101,7 @@ func UpdateTestingAPI(test *model.TDAPITestingItem) (int64, error) {
 			id = ?
 	`
 
-	result, err := db.Exec(sqlQuery, test.RequestName, test.GroupName, test.Method, test.Endpoint, test.HeadersText, test.BodyText, test.ID)
+	result, err := db.Exec(sqlQuery, test.RequestName, test.GroupID, test.Method, test.Endpoint, test.HeadersText, test.BodyText, test.ID)
 
 	if err != nil {
 		return 0, err
@@ -242,14 +242,7 @@ func DeleteTestingGroup(id string) error {
 		DELETE FROM 
 			td_api_testing 
 		WHERE 
-			group_name = (
-				SELECT 
-					name 
-				FROM 
-					td_api_testing_group 
-				WHERE 
-					id = ?
-			)
+			group_id = ?
 	`
 	_, err = tx.Exec(sqlDeleteItems, id)
 	if err != nil {
@@ -309,7 +302,7 @@ func BatchImportTestingData(batch *model.TDAPITestingImportBatch) error {
 
 	// 2. Insert Items
 	if len(batch.Items) > 0 {
-		sqlItem := `INSERT INTO td_api_testing (id, request_name, group_name, method, end_point, headers_text, body_text) VALUES (?, ?, ?, ?, ?, ?, ?)`
+		sqlItem := `INSERT INTO td_api_testing (id, request_name, group_id, method, end_point, headers_text, body_text) VALUES (?, ?, ?, ?, ?, ?, ?)`
 		stmtItem, err := tx.Prepare(sqlItem)
 		if err != nil {
 			tx.Rollback()
@@ -318,7 +311,7 @@ func BatchImportTestingData(batch *model.TDAPITestingImportBatch) error {
 		defer stmtItem.Close()
 
 		for _, item := range batch.Items {
-			_, err = stmtItem.Exec(item.ID, item.RequestName, item.GroupName, item.Method, item.Endpoint, item.HeadersText, item.BodyText)
+			_, err = stmtItem.Exec(item.ID, item.RequestName, item.GroupID, item.Method, item.Endpoint, item.HeadersText, item.BodyText)
 			if err != nil {
 				tx.Rollback()
 				return err
