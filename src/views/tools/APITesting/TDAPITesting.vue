@@ -1391,7 +1391,7 @@ export default {
       let me = this;
       if (item && item.apiUrl) {
         me.apiUrl = item.apiUrl;
-        me.httpMethod = item.httpMethod;
+        me.httpMethod = item.method;
         me.headersText = item.headersText;
         me.bodyText = item.bodyText;
         me.requestName = item.requestName;
