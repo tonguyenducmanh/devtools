@@ -7,15 +7,6 @@ import (
 )
 
 /**
- * Cấu trúc request thực thi SQL
- */
-type SQLRequest struct {
-	SQLText    string `json:"sql_text"`     // Câu lệnh SQL cần thực thi
-	IsTempDB   bool   `json:"is_temp_db"`   // Thực thi trên DB tạm hay DB ứng dụng
-	TempDBName string `json:"temp_db_name"` // Tên file DB tạm (nếu có)
-}
-
-/**
  * Thực thi câu lệnh SQL và trả về kết quả
  * @param w http.ResponseWriter
  * @param r *http.Request
