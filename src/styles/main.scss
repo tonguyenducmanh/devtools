@@ -18,9 +18,10 @@
   --font-size-small: 12px;
   --text-color-light: rgba(60, 60, 60, 0.7);
   --text-color-dark: rgba(235, 235, 235, 0.6);
-  --vt-font-family-base: "Inter var experimental", "Inter var", Inter,
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
-    Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  --vt-font-family-base:
+    "Inter var experimental", "Inter var", Inter, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   --box-shadow: 0 2px 2px rgba(92, 96, 93, 0.06);
 }
 
@@ -96,8 +97,18 @@ body[data-theme="dark"] {
 }
 
 body {
-  --main-font: ui-monospace, "Fira Code", Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+  --main-font:
+    ui-monospace, "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  --straight-font: "CormorantGaramond";
+}
+@font-face {
+  font-family: "Playfair";
+  src: url("../assets/font/CormorantGaramond-VariableFont_wght.ttf")
+    format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 a {
   color: inherit; /* blue colors for links too */
@@ -228,7 +239,8 @@ html[data-theme="dark"] {
   box-shadow: 0 0 60px 15px var(--btn-color);
   transform: translate(-80px);
   clip-path: inset(0);
-  animation: l4-1 0.5s ease-in-out infinite alternate,
+  animation:
+    l4-1 0.5s ease-in-out infinite alternate,
     l4-2 1s ease-in-out infinite;
 }
 @keyframes l4-1 {
