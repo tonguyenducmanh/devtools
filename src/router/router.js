@@ -225,6 +225,17 @@ const routerConfig = [
       titleKey: "i18nCommon.feature.HTMLPreview",
     },
   },
+  {
+    /**
+     * Quản lý dữ liệu SQLite
+     */
+    path: "/tooldata",
+    name: "tooldata",
+    component: () => import("@/views/tools/TDToolData.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.ToolData",
+    },
+  },
 ];
 
 const router = createRouter({
