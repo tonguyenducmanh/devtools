@@ -3,6 +3,8 @@ export default {
     typeInput: "Type value",
     edit: "Edit",
     ping: "Ping",
+    selectedRecord: "Selected",
+    record: "Records",
     history: {
       title: "History",
       show: "History",
