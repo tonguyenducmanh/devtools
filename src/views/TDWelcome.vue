@@ -2,85 +2,67 @@
   <div class="flex flex-col wrap-container">
     <div class="container">
       <div class="main-line-title">Dev Tools</div>
-      <p class="description">{{ $t("i18nCommon.createbyAuthor") }}</p>
+      <p class="description">{{ displayText }}<span class="cursor">|</span></p>
     </div>
     <p class="agreement">{{ $t("i18nCommon.agreement") }}</p>
-    <div class="language-buttons">
-      <div
-        v-for="lang in languageList"
-        :key="lang.key"
-        :class="['language-btn', { active: currentLanguage === lang.key }]"
-        @click="changeLanguage(lang.key)"
-      >
-        {{ lang && lang.name ? lang.name.toUpperCase() : null }}
-      </div>
-    </div>
   </div>
 </template>
-<script>
-import { loadLocale } from "@/i18n/i18nData.js";
 
+<script>
 export default {
   name: "TDWelcome",
   data() {
     return {
-      currentLanguage: null,
       languageList: Object.keys(this.$tdEnum.language).sort(),
+      // Thêm biến để quản lý text hiển thị
+      displayText: "",
+      fullText: "Whatever you code, code with all your heart",
+      typoText: "Wherever",
     };
   },
-  async created() {
-    // Get current language when component is created
-    this.currentLanguage = await this.getCurrentLanguage();
-    let locate = [];
-    for (let key in this.$tdEnum.language) {
-      let languageName = this.$t(`i18nGlobal.language.${key}`);
-      locate.push({ key, name: languageName });
-    }
-    this.languageList = locate.sort((a, b) => a.key - b.key);
-  },
+  created() {},
   methods: {
-    async getCurrentLanguage() {
-      let currentLanguage = await this.$tdCache.get(
-        this.$tdEnum.cacheConfig.Language,
-      );
-      if (currentLanguage) {
-        return currentLanguage;
+    // Logic tạo hiệu ứng gõ chữ
+    async runTypingEffect() {
+      const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      // 1. Gõ chữ sai "Wherever"
+      const typoText = "Wherever";
+      for (let i = 0; i <= typoText.length; i++) {
+        this.displayText = typoText.slice(0, i);
+        await sleep(150);
       }
-      return this.$tdEnum.language.vi;
-    },
-    async changeLanguage(lang) {
-      // Only change if different language is selected
-      if (this.currentLanguage !== lang) {
-        this.currentLanguage = lang;
-        await this.$tdCache.set(
-          this.$tdEnum.cacheConfig.Language,
-          this.currentLanguage,
-        );
-        await loadLocale(this.currentLanguage);
-        this.$tdUtility.reloadApp();
+
+      await sleep(800); // Tạm dừng để người dùng thấy lỗi
+
+      // 2. Xóa ngược lại 5 ký tự (xóa "erver", còn lại "Whe")
+      // Lưu ý: Để sửa "Wherever" thành "Whatever", ta xóa đến "Whe" rồi thêm "ate..."
+      // Hoặc đơn giản nhất là xóa về "Wh"
+      for (let i = 0; i < 6; i++) {
+        this.displayText = this.displayText.slice(0, -1);
+        await sleep(100);
       }
-    },
-    changeLangFromEvent(data, options) {
-      if (data) {
-        this.currentLanguage = data;
+
+      await sleep(300); // Khựng lại một chút trước khi gõ đúng
+
+      // 3. Gõ phần còn lại của "Whatever you code, code with all your heart"
+      // Bắt đầu gõ từ ký tự thứ 3 của fullText (chữ 'a' trong 'Whatever')
+      const fullText = "Whatever you code, code with all your heart";
+      for (let i = this.displayText.length; i < fullText.length; i++) {
+        this.displayText += fullText.charAt(i);
+        await sleep(80);
       }
     },
   },
   mounted() {
-    this.$tdEventBus.on(
-      this.$tdEnum.eventGlobal.changeLanguageFromSidebar,
-      this.changeLangFromEvent,
-    );
-  },
-  beforeUnmount() {
-    this.$tdEventBus.off(
-      this.$tdEnum.eventGlobal.changeLanguageFromSidebar,
-      this.changeLangFromEvent,
-    );
+    // Chạy hiệu ứng khi component vừa hiển thị
+    this.runTypingEffect();
   },
 };
 </script>
+
 <style lang="scss" scoped>
+/* Giữ nguyên các style cũ của bạn */
 .wrap-container {
   width: 100%;
   height: 100%;
@@ -166,6 +148,40 @@ body[data-theme="dark"] {
   .main-line-title::before {
     background-color: var(--bg-layer-color);
     mix-blend-mode: lighten;
+  }
+}
+
+.description {
+  font-family: var(--straight-font);
+  font-size: 40px;
+  min-height: 50px; /* Giữ chỗ để tránh layout bị nhảy khi gõ */
+}
+
+/* Thêm style cho con trỏ nhấp nháy */
+.cursor {
+  display: inline-block;
+  margin-left: 5px;
+  color: var(--btn-color);
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  from,
+  to {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Giữ nguyên phần dark theme của bạn */
+body[data-theme="dark"] {
+  .main-line-title {
+    color: #33a16f;
+  }
+  .agreement {
+    color: var(--text-color-dark);
   }
 }
 </style>
