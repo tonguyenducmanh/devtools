@@ -160,8 +160,12 @@ body[data-theme="dark"] .agreement {
   transform: translateY(-50%) rotate(-4deg) scaleX(1);
 }
 body[data-theme="dark"] {
+  .main-line-title {
+    color: #33a16f;
+  }
   .main-line-title::before {
     background-color: var(--bg-layer-color);
+    mix-blend-mode: lighten;
   }
 }
 .description {
