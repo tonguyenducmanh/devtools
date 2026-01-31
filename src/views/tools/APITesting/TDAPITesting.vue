@@ -877,7 +877,9 @@ export default {
 
         // Assign tests to collections
         tests.forEach((t) => {
-          let collection = collections.find((c) => c.collection_id === t.group_id);
+          let collection = collections.find(
+            (c) => c.collection_id === t.group_id,
+          );
           if (collection) {
             collection.requests.push({
               requestName: t.request_name,
@@ -892,18 +894,20 @@ export default {
 
         // Preserve opening state if re-loading
         if (me.allCollection && me.allCollection.length > 0) {
-            collections.forEach(newCol => {
-                let oldCol = me.allCollection.find(c => c.collection_id === newCol.collection_id);
-                if (oldCol) {
-                    newCol.openingCollection = oldCol.openingCollection;
-                }
-            });
+          collections.forEach((newCol) => {
+            let oldCol = me.allCollection.find(
+              (c) => c.collection_id === newCol.collection_id,
+            );
+            if (oldCol) {
+              newCol.openingCollection = oldCol.openingCollection;
+            }
+          });
         }
 
         me.allCollection = collections;
-
       } catch (error) {
         console.error("Lỗi tải dữ liệu testing:", error);
+        me.$tdUtility.showErrorNotFoundAgentServer();
       } finally {
         me.isLoadingData = false;
       }
@@ -918,29 +922,31 @@ export default {
       if (me.requestName && me.allCollection && me.allCollection.length > 0) {
         // Find existing Request to update
         if (me.currentRequestId) {
-           // Tim xem request nay thuoc collection nao
-           let currentCollection = me.allCollection.find(c => c.requests.find(r => r.requestId == me.currentRequestId));
-           if (currentCollection) {
-               // Update logic
-               let testData = {
-                id: me.currentRequestId,
-                request_name: me.requestName,
-                group_id: currentCollection.collection_id,
-                method: me.httpMethod,
-                end_point: me.apiUrl,
-                headers_text: me.headersText,
-                body_text: me.bodyText,
-              };
-               try {
-                    let response = await me.agentAPI.updateTestingAPI(testData);
-                    if (response && response.success && response.data?.success) {
-                        me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-                        await me.loadAllTestingData();
-                    }
-               } catch (e) {
-                   me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
-               }
-           }
+          // Tim xem request nay thuoc collection nao
+          let currentCollection = me.allCollection.find((c) =>
+            c.requests.find((r) => r.requestId == me.currentRequestId),
+          );
+          if (currentCollection) {
+            // Update logic
+            let testData = {
+              id: me.currentRequestId,
+              request_name: me.requestName,
+              group_id: currentCollection.collection_id,
+              method: me.httpMethod,
+              end_point: me.apiUrl,
+              headers_text: me.headersText,
+              body_text: me.bodyText,
+            };
+            try {
+              let response = await me.agentAPI.updateTestingAPI(testData);
+              if (response && response.success && response.data?.success) {
+                me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+                await me.loadAllTestingData();
+              }
+            } catch (e) {
+              me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+            }
+          }
         } else {
           // nếu không tồn tại request thì show popup tạo mới
           TDDialogUtil.showPopup({
@@ -955,7 +961,7 @@ export default {
     },
     async saveToCollection(collection) {
       let me = this;
-      
+
       let testData = {
         request_name: me.requestName || me.apiUrl, // Ensure name
         group_id: collection.collection_id,
@@ -968,9 +974,9 @@ export default {
       try {
         let response = await me.agentAPI.createTestingAPI(testData);
         if (response && response.success && response.data?.success) {
-            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-            me.currentRequestId = response.data.data.id;
-            await me.loadAllTestingData();
+          me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+          me.currentRequestId = response.data.data.id;
+          await me.loadAllTestingData();
         }
       } catch (e) {
         me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
@@ -979,15 +985,15 @@ export default {
     async deleteRequest(collectionId, request) {
       let me = this;
       if (request && request.requestId) {
-          try {
-            let response = await me.agentAPI.deleteTestingAPI(request.requestId);
-             if (response && response.success && response.data?.success) {
-                me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-                await me.loadAllTestingData(); // Reload to reflect changes
-            }
-          } catch(e) {
-              me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+        try {
+          let response = await me.agentAPI.deleteTestingAPI(request.requestId);
+          if (response && response.success && response.data?.success) {
+            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+            await me.loadAllTestingData(); // Reload to reflect changes
           }
+        } catch (e) {
+          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+        }
       }
     },
     enableRenameCollection(collection) {
@@ -1015,34 +1021,34 @@ export default {
       if (collection) {
         delete collection.is_renaming;
         if (collection.temp_name && collection.temp_name !== collection.name) {
-            // Call API update
-            try {
-                let response = await me.agentAPI.updateTestingGroup({
-                    id: collection.collection_id,
-                    name: collection.temp_name
-                });
-                if (response && response.success && response.data?.success) {
-                    me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-                    await me.loadAllTestingData();
-                }
-            } catch (e) {
-                 me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+          // Call API update
+          try {
+            let response = await me.agentAPI.updateTestingGroup({
+              id: collection.collection_id,
+              name: collection.temp_name,
+            });
+            if (response && response.success && response.data?.success) {
+              me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+              await me.loadAllTestingData();
             }
+          } catch (e) {
+            me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+          }
         }
       }
     },
     async deleteCollection(collectionId) {
       let me = this;
       if (collectionId) {
-          try {
-            let response = await me.agentAPI.deleteTestingGroup(collectionId);
-            if (response && response.success && response.data?.success) {
-                me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-                await me.loadAllTestingData();
-            }
-          } catch (e) {
-              me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+        try {
+          let response = await me.agentAPI.deleteTestingGroup(collectionId);
+          if (response && response.success && response.data?.success) {
+            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+            await me.loadAllTestingData();
           }
+        } catch (e) {
+          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+        }
       }
     },
 

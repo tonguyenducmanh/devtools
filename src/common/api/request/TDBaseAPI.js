@@ -134,14 +134,7 @@ class TDBaseAPI {
         };
       }
 
-      console.error("API Request Error:", error);
-
-      return {
-        success: false,
-        status: error.status || 500,
-        statusText: error.statusText || "Internal Error",
-        error: error.data || error.message || "Unknown error occurred",
-      };
+      throw error;
     }
   }
 

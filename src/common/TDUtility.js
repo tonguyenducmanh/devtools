@@ -78,8 +78,6 @@ class TDUtility {
     }
   }
 
-
-
   /**
    * định dạng ngày tháng
    */
@@ -215,6 +213,16 @@ class TDUtility {
       toast.error(i18nData.global.t("i18nCommon.toastMessage.error"));
     }
   }
+
+  /**
+   * Show thông báo không tìm thấy server agent
+   */
+  showErrorNotFoundAgentServer() {
+    toast.error(
+      i18nData.global.t("i18nCommon.toastMessage.notFoundAgentServer"),
+    );
+  }
+
   /**
    * copy ảnh từ blob
    */
