@@ -168,8 +168,4 @@ body[data-theme="dark"] {
     mix-blend-mode: lighten;
   }
 }
-.description {
-  font-family: var(--straight-font);
-  font-size: 40px;
-}
 </style>
