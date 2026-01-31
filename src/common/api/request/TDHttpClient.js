@@ -50,13 +50,14 @@ class TDHttpClient {
    * @returns {Promise}
    */
   static async post(url, data = {}, headers = {}, signal = null) {
+    const isFormData = data instanceof FormData;
     const options = {
       method: "POST",
       headers: {
-        ...this.defaultHeaders,
+        ...(isFormData ? {} : this.defaultHeaders),
         ...headers,
       },
-      body: JSON.stringify(data),
+      body: isFormData ? data : JSON.stringify(data),
     };
 
     // Thêm signal nếu có
@@ -76,13 +77,14 @@ class TDHttpClient {
    * @returns {Promise}
    */
   static async put(url, data = {}, headers = {}, signal = null) {
+    const isFormData = data instanceof FormData;
     const options = {
       method: "PUT",
       headers: {
-        ...this.defaultHeaders,
+        ...(isFormData ? {} : this.defaultHeaders),
         ...headers,
       },
-      body: JSON.stringify(data),
+      body: isFormData ? data : JSON.stringify(data),
     };
 
     // Thêm signal nếu có
@@ -102,13 +104,14 @@ class TDHttpClient {
    * @returns {Promise}
    */
   static async patch(url, data = {}, headers = {}, signal = null) {
+    const isFormData = data instanceof FormData;
     const options = {
       method: "PATCH",
       headers: {
-        ...this.defaultHeaders,
+        ...(isFormData ? {} : this.defaultHeaders),
         ...headers,
       },
-      body: JSON.stringify(data),
+      body: isFormData ? data : JSON.stringify(data),
     };
 
     // Thêm signal nếu có
