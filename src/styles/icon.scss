@@ -2,6 +2,7 @@
   width: 20px;
   height: 20px;
   background: url("@/assets/Sprite.svg") no-repeat;
+  cursor: pointer;
 }
 body[data-theme="dark"] {
   .td-icon {
@@ -39,4 +40,7 @@ body[data-theme="dark"] {
 }
 .td-setting-icon {
   background-position: -280px 0px;
+}
+.td-reload-icon {
+  background-position: -305px 0px;
 }
