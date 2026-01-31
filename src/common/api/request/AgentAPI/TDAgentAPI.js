@@ -168,10 +168,8 @@ class TDAgentAPI extends TDBaseAPI {
   /**
    * Lấy thông tin các bảng trong DB
    */
-  async getTablesInfo(isTemp, tempName) {
-    return await this.get(
-      `/tool_data/get_tables?is_temp=${isTemp}&temp_name=${tempName || ""}`,
-    );
+  async getTablesInfo(tempDBID) {
+    return await this.get(`/tool_data/get_tables?temp_db_id=${tempDBID || ""}`);
   }
 }
 
