@@ -150,7 +150,7 @@ body[data-theme="dark"] {
 .description {
   font-family: var(--straight-font);
   font-size: 40px;
-  min-height: 50px; /* Giữ chỗ để tránh layout bị nhảy khi gõ */
+  min-height: 50px;
 }
 
 /* Thêm style cho con trỏ nhấp nháy */
@@ -171,7 +171,6 @@ body[data-theme="dark"] {
   }
 }
 
-/* Giữ nguyên phần dark theme của bạn */
 body[data-theme="dark"] {
   .main-line-title {
     color: #33a16f;
