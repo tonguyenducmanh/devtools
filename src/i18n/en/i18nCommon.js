@@ -61,7 +61,6 @@ export default {
       textManipulation: "Text manipulation",
       APITesting: "API testing",
       APIMocking: "API mocking",
-      ToolData: "App Data Manager",
     },
     example: "example",
     base64ToImage: {
@@ -393,8 +392,6 @@ export default {
         collection: "Collection",
         history: "History",
       },
-    },
-    ToolData: {
     },
   },
 };

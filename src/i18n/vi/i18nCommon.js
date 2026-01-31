@@ -61,7 +61,6 @@ export default {
       textManipulation: "Xử lý văn bản",
       APITesting: "API testing",
       APIMocking: "API mocking",
-      ToolData: "Dữ liệu ứng dụng",
     },
     example: "ví dụ",
     base64ToImage: {
@@ -392,6 +391,5 @@ export default {
         history: "Lịch sử",
       },
     },
-    ToolData: {},
   },
 };
