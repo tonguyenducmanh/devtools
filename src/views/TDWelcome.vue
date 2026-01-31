@@ -137,7 +137,7 @@ body[data-theme="dark"] .agreement {
 .main-line-title {
   font-size: 150px;
   font-family: var(--straight-font);
-  font-weight: 700;
+  font-weight: 600;
   position: relative;
   opacity: 1;
   visibility: visible;
