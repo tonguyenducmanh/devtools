@@ -1,14 +1,10 @@
 <template>
   <div class="flex flex-col wrap-container">
     <div class="container">
-      <h1 class="tagline">
-        {{ $t("i18nCommon.welcomeTextOne") }}
-        <span class="accent">{{ $t("i18nCommon.welcomeTextTwo") }}</span
-        ><br />{{ $t("i18nCommon.welcomeTextThree") }}
-      </h1>
+      <div class="main-line-title">Dev Tools</div>
       <p class="description">{{ $t("i18nCommon.createbyAuthor") }}</p>
-      <p class="agreement">{{ $t("i18nCommon.agreement") }}</p>
     </div>
+    <p class="agreement">{{ $t("i18nCommon.agreement") }}</p>
     <div class="language-buttons">
       <div
         v-for="lang in languageList"
@@ -89,38 +85,11 @@ export default {
   width: 100%;
   height: 100%;
 }
-.tagline {
-  font-size: 76px;
-  line-height: 1.25;
-  font-weight: 900;
-  letter-spacing: -1.5px;
-  max-width: 960px;
-  margin: 0 auto;
-  text-align: center;
-  font-family: var(--vt-font-family-base);
-}
-body[data-theme="light"] .accent,
-body[data-theme="dark"] .tagline {
-  background: -webkit-linear-gradient(315deg, #42d392 25%, #647eff);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.description {
-  max-width: 960px;
-  line-height: 1.5;
-  color: var(--text-color-light);
-  transition: color 0.5s;
-  font-size: 22px;
-  margin: 24px auto 40px;
-}
-body[data-theme="dark"] .description {
-  color: var(--text-color-dark);
-}
 .agreement {
   color: var(--text-color-light);
   text-align: center;
-  max-width: 800px;
+  width: 95%;
+  margin: var(--padding);
 }
 body[data-theme="dark"] .agreement {
   color: var(--text-color-dark);
@@ -164,5 +133,34 @@ body[data-theme="dark"] .agreement {
   width: 100%;
   height: 100%;
   flex: 1;
+}
+.main-line-title {
+  font-size: 150px;
+  font-family: var(--straight-font);
+  font-weight: 700;
+  position: relative;
+  opacity: 1;
+  visibility: visible;
+  z-index: 1;
+}
+.main-line-title::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 30%;
+  margin-top: 7%;
+  background-color: var(--btn-color);
+  transform-origin: top left;
+  mix-blend-mode: color;
+  box-sizing: border-box;
+  transition: transform 0.6s cubic-bezier(0.075, 0.82, 0.165, 1) 0.5s;
+  transform: translateY(-50%) rotate(-4deg) scaleX(1);
+}
+.description {
+  font-family: var(--straight-font);
+  font-size: 40px;
 }
 </style>
