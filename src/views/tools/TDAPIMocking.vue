@@ -123,6 +123,11 @@
               @click="addNewGroup"
               v-tooltip="$t('i18nCommon.apiTesting.add')"
             ></div>
+            <div
+              @click="loadAllMockAPIs"
+              class="td-icon td-reload-icon"
+              v-tooltip="$t('i18nCommon.APIMocking.refresh')"
+            ></div>
           </div>
           <!-- danh sách các mock API được nhóm theo group_name -->
           <div class="td-collection">
@@ -203,20 +208,6 @@
               :type="$tdEnum.buttonType.secondary"
               :noMargin="true"
               :label="$t('i18nCommon.APIMocking.createNew')"
-              :borderRadiusPosition="[
-                $tdEnum.BorderRadiusPosition.TopLeft,
-                $tdEnum.BorderRadiusPosition.BottomLeft,
-              ]"
-            ></TDButton>
-            <TDButton
-              @click="loadAllMockAPIs"
-              :type="$tdEnum.buttonType.secondary"
-              :noMargin="true"
-              :label="$t('i18nCommon.APIMocking.refresh')"
-              :borderRadiusPosition="[
-                $tdEnum.BorderRadiusPosition.TopRight,
-                $tdEnum.BorderRadiusPosition.BottomRight,
-              ]"
             ></TDButton>
           </div>
         </div>

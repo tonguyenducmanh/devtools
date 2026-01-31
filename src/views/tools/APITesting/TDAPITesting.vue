@@ -404,6 +404,11 @@
                 @click="addNewCollection"
                 v-tooltip="$t('i18nCommon.apiTesting.add')"
               ></div>
+              <div
+                @click="loadAllTestingData"
+                class="td-icon td-reload-icon"
+                v-tooltip="$t('i18nCommon.APIMocking.refresh')"
+              ></div>
             </div>
             <!-- phần danh sách các request đã lưu theo thư mục -->
             <div class="td-collection">
