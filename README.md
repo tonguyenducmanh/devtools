@@ -4,6 +4,8 @@ This project provides a collection of useful tools for developers, aggregated wi
 
 This is a Client-Daemon Application.
 
+![alt text](imgs/screenshot.png)
+
 [https://tool.tomanh.com/](https://tool.tomanh.com/)
 
 ---
@@ -61,6 +63,7 @@ The backend services are configured or default via `config/config.json`.
 ### Data Storage (SQLite)
 
 This tool uses **SQLite** (Go side) to persist data into a local file.
+
 - **Database File**: `tool_tomanh.db` (as defined in `config.json`)
 - All configurations, user-defined mock APIs, and tool-specific data are stored in this file.
 - SQLite is used to ensure portability and ease of backup—everything is contained within your local directory.
@@ -98,5 +101,6 @@ You can override the configuration file settings using command line flags.
 ## UI Configuration
 
 Frontend-specific configuration can be found at:
+
 - `public/cfg/config.js`
 - Backend configuration: `config/config.json`
