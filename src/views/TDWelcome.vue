@@ -16,8 +16,6 @@ export default {
       languageList: Object.keys(this.$tdEnum.language).sort(),
       // Thêm biến để quản lý text hiển thị
       displayText: "",
-      fullText: "Whatever you code, code with all your heart",
-      typoText: "Wherever",
     };
   },
   created() {},
