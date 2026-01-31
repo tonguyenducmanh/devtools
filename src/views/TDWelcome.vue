@@ -159,6 +159,11 @@ body[data-theme="dark"] .agreement {
   transition: transform 0.6s cubic-bezier(0.075, 0.82, 0.165, 1) 0.5s;
   transform: translateY(-50%) rotate(-4deg) scaleX(1);
 }
+body[data-theme="dark"] {
+  .main-line-title::before {
+    background-color: var(--bg-layer-color);
+  }
+}
 .description {
   font-family: var(--straight-font);
   font-size: 40px;
