@@ -3,6 +3,8 @@ export default {
     typeInput: "Nhập giá trị",
     edit: "Sửa",
     ping: "Ping",
+    selectedRecord: "Đã chọn",
+    record: "Bản ghi",
     history: {
       title: "Lịch sử",
       show: "Lịch sử",
