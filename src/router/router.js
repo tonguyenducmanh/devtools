@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import i18nData from "@/i18n/i18nData.js";
-import TDUtility from "@/common/TDUtility.js";
 // cấu hình router dùng chung cho nhiều file
 const routerConfig = [
   {
