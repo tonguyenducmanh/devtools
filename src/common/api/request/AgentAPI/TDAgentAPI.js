@@ -142,35 +142,6 @@ class TDAgentAPI extends TDBaseAPI {
   async deleteMockGroup(id) {
     return await this.delete(`/mock_api/delete_group?id=${id}`);
   }
-
-  /**
-   * Thực thi câu lệnh SQL
-   */
-  async executeSQL(sqlRequest) {
-    return await this.post("/tool_data/execute_sql", sqlRequest);
-  }
-
-  /**
-   * Upload file SQLite tạm thời
-   */
-  async uploadDB(formData) {
-    return await this.post("/tool_data/upload_db", formData);
-  }
-
-  /**
-   * Download database ứng dụng
-   */
-  async downloadDB() {
-    // Với download file, ta cần handle blob hoặc return URL
-    return this.getURLRequest("/tool_data/download_db");
-  }
-
-  /**
-   * Lấy thông tin các bảng trong DB
-   */
-  async getTablesInfo(tempDBID) {
-    return await this.get(`/tool_data/get_tables?temp_db_id=${tempDBID || ""}`);
-  }
 }
 
 export default TDAgentAPI;
