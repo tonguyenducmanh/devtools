@@ -33,9 +33,7 @@ export default {
 
       await sleep(800); // Tạm dừng để người dùng thấy lỗi
 
-      // 2. Xóa ngược lại 5 ký tự (xóa "erver", còn lại "Whe")
-      // Lưu ý: Để sửa "Wherever" thành "Whatever", ta xóa đến "Whe" rồi thêm "ate..."
-      // Hoặc đơn giản nhất là xóa về "Wh"
+      // 2. Xóa ngược lại 6 ký tự (xóa "erver", còn lại "Wh")
       for (let i = 0; i < 6; i++) {
         this.displayText = this.displayText.slice(0, -1);
         await sleep(100);
