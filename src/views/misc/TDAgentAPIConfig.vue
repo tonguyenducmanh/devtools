@@ -72,7 +72,7 @@ export default {
           me.$tdToast.success(res);
         }
       } catch (ex) {
-        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+        me.$tdUtility.showErrorNotFoundAgentServer();
       }
     },
   },
