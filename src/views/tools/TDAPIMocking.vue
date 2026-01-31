@@ -423,6 +423,7 @@ export default {
         await Promise.all([me.loadAllGroups(), me.loadMockData()]);
       } catch (error) {
         console.error("Lỗi tải mock APIs:", error);
+        me.$tdUtility.showErrorNotFoundAgentServer();
       } finally {
         me.isLoading = false;
       }

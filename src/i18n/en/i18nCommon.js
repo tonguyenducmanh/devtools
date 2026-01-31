@@ -265,6 +265,7 @@ export default {
       fail: "Fail",
       error: "Have error",
       applyMockSuccess: "Apply mock success",
+      notFoundAgentServer: "Not found server agent",
     },
     cosinSimilarity: {
       firstVector: "First Vector",
@@ -384,11 +385,11 @@ export default {
       deleteGroupSuccess: "Delete group success",
       deleteGroupErr: "Error deleting group",
       wrapText: "Wrap text",
-      sidebarOption:{
+      sidebarOption: {
         setting: "Setting",
         collection: "Collection",
         history: "History",
-      }
+      },
     },
   },
 };

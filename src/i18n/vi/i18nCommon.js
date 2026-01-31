@@ -264,6 +264,7 @@ export default {
       fail: "Thất bại",
       error: "Đã có lỗi xảy ra",
       applyMockSuccess: "Đã áp dụng ví dụ",
+      notFoundAgentServer: "Không tìm thấy server agent",
     },
     cosinSimilarity: {
       firstVector: "Vector thứ nhất",
@@ -382,11 +383,11 @@ export default {
       deleteGroupSuccess: "Xóa nhóm thành công",
       deleteGroupErr: "Lỗi xóa nhóm",
       wrapText: "Xuống dòng",
-      sidebarOption:{
+      sidebarOption: {
         setting: "Cài đặt",
         collection: "Bộ sưu tập",
         history: "Lịch sử",
-      }
+      },
     },
   },
 };
