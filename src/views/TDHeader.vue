@@ -17,9 +17,9 @@
         </div>
       </div>
     </div>
-    <TDAgentAPIConfig />
     <div>
       <div class="td-header-btn">
+        <TDAgentAPIConfig />
         <!-- Updated Dark Mode Toggle -->
         <button
           v-tooltip="$t('i18nCommon.tdheader.toggleTheme')"
