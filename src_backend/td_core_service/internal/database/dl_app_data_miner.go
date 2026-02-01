@@ -51,7 +51,7 @@ func GetAllDataByTableName(tableName string) ([]map[string]any, error) {
 	defer db.Close()
 
 	// Sử dụng Sprintf vì tên bảng không thể dùng placeholder (?)
-	query := fmt.Sprintf("SELECT * FROM %s WHERE 1 = 1;", tableName)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE 1 = 1 ORDER BY created_date DESC;", tableName)
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
