@@ -31,6 +31,7 @@
         :showFooter="true"
         :noMargin="true"
         :emptyCellText="'null'"
+        :hoverable="false"
       >
       </TDTableViewer>
     </div>

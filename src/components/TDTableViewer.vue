@@ -735,7 +735,10 @@ export default {
         color: var(--text-secondary-color);
       }
     }
-
+    .td-table-cell:hover {
+      background-color: var(--bg-layer-color);
+      cursor: pointer;
+    }
     .td-table-body {
       .td-table-row {
         border-bottom: 1px solid var(--border-color);
