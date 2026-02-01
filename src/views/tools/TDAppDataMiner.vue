@@ -41,6 +41,7 @@ export default {
       agentAPI: null,
       tableName: null,
       allTables: [],
+      currentTableDatas: [],
     };
   },
   async mounted() {
@@ -74,7 +75,27 @@ export default {
         me.$tdUtility.showErrorNotFoundAgentServer();
       }
     },
-    async showDataByTable() {},
+    async showDataByTable() {
+      let me = this;
+      if (me.tableName) {
+        me.currentTableDatas = [];
+        try {
+          let res = me.agentAPI.getAllDataByTableName(me.tableName);
+          if (
+            res &&
+            res.success &&
+            res.data &&
+            Array.isArray(res.data.data) &&
+            res.data.data.length > 0
+          ) {
+            me.currentTableDatas = res.data.data;
+          }
+        } catch (error) {
+          console.error("Lỗi tải table APIs:", error);
+          me.$tdUtility.showErrorNotFoundAgentServer();
+        }
+      }
+    },
   },
 };
 </script>
