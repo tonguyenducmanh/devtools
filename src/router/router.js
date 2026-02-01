@@ -24,6 +24,7 @@ const routerConfig = [
     component: () => import("@/views/tools/TDOneTimePassword.vue"),
     meta: {
       titleKey: "i18nCommon.feature.oneTimePassword",
+      helpKey: "i18nHelp.feature.oneTimePassword",
     },
   },
   {
@@ -35,6 +36,7 @@ const routerConfig = [
     component: () => import("@/views/tools/APITesting/TDAPITesting.vue"),
     meta: {
       titleKey: "i18nCommon.feature.APITesting",
+      helpKey: "i18nHelp.feature.APITesting",
     },
   },
   {
@@ -46,6 +48,7 @@ const routerConfig = [
     component: () => import("@/views/tools/TDAPIMocking.vue"),
     meta: {
       titleKey: "i18nCommon.feature.APIMocking",
+      helpKey: "i18nHelp.feature.APIMocking",
     },
   },
   {
@@ -156,6 +159,7 @@ const routerConfig = [
     component: () => import("@/views/tools/TDCosinSimilarity.vue"),
     meta: {
       titleKey: "i18nCommon.feature.cosinSimilarity",
+      helpKey: "i18nHelp.feature.cosinSimilarity",
     },
   },
   {
