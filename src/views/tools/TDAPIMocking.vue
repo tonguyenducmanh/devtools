@@ -249,7 +249,7 @@ import TDResizer from "@/components/TDResizer.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDArrow from "@/components/TDArrow.vue";
 import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
-import TDAgentAPI from "@/common/api/request/AgentAPI/TDAgentAPI.js";
+import TDServerMockAPI from "@/common/api/request/AgentAPI/TDServerMockAPI.js";
 
 export default {
   name: "TDAPIMocking",
@@ -297,7 +297,7 @@ export default {
     };
   },
   async mounted() {
-    this.agentAPI = new TDAgentAPI();
+    this.agentAPI = new TDServerMockAPI();
     await this.loadAllMockAPIs();
   },
   computed: {
