@@ -9,6 +9,7 @@
           :options="allTables"
           :noMargin="true"
           :usingStylePercent="true"
+          :isCapitalizeText="false"
         ></TDComboBox>
         <TDButton
           @click="reloadTable"
@@ -51,8 +52,23 @@ export default {
   methods: {
     async reloadTable() {
       let me = this;
+      me.allTables = [];
       try {
-        let data = await me.agentAPI.getAllTable();
+        let res = await me.agentAPI.getAllTable();
+        if (
+          res &&
+          res.success &&
+          res.data &&
+          Array.isArray(res.data.data) &&
+          res.data.data.length > 0
+        ) {
+          res.data.data.forEach((currentTable) => {
+            me.allTables.push({
+              value: currentTable,
+              label: currentTable,
+            });
+          });
+        }
       } catch (error) {
         console.error("Lỗi tải table APIs:", error);
         me.$tdUtility.showErrorNotFoundAgentServer();
