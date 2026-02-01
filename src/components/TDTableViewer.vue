@@ -632,26 +632,7 @@ export default {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     background-color: var(--bg-main-color);
-
-    &::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: var(--bg-layer-color);
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: var(--border-color);
-      border-radius: 4px;
-
-      &:hover {
-        background: var(--text-secondary-color);
-      }
-    }
   }
-
   .td-table-wrapper {
     min-width: 100%;
     width: fit-content;
