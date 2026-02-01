@@ -525,18 +525,7 @@ export default {
     getTooltipContent(row, column) {
       const value = this.formatCellValue(row, column);
       const valueStr = String(value);
-
-      // Only show tooltip if content is long enough to potentially truncate
-      const estimatedLines = Math.ceil(
-        (valueStr.length * this.charWidthPx) /
-          this.calculateMaxContentWidth(column),
-      );
-
-      if (estimatedLines > column.maxLines) {
-        return valueStr;
-      }
-
-      return null;
+      return valueStr;
     },
 
     getColumnClass(column) {
