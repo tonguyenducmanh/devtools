@@ -118,10 +118,7 @@
                 v-for="(column, colIndex) in computedColumns"
                 :key="`cell-${rowIndex}-${colIndex}`"
                 class="td-table-cell"
-                :class="[
-                  getColumnClass(column),
-                  { 'td-table-cell-truncated': shouldTruncate(column) },
-                ]"
+                :class="[getColumnClass(column)]"
                 :style="getColumnStyle(column)"
               >
                 <slot
@@ -132,15 +129,6 @@
                   :rowIndex="rowIndex"
                 >
                   <div
-                    v-if="shouldTruncate(column)"
-                    class="td-table-cell-content"
-                    @click="handleDataSelected(row, column)"
-                    v-tooltip="getTooltipContent(row, column)"
-                  >
-                    {{ formatCellValue(row, column) }}
-                  </div>
-                  <div
-                    v-else
                     class="td-table-cell-content"
                     @click="handleDataSelected(row, column)"
                   >
@@ -229,7 +217,6 @@ export default {
       //   align: 'left',
       //   sortable: true,
       //   formatter: (val) => val,
-      //   maxLines: 3, // Max lines before truncate (default: 2)
       //   autoWidth: true, // Auto calculate width based on content (default: false)
       // }]
     },
@@ -280,12 +267,6 @@ export default {
     noMargin: {
       type: Boolean,
       default: false,
-    },
-
-    // Column width calculation
-    defaultMaxLines: {
-      type: Number,
-      default: 2, // Default max lines before showing tooltip
     },
     autoCalculateWidth: {
       type: Boolean,
@@ -361,7 +342,6 @@ export default {
             col.autoWidth !== undefined
               ? col.autoWidth
               : this.autoCalculateWidth,
-          maxLines: col.maxLines || this.defaultMaxLines,
         }));
       }
 
@@ -376,7 +356,6 @@ export default {
         label: this.formatLabel(key),
         align: "left",
         autoWidth: this.autoCalculateWidth,
-        maxLines: this.defaultMaxLines,
       }));
     },
 
@@ -513,13 +492,6 @@ export default {
     },
 
     /**
-     * Check if content should be truncated based on maxLines
-     */
-    shouldTruncate(column) {
-      return column.maxLines && column.maxLines > 0;
-    },
-
-    /**
      * Get tooltip content for truncated cells
      */
     getTooltipContent(row, column) {
@@ -560,11 +532,6 @@ export default {
       }
       if (column.maxWidth) {
         styles.maxWidth = column.maxWidth;
-      }
-
-      // Handle text wrapping and truncation
-      if (column.maxLines && column.maxLines > 0) {
-        styles.maxHeight = `${column.maxLines * 1.5}em`; // 1.5em per line (line-height)
       }
 
       return styles;
@@ -758,8 +725,8 @@ export default {
           -webkit-box-orient: vertical;
           overflow: hidden;
           text-overflow: ellipsis;
-          -webkit-line-clamp: var(--max-lines, 2);
-          line-clamp: var(--max-lines, 2);
+          -webkit-line-clamp: 1;
+          line-clamp: 1;
         }
       }
 
