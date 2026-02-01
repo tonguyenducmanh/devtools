@@ -30,6 +30,7 @@
         :showIndex="true"
         :showFooter="true"
         :noMargin="true"
+        :emptyCellText="'null'"
       >
       </TDTableViewer>
     </div>

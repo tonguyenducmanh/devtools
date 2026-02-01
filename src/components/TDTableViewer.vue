@@ -299,7 +299,10 @@ export default {
       default: "asc",
       validator: (val) => ["asc", "desc"].includes(val),
     },
-
+    emptyCellText: {
+      type: String,
+      default: "",
+    },
     // Actions
     actions: {
       type: Array,
@@ -444,7 +447,7 @@ export default {
       if (column.formatter && typeof column.formatter === "function") {
         return column.formatter(value, row);
       }
-      return value ?? "-";
+      return !value || value == "" ? this.emptyCellText : value;
     },
 
     /**
