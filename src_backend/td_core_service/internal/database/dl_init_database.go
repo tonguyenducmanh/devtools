@@ -95,6 +95,24 @@ func InitDatabase() {
 		return
 	}
 
+	sqlStmtTestingLog := `
+	CREATE TABLE IF NOT EXISTS td_api_testing_log (
+		id TEXT PRIMARY KEY NOT NULL,
+		api_url TEXT NOT NULL,
+		method TEXT,
+		headers_text TEXT,
+		body_text TEXT,
+		response_text TEXT,
+		status_code INTERGER,
+		created_date DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+	`
+	_, err = db.Exec(sqlStmtTestingLog)
+	if err != nil {
+		log.Printf("%q: %s\n", err, sqlStmtTestingLog)
+		return
+	}
+
 	// 5. Tạo bảng nhóm api testing
 	sqlStmtTestingGroup := `
 	CREATE TABLE IF NOT EXISTS td_api_testing_group (

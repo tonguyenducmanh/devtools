@@ -71,11 +71,22 @@ func executeRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingRespons
 	// Ép kiểu headers về JSON string như code cũ
 	headerJson, _ := json.Marshal(resp.Header)
 
+	// log dữ liệu vào db
+	logDataCallAPIToDatabase(reqData, string(respBody), resp.StatusCode)
+
 	return &model.TDAPITestingResponse{
 		Status:  resp.StatusCode,
 		Headers: string(headerJson),
 		Body:    string(respBody),
 	}, nil
+}
+
+/**
+ * log dữ liệu vào db
+ */
+func logDataCallAPIToDatabase(reqData model.TDAPITestingParam, responseText string, statusCode int) {
+	id := GenUUID()
+	database.LogDataCallAPIToDatabase(reqData, responseText, statusCode, id)
 }
 
 /**
