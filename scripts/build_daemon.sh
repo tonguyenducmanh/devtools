@@ -6,7 +6,7 @@ ROOT_DIR=$(pwd)
 
 # 1. Cấu hình đường dẫn
 DAEMON_DIR="$ROOT_DIR/src_backend/td_app/cmd/daemon_app"
-WEB_APP_DIR="$ROOT_DIR/src_backend/td_core_service/internal/service/dist/"
+WEB_APP_DIR="$ROOT_DIR/src_backend/td_core_service/internal/web/dist/"
 FRONTEND_DIST="$ROOT_DIR/dist"
 OUTPUT_DIR="$ROOT_DIR/out"
 OUTPUT_NAME="dev-tool-daemon"
