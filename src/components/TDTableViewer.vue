@@ -118,7 +118,10 @@
                 v-for="(column, colIndex) in computedColumns"
                 :key="`cell-${rowIndex}-${colIndex}`"
                 class="td-table-cell"
-                :class="getColumnClass(column)"
+                :class="[
+                  getColumnClass(column),
+                  { 'td-table-cell-truncated': shouldTruncate(column) },
+                ]"
                 :style="getColumnStyle(column)"
               >
                 <slot
@@ -128,7 +131,16 @@
                   :value="getCellValue(row, column.key)"
                   :rowIndex="rowIndex"
                 >
-                  {{ formatCellValue(row, column) }}
+                  <div
+                    v-if="shouldTruncate(column)"
+                    class="td-table-cell-content"
+                    v-tooltip="getTooltipContent(row, column)"
+                  >
+                    {{ formatCellValue(row, column) }}
+                  </div>
+                  <div v-else class="td-table-cell-content">
+                    {{ formatCellValue(row, column) }}
+                  </div>
                 </slot>
               </td>
 
@@ -203,8 +215,18 @@ export default {
     columns: {
       type: Array,
       default: null,
-      // Example: [{ key: 'name', label: 'Name', width: '200px', align: 'left', sortable: true, formatter: (val) => val }]
-      // If not provided, columns will be auto-generated from data
+      // Example: [{
+      //   key: 'name',
+      //   label: 'Name',
+      //   width: '200px', // Fixed width
+      //   minWidth: '100px',
+      //   maxWidth: '400px',
+      //   align: 'left',
+      //   sortable: true,
+      //   formatter: (val) => val,
+      //   maxLines: 3, // Max lines before truncate (default: 2)
+      //   autoWidth: true, // Auto calculate width based on content (default: false)
+      // }]
     },
 
     // Selection
@@ -255,6 +277,28 @@ export default {
       default: false,
     },
 
+    // Column width calculation
+    defaultMaxLines: {
+      type: Number,
+      default: 2, // Default max lines before showing tooltip
+    },
+    autoCalculateWidth: {
+      type: Boolean,
+      default: true, // Enable auto width calculation by default
+    },
+    charWidthPx: {
+      type: Number,
+      default: 8, // Average character width in pixels (can adjust based on font)
+    },
+    minColumnWidth: {
+      type: Number,
+      default: 100, // Minimum column width in pixels
+    },
+    maxColumnWidth: {
+      type: Number,
+      default: 400, // Maximum column width in pixels
+    },
+
     // Sorting
     sortable: {
       type: Boolean,
@@ -274,7 +318,6 @@ export default {
     actions: {
       type: Array,
       default: () => [],
-      // Example: [{ label: 'Edit', action: 'edit', class: 'primary' }]
     },
     actionsLabel: {
       type: String,
@@ -299,6 +342,7 @@ export default {
       selectedRows: [],
       sortColumn: this.defaultSortColumn,
       sortDirection: this.defaultSortDirection,
+      columnWidthCache: {}, // Cache calculated widths
     };
   },
 
@@ -306,7 +350,14 @@ export default {
     // Auto-generate columns from data if not provided
     computedColumns() {
       if (this.columns && this.columns.length > 0) {
-        return this.columns;
+        return this.columns.map((col) => ({
+          ...col,
+          autoWidth:
+            col.autoWidth !== undefined
+              ? col.autoWidth
+              : this.autoCalculateWidth,
+          maxLines: col.maxLines || this.defaultMaxLines,
+        }));
       }
 
       // Generate columns from first data row
@@ -318,8 +369,9 @@ export default {
       return Object.keys(firstRow).map((key) => ({
         key,
         label: this.formatLabel(key),
-        width: "auto",
         align: "left",
+        autoWidth: this.autoCalculateWidth,
+        maxLines: this.defaultMaxLines,
       }));
     },
 
@@ -381,15 +433,21 @@ export default {
       },
       immediate: true,
     },
+    tableData: {
+      handler() {
+        // Recalculate widths when data changes
+        this.columnWidthCache = {};
+      },
+      deep: true,
+    },
   },
 
   methods: {
     formatLabel(key) {
-      // Convert camelCase or snake_case to Title Case
       return key
-        .replace(/([A-Z])/g, " $1") // camelCase to spaces
-        .replace(/_/g, " ") // snake_case to spaces
-        .replace(/\b\w/g, (c) => c.toUpperCase()) // capitalize first letter of each word
+        .replace(/([A-Z])/g, " $1")
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase())
         .trim();
     },
 
@@ -403,6 +461,77 @@ export default {
         return column.formatter(value, row);
       }
       return value ?? "-";
+    },
+
+    /**
+     * Calculate the maximum content width for a column
+     */
+    calculateMaxContentWidth(column) {
+      // Check cache first
+      if (this.columnWidthCache[column.key]) {
+        return this.columnWidthCache[column.key];
+      }
+
+      let maxLength = 0;
+
+      // Check header length
+      const headerText = column.label || column.key;
+      maxLength = Math.max(maxLength, headerText.length);
+
+      // Check all data rows
+      this.tableData.forEach((row) => {
+        const value = this.formatCellValue(row, column);
+        const valueStr = String(value);
+        maxLength = Math.max(maxLength, valueStr.length);
+      });
+
+      // Calculate width in pixels (character count * average char width + padding)
+      const calculatedWidth = maxLength * this.charWidthPx + 48; // 48px for padding
+
+      // Apply min/max constraints
+      const columnMinWidth = column.minWidth
+        ? parseInt(column.minWidth)
+        : this.minColumnWidth;
+      const columnMaxWidth = column.maxWidth
+        ? parseInt(column.maxWidth)
+        : this.maxColumnWidth;
+
+      const finalWidth = Math.max(
+        columnMinWidth,
+        Math.min(calculatedWidth, columnMaxWidth),
+      );
+
+      // Cache the result
+      this.columnWidthCache[column.key] = finalWidth;
+
+      return finalWidth;
+    },
+
+    /**
+     * Check if content should be truncated based on maxLines
+     */
+    shouldTruncate(column) {
+      return column.maxLines && column.maxLines > 0;
+    },
+
+    /**
+     * Get tooltip content for truncated cells
+     */
+    getTooltipContent(row, column) {
+      const value = this.formatCellValue(row, column);
+      const valueStr = String(value);
+
+      // Only show tooltip if content is long enough to potentially truncate
+      const estimatedLines = Math.ceil(
+        (valueStr.length * this.charWidthPx) /
+          this.calculateMaxContentWidth(column),
+      );
+
+      if (estimatedLines > column.maxLines) {
+        return valueStr;
+      }
+
+      return null;
     },
 
     getColumnClass(column) {
@@ -419,23 +548,31 @@ export default {
     getColumnStyle(column) {
       const styles = {};
 
-      // Auto width means fit-content
-      styles.whiteSpace = column.wrap === false ? "nowrap" : "normal";
-      styles.wordBreak = "break-word";
-      styles.overflowWrap = "break-word";
-      if (column.width === "auto") {
-        styles.minWidth = "500px";
-      } else if (column.width) {
+      // If column has explicit width, use it
+      if (column.width && column.width !== "auto") {
         styles.width = column.width;
         styles.minWidth = column.width;
       }
+      // Auto calculate width based on content
+      else if (column.autoWidth) {
+        const calculatedWidth = this.calculateMaxContentWidth(column);
+        styles.width = `${calculatedWidth}px`;
+        styles.minWidth = `${calculatedWidth}px`;
+      }
 
+      // Apply explicit min/max width if provided
       if (column.minWidth) {
         styles.minWidth = column.minWidth;
       }
       if (column.maxWidth) {
         styles.maxWidth = column.maxWidth;
       }
+
+      // Handle text wrapping and truncation
+      if (column.maxLines && column.maxLines > 0) {
+        styles.maxHeight = `${column.maxLines * 1.5}em`; // 1.5em per line (line-height)
+      }
+
       return styles;
     },
 
@@ -585,6 +722,7 @@ export default {
       padding: var(--padding) calc(var(--padding) * 1.5);
       text-align: left;
       color: var(--text-primary-color);
+      vertical-align: top;
 
       &-header {
         font-weight: 600;
@@ -604,6 +742,26 @@ export default {
           &-inactive {
             opacity: 0.3;
           }
+        }
+      }
+
+      // Cell content wrapper for truncation
+      &-content {
+        word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        line-height: 1.5;
+      }
+
+      // Truncated cells
+      &-truncated {
+        .td-table-cell-content {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          -webkit-line-clamp: var(--max-lines, 2);
+          line-clamp: var(--max-lines, 2);
         }
       }
 
