@@ -390,5 +390,10 @@ export default {
         history: "History",
       },
     },
+    AppDataMiner: {
+      selectTable: "Select table",
+      refreshTableData: "Reload table list",
+      showDataByTable: "Load data",
+    },
   },
 };
