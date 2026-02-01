@@ -528,3 +528,6 @@ FodyWeavers.xsd
 
 
 *.db
+
+# debug go
+__debug*
