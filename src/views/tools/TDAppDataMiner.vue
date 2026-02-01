@@ -23,7 +23,9 @@
         :label="$t('i18nCommon.AppDataMiner.showDataByTable')"
       />
     </div>
-    <div class="td-app-data-viewer"></div>
+    <div class="td-app-data-viewer">
+      
+    </div>
   </div>
 </template>
 
