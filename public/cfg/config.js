@@ -14,7 +14,7 @@
     isCompressText: true,
   };
   window.__env.githubSource = {
-    url: "https://github.com/tonguyenducmanh/tool-tomanh",
+    url: "https://github.com/tonguyenducmanh/devtools",
   };
   window.__env.oneTimePasswordAuthen = {
     showDecodedInfo: false,
