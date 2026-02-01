@@ -10,6 +10,7 @@
           :noMargin="true"
           :usingStylePercent="true"
           :isCapitalizeText="false"
+          @selected="showDataByTable"
         ></TDComboBox>
         <TDButton
           @click="reloadTable"
@@ -18,11 +19,6 @@
           :noMargin="true"
         ></TDButton>
       </div>
-      <TDButton
-        :noMargin="true"
-        @click="showDataByTable"
-        :label="$t('i18nCommon.AppDataMiner.showDataByTable')"
-      />
     </div>
     <div class="td-app-data-viewer">
       <TDTableViewer
