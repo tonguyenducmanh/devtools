@@ -1,10 +1,13 @@
 <template>
-  <div class="td-table-viewer" :class="{
-    'td-table-viewer-no-margin': noMargin,
-    'td-table-viewer-striped': striped,
-    'td-table-viewer-bordered': bordered,
-    'td-table-viewer-hoverable': hoverable,
-  }">
+  <div
+    class="td-table-viewer"
+    :class="{
+      'td-table-viewer-no-margin': noMargin,
+      'td-table-viewer-striped': striped,
+      'td-table-viewer-bordered': bordered,
+      'td-table-viewer-hoverable': hoverable,
+    }"
+  >
     <div v-if="label" class="td-table-label">
       {{ label.capitalize() }}
     </div>
@@ -13,14 +16,28 @@
       <div class="td-table-wrapper" ref="tableWrapper">
         <table class="td-table">
           <!-- Header -->
-          <thead class="td-table-header" :class="{ 'td-table-header-sticky': stickyHeader }">
+          <thead
+            class="td-table-header"
+            :class="{ 'td-table-header-sticky': stickyHeader }"
+          >
             <tr>
               <!-- Selection Column -->
-              <th v-if="selectable" class="td-table-cell td-table-cell-checkbox">
+              <th
+                v-if="selectable"
+                class="td-table-cell td-table-cell-checkbox"
+              >
                 <label class="td-table-checkbox-label">
-                  <input type="checkbox" :checked="isAllSelected" @change="toggleSelectAll" class="td-table-checkbox" />
+                  <input
+                    type="checkbox"
+                    :checked="isAllSelected"
+                    @change="toggleSelectAll"
+                    class="td-table-checkbox"
+                  />
                   <span class="td-checkbox-custom">
-                    <span v-if="isAllSelected" class="td-checkbox-active"></span>
+                    <span
+                      v-if="isAllSelected"
+                      class="td-checkbox-active"
+                    ></span>
                   </span>
                 </label>
               </th>
@@ -31,18 +48,29 @@
               </th>
 
               <!-- Data Columns -->
-              <th v-for="(column, index) in computedColumns" :key="`header-${index}`"
-                class="td-table-cell td-table-cell-header" :class="getColumnClass(column)"
-                :style="getColumnStyle(column)" @click="handleHeaderClick(column)">
+              <th
+                v-for="(column, index) in computedColumns"
+                :key="`header-${index}`"
+                class="td-table-cell td-table-cell-header"
+                :class="getColumnClass(column)"
+                :style="getColumnStyle(column)"
+                @click="handleHeaderClick(column)"
+              >
                 <div class="td-table-header-content">
                   <span>{{ column.label || column.key }}</span>
                   <span v-if="column.sortable" class="td-table-sort-icon">
-                    <span v-if="
-                      sortColumn === column.key && sortDirection === 'asc'
-                    ">▲</span>
-                    <span v-else-if="
-                      sortColumn === column.key && sortDirection === 'desc'
-                    ">▼</span>
+                    <span
+                      v-if="
+                        sortColumn === column.key && sortDirection === 'asc'
+                      "
+                      >▲</span
+                    >
+                    <span
+                      v-else-if="
+                        sortColumn === column.key && sortDirection === 'desc'
+                      "
+                      >▼</span
+                    >
                     <span v-else class="td-table-sort-icon-inactive">⬍</span>
                   </span>
                 </div>
@@ -57,15 +85,30 @@
 
           <!-- Body -->
           <tbody class="td-table-body">
-            <tr v-for="(row, rowIndex) in processedData" :key="`row-${rowIndex}`" class="td-table-row"
-              :class="{ 'td-table-row-selected': isRowSelected(row) }" @click="handleRowClick(row, rowIndex)">
+            <tr
+              v-for="(row, rowIndex) in processedData"
+              :key="`row-${rowIndex}`"
+              class="td-table-row"
+              :class="{ 'td-table-row-selected': isRowSelected(row) }"
+              @click="handleRowClick(row, rowIndex)"
+            >
               <!-- Selection Column -->
-              <td v-if="selectable" class="td-table-cell td-table-cell-checkbox">
+              <td
+                v-if="selectable"
+                class="td-table-cell td-table-cell-checkbox"
+              >
                 <label class="td-table-checkbox-label" @click.stop>
-                  <input type="checkbox" :checked="isRowSelected(row)" @change="toggleRowSelection(row)"
-                    class="td-table-checkbox" />
+                  <input
+                    type="checkbox"
+                    :checked="isRowSelected(row)"
+                    @change="toggleRowSelection(row)"
+                    class="td-table-checkbox"
+                  />
                   <span class="td-checkbox-custom">
-                    <span v-if="isRowSelected(row)" class="td-checkbox-active"></span>
+                    <span
+                      v-if="isRowSelected(row)"
+                      class="td-checkbox-active"
+                    ></span>
                   </span>
                 </label>
               </td>
@@ -76,10 +119,20 @@
               </td>
 
               <!-- Data Columns -->
-              <td v-for="(column, colIndex) in computedColumns" :key="`cell-${rowIndex}-${colIndex}`"
-                class="td-table-cell" :class="getColumnClass(column)" :style="getColumnStyle(column)">
-                <slot :name="`cell-${column.key}`" :row="row" :column="column" :value="getCellValue(row, column.key)"
-                  :rowIndex="rowIndex">
+              <td
+                v-for="(column, colIndex) in computedColumns"
+                :key="`cell-${rowIndex}-${colIndex}`"
+                class="td-table-cell"
+                :class="getColumnClass(column)"
+                :style="getColumnStyle(column)"
+              >
+                <slot
+                  :name="`cell-${column.key}`"
+                  :row="row"
+                  :column="column"
+                  :value="getCellValue(row, column.key)"
+                  :rowIndex="rowIndex"
+                >
                   {{ formatCellValue(row, column) }}
                 </slot>
               </td>
@@ -88,9 +141,13 @@
               <td v-if="hasActions" class="td-table-cell td-table-cell-actions">
                 <slot name="actions" :row="row" :rowIndex="rowIndex">
                   <div class="td-table-actions">
-                    <button v-for="(action, actionIndex) in actions" :key="`action-${actionIndex}`"
-                      @click.stop="handleAction(action, row, rowIndex)" class="td-table-action-button"
-                      :class="action.class">
+                    <button
+                      v-for="(action, actionIndex) in actions"
+                      :key="`action-${actionIndex}`"
+                      @click.stop="handleAction(action, row, rowIndex)"
+                      class="td-table-action-button"
+                      :class="action.class"
+                    >
                       {{ action.label }}
                     </button>
                   </div>
@@ -99,10 +156,16 @@
             </tr>
 
             <!-- Empty State -->
-            <tr v-if="!processedData || processedData.length === 0" class="td-table-row-empty">
-              <td :colspan="totalColumns" class="td-table-cell td-table-cell-empty">
+            <tr
+              v-if="!processedData || processedData.length === 0"
+              class="td-table-row-empty"
+            >
+              <td
+                :colspan="totalColumns"
+                class="td-table-cell td-table-cell-empty"
+              >
                 <slot name="empty">
-                  {{ emptyText }}
+                  {{ emptyText || $t("i18nCommon.noDataAvailable") }}
                 </slot>
               </td>
             </tr>
@@ -114,7 +177,11 @@
     <!-- Footer Info -->
     <div v-if="showFooter" class="td-table-footer">
       <div class="td-table-info">
-        <slot name="footer" :selectedRows="selectedRows" :totalRows="processedData.length">
+        <slot
+          name="footer"
+          :selectedRows="selectedRows"
+          :totalRows="processedData.length"
+        >
           <span v-if="selectable && selectedRows.length > 0">
             {{ selectedRows.length }}
             {{ $t("i18nCommon.selectedRecord") }} /
@@ -134,7 +201,7 @@ export default {
 
   props: {
     // Data
-    data: {
+    tableData: {
       type: Array,
       default: () => [],
     },
@@ -232,7 +299,7 @@ export default {
     // Empty state
     emptyText: {
       type: String,
-      default: "No data available",
+      default: null,
     },
 
     // Footer
@@ -258,18 +325,17 @@ export default {
       }
 
       // Generate columns from first data row
-      if (!this.data || this.data.length === 0) {
+      if (!this.tableData || this.tableData.length === 0) {
         return [];
       }
 
-      const firstRow = this.data[0];
-      return Object.keys(firstRow)
-        .map((key) => ({
-          key,
-          label: this.formatLabel(key),
-          width: "auto",
-          align: "left",
-        }));
+      const firstRow = this.tableData[0];
+      return Object.keys(firstRow).map((key) => ({
+        key,
+        label: this.formatLabel(key),
+        width: "auto",
+        align: "left",
+      }));
     },
 
     containerStyle() {
@@ -297,16 +363,16 @@ export default {
 
     isAllSelected() {
       return (
-        this.data.length > 0 && this.selectedRows.length === this.data.length
+        this.tableData.length > 0 && this.selectedRows.length === this.tableData.length
       );
     },
 
     processedData() {
-      let data = [...this.data];
+      let tableData = [...this.tableData];
 
       // Apply sorting
       if (this.sortColumn) {
-        data.sort((a, b) => {
+        tableData.sort((a, b) => {
           const aVal = this.getCellValue(a, this.sortColumn);
           const bVal = this.getCellValue(b, this.sortColumn);
 
@@ -318,7 +384,7 @@ export default {
         });
       }
 
-      return data;
+      return tableData;
     },
   },
 
@@ -410,7 +476,7 @@ export default {
       if (this.isAllSelected) {
         this.selectedRows = [];
       } else {
-        this.selectedRows = [...this.data];
+        this.selectedRows = [...this.tableData];
       }
 
       this.$emit("update:modelValue", this.selectedRows);
@@ -452,7 +518,7 @@ export default {
     },
 
     selectAll() {
-      this.selectedRows = [...this.data];
+      this.selectedRows = [...this.tableData];
       this.$emit("update:modelValue", this.selectedRows);
       this.$emit("selection-change", this.selectedRows);
     },
@@ -648,7 +714,7 @@ export default {
       }
     }
 
-    .td-table-checkbox:checked+.td-checkbox-custom {
+    .td-table-checkbox:checked + .td-checkbox-custom {
       border-color: var(--btn-color);
     }
 

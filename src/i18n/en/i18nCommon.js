@@ -5,6 +5,7 @@ export default {
     ping: "Ping",
     selectedRecord: "Selected",
     record: "Records",
+    noDataAvailable: "No data available",
     history: {
       title: "History",
       show: "History",
