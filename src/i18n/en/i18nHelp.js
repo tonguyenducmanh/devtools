@@ -1,6 +1,7 @@
 export default {
   i18nHelp: {
     feature: {
+      AppDataMiner: "View all the data stored in the application's database",
       cosinSimilarity:
         "Calculates the similarity between two n-dimensional vectors",
       oneTimePassword: "Generates 6-character OTP codes every 30 seconds",

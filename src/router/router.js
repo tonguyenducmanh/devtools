@@ -17,6 +17,18 @@ const routerConfig = [
   },
   {
     /**
+     * App data miner tool
+     */
+    path: "/appdataminer",
+    name: "appdataminer",
+    component: () => import("@/views/tools/TDAppDataMiner.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.AppDataMiner",
+      helpKey: "i18nHelp.feature.AppDataMiner",
+    },
+  },
+  {
+    /**
      * Time-based one-time password authenticator
      */
     path: "/TDOneTimePassword",
