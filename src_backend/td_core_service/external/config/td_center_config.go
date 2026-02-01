@@ -42,6 +42,6 @@ func DefaultConfig() TDCenterConfig {
 			Port:        8888,
 			EnableTrace: false,
 		},
-		DatabaseName: "tool_tomanh.db",
+		DatabaseName: "dev_tool.db",
 	}
 }
