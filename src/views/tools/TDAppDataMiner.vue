@@ -27,7 +27,6 @@
     <div class="td-app-data-viewer">
       <TDTableViewer
         :tableData="currentTableDatas"
-        :noMargin="true"
         :showIndex="true"
         :showFooter="true"
       >
