@@ -23,14 +23,12 @@
         :label="$t('i18nCommon.AppDataMiner.showDataByTable')"
       />
     </div>
-    <div class="td-app-data-viewer">
-      
-    </div>
+    <div class="td-app-data-viewer"></div>
   </div>
 </template>
 
 <script>
-import TDAgentAPI from "@/common/api/request/AgentAPI/TDAgentAPI.js";
+import TDServerAppDataMiner from "@/common/api/request/AgentAPI/TDServerAppDataMiner.js";
 
 export default {
   name: "TDAppDataMiner",
@@ -45,12 +43,21 @@ export default {
     };
   },
   async mounted() {
-    this.agentAPI = new TDAgentAPI();
+    this.agentAPI = new TDServerAppDataMiner();
+    await this.reloadTable();
   },
   computed: {},
   beforeUnmount() {},
   methods: {
-    async reloadTable() {},
+    async reloadTable() {
+      let me = this;
+      try {
+        let data = await me.agentAPI.getAllTable();
+      } catch (error) {
+        console.error("Lỗi tải table APIs:", error);
+        me.$tdUtility.showErrorNotFoundAgentServer();
+      }
+    },
     async showDataByTable() {},
   },
 };
