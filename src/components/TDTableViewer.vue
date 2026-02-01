@@ -240,7 +240,7 @@ export default {
     },
     indexLabel: {
       type: String,
-      default: "#",
+      default: "",
     },
     striped: {
       type: Boolean,
