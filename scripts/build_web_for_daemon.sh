@@ -8,7 +8,7 @@ ROOT_DIR=$(pwd)
 WEB_APP_DIR="$ROOT_DIR/src_backend/td_core_service/internal/service/dist/"
 FRONTEND_DIST="$ROOT_DIR/dist"
 OUTPUT_DIR="$ROOT_DIR/out"
-OUTPUT_NAME="tool-tomanh-daemon"
+OUTPUT_NAME="dev-tool-daemon"
 
 # Đảm bảo thư mục output tồn tại
 mkdir -p "$OUTPUT_DIR"

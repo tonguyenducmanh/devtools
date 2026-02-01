@@ -1,6 +1,6 @@
 module td_core_service
 
-go 1.25.0
+go 1.25.6
 
 require modernc.org/sqlite v1.44.3
 

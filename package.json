@@ -1,6 +1,6 @@
 {
-  "name": "tool-tomanh",
-  "productName": "tool-tomanh",
+  "name": "dev-tool",
+  "productName": "dev-tool",
   "version": "5.0.0",
   "description": "tool tomanh",
   "main": ".vite/build/main.js",
