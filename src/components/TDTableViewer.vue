@@ -4,14 +4,9 @@
     :class="{
       'td-table-viewer-no-margin': noMargin,
       'td-table-viewer-striped': striped,
-      'td-table-viewer-bordered': bordered,
       'td-table-viewer-hoverable': hoverable,
     }"
   >
-    <div v-if="label" class="td-table-label">
-      {{ label.capitalize() }}
-    </div>
-
     <div class="td-table-container" :style="containerStyle">
       <div class="td-table-wrapper" ref="tableWrapper">
         <table class="td-table">
@@ -225,12 +220,6 @@ export default {
       type: String,
       default: "id",
     },
-
-    // Display options
-    label: {
-      type: String,
-      default: null,
-    },
     showIndex: {
       type: Boolean,
       default: false,
@@ -240,10 +229,6 @@ export default {
       default: "#",
     },
     striped: {
-      type: Boolean,
-      default: true,
-    },
-    bordered: {
       type: Boolean,
       default: true,
     },
