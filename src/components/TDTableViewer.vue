@@ -711,7 +711,9 @@ export default {
       }
 
       &-index {
-        width: 50px;
+        width: 30px;
+        min-width: 30px;
+        max-width: 30px;
         text-align: center;
         color: var(--text-secondary-color);
         font-weight: 500;
