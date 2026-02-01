@@ -5,7 +5,7 @@
     v-click-outside="closeCombo"
   >
     <div class="td-label" :class="{ 'td-label-top': isLabelTop }" v-if="label">
-      {{ label.capitalize() }}
+      {{ isCapitalizeText ? label.capitalize() : label }}
     </div>
 
     <div class="td-combobox-wraper">
@@ -30,7 +30,7 @@
           class="td-dropdown-item"
         >
           <slot name="option" :option="option">
-            {{ option.label.capitalize() }}
+            {{ isCapitalizeText ? option.label.capitalize() : option.label }}
           </slot>
         </TDComboBoxOption>
       </div>
@@ -89,6 +89,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    isCapitalizeText: {
+      type: Boolean,
+      default: true,
+    },
   },
   emits: ["update:modelValue", "selected"],
   data() {
@@ -99,7 +103,11 @@ export default {
   computed: {
     selectedLabel() {
       const found = this.options.find((o) => o.value === this.modelValue);
-      return found ? found.label.capitalize() : this.placeHolder;
+      return found
+        ? this.isCapitalizeText
+          ? found.label.capitalize()
+          : found.label
+        : this.placeHolder;
     },
     styleCombo() {
       let me = this;
