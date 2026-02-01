@@ -274,7 +274,7 @@ export default {
     },
     charWidthPx: {
       type: Number,
-      default: 16, // Average character width in pixels (can adjust based on font)
+      default: 10, // Average character width in pixels (can adjust based on font)
     },
     minColumnWidth: {
       type: Number,
