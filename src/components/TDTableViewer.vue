@@ -108,7 +108,11 @@
               </td>
 
               <!-- Index Column -->
-              <td v-if="showIndex" class="td-table-cell td-table-cell-index">
+              <td
+                v-if="showIndex"
+                class="td-table-cell td-table-cell-index"
+                @click="copyRow(row)"
+              >
                 {{ rowIndex + 1 }}
               </td>
 
@@ -598,6 +602,9 @@ export default {
     handleDataSelected(row, column) {
       let data = this.formatCellValue(row, column);
       this.$tdUtility.copyToClipboard(data);
+    },
+    copyRow(row) {
+      this.$tdUtility.copyToClipboard(JSON.stringify(row));
     },
   },
 };
