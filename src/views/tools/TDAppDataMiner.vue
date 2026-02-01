@@ -29,6 +29,7 @@
         :tableData="currentTableDatas"
         :showIndex="true"
         :showFooter="true"
+        :noMargin="true"
       >
       </TDTableViewer>
     </div>
