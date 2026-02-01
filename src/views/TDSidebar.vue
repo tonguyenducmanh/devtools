@@ -12,7 +12,7 @@
             :id="index"
             :to="item.pathVisible ?? item.path"
           >
-            <div class="flex td-item-content">
+            <div class="flex td-item-content" v-tooltip="$t(item.meta.helpKey)">
               <div>{{ $t(item.meta.titleKey) }}</div>
             </div>
           </RouterLink>
@@ -59,7 +59,7 @@ export default {
           }
         });
         allTool = allTool.filter((x) =>
-          x.meta.title.containsNotSentive(me.queryTool)
+          x.meta.title.containsNotSentive(me.queryTool),
         );
       }
       me.routerLink = allTool;
@@ -68,7 +68,7 @@ export default {
       let me = this;
 
       let toggleSidebarState = await me.$tdCache.get(
-        me.$tdEnum.cacheConfig.IsShowSidebar
+        me.$tdEnum.cacheConfig.IsShowSidebar,
       );
       if (toggleSidebarState) {
         me.isShowSidebar = toggleSidebarState.value;

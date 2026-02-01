@@ -73,7 +73,7 @@ let i18nData = {
 
 /**
  * Load dữ liệu i18n cho 1 ngôn ngữ mới
- * @param {*} locale 
+ * @param {*} locale
  */
 
 export async function loadLocale(locale) {
@@ -81,7 +81,12 @@ export async function loadLocale(locale) {
   if (!state.messages[locale]) {
     // import động các tệp tin ngôn ngữ tương ứng
     let msgs = await import(`@/i18n/${locale}/i18nCommon.js`);
-    state.messages[locale] = { ...i18nGlobal, ...msgs.default };
+    let helps = await import(`@/i18n/${locale}/i18nHelp.js`);
+    state.messages[locale] = {
+      ...i18nGlobal,
+      ...msgs.default,
+      ...helps.default,
+    };
   }
   // Gán giá trị thông qua .value vì đây là computed setter
   i18nData.global.locale.value = locale;
