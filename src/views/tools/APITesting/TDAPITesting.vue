@@ -658,7 +658,7 @@ import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDMockAPIProMode from "@/common/mock/TDMockAPIProMode.js";
 import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
-import TDAgentAPI from "@/common/api/request/AgentAPI/TDAgentAPI.js";
+import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
 
 export default {
   name: "TDAPITesting",
@@ -733,7 +733,7 @@ export default {
     };
   },
   async mounted() {
-    this.agentAPI = new TDAgentAPI();
+    this.agentAPI = new TDServerTestingAPI();
     await this.loadAllTestingData();
   },
   computed: {
