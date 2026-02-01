@@ -1,5 +1,5 @@
 {
-  "database_name": "tool_tomanh.db",
+  "database_name": "dev_tool.db",
   "api_config": {
     "port": 7777,
     "enable_trace": false
