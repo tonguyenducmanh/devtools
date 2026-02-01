@@ -363,7 +363,8 @@ export default {
 
     isAllSelected() {
       return (
-        this.tableData.length > 0 && this.selectedRows.length === this.tableData.length
+        this.tableData.length > 0 &&
+        this.selectedRows.length === this.tableData.length
       );
     },
 
@@ -582,7 +583,7 @@ export default {
       &.td-table-header-sticky {
         position: sticky;
         top: 0;
-        z-index: 10;
+        z-index: 1;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       }
 

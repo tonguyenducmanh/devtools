@@ -25,7 +25,11 @@
       />
     </div>
     <div class="td-app-data-viewer">
-      <TDTableViewer :tableData="currentTableDatas" :noMargin="true">
+      <TDTableViewer
+        :tableData="currentTableDatas"
+        :noMargin="true"
+        :showIndex="true"
+      >
       </TDTableViewer>
     </div>
   </div>
