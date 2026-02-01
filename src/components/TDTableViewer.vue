@@ -134,11 +134,16 @@
                   <div
                     v-if="shouldTruncate(column)"
                     class="td-table-cell-content"
+                    @click="handleDataSelected(row, column)"
                     v-tooltip="getTooltipContent(row, column)"
                   >
                     {{ formatCellValue(row, column) }}
                   </div>
-                  <div v-else class="td-table-cell-content">
+                  <div
+                    v-else
+                    class="td-table-cell-content"
+                    @click="handleDataSelected(row, column)"
+                  >
                     {{ formatCellValue(row, column) }}
                   </div>
                 </slot>
@@ -646,6 +651,10 @@ export default {
       this.selectedRows = [...this.tableData];
       this.$emit("update:modelValue", this.selectedRows);
       this.$emit("selection-change", this.selectedRows);
+    },
+    handleDataSelected(row, column) {
+      let data = this.formatCellValue(row, column);
+      this.$tdUtility.copyToClipboard(data);
     },
   },
 };
