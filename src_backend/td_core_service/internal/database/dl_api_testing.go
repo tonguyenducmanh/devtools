@@ -321,3 +321,32 @@ func BatchImportTestingData(batch *model.TDAPITestingImportBatch) error {
 
 	return tx.Commit()
 }
+
+/**
+ * log dữ liệu vào db
+ */
+func LogDataCallAPIToDatabase(reqData model.TDAPITestingParam, responseText string, statusCode int, id string) {
+	db, err := GetConnectionDB()
+	if err != nil {
+		// không làm gì
+	}
+	defer db.Close()
+
+	sqlQuery := `
+		INSERT INTO td_api_testing_log (
+			id,
+			api_url,
+			method,
+			headers_text,
+			body_text,
+			response_text,
+			status_code
+		) 
+		VALUES (
+			?, ?, ?, ?, ?, ?, ?
+		)
+	`
+	_, err = db.Exec(sqlQuery, id, reqData.ApiURL, reqData.HttpMethod, reqData.HeadersText, reqData.BodyText, responseText, statusCode)
+
+	// không làm gì
+}
