@@ -645,11 +645,10 @@ export default {
         position: sticky;
         top: 0;
         z-index: 1;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       }
 
       tr {
-        border-bottom: 2px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
       }
     }
 
@@ -860,9 +859,9 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: var(--padding);
-    border-top: 1px solid var(--border-color);
+    margin-top: var(--padding);
     background-color: var(--bg-layer-color);
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    border-radius: var(--border-radius);
 
     .td-table-info {
       font-size: var(--font-size-small);
@@ -903,5 +902,8 @@ export default {
       }
     }
   }
+}
+.td-table-cell:not(:last-child) {
+  border-right: 1px solid var(--border-color);
 }
 </style>
