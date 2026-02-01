@@ -470,25 +470,16 @@ export default {
       });
 
       // Calculate width in pixels (character count * average char width + padding)
-      const calculatedWidth = maxLength * this.charWidthPx + 48; // 48px for padding
-
-      // Apply min/max constraints
-      const columnMinWidth = column.minWidth
-        ? parseInt(column.minWidth)
-        : this.minColumnWidth;
-      const columnMaxWidth = column.maxWidth
-        ? parseInt(column.maxWidth)
-        : this.maxColumnWidth;
-
-      const finalWidth = Math.max(
-        columnMinWidth,
-        Math.min(calculatedWidth, columnMaxWidth),
-      );
+      let calculatedWidth = maxLength * this.charWidthPx + 48; // 48px for padding
 
       // Cache the result
-      this.columnWidthCache[column.key] = finalWidth;
-
-      return finalWidth;
+      if (calculatedWidth > this.maxColumnWidth) {
+        calculatedWidth = this.maxColumnWidth;
+      } else if (calculatedWidth < this.minColumnWidth) {
+        calculatedWidth = this.minColumnWidth;
+      }
+      this.columnWidthCache[column.key] = calculatedWidth;
+      return calculatedWidth;
     },
 
     /**
