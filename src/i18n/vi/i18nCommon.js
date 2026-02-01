@@ -5,6 +5,7 @@ export default {
     ping: "Ping",
     selectedRecord: "Đã chọn",
     record: "Bản ghi",
+    noDataAvailable: "Không có dữ liệu",
     history: {
       title: "Lịch sử",
       show: "Lịch sử",

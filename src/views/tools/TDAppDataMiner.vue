@@ -24,7 +24,10 @@
         :label="$t('i18nCommon.AppDataMiner.showDataByTable')"
       />
     </div>
-    <div class="td-app-data-viewer"></div>
+    <div class="td-app-data-viewer">
+      <TDTableViewer :tableData="currentTableDatas" :noMargin="true">
+      </TDTableViewer>
+    </div>
   </div>
 </template>
 
@@ -80,7 +83,7 @@ export default {
       if (me.tableName) {
         me.currentTableDatas = [];
         try {
-          let res = me.agentAPI.getAllDataByTableName(me.tableName);
+          let res = await me.agentAPI.getAllDataByTableName(me.tableName);
           if (
             res &&
             res.success &&
@@ -118,6 +121,9 @@ export default {
   }
   .td-app-data-viewer {
     flex: 1;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: var(--padding);
   }
 }
 </style>
