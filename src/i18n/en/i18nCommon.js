@@ -38,6 +38,7 @@ export default {
     },
     feature: {
       welcome: "Welcome",
+      AppDataMiner: "App data miner",
       cosinSimilarity: "Cosine Similarity",
       oneTimePassword: "One time password",
       textCompress: "Text Compress",

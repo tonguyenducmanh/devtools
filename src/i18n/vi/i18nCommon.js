@@ -38,6 +38,7 @@ export default {
     },
     feature: {
       welcome: "Tổng quan",
+      AppDataMiner: "Dữ liệu ứng dụng",
       cosinSimilarity: "Độ tương đồng",
       oneTimePassword: "Mật khẩu một lần",
       textCompress: "Nén văn bản",

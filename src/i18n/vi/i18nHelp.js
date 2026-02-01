@@ -1,6 +1,8 @@
 export default {
   i18nHelp: {
     feature: {
+      AppDataMiner:
+        "Xem toàn bộ dữ liệu được lưu trữ trong cơ sở dữ liệu của ứng dụng",
       cosinSimilarity: "Tính toán độ tương đồng giữa 2 vector cùng có n chiều",
       oneTimePassword: "Tạo các mã OTP 6 ký tự 30s 1 lần",
       APITesting:
