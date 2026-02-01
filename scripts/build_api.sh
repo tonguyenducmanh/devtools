@@ -5,7 +5,7 @@ echo "--- Bắt đầu quy trình build api ---"
 ROOT_DIR=$(pwd)
 # Đường dẫn tuyệt đối hoặc tương đối tính từ thư mục chạy script
 MODULE_DIR="$ROOT_DIR/src_backend/td_app/cmd/api_app"
-APP_NAME="$ROOT_DIR/out/tool-tomanh-api"
+APP_NAME="$ROOT_DIR/out/dev-tool-api"
 
 # Di chuyển vào thư mục module để Go nhận diện go.mod
 cd $MODULE_DIR

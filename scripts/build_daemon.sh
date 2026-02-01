@@ -9,7 +9,7 @@ DAEMON_DIR="$ROOT_DIR/src_backend/td_app/cmd/daemon_app"
 WEB_APP_DIR="$ROOT_DIR/src_backend/td_core_service/internal/service/dist/"
 FRONTEND_DIST="$ROOT_DIR/dist"
 OUTPUT_DIR="$ROOT_DIR/out"
-OUTPUT_NAME="tool-tomanh-daemon"
+OUTPUT_NAME="dev-tool-daemon"
 
 
 # 4. Build Backend (Go daemon)
