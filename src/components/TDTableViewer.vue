@@ -119,6 +119,7 @@
                 class="td-table-cell"
                 :class="[getColumnClass(column)]"
                 :style="getColumnStyle(column)"
+                @click="handleDataSelected(row, column)"
               >
                 <slot
                   :name="`cell-${column.key}`"
@@ -127,10 +128,7 @@
                   :value="getCellValue(row, column.key)"
                   :rowIndex="rowIndex"
                 >
-                  <div
-                    class="td-table-cell-content"
-                    @click="handleDataSelected(row, column)"
-                  >
+                  <div class="td-table-cell-content">
                     {{ formatCellValue(row, column) }}
                   </div>
                 </slot>
