@@ -60,6 +60,7 @@ const routerConfig = [
     component: () => import("@/views/tools/TDTextToQRCode.vue"),
     meta: {
       titleKey: "i18nCommon.feature.QRCodeFromText",
+      helpKey: "i18nHelp.feature.QRCodeFromText",
     },
   },
   {
@@ -71,6 +72,7 @@ const routerConfig = [
     component: () => import("@/views/tools/TDQRCodeToText.vue"),
     meta: {
       titleKey: "i18nCommon.feature.QRCodeToText",
+      helpKey: "i18nHelp.feature.QRCodeToText",
     },
   },
   {
@@ -126,6 +128,7 @@ const routerConfig = [
     component: () => import("@/views/tools/TDTextManipulation.vue"),
     meta: {
       titleKey: "i18nCommon.feature.textManipulation",
+      helpKey: "i18nHelp.feature.textManipulation",
     },
   },
   {
