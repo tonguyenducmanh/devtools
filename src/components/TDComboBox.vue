@@ -81,6 +81,14 @@ export default {
       type: Object,
       default: null,
     },
+    placeHolder: {
+      type: String,
+      default: "Chọn giá trị",
+    },
+    usingStylePercent: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ["update:modelValue", "selected"],
   data() {
@@ -91,17 +99,18 @@ export default {
   computed: {
     selectedLabel() {
       const found = this.options.find((o) => o.value === this.modelValue);
-      return found ? found.label.capitalize() : "Chọn giá trị";
+      return found ? found.label.capitalize() : this.placeHolder;
     },
     styleCombo() {
       let me = this;
       let styleDynamicCombo = null;
       if (me.width) {
         let currentSettingBorder = me.borderRadiusStyle;
+        let keySize = me.usingStylePercent ? "%" : "px";
         styleDynamicCombo = {
-          width: `${me.width}px`,
-          "max-width": `${me.width}px`,
-          "min-width": `${me.width}px`,
+          width: `${me.width}${keySize}`,
+          "max-width": `${me.width}${keySize}`,
+          "min-width": `${me.width}${keySize}`,
         };
         Object.assign(styleDynamicCombo, currentSettingBorder);
       }

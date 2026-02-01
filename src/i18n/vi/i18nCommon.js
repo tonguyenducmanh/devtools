@@ -388,5 +388,10 @@ export default {
         history: "Lịch sử",
       },
     },
+    AppDataMiner: {
+      selectTable: "Chọn bảng",
+      refreshTableData: "Load lại danh sách bảng",
+      showDataByTable: "Tải dữ liệu",
+    },
   },
 };
