@@ -263,7 +263,7 @@ export default {
     },
     maxHeight: {
       type: String,
-      default: "600px",
+      default: "100%",
     },
     noMargin: {
       type: Boolean,
@@ -435,9 +435,11 @@ export default {
       const styles = {};
 
       // Auto width means fit-content
+      styles.whiteSpace = column.wrap === false ? "nowrap" : "normal";
+      styles.wordBreak = "break-word";
+      styles.overflowWrap = "break-word";
       if (column.width === "auto") {
-        styles.width = "fit-content";
-        styles.whiteSpace = "nowrap";
+        styles.minWidth = "500px";
       } else if (column.width) {
         styles.width = column.width;
         styles.minWidth = column.width;
@@ -532,6 +534,8 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
+  overflow: auto;
   margin: var(--padding);
 
   .td-table-label {

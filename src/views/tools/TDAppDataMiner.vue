@@ -127,6 +127,7 @@ export default {
   .td-app-data-viewer {
     flex: 1;
     width: 100%;
+    min-height: 0;
     box-sizing: border-box;
     margin-top: var(--padding);
   }
