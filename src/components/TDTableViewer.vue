@@ -3,7 +3,6 @@
     class="td-table-viewer"
     :class="{
       'td-table-viewer-no-margin': noMargin,
-      'td-table-viewer-striped': striped,
       'td-table-viewer-hoverable': hoverable,
     }"
   >
@@ -241,10 +240,6 @@ export default {
     indexLabel: {
       type: String,
       default: "",
-    },
-    striped: {
-      type: Boolean,
-      default: true,
     },
     hoverable: {
       type: Boolean,
@@ -873,13 +868,6 @@ export default {
       font-size: var(--font-size-small);
       color: var(--text-secondary-color);
     }
-  }
-}
-
-// Striped rows
-.td-table-viewer-striped {
-  .td-table-body .td-table-row:nth-child(even) {
-    background-color: var(--bg-layer-color);
   }
 }
 
