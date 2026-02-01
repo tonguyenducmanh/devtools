@@ -44,7 +44,7 @@ The backend services are configured or default via `config/config.json`.
 
 ```json
 {
-  "database_name": "tool_tomanh.db",
+  "database_name": "dev_tool.db",
   "api_config": {
     "port": 7777,
     "enable_trace": false
@@ -64,7 +64,7 @@ The backend services are configured or default via `config/config.json`.
 
 This tool uses **SQLite** (Go side) to persist data into a local file.
 
-- **Database File**: `tool_tomanh.db` (as defined in `config.json`)
+- **Database File**: `dev_tool.db` (as defined in `config.json`)
 - All configurations, user-defined mock APIs, and tool-specific data are stored in this file.
 - SQLite is used to ensure portability and ease of backup—everything is contained within your local directory.
 
