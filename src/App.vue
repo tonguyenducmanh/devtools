@@ -76,7 +76,7 @@ export default {
         await me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
       }
       let toggleHeader = await me.$tdCache.get(
-        me.$tdEnum.cacheConfig.IsShowHeader
+        me.$tdEnum.cacheConfig.IsShowHeader,
       );
       if (toggleHeader) {
         me.showHeader = toggleHeader.value;
@@ -134,7 +134,7 @@ export default {
       flex: 1;
       display: flex;
       flex-direction: column;
-      width: 100%;
+      min-width: 0;
       height: 100%;
       position: relative;
       border-radius: calc(var(--border-radius) * 1.5);
