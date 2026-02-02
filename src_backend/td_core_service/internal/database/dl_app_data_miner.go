@@ -1,6 +1,9 @@
 package database
 
-import "fmt"
+import (
+	"database/sql"
+	"fmt"
+)
 
 /**
  * thực hiện lấy danh sách toàn bộ bảng trong database
@@ -59,6 +62,33 @@ func GetAllDataByTableName(tableName string) ([]map[string]any, error) {
 	defer rows.Close()
 
 	// Lấy danh sách tên các cột để map dữ liệu chính xác
+	return appMinerReadDynamicData(rows)
+}
+
+/**
+ * thực hiện query động theo yêu cầu của user
+ */
+func DataMinerExecuteQuery(script string) ([]map[string]any, error) {
+	db, err := GetConnectionDB()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	rows, err := db.Query(script)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	// Lấy danh sách tên các cột để map dữ liệu chính xác
+	return appMinerReadDynamicData(rows)
+}
+
+/**
+ * hàm đọc dữ liệu động trả về cho frontend
+ */
+func appMinerReadDynamicData(rows *sql.Rows) ([]map[string]any, error) {
 	columns, err := rows.Columns()
 	if err != nil {
 		return nil, err
