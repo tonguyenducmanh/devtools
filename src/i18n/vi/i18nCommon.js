@@ -5,6 +5,9 @@ export default {
     ping: "Ping",
     selectedRecord: "Đã chọn",
     record: "Bản ghi",
+    copy: "Sao chép",
+    footerHelp:
+      "Chọn vào số dòng để copy cả dòng, chọn vào 1 cell cụ thể để copy 1 cell",
     noDataAvailable: "Không có dữ liệu",
     history: {
       title: "Lịch sử",

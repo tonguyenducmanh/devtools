@@ -5,6 +5,9 @@ export default {
     ping: "Ping",
     selectedRecord: "Selected",
     record: "Records",
+    copy: "Copy",
+    footerHelp:
+      "Select the row number to copy the entire row, select a specific cell to copy a single cell.",
     noDataAvailable: "No data available",
     history: {
       title: "History",
