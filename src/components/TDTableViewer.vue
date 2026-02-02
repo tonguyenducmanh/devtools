@@ -111,6 +111,7 @@
               <td
                 v-if="showIndex"
                 class="td-table-cell td-table-cell-index"
+                v-tooltip="$t('i18nCommon.copy')"
                 @click="copyRow(row)"
               >
                 {{ rowIndex + 1 }}
@@ -177,18 +178,23 @@
 
     <!-- Footer Info -->
     <div v-if="showFooter" class="td-table-footer">
-      <div class="td-table-info">
+      <div class="flex td-table-info">
         <slot
           name="footer"
           :selectedRows="selectedRows"
           :totalRows="processedData.length"
         >
-          <span v-if="selectable && selectedRows.length > 0">
-            {{ selectedRows.length }}
-            {{ $t("i18nCommon.selectedRecord") }} /
+          <span class="td-table-info-row-count">
+            <span v-if="selectable && selectedRows.length > 0">
+              {{ selectedRows.length }}
+              {{ $t("i18nCommon.selectedRecord") }} /
+            </span>
+            <span>
+              {{ processedData.length }} {{ $t("i18nCommon.record") }}
+            </span>
           </span>
-          <span>
-            {{ processedData.length }} {{ $t("i18nCommon.record") }}
+          <span v-if="usingFooterHelp">
+            {{ footerHelpText }}
           </span>
         </slot>
       </div>
@@ -205,6 +211,14 @@ export default {
     tableData: {
       type: Array,
       default: () => [],
+    },
+    usingFooterHelp: {
+      type: Boolean,
+      default: true,
+    },
+    footerHelp: {
+      type: String,
+      default: null,
     },
     columns: {
       type: Array,
@@ -333,6 +347,17 @@ export default {
   },
 
   computed: {
+    footerHelpText() {
+      let me = this;
+      if (me.usingFooterHelp) {
+        if (me.footerHelp) {
+          return me.footerHelp;
+        } else {
+          return me.$t("i18nCommon.footerHelp");
+        }
+      }
+      return null;
+    },
     // Auto-generate columns from data if not provided
     computedColumns() {
       if (this.columns && this.columns.length > 0) {
@@ -872,6 +897,8 @@ export default {
     .td-table-info {
       font-size: var(--font-size-small);
       color: var(--text-secondary-color);
+      justify-content: space-between;
+      width: 100%;
     }
   }
 }
