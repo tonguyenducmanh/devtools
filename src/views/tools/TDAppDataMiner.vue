@@ -137,6 +137,7 @@ export default {
 
 <style scoped lang="scss">
 .td-app-data-miner-container {
+  margin-top: var(--padding);
   width: 100%;
   height: 100%;
   gap: var(--padding);
