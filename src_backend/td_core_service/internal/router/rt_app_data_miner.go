@@ -11,4 +11,5 @@ import (
 func InjectAppDataMiner(app *http.ServeMux) {
 	app.HandleFunc("GET /data_miner/get_all_table_name", service.GetAllTableInDatabase)
 	app.HandleFunc("GET /data_miner/get_data_by_table_name", service.GetAllDataByTableName)
+	app.HandleFunc("POST /data_miner/execute_query", service.DataMinerExecuteQuery)
 }

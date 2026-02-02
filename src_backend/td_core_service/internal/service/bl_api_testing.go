@@ -20,7 +20,6 @@ import (
 func Execute(w http.ResponseWriter, r *http.Request) {
 	var req model.TDAPITestingParam
 
-	// Thay thế binding của Gin bằng json.Decoder
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
 		return

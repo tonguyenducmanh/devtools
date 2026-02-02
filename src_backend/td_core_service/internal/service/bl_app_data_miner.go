@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"td_core_service/internal/database"
+	"td_core_service/internal/model"
 )
 
 /**
@@ -40,4 +41,29 @@ func GetAllDataByTableName(w http.ResponseWriter, r *http.Request) {
 		"success": true,
 		"data":    allDataByTableName,
 	})
+}
+
+/**
+ * thực hiện query tùy chỉnh cho user
+ */
+func DataMinerExecuteQuery(w http.ResponseWriter, r *http.Request) {
+	var req model.APIDataMinerQueryParam
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
+		return
+	}
+
+	allDataDynamic, err := database.DataMinerExecuteQuery(req.QueryCommand)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Lỗi query: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"data":    allDataDynamic,
+	})
+
 }

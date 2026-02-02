@@ -1,6 +1,15 @@
 <template>
   <div class="flex flex-col td-app-data-miner-container">
-    <div class="flex td-app-data-miner-header">
+    <div class="flex td-script-query">
+      <TDTextarea
+        v-model="scriptQuery"
+        :enableHighlight="true"
+        language="sql"
+        :wrapText="false"
+        :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
+      ></TDTextarea>
+    </div>
+    <div class="flex flex td-app-data-miner-group-btn">
       <div class="flex td-app-data-table-select">
         <TDComboBox
           class="td-table-select-combo"
@@ -19,6 +28,11 @@
           :noMargin="true"
         ></TDButton>
       </div>
+      <TDButton
+        @click="queryDynamicData"
+        :label="$t('i18nCommon.AppDataMiner.queryDynamic')"
+        :noMargin="true"
+      ></TDButton>
     </div>
     <div class="td-app-data-viewer">
       <TDTableViewer
@@ -48,6 +62,7 @@ export default {
       tableName: null,
       allTables: [],
       currentTableDatas: [],
+      scriptQuery: null,
     };
   },
   async mounted() {
@@ -102,6 +117,34 @@ export default {
         }
       }
     },
+
+    /**
+     * Query dữ liệu động
+     */
+    async queryDynamicData() {
+      let me = this;
+      if (me.scriptQuery) {
+        me.currentTableDatas = [];
+        try {
+          let param = {
+            query_command: me.scriptQuery,
+          };
+          let res = await me.agentAPI.dataMinerExecuteQuery(param);
+          if (
+            res &&
+            res.success &&
+            res.data &&
+            Array.isArray(res.data.data) &&
+            res.data.data.length > 0
+          ) {
+            me.currentTableDatas = res.data.data;
+          }
+        } catch (error) {
+          console.error("Lỗi tải table APIs:", error);
+          me.$tdUtility.showErrorNotFoundAgentServer();
+        }
+      }
+    },
   },
 };
 </script>
@@ -110,8 +153,13 @@ export default {
 .td-app-data-miner-container {
   width: 100%;
   height: 100%;
-  .td-app-data-miner-header {
-    justify-content: flex-start;
+  gap: var(--padding);
+  .td-script-query {
+    width: 100%;
+    height: 200px;
+  }
+  .td-app-data-miner-group-btn {
+    justify-content: space-between;
     width: 100%;
     gap: var(--padding);
     .td-app-data-table-select {
@@ -127,7 +175,6 @@ export default {
     width: 100%;
     min-height: 0;
     box-sizing: border-box;
-    margin-top: var(--padding);
   }
 }
 </style>

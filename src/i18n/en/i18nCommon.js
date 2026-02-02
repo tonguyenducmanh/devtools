@@ -395,6 +395,7 @@ export default {
       selectTable: "Select table",
       refreshTableData: "Reload table list",
       showDataByTable: "Load data",
+      queryDynamic: "Query",
     },
   },
 };

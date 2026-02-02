@@ -23,6 +23,13 @@ class TDServerAppDataMiner extends TDAgentAPI {
       `/data_miner/get_data_by_table_name?table_name=${tableName}`,
     );
   }
+
+  /**
+   * query dữ liệu động từ data ứng dụng
+   */
+  async dataMinerExecuteQuery(param) {
+    return await this.post(`/data_miner/execute_query`, param);
+  }
 }
 
 export default TDServerAppDataMiner;

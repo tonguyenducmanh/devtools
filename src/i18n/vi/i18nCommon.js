@@ -393,6 +393,7 @@ export default {
       selectTable: "Chọn bảng",
       refreshTableData: "Load lại danh sách bảng",
       showDataByTable: "Tải dữ liệu",
+      queryDynamic: "Lấy dữ liệu",
     },
   },
 };

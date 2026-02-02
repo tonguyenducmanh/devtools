@@ -428,11 +428,7 @@ export default {
 
   methods: {
     formatLabel(key) {
-      return key
-        .replace(/([A-Z])/g, " $1")
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, (c) => c.toUpperCase())
-        .trim();
+      return key.trim();
     },
 
     getCellValue(row, key) {
