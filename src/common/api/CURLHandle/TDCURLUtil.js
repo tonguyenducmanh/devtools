@@ -18,12 +18,12 @@ class TDCURLUtil {
       throw new Error("Agent server not configured");
     }
 
-    const controller = new AbortController();
+    let controller = new AbortController();
     // thực hiện gọi api vào agent
     let promise = new TDServerTestingAPI()
       .executeRequest(request, controller.signal)
       .then(async (res) => {
-        const data = await res.data;
+        let data = await res.data;
 
         try {
           return {
@@ -212,7 +212,7 @@ class TDCURLUtil {
   buildInjectCode(secranioCode) {
     let me = this;
     return `
-const requestCURL = window.__tdInfo.requestCURL;
+let requestCURL = window.__tdInfo.requestCURL;
 let result = 
 (async () => {
   ${secranioCode}
