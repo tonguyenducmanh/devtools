@@ -99,22 +99,8 @@ export default {
     async showDataByTable() {
       let me = this;
       if (me.tableName) {
-        me.currentTableDatas = [];
-        try {
-          let res = await me.agentAPI.getAllDataByTableName(me.tableName);
-          if (
-            res &&
-            res.success &&
-            res.data &&
-            Array.isArray(res.data.data) &&
-            res.data.data.length > 0
-          ) {
-            me.currentTableDatas = res.data.data;
-          }
-        } catch (error) {
-          console.error("Lỗi tải table APIs:", error);
-          me.$tdUtility.showErrorNotFoundAgentServer();
-        }
+        me.scriptQuery = `select * from ${me.tableName} limit 20;`;
+        await me.queryDynamicData();
       }
     },
 
