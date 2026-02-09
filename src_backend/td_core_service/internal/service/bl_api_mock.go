@@ -30,6 +30,19 @@ func InitMockAPIService(port int) {
 }
 
 /**
+ * Khởi động lại mock server từ phía client
+ */
+func RestartMockServerFromClient(w http.ResponseWriter, r *http.Request) {
+	RestartMockServer()
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"message": "Khởi động lại mock server từ phía client thành công",
+	})
+}
+
+/**
  * Khởi động lại server mock API
  */
 func RestartMockServer() {

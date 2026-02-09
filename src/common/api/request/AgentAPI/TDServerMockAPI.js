@@ -55,6 +55,13 @@ class TDServerMockAPI extends TDAgentAPI {
   async deleteMockGroup(id) {
     return await this.delete(`/mock_api/delete_group?id=${id}`);
   }
+
+  /**
+   * Lấy tất cả mock APIs
+   */
+  async restartMockServerFromClient() {
+    return await this.get("/mock_api/restart_mock_server");
+  }
 }
 
 export default TDServerMockAPI;

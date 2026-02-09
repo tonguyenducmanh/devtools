@@ -202,12 +202,18 @@
             </div>
           </div>
           <!-- nút tạo mới và làm mới danh sách -->
-          <div class="flex">
+          <div class="flex flex-col collection-group-footer">
             <TDButton
               @click="createNewMock"
               :type="$tdEnum.buttonType.secondary"
               :noMargin="true"
               :label="$t('i18nCommon.APIMocking.createNew')"
+            ></TDButton>
+            <TDButton
+              @click="restartMockServer"
+              :type="$tdEnum.buttonType.secondary"
+              :noMargin="true"
+              :label="$t('i18nCommon.APIMocking.restartMock')"
             ></TDButton>
           </div>
         </div>
@@ -509,6 +515,14 @@ export default {
       me.bodyText = "";
       me.responseText = "";
     },
+    async restartMockServer() {
+      let me = this;
+      try {
+        await me.agentAPI.restartMockServerFromClient();
+      } catch (error) {
+        me.$tdUtility.showErrorNotFoundAgentServer();
+      }
+    },
     /**
      * Lưu hoặc cập nhật mock API
      */
@@ -704,5 +718,8 @@ export default {
 }
 .td-plus-icon {
   cursor: pointer;
+}
+.collection-group-footer {
+  gap: var(--padding);
 }
 </style>

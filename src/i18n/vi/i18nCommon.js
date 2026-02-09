@@ -372,6 +372,7 @@ export default {
       addNew: "Thêm mới",
       groupName: "Tên nhóm",
       createNew: "Tạo mới",
+      restartMock: "Khởi động lại server mock",
       refresh: "Làm mới",
       loadMockErr: "Lỗi tải danh sách mock APIs",
       requestNameAndApiUrlRequired: "Vui lòng nhập tên request và endpoint",

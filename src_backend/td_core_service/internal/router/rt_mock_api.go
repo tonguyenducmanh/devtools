@@ -19,4 +19,7 @@ func InjectMockAPIRouter(app *http.ServeMux) {
 	app.HandleFunc("GET /mock_api/get_all_group", service.GetAllMockGroup)
 	app.HandleFunc("POST /mock_api/create_group", service.CreateMockGroup)
 	app.HandleFunc("DELETE /mock_api/delete_group", service.RemoveMockGroup)
+
+	// Common
+	app.HandleFunc("GET /mock_api/restart_mock_server", service.RestartMockServerFromClient)
 }
