@@ -239,7 +239,7 @@ func CreateMockAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.ID = GenUUID()
+	req.ID = core_service.GenUUID()
 
 	err := database.CreateMockAPI(&req)
 	if err != nil {
@@ -376,7 +376,7 @@ func CreateMockGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.ID = GenUUID()
+	req.ID = core_service.GenUUID()
 
 	err := database.CreateMockGroup(&req)
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"td_core_service/internal/core_service"
 	"td_core_service/internal/database"
 	"td_core_service/internal/model"
 )
@@ -84,7 +85,7 @@ func executeRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingRespons
  * log dữ liệu vào db
  */
 func logDataCallAPIToDatabase(reqData model.TDAPITestingParam, responseText string, statusCode int) {
-	id := GenUUID()
+	id := core_service.GenUUID()
 	database.LogDataCallAPIToDatabase(reqData, responseText, statusCode, id)
 }
 
