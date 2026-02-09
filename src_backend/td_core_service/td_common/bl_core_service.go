@@ -1,8 +1,9 @@
-package core_service
+package td_common
 
 import (
 	"crypto/rand"
 	"fmt"
+	"time"
 )
 
 /**
@@ -11,7 +12,8 @@ import (
 func BuildRunningAddressServer(server_name string, port *int) string {
 	addr := fmt.Sprintf("%d", *port)
 	server := "localhost"
-	fmt.Printf("%s đang chạy tại http://%s:%s\n", server_name, server, addr)
+	log_message := fmt.Sprintf("%s đang chạy tại http://%s:%s\n", server_name, server, addr)
+	LogInfo(log_message)
 	addBuildMuxServer := fmt.Sprintf(":%d", *port)
 	return addBuildMuxServer
 }
@@ -34,4 +36,10 @@ func GenUUID() string {
 
 	return fmt.Sprintf("%x-%x-%x-%x-%x",
 		b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
+}
+
+func LogInfo(message string) {
+	t := time.Now()
+	// Định dạng: Ngày/Tháng/Năm Giờ:Phút:Giây
+	fmt.Printf("[%s] %s", t.Format("02/01/2006 15:04:05"), message)
 }

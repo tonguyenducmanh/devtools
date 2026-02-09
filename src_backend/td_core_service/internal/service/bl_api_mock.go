@@ -10,9 +10,9 @@ import (
 	"strings"
 	"sync"
 	configGlobal "td_core_service/external/config"
-	"td_core_service/internal/core_service"
 	"td_core_service/internal/database"
 	"td_core_service/internal/model"
+	"td_core_service/td_common"
 	"time"
 )
 
@@ -81,7 +81,7 @@ func RestartMockServer() {
 
 	// Chạy server trong goroutine
 	go func() {
-		core_service.BuildRunningAddressServer("Server Mock API", &mockPort)
+		td_common.BuildRunningAddressServer("Server Mock API", &mockPort)
 		if err := mockServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			fmt.Printf("Lỗi Mock API Server: %v\n", err)
 		}
@@ -239,7 +239,7 @@ func CreateMockAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.ID = core_service.GenUUID()
+	req.ID = td_common.GenUUID()
 
 	err := database.CreateMockAPI(&req)
 	if err != nil {
@@ -376,7 +376,7 @@ func CreateMockGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.ID = core_service.GenUUID()
+	req.ID = td_common.GenUUID()
 
 	err := database.CreateMockGroup(&req)
 	if err != nil {
