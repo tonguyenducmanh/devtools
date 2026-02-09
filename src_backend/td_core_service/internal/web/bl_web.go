@@ -14,9 +14,7 @@ import (
 //go:embed all:dist
 var embeddedFiles embed.FS
 
-/**
- * Chạy web app
- */
+// Chạy web app
 func RunWebApp(port *int, trace *bool) {
 
 	publicFS, err := fs.Sub(embeddedFiles, "dist")
@@ -35,9 +33,7 @@ func RunWebApp(port *int, trace *bool) {
 	}
 }
 
-/**
- * log folder được dùng để run static web
- */
+// log folder được dùng để run static web
 func logDirectory(trace *bool, publicFS fs.FS) {
 	if *trace {
 		fmt.Println("Embedded files:")

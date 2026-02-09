@@ -1,8 +1,6 @@
 package config
 
-/**
- * kiểu dữ liệu config chung
- */
+// kiểu dữ liệu config chung
 type TDCenterConfig struct {
 	// cấu hình api chung của app backend
 	APIConfig APIConfig `json:"api_config"`
@@ -31,9 +29,7 @@ type MockAPIConfig struct {
 	EnableTrace bool `json:"enable_trace"`
 }
 
-/**
- * apply giá trị default
- */
+// apply giá trị default
 func DefaultConfig() TDCenterConfig {
 	return TDCenterConfig{
 		APIConfig: APIConfig{

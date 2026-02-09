@@ -4,9 +4,7 @@ import (
 	"td_core_service/internal/model"
 )
 
-/**
- * Lấy tất cả mock API từ database
- */
+// Lấy tất cả mock API từ database
 func GetAllMockAPIs() ([]model.TDAPIMockItem, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -47,9 +45,7 @@ func GetAllMockAPIs() ([]model.TDAPIMockItem, error) {
 	return mocks, nil
 }
 
-/**
- * Lấy tất cả mock API để auto start (không sắp xếp)
- */
+// Lấy tất cả mock API để auto start (không sắp xếp)
 func GetAllMockAPIsForAutoStart() ([]model.TDAPIMockItem, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -88,9 +84,7 @@ func GetAllMockAPIsForAutoStart() ([]model.TDAPIMockItem, error) {
 	return mocks, nil
 }
 
-/**
- * Tạo mock API mới trong database
- */
+// Tạo mock API mới trong database
 func CreateMockAPI(mock *model.TDAPIMockItem) error {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -117,9 +111,7 @@ func CreateMockAPI(mock *model.TDAPIMockItem) error {
 	return err
 }
 
-/**
- * Cập nhật mock API trong database
- */
+// Cập nhật mock API trong database
 func UpdateMockAPI(mock *model.TDAPIMockItem) (int64, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -151,9 +143,7 @@ func UpdateMockAPI(mock *model.TDAPIMockItem) (int64, error) {
 	return result.RowsAffected()
 }
 
-/**
- * Xóa mock API khỏi database
- */
+// Xóa mock API khỏi database
 func DeleteMockAPI(id string) (int64, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -175,9 +165,7 @@ func DeleteMockAPI(id string) (int64, error) {
 	return result.RowsAffected()
 }
 
-/**
- * Lấy tất cả nhóm mock API từ database
- */
+// Lấy tất cả nhóm mock API từ database
 func GetAllMockGroups() ([]model.TDAPIMockGroup, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -213,9 +201,7 @@ func GetAllMockGroups() ([]model.TDAPIMockGroup, error) {
 	return groups, nil
 }
 
-/**
- * Tạo nhóm mock API mới
- */
+// Tạo nhóm mock API mới
 func CreateMockGroup(group *model.TDAPIMockGroup) error {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -237,9 +223,7 @@ func CreateMockGroup(group *model.TDAPIMockGroup) error {
 	return err
 }
 
-/**
- * Xóa nhóm mock API và tất cả mock API thuộc nhóm đó
- */
+// Xóa nhóm mock API và tất cả mock API thuộc nhóm đó
 func DeleteMockGroup(id string) error {
 	db, err := GetConnectionDB()
 	if err != nil {

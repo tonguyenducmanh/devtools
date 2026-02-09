@@ -8,9 +8,7 @@ import (
 	"td_core_service/internal/model"
 )
 
-/**
- * thực hiện lấy danh sách toàn bộ bảng trong database
- */
+// thực hiện lấy danh sách toàn bộ bảng trong database
 func GetAllTableInDatabase(w http.ResponseWriter, r *http.Request) {
 	allTables, err := database.GetAllTableInDatabase()
 	if err != nil {
@@ -25,9 +23,7 @@ func GetAllTableInDatabase(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * thực hiện lấy danh sách toàn bộ dữ liệu theo 1 bảng có trong database
- */
+// thực hiện lấy danh sách toàn bộ dữ liệu theo 1 bảng có trong database
 func GetAllDataByTableName(w http.ResponseWriter, r *http.Request) {
 	currentTableName := r.URL.Query().Get("table_name")
 	allDataByTableName, err := database.GetAllDataByTableName(currentTableName)
@@ -43,9 +39,7 @@ func GetAllDataByTableName(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * thực hiện query tùy chỉnh cho user
- */
+// thực hiện query tùy chỉnh cho user
 func DataMinerExecuteQuery(w http.ResponseWriter, r *http.Request) {
 	var req model.APIDataMinerQueryParam
 

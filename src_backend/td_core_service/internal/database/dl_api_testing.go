@@ -4,9 +4,7 @@ import (
 	"td_core_service/internal/model"
 )
 
-/**
- * Lấy tất cả API testing từ database
- */
+// Lấy tất cả API testing từ database
 func GetAllTestingAPIs() ([]model.TDAPITestingItem, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -47,9 +45,7 @@ func GetAllTestingAPIs() ([]model.TDAPITestingItem, error) {
 	return tests, nil
 }
 
-/**
- * Tạo API testing mới
- */
+// Tạo API testing mới
 func CreateTestingAPI(test *model.TDAPITestingItem) error {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -76,9 +72,7 @@ func CreateTestingAPI(test *model.TDAPITestingItem) error {
 	return err
 }
 
-/**
- * Cập nhật API testing
- */
+// Cập nhật API testing
 func UpdateTestingAPI(test *model.TDAPITestingItem) (int64, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -110,9 +104,7 @@ func UpdateTestingAPI(test *model.TDAPITestingItem) (int64, error) {
 	return result.RowsAffected()
 }
 
-/**
- * Xóa API testing
- */
+// Xóa API testing
 func DeleteTestingAPI(id string) (int64, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -134,9 +126,7 @@ func DeleteTestingAPI(id string) (int64, error) {
 	return result.RowsAffected()
 }
 
-/**
- * Lấy tất cả nhóm API testing
- */
+// Lấy tất cả nhóm API testing
 func GetAllTestingGroups() ([]model.TDAPITestingGroup, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -172,9 +162,7 @@ func GetAllTestingGroups() ([]model.TDAPITestingGroup, error) {
 	return groups, nil
 }
 
-/**
- * Tạo nhóm API testing mới
- */
+// Tạo nhóm API testing mới
 func CreateTestingGroup(group *model.TDAPITestingGroup) error {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -196,9 +184,7 @@ func CreateTestingGroup(group *model.TDAPITestingGroup) error {
 	return err
 }
 
-/**
- * Cập nhật nhóm API testing
- */
+// Cập nhật nhóm API testing
 func UpdateTestingGroup(group *model.TDAPITestingGroup) (int64, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -222,9 +208,7 @@ func UpdateTestingGroup(group *model.TDAPITestingGroup) (int64, error) {
 	return result.RowsAffected()
 }
 
-/**
- * Xóa nhóm API testing và các test thuộc nhóm đó
- */
+// Xóa nhóm API testing và các test thuộc nhóm đó
 func DeleteTestingGroup(id string) error {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -266,9 +250,7 @@ func DeleteTestingGroup(id string) error {
 	return tx.Commit()
 }
 
-/**
- * Import hàng loạt dữ liệu API testing (Groups + Items) trong 1 transaction
- */
+// Import hàng loạt dữ liệu API testing (Groups + Items) trong 1 transaction
 func BatchImportTestingData(batch *model.TDAPITestingImportBatch) error {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -322,9 +304,7 @@ func BatchImportTestingData(batch *model.TDAPITestingImportBatch) error {
 	return tx.Commit()
 }
 
-/**
- * log dữ liệu vào db
- */
+// log dữ liệu vào db
 func LogDataCallAPIToDatabase(reqData model.TDAPITestingParam, responseText string, statusCode int, id string) {
 	db, err := GetConnectionDB()
 	if err != nil {

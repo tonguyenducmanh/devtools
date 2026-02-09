@@ -5,9 +5,7 @@ import (
 	"td_core_service/internal/service"
 )
 
-/**
- * Inject các router liên quan đến Mock API
- */
+// Inject các router liên quan đến Mock API
 func InjectMockAPIRouter(app *http.ServeMux) {
 	// API cho mock item
 	app.HandleFunc("POST /mock_api/create_mock", service.CreateMockAPI)

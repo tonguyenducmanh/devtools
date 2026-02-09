@@ -22,17 +22,13 @@ var (
 	mockPort        int
 )
 
-/**
- * Khởi tạo mock API service với port riêng
- */
+// Khởi tạo mock API service với port riêng
 func InitMockAPIService(port int) {
 	mockPort = port
 	RestartMockServer()
 }
 
-/**
- * Khởi động lại mock server từ phía client
- */
+// Khởi động lại mock server từ phía client
 func RestartMockServerFromClient(w http.ResponseWriter, r *http.Request) {
 	RestartMockServer()
 
@@ -43,9 +39,7 @@ func RestartMockServerFromClient(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * Khởi động lại server mock API
- */
+// Khởi động lại server mock API
 func RestartMockServer() {
 	mockServerMutex.Lock()
 	defer mockServerMutex.Unlock()
@@ -93,9 +87,7 @@ func RestartMockServer() {
 	}()
 }
 
-/**
- * build ra hàm handler cho việc xử lý api từ phía client
- */
+// build ra hàm handler cho việc xử lý api từ phía client
 func buildHandlerAPIMux(mux *http.ServeMux) http.HandlerFunc {
 	var handler http.HandlerFunc = nil
 	// cấu hình endpoint có phân biệt hoa thường hay không
@@ -110,9 +102,7 @@ func buildHandlerAPIMux(mux *http.ServeMux) http.HandlerFunc {
 	return handler
 }
 
-/**
- * Nhóm các mock theo endpoint và method
- */
+// Nhóm các mock theo endpoint và method
 func groupMocksByRoute(mocks []model.TDAPIMockItem) map[string][]model.TDAPIMockItem {
 	mocksByRoute := make(map[string][]model.TDAPIMockItem)
 
@@ -128,9 +118,7 @@ func groupMocksByRoute(mocks []model.TDAPIMockItem) map[string][]model.TDAPIMock
 	return mocksByRoute
 }
 
-/**
- * Đăng ký route vào mux 1 số route default
- */
+// Đăng ký route vào mux 1 số route default
 func registerDefaultRouteOnMux(mux *http.ServeMux) {
 	// route không tồn tại thì trả về not found specific
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -149,9 +137,7 @@ func registerDefaultRouteOnMux(mux *http.ServeMux) {
 	})
 }
 
-/**
- * Đăng ký route vào mux cụ thể với hỗ trợ nhiều response theo body
- */
+// Đăng ký route vào mux cụ thể với hỗ trợ nhiều response theo body
 func registerMockRouteOnMux(mux *http.ServeMux, pattern string, mocks []model.TDAPIMockItem) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -184,9 +170,7 @@ func registerMockRouteOnMux(mux *http.ServeMux, pattern string, mocks []model.TD
 	td_common.LogInfo(fmt.Sprintf("Đã đăng ký mock API: %s với %d biến thể", pattern, len(mocks)))
 }
 
-/**
- * Tìm mock phù hợp dựa trên request body
- */
+// Tìm mock phù hợp dựa trên request body
 func findMatchingMock(mocks []model.TDAPIMockItem, BodyText []byte) *model.TDAPIMockItem {
 	BodyTextStr := string(BodyText)
 
@@ -213,9 +197,7 @@ func findMatchingMock(mocks []model.TDAPIMockItem, BodyText []byte) *model.TDAPI
 	return &mocks[0]
 }
 
-/**
- * So sánh 2 JSON string có bằng nhau không (bỏ qua thứ tự key)
- */
+// So sánh 2 JSON string có bằng nhau không (bỏ qua thứ tự key)
 func jsonEqual(json1, json2 string) bool {
 	// Nếu cả 2 đều rỗng
 	if strings.TrimSpace(json1) == "" && strings.TrimSpace(json2) == "" {
@@ -241,17 +223,13 @@ func jsonEqual(json1, json2 string) bool {
 	return string(bytes1) == string(bytes2)
 }
 
-/**
- * Hash body để so sánh nhanh (dự phòng)
- */
+// Hash body để so sánh nhanh (dự phòng)
 func hashBody(body string) string {
 	hash := md5.Sum([]byte(strings.TrimSpace(body)))
 	return fmt.Sprintf("%x", hash)
 }
 
-/**
- * thực hiện tạo api mock
- */
+// thực hiện tạo api mock
 func CreateMockAPI(w http.ResponseWriter, r *http.Request) {
 	var req model.TDAPIMockItem
 
@@ -284,9 +262,7 @@ func CreateMockAPI(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * thực hiện lấy danh sách mock api
- */
+// thực hiện lấy danh sách mock api
 func GetAllMockAPI(w http.ResponseWriter, r *http.Request) {
 	mocks, err := database.GetAllMockAPIs()
 	if err != nil {
@@ -301,9 +277,7 @@ func GetAllMockAPI(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * thực hiện cập nhật api mock
- */
+// thực hiện cập nhật api mock
 func UpdateMockAPI(w http.ResponseWriter, r *http.Request) {
 	var req model.TDAPIMockItem
 
@@ -338,9 +312,7 @@ func UpdateMockAPI(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * thực hiện xóa api mock
- */
+// thực hiện xóa api mock
 func RemoveMockAPI(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
@@ -369,9 +341,7 @@ func RemoveMockAPI(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * thực hiện lấy danh sách nhóm mock api
- */
+// thực hiện lấy danh sách nhóm mock api
 func GetAllMockGroup(w http.ResponseWriter, r *http.Request) {
 	groups, err := database.GetAllMockGroups()
 	if err != nil {
@@ -386,9 +356,7 @@ func GetAllMockGroup(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * thực hiện tạo nhóm mock api mới
- */
+// thực hiện tạo nhóm mock api mới
 func CreateMockGroup(w http.ResponseWriter, r *http.Request) {
 	var req model.TDAPIMockGroup
 
@@ -418,9 +386,7 @@ func CreateMockGroup(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * thực hiện xóa nhóm mock api
- */
+// thực hiện xóa nhóm mock api
 func RemoveMockGroup(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	if id == "" {

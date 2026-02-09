@@ -7,9 +7,7 @@ import (
 	"time"
 )
 
-/**
- * log ra server đang chạy
- */
+// log ra server đang chạy
 func BuildRunningAddressServer(server_name string, port *int) string {
 	addr := fmt.Sprintf("%d", *port)
 	server := "localhost"
@@ -19,9 +17,7 @@ func BuildRunningAddressServer(server_name string, port *int) string {
 	return addBuildMuxServer
 }
 
-/**
- * Tạo UUID v4
- */
+// Tạo UUID v4
 func GenUUID() string {
 	b := make([]byte, 16)
 	_, err := rand.Read(b)
@@ -39,6 +35,7 @@ func GenUUID() string {
 		b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 }
 
+// hàm log common của toàn chương trình
 func LogInfo(message string) {
 	t := time.Now()
 	sub_fix := "\n"

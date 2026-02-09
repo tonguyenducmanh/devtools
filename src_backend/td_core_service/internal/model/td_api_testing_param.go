@@ -1,8 +1,6 @@
 package model
 
-/**
- * param api gọi từ frontend
- */
+// param api gọi từ frontend
 type TDAPITestingParam struct {
 	ApiURL      string `json:"api_url" binding:"required"`
 	HttpMethod  string `json:"http_method" binding:"required"`

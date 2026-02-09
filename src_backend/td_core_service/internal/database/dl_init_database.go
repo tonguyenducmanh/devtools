@@ -22,18 +22,14 @@ func dbPath() string {
 	return filepath.Join(dir, configGlobal.GetConfigGlobal().DatabaseName)
 }
 
-/**
- * Lấy ra thông tin kết nối
- */
+// Lấy ra thông tin kết nối
 func GetConnectionDB() (*sql.DB, error) {
 	// 1. Mở kết nối (Tên driver là "sqlite")
 	db, err := sql.Open("sqlite", dbPath())
 	return db, err
 }
 
-/**
- * Khởi tạo database nếu chưa có
- */
+// Khởi tạo database nếu chưa có
 func InitDatabase() {
 	// 1. Mở kết nối (Tên driver là "sqlite")
 	db, err := GetConnectionDB()

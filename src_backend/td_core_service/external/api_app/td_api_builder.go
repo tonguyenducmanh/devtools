@@ -9,9 +9,7 @@ import (
 	"td_core_service/td_common"
 )
 
-/**
- * khởi chạy api app
- */
+// khởi chạy api app
 func RunAPIApp(port *int, mockPort *int, trace *bool) {
 
 	database.InitDatabase()
@@ -33,9 +31,7 @@ func RunAPIApp(port *int, mockPort *int, trace *bool) {
 	}
 }
 
-/**
- * thêm các route xử lý nghiệp vụ
- */
+// thêm các route xử lý nghiệp vụ
 func addRoute(app *http.ServeMux) {
 	// Inject router cho từng nghiệp vụ
 	router.InjectCommonRouter(app)

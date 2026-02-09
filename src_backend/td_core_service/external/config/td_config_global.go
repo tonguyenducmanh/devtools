@@ -13,9 +13,7 @@ var (
 	oneLock      sync.Once
 )
 
-/**
- * lấy ra cấu hình config
- */
+// lấy ra cấu hình config
 func GetConfigGlobal() *TDCenterConfig {
 	oneLock.Do(func() {
 		path, _ := findConfigUpwards()
@@ -32,9 +30,7 @@ func GetConfigGlobal() *TDCenterConfig {
 	return configGlobal
 }
 
-/**
- * tìm ra file config đang nằm ở thư mục nào
- */
+// tìm ra file config đang nằm ở thư mục nào
 func findConfigUpwards() (string, error) {
 	dir, err := os.Executable()
 	if err != nil {

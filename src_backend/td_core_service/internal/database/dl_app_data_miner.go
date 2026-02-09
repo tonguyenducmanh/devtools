@@ -5,9 +5,7 @@ import (
 	"fmt"
 )
 
-/**
- * thực hiện lấy danh sách toàn bộ bảng trong database
- */
+// thực hiện lấy danh sách toàn bộ bảng trong database
 func GetAllTableInDatabase() ([]string, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -43,9 +41,7 @@ func GetAllTableInDatabase() ([]string, error) {
 	return allTableNames, nil
 }
 
-/**
- * thực hiện lấy danh sách toàn bộ dữ liệu trong 1 bảng trong database
- */
+// thực hiện lấy danh sách toàn bộ dữ liệu trong 1 bảng trong database
 func GetAllDataByTableName(tableName string) ([]map[string]any, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -65,9 +61,7 @@ func GetAllDataByTableName(tableName string) ([]map[string]any, error) {
 	return appMinerReadDynamicData(rows)
 }
 
-/**
- * thực hiện query động theo yêu cầu của user
- */
+// thực hiện query động theo yêu cầu của user
 func DataMinerExecuteQuery(script string) ([]map[string]any, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -85,9 +79,7 @@ func DataMinerExecuteQuery(script string) ([]map[string]any, error) {
 	return appMinerReadDynamicData(rows)
 }
 
-/**
- * hàm đọc dữ liệu động trả về cho frontend
- */
+// hàm đọc dữ liệu động trả về cho frontend
 func appMinerReadDynamicData(rows *sql.Rows) ([]map[string]any, error) {
 	columns, err := rows.Columns()
 	if err != nil {

@@ -81,17 +81,13 @@ func executeRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingRespons
 	}, nil
 }
 
-/**
- * log dữ liệu vào db
- */
+// log dữ liệu vào db
 func logDataCallAPIToDatabase(reqData model.TDAPITestingParam, responseText string, statusCode int) {
 	id := td_common.GenUUID()
 	database.LogDataCallAPIToDatabase(reqData, responseText, statusCode, id)
 }
 
-/**
- * Lấy tất cả API testing
- */
+// Lấy tất cả API testing
 func GetAllTestingAPIs(w http.ResponseWriter, r *http.Request) {
 	tests, err := database.GetAllTestingAPIs()
 	if err != nil {
@@ -106,9 +102,7 @@ func GetAllTestingAPIs(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * Tạo API testing mới
- */
+// Tạo API testing mới
 func CreateTestingAPI(w http.ResponseWriter, r *http.Request) {
 	var test model.TDAPITestingItem
 	if err := json.NewDecoder(r.Body).Decode(&test); err != nil {
@@ -134,9 +128,7 @@ func CreateTestingAPI(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * Cập nhật API testing
- */
+// Cập nhật API testing
 func UpdateTestingAPI(w http.ResponseWriter, r *http.Request) {
 	var test model.TDAPITestingItem
 	if err := json.NewDecoder(r.Body).Decode(&test); err != nil {
@@ -157,9 +149,7 @@ func UpdateTestingAPI(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * Xóa API testing
- */
+// Xóa API testing
 func DeleteTestingAPI(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
@@ -180,9 +170,7 @@ func DeleteTestingAPI(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * Lấy tất cả nhóm API testing
- */
+// Lấy tất cả nhóm API testing
 func GetAllTestingGroups(w http.ResponseWriter, r *http.Request) {
 	groups, err := database.GetAllTestingGroups()
 	if err != nil {
@@ -197,9 +185,7 @@ func GetAllTestingGroups(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * Tạo nhóm API testing mới
- */
+// Tạo nhóm API testing mới
 func CreateTestingGroup(w http.ResponseWriter, r *http.Request) {
 	var group model.TDAPITestingGroup
 	if err := json.NewDecoder(r.Body).Decode(&group); err != nil {
@@ -225,9 +211,7 @@ func CreateTestingGroup(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * Cập nhật nhóm API testing
- */
+// Cập nhật nhóm API testing
 func UpdateTestingGroup(w http.ResponseWriter, r *http.Request) {
 	var group model.TDAPITestingGroup
 	if err := json.NewDecoder(r.Body).Decode(&group); err != nil {
@@ -248,9 +232,7 @@ func UpdateTestingGroup(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * Xóa nhóm API testing
- */
+// Xóa nhóm API testing
 func DeleteTestingGroup(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
@@ -271,9 +253,7 @@ func DeleteTestingGroup(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/**
- * parse header được stringify từ frontend
- */
+// parse header được stringify từ frontend
 func parseHeaders(text string) map[string]string {
 	headers := make(map[string]string)
 	lines := strings.Split(text, "\n")
@@ -290,9 +270,7 @@ func parseHeaders(text string) map[string]string {
 	return headers
 }
 
-/**
- * Import batch API testing
- */
+// Import batch API testing
 func BatchImportTestingData(w http.ResponseWriter, r *http.Request) {
 	var batch model.TDAPITestingImportBatch
 	if err := json.NewDecoder(r.Body).Decode(&batch); err != nil {

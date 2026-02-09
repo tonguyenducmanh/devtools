@@ -5,9 +5,7 @@ import (
 	"td_core_service/internal/service"
 )
 
-/**
- * Inject các router liên quan đến thực thi API (gọi nối)
- */
+// Inject các router liên quan đến thực thi API (gọi nối)
 func InjectAPITestingRouter(app *http.ServeMux) {
 	// Thực thi API
 	app.HandleFunc("POST /api_test/exec", service.Execute)
