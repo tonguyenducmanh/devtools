@@ -60,6 +60,11 @@ func RestartMockServer() {
 
 	// Tạo mux mới và đăng ký lại tất cả routes từ database
 	mux := http.NewServeMux()
+
+	// gán 1 số route default
+	registerDefaultRouteOnMux(mux)
+
+	// gán 1 số route theo thiết lập từ phía client
 	mocks, err := database.GetAllMockAPIsForAutoStart()
 	if err != nil {
 		td_common.LogInfo(fmt.Sprintf("Lỗi query mock APIs: %v", err))
@@ -121,6 +126,27 @@ func groupMocksByRoute(mocks []model.TDAPIMockItem) map[string][]model.TDAPIMock
 	}
 
 	return mocksByRoute
+}
+
+/**
+ * Đăng ký route vào mux 1 số route default
+ */
+func registerDefaultRouteOnMux(mux *http.ServeMux) {
+	// route không tồn tại thì trả về not found specific
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		not_found_log := "404 Not Found API endpoint mock không tồn tại"
+		// Log lại để biết có request truy cập vào route lạ
+		td_common.LogInfo(fmt.Sprintf("%s: %s %s", not_found_log, r.Method, r.URL.Path))
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": not_found_log,
+			"path":    r.URL.Path,
+			"method":  r.Method,
+		})
+	})
 }
 
 /**
