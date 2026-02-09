@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strings"
+	"td_core_service/internal/core_service"
 )
 
 //go:embed all:dist
@@ -27,8 +28,7 @@ func RunWebApp(port *int, trace *bool) {
 
 	handler := spaHandler(publicFS)
 
-	addr := fmt.Sprintf(":%d", *port)
-	fmt.Printf("Server Web đang chạy tại http://localhost%s\n", addr)
+	addr := core_service.BuildRunningAddressServer("Server Web UI", port)
 
 	if err := http.ListenAndServe(addr, handler); err != nil {
 		log.Fatal(err)

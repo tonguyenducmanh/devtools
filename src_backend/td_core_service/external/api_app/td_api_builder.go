@@ -1,8 +1,8 @@
 package api_app
 
 import (
-	"fmt"
 	"net/http"
+	"td_core_service/internal/core_service"
 	"td_core_service/internal/database"
 	"td_core_service/internal/middleware"
 	"td_core_service/internal/router"
@@ -26,8 +26,7 @@ func RunAPIApp(port *int, mockPort *int, trace *bool) {
 	// Xâu chuỗi Middlewares: CORS -> Router
 	finalHandler := middleware.ApplyCORS(app)
 
-	addr := fmt.Sprintf(":%d", *port)
-	fmt.Printf("Server API đang chạy tại http://localhost%s\n", addr)
+	addr := core_service.BuildRunningAddressServer("Server Agent API", port)
 
 	if err := http.ListenAndServe(addr, finalHandler); err != nil {
 		panic(err)

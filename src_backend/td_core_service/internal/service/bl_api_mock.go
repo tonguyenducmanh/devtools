@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	configGlobal "td_core_service/external/config"
+	"td_core_service/internal/core_service"
 	"td_core_service/internal/database"
 	"td_core_service/internal/model"
 	"time"
@@ -80,7 +81,7 @@ func RestartMockServer() {
 
 	// Chạy server trong goroutine
 	go func() {
-		fmt.Printf("Mock API Server đang chạy tại http://localhost:%d\n", mockPort)
+		core_service.BuildRunningAddressServer("Server Mock API", &mockPort)
 		if err := mockServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			fmt.Printf("Lỗi Mock API Server: %v\n", err)
 		}
