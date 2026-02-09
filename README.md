@@ -45,6 +45,7 @@ The backend services are configured or default via `config/config.json`.
 ```json
 {
   "database_name": "dev_tool.db",
+  "endpoint_case_sensitive": false,
   "api_config": {
     "port": 7777,
     "enable_trace": false
