@@ -71,31 +71,17 @@ This tool uses **SQLite** (Go side) to persist data into a local file.
 
 ---
 
-## Command Line Flags
-
-You can override the configuration file settings using command line flags.
-
 ### Daemon App (Runs both API and Web)
 
 ```bash
-./daemon_app -api-port=7777 -web-port=1403 -mock-port=8888 -api-trace=false -web-trace=false
+./daemon_app
 ```
-
-- `-api-port`: Port for the API agent
-- `-api-trace`: Enable detailed logging for the API
-- `-web-port`: Port for the Web server
-- `-web-trace`: Enable detailed logging for the Web server
-- `-mock-port`: Port for the Mock API server
 
 ### API App (Standalone API)
 
 ```bash
-./api_app -port=7777 -mock_port=8888 -trace=false
+./api_app
 ```
-
-- `-port`: Port for the API agent
-- `-mock_port`: Port for the Mock API server
-- `-trace`: Enable detailed logging for the API server
 
 ---
 
