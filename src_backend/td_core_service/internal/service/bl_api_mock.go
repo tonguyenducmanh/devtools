@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	configGlobal "td_core_service/external/config"
 	"td_core_service/internal/database"
 	"td_core_service/internal/model"
 	"time"
@@ -56,10 +57,12 @@ func RestartMockServer() {
 		}
 	}
 
+	handler := buildHandlerAPIMux(mux)
+
 	// Tạo server mới
 	mockServer = &http.Server{
 		Addr:    fmt.Sprintf(":%d", mockPort),
-		Handler: mux,
+		Handler: handler,
 	}
 
 	// Chạy server trong goroutine
@@ -69,6 +72,23 @@ func RestartMockServer() {
 			fmt.Printf("Lỗi Mock API Server: %v\n", err)
 		}
 	}()
+}
+
+/**
+ * build ra hàm handler cho việc xử lý api từ phía client
+ */
+func buildHandlerAPIMux(mux *http.ServeMux) http.HandlerFunc {
+	var handler http.HandlerFunc = nil
+	// cấu hình endpoint có phân biệt hoa thường hay không
+	if configGlobal.GetConfigGlobal().EndpointCaseSensitive {
+		handler = mux.ServeHTTP
+	} else {
+		handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			r.URL.Path = strings.ToLower(r.URL.Path)
+			mux.ServeHTTP(w, r)
+		})
+	}
+	return handler
 }
 
 /**

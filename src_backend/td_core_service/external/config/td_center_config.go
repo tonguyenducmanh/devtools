@@ -4,10 +4,16 @@ package config
  * kiểu dữ liệu config chung
  */
 type TDCenterConfig struct {
-	APIConfig     APIConfig     `json:"api_config"`
-	WebConfig     WebConfig     `json:"web_config"`
+	// cấu hình api chung của app backend
+	APIConfig APIConfig `json:"api_config"`
+	// cấu hình UI web server
+	WebConfig WebConfig `json:"web_config"`
+	// cấu hình mock api server
 	MockAPIConfig MockAPIConfig `json:"mock_api_config"`
-	DatabaseName  string        `json:"database_name"`
+	// tên database của app
+	DatabaseName string `json:"database_name"`
+	// endpoint của api có phân biệt hoa thường không
+	EndpointCaseSensitive bool `json:"endpoint_case_sensitive"`
 }
 
 type APIConfig struct {
@@ -42,6 +48,7 @@ func DefaultConfig() TDCenterConfig {
 			Port:        8888,
 			EnableTrace: false,
 		},
-		DatabaseName: "dev_tool.db",
+		DatabaseName:          "dev_tool.db",
+		EndpointCaseSensitive: false,
 	}
 }
