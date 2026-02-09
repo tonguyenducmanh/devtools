@@ -55,14 +55,14 @@ func RestartMockServer() {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 		defer cancel()
 		mockServer.Shutdown(ctx)
-		fmt.Printf("Đã dừng Mock API Server tại port %d để cập nhật cấu hình\n", mockPort)
+		td_common.LogInfo("Đã dừng Mock API Server để cập nhật cấu hình")
 	}
 
 	// Tạo mux mới và đăng ký lại tất cả routes từ database
 	mux := http.NewServeMux()
 	mocks, err := database.GetAllMockAPIsForAutoStart()
 	if err != nil {
-		fmt.Printf("Lỗi query mock APIs: %v\n", err)
+		td_common.LogInfo(fmt.Sprintf("Lỗi query mock APIs: %v\n", err))
 	} else {
 		// Nhóm các mock theo endpoint và method
 		mocksByRoute := groupMocksByRoute(mocks)
@@ -83,7 +83,7 @@ func RestartMockServer() {
 	go func() {
 		td_common.BuildRunningAddressServer("Server Mock API", &mockPort)
 		if err := mockServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			fmt.Printf("Lỗi Mock API Server: %v\n", err)
+			td_common.LogInfo(fmt.Sprintf("Lỗi Mock API Server: %v\n", err))
 		}
 	}()
 }
@@ -155,7 +155,7 @@ func registerMockRouteOnMux(mux *http.ServeMux, pattern string, mocks []model.TD
 	}
 
 	mux.HandleFunc(pattern, handler)
-	fmt.Printf("Đã đăng ký mock API: %s với %d variants\n", pattern, len(mocks))
+	td_common.LogInfo(fmt.Sprintf("Đã đăng ký mock API: %s với %d biến thể\n", pattern, len(mocks)))
 }
 
 /**
@@ -168,7 +168,7 @@ func findMatchingMock(mocks []model.TDAPIMockItem, BodyText []byte) *model.TDAPI
 	for i := range mocks {
 		if mocks[i].BodyText != "" {
 			if jsonEqual(mocks[i].BodyText, BodyTextStr) {
-				fmt.Printf("✓ Matched exact body for mock: %s\n", mocks[i].RequestName)
+				td_common.LogInfo(fmt.Sprintf("Đã tìm được body tương ứng với mock: %s\n", mocks[i].RequestName))
 				return &mocks[i]
 			}
 		}
@@ -177,13 +177,13 @@ func findMatchingMock(mocks []model.TDAPIMockItem, BodyText []byte) *model.TDAPI
 	// Trường hợp 2: Tìm mock có BodyText trống hoặc null (dùng làm default)
 	for i := range mocks {
 		if mocks[i].BodyText == "" || mocks[i].BodyText == "null" {
-			fmt.Printf("✓ Using default mock: %s\n", mocks[i].RequestName)
+			td_common.LogInfo(fmt.Sprintf("Đã sử dụng default mock: %s\n", mocks[i].RequestName))
 			return &mocks[i]
 		}
 	}
 
 	// Trường hợp 3: Nếu không tìm thấy, dùng mock đầu tiên
-	fmt.Printf("⚠ No matching body found, using first mock: %s\n", mocks[0].RequestName)
+	td_common.LogInfo(fmt.Sprintf("Không tìm được body tương ứng, dùng mock đầu tiên: %s\n", mocks[0].RequestName))
 	return &mocks[0]
 }
 
