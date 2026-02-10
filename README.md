@@ -8,8 +8,6 @@ This is a Client-Daemon Application.
 
 [https://tool.tomanh.com/](https://tool.tomanh.com/)
 
----
-
 ## Setup
 
 ```bash
@@ -34,8 +32,6 @@ chmod 777 ./build_all.sh
 ./build_all.sh
 ```
 
----
-
 ## Configuration
 
 The backend services are configured or default via `config/config.json`.
@@ -49,19 +45,3 @@ This tool uses **SQLite** (Go side) to persist data into a local file.
 - **Database File**: `dev_tool.db` (as defined in `config.json`)
 - All configurations, user-defined mock APIs, and tool-specific data are stored in this file.
 - SQLite is used to ensure portability and ease of backup—everything is contained within your local directory.
-
----
-
-### Daemon App (Runs both API and Web)
-
-```bash
-./daemon_app
-```
-
-### API App (Standalone API)
-
-```bash
-./api_app
-```
-
----
