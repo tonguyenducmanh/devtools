@@ -40,26 +40,7 @@ chmod 777 ./build_all.sh
 
 The backend services are configured or default via `config/config.json`.
 
-### Configuration File (`config/config.json`)
-
-```json
-{
-  "database_name": "dev_tool.db",
-  "endpoint_case_sensitive": false,
-  "api_config": {
-    "port": 7777,
-    "enable_trace": false
-  },
-  "web_config": {
-    "port": 1403,
-    "enable_trace": false
-  },
-  "mock_api_config": {
-    "port": 8888,
-    "enable_trace": false
-  }
-}
-```
+Frontend-specific configuration can be found at: `public/cfg/config.js`
 
 ### Data Storage (SQLite)
 
@@ -84,10 +65,3 @@ This tool uses **SQLite** (Go side) to persist data into a local file.
 ```
 
 ---
-
-## UI Configuration
-
-Frontend-specific configuration can be found at:
-
-- `public/cfg/config.js`
-- Backend configuration: `config/config.json`
