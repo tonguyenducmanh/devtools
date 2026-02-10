@@ -108,6 +108,10 @@ func groupMocksByRoute(mocks []model.TDAPIMockItem) map[string][]model.TDAPIMock
 
 	for i := range mocks {
 		endpoint := mocks[i].Endpoint
+		// cấu hình endpoint có phân biệt hoa thường hay không
+		if configGlobal.GetConfigGlobal().EndpointCaseSensitive {
+			endpoint = strings.ToLower(endpoint)
+		}
 		if !strings.HasPrefix(endpoint, "/") {
 			endpoint = "/" + endpoint
 		}
