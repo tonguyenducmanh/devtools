@@ -21,8 +21,11 @@ func RunAPIApp(port *int, mockPort *int, trace *bool) {
 	// Khởi tạo mock API service trên port riêng và tự động start tất cả mock APIs
 	service.InitMockAPIService(*mockPort)
 
+	// inject 1 số kịch bản chung toàn chương tình vào handler
+	var handler = td_common.BuildHanlderAPICommon(app)
+
 	// Xâu chuỗi Middlewares: CORS -> Router
-	finalHandler := middleware.ApplyCORS(app)
+	finalHandler := middleware.ApplyCORS(handler)
 
 	addr := td_common.BuildRunningAddressServer("Server Agent API", port)
 

@@ -52,11 +52,11 @@ func RestartMockServer() {
 		td_common.LogInfo("Đã dừng Mock API Server để cập nhật cấu hình")
 	}
 
-	// Tạo mux mới và đăng ký lại tất cả routes từ database
-	mux := http.NewServeMux()
+	// Tạo app mới và đăng ký lại tất cả routes từ database
+	app := http.NewServeMux()
 
 	// gán 1 số route default
-	registerDefaultRouteOnMux(mux)
+	registerDefaultRouteOnMux(app)
 
 	// gán 1 số route theo thiết lập từ phía client
 	mocks, err := database.GetAllMockAPIsForAutoStart()
@@ -66,11 +66,12 @@ func RestartMockServer() {
 		// Nhóm các mock theo endpoint và method
 		mocksByRoute := groupMocksByRoute(mocks)
 		for routeKey, routeMocks := range mocksByRoute {
-			registerMockRouteOnMux(mux, routeKey, routeMocks)
+			registerMockRouteOnMux(app, routeKey, routeMocks)
 		}
 	}
 
-	handler := buildHandlerAPIMux(mux)
+	// inject 1 số kịch bản chung toàn chương tình vào handler
+	var handler = td_common.BuildHanlderAPICommon(app)
 
 	// Tạo server mới
 	mockServer = &http.Server{
@@ -87,21 +88,6 @@ func RestartMockServer() {
 	}()
 }
 
-// build ra hàm handler cho việc xử lý api từ phía client
-func buildHandlerAPIMux(mux *http.ServeMux) http.HandlerFunc {
-	var handler http.HandlerFunc = nil
-	// cấu hình endpoint có phân biệt hoa thường hay không
-	if configGlobal.GetConfigGlobal().EndpointCaseSensitive {
-		handler = mux.ServeHTTP
-	} else {
-		handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			r.URL.Path = strings.ToLower(r.URL.Path)
-			mux.ServeHTTP(w, r)
-		})
-	}
-	return handler
-}
-
 // Nhóm các mock theo endpoint và method
 func groupMocksByRoute(mocks []model.TDAPIMockItem) map[string][]model.TDAPIMockItem {
 	mocksByRoute := make(map[string][]model.TDAPIMockItem)
@@ -109,7 +95,7 @@ func groupMocksByRoute(mocks []model.TDAPIMockItem) map[string][]model.TDAPIMock
 	for i := range mocks {
 		endpoint := mocks[i].Endpoint
 		// cấu hình endpoint có phân biệt hoa thường hay không
-		if configGlobal.GetConfigGlobal().EndpointCaseSensitive {
+		if !configGlobal.GetConfigGlobal().EndpointCaseSensitive {
 			endpoint = strings.ToLower(endpoint)
 		}
 		if !strings.HasPrefix(endpoint, "/") {

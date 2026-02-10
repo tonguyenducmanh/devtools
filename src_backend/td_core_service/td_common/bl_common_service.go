@@ -3,7 +3,9 @@ package td_common
 import (
 	"crypto/rand"
 	"fmt"
+	"net/http"
 	"strings"
+	configGlobal "td_core_service/external/config"
 	"time"
 )
 
@@ -44,4 +46,20 @@ func LogInfo(message string) {
 	}
 	// Định dạng: Ngày/Tháng/Năm Giờ:Phút:Giây
 	fmt.Printf("[%s] %s", t.Format("02/01/2006 15:04:05"), message)
+}
+
+// build ra hanlder api common
+func BuildHanlderAPICommon(app *http.ServeMux) http.HandlerFunc {
+	var handler http.HandlerFunc = nil
+
+	// cấu hình endpoint có phân biệt hoa thường hay không
+	if configGlobal.GetConfigGlobal().EndpointCaseSensitive {
+		handler = app.ServeHTTP
+	} else {
+		handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			r.URL.Path = strings.ToLower(r.URL.Path)
+			app.ServeHTTP(w, r)
+		})
+	}
+	return handler
 }
