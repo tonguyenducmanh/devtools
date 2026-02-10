@@ -63,3 +63,10 @@ func BuildHanlderAPICommon(app *http.ServeMux) http.HandlerFunc {
 	}
 	return handler
 }
+
+// cấu hình bypass CORS
+func BypassCORSConfig(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+}

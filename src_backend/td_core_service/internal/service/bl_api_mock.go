@@ -132,9 +132,7 @@ func registerMockRouteOnMux(mux *http.ServeMux, pattern string, mocks []model.TD
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		// Thêm CORS cho mock API
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		td_common.BypassCORSConfig(w)
 
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
