@@ -11,6 +11,7 @@ import (
 	"sync"
 	configGlobal "td_core_service/external/config"
 	"td_core_service/internal/database"
+	"td_core_service/internal/middleware"
 	"td_core_service/internal/model"
 	"td_core_service/td_common"
 	"time"
@@ -132,7 +133,7 @@ func registerMockRouteOnMux(mux *http.ServeMux, pattern string, mocks []model.TD
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		// Thêm CORS cho mock API
-		td_common.BypassCORSConfig(w)
+		middleware.BypassCORSConfig(w)
 
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
