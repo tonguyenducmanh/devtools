@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="main-otp-container">
-      <div class="flex">
+      <div class="flex td-first-header">
         <TDComboBox
           :width="120"
           :noMargin="true"
@@ -33,6 +33,7 @@
           ></TDUpload>
           <div>
             <TDButton
+              :noMargin="true"
               :type="$tdEnum.buttonType.secondary"
               :label="$t('i18nCommon.oneTimePassword.auth.add')"
               @click="decodeGoogleAuth"
@@ -51,6 +52,7 @@
           />
           <div>
             <TDButton
+              :noMargin="true"
               :type="$tdEnum.buttonType.secondary"
               :label="$t('i18nCommon.oneTimePassword.auth.add')"
               :readOnly="!migrationURL"
@@ -69,14 +71,17 @@
             :placeHolder="$t('i18nCommon.oneTimePassword.inputs.issuer')"
           />
           <TDInput
+            :noMargin="true"
             v-model="addNewObject.name"
             :placeHolder="$t('i18nCommon.oneTimePassword.inputs.name')"
           />
           <TDInput
+            :noMargin="true"
             v-model="addNewObject.secret"
             :placeHolder="$t('i18nCommon.oneTimePassword.inputs.secret')"
           />
           <TDButton
+            :noMargin="true"
             :type="$tdEnum.buttonType.secondary"
             :readOnly="
               !addNewObject || !addNewObject.name || !addNewObject.secret
@@ -683,7 +688,6 @@ export default {
   flex-direction: column;
   width: 100%;
   height: 100%;
-  padding: var(--padding);
 }
 .note {
   color: var(--warning-color);
@@ -699,9 +703,9 @@ export default {
   .otp-container {
     display: flex;
     flex-direction: column;
-    gap: calc(var(--padding) / 2);
+    gap: var(--padding);
     width: 100%;
-    padding: var(--padding);
+    padding: var(--padding) 0;
   }
 
   .otp-item {
@@ -716,7 +720,6 @@ export default {
     padding: var(--padding);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
-    margin: var(--padding);
     .otp-left {
       display: flex;
       flex-direction: column;
@@ -764,7 +767,7 @@ export default {
   }
 }
 .td-source-otp {
-  margin-left: var(--padding);
+  // margin-left: var(--padding);
 }
 
 body[data-theme="dark"] {
@@ -772,8 +775,13 @@ body[data-theme="dark"] {
     color: var(--text-color) !important;
   }
 }
+.td-first-header {
+  margin-bottom: var(--padding);
+  .flex-one {
+    gap: var(--padding);
+  }
+}
 .td-second-header {
   gap: var(--padding);
-  margin: 0 var(--padding);
 }
 </style>
