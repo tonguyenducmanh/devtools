@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="main-otp-container">
+    <div class="flex flex-col otp-header">
       <div class="flex td-first-header">
         <TDComboBox
           :width="120"
@@ -137,6 +137,8 @@
       <div v-if="isShowProgress" class="otp-progress-wrapper">
         <progress :value="progress" max="100"></progress>
       </div>
+    </div>
+    <div class="main-otp-container">
       <div class="flex otp-container">
         <template v-for="(item, index) in optShowList">
           <div
@@ -747,9 +749,28 @@ export default {
       font-size: 32px;
     }
   }
+}
+
+body[data-theme="dark"] {
+  .otp-value {
+    color: var(--text-color) !important;
+  }
+}
+.otp-header {
+  width: 100%;
+  .td-first-header {
+    width: 100%;
+    margin-bottom: var(--padding);
+    .flex-one {
+      gap: var(--padding);
+    }
+  }
+  .td-second-header {
+    width: 100%;
+    gap: var(--padding);
+  }
   .otp-progress-wrapper {
     width: 100%;
-    padding: 0 var(--padding);
     progress {
       width: 100%;
       height: 8px;
@@ -765,23 +786,5 @@ export default {
       }
     }
   }
-}
-.td-source-otp {
-  // margin-left: var(--padding);
-}
-
-body[data-theme="dark"] {
-  .otp-value {
-    color: var(--text-color) !important;
-  }
-}
-.td-first-header {
-  margin-bottom: var(--padding);
-  .flex-one {
-    gap: var(--padding);
-  }
-}
-.td-second-header {
-  gap: var(--padding);
 }
 </style>
