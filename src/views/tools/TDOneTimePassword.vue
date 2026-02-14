@@ -158,9 +158,14 @@
         </template>
       </div>
     </div>
-    <div class="flex">
-      <TDInput v-model="filterRemove" :placeHolder="placeHolderRemove" />
+    <div class="flex footer-section">
+      <TDInput
+        :noMargin="true"
+        v-model="filterRemove"
+        :placeHolder="placeHolderRemove"
+      />
       <TDButton
+        :noMargin="true"
         :label="$t('i18nCommon.oneTimePassword.remove.button')"
         :readOnly="!filterRemove"
         @click="removeByFilter"
@@ -786,5 +791,9 @@ body[data-theme="dark"] {
       }
     }
   }
+}
+.footer-section {
+  margin-top: var(--padding);
+  gap: var(--padding);
 }
 </style>
