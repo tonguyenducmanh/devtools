@@ -122,6 +122,18 @@
                 :noMargin="true"
               />
             </div>
+            <div class="flex input-config-item">
+              <span class="title-input-config">{{
+                $t("i18nCommon.textToQRCode.exampleWordCount")
+              }}</span>
+              <TDInput
+                v-model="exampleWordCount"
+                :inputType="'number'"
+                class="value-input-config max-length-input"
+                :placeHolder="'350'"
+                :noMargin="true"
+              />
+            </div>
           </div>
         </div>
       </template>
@@ -133,7 +145,7 @@ import QRCode from "qrcode";
 import JSZip from "jszip";
 import TDCompress from "@/common/compress/TDCompress.js";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
-
+import TDMockTextGenerate from "@/common/mock/TDMockTextGenerate.js";
 export default {
   name: "TDTextToQRCode",
   components: { TDSubSidebar },
@@ -150,8 +162,9 @@ export default {
       this.secondSectionSize = sizes.rightSize;
     },
     async applyMock() {
+      let me = this;
       let dataMock = {
-        textGenQR: "2131",
+        textGenQR: TDMockTextGenerate.generateLoremWords(me.exampleWordCount),
       };
       this.$tdUtility.applyMock(this, dataMock);
     },
@@ -387,6 +400,7 @@ export default {
       maxLengthUserConfig: window.__env.textToQRConfig.maxTextOneChunk,
       QRWidthSize: 300,
       QRHeightSize: 350,
+      exampleWordCount: 10,
       isCompressText:
         window.__env &&
         window.__env.textToQRConfig &&

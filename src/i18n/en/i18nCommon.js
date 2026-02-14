@@ -193,6 +193,7 @@ export default {
       popupTitle: "HTML Preview",
     },
     textToQRCode: {
+      exampleWordCount: "Example word",
       QRWidthSize: "QR width",
       QRHeightSize: "QR height",
       title: "Text To QRCode tool!",
