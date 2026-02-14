@@ -16,6 +16,7 @@ import TDComboBox from "@/components/TDComboBox.vue";
 import TDHistory from "@/components/TDHistory.vue";
 import TDTableViewer from "@/components/TDTableViewer.vue";
 import TDResizer from "@/components/TDResizer.vue";
+import TDVirtualScroll from "@/components/TDVirtualScroll.vue";
 import TDPopup from "@/components/TDPopup.vue";
 import i18nData, { loadLocale } from "@/i18n/i18nData.js";
 import eventBus from "@/common/event/TDEventBus.js";
@@ -51,6 +52,7 @@ import "@/common/TDMonacoEditor.js";
   currentApp.component("TDPopup", TDPopup);
   currentApp.component("TDTableViewer", TDTableViewer);
   currentApp.component("TDResizer", TDResizer);
+  currentApp.component("TDVirtualScroll", TDVirtualScroll);
 
   // router link
   currentApp.use(router);

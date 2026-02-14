@@ -36,31 +36,39 @@
         :minSize="15"
       />
       <div class="qrcode-box" :style="secondSectionResizeStyle">
-        <template v-for="(item, index) in qrCodeItems">
-          <div class="qr-container" :style="QRImageStyle">
-            <div class="qr-header">
-              <span>{{
-                $t("i18nCommon.textToQRCode.part").format(
-                  index + 1,
-                  qrCodeItems.length,
-                )
-              }}</span>
-              <TDButton
-                @click="copyQRCode(item.src, index)"
-                :type="$tdEnum.buttonType.secondary"
-                :label="$t('i18nCommon.textToQRCode.buttons.copyImage')"
-                class="download-btn"
-              ></TDButton>
-              <TDButton
-                @click="downloadQRCode(item.src, index)"
-                :type="$tdEnum.buttonType.secondary"
-                :label="$t('i18nCommon.textToQRCode.buttons.download')"
-                class="download-btn"
-              ></TDButton>
+        <TDVirtualScroll
+          :items="qrCodeItems"
+          :itemHeight="QRHeightSize"
+          :itemWidth="QRWidthSize"
+          :gap="10"
+          :bufferSize="0"
+        >
+          <template #default="{ item, index }">
+            <div class="qr-container" :style="QRImageStyle">
+              <div class="qr-header">
+                <span>{{
+                  $t("i18nCommon.textToQRCode.part").format(
+                    index + 1,
+                    qrCodeItems.length,
+                  )
+                }}</span>
+                <TDButton
+                  @click="copyQRCode(item.src, index)"
+                  :type="$tdEnum.buttonType.secondary"
+                  :label="$t('i18nCommon.textToQRCode.buttons.copyImage')"
+                  class="download-btn"
+                ></TDButton>
+                <TDButton
+                  @click="downloadQRCode(item.src, index)"
+                  :type="$tdEnum.buttonType.secondary"
+                  :label="$t('i18nCommon.textToQRCode.buttons.download')"
+                  class="download-btn"
+                ></TDButton>
+              </div>
+              <img :src="item.src" />
             </div>
-            <img :src="item.src" />
-          </div>
-        </template>
+          </template>
+        </TDVirtualScroll>
       </div>
     </div>
     <TDSubSidebar v-model="isShowSidebar">
@@ -434,12 +442,12 @@ export default {
   margin-bottom: var(--padding);
 }
 .qrcode-box {
+  width: 100%;
   display: flex;
   flex-wrap: wrap; /* cho phép xuống hàng */
   gap: var(--padding);
   justify-content: flex-start; /* hoặc center nếu muốn */
   align-items: flex-start;
-  overflow: auto;
 }
 /* Style cho container của từng mã QR */
 .qr-container {
