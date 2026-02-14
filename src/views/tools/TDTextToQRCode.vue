@@ -150,12 +150,10 @@ export default {
       this.secondSectionSize = sizes.rightSize;
     },
     async applyMock() {
-      // Lazy-load module
-      const { TDMockTextToQRCode } = await import(
-        /* webpackChunkName: "mock-text-to-qr-code" */
-        "@/common/mock/TDMockTextToQRCode.js"
-      );
-      this.$tdUtility.applyMock(this, TDMockTextToQRCode);
+      let dataMock = {
+        textGenQR: "2131",
+      };
+      this.$tdUtility.applyMock(this, dataMock);
     },
     async toggleCompressText() {
       let me = this;
