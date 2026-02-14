@@ -57,7 +57,7 @@ export default {
       QRCodeFromText: "Mã QR từ văn bản",
       QRCodeToText: "Mã QR sang văn bản",
       DownloadVSCodeExtension: "Tiện ích VS Code",
-      UUIDV4Generator: "Trình tạo UUID V4",
+      UUIDV4Generator: "Trình tạo UUID",
       HTMLPreview: "Xem trước HTML",
       textManipulation: "Xử lý văn bản",
       APITesting: "API testing",

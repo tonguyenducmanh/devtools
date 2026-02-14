@@ -57,7 +57,7 @@ export default {
       QRCodeFromText: "QRCode from text",
       QRCodeToText: "QRCode to text",
       DownloadVSCodeExtension: "VSCode Extension",
-      UUIDV4Generator: "UUIDv4 generator",
+      UUIDV4Generator: "UUID generator",
       HTMLPreview: "HTML Preview",
       textManipulation: "Text manipulation",
       APITesting: "API testing",
@@ -179,7 +179,7 @@ export default {
       },
     },
     uuidGenerator: {
-      title: "UUIDv4 generator tool!",
+      title: "UUID generator tool!",
       buttons: {
         generate: "Generate",
       },
