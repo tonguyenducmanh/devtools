@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <div class="main-otp-container">
-      <div class="flex">
+    <div class="flex flex-col otp-header">
+      <div class="flex td-first-header">
         <TDComboBox
           :width="120"
           :noMargin="true"
@@ -33,6 +33,7 @@
           ></TDUpload>
           <div>
             <TDButton
+              :noMargin="true"
               :type="$tdEnum.buttonType.secondary"
               :label="$t('i18nCommon.oneTimePassword.auth.add')"
               @click="decodeGoogleAuth"
@@ -51,6 +52,7 @@
           />
           <div>
             <TDButton
+              :noMargin="true"
               :type="$tdEnum.buttonType.secondary"
               :label="$t('i18nCommon.oneTimePassword.auth.add')"
               :readOnly="!migrationURL"
@@ -69,14 +71,17 @@
             :placeHolder="$t('i18nCommon.oneTimePassword.inputs.issuer')"
           />
           <TDInput
+            :noMargin="true"
             v-model="addNewObject.name"
             :placeHolder="$t('i18nCommon.oneTimePassword.inputs.name')"
           />
           <TDInput
+            :noMargin="true"
             v-model="addNewObject.secret"
             :placeHolder="$t('i18nCommon.oneTimePassword.inputs.secret')"
           />
           <TDButton
+            :noMargin="true"
             :type="$tdEnum.buttonType.secondary"
             :readOnly="
               !addNewObject || !addNewObject.name || !addNewObject.secret
@@ -132,6 +137,8 @@
       <div v-if="isShowProgress" class="otp-progress-wrapper">
         <progress :value="progress" max="100"></progress>
       </div>
+    </div>
+    <div class="main-otp-container">
       <div class="flex otp-container">
         <template v-for="(item, index) in optShowList">
           <div
@@ -683,7 +690,6 @@ export default {
   flex-direction: column;
   width: 100%;
   height: 100%;
-  padding: var(--padding);
 }
 .note {
   color: var(--warning-color);
@@ -699,9 +705,9 @@ export default {
   .otp-container {
     display: flex;
     flex-direction: column;
-    gap: calc(var(--padding) / 2);
+    gap: var(--padding);
     width: 100%;
-    padding: var(--padding);
+    padding: var(--padding) 0;
   }
 
   .otp-item {
@@ -716,7 +722,6 @@ export default {
     padding: var(--padding);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
-    margin: var(--padding);
     .otp-left {
       display: flex;
       flex-direction: column;
@@ -744,9 +749,28 @@ export default {
       font-size: 32px;
     }
   }
+}
+
+body[data-theme="dark"] {
+  .otp-value {
+    color: var(--text-color) !important;
+  }
+}
+.otp-header {
+  width: 100%;
+  .td-first-header {
+    width: 100%;
+    margin-bottom: var(--padding);
+    .flex-one {
+      gap: var(--padding);
+    }
+  }
+  .td-second-header {
+    width: 100%;
+    gap: var(--padding);
+  }
   .otp-progress-wrapper {
     width: 100%;
-    padding: 0 var(--padding);
     progress {
       width: 100%;
       height: 8px;
@@ -762,18 +786,5 @@ export default {
       }
     }
   }
-}
-.td-source-otp {
-  margin-left: var(--padding);
-}
-
-body[data-theme="dark"] {
-  .otp-value {
-    color: var(--text-color) !important;
-  }
-}
-.td-second-header {
-  gap: var(--padding);
-  margin: 0 var(--padding);
 }
 </style>
