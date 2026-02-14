@@ -130,7 +130,7 @@
                 v-model="exampleWordCount"
                 :inputType="'number'"
                 class="value-input-config max-length-input"
-                :placeHolder="'350'"
+                :placeHolder="'10'"
                 :noMargin="true"
               />
             </div>
