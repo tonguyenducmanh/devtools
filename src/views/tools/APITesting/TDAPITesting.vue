@@ -650,7 +650,6 @@
 import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDArrow from "@/components/TDArrow.vue";
-import TDResizer from "@/components/TDResizer.vue";
 import JSZip from "jszip";
 import TDAPIResponseStatus from "@/views/tools/APITesting/TDAPIResponseStatus.vue";
 import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
@@ -669,7 +668,6 @@ export default {
     TDAPIResponse,
     TDAPIResponseStatus,
     TDHistorySidebar,
-    TDResizer,
   },
 
   data() {

@@ -1,7 +1,7 @@
 <template>
   <div class="flex container">
-    <div class="main-tool">
-      <div class="flex flex-col input-section">
+    <div class="flex flex-col main-tool">
+      <div class="flex flex-col input-section" :style="firstSectionResizeStyle">
         <div class="input-area">
           <TDTextarea
             :placeHolder="$t('i18nCommon.textToQRCode.input.placeholder')"
@@ -28,34 +28,39 @@
           ></TDButton>
         </div>
       </div>
-      <div v-if="textGenQR" class="qrcode-section">
-        <div class="qrcode-box">
-          <template v-for="(item, index) in qrCodeItems">
-            <div class="qr-container" :style="QRImageStyle">
-              <div class="qr-header">
-                <span>{{
-                  $t("i18nCommon.textToQRCode.part").format(
-                    index + 1,
-                    qrCodeItems.length,
-                  )
-                }}</span>
-                <TDButton
-                  @click="copyQRCode(item.src, index)"
-                  :type="$tdEnum.buttonType.secondary"
-                  :label="$t('i18nCommon.textToQRCode.buttons.copyImage')"
-                  class="download-btn"
-                ></TDButton>
-                <TDButton
-                  @click="downloadQRCode(item.src, index)"
-                  :type="$tdEnum.buttonType.secondary"
-                  :label="$t('i18nCommon.textToQRCode.buttons.download')"
-                  class="download-btn"
-                ></TDButton>
-              </div>
-              <img :src="item.src" />
+      <!-- Resizer -->
+      <TDResizer
+        v-if="textGenQR && qrCodeItems && qrCodeItems.length > 0"
+        :direction="'vertical'"
+        @resize="handleResize"
+        :minSize="15"
+      />
+      <div class="qrcode-box" :style="secondSectionResizeStyle">
+        <template v-for="(item, index) in qrCodeItems">
+          <div class="qr-container" :style="QRImageStyle">
+            <div class="qr-header">
+              <span>{{
+                $t("i18nCommon.textToQRCode.part").format(
+                  index + 1,
+                  qrCodeItems.length,
+                )
+              }}</span>
+              <TDButton
+                @click="copyQRCode(item.src, index)"
+                :type="$tdEnum.buttonType.secondary"
+                :label="$t('i18nCommon.textToQRCode.buttons.copyImage')"
+                class="download-btn"
+              ></TDButton>
+              <TDButton
+                @click="downloadQRCode(item.src, index)"
+                :type="$tdEnum.buttonType.secondary"
+                :label="$t('i18nCommon.textToQRCode.buttons.download')"
+                class="download-btn"
+              ></TDButton>
             </div>
-          </template>
-        </div>
+            <img :src="item.src" />
+          </div>
+        </template>
       </div>
     </div>
     <TDSubSidebar v-model="isShowSidebar">
@@ -132,6 +137,10 @@ export default {
   },
   mounted() {},
   methods: {
+    handleResize(sizes) {
+      this.firstSectionSize = sizes.leftSize;
+      this.secondSectionSize = sizes.rightSize;
+    },
     async applyMock() {
       // Lazy-load module
       const { TDMockTextToQRCode } = await import(
@@ -345,9 +354,27 @@ export default {
       };
       return style;
     },
+    /**
+     * Tính toán style động cho request area
+     */
+    firstSectionResizeStyle() {
+      let me = this;
+      let style = { height: `${me.firstSectionSize}%` };
+      return style;
+    },
+    /**
+     * Tính toán style động cho response area
+     */
+    secondSectionResizeStyle() {
+      let me = this;
+      let style = { height: `${me.secondSectionSize}%` };
+      return style;
+    },
   },
   data() {
     return {
+      firstSectionSize: 50, // Phần request chiếm 50%
+      secondSectionSize: 50, // Phần response chiếm 50%
       isShowSidebar: true,
       textGenQR: null,
       qrCodeItems: [],
@@ -370,9 +397,9 @@ export default {
   height: 100%;
 }
 .main-tool {
-  flex: 1;
   height: 100%;
-  overflow: auto;
+  width: 100%;
+  justify-content: flex-start;
 }
 
 .input-section {
@@ -381,9 +408,13 @@ export default {
   align-items: flex-start;
 }
 
+.qr-section {
+  width: 100%;
+}
+
 .input-area {
   width: 100%;
-  height: 200px;
+  flex: 1;
 }
 .checkbox-wrapper {
   display: flex;
@@ -402,15 +433,13 @@ export default {
 .button-generate {
   margin-bottom: var(--padding);
 }
-.qrcode-section {
-  margin: var(--padding);
-}
 .qrcode-box {
   display: flex;
   flex-wrap: wrap; /* cho phép xuống hàng */
   gap: var(--padding);
   justify-content: flex-start; /* hoặc center nếu muốn */
   align-items: flex-start;
+  overflow: auto;
 }
 /* Style cho container của từng mã QR */
 .qr-container {

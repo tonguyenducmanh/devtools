@@ -251,7 +251,6 @@
 </template>
 
 <script>
-import TDResizer from "@/components/TDResizer.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDArrow from "@/components/TDArrow.vue";
 import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
@@ -259,7 +258,7 @@ import TDServerMockAPI from "@/common/api/request/AgentAPI/TDServerMockAPI.js";
 
 export default {
   name: "TDAPIMocking",
-  components: { TDResizer, TDSubSidebar, TDArrow },
+  components: { TDSubSidebar, TDArrow },
   mixins: [TDLayoutConfigMixin],
 
   data() {
