@@ -56,7 +56,12 @@
           :bufferSize="0"
         >
           <template #default="{ item, index }">
-            <div class="qr-container" :style="QRImageStyle">
+            <div
+              class="qr-container"
+              :style="QRImageStyle"
+              v-tooltip="$t('i18nCommon.copy')"
+              @click="copyQRCode(item.src, index)"
+            >
               <img :src="item.src" />
             </div>
           </template>
@@ -270,6 +275,15 @@ export default {
       me.qrCodeItems.push(result);
     },
     /**
+     * Copy ảnh từ url
+     * @param {string} dataUrl - Data URL của QR code
+     */
+    copyQRCode(dataUrl, index) {
+      let me = this;
+      // Tạo blob và mở popup tải file
+      me.$tdUtility.copyImageFromUrl(dataUrl);
+    },
+    /**
      * Chuyển đổi Data URL thành Blob
      * @param {string} dataUrl - Data URL cần chuyển đổi
      * @returns {Blob} Blob data
@@ -420,6 +434,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  cursor: pointer;
 }
 
 .download-btn {
