@@ -8,24 +8,36 @@
             v-model="textGenQR"
           ></TDTextarea>
         </div>
-        <div class="flex button-generate">
-          <TDButton
-            :readOnly="!textGenQR"
-            @click="generateQRCode(null)"
-            :label="$t('i18nCommon.textToQRCode.buttons.generate')"
-          ></TDButton>
-          <TDButton
-            @click="downloadAllQRCodes"
-            :type="$tdEnum.buttonType.secondary"
-            :readOnly="!qrCodeItems || !qrCodeItems.length"
-            :label="$t('i18nCommon.textToQRCode.buttons.downloadAll')"
-            class="download-all-btn"
-          ></TDButton>
-          <TDButton
-            @click="applyMock"
-            :type="$tdEnum.buttonType.secondary"
-            :label="$t('i18nCommon.textToQRCode.buttons.example')"
-          ></TDButton>
+        <div class="flex group-footer-input">
+          <div class="flex button-generate">
+            <TDButton
+              :noMargin="true"
+              :readOnly="!textGenQR"
+              @click="generateQRCode(null)"
+              :label="$t('i18nCommon.textToQRCode.buttons.generate')"
+            ></TDButton>
+            <TDButton
+              :noMargin="true"
+              @click="downloadAllQRCodes"
+              :type="$tdEnum.buttonType.secondary"
+              :readOnly="!qrCodeItems || !qrCodeItems.length"
+              :label="$t('i18nCommon.textToQRCode.buttons.downloadAll')"
+              class="download-all-btn"
+            ></TDButton>
+            <TDButton
+              :noMargin="true"
+              @click="applyMock"
+              :type="$tdEnum.buttonType.secondary"
+              :label="$t('i18nCommon.textToQRCode.buttons.example')"
+            ></TDButton>
+          </div>
+          <div v-if="qrCodeItems && qrCodeItems.length > 0">
+            {{
+              $t("i18nCommon.textToQRCode.totalQRGen").format(
+                qrCodeItems.length,
+              )
+            }}
+          </div>
         </div>
       </div>
       <!-- Resizer -->
@@ -38,33 +50,13 @@
       <div class="qrcode-box" :style="secondSectionResizeStyle">
         <TDVirtualScroll
           :items="qrCodeItems"
-          :itemHeight="QRHeightSize"
-          :itemWidth="QRWidthSize"
+          :itemHeight="QRSizeInPixel"
+          :itemWidth="QRSizeInPixel"
           :gap="10"
           :bufferSize="0"
         >
           <template #default="{ item, index }">
             <div class="qr-container" :style="QRImageStyle">
-              <div class="qr-header">
-                <span>{{
-                  $t("i18nCommon.textToQRCode.part").format(
-                    index + 1,
-                    qrCodeItems.length,
-                  )
-                }}</span>
-                <TDButton
-                  @click="copyQRCode(item.src, index)"
-                  :type="$tdEnum.buttonType.secondary"
-                  :label="$t('i18nCommon.textToQRCode.buttons.copyImage')"
-                  class="download-btn"
-                ></TDButton>
-                <TDButton
-                  @click="downloadQRCode(item.src, index)"
-                  :type="$tdEnum.buttonType.secondary"
-                  :label="$t('i18nCommon.textToQRCode.buttons.download')"
-                  class="download-btn"
-                ></TDButton>
-              </div>
               <img :src="item.src" />
             </div>
           </template>
@@ -100,22 +92,10 @@
             </div>
             <div class="flex input-config-item">
               <span class="title-input-config">{{
-                $t("i18nCommon.textToQRCode.QRWidthSize")
+                $t("i18nCommon.textToQRCode.QRSizeInPixel")
               }}</span>
               <TDInput
-                v-model="QRWidthSize"
-                :inputType="'number'"
-                class="value-input-config max-length-input"
-                :placeHolder="300"
-                :noMargin="true"
-              />
-            </div>
-            <div class="flex input-config-item">
-              <span class="title-input-config">{{
-                $t("i18nCommon.textToQRCode.QRHeightSize")
-              }}</span>
-              <TDInput
-                v-model="QRHeightSize"
+                v-model="QRSizeInPixel"
                 :inputType="'number'"
                 class="value-input-config max-length-input"
                 :placeHolder="350"
@@ -326,29 +306,6 @@ export default {
     },
 
     /**
-     * Tải xuống QR code dưới dạng hình ảnh PNG
-     * @param {string} dataUrl - Data URL của QR code
-     * @param {number} index - Vị trí của QR code trong danh sách
-     */
-    downloadQRCode(dataUrl, index) {
-      let me = this;
-      // Tạo blob và mở popup tải file
-      me.$tdUtility.createDownloadFileFromUrl(
-        dataUrl,
-        `qrcode-part-${index + 1}.png`,
-      );
-    },
-    /**
-     * Copy ảnh từ url
-     * @param {string} dataUrl - Data URL của QR code
-     */
-    copyQRCode(dataUrl, index) {
-      let me = this;
-      // Tạo blob và mở popup tải file
-      me.$tdUtility.copyImageFromUrl(dataUrl);
-    },
-
-    /**
      * Lấy timestamp hiện tại để thêm vào header
      * @returns {string} Timestamp định dạng YYYYMMDDHHmmss
      */
@@ -368,8 +325,8 @@ export default {
     QRImageStyle() {
       let me = this;
       let style = {
-        width: `${me.QRWidthSize}px`,
-        height: `${me.QRHeightSize}px`,
+        width: `${me.QRSizeInPixel}px`,
+        height: `${me.QRSizeInPixel}px`,
       };
       return style;
     },
@@ -398,8 +355,7 @@ export default {
       textGenQR: null,
       qrCodeItems: [],
       maxLengthUserConfig: window.__env.textToQRConfig.maxTextOneChunk,
-      QRWidthSize: 300,
-      QRHeightSize: 350,
+      QRSizeInPixel: 350,
       exampleWordCount: 10,
       isCompressText:
         window.__env &&
@@ -450,9 +406,7 @@ export default {
   color: #333;
   cursor: pointer;
 }
-.button-generate {
-  margin-bottom: var(--padding);
-}
+
 .qrcode-box {
   width: 100%;
   display: flex;
@@ -463,20 +417,8 @@ export default {
 }
 /* Style cho container của từng mã QR */
 .qr-container {
-  width: 300px;
-  height: 350px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-}
-
-.qr-header {
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
   align-items: center;
 }
 
@@ -512,6 +454,14 @@ export default {
     .value-input-config {
       width: 100px;
     }
+  }
+}
+.group-footer-input {
+  width: 100%;
+  justify-content: space-between;
+  margin: var(--padding) 0;
+  .button-generate {
+    gap: var(--padding);
   }
 }
 </style>

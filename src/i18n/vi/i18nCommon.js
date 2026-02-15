@@ -192,9 +192,9 @@ export default {
       popupTitle: "Xem trước HTML",
     },
     textToQRCode: {
+      totalQRGen: "Đã tạo {0} mã QR",
       exampleWordCount: "Số từ ví dụ",
-      QRWidthSize: "Độ rộng QR",
-      QRHeightSize: "Độ cao QR",
+      QRSizeInPixel: "Kích cỡ QR (px)",
       title: "Công cụ tạo mã QR từ văn bản!",
       input: {
         placeholder: "Nhập văn bản để tạo mã QR code...",
