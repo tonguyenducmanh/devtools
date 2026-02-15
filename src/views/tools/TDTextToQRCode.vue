@@ -106,7 +106,7 @@
                 v-model="QRWidthSize"
                 :inputType="'number'"
                 class="value-input-config max-length-input"
-                :placeHolder="'300'"
+                :placeHolder="300"
                 :noMargin="true"
               />
             </div>
@@ -118,7 +118,7 @@
                 v-model="QRHeightSize"
                 :inputType="'number'"
                 class="value-input-config max-length-input"
-                :placeHolder="'350'"
+                :placeHolder="350"
                 :noMargin="true"
               />
             </div>
@@ -130,7 +130,7 @@
                 v-model="exampleWordCount"
                 :inputType="'number'"
                 class="value-input-config max-length-input"
-                :placeHolder="'10'"
+                :placeHolder="10"
                 :noMargin="true"
               />
             </div>

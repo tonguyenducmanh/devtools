@@ -44,7 +44,7 @@ export default {
   },
   props: {
     placeHolder: {
-      type: String,
+      type: [String, Number],
       default: null,
     },
     modelValue: {
@@ -82,7 +82,12 @@ export default {
   methods: {
     changeInputValue(e) {
       let me = this;
-      me.$emit("update:modelValue", e.target.value);
+      let valueEmit = e.target.value;
+      // e.target.value luôn trả về giá trị là kiểu text
+      if (me.inputType == "number") {
+        valueEmit = valueEmit === "" ? 0 : Number(valueEmit);
+      }
+      me.$emit("update:modelValue", valueEmit);
     },
     handleInputClickOutSide() {
       let me = this;
