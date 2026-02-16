@@ -234,6 +234,17 @@ const routerConfig = [
   },
   {
     /**
+     * tạo văn bản
+     */
+    path: "/textgenerator",
+    name: "textgenerator",
+    component: () => import("@/views/tools/TDTextGenerator.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.textgenerator",
+    },
+  },
+  {
+    /**
      * Time-based one-time password authenticator
      */
     path: "/TDHTMLPreview",

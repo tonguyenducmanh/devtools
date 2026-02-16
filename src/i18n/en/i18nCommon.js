@@ -42,6 +42,7 @@ export default {
     },
     feature: {
       welcome: "Welcome",
+      textgenerator: "Text Generator",
       AppDataMiner: "App data miner",
       cosinSimilarity: "Cosine Similarity",
       oneTimePassword: "One time password",
@@ -401,6 +402,13 @@ export default {
       refreshTableData: "Reload table list",
       showDataByTable: "Load data",
       queryDynamic: "Query",
+    },
+    textgenerator: {
+      resultPlaceholder: "Result random text",
+      exampleCount: "Gen count",
+      generate: "Gen",
+      genTypeWord: "Word",
+      genTypeParagraph: "Paragraph",
     },
   },
 };

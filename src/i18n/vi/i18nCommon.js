@@ -42,6 +42,7 @@ export default {
     },
     feature: {
       welcome: "Tổng quan",
+      textgenerator: "Tạo văn bản",
       AppDataMiner: "Dữ liệu ứng dụng",
       cosinSimilarity: "Độ tương đồng",
       oneTimePassword: "Mật khẩu một lần",
@@ -399,6 +400,13 @@ export default {
       refreshTableData: "Load lại danh sách bảng",
       showDataByTable: "Tải dữ liệu",
       queryDynamic: "Lấy dữ liệu",
+    },
+    textgenerator: {
+      resultPlaceholder: "Kết quả gen text ngẫu nhiên",
+      exampleCount: "Số lượng gen",
+      generate: "Tạo",
+      genTypeWord: "Từ",
+      genTypeParagraph: "Đoạn văn",
     },
   },
 };
