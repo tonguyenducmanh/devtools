@@ -816,6 +816,7 @@ export default {
   padding: var(--padding);
   border: 1px solid var(--border-color);
   outline: none;
+  font-size: var(--font-size-medium);
 }
 .td-base-url:hover {
   border: 1px solid var(--focus-color);
