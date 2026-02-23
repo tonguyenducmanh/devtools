@@ -180,6 +180,12 @@ export default {
         opacity: 0.4;
         cursor: not-allowed;
       }
+      .td-combobox-value {
+        flex: 1; /* Chiếm hết không gian còn lại */
+        overflow: hidden; /* Ẩn phần thừa */
+        text-overflow: ellipsis; /* Hiện dấu ... */
+        white-space: nowrap; /* Không cho xuống dòng */
+      }
     }
     .td-combobox-dropdown {
       position: absolute;
@@ -187,6 +193,9 @@ export default {
       left: 0;
       z-index: 10;
       width: 100%;
+      min-width: 100%; /* Ít nhất phải bằng chiều rộng ô input */
+      width: max-content; /* Tự mở rộng theo nội dung dài nhất */
+      max-width: 300px; /* (Tùy chọn) Giới hạn tối đa để không tràn màn hình */
       margin-top: 4px;
       border: 1px solid var(--border-color);
       background: var(--bg-main-color);
