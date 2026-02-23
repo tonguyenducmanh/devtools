@@ -6,6 +6,10 @@ export default {
       type: Array,
       default: null,
     },
+    noSetBorderRadius: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     borderRadiusStyle() {
@@ -103,34 +107,40 @@ export default {
         "border-radius": styleBorder,
       };
 
-      let allPostions = tdEnum.BorderRadiusPosition;
-      if (styleEnums && styleEnums.length > 0 && allPostions) {
-        let allStyles = [];
-        me.setStyleForCurrentBorder(
-          styleEnums,
-          tdEnum.BorderRadiusPosition.TopLeft,
-          allStyles
-        );
-        me.setStyleForCurrentBorder(
-          styleEnums,
-          tdEnum.BorderRadiusPosition.TopRight,
-          allStyles
-        );
-        me.setStyleForCurrentBorder(
-          styleEnums,
-          tdEnum.BorderRadiusPosition.BottomRight,
-          allStyles
-        );
-        me.setStyleForCurrentBorder(
-          styleEnums,
-          tdEnum.BorderRadiusPosition.BottomLeft,
-          allStyles
-        );
+      if (me.noSetBorderRadius) {
+        style = {
+          "border-radius": "unset",
+        };
+      } else {
+        let allPostions = tdEnum.BorderRadiusPosition;
+        if (styleEnums && styleEnums.length > 0 && allPostions) {
+          let allStyles = [];
+          me.setStyleForCurrentBorder(
+            styleEnums,
+            tdEnum.BorderRadiusPosition.TopLeft,
+            allStyles,
+          );
+          me.setStyleForCurrentBorder(
+            styleEnums,
+            tdEnum.BorderRadiusPosition.TopRight,
+            allStyles,
+          );
+          me.setStyleForCurrentBorder(
+            styleEnums,
+            tdEnum.BorderRadiusPosition.BottomRight,
+            allStyles,
+          );
+          me.setStyleForCurrentBorder(
+            styleEnums,
+            tdEnum.BorderRadiusPosition.BottomLeft,
+            allStyles,
+          );
 
-        if (allStyles && allStyles.length == 4) {
-          style = {
-            "border-radius": allStyles.join(" "),
-          };
+          if (allStyles && allStyles.length == 4) {
+            style = {
+              "border-radius": allStyles.join(" "),
+            };
+          }
         }
       }
       return style;

@@ -54,6 +54,14 @@
             $tdEnum.BorderRadiusPosition.BottomLeft,
           ]"
         />
+        <!-- base url -->
+        <div
+          class="flex td-base-url"
+          @click="copyBaseURL"
+          v-tooltip="$t('i18nCommon.APIMocking.APIMockBaseURL')"
+        >
+          <span>{{ mockBaseUrl }}</span>
+        </div>
         <!-- nhập url endpoint api -->
         <TDInput
           v-model="apiUrl"
@@ -609,6 +617,13 @@ export default {
         me.$tdUtility.copyToClipboard(curlContent);
       }
     },
+    copyBaseURL() {
+      let me = this;
+      if (me.mockBaseUrl) {
+        let me = this;
+        me.$tdUtility.copyToClipboard(me.mockBaseUrl);
+      }
+    },
     getRequestObj() {
       let me = this;
       let apiUrl = me.mockBaseUrl + me.apiUrl;
@@ -781,5 +796,18 @@ export default {
 }
 .collection-group-footer {
   gap: var(--padding);
+}
+.td-base-url {
+  background-color: var(--bg-thirt-color);
+  height: 100%;
+  box-sizing: border-box;
+  width: fit-content;
+  cursor: pointer;
+  padding: var(--padding);
+  border: 1px solid var(--border-color);
+  outline: none;
+}
+.td-base-url:hover {
+  border: 1px solid var(--focus-color);
 }
 </style>

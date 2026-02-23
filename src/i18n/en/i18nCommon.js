@@ -372,6 +372,7 @@ export default {
       AutoPagination: "Call API paging",
     },
     APIMocking: {
+      APIMockBaseURL: "Mock server base URL response from agent",
       importMock: "Import mock",
       tooltipImportMock:
         "Import endpoint, request, and response data from the API Testing tool to create mock data",
