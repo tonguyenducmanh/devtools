@@ -166,7 +166,7 @@ func findMatchingMock(mocks []model.TDAPIMockItem, BodyText []byte) *model.TDAPI
 	for i := range mocks {
 		if mocks[i].BodyText != "" {
 			if td_common.JSONEquivalent(mocks[i].BodyText, BodyTextStr) {
-				td_common.LogInfo(fmt.Sprintf("Đã tìm được body tương ứng với mock: %s", mocks[i].RequestName))
+				td_common.LogInfo(fmt.Sprintf("Đã tìm được body tương ứng với mock: %s - endpoint: %s", mocks[i].RequestName, mocks[i].Endpoint))
 				return &mocks[i]
 			}
 		}
@@ -175,13 +175,13 @@ func findMatchingMock(mocks []model.TDAPIMockItem, BodyText []byte) *model.TDAPI
 	// Trường hợp 2: Tìm mock có BodyText trống hoặc null (dùng làm default)
 	for i := range mocks {
 		if mocks[i].BodyText == "" || mocks[i].BodyText == "null" {
-			td_common.LogInfo(fmt.Sprintf("Đã sử dụng default mock: %s", mocks[i].RequestName))
+			td_common.LogInfo(fmt.Sprintf("Đã sử dụng default mock: %s - endpoint: %s", mocks[i].RequestName, mocks[i].Endpoint))
 			return &mocks[i]
 		}
 	}
 
 	// Trường hợp 3: Nếu không tìm thấy, dùng mock đầu tiên
-	td_common.LogInfo(fmt.Sprintf("Không tìm được body tương ứng, dùng mock đầu tiên có endpoint khớp với yêu cầu: %s", mocks[0].RequestName))
+	td_common.LogInfo(fmt.Sprintf("Không tìm được body tương ứng, dùng mock đầu tiên: %s  - endpoint: %s", mocks[0].RequestName, mocks[0].Endpoint))
 	return &mocks[0]
 }
 
