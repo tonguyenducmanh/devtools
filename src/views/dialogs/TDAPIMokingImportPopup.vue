@@ -70,11 +70,12 @@ export default {
     async importMock() {
       let me = this;
       if (me.mockContent) {
-        me.ownerForm.createNewMock();
+        me.ownerForm.currentMockId = null;
         let mockData = JSON.parse(me.mockContent);
         me.ownerForm.requestName = mockData.requestName;
         me.ownerForm.httpMethod = mockData.httpMethod;
-        me.ownerForm.apiUrl = mockData.apiUrl;
+        let pathname = new URL(mockData.apiUrl).pathname;
+        me.ownerForm.apiUrl = pathname;
         me.ownerForm.bodyText = mockData.bodyText;
         me.ownerForm.responseText = mockData.responseText;
       }
