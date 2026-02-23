@@ -7,6 +7,7 @@
       :placeHolder="$t('i18nCommon.apiTesting.agentUrl')"
     />
     <TDButton
+      v-tooltip="$t('i18nCommon.apiTesting.pingAgent')"
       :noMargin="true"
       @click="heathCheck"
       :type="$tdEnum.buttonType.secondary"

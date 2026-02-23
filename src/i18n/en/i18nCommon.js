@@ -298,6 +298,7 @@ export default {
       help: "Type to search features, use ↑↓ to navigate and Enter to select",
     },
     apiTesting: {
+      pingAgent: "Ping server agent",
       copyCURLFromAPI: "Copy CURL",
       saveForNewCollection: "Save in collection {0}",
       scriptName: "Script name",
