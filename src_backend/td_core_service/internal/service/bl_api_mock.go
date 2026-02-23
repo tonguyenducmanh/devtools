@@ -181,7 +181,7 @@ func findMatchingMock(mocks []model.TDAPIMockItem, BodyText []byte) *model.TDAPI
 	}
 
 	// Trường hợp 3: Nếu không tìm thấy, dùng mock đầu tiên
-	td_common.LogInfo(fmt.Sprintf("Không tìm được body tương ứng, dùng mock đầu tiên: %s", mocks[0].RequestName))
+	td_common.LogInfo(fmt.Sprintf("Không tìm được body tương ứng, dùng mock đầu tiên có endpoint khớp với yêu cầu: %s", mocks[0].RequestName))
 	return &mocks[0]
 }
 
