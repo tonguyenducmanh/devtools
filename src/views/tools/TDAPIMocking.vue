@@ -263,6 +263,7 @@ import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDArrow from "@/components/TDArrow.vue";
 import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
 import TDServerMockAPI from "@/common/api/request/AgentAPI/TDServerMockAPI.js";
+import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
 
 export default {
   name: "TDAPIMocking",
@@ -595,7 +596,20 @@ export default {
     copyCURL() {
       let me = this;
       if (me.currentMockId) {
+        let me = this;
+        let curlContent = TDCURLUtil.stringifyCURL(me.getRequestObj());
+        me.$tdUtility.copyToClipboard(curlContent);
       }
+    },
+    getRequestObj() {
+      let me = this;
+      let apiUrl = me.mockBaseUrl + me.apiUrl;
+      return {
+        apiUrl: apiUrl,
+        httpMethod: me.httpMethod,
+        headersText: null,
+        bodyText: me.bodyText,
+      };
     },
     /**
      * Xóa mock API
