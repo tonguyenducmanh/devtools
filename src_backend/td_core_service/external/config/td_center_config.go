@@ -16,11 +16,13 @@ type TDCenterConfig struct {
 
 type APIConfig struct {
 	Port        int  `json:"port"`
+	Enable      bool `json:"enable"`
 	EnableTrace bool `json:"enable_trace"`
 }
 
 type WebConfig struct {
 	Port        int  `json:"port"`
+	Enable      bool `json:"enable"`
 	EnableTrace bool `json:"enable_trace"`
 }
 
@@ -34,10 +36,12 @@ func DefaultConfig() TDCenterConfig {
 	return TDCenterConfig{
 		APIConfig: APIConfig{
 			Port:        7777,
+			Enable:      true,
 			EnableTrace: false,
 		},
 		WebConfig: WebConfig{
 			Port:        1403,
+			Enable:      true,
 			EnableTrace: false,
 		},
 		MockAPIConfig: MockAPIConfig{

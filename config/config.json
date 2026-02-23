@@ -3,10 +3,12 @@
   "endpoint_case_sensitive": false,
   "api_config": {
     "port": 7777,
+    "enable": true,
     "enable_trace": false
   },
   "web_config": {
     "port": 1403,
+    "enable": true,
     "enable_trace": false
   },
   "mock_api_config": {
