@@ -7,6 +7,7 @@ export const TDDialogEnum = {
   TDAPISaveToCollectionPopup: 1,
   TDGoToToolPopup: 2,
   TDAPIImportCURLPopup: 3,
+  TDAPIMokingImportPopup: 4,
 };
 
 /**
@@ -20,6 +21,8 @@ const DialogComponentMap = {
     import("@/views/dialogs/TDGoToToolPopup.vue"),
   [TDDialogEnum.TDAPIImportCURLPopup]: () =>
     import("@/views/dialogs/TDAPIImportCURLPopup.vue"),
+  [TDDialogEnum.TDAPIMokingImportPopup]: () =>
+    import("@/views/dialogs/TDAPIMokingImportPopup.vue"),
 };
 
 class TDDialogUtil {

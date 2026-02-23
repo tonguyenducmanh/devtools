@@ -346,9 +346,9 @@ export default {
       wrapText: "Wrap text",
       showReponse: "Show response",
       downloadReponse: "Download response",
-      mock: "Mock",
+      mock: "Export mock",
       copyMockData:
-        "Sao chép dữ liệu endpoint, request, response của api vừa gọi để làm mock data ở tool API Mocking (dùng cho các môi trường không gọi được api bên ngoài cần mock data)",
+        "Copy the endpoint, request, and response data of the recently called API to create mock data in the API Mocking tool (used in environments where external APIs cannot be called and data mocking is necessary).",
       tutorialProModeCode:
         "//requestCURL() is a built-in function used to call APIs using CURL\n//if curl text contain keyword \\ then change to \\\\ \n//if text contain keyword ' then change to '\\\\'' \n",
       newCollectionName: "New collection name",
@@ -372,6 +372,9 @@ export default {
       AutoPagination: "Call API paging",
     },
     APIMocking: {
+      importMock: "Import mock",
+      tooltipImportMock:
+        "Import endpoint, request, and response data from the API Testing tool to create mock data",
       copyCURL: "Copy CURL",
       endpoint: "Enter endpoint",
       bodyPlaceholder: "Enter body mock api",

@@ -1,0 +1,90 @@
+<template>
+  <TDPopup
+    :visible="true"
+    :showHeader="false"
+    @close="handleClose"
+    width="800px"
+  >
+    <div class="flex flex-col td-api-import-curl">
+      <TDTextarea
+        :isLabelTop="true"
+        v-model="mockContent"
+        :enableHighlight="currentConfigLayout.enableHighlight"
+        language="shell"
+        ref="mockContentInput"
+        :placeHolder="$t('i18nCommon.apiTesting.contentCURL')"
+      ></TDTextarea>
+      <!-- các nút dưới ô nhập curl -->
+      <div class="flex">
+        <TDButton
+          @click="importMock"
+          :label="$t('i18nCommon.apiTesting.importCURL')"
+        ></TDButton>
+        <TDButton
+          @click="handleClose"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.apiTesting.cancel')"
+        ></TDButton>
+      </div>
+    </div>
+  </TDPopup>
+</template>
+
+<script>
+export default {
+  name: "TDAPIMokingImportPopup",
+
+  props: {
+    ownerForm: {
+      type: Object,
+      required: true,
+    },
+    currentConfigLayout: {
+      type: Object,
+      default: {},
+    },
+  },
+
+  data() {
+    return {
+      mockContent: "",
+    };
+  },
+  computed: {},
+  mounted() {
+    let me = this;
+    me.$nextTick(() => {
+      if (me.$refs.mockContentInput) {
+        me.$refs.mockContentInput.focus();
+      }
+    });
+  },
+  methods: {
+    show(param) {
+      let me = this;
+    },
+    handleClose() {
+      this.$emit("close"); // popup chỉ emit
+    },
+
+    async importMock() {
+      let me = this;
+      if (me.mockContent) {
+        me.ownerForm.createNewMock();
+        let mockData = JSON.parse(me.mockContent);
+        me.ownerForm.requestName = mockData.requestName;
+        me.ownerForm.httpMethod = mockData.httpMethod;
+        me.ownerForm.apiUrl = mockData.apiUrl;
+        me.ownerForm.bodyText = mockData.bodyText;
+        me.ownerForm.responseText = mockData.responseText;
+      }
+      me.handleClose();
+    },
+  },
+};
+</script>
+<style scoped lang="scss">
+.td-api-import-curl {
+  height: 500px;
+}
+</style>

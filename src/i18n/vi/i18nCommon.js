@@ -344,7 +344,7 @@ export default {
       wrapText: "Xuống dòng",
       showReponse: "Xem response",
       downloadReponse: "Tải xuống response",
-      mock: "Mock",
+      mock: "Xuất mock",
       copyMockData:
         "Sao chép dữ liệu endpoint, request, response của api vừa gọi để làm mock data ở tool API Mocking (dùng cho các môi trường không gọi được api bên ngoài cần mock data)",
       tutorialProModeCode:
@@ -370,6 +370,9 @@ export default {
       AutoPagination: "Gọi lấy dữ liệu paging",
     },
     APIMocking: {
+      importMock: "Nhập mock",
+      tooltipImportMock:
+        "Nhập dữ liệu endpoint, request, response của tool API Testing để làm mock data",
       copyCURL: "Sao chép CURL",
       endpoint: "Nhập endpoint",
       bodyPlaceholder: "Nhập body mock api",

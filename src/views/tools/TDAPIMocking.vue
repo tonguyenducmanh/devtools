@@ -27,6 +27,13 @@
           "
         />
         <TDButton
+          :noMargin="true"
+          :type="$tdEnum.buttonType.secondary"
+          @click="importMock"
+          v-tooltip="$t('i18nCommon.APIMocking.tooltipImportMock')"
+          :label="$t('i18nCommon.APIMocking.importMock')"
+        />
+        <TDButton
           v-if="currentMockId"
           @click="copyCURL"
           :type="$tdEnum.buttonType.secondary"
@@ -264,6 +271,7 @@ import TDArrow from "@/components/TDArrow.vue";
 import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
 import TDServerMockAPI from "@/common/api/request/AgentAPI/TDServerMockAPI.js";
 import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
+import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 
 export default {
   name: "TDAPIMocking",
@@ -610,6 +618,19 @@ export default {
         headersText: null,
         bodyText: me.bodyText,
       };
+    },
+    /**
+     * mở popup nhập mock
+     */
+    importMock() {
+      let me = this;
+      TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDAPIMokingImportPopup,
+        ownerForm: this,
+        props: {
+          currentConfigLayout: me.currentConfigLayout,
+        },
+      });
     },
     /**
      * Xóa mock API
