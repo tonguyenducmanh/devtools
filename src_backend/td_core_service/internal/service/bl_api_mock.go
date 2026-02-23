@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -166,7 +165,7 @@ func findMatchingMock(mocks []model.TDAPIMockItem, BodyText []byte) *model.TDAPI
 	// Trường hợp 1: Tìm mock có BodyText khớp chính xác (so sánh JSON)
 	for i := range mocks {
 		if mocks[i].BodyText != "" {
-			if jsonEqual(mocks[i].BodyText, BodyTextStr) {
+			if td_common.JSONEquivalent(mocks[i].BodyText, BodyTextStr) {
 				td_common.LogInfo(fmt.Sprintf("Đã tìm được body tương ứng với mock: %s", mocks[i].RequestName))
 				return &mocks[i]
 			}
@@ -184,38 +183,6 @@ func findMatchingMock(mocks []model.TDAPIMockItem, BodyText []byte) *model.TDAPI
 	// Trường hợp 3: Nếu không tìm thấy, dùng mock đầu tiên
 	td_common.LogInfo(fmt.Sprintf("Không tìm được body tương ứng, dùng mock đầu tiên: %s", mocks[0].RequestName))
 	return &mocks[0]
-}
-
-// So sánh 2 JSON string có bằng nhau không (bỏ qua thứ tự key)
-func jsonEqual(json1, json2 string) bool {
-	// Nếu cả 2 đều rỗng
-	if strings.TrimSpace(json1) == "" && strings.TrimSpace(json2) == "" {
-		return true
-	}
-
-	// Parse JSON
-	var obj1, obj2 interface{}
-
-	if err := json.Unmarshal([]byte(json1), &obj1); err != nil {
-		// Nếu không phải JSON, so sánh string thông thường
-		return strings.TrimSpace(json1) == strings.TrimSpace(json2)
-	}
-
-	if err := json.Unmarshal([]byte(json2), &obj2); err != nil {
-		return false
-	}
-
-	// So sánh bằng cách serialize lại (chuẩn hóa)
-	bytes1, _ := json.Marshal(obj1)
-	bytes2, _ := json.Marshal(obj2)
-
-	return string(bytes1) == string(bytes2)
-}
-
-// Hash body để so sánh nhanh (dự phòng)
-func hashBody(body string) string {
-	hash := md5.Sum([]byte(strings.TrimSpace(body)))
-	return fmt.Sprintf("%x", hash)
 }
 
 // thực hiện tạo api mock
