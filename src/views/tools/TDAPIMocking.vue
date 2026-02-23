@@ -17,6 +17,7 @@
           :isEditable="false"
         ></TDComboBox>
         <TDButton
+          :readOnly="!groupId"
           :noMargin="true"
           @click="saveRequest"
           :label="
