@@ -344,6 +344,9 @@ export default {
       wrapText: "Xuống dòng",
       showReponse: "Xem response",
       downloadReponse: "Tải xuống response",
+      mock: "Mock",
+      copyMockData:
+        "Sao chép dữ liệu endpoint, request, response của api vừa gọi để làm mock data ở tool API Mocking (dùng cho các môi trường không gọi được api bên ngoài cần mock data)",
       tutorialProModeCode:
         "//requestCURL() là hàm cung cấp sẵn dùng để gọi api bằng CURL\n//nếu trong curl text có chứa ký tự \\ thì phải dùng \\\\ \n//nếu text có chứa ký tự ' thì thay bằng '\\\\'' \n",
       newCollectionName: "Tên collection mới",

@@ -49,6 +49,15 @@
           :type="$tdEnum.buttonType.secondary"
           :label="$t('i18nCommon.apiTesting.downloadReponse')"
         ></TDButton>
+        <!-- nút copy dữ liệu làm mock data -->
+        <TDButton
+          :noMargin="true"
+          :readOnly="!responseText"
+          @click="copyMockData"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.apiTesting.mock')"
+          v-tooltip="$t('i18nCommon.apiTesting.copyMockData')"
+        ></TDButton>
       </div>
       <!-- hết phần danh sách nút đầu của api -->
       <!-- phần nội dung tùy thuộc vào từng loại api -->
@@ -1547,6 +1556,18 @@ export default {
         me.requestName = item.requestName;
       }
       // không gọi api ngay mà để user gọi
+    },
+    copyMockData() {
+      let me = this;
+      if (me.responseText) {
+        let mockData = {};
+        mockData.requestName = me.requestName;
+        mockData.httpMethod = me.httpMethod;
+        mockData.apiUrl = me.apiUrl;
+        mockData.bodyText = me.bodyText;
+        mockData.responseText = me.responseText;
+        me.$tdUtility.copyToClipboard(JSON.stringify(mockData));
+      }
     },
   },
 };

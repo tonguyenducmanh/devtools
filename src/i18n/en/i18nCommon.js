@@ -346,6 +346,9 @@ export default {
       wrapText: "Wrap text",
       showReponse: "Show response",
       downloadReponse: "Download response",
+      mock: "Mock",
+      copyMockData:
+        "Sao chép dữ liệu endpoint, request, response của api vừa gọi để làm mock data ở tool API Mocking (dùng cho các môi trường không gọi được api bên ngoài cần mock data)",
       tutorialProModeCode:
         "//requestCURL() is a built-in function used to call APIs using CURL\n//if curl text contain keyword \\ then change to \\\\ \n//if text contain keyword ' then change to '\\\\'' \n",
       newCollectionName: "New collection name",
