@@ -3,19 +3,29 @@
     <!-- phần thao tác chính của tool -->
     <div class="flex flex-col td-mockding-main">
       <div class="flex td-mocking-header-first">
-        <TDInput
-          v-model="requestName"
-          :placeHolder="$t('i18nCommon.APIMocking.requestName')"
-          :noMargin="true"
-        ></TDInput>
-        <TDComboBox
-          v-model="groupId"
-          :placeHolder="$t('i18nCommon.APIMocking.groupName')"
-          :options="allGroupOptions"
-          :noMargin="true"
-          :width="200"
-          :isEditable="false"
-        ></TDComboBox>
+        <div class="flex flex-one">
+          <TDComboBox
+            v-model="groupId"
+            :placeHolder="$t('i18nCommon.APIMocking.groupName')"
+            :options="allGroupOptions"
+            :noMargin="true"
+            :width="120"
+            :isEditable="false"
+            :borderRadiusPosition="[
+              $tdEnum.BorderRadiusPosition.TopLeft,
+              $tdEnum.BorderRadiusPosition.BottomLeft,
+            ]"
+          ></TDComboBox>
+          <TDInput
+            v-model="requestName"
+            :placeHolder="$t('i18nCommon.APIMocking.requestName')"
+            :noMargin="true"
+            :borderRadiusPosition="[
+              $tdEnum.BorderRadiusPosition.TopRight,
+              $tdEnum.BorderRadiusPosition.BottomRight,
+            ]"
+          ></TDInput>
+        </div>
         <TDButton
           :readOnly="!groupId"
           :noMargin="true"
