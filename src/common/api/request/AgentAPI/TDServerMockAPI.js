@@ -62,6 +62,13 @@ class TDServerMockAPI extends TDAgentAPI {
   async restartMockServerFromClient() {
     return await this.get("/mock_api/restart_mock_server");
   }
+
+  /**
+   * Lấy ra base url của mock server
+   */
+  async getMockBaseURL() {
+    return await this.get("/mock_api/get_base_url");
+  }
 }
 
 export default TDServerMockAPI;

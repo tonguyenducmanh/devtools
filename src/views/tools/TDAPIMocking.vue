@@ -281,6 +281,7 @@ export default {
       currentMockId: null,
       allMockAPIs: [],
       openGroups: {},
+      mockBaseUrl: null,
       methodOptions: [
         { value: "GET", label: "GET", customStyle: { color: "#5EA572" } },
         { value: "POST", label: "POST", customStyle: { color: "#AE7D0D" } },
@@ -424,13 +425,22 @@ export default {
       me.isLoading = true;
       try {
         // Tải cả danh sách nhóm và danh sách mock
-        await Promise.all([me.loadAllGroups(), me.loadMockData()]);
+        await Promise.all([
+          me.loadAllGroups(),
+          me.loadMockData(),
+          me.loadMockServerBaseUrl(),
+        ]);
       } catch (error) {
         console.error("Lỗi tải mock APIs:", error);
         me.$tdUtility.showErrorNotFoundAgentServer();
       } finally {
         me.isLoading = false;
       }
+    },
+    async loadMockServerBaseUrl() {
+      let me = this;
+      let response = await me.agentAPI.getMockBaseURL();
+      me.mockBaseUrl = response?.data?.data;
     },
     async loadMockData() {
       let me = this;

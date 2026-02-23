@@ -365,3 +365,17 @@ func RemoveMockGroup(w http.ResponseWriter, r *http.Request) {
 		"message": "Xóa nhóm và các mock API thành công",
 	})
 }
+
+// lấy ra base url của mock server
+func GetMockServerBaseUrl(w http.ResponseWriter, r *http.Request) {
+	port := configGlobal.GetConfigGlobal().MockAPIConfig.Port
+	addr := fmt.Sprintf("%d", port)
+	server := td_common.GetServerIP()
+	base_url := fmt.Sprintf("http://%s:%s", server, addr)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"data":    base_url,
+	})
+}

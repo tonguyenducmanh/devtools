@@ -3,16 +3,46 @@ package td_common
 import (
 	"crypto/rand"
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 	configGlobal "td_core_service/external/config"
 	"time"
 )
 
+// GetServerIP trả về IP LAN của server
+func GetServerIP() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return "localhost"
+	}
+
+	for _, addr := range addrs {
+		if ipNet, ok := addr.(*net.IPNet); ok {
+			ip := ipNet.IP
+
+			// bỏ qua IPv6
+			if ip.To4() == nil {
+				continue
+			}
+
+			// nếu là localhost → trả về localhost
+			if ip.IsLoopback() {
+				return "localhost"
+			}
+
+			// IP LAN hợp lệ
+			return ip.String()
+		}
+	}
+
+	return "localhost"
+}
+
 // log ra server đang chạy
 func BuildRunningAddressServer(server_name string, port *int) string {
 	addr := fmt.Sprintf("%d", *port)
-	server := "localhost"
+	server := GetServerIP()
 	log_message := fmt.Sprintf("%s đang chạy tại http://%s:%s\n", server_name, server, addr)
 	LogInfo(log_message)
 	addBuildMuxServer := fmt.Sprintf(":%d", *port)
