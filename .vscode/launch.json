@@ -11,7 +11,7 @@
       "env": {
         "GO_ENV": "development"
       },
-      "showLog": true
+      "showLog": false
     },
     {
       "name": "Debug td_tool_daemon",
@@ -23,7 +23,7 @@
       "env": {
         "GO_ENV": "development"
       },
-      "showLog": true
+      "showLog": false
     }
   ]
 }
