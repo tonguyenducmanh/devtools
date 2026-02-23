@@ -26,6 +26,13 @@
               : $t('i18nCommon.APIMocking.addNew')
           "
         />
+        <TDButton
+          v-if="currentMockId"
+          @click="copyCURL"
+          :type="$tdEnum.buttonType.secondary"
+          :noMargin="true"
+          :label="$t('i18nCommon.APIMocking.copyCURL')"
+        ></TDButton>
       </div>
       <div class="flex td-mocking-header">
         <!-- combo chọn method http -->
@@ -570,6 +577,14 @@ export default {
       } catch (error) {
         console.error(me.$t("i18nCommon.APIMocking.saveMockErr"), error);
         me.$tdToast.error(me.$t("i18nCommon.APIMocking.saveMockErr"));
+      }
+    },
+    /**
+     * copy curl mock api
+     */
+    copyCURL() {
+      let me = this;
+      if (me.currentMockId) {
       }
     },
     /**

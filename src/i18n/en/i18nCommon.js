@@ -369,6 +369,7 @@ export default {
       AutoPagination: "Call API paging",
     },
     APIMocking: {
+      copyCURL: "Copy CURL",
       endpoint: "Enter endpoint",
       bodyPlaceholder: "Enter body mock api",
       responsePlaceholder: "Enter response mock api",
