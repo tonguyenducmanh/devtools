@@ -3,7 +3,7 @@
     <div v-if="visible" class="td-popup-overlay" @click="onOverlayClick">
       <div class="td-popup-container" :style="{ width }" @click.stop>
         <div v-if="showHeader" class="td-popup-header">
-          <h3 class="td-popup-title">{{ title }}</h3>
+          <div class="td-popup-title">{{ title }}</div>
           <button
             v-if="showCloseHeaderIcon"
             class="td-popup-close"

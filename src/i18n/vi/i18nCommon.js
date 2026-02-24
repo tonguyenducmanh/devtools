@@ -372,6 +372,8 @@ export default {
       AutoPagination: "Gọi lấy dữ liệu paging",
     },
     APIMocking: {
+      ImportPlaceHolder:
+        "Nhập từ tool API testing hoặc từ bảng td_api_testing_log ở tool Dữ liệu ứng dụng",
       APIMockBaseURL: "Base URL mock server được trả về từ agent",
       importMock: "Nhập mock",
       tooltipImportMock:

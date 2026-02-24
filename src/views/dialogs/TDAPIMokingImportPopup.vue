@@ -1,9 +1,10 @@
 <template>
   <TDPopup
     :visible="true"
-    :showHeader="false"
+    :showHeader="true"
     @close="handleClose"
-    width="800px"
+    width="1000px"
+    :title="$t('i18nCommon.APIMocking.ImportPlaceHolder')"
   >
     <div class="flex flex-col td-api-import-curl">
       <TDTextarea

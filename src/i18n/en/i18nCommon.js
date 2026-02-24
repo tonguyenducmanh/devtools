@@ -374,6 +374,8 @@ export default {
       AutoPagination: "Call API paging",
     },
     APIMocking: {
+      ImportPlaceHolder:
+        "Import data from the API testing tool or from the td_api_testing_log table in the App data miner tool",
       APIMockBaseURL: "Mock server base URL response from agent",
       importMock: "Import mock",
       tooltipImportMock:
