@@ -1,3 +1,6 @@
+// file này chứa toàn bộ các logic service về việc xử lý dữ liệu
+// khi nhận được request tới server mock cần tìm ra body, header, endpoint tương ứng
+
 package service
 
 import (
@@ -112,18 +115,23 @@ func groupMocksByRoute(mocks []model.TDAPIMockItem) map[string][]model.TDAPIMock
 func registerDefaultRouteOnMux(mux *http.ServeMux) {
 	// route không tồn tại thì trả về not found specific
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		not_found_log := "404 Not Found API endpoint mock không tồn tại"
-		// Log lại để biết có request truy cập vào route lạ
-		td_common.LogInfo(fmt.Sprintf("%s: %s %s", not_found_log, r.Method, r.URL.Path))
+		BuildNotFoundResponse(w, r)
+	})
+}
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"message": not_found_log,
-			"path":    r.URL.Path,
-			"method":  r.Method,
-		})
+// xử lý nghiệp vụ khi không tìm được mock phù hợp
+func BuildNotFoundResponse(w http.ResponseWriter, r *http.Request) {
+	not_found_log := "404 Not Found API endpoint mock không tồn tại"
+	// Log lại để biết có request truy cập vào route lạ
+	td_common.LogInfo(fmt.Sprintf("%s: %s %s", not_found_log, r.Method, r.URL.Path))
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNotFound)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": false,
+		"message": not_found_log,
+		"path":    r.URL.Path,
+		"method":  r.Method,
 	})
 }
 
@@ -148,10 +156,17 @@ func registerMockRouteOnMux(mux *http.ServeMux, pattern string, mocks []model.TD
 		defer r.Body.Close()
 
 		// Tìm mock phù hợp dựa trên body
-		selectedMock := findMatchingMock(mocks, bodyBytes)
+		selectedMock, notFoundBody := findMatchingMock(mocks, bodyBytes)
 
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(selectedMock.ResponeText))
+		// không tìm thấy mock phù hợp thì trả về not found
+		if notFoundBody == true {
+			BuildNotFoundResponse(w, r)
+		} else {
+			// trả về mock phù hợp
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(selectedMock.ResponeText))
+		}
+
 	}
 
 	mux.HandleFunc(pattern, handler)
@@ -159,7 +174,7 @@ func registerMockRouteOnMux(mux *http.ServeMux, pattern string, mocks []model.TD
 }
 
 // Tìm mock phù hợp dựa trên request body
-func findMatchingMock(mocks []model.TDAPIMockItem, BodyText []byte) *model.TDAPIMockItem {
+func findMatchingMock(mocks []model.TDAPIMockItem, BodyText []byte) (*model.TDAPIMockItem, bool) {
 	BodyTextStr := string(BodyText)
 
 	// Trường hợp 1: Tìm mock có BodyText khớp chính xác (so sánh JSON)
@@ -167,203 +182,26 @@ func findMatchingMock(mocks []model.TDAPIMockItem, BodyText []byte) *model.TDAPI
 		if mocks[i].BodyText != "" {
 			if td_common.JSONEquivalent(mocks[i].BodyText, BodyTextStr) {
 				td_common.LogInfo(fmt.Sprintf("Đã tìm được body tương ứng với mock: %s - endpoint: %s", mocks[i].RequestName, mocks[i].Endpoint))
-				return &mocks[i]
+				return &mocks[i], false
 			}
 		}
 	}
-
-	// Trường hợp 2: Tìm mock có BodyText trống hoặc null (dùng làm default)
-	for i := range mocks {
-		if mocks[i].BodyText == "" || mocks[i].BodyText == "null" {
-			td_common.LogInfo(fmt.Sprintf("Đã sử dụng default mock: %s - endpoint: %s", mocks[i].RequestName, mocks[i].Endpoint))
-			return &mocks[i]
+	if configGlobal.GetConfigGlobal().MockAPIConfig.EnableMockNotCareBody {
+		// Trường hợp 2: Tìm mock có BodyText trống hoặc null (dùng làm default)
+		for i := range mocks {
+			if mocks[i].BodyText == "" || mocks[i].BodyText == "null" {
+				td_common.LogInfo(fmt.Sprintf("Đã sử dụng default mock: %s - endpoint: %s", mocks[i].RequestName, mocks[i].Endpoint))
+				return &mocks[i], false
+			}
 		}
+
+		// Trường hợp 3: Nếu không tìm thấy, dùng mock đầu tiên
+		td_common.LogInfo(fmt.Sprintf("Không tìm được body tương ứng, dùng mock đầu tiên: %s  - endpoint: %s", mocks[0].RequestName, mocks[0].Endpoint))
+		return &mocks[0], false
+	} else {
+		// trả về là không tìm thấy mock tương ứng
+		return nil, true
 	}
-
-	// Trường hợp 3: Nếu không tìm thấy, dùng mock đầu tiên
-	td_common.LogInfo(fmt.Sprintf("Không tìm được body tương ứng, dùng mock đầu tiên: %s  - endpoint: %s", mocks[0].RequestName, mocks[0].Endpoint))
-	return &mocks[0]
-}
-
-// thực hiện tạo api mock
-func CreateMockAPI(w http.ResponseWriter, r *http.Request) {
-	var req model.TDAPIMockItem
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
-		return
-	}
-
-	if req.RequestName == "" || req.Endpoint == "" {
-		http.Error(w, "request_name và end_point là bắt buộc", http.StatusBadRequest)
-		return
-	}
-
-	req.ID = td_common.GenUUID()
-
-	err := database.CreateMockAPI(&req)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Lỗi lưu mock API: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	// Restart server để áp dụng thay đổi
-	go RestartMockServer()
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"message": "Tạo mock API thành công và đang khởi động lại server mock",
-		"data":    req,
-	})
-}
-
-// thực hiện lấy danh sách mock api
-func GetAllMockAPI(w http.ResponseWriter, r *http.Request) {
-	mocks, err := database.GetAllMockAPIs()
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Lỗi query: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    mocks,
-	})
-}
-
-// thực hiện cập nhật api mock
-func UpdateMockAPI(w http.ResponseWriter, r *http.Request) {
-	var req model.TDAPIMockItem
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
-		return
-	}
-
-	if req.ID == "" {
-		http.Error(w, "ID là bắt buộc", http.StatusBadRequest)
-		return
-	}
-
-	rowsAffected, err := database.UpdateMockAPI(&req)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Lỗi cập nhật: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	if rowsAffected == 0 {
-		http.Error(w, "Không tìm thấy mock API", http.StatusNotFound)
-		return
-	}
-
-	// Restart server để áp dụng thay đổi
-	go RestartMockServer()
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"message": "Cập nhật mock API thành công và đang khởi động lại server mock",
-	})
-}
-
-// thực hiện xóa api mock
-func RemoveMockAPI(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
-	if id == "" {
-		http.Error(w, "ID là bắt buộc", http.StatusBadRequest)
-		return
-	}
-
-	rowsAffected, err := database.DeleteMockAPI(id)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Lỗi xóa: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	if rowsAffected == 0 {
-		http.Error(w, "Không tìm thấy mock API", http.StatusNotFound)
-		return
-	}
-
-	// Restart server để áp dụng thay đổi
-	go RestartMockServer()
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"message": "Xóa mock API thành công và đang khởi động lại server mock",
-	})
-}
-
-// thực hiện lấy danh sách nhóm mock api
-func GetAllMockGroup(w http.ResponseWriter, r *http.Request) {
-	groups, err := database.GetAllMockGroups()
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Lỗi query nhóm: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    groups,
-	})
-}
-
-// thực hiện tạo nhóm mock api mới
-func CreateMockGroup(w http.ResponseWriter, r *http.Request) {
-	var req model.TDAPIMockGroup
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
-		return
-	}
-
-	if req.Name == "" {
-		http.Error(w, "Tên nhóm là bắt buộc", http.StatusBadRequest)
-		return
-	}
-
-	req.ID = td_common.GenUUID()
-
-	err := database.CreateMockGroup(&req)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Lỗi lưu nhóm: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"message": "Tạo nhóm mock API thành công",
-		"data":    req,
-	})
-}
-
-// thực hiện xóa nhóm mock api
-func RemoveMockGroup(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
-	if id == "" {
-		http.Error(w, "ID nhóm là bắt buộc", http.StatusBadRequest)
-		return
-	}
-
-	err := database.DeleteMockGroup(id)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Lỗi xóa nhóm: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	// Restart server mock vì các mock api trong nhóm đã bị xóa (cascade)
-	go RestartMockServer()
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"message": "Xóa nhóm và các mock API thành công",
-	})
 }
 
 // lấy ra base url của mock server

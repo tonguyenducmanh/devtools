@@ -31,6 +31,8 @@ type WebConfig struct {
 type MockAPIConfig struct {
 	Port        int  `json:"port"`
 	EnableTrace bool `json:"enable_trace"`
+	// api mock không quan tâm tới body, chỉ cần trùng endpoint là được
+	EnableMockNotCareBody bool `json:"enable_mock_not_care_body"`
 }
 
 // apply giá trị default
@@ -47,8 +49,9 @@ func DefaultConfig() TDCenterConfig {
 			EnableTrace: false,
 		},
 		MockAPIConfig: MockAPIConfig{
-			Port:        8888,
-			EnableTrace: false,
+			Port:                  8888,
+			EnableTrace:           false,
+			EnableMockNotCareBody: true,
 		},
 		DatabaseName:          "dev_tool.db",
 		EndpointCaseSensitive: false,
