@@ -1559,15 +1559,19 @@ export default {
     },
     copyMockData() {
       let me = this;
-      if (me.responseText) {
-        let mockData = {};
-        // đặt dạng snake_case để khớp với kiểu dữ liệu bảng td_api_testing_log
-        mockData.request_name = me.requestName;
-        mockData.method = me.httpMethod;
-        mockData.api_url = me.apiUrl;
-        mockData.body_text = me.bodyText;
-        mockData.response_text = me.responseText;
-        me.$tdUtility.copyToClipboard(JSON.stringify(mockData));
+      if (me.currentConfigLayout.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
+        console.log("chưa support pro mode copy mock");
+      } else {
+        if (me.responseText) {
+          let mockData = {};
+          // đặt dạng snake_case để khớp với kiểu dữ liệu bảng td_api_testing_log
+          mockData.request_name = me.requestName;
+          mockData.method = me.httpMethod;
+          mockData.api_url = me.apiUrl;
+          mockData.body_text = me.bodyText;
+          mockData.response_text = me.responseText;
+          me.$tdUtility.copyToClipboard(JSON.stringify(mockData));
+        }
       }
     },
   },
