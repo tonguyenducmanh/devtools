@@ -12,31 +12,36 @@ import (
 
 // GetServerIP trả về IP LAN của server
 func GetServerIP() string {
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		return "localhost"
-	}
-
-	for _, addr := range addrs {
-		if ipNet, ok := addr.(*net.IPNet); ok {
-			ip := ipNet.IP
-
-			// bỏ qua IPv6
-			if ip.To4() == nil {
-				continue
-			}
-
-			// nếu là localhost → trả về localhost
-			if ip.IsLoopback() {
-				return "localhost"
-			}
-
-			// IP LAN hợp lệ
-			return ip.String()
+	localHostVal := "localhost"
+	if configGlobal.GetConfigGlobal().ShowIPServer {
+		addrs, err := net.InterfaceAddrs()
+		if err != nil {
+			return localHostVal
 		}
-	}
 
-	return "localhost"
+		for _, addr := range addrs {
+			if ipNet, ok := addr.(*net.IPNet); ok {
+				ip := ipNet.IP
+
+				// bỏ qua IPv6
+				if ip.To4() == nil {
+					continue
+				}
+
+				// nếu là localhost → trả về localhost
+				if ip.IsLoopback() {
+					return localHostVal
+				}
+
+				// IP LAN hợp lệ
+				return ip.String()
+			}
+		}
+
+		return localHostVal
+	} else {
+		return localHostVal
+	}
 }
 
 // log ra server đang chạy

@@ -12,6 +12,8 @@ type TDCenterConfig struct {
 	DatabaseName string `json:"database_name"`
 	// endpoint của api có phân biệt hoa thường không
 	EndpointCaseSensitive bool `json:"endpoint_case_sensitive"`
+	// show địa chỉ ip server thay vì local host
+	ShowIPServer bool `json:"show_ip_server"`
 }
 
 type APIConfig struct {
@@ -50,5 +52,6 @@ func DefaultConfig() TDCenterConfig {
 		},
 		DatabaseName:          "dev_tool.db",
 		EndpointCaseSensitive: false,
+		ShowIPServer:          false,
 	}
 }
