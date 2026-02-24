@@ -159,7 +159,7 @@ func registerMockRouteOnMux(mux *http.ServeMux, pattern string, mocks []model.TD
 		defer r.Body.Close()
 
 		// Tìm mock phù hợp dựa trên body
-		selectedMock, notFoundBody := findMatchingMock(mocks, bodyBytes)
+		selectedMock, notFoundBody := findMatchingMockBodyGroupByEndpoint(mocks, bodyBytes)
 
 		// không tìm thấy mock phù hợp thì trả về not found
 		if notFoundBody == true {
@@ -177,8 +177,8 @@ func registerMockRouteOnMux(mux *http.ServeMux, pattern string, mocks []model.TD
 	td_common.LogInfo(fmt.Sprintf("Đã đăng ký mock API: %s với %d biến thể", pattern, len(mocks)))
 }
 
-// Tìm mock phù hợp dựa trên request body
-func findMatchingMock(mocks []model.TDAPIMockItem, BodyText []byte) (*model.TDAPIMockItem, bool) {
+// Tìm mock phù hợp dựa trên request body, các body này có chung endpoint api
+func findMatchingMockBodyGroupByEndpoint(mocks []model.TDAPIMockItem, BodyText []byte) (*model.TDAPIMockItem, bool) {
 	BodyTextStr := string(BodyText)
 
 	// Trường hợp 1: Tìm mock có BodyText khớp chính xác (so sánh JSON)
