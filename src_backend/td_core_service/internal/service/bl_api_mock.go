@@ -115,13 +115,16 @@ func groupMocksByRoute(mocks []model.TDAPIMockItem) map[string][]model.TDAPIMock
 func registerDefaultRouteOnMux(mux *http.ServeMux) {
 	// route không tồn tại thì trả về not found specific
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		BuildNotFoundResponse(w, r)
+		BuildNotFoundResponse(w, r, nil)
 	})
 }
 
 // xử lý nghiệp vụ khi không tìm được mock phù hợp
-func BuildNotFoundResponse(w http.ResponseWriter, r *http.Request) {
-	not_found_log := "404 Not Found API endpoint mock không tồn tại"
+func BuildNotFoundResponse(w http.ResponseWriter, r *http.Request, messageNotFound *string) {
+	not_found_log := "404 Not Found - API endpoint mock không tồn tại"
+	if messageNotFound != nil {
+		not_found_log = *messageNotFound
+	}
 	// Log lại để biết có request truy cập vào route lạ
 	td_common.LogInfo(fmt.Sprintf("%s: %s %s", not_found_log, r.Method, r.URL.Path))
 
@@ -160,7 +163,8 @@ func registerMockRouteOnMux(mux *http.ServeMux, pattern string, mocks []model.TD
 
 		// không tìm thấy mock phù hợp thì trả về not found
 		if notFoundBody == true {
-			BuildNotFoundResponse(w, r)
+			notFoundMess := "404 Not Found - API endpoint mock có tồn tại nhưng không tìm được body mock tương ứng"
+			BuildNotFoundResponse(w, r, &notFoundMess)
 		} else {
 			// trả về mock phù hợp
 			w.WriteHeader(http.StatusOK)
