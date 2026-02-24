@@ -51,6 +51,7 @@
         ></TDButton>
         <!-- nút copy dữ liệu làm mock data -->
         <TDButton
+          v-if="currentConfigLayout.currentAPIMode != $tdEnum.APIMode.ProMode"
           :noMargin="true"
           :readOnly="!responseText"
           @click="copyMockData"
