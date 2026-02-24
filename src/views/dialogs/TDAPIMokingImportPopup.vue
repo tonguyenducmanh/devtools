@@ -74,12 +74,12 @@ export default {
         let mockData = JSON.parse(me.mockContent);
         if (mockData) {
           me.ownerForm.currentMockId = null;
-          me.ownerForm.requestName = mockData.requestName;
-          me.ownerForm.httpMethod = mockData.httpMethod;
-          let pathname = new URL(mockData.apiUrl).pathname;
+          me.ownerForm.requestName = mockData.request_name ?? mockData.api_url;
+          me.ownerForm.httpMethod = mockData.method;
+          let pathname = new URL(mockData.api_url).pathname;
           me.ownerForm.apiUrl = pathname;
-          me.ownerForm.bodyText = mockData.bodyText;
-          me.ownerForm.responseText = mockData.responseText;
+          me.ownerForm.bodyText = mockData.body_text;
+          me.ownerForm.responseText = mockData.response_text;
         }
       }
       me.handleClose();

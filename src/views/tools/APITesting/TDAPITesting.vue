@@ -1561,11 +1561,12 @@ export default {
       let me = this;
       if (me.responseText) {
         let mockData = {};
-        mockData.requestName = me.requestName;
-        mockData.httpMethod = me.httpMethod;
-        mockData.apiUrl = me.apiUrl;
-        mockData.bodyText = me.bodyText;
-        mockData.responseText = me.responseText;
+        // đặt dạng snake_case để khớp với kiểu dữ liệu bảng td_api_testing_log
+        mockData.request_name = me.requestName;
+        mockData.method = me.httpMethod;
+        mockData.api_url = me.apiUrl;
+        mockData.body_text = me.bodyText;
+        mockData.response_text = me.responseText;
         me.$tdUtility.copyToClipboard(JSON.stringify(mockData));
       }
     },
