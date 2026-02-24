@@ -110,6 +110,7 @@ class TDUtility {
       navigator.clipboard.writeText(value);
       toast.success(i18nData.global.t("i18nCommon.toastMessage.copy"));
     } catch (error) {
+      console.log(error);
       toast.error(i18nData.global.t("i18nCommon.toastMessage.cannotCopy"));
     }
   }
