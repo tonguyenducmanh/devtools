@@ -106,8 +106,12 @@ class TDUtility {
    */
   copyToClipboard(value) {
     let me = this;
-    navigator.clipboard.writeText(value);
-    toast.success(i18nData.global.t("i18nCommon.toastMessage.copy"));
+    try {
+      navigator.clipboard.writeText(value);
+      toast.success(i18nData.global.t("i18nCommon.toastMessage.copy"));
+    } catch (error) {
+      toast.error(i18nData.global.t("i18nCommon.toastMessage.cannotCopy"));
+    }
   }
 
   /**

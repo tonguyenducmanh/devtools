@@ -271,6 +271,8 @@ export default {
       error: "Have error",
       applyMockSuccess: "Apply mock success",
       notFoundAgentServer: "Not found server agent",
+      cannotCopy:
+        "Unable to copy using browser API, please check if HTTP is insecure.",
     },
     cosinSimilarity: {
       firstVector: "First Vector",

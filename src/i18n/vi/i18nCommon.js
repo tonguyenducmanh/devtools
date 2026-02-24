@@ -270,6 +270,8 @@ export default {
       error: "Đã có lỗi xảy ra",
       applyMockSuccess: "Đã áp dụng ví dụ",
       notFoundAgentServer: "Không tìm thấy server agent",
+      cannotCopy:
+        "Không thể copy được bằng api của trình duyệt, vui lòng kiểm tra xem có phải http insecure không",
     },
     cosinSimilarity: {
       firstVector: "Vector thứ nhất",
