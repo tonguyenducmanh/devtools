@@ -47,6 +47,11 @@ func DefaultConfig() TDCenterConfig {
 			Port:   7777,
 			Enable: true,
 		},
+		LogConfig: LogConfig{
+			LogConsole:  true,
+			LogDatabase: false,
+			LevelLog:    []string{"info"},
+		},
 		WebConfig: WebConfig{
 			Port:   1403,
 			Enable: true,
