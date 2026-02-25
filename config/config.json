@@ -4,17 +4,14 @@
   "show_ip_server": false,
   "api_config": {
     "port": 7777,
-    "enable": true,
-    "enable_trace": false
+    "enable": true
   },
   "web_config": {
     "port": 1403,
-    "enable": true,
-    "enable_trace": false
+    "enable": true
   },
   "mock_api_config": {
     "port": 8888,
-    "enable_trace": false,
     "enable_mock_not_care_body": true
   }
 }

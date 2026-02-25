@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strings"
+	configGlobal "td_core_service/external/config"
 	"td_core_service/td_common"
 )
 
@@ -15,18 +16,19 @@ import (
 var embeddedFiles embed.FS
 
 // Chạy web app
-func RunWebApp(port *int, trace *bool) {
+func RunWebApp() {
+	port := configGlobal.GetConfigGlobal().APIConfig.Port
 
 	publicFS, err := fs.Sub(embeddedFiles, "dist")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	logDirectory(trace, publicFS)
+	logDirectory(publicFS)
 
 	handler := spaHandler(publicFS)
 
-	addr := td_common.BuildRunningAddressServer("Server Web UI", port)
+	addr := td_common.BuildRunningAddressServer("Server Web UI", &port)
 
 	if err := http.ListenAndServe(addr, handler); err != nil {
 		log.Fatal(err)
@@ -34,20 +36,18 @@ func RunWebApp(port *int, trace *bool) {
 }
 
 // log folder được dùng để run static web
-func logDirectory(trace *bool, publicFS fs.FS) {
-	if *trace {
-		fmt.Println("Embedded files:")
-		fs.WalkDir(publicFS, ".", func(path string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			// chỉ log file, không log folder
-			if !d.IsDir() {
-				fmt.Printf("  - %s\n", path)
-			}
-			return nil
-		})
-	}
+func logDirectory(publicFS fs.FS) {
+	fmt.Println("Embedded files:")
+	fs.WalkDir(publicFS, ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		// chỉ log file, không log folder
+		if !d.IsDir() {
+			fmt.Printf("  - %s\n", path)
+		}
+		return nil
+	})
 }
 
 /**

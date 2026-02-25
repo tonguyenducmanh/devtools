@@ -2,6 +2,7 @@ package api_app
 
 import (
 	"net/http"
+	configGlobal "td_core_service/external/config"
 	"td_core_service/internal/database"
 	"td_core_service/internal/middleware"
 	"td_core_service/internal/router"
@@ -10,8 +11,9 @@ import (
 )
 
 // khởi chạy api app
-func RunAPIApp(port *int, mockPort *int, trace *bool) {
-
+func RunAPIApp() {
+	port := configGlobal.GetConfigGlobal().APIConfig.Port
+	mockPort := configGlobal.GetConfigGlobal().MockAPIConfig.Port
 	database.InitDatabase()
 
 	app := http.NewServeMux()
@@ -19,7 +21,7 @@ func RunAPIApp(port *int, mockPort *int, trace *bool) {
 	addRoute(app)
 
 	// Khởi tạo mock API service trên port riêng và tự động start tất cả mock APIs
-	service.InitMockAPIService(*mockPort)
+	service.InitMockAPIService(mockPort)
 
 	// inject 1 số kịch bản chung toàn chương tình vào handler
 	var handler = td_common.BuildHanlderAPICommon(app)
@@ -27,7 +29,7 @@ func RunAPIApp(port *int, mockPort *int, trace *bool) {
 	// Xâu chuỗi Middlewares: CORS -> Router
 	finalHandler := middleware.ApplyCORS(handler)
 
-	addr := td_common.BuildRunningAddressServer("Server Agent API", port)
+	addr := td_common.BuildRunningAddressServer("Server Agent API", &port)
 
 	if err := http.ListenAndServe(addr, finalHandler); err != nil {
 		panic(err)
