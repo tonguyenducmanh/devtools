@@ -17,7 +17,7 @@ var embeddedFiles embed.FS
 
 // Chạy web app
 func RunWebApp() {
-	port := configGlobal.GetConfigGlobal().APIConfig.Port
+	port := configGlobal.GetConfigGlobal().WebConfig.Port
 
 	publicFS, err := fs.Sub(embeddedFiles, "dist")
 	if err != nil {
