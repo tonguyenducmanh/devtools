@@ -11,7 +11,7 @@ import (
 )
 
 // hàm log common của toàn chương trình
-func LogData(message string, level string) {
+func logData(message string, level string) {
 
 	// kiểm tra có log level này mới cho dùng
 	if !slices.Contains(td_config.GetConfigGlobal().LogConfig.LevelLog, level) {
@@ -43,17 +43,17 @@ func LogData(message string, level string) {
 }
 
 func LogInfo(message string) {
-	LogData(message, "info")
+	logData(message, "info")
 }
 
 func LogDebug(message string) {
-	LogData(message, "debug")
+	logData(message, "debug")
 }
 
 func LogError(message string) {
-	LogData(message, "error")
+	logData(message, "error")
 }
 
 func LogException(message string) {
-	LogData(message, "exception")
+	logData(message, "exception")
 }
