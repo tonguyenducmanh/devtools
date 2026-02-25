@@ -2,7 +2,6 @@ package web
 
 import (
 	"embed"
-	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
@@ -37,14 +36,14 @@ func RunWebApp() {
 
 // log folder được dùng để run static web
 func logDirectory(publicFS fs.FS) {
-	fmt.Println("Embedded web files:")
+	td_common.LogInfo("Embedded web files:")
 	fs.WalkDir(publicFS, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 		// chỉ log file, không log folder
 		if !d.IsDir() {
-			fmt.Printf("  - %s\n", path)
+			td_common.LogInfo(path)
 		}
 		return nil
 	})

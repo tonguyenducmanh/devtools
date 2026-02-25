@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strings"
 	configGlobal "td_core_service/external/config"
-	"time"
 )
 
 // GetServerIP trả về IP LAN của server
@@ -70,17 +69,6 @@ func GenUUID() string {
 
 	return fmt.Sprintf("%x-%x-%x-%x-%x",
 		b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
-}
-
-// hàm log common của toàn chương trình
-func LogInfo(message string) {
-	t := time.Now()
-	sub_fix := "\n"
-	if !strings.HasSuffix(message, sub_fix) {
-		message += sub_fix
-	}
-	// Định dạng: Ngày/Tháng/Năm Giờ:Phút:Giây
-	fmt.Printf("[%s] %s", t.Format("02/01/2006 15:04:05"), message)
 }
 
 // build ra hanlder api common
