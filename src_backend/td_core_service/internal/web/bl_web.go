@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strings"
-	configGlobal "td_core_service/external/config"
+	"td_config"
 	"td_core_service/td_common"
 )
 
@@ -16,7 +16,7 @@ var embeddedFiles embed.FS
 
 // Chạy web app
 func RunWebApp() {
-	port := configGlobal.GetConfigGlobal().WebConfig.Port
+	port := td_config.GetConfigGlobal().WebConfig.Port
 
 	publicFS, err := fs.Sub(embeddedFiles, "dist")
 	if err != nil {
@@ -36,14 +36,14 @@ func RunWebApp() {
 
 // log folder được dùng để run static web
 func logDirectory(publicFS fs.FS) {
-	td_common.LogInfo("Embedded web files:")
+	td_common.LogDebug("Embedded web files:")
 	fs.WalkDir(publicFS, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 		// chỉ log file, không log folder
 		if !d.IsDir() {
-			td_common.LogInfo(path)
+			td_common.LogDebug(path)
 		}
 		return nil
 	})

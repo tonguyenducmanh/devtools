@@ -1,4 +1,4 @@
-package config
+package td_config
 
 // kiểu dữ liệu config chung
 type TDCenterConfig struct {
@@ -8,6 +8,8 @@ type TDCenterConfig struct {
 	WebConfig WebConfig `json:"web_config"`
 	// cấu hình mock api server
 	MockAPIConfig MockAPIConfig `json:"mock_api_config"`
+	// cấu hình log
+	LogConfig LogConfig `json:"log_config"`
 	// tên database của app
 	DatabaseName string `json:"database_name"`
 	// endpoint của api có phân biệt hoa thường không
@@ -16,18 +18,24 @@ type TDCenterConfig struct {
 	ShowIPServer bool `json:"show_ip_server"`
 }
 
+type LogConfig struct {
+	LogConsole  bool     `json:"log_console"`
+	LogDatabase bool     `json:"log_database"`
+	LevelLog    []string `json:"level_log"`
+}
+
 type APIConfig struct {
-	Port        int  `json:"port"`
-	Enable      bool `json:"enable"`
+	Port   int  `json:"port"`
+	Enable bool `json:"enable"`
 }
 
 type WebConfig struct {
-	Port        int  `json:"port"`
-	Enable      bool `json:"enable"`
+	Port   int  `json:"port"`
+	Enable bool `json:"enable"`
 }
 
 type MockAPIConfig struct {
-	Port        int  `json:"port"`
+	Port int `json:"port"`
 	// api mock không quan tâm tới body, chỉ cần trùng endpoint là được
 	EnableMockNotCareBody bool `json:"enable_mock_not_care_body"`
 }
@@ -36,12 +44,12 @@ type MockAPIConfig struct {
 func DefaultConfig() TDCenterConfig {
 	return TDCenterConfig{
 		APIConfig: APIConfig{
-			Port:        7777,
-			Enable:      true,
+			Port:   7777,
+			Enable: true,
 		},
 		WebConfig: WebConfig{
-			Port:        1403,
-			Enable:      true,
+			Port:   1403,
+			Enable: true,
 		},
 		MockAPIConfig: MockAPIConfig{
 			Port:                  8888,

@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	configGlobal "td_core_service/external/config"
+	"td_config"
 
 	_ "modernc.org/sqlite"
 )
@@ -19,7 +19,7 @@ func executableDir() string {
 }
 func dbPath() string {
 	dir := executableDir()
-	return filepath.Join(dir, configGlobal.GetConfigGlobal().DatabaseName)
+	return filepath.Join(dir, td_config.GetConfigGlobal().DatabaseName)
 }
 
 // Lấy ra thông tin kết nối

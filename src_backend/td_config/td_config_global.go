@@ -1,4 +1,4 @@
-package config
+package td_config
 
 import (
 	"encoding/json"

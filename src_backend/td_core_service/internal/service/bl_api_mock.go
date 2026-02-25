@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
-	configGlobal "td_core_service/external/config"
+	"td_config"
 	"td_core_service/internal/database"
 	"td_core_service/internal/middleware"
 	"td_core_service/internal/model"
@@ -98,7 +98,7 @@ func groupMocksByRoute(mocks []model.TDAPIMockItem) map[string][]model.TDAPIMock
 	for i := range mocks {
 		endpoint := mocks[i].Endpoint
 		// cấu hình endpoint có phân biệt hoa thường hay không
-		if !configGlobal.GetConfigGlobal().EndpointCaseSensitive {
+		if !td_config.GetConfigGlobal().EndpointCaseSensitive {
 			endpoint = strings.ToLower(endpoint)
 		}
 		if !strings.HasPrefix(endpoint, "/") {
@@ -190,7 +190,7 @@ func findMatchingMockBodyGroupByEndpoint(mocks []model.TDAPIMockItem, BodyText [
 			}
 		}
 	}
-	if configGlobal.GetConfigGlobal().MockAPIConfig.EnableMockNotCareBody {
+	if td_config.GetConfigGlobal().MockAPIConfig.EnableMockNotCareBody {
 		// Trường hợp 2: Tìm mock có BodyText trống hoặc null (dùng làm default)
 		for i := range mocks {
 			if mocks[i].BodyText == "" || mocks[i].BodyText == "null" {
@@ -210,7 +210,7 @@ func findMatchingMockBodyGroupByEndpoint(mocks []model.TDAPIMockItem, BodyText [
 
 // lấy ra base url của mock server
 func GetMockServerBaseUrl(w http.ResponseWriter, r *http.Request) {
-	port := configGlobal.GetConfigGlobal().MockAPIConfig.Port
+	port := td_config.GetConfigGlobal().MockAPIConfig.Port
 	addr := fmt.Sprintf("%d", port)
 	server := td_common.GetServerIP()
 	base_url := fmt.Sprintf("http://%s:%s", server, addr)

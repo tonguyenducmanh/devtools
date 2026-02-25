@@ -2,6 +2,11 @@
   "database_name": "dev_tool.db",
   "endpoint_case_sensitive": false,
   "show_ip_server": false,
+  "log_config": {
+    "log_console": true,
+    "log_database": true,
+    "level_log": ["info"]
+  },
   "api_config": {
     "port": 7777,
     "enable": true

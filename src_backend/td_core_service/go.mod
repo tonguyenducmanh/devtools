@@ -2,7 +2,12 @@ module td_core_service
 
 go 1.25.6
 
-require modernc.org/sqlite v1.44.3
+replace td_config => ../td_config
+
+require (
+	modernc.org/sqlite v1.44.3
+	td_config v0.0.0-00010101000000-000000000000
+)
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect

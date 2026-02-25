@@ -6,13 +6,13 @@ import (
 	"net"
 	"net/http"
 	"strings"
-	configGlobal "td_core_service/external/config"
+	"td_config"
 )
 
 // GetServerIP trả về IP LAN của server
 func GetServerIP() string {
 	localHostVal := "localhost"
-	if configGlobal.GetConfigGlobal().ShowIPServer {
+	if td_config.GetConfigGlobal().ShowIPServer {
 		addrs, err := net.InterfaceAddrs()
 		if err != nil {
 			return localHostVal
@@ -76,7 +76,7 @@ func BuildHanlderAPICommon(app *http.ServeMux) http.HandlerFunc {
 	var handler http.HandlerFunc = nil
 
 	// cấu hình endpoint có phân biệt hoa thường hay không
-	if configGlobal.GetConfigGlobal().EndpointCaseSensitive {
+	if td_config.GetConfigGlobal().EndpointCaseSensitive {
 		handler = app.ServeHTTP
 	} else {
 		handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

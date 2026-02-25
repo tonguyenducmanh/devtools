@@ -2,7 +2,7 @@ package api_app
 
 import (
 	"net/http"
-	configGlobal "td_core_service/external/config"
+	"td_config"
 	"td_core_service/internal/database"
 	"td_core_service/internal/middleware"
 	"td_core_service/internal/router"
@@ -17,8 +17,8 @@ func InitDatabase() {
 
 // khởi chạy api app
 func RunAPIApp() {
-	port := configGlobal.GetConfigGlobal().APIConfig.Port
-	mockPort := configGlobal.GetConfigGlobal().MockAPIConfig.Port
+	port := td_config.GetConfigGlobal().APIConfig.Port
+	mockPort := td_config.GetConfigGlobal().MockAPIConfig.Port
 
 	app := http.NewServeMux()
 
