@@ -37,7 +37,7 @@ func RunWebApp() {
 
 // log folder được dùng để run static web
 func logDirectory(publicFS fs.FS) {
-	fmt.Println("Embedded files:")
+	fmt.Println("Embedded web files:")
 	fs.WalkDir(publicFS, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
