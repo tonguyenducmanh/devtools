@@ -10,11 +10,15 @@ import (
 	"td_core_service/td_common"
 )
 
+// build dữ liệu database
+func InitDatabase() {
+	database.InitDatabase()
+}
+
 // khởi chạy api app
 func RunAPIApp() {
 	port := configGlobal.GetConfigGlobal().APIConfig.Port
 	mockPort := configGlobal.GetConfigGlobal().MockAPIConfig.Port
-	database.InitDatabase()
 
 	app := http.NewServeMux()
 

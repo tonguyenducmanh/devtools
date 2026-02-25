@@ -122,4 +122,19 @@ func InitDatabase() {
 		log.Printf("%q: %s\n", err, sqlStmtTestingGroup)
 		return
 	}
+
+	// 6. Tạo bảng log app server
+	sqlCreateLogTable := `
+	CREATE TABLE IF NOT EXISTS td_log_app (
+		id TEXT PRIMARY KEY NOT NULL,
+		log_data TEXT NOT NULL,
+		level TEXT NOT NULL,
+		created_date DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+	`
+	_, err = db.Exec(sqlCreateLogTable)
+	if err != nil {
+		log.Printf("%q: %s\n", err, sqlCreateLogTable)
+		return
+	}
 }

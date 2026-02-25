@@ -99,7 +99,7 @@ export default {
     async showDataByTable() {
       let me = this;
       if (me.tableName) {
-        me.scriptQuery = `select * from ${me.tableName} limit 20;`;
+        me.scriptQuery = `select * from ${me.tableName} order by created_date desc limit 20;`;
         await me.queryDynamicData();
       }
     },
