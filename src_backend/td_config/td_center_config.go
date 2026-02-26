@@ -19,9 +19,8 @@ type TDCenterConfig struct {
 }
 
 type LogConfig struct {
-	LogConsole  bool     `json:"log_console"`
-	LogDatabase bool     `json:"log_database"`
-	LevelLog    []string `json:"level_log"`
+	LogConsole bool     `json:"log_console"`
+	LevelLog   []string `json:"level_log"`
 }
 
 type APIConfig struct {
@@ -48,9 +47,8 @@ func DefaultConfig() TDCenterConfig {
 			Enable: true,
 		},
 		LogConfig: LogConfig{
-			LogConsole:  true,
-			LogDatabase: false,
-			LevelLog:    []string{"info"},
+			LogConsole: true,
+			LevelLog:   []string{"info"},
 		},
 		WebConfig: WebConfig{
 			Port:   1403,

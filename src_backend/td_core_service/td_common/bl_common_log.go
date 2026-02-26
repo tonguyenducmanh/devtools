@@ -5,8 +5,6 @@ import (
 	"slices"
 	"strings"
 	"td_config"
-	"td_core_service/internal/database"
-	"td_core_service/internal/model"
 	"time"
 )
 
@@ -31,14 +29,6 @@ func logData(message string, level string) {
 
 		// Định dạng: Ngày/Tháng/Năm Giờ:Phút:Giây
 		fmt.Printf("[%s] %s: %s", t.Format("02/01/2006 15:04:05"), levelLogName, message)
-	}
-
-	// log vào db
-	if td_config.GetConfigGlobal().LogConfig.LogDatabase {
-		dataLogDB := model.TDLogApp{
-			ID: GenUUID(), Level: level, LogData: message,
-		}
-		database.CreateLogApp(&dataLogDB)
 	}
 }
 
