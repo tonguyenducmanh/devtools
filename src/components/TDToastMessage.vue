@@ -7,6 +7,7 @@
           v-for="toast in toasts"
           :key="toast.id"
           :class="['toast', `td-toast-${toast.type}`]"
+          @click="removeToast(toast.id)"
         >
           <div class="td-toast-content">
             <div class="td-toast-icon">
@@ -140,6 +141,7 @@ export default {
 }
 
 .toast {
+  cursor: pointer;
   background-color: var(--bg-main-color);
   border-radius: calc(var(--border-radius) * 1.5);
 
