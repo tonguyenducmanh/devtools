@@ -2,7 +2,7 @@
   <div class="flex td-user-setting">
     <div class="flex flex-col setting-group">
       <div class="flex user-setting-item">
-        <div>{{ $t("i18nCommon.tdheader.toggleTheme") }}</div>
+        <div>{{ $t("i18nUserSettings.settings.theme") }}</div>
         <TDComboBox
           :width="200"
           v-model="currentUserSetting.theme"
@@ -11,7 +11,7 @@
         />
       </div>
       <div class="flex user-setting-item">
-        <div>{{ $t("i18nCommon.tdheader.changeLanguage") }}</div>
+        <div>{{ $t("i18nUserSettings.settings.language") }}</div>
         <TDComboBox
           :width="200"
           v-model="currentUserSetting.currentLanguage"
@@ -29,14 +29,12 @@
 
     <div class="flex flex-col setting-group">
       <TDAgentAPIConfig />
-      <div class="flex user-setting-item">
-        <div>{{ $t("i18nCommon.tdheader.goToSource") }}</div>
-        <div
-          class="td-icon td-github-icon"
-          @click="goToSource"
-          v-tooltip="$t('i18nCommon.tdheader.goToSource')"
-        ></div>
-      </div>
+      <TDButton
+        :noMargin="true"
+        :type="$tdEnum.buttonType.secondary"
+        @click="goToSource"
+        :label="$t('i18nCommon.tdheader.goToSource')"
+      />
     </div>
   </div>
 </template>

@@ -5,5 +5,9 @@ export default {
       light: "Sáng",
       dark: "Tối",
     },
+    settings: {
+      theme: "Chủ đề ứng dụng",
+      language: "Ngôn ngữ",
+    },
   },
 };

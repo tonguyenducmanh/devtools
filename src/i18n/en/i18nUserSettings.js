@@ -5,5 +5,9 @@ export default {
       light: "Light",
       dark: "Dark",
     },
+    settings: {
+      theme: "Theme app",
+      language: "Language",
+    },
   },
 };
