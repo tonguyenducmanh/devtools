@@ -42,6 +42,7 @@ export default {
     },
     feature: {
       welcome: "Welcome",
+      userSettings: "User setting",
       textgenerator: "Text Generator",
       AppDataMiner: "App data miner",
       cosinSimilarity: "Cosine Similarity",

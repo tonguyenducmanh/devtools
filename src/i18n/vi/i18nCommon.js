@@ -42,6 +42,7 @@ export default {
     },
     feature: {
       welcome: "Tổng quan",
+      userSettings: "Thiết lập ứng dụng",
       textgenerator: "Tạo văn bản",
       AppDataMiner: "Dữ liệu ứng dụng",
       cosinSimilarity: "Độ tương đồng",

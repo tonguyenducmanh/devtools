@@ -17,6 +17,18 @@ const routerConfig = [
   },
   {
     /**
+     * màn hình thiết lập trang web
+     */
+    path: "/TDUserSettings",
+    name: "TDUserSettings",
+    component: () => import("@/views/TDUserSettings.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.userSettings",
+    },
+    hide: true,
+  },
+  {
+    /**
      * App data miner tool
      */
     path: "/appdataminer",
