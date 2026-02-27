@@ -127,7 +127,7 @@ export default {
 <style scoped>
 .td-toast-container {
   position: fixed;
-  bottom: 20px;
+  top: 20px;
   right: 20px;
   z-index: 9999;
   display: flex;
@@ -143,7 +143,9 @@ export default {
   background-color: var(--bg-main-color);
   border-radius: calc(var(--border-radius) * 1.5);
 
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.1),
+    0 4px 6px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--border-color);
   padding: 16px;
   display: flex;
@@ -234,12 +236,12 @@ export default {
 
 .td-toast-enter-from {
   opacity: 0;
-  transform: translateX(100%) scale(0.95);
+  transform: translateY(20px) scale(0.95);
 }
 
 .td-toast-leave-to {
   opacity: 0;
-  transform: translateX(100%) scale(0.95);
+  transform: translateY(20px) scale(0.95);
 }
 
 .td-toast-move {
