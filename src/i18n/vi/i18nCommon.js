@@ -390,7 +390,8 @@ export default {
       restartMock: "Khởi động lại server mock",
       refresh: "Làm mới",
       loadMockErr: "Lỗi tải danh sách mock APIs",
-      requestNameAndApiUrlRequired: "Vui lòng nhập tên request và endpoint",
+      requestNameAndApiUrlRequired:
+        "Vui lòng nhập tên request và endpoint, tên nhóm",
       updateMockSuccess: "Cập nhật mock API thành công",
       createMockSuccess: "Tạo mock API thành công",
       saveMockErr: "Lỗi lưu mock API",

@@ -27,7 +27,6 @@
           ></TDInput>
         </div>
         <TDButton
-          :readOnly="!groupId"
           :noMargin="true"
           @click="saveRequest"
           :label="
@@ -573,7 +572,7 @@ export default {
     async saveRequest() {
       let me = this;
 
-      if (!me.requestName || !me.apiUrl) {
+      if (!me.requestName || !me.apiUrl || !me.groupId) {
         me.$tdToast.warning(
           me.$t("i18nCommon.APIMocking.requestNameAndApiUrlRequired"),
         );

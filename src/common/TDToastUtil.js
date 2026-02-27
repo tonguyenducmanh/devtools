@@ -1,7 +1,5 @@
-// utils/toast.js
 import { createApp } from "vue";
 import ToastContainer from "@/components/TDToastMessage.vue";
-import i18nData from "@/i18n/i18nData.js";
 
 class ToastManager {
   constructor() {

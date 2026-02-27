@@ -392,7 +392,8 @@ export default {
       restartMock: "Restart mock server",
       refresh: "Refresh",
       loadMockErr: "Error loading mock APIs",
-      requestNameAndApiUrlRequired: "Please enter request name and endpoint",
+      requestNameAndApiUrlRequired:
+        "Please enter request name and endpoint, group name",
       updateMockSuccess: "Update mock API success",
       createMockSuccess: "Create mock API success",
       saveMockErr: "Error saving mock API",
