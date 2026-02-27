@@ -2,7 +2,13 @@
   <div class="flex td-header-container">
     <div class="flex td-app-name">
       <div class="td-logo" @click="goToWelcome"></div>
-      <div class="td-app-title" @click="goToWelcome">{{ appName }}</div>
+      <div
+        class="td-app-title"
+        @click="goToWelcome"
+        v-tooltip="$t('i18nCommon.feature.welcome')"
+      >
+        {{ appName }}
+      </div>
       <!-- Search Box -->
       <div class="td-search-container">
         <div class="td-search-box" @click="openSearchModal">
