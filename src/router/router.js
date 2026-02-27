@@ -21,7 +21,7 @@ const routerConfig = [
      */
     path: "/TDUserSettings",
     name: "TDUserSettings",
-    component: () => import("@/views/TDUserSettings.vue"),
+    component: () => import("@/views/misc/TDUserSettings.vue"),
     meta: {
       titleKey: "i18nCommon.feature.userSettings",
     },
