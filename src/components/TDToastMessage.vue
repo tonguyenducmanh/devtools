@@ -149,7 +149,7 @@ export default {
   border: 1px solid var(--border-color);
   padding: 16px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   min-height: 60px;
   position: relative;
@@ -160,7 +160,7 @@ export default {
 
 .td-toast-content {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
   flex: 1;
 }
