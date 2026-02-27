@@ -81,10 +81,12 @@ export async function loadLocale(locale) {
   if (!state.messages[locale]) {
     // import động các tệp tin ngôn ngữ tương ứng
     let msgs = await import(`@/i18n/${locale}/i18nCommon.js`);
+    let userSettings = await import(`@/i18n/${locale}/i18nUserSettings.js`);
     let helps = await import(`@/i18n/${locale}/i18nHelp.js`);
     state.messages[locale] = {
       ...i18nGlobal,
       ...msgs.default,
+      ...userSettings.default,
       ...helps.default,
     };
   }

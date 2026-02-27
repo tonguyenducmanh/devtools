@@ -32,7 +32,6 @@
 </template>
 
 <script>
-import { loadLocale } from "@/i18n/i18nData.js";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 export default {
   name: "TDHeader",
