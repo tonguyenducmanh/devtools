@@ -127,8 +127,9 @@ export default {
 <style scoped>
 .td-toast-container {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 9999;
   display: flex;
   flex-direction: column;
