@@ -139,7 +139,6 @@ export default {
 }
 
 .toast {
-  font-size: var(--font-size-medium);
   background-color: var(--bg-main-color);
   border-radius: calc(var(--border-radius) * 1.5);
 
@@ -191,16 +190,6 @@ export default {
 .td-toast-message {
   flex: 1;
   min-width: 0;
-}
-
-.td-toast-title {
-  font-weight: 600;
-  font-size: 17px;
-  margin-bottom: 2px;
-}
-
-.td-toast-text {
-  font-size: 17px;
 }
 
 .td-toast-close {
