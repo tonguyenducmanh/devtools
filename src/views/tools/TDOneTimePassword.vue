@@ -496,7 +496,6 @@ export default {
           await me.saveUsername();
         }
       }
-      me.$tdToast.success(me.$t("i18nCommon.toastMessage.opened"));
     },
     /**
      * Google Authenticator uses protobuff to encode the 2fa data.
