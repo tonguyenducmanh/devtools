@@ -202,13 +202,6 @@ const sidebarConfig = [
   },
   {
     type: "route",
-    path: "/downloadvscodeext",
-    name: "downloadvscodeext",
-    component: () => import("@/views/tools/TDDownloadVSCodeExt.vue"),
-    meta: { titleKey: "i18nCommon.feature.DownloadVSCodeExtension" },
-  },
-  {
-    type: "route",
     path: "/uuidv4generator",
     name: "uuidv4generator",
     component: () => import("@/views/tools/TDUUIDv4Generator.vue"),
