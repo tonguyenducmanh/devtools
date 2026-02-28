@@ -5,20 +5,41 @@
   >
     <div v-if="isShowSidebar" class="td-sidebar">
       <div class="td-tool-group">
-        <template v-for="(item, index) in routerLink">
+        <template v-for="(item, index) in sidebarItems" :key="index">
+          <!-- Group item: chỉ hiển thị tên group, không có children -->
           <RouterLink
+            v-if="item.type === 'group'"
+            class="td-sidebar-item"
+            :class="{ 'td-item-active': isGroupActive(item.groupKey) }"
+            :to="item.defaultPath"
+          >
+            <div class="flex td-item-content">
+              <span>{{ $t(item.groupTitleKey) }}</span>
+            </div>
+          </RouterLink>
+
+          <!-- Standalone route item -->
+          <RouterLink
+            v-else
             class="td-sidebar-item"
             activeClass="td-item-active"
-            :id="index"
-            :to="item.pathVisible ?? item.path"
+            :to="item.route.pathVisible ?? item.route.path"
           >
-            <div class="flex td-item-content" v-tooltip="$t(item.meta.helpKey)">
-              <div>{{ $t(item.meta.titleKey) }}</div>
+            <div
+              class="flex td-item-content"
+              v-tooltip="
+                item.route.meta.helpKey
+                  ? $t(item.route.meta.helpKey)
+                  : undefined
+              "
+            >
+              <span>{{ $t(item.route.meta.titleKey) }}</span>
             </div>
           </RouterLink>
         </template>
       </div>
     </div>
+
     <TDToggleArea
       :collapsed="!isShowSidebar"
       edge="left"
@@ -28,41 +49,31 @@
 </template>
 
 <script>
-import { getRouterConfig } from "@/router/router.js";
+import { getSidebarItems } from "@/router/router.js";
 import TDToggleArea from "@/components/TDToggleArea.vue";
+
 export default {
   name: "TDSidebar",
   components: { TDToggleArea },
-  computed: {},
-  created() {
-    let me = this;
-    me.processWhenCreated();
-  },
-  mounted() {},
-  props: {},
+
   data() {
-    let me = this;
     return {
-      routerLink: getRouterConfig(),
+      sidebarItems: getSidebarItems(),
       isShowSidebar: true,
-      queryTool: null,
     };
   },
+
+  created() {
+    this.processWhenCreated();
+  },
+
   methods: {
-    filterToolNow() {
-      let me = this;
-      let allTool = getRouterConfig();
-      if (me.queryTool && allTool && allTool.length > 0) {
-        allTool.forEach((element) => {
-          if (element.meta && element.meta.titleKey) {
-            element.meta.title = me.$t(element.meta.titleKey);
-          }
-        });
-        allTool = allTool.filter((x) =>
-          x.meta.title.containsNotSentive(me.queryTool),
-        );
-      }
-      me.routerLink = allTool;
+    /**
+     * Group được coi là active khi route hiện tại có cùng groupKey
+     * (tức là đang đứng ở bất kỳ tool nào trong group đó)
+     */
+    isGroupActive(groupKey) {
+      return this.$route.meta?.groupKey === groupKey;
     },
     async processWhenCreated() {
       let me = this;
@@ -100,7 +111,7 @@ export default {
   width: 250px;
   min-width: 250px;
   max-width: 250px;
-  height: calc(100% - var(--padding));
+  height: 100%;
   background-color: var(--bg-main-color);
   display: flex;
   flex-direction: column;
@@ -108,48 +119,9 @@ export default {
   justify-content: flex-start;
   transition: transform 0.3s ease-in-out;
   overflow-x: hidden;
-  height: 100%;
   padding: var(--padding);
   border-radius: var(--border-radius);
-  .td-filter-tool {
-    display: flex;
-    margin: var(--padding);
-    width: calc(100% - 2 * var(--padding));
-  }
-
-  .td-sidebar-item {
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-    height: 45px;
-    padding: var(--padding);
-    color: var(--text-color);
-    text-decoration: none;
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-    .td-item-content {
-      justify-content: flex-start;
-      column-gap: var(--padding);
-      width: 100%;
-      padding: var(--padding);
-      border-radius: calc(var(--border-radius) * 1.5);
-    }
-    &:hover {
-      .td-item-content {
-        background-color: var(--bg-layer-color);
-      }
-    }
-
-    &.td-item-active {
-      .td-item-content {
-        background-color: var(--bg-layer-color);
-      }
-      font-weight: 600;
-    }
-  }
+  animation: slideIn 0.3s ease-out forwards;
 
   .td-tool-group {
     flex: 1;
@@ -160,15 +132,37 @@ export default {
   }
 }
 
-.td-menu {
-  position: absolute;
-  cursor: pointer;
-  background-position: 0px 0px;
-  z-index: 2;
-  top: 0;
-  left: 100%;
-}
-.td-sidebar {
-  animation: slideIn 0.3s ease-out forwards;
+.td-sidebar-item {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  height: 45px;
+  padding: var(--padding);
+  color: var(--text-color);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  .td-item-content {
+    justify-content: flex-start;
+    column-gap: var(--padding);
+    width: 100%;
+    padding: var(--padding);
+    border-radius: calc(var(--border-radius) * 1.5);
+  }
+
+  &:hover .td-item-content {
+    background-color: var(--bg-layer-color);
+  }
+
+  &.td-item-active {
+    font-weight: 600;
+
+    .td-item-content {
+      background-color: var(--bg-layer-color);
+    }
+  }
 }
 </style>
