@@ -113,12 +113,6 @@ const sidebarConfig = [
         component: () => import("@/views/tools/TDJSONToExcel.vue"),
         meta: { titleKey: "i18nCommon.feature.JSONToExcel" },
       },
-      {
-        path: "mapping",
-        name: "mappingjson",
-        component: () => import("@/views/tools/TDMappingJSON.vue"),
-        meta: { titleKey: "i18nCommon.feature.JSONMapping" },
-      },
     ],
   },
   {
