@@ -23,75 +23,56 @@
 </template>
 
 <script>
+import { shallowRef, watch, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { getGroupConfig } from "@/router/router.js";
 
 export default {
   name: "TDGroupView",
 
-  data() {
-    return {
-      groupChildren: [],
-      activeComponent: null,
-    };
-  },
+  setup() {
+    const route = useRoute();
+    const router = useRouter();
 
-  computed: {
-    activeToolPath() {
-      return this.$route.meta?.toolPath ?? null;
-    },
-    groupKey() {
-      return this.$route.meta?.groupKey ?? null;
-    },
-  },
+    const activeComponent = shallowRef(null);
+    const groupChildren = shallowRef([]);
 
-  watch: {
-    // Khi user chuyển tab (route thay đổi trong cùng 1 group)
-    "$route.path": {
-      immediate: true,
-      handler() {
-        this.syncFromRoute();
-      },
-    },
-  },
+    const activeToolPath = computed(() => route.meta?.toolPath ?? null);
 
-  created() {
-    this.loadGroupConfig();
-  },
+    function loadGroupConfig() {
+      const groupKey = route.meta?.groupKey;
+      const config = getGroupConfig(groupKey);
+      groupChildren.value = config?.children ?? [];
+    }
 
-  methods: {
-    loadGroupConfig() {
-      const config = getGroupConfig(this.groupKey);
-      if (config) {
-        this.groupChildren = config.children;
-      }
-    },
+    async function syncFromRoute() {
+      loadGroupConfig();
 
-    async syncFromRoute() {
-      // Nếu group thay đổi (hiếm, nhưng phòng trường hợp) thì reload config
-      if (
-        this.groupChildren.length === 0 ||
-        this.groupKey !== this._lastGroupKey
-      ) {
-        this._lastGroupKey = this.groupKey;
-        this.loadGroupConfig();
-      }
-
-      // Load đúng component của toolPath hiện tại
-      const child = this.groupChildren.find(
-        (c) => c.path === this.activeToolPath,
+      const child = groupChildren.value.find(
+        (c) => c.path === activeToolPath.value,
       );
       if (child) {
         const mod = await child.component();
-        this.activeComponent = mod.default ?? mod;
+        // Gán vào shallowRef — Vue không reactive hoá sâu bên trong
+        activeComponent.value = mod.default ?? mod;
       }
-    },
+    }
 
-    navigateTo(child) {
-      const fullPath = `/${this.$route.meta.groupPath}/${child.path}`;
-      if (this.$route.path !== fullPath) {
-        this.$router.push(fullPath);
+    function navigateTo(child) {
+      const fullPath = `/${route.meta.groupPath}/${child.path}`;
+      if (route.path !== fullPath) {
+        router.push(fullPath);
       }
-    },
+    }
+
+    watch(() => route.path, syncFromRoute, { immediate: true });
+
+    return {
+      activeComponent,
+      groupChildren,
+      activeToolPath,
+      navigateTo,
+    };
   },
 };
 </script>
@@ -168,8 +149,8 @@ export default {
 
 /* ── Tool content ── */
 .td-tab-content {
-    margin-top: var(--padding);
-    width: 100%;
-    height: 100%;
+  margin-top: var(--padding);
+  width: 100%;
+  height: 100%;
 }
 </style>
