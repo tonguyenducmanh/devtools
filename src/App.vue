@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import TDHeader from "@/views/TDHeader.vue";
-import TDSidebar from "@/views/TDSidebar.vue";
+import TDHeader from "@/views/misc/TDHeader.vue";
+import TDSidebar from "@/views/misc/TDSidebar.vue";
 import "@/common/TDPrototype.js";
 import TDAppStartup from "@/common/TDAppStartup.js";
 import TDToggleArea from "@/components/TDToggleArea.vue";

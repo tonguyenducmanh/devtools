@@ -9,7 +9,7 @@ const routerConfig = [
     path: "/:pathMatch(.*)*",
     pathVisible: "/",
     name: "home",
-    component: () => import("@/views/TDWelcome.vue"),
+    component: () => import("@/views/misc/TDWelcome.vue"),
     meta: {
       titleKey: "i18nCommon.feature.welcome",
     },
