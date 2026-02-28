@@ -22,9 +22,7 @@
             v-for="(route, index) in filteredRoutes"
             :key="route.name"
             class="td-search-item"
-            :class="{
-              'td-search-item-active': index === selectedIndex,
-            }"
+            :class="{ 'td-search-item-active': index === selectedIndex }"
             @click="selectRoute(route)"
             @mouseenter="selectedIndex = index"
           >
@@ -32,8 +30,12 @@
               <div class="td-search-item-title">
                 {{ $t(route.meta.titleKey) }}
               </div>
-              <div class="td-search-item-description" v-if="route.description">
-                {{ route.description }}
+              <!-- Hiển thị tên group cha nếu tool thuộc group -->
+              <div
+                class="td-search-item-description"
+                v-if="route.groupTitleKey"
+              >
+                {{ $t(route.groupTitleKey) }}
               </div>
             </div>
             <div class="td-search-item-shortcut">
@@ -62,7 +64,7 @@
 </template>
 
 <script>
-import { getRouterConfig } from "@/router/router.js";
+import { getAllSearchableRoutes } from "@/router/router.js";
 
 export default {
   name: "TDGoToToolPopup",
@@ -78,41 +80,51 @@ export default {
     return {
       searchQuery: "",
       selectedIndex: 0,
+      // Cache danh sách route để không gọi lại mỗi lần computed
+      _allRoutes: getAllSearchableRoutes(),
     };
   },
+
   computed: {
     filteredRoutes() {
       if (!this.searchQuery) return [];
       const query = this.searchQuery.normalizeText();
 
-      return getRouterConfig()
+      return this._allRoutes
         .filter((route) => {
           const title = this.$t(route.meta.titleKey).normalizeText();
-          const routeName = route.name.normalizeText();
-
-          return title.includes(query) || routeName.includes(query);
+          const name = route.name.normalizeText();
+          // Tìm theo tên tool hoặc tên group
+          const groupTitle = route.groupTitleKey
+            ? this.$t(route.groupTitleKey).normalizeText()
+            : "";
+          return (
+            title.includes(query) ||
+            name.includes(query) ||
+            groupTitle.includes(query)
+          );
         })
-        .slice(0, 8); // Giới hạn 8 kết quả
+        .slice(0, 8);
     },
   },
+
+  watch: {
+    // Reset selected index khi kết quả thay đổi
+    filteredRoutes() {
+      this.selectedIndex = 0;
+    },
+  },
+
   mounted() {
-    let me = this;
-    if (me.$refs.searchInput) {
-      me.$refs.searchInput.focus();
-    }
+    this.$refs.searchInput?.focus();
   },
+
   methods: {
-    show(param) {
-      let me = this;
-    },
     handleClose() {
-      this.$emit("close"); // popup chỉ emit
+      this.$emit("close");
     },
 
-    async save(collection) {
-      this.handleClose();
-    },
-
+    show() {},
     handleKeydown(event) {
       if (!this.filteredRoutes.length) return;
 
@@ -121,7 +133,7 @@ export default {
           event.preventDefault();
           this.selectedIndex = Math.min(
             this.selectedIndex + 1,
-            this.filteredRoutes.length - 1
+            this.filteredRoutes.length - 1,
           );
           break;
         case "ArrowUp":
@@ -135,18 +147,20 @@ export default {
           }
           break;
         case "Escape":
-          this.closeSearchModal();
+          this.handleClose();
           break;
       }
     },
 
     selectRoute(route) {
-      this.$router.push(route.pathVisible || route.path);
+      // Dùng fullPath thay vì route.path vì tool trong group có path dạng /group/tool
+      this.$router.push(route.fullPath);
       this.handleClose();
     },
   },
 };
 </script>
+
 <style scoped lang="scss">
 .td-search-modal {
   width: 100%;
@@ -163,9 +177,11 @@ export default {
     align-items: center;
     padding: 16px;
     border-bottom: 1px solid var(--border-color);
+
     .td-search-icon {
       margin-right: var(--padding);
     }
+
     .td-search-input {
       flex: 1;
       border: none;
@@ -214,13 +230,6 @@ export default {
           background-color: var(--bg-layer-color);
         }
 
-        .td-icon {
-          width: 24px;
-          height: 24px;
-          margin-right: 12px;
-          opacity: 0.8;
-        }
-
         .td-search-item-content {
           flex: 1;
 
@@ -255,6 +264,7 @@ export default {
   .td-search-help {
     padding: 40px 16px;
     text-align: center;
+
     .td-search-empty-text,
     .td-search-help-text {
       color: var(--text-color-secondary);

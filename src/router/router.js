@@ -294,3 +294,31 @@ export function getSidebarItems() {
 export function getGroupConfig(groupKey) {
   return groupConfig.find((g) => g.groupKey === groupKey) ?? null;
 }
+
+/**
+ * Trả về toàn bộ danh sách tool có thể tìm kiếm (dùng cho search popup).
+ * Mỗi item đều có fullPath để navigate trực tiếp.
+ *
+ * Shape: { name, fullPath, meta: { titleKey, helpKey? }, groupTitleKey? }
+ */
+export function getAllSearchableRoutes() {
+  const fromGroups = groupConfig.flatMap((group) =>
+    group.children.map((child) => ({
+      name: child.name,
+      fullPath: `/${group.groupPath}/${child.path}`,
+      meta: child.meta,
+      groupTitleKey: group.groupTitleKey,
+    })),
+  );
+
+  const fromStandalone = standaloneRoutes
+    .filter((r) => !r.hide)
+    .map((r) => ({
+      name: r.name,
+      fullPath: r.pathVisible ?? r.path,
+      meta: r.meta,
+      groupTitleKey: null,
+    }));
+
+  return [...fromGroups, ...fromStandalone];
+}
