@@ -130,7 +130,7 @@ export default {
       let me = this;
       await me.saveLanguage();
       await me.saveTheme();
-      me.handleChangeAgentURL();
+      await me.handleChangeAgentURL();
       me.$tdUtility.reloadApp();
     },
     async getCurrentLanguage() {
