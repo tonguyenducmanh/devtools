@@ -112,4 +112,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool mock api",
   },
+  AgentUrl: {
+    KeyFormat: "AgentUrl",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình url server agent",
+  },
 };

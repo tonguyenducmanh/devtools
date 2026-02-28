@@ -30,6 +30,7 @@ import TDSidebar from "@/views/TDSidebar.vue";
 import "@/common/TDPrototype.js";
 import TDAppStartup from "@/common/TDAppStartup.js";
 import TDToggleArea from "@/components/TDToggleArea.vue";
+import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
 
 export default {
   components: { TDHeader, TDSidebar, TDToggleArea },
@@ -70,6 +71,12 @@ export default {
      */
     async processWhenRunApp() {
       let me = this;
+      let cacheAgentUrl = await me.$tdCache.get(
+        me.$tdEnum.cacheConfig.AgentUrl,
+      );
+      let setConfig = TDCURLUtil.setGlobalInfoBeforeRequest({
+        agentURL: cacheAgentUrl,
+      });
       let currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
       if (!currentTheme) {
         currentTheme = window.__env.defaultValue.theme;

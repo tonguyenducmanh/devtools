@@ -199,11 +199,12 @@ class TDCURLUtil {
   setGlobalInfoBeforeRequest(options) {
     let me = this;
     window.__tdInfo = {
-      agentURL: options.agentURL ?? window.__env?.APITesting?.agentServer,
+      agentURL: options?.agentURL ?? window.__env?.APITesting?.agentServer,
       requestCURL: me.requestCURL,
       parseCURL: me.parseCURL,
       fetchAgent: me.fetchAgent,
     };
+    return window.__tdInfo;
   }
   /**
    * Đoạn code build ra script javascript động để chạy request bằng CURL
