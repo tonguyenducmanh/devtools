@@ -133,7 +133,7 @@ export default {
 }
 
 .td-tab-label {
-  font-size: var(--font-size-medium);
+  font-size: var(--font-size-medium-rare);
 }
 
 /* Gạch chân active */
