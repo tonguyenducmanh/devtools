@@ -112,7 +112,6 @@ export default {
     word-break: keep-all; /* For wider browser support */
     white-space: nowrap; /* Ensure wrapping is enabled */
     padding-right: var(--padding);
-    font-size: var(--font-size-l-medium);
   }
   .td-label-top {
     padding-bottom: var(--padding);

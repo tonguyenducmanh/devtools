@@ -219,7 +219,7 @@ export default {
         monaco.editor.setTheme(myThemeName);
         me.editorModel = monaco.editor.createModel(
           me.getDefaultModelValueForEditor(),
-          me.language
+          me.language,
         );
         let configObject = {
           model: me.editorModel,
@@ -290,7 +290,6 @@ export default {
     word-break: keep-all;
     white-space: nowrap;
     padding-right: var(--padding);
-    font-size: var(--font-size-l-medium);
   }
 
   .td-label-top {
