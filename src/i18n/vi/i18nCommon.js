@@ -300,7 +300,7 @@ export default {
       help: "Gõ để tìm kiếm các tính năng, sử dụng ↑↓ để điều hướng và Enter để chọn",
     },
     apiTesting: {
-      pingAgent: "Kiểm tra server agent có sống không",
+      pingAgent: "Kiểm tra server agent",
       copyCURLFromAPI: "Sao chép CURL",
       saveForNewCollection: "Lưu vào bộ sưu tập {0}",
       scriptName: "Tên script",
