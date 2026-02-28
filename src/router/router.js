@@ -1,37 +1,41 @@
 import { createRouter, createWebHistory } from "vue-router";
 import i18nData from "@/i18n/i18nData.js";
 
-/**
- * Định nghĩa các group và tool con.
- * Path tool con sẽ là: /<groupPath>/<toolPath>
- */
-const groupConfig = [
+// ─── Cấu hình sidebar ─────────────────────────────────────────────────────────
+// type: "group"  → nhóm nhiều tool, hiển thị tab bar khi vào
+// type: "route"  → tool đơn lẻ, điều hướng trực tiếp như cũ
+// hide: true     → không hiện trên sidebar (vẫn đăng ký route)
+
+const sidebarConfig = [
   {
-    groupKey: "qrcode",
-    groupPath: "qrcode",
-    groupTitleKey: "i18nCommon.group.QRCode",
-    children: [
-      {
-        path: "textoqrcode",
-        name: "textoqrcode",
-        component: () => import("@/views/tools/TDTextToQRCode.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.QRCodeFromText",
-          helpKey: "i18nHelp.feature.QRCodeFromText",
-        },
-      },
-      {
-        path: "qrcodetotext",
-        name: "qrcodetotext",
-        component: () => import("@/views/tools/TDQRCodeToText.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.QRCodeToText",
-          helpKey: "i18nHelp.feature.QRCodeToText",
-        },
-      },
-    ],
+    type: "route",
+    hide: true,
+    path: "/:pathMatch(.*)*",
+    pathVisible: "/",
+    name: "home",
+    component: () => import("@/views/misc/TDWelcome.vue"),
+    meta: { titleKey: "i18nCommon.feature.welcome" },
   },
   {
+    type: "route",
+    hide: true,
+    path: "/TDUserSettings",
+    name: "TDUserSettings",
+    component: () => import("@/views/misc/TDUserSettings.vue"),
+    meta: { titleKey: "i18nCommon.feature.userSettings" },
+  },
+  {
+    type: "route",
+    path: "/TDOneTimePassword",
+    name: "TDOneTimePassword",
+    component: () => import("@/views/tools/TDOneTimePassword.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.oneTimePassword",
+      helpKey: "i18nHelp.feature.oneTimePassword",
+    },
+  },
+  {
+    type: "group",
     groupKey: "api",
     groupPath: "api",
     groupTitleKey: "i18nCommon.group.API",
@@ -66,6 +70,33 @@ const groupConfig = [
     ],
   },
   {
+    type: "group",
+    groupKey: "qrcode",
+    groupPath: "qrcode",
+    groupTitleKey: "i18nCommon.group.QRCode",
+    children: [
+      {
+        path: "textoqrcode",
+        name: "textoqrcode",
+        component: () => import("@/views/tools/TDTextToQRCode.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.QRCodeFromText",
+          helpKey: "i18nHelp.feature.QRCodeFromText",
+        },
+      },
+      {
+        path: "qrcodetotext",
+        name: "qrcodetotext",
+        component: () => import("@/views/tools/TDQRCodeToText.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.QRCodeToText",
+          helpKey: "i18nHelp.feature.QRCodeToText",
+        },
+      },
+    ],
+  },
+  {
+    type: "group",
     groupKey: "json",
     groupPath: "json",
     groupTitleKey: "i18nCommon.group.JSON",
@@ -91,6 +122,14 @@ const groupConfig = [
     ],
   },
   {
+    type: "route",
+    path: "/comparecode",
+    name: "comparecode",
+    component: () => import("@/views/tools/TDCompareCode.vue"),
+    meta: { titleKey: "i18nCommon.feature.compareCode" },
+  },
+  {
+    type: "group",
     groupKey: "image",
     groupPath: "image",
     groupTitleKey: "i18nCommon.group.Image",
@@ -116,6 +155,7 @@ const groupConfig = [
     ],
   },
   {
+    type: "group",
     groupKey: "text",
     groupPath: "text",
     groupTitleKey: "i18nCommon.group.Text",
@@ -143,38 +183,15 @@ const groupConfig = [
       },
     ],
   },
-];
-
-/** Các route standalone (không thuộc group nào) */
-const standaloneRoutes = [
   {
-    path: "/:pathMatch(.*)*",
-    pathVisible: "/",
-    name: "home",
-    component: () => import("@/views/misc/TDWelcome.vue"),
-    meta: { titleKey: "i18nCommon.feature.welcome" },
-    hide: true,
-  },
-  {
-    path: "/TDUserSettings",
-    name: "TDUserSettings",
-    component: () => import("@/views/misc/TDUserSettings.vue"),
-    meta: { titleKey: "i18nCommon.feature.userSettings" },
-    hide: true,
-  },
-  {
-    path: "/comparecode",
-    name: "comparecode",
-    component: () => import("@/views/tools/TDCompareCode.vue"),
-    meta: { titleKey: "i18nCommon.feature.compareCode" },
-  },
-  {
+    type: "route",
     path: "/codeformatter",
     name: "codeformatter",
     component: () => import("@/views/tools/TDCodeFormatter.vue"),
     meta: { titleKey: "i18nCommon.feature.CodeFormatter" },
   },
   {
+    type: "route",
     path: "/cosinsimilarity",
     name: "cosinsimilarity",
     component: () => import("@/views/tools/TDCosinSimilarity.vue"),
@@ -184,27 +201,21 @@ const standaloneRoutes = [
     },
   },
   {
+    type: "route",
     path: "/downloadvscodeext",
     name: "downloadvscodeext",
     component: () => import("@/views/tools/TDDownloadVSCodeExt.vue"),
     meta: { titleKey: "i18nCommon.feature.DownloadVSCodeExtension" },
   },
   {
+    type: "route",
     path: "/uuidv4generator",
     name: "uuidv4generator",
     component: () => import("@/views/tools/TDUUIDv4Generator.vue"),
     meta: { titleKey: "i18nCommon.feature.UUIDV4Generator" },
   },
   {
-    path: "/TDOneTimePassword",
-    name: "TDOneTimePassword",
-    component: () => import("@/views/tools/TDOneTimePassword.vue"),
-    meta: {
-      titleKey: "i18nCommon.feature.oneTimePassword",
-      helpKey: "i18nHelp.feature.oneTimePassword",
-    },
-  },
-  {
+    type: "route",
     path: "/TDHTMLPreview",
     name: "TDHTMLPreview",
     component: () => import("@/views/tools/TDHTMLPreview.vue"),
@@ -212,39 +223,37 @@ const standaloneRoutes = [
   },
 ];
 
-// ─── Build flat route list cho vue-router ────────────────────────────────────
-// Mỗi group sinh ra:
-//   /groupPath            → redirect sang child đầu tiên
-//   /groupPath/toolPath   → TDGroupView (wrapper chứa tab bar + lazy component)
+const allRoutes = sidebarConfig.flatMap((item) => {
+  if (item.type === "route") {
+    // Standalone: đăng ký trực tiếp (bỏ field "type", "hide")
+    const { type, hide, ...routeDef } = item;
+    return [routeDef];
+  }
 
-const groupRoutes = groupConfig.flatMap((group) => {
-  const firstChildFullPath = `/${group.groupPath}/${group.children[0].path}`;
+  if (item.type === "group") {
+    // Group: redirect root + mỗi child dùng TDGroupView
+    const firstChildFullPath = `/${item.groupPath}/${item.children[0].path}`;
+    const groupRootRoute = {
+      path: `/${item.groupPath}`,
+      redirect: firstChildFullPath,
+    };
+    const childRoutes = item.children.map((child) => ({
+      path: `/${item.groupPath}/${child.path}`,
+      name: child.name,
+      component: () => import("@/views/misc/TDGroupView.vue"),
+      meta: {
+        ...child.meta,
+        groupKey: item.groupKey,
+        groupPath: item.groupPath,
+        groupTitleKey: item.groupTitleKey,
+        toolPath: child.path,
+      },
+    }));
+    return [groupRootRoute, ...childRoutes];
+  }
 
-  const groupRootRoute = {
-    path: `/${group.groupPath}`,
-    redirect: firstChildFullPath,
-  };
-
-  const childRoutes = group.children.map((child) => ({
-    path: `/${group.groupPath}/${child.path}`,
-    name: child.name,
-    // TDGroupView là wrapper dùng chung cho mọi tool trong group
-    component: () => import("@/components/TDGroupView.vue"),
-    meta: {
-      ...child.meta,
-      groupKey: group.groupKey,
-      groupPath: group.groupPath,
-      groupTitleKey: group.groupTitleKey,
-      toolPath: child.path, // để TDGroupView xác định tab active
-    },
-  }));
-
-  return [groupRootRoute, ...childRoutes];
+  return [];
 });
-
-const allRoutes = [...standaloneRoutes, ...groupRoutes];
-
-// ─── Router instance ──────────────────────────────────────────────────────────
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -263,62 +272,67 @@ router.beforeEach((to, from, next) => {
 
 export default router;
 
-// ─── Helpers export ───────────────────────────────────────────────────────────
-
 /**
- * Trả về danh sách items cho sidebar:
- * - Group → 1 item (không expand, chỉ hiện tên)
- * - Standalone → 1 item như cũ
+ * Trả về danh sách items cho sidebar theo đúng thứ tự khai báo trong sidebarConfig.
+ * Group và standalone xen kẽ tự do.
  */
 export function getSidebarItems() {
-  const groupItems = groupConfig.map((group) => ({
-    type: "group",
-    groupKey: group.groupKey,
-    groupPath: group.groupPath,
-    groupTitleKey: group.groupTitleKey,
-    // Navigate tới tool đầu tiên khi click group
-    defaultPath: `/${group.groupPath}/${group.children[0].path}`,
-  }));
-
-  const standaloneItems = standaloneRoutes
-    .filter((r) => !r.hide)
-    .map((r) => ({ type: "route", route: r }));
-
-  return [...groupItems, ...standaloneItems];
+  return sidebarConfig
+    .filter((item) => !item.hide)
+    .map((item) => {
+      if (item.type === "group") {
+        return {
+          type: "group",
+          groupKey: item.groupKey,
+          groupPath: item.groupPath,
+          groupTitleKey: item.groupTitleKey,
+          defaultPath: `/${item.groupPath}/${item.children[0].path}`,
+        };
+      }
+      // type === "route"
+      return {
+        type: "route",
+        route: item,
+      };
+    });
 }
 
 /**
- * Trả về toàn bộ config của 1 group theo groupKey
- * Dùng trong TDGroupView để lấy danh sách tabs
+ * Trả về toàn bộ config của 1 group theo groupKey.
+ * Dùng trong TDGroupView để lấy danh sách tabs.
  */
 export function getGroupConfig(groupKey) {
-  return groupConfig.find((g) => g.groupKey === groupKey) ?? null;
+  return (
+    sidebarConfig.find(
+      (item) => item.type === "group" && item.groupKey === groupKey,
+    ) ?? null
+  );
 }
 
 /**
  * Trả về toàn bộ danh sách tool có thể tìm kiếm (dùng cho search popup).
- * Mỗi item đều có fullPath để navigate trực tiếp.
- *
- * Shape: { name, fullPath, meta: { titleKey, helpKey? }, groupTitleKey? }
+ * Shape: { name, fullPath, meta, groupTitleKey? }
  */
 export function getAllSearchableRoutes() {
-  const fromGroups = groupConfig.flatMap((group) =>
-    group.children.map((child) => ({
-      name: child.name,
-      fullPath: `/${group.groupPath}/${child.path}`,
-      meta: child.meta,
-      groupTitleKey: group.groupTitleKey,
-    })),
-  );
-
-  const fromStandalone = standaloneRoutes
-    .filter((r) => !r.hide)
-    .map((r) => ({
-      name: r.name,
-      fullPath: r.pathVisible ?? r.path,
-      meta: r.meta,
-      groupTitleKey: null,
-    }));
-
-  return [...fromGroups, ...fromStandalone];
+  return sidebarConfig.flatMap((item) => {
+    if (item.type === "group") {
+      return item.children.map((child) => ({
+        name: child.name,
+        fullPath: `/${item.groupPath}/${child.path}`,
+        meta: child.meta,
+        groupTitleKey: item.groupTitleKey,
+      }));
+    }
+    if (item.type === "route" && !item.hide) {
+      return [
+        {
+          name: item.name,
+          fullPath: item.pathVisible ?? item.path,
+          meta: item.meta,
+          groupTitleKey: null,
+        },
+      ];
+    }
+    return [];
+  });
 }
