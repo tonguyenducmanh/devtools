@@ -175,15 +175,15 @@ const sidebarConfig = [
         component: () => import("@/views/tools/TDTextGenerator.vue"),
         meta: { titleKey: "i18nCommon.feature.textgenerator" },
       },
+      {
+        path: "codeformatter",
+        name: "codeformatter",
+        component: () => import("@/views/tools/TDCodeFormatter.vue"),
+        meta: { titleKey: "i18nCommon.feature.CodeFormatter" },
+      },
     ],
   },
-  {
-    type: "route",
-    path: "/codeformatter",
-    name: "codeformatter",
-    component: () => import("@/views/tools/TDCodeFormatter.vue"),
-    meta: { titleKey: "i18nCommon.feature.CodeFormatter" },
-  },
+
   {
     type: "route",
     path: "/cosinsimilarity",
