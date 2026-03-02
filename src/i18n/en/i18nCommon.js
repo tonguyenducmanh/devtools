@@ -1,8 +1,8 @@
 export default {
   i18nCommon: {
     group: {
-      QRCode: "Create QR",
-      API: "API tooling",
+      QRCode: "QR tooling",
+      API: "API intergate",
       JSON: "JSON building",
       Image: "Image handle",
       Text: "Text transfrom",

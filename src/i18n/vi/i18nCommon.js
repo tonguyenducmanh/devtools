@@ -1,9 +1,9 @@
 export default {
   i18nCommon: {
     group: {
-      QRCode: "Tạo mã QR",
-      API: "Xử lý API",
-      JSON: "Công cụ JSON",
+      QRCode: "Công cụ QR",
+      API: "Tích hợp API",
+      JSON: "Xử lý JSON",
       Image: "Xử lý ảnh",
       Text: "Biến đổi văn bản",
     },
