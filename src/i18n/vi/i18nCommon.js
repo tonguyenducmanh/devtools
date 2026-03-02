@@ -53,7 +53,7 @@ export default {
       textgenerator: "Tạo văn bản",
       AppDataMiner: "Dữ liệu ứng dụng",
       cosinSimilarity: "Độ tương đồng",
-      oneTimePassword: "Mật khẩu một lần",
+      oneTimePassword: "Tạo mã OTP",
       textCompress: "Nén văn bản",
       compareCode: "So sánh mã",
       colorPicker: "Chọn màu",
