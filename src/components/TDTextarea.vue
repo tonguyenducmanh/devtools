@@ -4,7 +4,14 @@
     :class="{ 'flex-col': isLabelTop, 'td-textarea-read-only': readOnly }"
     :style="styleComputed"
   >
-    <div class="td-label" :class="{ 'td-label-top': isLabelTop }" v-if="label">
+    <div
+      class="td-label"
+      :class="{
+        'td-label-top': isLabelTop && !enableHighlight,
+        'td-label-editor': enableHighlight,
+      }"
+      v-if="label"
+    >
       {{ label.capitalize() }}
     </div>
     <div
@@ -284,6 +291,7 @@ export default {
   display: flex;
   height: 100%;
   width: 100%;
+  position: relative;
 
   .td-label {
     overflow-wrap: normal;
@@ -295,7 +303,17 @@ export default {
   .td-label-top {
     padding-bottom: var(--padding);
   }
-
+  .td-label-editor {
+    position: absolute;
+    bottom: var(--padding);
+    left: var(--padding);
+    z-index: 1;
+    font-size: var(--font-size-medium-rare);
+    color: var(--text-secondary-color);
+  }
+  .td-label-editor:hover {
+    opacity: 0.5;
+  }
   .textarea-wrapper {
     position: relative;
     width: 100%;
