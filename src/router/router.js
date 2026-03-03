@@ -155,6 +155,12 @@ const sidebarConfig = [
     groupTitleKey: "i18nCommon.group.Text",
     children: [
       {
+        path: "codeformatter",
+        name: "codeformatter",
+        component: () => import("@/views/tools/TDCodeFormatter.vue"),
+        meta: { titleKey: "i18nCommon.feature.CodeFormatter" },
+      },
+      {
         path: "compress",
         name: "TDTextCompress",
         component: () => import("@/views/tools/TDTextCompress.vue"),
@@ -174,12 +180,6 @@ const sidebarConfig = [
         name: "textgenerator",
         component: () => import("@/views/tools/TDTextGenerator.vue"),
         meta: { titleKey: "i18nCommon.feature.textgenerator" },
-      },
-      {
-        path: "codeformatter",
-        name: "codeformatter",
-        component: () => import("@/views/tools/TDCodeFormatter.vue"),
-        meta: { titleKey: "i18nCommon.feature.CodeFormatter" },
       },
     ],
   },
