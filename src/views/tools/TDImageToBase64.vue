@@ -1,7 +1,6 @@
 <template>
-  <div class="container">
-    <!-- <div class="title">{{ $t("i18nCommon.imageToBase64.title") }}</div> -->
-    <div class="flex flex-wrap paste-box">
+  <div class="flex flex-col container">
+    <div class="flex paste-box">
       <div
         ref="drop-zone"
         class="drop-zone"
@@ -18,8 +17,6 @@
           :placeHolder="$t('i18nCommon.imageToBase64.placeHolder')"
           v-model="base64Result"
           :readOnly="true"
-          height="400px"
-          width="500px"
         ></TDTextarea>
       </div>
     </div>
@@ -108,21 +105,14 @@ export default {
 .container {
   width: 100%;
   height: 100%;
-  padding: 2rem;
-  border-radius: 0;
-
-  box-shadow: none;
 }
 .paste-box {
-  column-gap: 20px;
-  padding: var(--padding);
+  gap: var(--padding);
+  width: 100%;
+  flex: 1;
 }
 
 .drop-zone {
-  min-width: 500px;
-  max-width: 500px;
-  min-height: 400px;
-  max-height: 400px;
   border: 1px dashed var(--bg-active-color);
   padding: 1.5rem;
   text-align: center;
@@ -132,6 +122,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  height: 100%;
 }
 
 .drop-zone:hover {
@@ -151,5 +143,7 @@ export default {
 
 .result-container {
   display: flex;
+  width: 100%;
+  height: 100%;
 }
 </style>
