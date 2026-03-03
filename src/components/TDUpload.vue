@@ -27,7 +27,9 @@
           {{ getTitleFileSelected }}
         </span>
       </template>
-      <span v-else-if="labelEmpty">{{ labelEmpty }}</span>
+      <span v-else-if="labelEmpty" class="td-selected-item">{{
+        labelEmpty
+      }}</span>
     </div>
   </div>
 </template>
@@ -77,7 +79,7 @@ export default {
       if (me.selectedFiles && me.selectedFiles.length > 0) {
         if (me.selectedFiles.length == 1) {
           result = `${me.selectedFiles[0].name} (${me.formatFileSize(
-            me.selectedFiles[0].size
+            me.selectedFiles[0].size,
           )})`;
         } else {
           result = `${me.$t("i18nCommon.fileSelected")}: ${
