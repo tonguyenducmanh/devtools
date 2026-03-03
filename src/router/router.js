@@ -129,6 +129,12 @@ const sidebarConfig = [
     groupTitleKey: "i18nCommon.group.Image",
     children: [
       {
+        path: "colorpicker",
+        name: "colorpicker",
+        component: () => import("@/views/tools/TDColorPicker.vue"),
+        meta: { titleKey: "i18nCommon.feature.colorPicker" },
+      },
+      {
         path: "base64toimage",
         name: "base64toimage",
         component: () => import("@/views/tools/TDBase64ToImage.vue"),
@@ -139,12 +145,6 @@ const sidebarConfig = [
         name: "imagetobase64",
         component: () => import("@/views/tools/TDImageToBase64.vue"),
         meta: { titleKey: "i18nCommon.feature.ImageToBase64" },
-      },
-      {
-        path: "colorpicker",
-        name: "colorpicker",
-        component: () => import("@/views/tools/TDColorPicker.vue"),
-        meta: { titleKey: "i18nCommon.feature.colorPicker" },
       },
     ],
   },

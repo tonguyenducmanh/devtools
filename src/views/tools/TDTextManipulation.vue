@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <div class="td-input-source">
+    <div class="mb-medium td-input-source">
       <TDTextarea
         :placeHolder="$t('i18nCommon.textManipulation.expressionSource')"
         v-model="expressionSource"
@@ -41,7 +41,13 @@
         />
       </div>
     </div>
-
+    <div class="td-input-source">
+      <TDTextarea
+        :placeHolder="$t('i18nCommon.textManipulation.outputSource')"
+        v-model="outputSource"
+        :readOnly="true"
+      ></TDTextarea>
+    </div>
     <div class="flex">
       <TDButton
         @click="manipulate"
@@ -58,11 +64,6 @@
         :label="$t('i18nCommon.example')"
       ></TDButton>
     </div>
-    <TDTextarea
-      :placeHolder="$t('i18nCommon.textManipulation.outputSource')"
-      v-model="outputSource"
-      :readOnly="true"
-    ></TDTextarea>
   </div>
 </template>
 
@@ -189,7 +190,7 @@ export default {
       this.outputRowSeperator = mock.outputRowSeperator;
       this.outputSource = "";
       this.$tdToast.success(
-        this.$t("i18nCommon.toastMessage.applyMockSuccess")
+        this.$t("i18nCommon.toastMessage.applyMockSuccess"),
       );
     },
     /**

@@ -1,11 +1,19 @@
 <template>
   <div class="flex flex-col td-text-gen-container">
+    <div class="td-text-gen-result">
+      <TDTextarea
+        :placeHolder="$t('i18nCommon.textgenerator.resultPlaceholder')"
+        v-model="randomTextGenerated"
+        :readOnly="true"
+      ></TDTextarea>
+    </div>
     <div class="flex build-area">
       <TDComboBox
         :width="120"
         :noMargin="true"
         v-model="genType"
         :options="genTypeOption"
+        :isDropTop="true"
       />
       <span class="title-input-config">{{ generateTitle }}</span>
       <div>
@@ -27,13 +35,6 @@
         :type="$tdEnum.buttonType.secondary"
         :label="$t('i18nCommon.copy')"
       ></TDButton>
-    </div>
-    <div class="td-text-gen-result">
-      <TDTextarea
-        :placeHolder="$t('i18nCommon.textgenerator.resultPlaceholder')"
-        v-model="randomTextGenerated"
-        :readOnly="true"
-      ></TDTextarea>
     </div>
   </div>
 </template>

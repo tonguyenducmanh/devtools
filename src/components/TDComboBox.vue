@@ -20,7 +20,11 @@
         </span>
         <TDArrow :openProp="open" />
       </div>
-      <div v-if="open" class="td-combobox-dropdown">
+      <div
+        v-if="open"
+        class="td-combobox-dropdown"
+        :class="{ 'td-combobox-droptop': isDropTop }"
+      >
         <TDComboBoxOption
           v-for="(option, index) in options"
           :key="index"
@@ -92,6 +96,10 @@ export default {
     isCapitalizeText: {
       type: Boolean,
       default: true,
+    },
+    isDropTop: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ["update:modelValue", "selected"],
@@ -206,6 +214,12 @@ export default {
       .td-dropdown-item:last-child {
         border-radius: 0 0 var(--border-radius) var(--border-radius);
       }
+    }
+    .td-combobox-droptop {
+      top: unset;
+      bottom: 100%;
+      margin-top: unset;
+      margin-bottom: 4px;
     }
 
     .arrow {

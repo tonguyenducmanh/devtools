@@ -2,26 +2,28 @@
   <div class="flex container">
     <div class="main-tool">
       <div class="flex flex-col qr-section">
-        <div style="width: 100%">
-          <TDUpload
-            @dragover="handleDragOver"
-            @dragleave="handleDragLeave"
-            @drop="handleDrop"
-            ref="uploadArea"
-            class="upload-area"
-            :labelEmpty="$t('i18nCommon.qrCodeToText.dropZone.placeholder')"
-            :label="$t('i18nCommon.qrCodeToText.dropZone.label')"
-            multiple
-            @selected="convertQRCode"
-          ></TDUpload>
-        </div>
-        <div class="flex button-generate">
+        <div class="flex tool-qr-header">
+          <div class="flex-one">
+            <TDUpload
+              @dragover="handleDragOver"
+              @dragleave="handleDragLeave"
+              @drop="handleDrop"
+              ref="uploadArea"
+              class="upload-area"
+              :labelEmpty="$t('i18nCommon.qrCodeToText.dropZone.placeholder')"
+              :label="$t('i18nCommon.qrCodeToText.dropZone.label')"
+              multiple
+              @selected="convertQRCode"
+            ></TDUpload>
+          </div>
           <TDButton
+            :noMargin="true"
             @click="convertQRCode"
             :label="$t('i18nCommon.qrCodeToText.convert')"
           ></TDButton>
           <TDButton
             @click="copyResult"
+            :noMargin="true"
             :type="$tdEnum.buttonType.secondary"
             :label="$t('i18nCommon.qrCodeToText.copy')"
           ></TDButton>
@@ -104,7 +106,7 @@ export default {
       e.preventDefault();
       let me = this;
       const files = Array.from(e.dataTransfer.files).filter((file) =>
-        file.type.includes("image")
+        file.type.includes("image"),
       );
 
       if (files.length) {
@@ -146,7 +148,7 @@ export default {
             if (me.isCompressText) {
               me.textOutput = await TDCompress.decompressText(
                 finalOutput,
-                me.$tdEnum.compressType.gzip
+                me.$tdEnum.compressType.gzip,
               );
             } else {
               me.textOutput = finalOutput;
@@ -193,7 +195,7 @@ export default {
       // Nếu có cả chunk có header và không có header, có thể có lỗi hoặc dữ liệu không nhất quán.
       if (chunksWithHeader.length !== rawResults.length) {
         console.warn(
-          "Một số QR code có header, một số thì không. Chỉ các QR có header sẽ được sắp xếp và ghép nối."
+          "Một số QR code có header, một số thì không. Chỉ các QR có header sẽ được sắp xếp và ghép nối.",
         );
       }
 
@@ -207,7 +209,7 @@ export default {
 
       // Lọc chỉ những chunk có timestamp lớn nhất
       let latestChunks = chunksWithHeader.filter(
-        (chunk) => chunk.timestamp === maxTimestamp
+        (chunk) => chunk.timestamp === maxTimestamp,
       );
 
       // Sắp xếp theo timestamp và index
@@ -243,10 +245,10 @@ export default {
   height: 100%;
 }
 .qr-section {
-  padding: var(--padding);
   flex: 1;
   width: 100%;
   height: 100%;
+  gap: var(--padding);
 }
 
 .td-img {
@@ -267,5 +269,10 @@ export default {
   height: 100%;
   justify-content: flex-start;
   width: 100%;
+}
+.tool-qr-header {
+  width: 100%;
+  justify-content: space-between;
+  gap: var(--padding);
 }
 </style>

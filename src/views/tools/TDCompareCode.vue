@@ -1,11 +1,13 @@
 <template>
   <div class="flex flex-col container">
+    <div class="highlight-layer" ref="textareaWrap"></div>
     <div class="flex">
       <TDComboBox
         :width="200"
         v-model="language"
         :options="methodOptions"
         @selected="compare"
+        :isDropTop="true"
       />
       <TDCheckbox
         v-model="wrapText"
@@ -18,7 +20,6 @@
         :label="$t('i18nCommon.compareCode.example')"
       ></TDButton>
     </div>
-    <div class="highlight-layer" ref="textareaWrap"></div>
   </div>
 </template>
 
@@ -67,16 +68,16 @@ export default {
         }
         me.originalModel = monaco.editor.createModel(
           me.firstCodeFile,
-          me.language
+          me.language,
         );
         me.modifiedModel = monaco.editor.createModel(
           me.secondCodeFile,
-          me.language
+          me.language,
         );
 
         me.editor = monaco.editor.createDiffEditor(
           me.$refs.textareaWrap,
-          configObject
+          configObject,
         );
         me.editor.setModel({
           original: me.originalModel,

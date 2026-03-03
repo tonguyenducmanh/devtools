@@ -1,8 +1,5 @@
 <template>
   <div class="flex flex-col container">
-    <div class="flex tool-header">
-      <TDComboBox :width="200" v-model="language" :options="methodOptions" />
-    </div>
     <div class="flex input-container">
       <TDTextarea
         :placeHolder="$t('i18nCommon.codeFormatter.inputCode')"
@@ -22,25 +19,33 @@
         :readOnly="true"
       ></TDTextarea>
     </div>
-    <div class="flex">
-      <TDButton
-        @click="handleFormat"
-        :label="$t('i18nCommon.codeFormatter.formatCode')"
-      ></TDButton>
-      <TDCheckbox
-        v-model="enableHighlight"
-        :label="$t('i18nCommon.enableHighlight')"
-      ></TDCheckbox>
-      <TDButton
-        @click="applyMock"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.example')"
-      ></TDButton>
-      <TDButton
-        @click="handleCopyEvent(outputSource)"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.codeFormatter.copyOutput')"
-      ></TDButton>
+    <div class="flex tool-header">
+      <TDComboBox
+        :width="200"
+        v-model="language"
+        :options="methodOptions"
+        :isDropTop="true"
+      />
+      <div class="flex">
+        <TDButton
+          @click="handleFormat"
+          :label="$t('i18nCommon.codeFormatter.formatCode')"
+        ></TDButton>
+        <TDCheckbox
+          v-model="enableHighlight"
+          :label="$t('i18nCommon.enableHighlight')"
+        ></TDCheckbox>
+        <TDButton
+          @click="applyMock"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.example')"
+        ></TDButton>
+        <TDButton
+          @click="handleCopyEvent(outputSource)"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.codeFormatter.copyOutput')"
+        ></TDButton>
+      </div>
     </div>
   </div>
 </template>
