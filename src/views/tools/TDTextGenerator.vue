@@ -119,7 +119,6 @@ export default {
   }
   .build-area {
     width: 100%;
-    margin-bottom: var(--padding);
     gap: var(--padding);
   }
 }
