@@ -91,7 +91,7 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: flex-end;
-  gap: 2px;
+  gap: var(--padding);
   border-bottom: 2px solid var(--bg-layer-color);
   flex-shrink: 0;
   overflow-x: auto;
