@@ -127,3 +127,16 @@ String.prototype.normalizeText =
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
   };
+
+/**
+ * lấy ngày trong năm
+ */
+Date.prototype.getDayOfTheYear =
+  Date.prototype.getDayOfTheYear ||
+  function () {
+    // kiểm tra nếu kết thúc chứa text cần check
+    // và length phải lớn hơn text cần check
+    return Math.floor(
+      (this - new Date(this.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24),
+    );
+  };

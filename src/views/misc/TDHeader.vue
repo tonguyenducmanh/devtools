@@ -23,6 +23,16 @@
         </div>
       </div>
     </div>
+    <template v-if="quote">
+      <div class="td-quote-header">
+        <div class="td-quote-marquee">
+          <span class="td-quote-content">
+            {{ quote.q }}
+          </span>
+          <span class="td-quote-author"> — {{ quote.a }} </span>
+        </div>
+      </div>
+    </template>
     <div
       class="td-icon td-setting-icon"
       @click="goToUserSetting"
@@ -33,6 +43,7 @@
 
 <script>
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
+import { QUOTES } from "@/common/TDQuote.js";
 export default {
   name: "TDHeader",
   computed: {
@@ -40,8 +51,9 @@ export default {
       return window.__env.appName;
     },
   },
-  created() {
+  async created() {
     let me = this;
+    await me.buildQuote();
   },
   mounted() {
     // Thêm keyboard shortcut Cmd+K / Ctrl+K
@@ -53,9 +65,28 @@ export default {
   props: {},
   data() {
     let me = this;
-    return {};
+    return {
+      quote: null,
+    };
   },
   methods: {
+    async buildQuote() {
+      let me = this;
+      const cached = await me.$tdCache.get(me.$tdEnum.cacheConfig.DailyQuote);
+      const today = new Date().toDateString();
+
+      if (cached && cached.date === today) {
+        me.quote = cached.quote;
+      } else {
+        // Lấy quote mới theo ngày
+        const dayIndex = new Date().getDayOfTheYear() % QUOTES.length;
+        me.quote = QUOTES[dayIndex];
+        await me.$tdCache.set(me.$tdEnum.cacheConfig.DailyQuote, {
+          date: today,
+          quote: me.quote,
+        });
+      }
+    },
     goToWelcome() {
       let me = this;
       me.$router.push("/");
@@ -157,6 +188,37 @@ export default {
     .td-search-shortcut {
       display: none;
     }
+  }
+}
+.td-quote-header {
+  flex: 1;
+  overflow: hidden; // Ẩn phần chạy ra ngoài
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.td-quote-marquee {
+  display: inline-block;
+  padding-left: 100%;
+  animation: quote-scroll 15s linear infinite;
+}
+
+.td-quote-content {
+  margin-right: 8px;
+}
+
+.td-quote-author {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+@keyframes quote-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
   }
 }
 </style>
