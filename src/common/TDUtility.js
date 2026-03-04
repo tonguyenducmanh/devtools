@@ -1,4 +1,4 @@
-import { toast } from "@/common/TDToastUtil.js";
+import { toast } from "@/common/ToastPlugin.js";
 import i18nData from "@/i18n/i18nData.js";
 /**
  * các method TDutility dùng cho toàn bộ frontend
