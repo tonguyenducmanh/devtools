@@ -2,22 +2,13 @@
 // Danh sách 30 câu quote tiếng Việt hay — đủ dùng cho 1 tháng
 // Cách bổ sung: thêm object { q, a } vào mảng bên dưới
 export const QUOTES = [
-  { q: "Hành trình ngàn dặm bắt đầu từ một bước chân.", a: "Lão Tử" },
   {
     q: "Chúng ta là những gì chúng ta thường xuyên làm. Sự xuất sắc, do đó, không phải là một hành động mà là một thói quen.",
     a: "Aristotle",
   },
   {
-    q: "Bạn sinh ra là một bản chính, đừng chết như 1 bản sao.",
-    a: "Khuyết Danh",
-  },
-  {
     q: "Khó khăn không phải là chướng ngại vật trên con đường, mà chính là con đường.",
     a: "Zen Proverb",
-  },
-  {
-    q: "Bộ lông trang sức con công, học vấn trang sức con người.",
-    a: "Ngạn ngữ Nga",
   },
   {
     q: "Bộ lông trang sức con công, học vấn trang sức con người.",
