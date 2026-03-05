@@ -8,103 +8,59 @@ export const QUOTES = [
     a: "Aristotle",
   },
   {
-    q: "Đừng đợi. Thời điểm hoàn hảo sẽ không bao giờ đến.",
-    a: "Napoleon Hill",
+    q: "Bạn sinh ra là một bản chính, đừng chết như 1 bản sao.",
+    a: "Khuyết Danh",
   },
-  { q: "Sống không phải là tồn tại — mà là sống thực sự.", a: "Victor Hugo" },
   {
     q: "Khó khăn không phải là chướng ngại vật trên con đường, mà chính là con đường.",
     a: "Zen Proverb",
   },
-  { q: "Ai dám mơ ước lớn, kẻ đó sẽ làm nên chuyện lớn.", a: "Walt Disney" },
   {
-    q: "Trong đêm tối nhất, những ngôi sao sáng nhất mới hiện ra.",
-    a: "Khalil Gibran",
+    q: "Bộ lông trang sức con công, học vấn trang sức con người.",
+    a: "Ngạn ngữ Nga",
   },
   {
-    q: "Thành công không phải là chìa khóa dẫn đến hạnh phúc. Hạnh phúc mới là chìa khóa dẫn đến thành công.",
-    a: "Albert Schweitzer",
+    q: "Bộ lông trang sức con công, học vấn trang sức con người.",
+    a: "Ngạn ngữ Nga",
   },
   {
-    q: "Hãy là sự thay đổi mà bạn muốn thấy trên thế giới.",
-    a: "Mahatma Gandhi",
+    q: "Sự khác biệt giữa bất khả thi và khả thi nằm ở sự quyết tâm của con người.",
+    a: "Tommy Lasorda",
   },
   {
-    q: "Cuộc đời không phải là chờ đợi cơn bão qua đi, mà là học cách nhảy múa trong mưa.",
-    a: "Vivian Greene",
+    q: "Phán xét người khác không định hình con người họ. Nó định hình con người bạn.",
+    a: "Khuyết Danh",
   },
   {
-    q: "Người chiến thắng không phải là người không bao giờ thất bại, mà là người không bao giờ bỏ cuộc.",
-    a: "Vince Lombardi",
+    q: "Dù bạn có code tính năng gì, hãy làm nó bằng cả trái tim.",
+    a: "Tô Mạnh",
   },
   {
-    q: "Một cuốn sách, một cây bút, một đứa trẻ, và một giáo viên có thể thay đổi thế giới.",
-    a: "Malala Yousafzai",
+    q: "Không có vũ khí nguy hiểm, chỉ có những con người nguy hiểm.",
+    a: "Robert A Heinlein",
   },
   {
-    q: "Đừng bao giờ so sánh cuộc hành trình của mình với người khác. Đường của mỗi người mỗi khác.",
-    a: "Khuyết danh",
-  },
-  { q: "Biết người là trí tuệ, biết mình là giác ngộ.", a: "Lão Tử" },
-  {
-    q: "Mỗi ngày là một trang mới. Hãy viết câu chuyện của bạn bằng chính đôi tay mình.",
-    a: "Khuyết danh",
+    q: "Lời nói ác ý khiến tình cảm tổn thương, nhưng sự im lặng làm trái tim tan vỡ.",
+    a: "Khuyết Danh",
   },
   {
-    q: "Không có gì mạnh mẽ hơn một ý tưởng đã đến đúng thời điểm của nó.",
-    a: "Victor Hugo",
+    q: "Người xưa thận trọng lời nói, sợ sẽ xấu hổ nếu nói mà làm không được.",
+    a: "Khổng Tử",
   },
   {
-    q: "Người bi quan thấy khó khăn trong mỗi cơ hội; người lạc quan thấy cơ hội trong mỗi khó khăn.",
-    a: "Winston Churchill",
+    q: "Bất kể bạn học chuyên ngành gì, nhất định khi tìm việc phải tìm 1 công việc mình yêu thích. Như vậy bạn mới có thể vui vẻ từ 6h sáng đến 8h tối được. Thêm nữa, hãy tìm một người bạn yêu để ở bên cạnh người đó, như vậy bạn mới có thể hạnh phúc từ 8h tối đến 6h sáng hôm sau. Đó chính là cuộc sống.",
+    a: "Hòa Hỏa",
   },
   {
-    q: "Học từ ngày hôm qua, sống trong ngày hôm nay, hy vọng vào ngày mai.",
-    a: "Albert Einstein",
-  },
-  { q: "Kỷ luật là cây cầu giữa mục tiêu và thành tựu.", a: "Jim Rohn" },
-  {
-    q: "Điều duy nhất cản trở giấc mơ của bạn là nỗi sợ rằng nó sẽ thất bại.",
-    a: "Paulo Coelho",
+    q: "Có một cách chuyển tiền thậm chí còn nhanh hơn cả ngân hàng điện tử. Nó được gọi là hôn nhân.",
+    a: "ames Holt McGavran",
   },
   {
-    q: "Thành thật mà nói, dũng cảm không phải là không sợ — mà là biết còn nhiều thứ quan trọng hơn nỗi sợ.",
-    a: "Ambrose Redmoon",
+    q: "Con người sinh ra không phải để tan biến đi như một hạt cát vô danh.Họ sinh ra để in dấu lại trên mặt đất, in dấu lại trong trái tim người khác.",
+    a: "Xukhomlinski",
   },
   {
-    q: "Bạn không thể đi ngược dòng sông thời gian. Hãy bơi cùng nó.",
-    a: "Khuyết danh",
-  },
-  {
-    q: "Tự tin là bước đầu tiên trên con đường dẫn đến thành công.",
-    a: "Ralph Waldo Emerson",
-  },
-  {
-    q: "Gieo suy nghĩ, gặt hành động. Gieo hành động, gặt thói quen. Gieo thói quen, gặt số phận.",
-    a: "Charles Reade",
-  },
-  {
-    q: "Trí tuệ là biết phải làm gì tiếp theo; đức hạnh là thực sự làm điều đó.",
-    a: "David Starr Jordan",
-  },
-  {
-    q: "Mọi thành tựu vĩ đại đều bắt đầu từ một quyết định dũng cảm.",
-    a: "Wilma Rudolph",
-  },
-  {
-    q: "Đừng tính đếm những ngày — hãy làm cho những ngày đó đáng giá.",
-    a: "Muhammad Ali",
-  },
-  {
-    q: "Tốt hơn là thắp một ngọn nến còn hơn ngồi nguyền rủa bóng tối.",
-    a: "Eleanor Roosevelt",
-  },
-  {
-    q: "Hãy tha thứ cho người khác không phải vì họ xứng đáng, mà vì bạn xứng đáng được sống trong bình yên.",
-    a: "Jonathan Lockwood Huie",
-  },
-  {
-    q: "Cuộc sống là 10% những gì xảy ra với bạn và 90% cách bạn phản ứng với nó.",
-    a: "Charles R. Swindoll",
+    q: "Thành công không có nghĩa không phạm sai lầm mà là không phạm một sai lầm hai lần.",
+    a: "George Bernard Shaw",
   },
 ];
