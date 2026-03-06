@@ -118,10 +118,4 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình url server agent",
   },
-  DailyQuote: {
-    KeyFormat: "DailyQuote",
-    CacheLevel: tdEnum.cacheType.local,
-    ExpireTime: 86400, // 1 ngày (giây)
-    Note: "cache câu quote theo ngày",
-  },
 };
