@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import tdUtility from "@/common/TDUtility.js";
-
+import { useTabManager } from "@/stores/TDTabManager";
 // ─── Cấu hình sidebar ─────────────────────────────────────────────────────────
 // type: "group"  → nhóm nhiều tool, hiển thị tab bar khi vào
 // type: "route"  → tool đơn lẻ, điều hướng trực tiếp như cũ
@@ -246,8 +246,12 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: allRoutes,
 });
+const { exitTabMode } = useTabManager();
 
+// xử lý logic khi user chủ động bấm vào router cụ thể thì xử lý trước khi chuyển sang
 router.beforeEach((to, from, next) => {
+  // thoát chế độ làm việc multi tab nếu có
+  exitTabMode();
   document.title = tdUtility.defaultTitleApp();
   next();
 });

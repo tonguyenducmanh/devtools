@@ -104,7 +104,7 @@ export default {
     },
   },
   setup() {
-    const { state, activateTab, closeTab } = useTabManager();
+    const { state, activateTab, closeTab, exitTabMode } = useTabManager();
 
     const tabs = computed(() => state.tabs);
     const activeTabId = computed(() => state.activeTabId);
@@ -124,11 +124,6 @@ export default {
     const draggingIndex = ref(-1);
     const dragOverIndex = ref(-1);
     const tabBarRef = ref(null);
-
-    function exitTabMode() {
-      state.tabs.splice(0, state.tabs.length);
-      state.activeTabId = null;
-    }
 
     // ── Drag & Drop ──────────────────────────────────────────────
 

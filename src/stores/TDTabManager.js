@@ -76,10 +76,19 @@ export function useTabManager() {
     state.activeTabId = id;
   }
 
+  /**
+   * Dọn dữ liệu và thoát chế độ luôn
+   */
+  function exitTabMode() {
+    state.tabs.splice(0, state.tabs.length);
+    state.activeTabId = null;
+  }
+
   return {
     state,
     openTab,
     closeTab,
     activateTab,
+    exitTabMode,
   };
 }
