@@ -45,24 +45,26 @@
 
     <!-- Flyout: teleport to body, outside all loops -->
     <Teleport to="body">
-      <div
-        v-if="hoveredItem"
-        class="td-sidebar-group-flyout"
-        :style="flyoutStyle"
-        @mouseenter="onFlyoutMouseEnter"
-        @mouseleave="onFlyoutMouseLeave"
-      >
-        <RouterLink
-          v-for="child in hoveredItem.children"
-          :key="child.name"
-          class="td-sidebar-flyout-item"
-          :to="`/${hoveredItem.groupPath}/${child.path}`"
-          @click="hoveredItem = null"
-          v-tooltip="$t(child.meta.helpKey)"
+      <transition name="td-flyout">
+        <div
+          v-if="hoveredItem"
+          class="td-sidebar-group-flyout"
+          :style="flyoutStyle"
+          @mouseenter="onFlyoutMouseEnter"
+          @mouseleave="onFlyoutMouseLeave"
         >
-          {{ $t(child.meta.titleKey) }}
-        </RouterLink>
-      </div>
+          <RouterLink
+            v-for="child in hoveredItem.children"
+            :key="child.name"
+            class="td-sidebar-flyout-item"
+            :to="`/${hoveredItem.groupPath}/${child.path}`"
+            @click="hoveredItem = null"
+            v-tooltip="$t(child.meta.helpKey)"
+          >
+            {{ $t(child.meta.titleKey) }}
+          </RouterLink>
+        </div>
+      </transition>
     </Teleport>
   </div>
 </template>
@@ -205,7 +207,7 @@ export default {
   text-decoration: none;
   transition: all 0.2s ease;
   position: relative;
-  overflow: visible; // needed so flyout isn't clipped
+  overflow: visible;
 
   .td-item-content {
     justify-content: flex-start;
@@ -231,6 +233,22 @@ export default {
 
 <!-- Flyout is teleported to body, so it needs non-scoped styles -->
 <style lang="scss">
+.td-flyout-enter-active {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.td-flyout-leave-active {
+  transition:
+    opacity 0.1s ease,
+    transform 0.1s ease;
+}
+.td-flyout-enter-from,
+.td-flyout-leave-to {
+  opacity: 0;
+  transform: translateX(-6px);
+}
+
 .td-sidebar-group-flyout {
   background-color: var(--bg-main-color);
   border: 1px solid var(--bg-layer-color);
@@ -238,18 +256,6 @@ export default {
   box-shadow: var(--box-shadow);
   padding: var(--padding);
   overflow: hidden;
-  animation: flyoutIn 0.15s ease-out forwards;
-}
-
-@keyframes flyoutIn {
-  from {
-    opacity: 0;
-    transform: translateX(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
 }
 
 .td-sidebar-flyout-item {
