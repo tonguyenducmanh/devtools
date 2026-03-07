@@ -313,7 +313,7 @@ export default {
   z-index: 999;
   background-color: var(--bg-main-color);
   box-shadow: var(--box-shadow);
-  overflow-y: auto; /* ✅ QUAN TRỌNG */
+  overflow-y: auto; 
 }
 
 .button-group {
