@@ -218,7 +218,7 @@ const allRoutes = sidebarConfig.flatMap((item) => {
   }
 
   if (item.type === "group") {
-    // Group: redirect root + mỗi child dùng TDGroupView
+    // Group: redirect root + mỗi child dùng TDStaticTabView
     const firstChildFullPath = `/${item.groupPath}/${item.children[0].path}`;
     const groupRootRoute = {
       path: `/${item.groupPath}`,
@@ -227,7 +227,7 @@ const allRoutes = sidebarConfig.flatMap((item) => {
     const childRoutes = item.children.map((child) => ({
       path: `/${item.groupPath}/${child.path}`,
       name: child.name,
-      component: () => import("@/views/misc/TDGroupView.vue"),
+      component: () => import("@/views/misc/TDStaticTabView.vue"),
       meta: {
         ...child.meta,
         groupKey: item.groupKey,
@@ -287,7 +287,7 @@ export function getSidebarItems() {
 
 /**
  * Trả về toàn bộ config của 1 group theo groupKey.
- * Dùng trong TDGroupView để lấy danh sách tabs.
+ * Dùng trong TDStaticTabView để lấy danh sách tabs.
  */
 export function getGroupConfig(groupKey) {
   return (

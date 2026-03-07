@@ -18,7 +18,7 @@
         <TDSidebar />
       </div>
       <div class="td-main">
-        <TDTabView />
+        <TDDynamicTabView />
       </div>
     </div>
   </div>
@@ -27,14 +27,14 @@
 <script>
 import TDHeader from "@/views/misc/TDHeader.vue";
 import TDSidebar from "@/views/misc/TDSidebar.vue";
-import TDTabView from "@/views/misc/TDTabView.vue";
+import TDDynamicTabView from "@/views/misc/TDDynamicTabView.vue";
 import "@/common/TDPrototype.js";
 import TDAppStartup from "@/common/TDAppStartup.js";
 import TDToggleArea from "@/components/TDToggleArea.vue";
 import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
 
 export default {
-  components: { TDHeader, TDSidebar, TDToggleArea, TDTabView },
+  components: { TDHeader, TDSidebar, TDToggleArea, TDDynamicTabView },
   created() {
     let me = this;
     me.logSomeInfo();

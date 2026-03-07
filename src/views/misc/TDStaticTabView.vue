@@ -1,6 +1,6 @@
 <!-- component hiển thị static group view của các tính năng đã được phân nhóm từ trước thành nhiều tab -->
 <template>
-  <div class="td-group-view">
+  <div class="td-static-tab-view">
     <!-- Tab bar -->
     <div class="td-tab-bar">
       <div
@@ -29,7 +29,7 @@ import { useRoute, useRouter } from "vue-router";
 import { getGroupConfig } from "@/router/router.js";
 
 export default {
-  name: "TDGroupView",
+  name: "TDStaticTabView",
 
   setup() {
     const route = useRoute();
@@ -78,7 +78,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.td-group-view {
+.td-static-tab-view {
   display: flex;
   flex-direction: column;
   width: 100%;

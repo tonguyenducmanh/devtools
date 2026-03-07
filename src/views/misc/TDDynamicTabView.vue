@@ -2,7 +2,7 @@
 support cùng 1 tính năng được phép hiển thị thành nhiều lần
 -->
 <template>
-  <div class="td-tab-view">
+  <div class="td-dynamic-tab-view">
     <!-- Tab bar: chỉ hiện khi có tab -->
     <Transition name="td-tabbar">
       <div v-if="isTabMode" class="td-tab-bar">
@@ -61,7 +61,7 @@ import { computed } from "vue";
 import { useTabManager } from "@/stores/TDTabManager.js";
 
 export default {
-  name: "TDTabView",
+  name: "TDDynamicTabView",
 
   setup() {
     const { state, activateTab, closeTab } = useTabManager();
@@ -81,7 +81,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.td-tab-view {
+.td-dynamic-tab-view {
   display: flex;
   flex-direction: column;
   width: 100%;
