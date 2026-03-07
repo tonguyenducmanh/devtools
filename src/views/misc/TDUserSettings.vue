@@ -70,9 +70,9 @@
   </div>
 </template>
 <script>
-import { loadLocale } from "@/i18n/i18nData.js";
 import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
 import TDAgentAPI from "@/common/api/request/AgentAPI/TDAgentAPI.js";
+import { getUserSettingDefault } from "@/common/TDUserSettingDefault.js";
 
 export default {
   name: "TDUserSettings",
@@ -80,12 +80,7 @@ export default {
   data() {
     let me = this;
     return {
-      currentUserSetting: {
-        theme: "light",
-        currentLanguage: "vi",
-        agentURL: window.__env?.APITesting?.agentServer,
-        wrapTab: true,
-      },
+      currentUserSetting: getUserSettingDefault(),
       themeOption: [
         { value: "light", label: me.$t("i18nUserSettings.themeSetting.light") },
         { value: "dark", label: me.$t("i18nUserSettings.themeSetting.dark") },
