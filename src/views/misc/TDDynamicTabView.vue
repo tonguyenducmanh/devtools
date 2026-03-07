@@ -117,10 +117,9 @@ export default {
       ghost.style.opacity = "0.85";
       ghost.style.transform = "rotate(2deg) scale(1.05)";
       ghost.style.pointerEvents = "none";
-      ghost.style.background = "var(--bg-layer-color, #2a2a3a)";
-      ghost.style.borderRadius = "var(--border-radius, 6px)";
-      ghost.style.boxShadow = "0 8px 24px rgba(0,0,0,0.4)";
-      ghost.style.padding = "var(--padding, 8px) 12px";
+      ghost.style.background = "var(--bg-layer-color)";
+      ghost.style.borderRadius = "var(--border-radius)";
+      ghost.style.padding = "var(--padding)";
       ghost.style.minWidth = el.offsetWidth + "px";
       document.body.appendChild(ghost);
       event.dataTransfer.setDragImage(
