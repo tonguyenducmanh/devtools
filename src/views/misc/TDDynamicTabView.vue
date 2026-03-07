@@ -5,26 +5,27 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
   <div class="td-dynamic-tab-view">
     <!-- Tab bar: chỉ hiện khi có tab -->
     <Transition name="td-tabbar">
-      <div v-if="isTabMode" class="td-tab-bar">
-        <div
-          v-for="tab in tabs"
-          :key="tab.id"
-          class="td-tab-item"
-          :class="{ 'td-tab-active': activeTabId === tab.id }"
-          @click="activateTab(tab.id)"
-          v-tooltip="$t(tab.helpKey)"
-        >
-          <span class="td-tab-label">{{ $t(tab.titleKey) }}</span>
-
-          <button
-            class="td-tab-close"
-            @click.stop="closeTab(tab.id)"
-            v-tooltip="$t('i18nCommon.tabManager.closeTab')"
+      <div v-if="isTabMode" class="flex td-tab-wrap">
+        <div class="td-tab-bar">
+          <div
+            v-for="tab in tabs"
+            :key="tab.id"
+            class="td-tab-item"
+            :class="{ 'td-tab-active': activeTabId === tab.id }"
+            @click="activateTab(tab.id)"
+            v-tooltip="$t(tab.helpKey)"
           >
-            <span class="td-icon td-close-icon"> </span>
-          </button>
-        </div>
+            <span class="td-tab-label">{{ $t(tab.titleKey) }}</span>
 
+            <button
+              class="td-tab-close"
+              @click.stop="closeTab(tab.id)"
+              v-tooltip="$t('i18nCommon.tabManager.closeTab')"
+            >
+              <span class="td-icon td-close-icon"> </span>
+            </button>
+          </div>
+        </div>
         <!-- Nút đóng tất cả -->
         <button
           class="td-tab-exit-btn"
@@ -108,8 +109,11 @@ export default {
   max-height: 48px;
   opacity: 1;
 }
-
+.td-tab-wrap {
+  width: 100%;
+}
 .td-tab-bar {
+  flex: 1;
   display: flex;
   flex-direction: row;
   align-items: flex-end;
@@ -198,7 +202,7 @@ export default {
   margin-left: auto;
   margin-right: 4px;
   align-self: center;
-  border: none;
+  border: 1px solid var(--border-color);
   background: transparent;
   color: var(--text-secondary-color);
   cursor: pointer;
