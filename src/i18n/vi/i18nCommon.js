@@ -1,5 +1,10 @@
 export default {
   i18nCommon: {
+    tabManager: {
+      addNewTab: "Mở tab mới",
+      closeTab: "Đóng tab này",
+      closeAllTabs: "Đóng tất cả các tab",
+    },
     group: {
       QRCode: "Công cụ QR",
       API: "Tích hợp API",

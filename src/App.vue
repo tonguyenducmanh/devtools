@@ -18,7 +18,7 @@
         <TDSidebar />
       </div>
       <div class="td-main">
-        <RouterView />
+        <TDTabView />
       </div>
     </div>
   </div>
@@ -27,13 +27,14 @@
 <script>
 import TDHeader from "@/views/misc/TDHeader.vue";
 import TDSidebar from "@/views/misc/TDSidebar.vue";
+import TDTabView from "@/views/misc/TDTabView.vue";
 import "@/common/TDPrototype.js";
 import TDAppStartup from "@/common/TDAppStartup.js";
 import TDToggleArea from "@/components/TDToggleArea.vue";
 import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
 
 export default {
-  components: { TDHeader, TDSidebar, TDToggleArea },
+  components: { TDHeader, TDSidebar, TDToggleArea, TDTabView },
   created() {
     let me = this;
     me.logSomeInfo();
@@ -130,7 +131,6 @@ export default {
     flex: 1;
     .td-sidebar-wrap {
       border-radius: calc(var(--border-radius) * 1.5);
-      // background-color: var(--bg-main-color);
       display: flex;
       flex-direction: column;
       height: 100%;

@@ -1,3 +1,4 @@
+<!-- component hiển thị static group view của các tính năng đã được phân nhóm từ trước thành nhiều tab -->
 <template>
   <div class="td-group-view">
     <!-- Tab bar -->
@@ -53,7 +54,6 @@ export default {
       );
       if (child) {
         const mod = await child.component();
-        // Gán vào shallowRef — Vue không reactive hoá sâu bên trong
         activeComponent.value = mod.default ?? mod;
       }
     }

@@ -6,7 +6,7 @@
     <div v-if="isShowSidebar" class="td-sidebar">
       <div class="td-tool-group">
         <template v-for="(item, index) in sidebarItems" :key="index">
-          <!-- Group item -->
+          <!-- Group item: hover → flyout -->
           <div
             v-if="item.type === 'group'"
             class="td-sidebar-item"
@@ -19,20 +19,31 @@
             </RouterLink>
           </div>
 
-          <!-- Standalone route item -->
-          <RouterLink
+          <!-- Standalone route item: link + nút pin -->
+          <div
             v-else
-            class="td-sidebar-item"
-            activeClass="td-item-active"
-            :to="item.route.pathVisible ?? item.route.path"
+            class="td-sidebar-item td-sidebar-item--route"
+            :class="{ 'td-item-active': isStandaloneActive(item.route) }"
           >
-            <div
-              class="flex td-item-content"
-              v-tooltip="$t(item.route.meta.helpKey)"
+            <RouterLink
+              class="td-item-content flex"
+              :to="item.route.pathVisible ?? item.route.path"
+              v-tooltip="
+                item.route.meta.helpKey
+                  ? $t(item.route.meta.helpKey)
+                  : undefined
+              "
             >
               <span>{{ $t(item.route.meta.titleKey) }}</span>
-            </div>
-          </RouterLink>
+              <button
+                class="td-sidebar-pin-btn"
+                v-tooltip="$t('i18nCommon.tabManager.addNewTab')"
+                @click.prevent.stop="onOpenRouteTab(item.route)"
+              >
+                <span class="td-icon td-plus-icon"> </span>
+              </button>
+            </RouterLink>
+          </div>
         </template>
       </div>
     </div>
@@ -43,9 +54,9 @@
       @toggle="toggleSidebar"
     />
 
-    <!-- Flyout: teleport to body, outside all loops -->
+    <!-- Flyout -->
     <Teleport to="body">
-      <transition name="td-flyout">
+      <Transition name="td-flyout">
         <div
           v-if="hoveredItem"
           class="td-sidebar-group-flyout"
@@ -53,18 +64,32 @@
           @mouseenter="onFlyoutMouseEnter"
           @mouseleave="onFlyoutMouseLeave"
         >
-          <RouterLink
+          <div
             v-for="child in hoveredItem.children"
             :key="child.name"
-            class="td-sidebar-flyout-item"
-            :to="`/${hoveredItem.groupPath}/${child.path}`"
-            @click="hoveredItem = null"
-            v-tooltip="$t(child.meta.helpKey)"
+            class="td-sidebar-flyout-row"
           >
-            {{ $t(child.meta.titleKey) }}
-          </RouterLink>
+            <RouterLink
+              class="td-sidebar-flyout-item"
+              :to="`/${hoveredItem.groupPath}/${child.path}`"
+              @click="hoveredItem = null"
+              v-tooltip="
+                child.meta.helpKey ? $t(child.meta.helpKey) : undefined
+              "
+            >
+              {{ $t(child.meta.titleKey) }}
+            </RouterLink>
+
+            <button
+              class="td-flyout-pin-btn"
+              v-tooltip="$t('i18nCommon.tabManager.addNewTab')"
+              @click.prevent.stop="onOpenGroupChildTab(hoveredItem, child)"
+            >
+              <span class="td-icon td-plus-icon"> </span>
+            </button>
+          </div>
         </div>
-      </transition>
+      </Transition>
     </Teleport>
   </div>
 </template>
@@ -72,10 +97,16 @@
 <script>
 import { getSidebarItems } from "@/router/router.js";
 import TDToggleArea from "@/components/TDToggleArea.vue";
+import { useTabManager } from "@/stores/TDTabManager.js";
 
 export default {
   name: "TDSidebar",
   components: { TDToggleArea },
+
+  setup() {
+    const { openTab } = useTabManager();
+    return { openTab };
+  },
 
   data() {
     return {
@@ -94,6 +125,14 @@ export default {
   methods: {
     isGroupActive(groupKey) {
       return this.$route.meta?.groupKey === groupKey;
+    },
+
+    isStandaloneActive(route) {
+      const target = route.pathVisible ?? route.path;
+      return (
+        this.$route.path === target ||
+        this.$route.matched.some((r) => r.path === target)
+      );
     },
 
     async processWhenCreated() {
@@ -116,26 +155,23 @@ export default {
 
     onGroupMouseEnter(event, item) {
       clearTimeout(this._leaveTimer);
-      const ITEM_HEIGHT = 38;
-      const FLYOUT_PADDING = 16;
+      const ITEM_HEIGHT = 42;
+      const FLYOUT_PADDING = 12;
       const childCount = item.children?.length ?? 0;
-      const triggerRect = event.currentTarget.getBoundingClientRect();
+      const rect = event.currentTarget.getBoundingClientRect();
       const flyoutHeight = childCount * ITEM_HEIGHT + FLYOUT_PADDING;
-      const viewportHeight = window.innerHeight;
+      const vh = window.innerHeight;
 
-      let top = triggerRect.top;
-      if (top + flyoutHeight > viewportHeight - 8) {
-        top = viewportHeight - flyoutHeight - 8;
-      }
+      let top = rect.top;
+      if (top + flyoutHeight > vh - 8) top = vh - flyoutHeight - 8;
       if (top < 8) top = 8;
 
       this.flyoutStyle = {
         position: "fixed",
         top: `${top}px`,
-        left: `${triggerRect.right + 4}px`,
+        left: `${rect.right + 4}px`,
         zIndex: 10,
       };
-
       this.hoveredItem = item;
     },
 
@@ -154,6 +190,30 @@ export default {
         this.hoveredItem = null;
       }, 120);
     },
+
+    // Mở tab từ group flyout item
+    onOpenGroupChildTab(groupItem, child) {
+      this.openTab({
+        titleKey: child.meta.titleKey,
+        helpKey: child.meta?.helpKey,
+        groupPath: groupItem.groupPath,
+        path: child.path,
+        component: child.component,
+      });
+      this.hoveredItem = null;
+    },
+
+    // Mở tab từ standalone route item
+    onOpenRouteTab(route) {
+      this.openTab({
+        titleKey: route.meta.titleKey,
+        helpKey: route.meta?.helpKey,
+        groupPath: "",
+        path: route.path,
+        // Standalone route dùng component trực tiếp từ route config
+        component: route.component,
+      });
+    },
   },
 };
 </script>
@@ -164,11 +224,9 @@ export default {
   height: 100%;
   margin-right: var(--padding);
 }
-
 .td-sidebar-container-collapsed {
   margin-right: unset;
 }
-
 .td-sidebar {
   position: relative;
   width: 250px;
@@ -199,7 +257,6 @@ export default {
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   width: 100%;
   height: 45px;
   padding: var(--padding);
@@ -210,28 +267,58 @@ export default {
   overflow: visible;
 
   .td-item-content {
-    justify-content: flex-start;
+    flex: 1;
+    justify-content: space-between;
     column-gap: var(--padding);
-    width: 100%;
     padding: var(--padding);
     border-radius: calc(var(--border-radius) * 1.5);
+    text-decoration: none;
+    color: var(--text-color);
+    min-width: 0;
   }
 
-  &:hover .td-item-content {
+  &:hover .td-item-content,
+  &.td-item-active .td-item-content {
     background-color: var(--bg-layer-color);
   }
 
   &.td-item-active {
     font-weight: 600;
+  }
 
-    .td-item-content {
-      background-color: var(--bg-layer-color);
+  // Nút pin chỉ hiện khi hover vào item
+  &--route {
+    &:hover .td-sidebar-pin-btn {
+      opacity: 1;
     }
+  }
+}
+
+.td-sidebar-pin-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 2px;
+  border-radius: calc(var(--border-radius) * 0.75);
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    opacity: 1;
   }
 }
 </style>
 
-<!-- Flyout is teleported to body, so it needs non-scoped styles -->
 <style lang="scss">
 .td-flyout-enter-active {
   transition:
@@ -254,23 +341,58 @@ export default {
   border: 1px solid var(--bg-layer-color);
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
-  padding: var(--padding);
+  padding: calc(var(--padding) / 2);
   overflow: hidden;
+  min-width: 200px;
 }
 
-.td-sidebar-flyout-item {
-  display: block;
-  padding: var(--padding);
-  font-size: var(--font-size-medium-rare);
+.td-sidebar-flyout-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   border-radius: var(--border-radius);
-  color: var(--text-color);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: background-color 0.15s ease;
 
   &:hover {
     background-color: var(--bg-layer-color);
+    .td-flyout-pin-btn {
+      opacity: 1;
+    }
+  }
+}
+
+.td-sidebar-flyout-item {
+  flex: 1;
+  display: block;
+  padding: var(--padding);
+  font-size: var(--font-size-medium-rare);
+  color: var(--text-color);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.td-flyout-pin-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 6px;
+  border-radius: calc(var(--border-radius) * 0.75);
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    opacity: 1;
   }
 }
 </style>

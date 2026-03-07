@@ -1,5 +1,10 @@
 export default {
   i18nCommon: {
+    tabManager: {
+      addNewTab: "Add new tab",
+      closeTab: "Close this tab",
+      closeAllTabs: "Close all tabs",
+    },
     group: {
       QRCode: "QR tooling",
       API: "API intergate",
