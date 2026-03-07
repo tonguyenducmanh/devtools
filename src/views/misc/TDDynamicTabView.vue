@@ -162,20 +162,29 @@ export default {
       const bar = tabBarRef.value;
       if (!bar) return;
 
-      // Find which tab index the cursor is over
       const tabEls = [...bar.querySelectorAll(".td-tab-item")];
-      let foundIndex = tabs.value.length; // default: end
+
+      let closestIndex = tabs.value.length;
+      let closestDistance = Infinity;
 
       for (let i = 0; i < tabEls.length; i++) {
         const rect = tabEls[i].getBoundingClientRect();
-        const midX = rect.left + rect.width / 2;
-        if (event.clientX < midX) {
-          foundIndex = i;
-          break;
+
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        const dx = event.clientX - centerX;
+        const dy = event.clientY - centerY;
+
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = i;
         }
       }
 
-      dragOverIndex.value = foundIndex;
+      dragOverIndex.value = closestIndex;
     }
 
     function onDragLeave(event) {
@@ -317,11 +326,13 @@ export default {
 
 .td-tab-bar-wrap {
   flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 /* ── Tab item ── */
 .td-tab-item {
   position: relative;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 5px;
