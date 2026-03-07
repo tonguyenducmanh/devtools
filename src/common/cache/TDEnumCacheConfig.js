@@ -1,6 +1,5 @@
 export const EnumCacheConfig = {
   QRHistory: 1,
-  IsShowSidebar: 2,
   OneTimeAuthen: 3,
   LastOneTimeAuthenUserName: 4,
   LastOneTimeAuthenPassword: 5,
@@ -12,7 +11,6 @@ export const EnumCacheConfig = {
   APIPromodeHistory: 13,
   APICollection: 15,
   APIConfigLayout: 16,
-  IsShowHeader: 17,
   APIMockConfigLayout: 18,
   UserSettings: 21,
 };

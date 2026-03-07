@@ -366,6 +366,8 @@ class TDUtility {
       currentLanguage: "vi",
       agentURL: window.__env?.APITesting?.agentServer,
       wrapTab: true,
+      showSideBar: true,
+      showHeader: true,
     };
     let cacheData = await cache.get(enumeration.cacheConfig.UserSettings);
     if (cacheData) {
@@ -376,6 +378,14 @@ class TDUtility {
     } else {
       return currentUserSetting;
     }
+  }
+  /**
+   * lưu thiết lập user
+   */
+  async saveUserSettings(key, val) {
+    let allSettings = await this.getUserSettings();
+    allSettings[key] = val;
+    await cache.set(enumeration.cacheConfig.UserSettings, allSettings);
   }
 }
 

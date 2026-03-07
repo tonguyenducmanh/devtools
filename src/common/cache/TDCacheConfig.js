@@ -52,18 +52,6 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử preview HTML",
   },
-  IsShowSidebar: {
-    KeyFormat: "IsShowSidebar",
-    CacheLevel: tdEnum.cacheType.indexedDB,
-    ExpireTime: 0,
-    Note: "cài đặt hiển thị sidebar",
-  },
-  IsShowHeader: {
-    KeyFormat: "IsShowHeader",
-    CacheLevel: tdEnum.cacheType.indexedDB,
-    ExpireTime: 0,
-    Note: "cài đặt hiển thị header",
-  },
   APICollection: {
     KeyFormat: "APICollection",
     CacheLevel: tdEnum.cacheType.indexedDB,

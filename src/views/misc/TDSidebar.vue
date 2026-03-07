@@ -1,9 +1,9 @@
 <template>
   <div
     class="td-sidebar-container"
-    :class="{ 'td-sidebar-container-collapsed': !isShowSidebar }"
+    :class="{ 'td-sidebar-container-collapsed': !showSideBar }"
   >
-    <div v-if="isShowSidebar" class="td-sidebar">
+    <div v-if="showSideBar" class="td-sidebar">
       <div class="td-tool-group">
         <template v-for="(item, index) in sidebarItems" :key="index">
           <!-- Group item: hover → flyout -->
@@ -49,7 +49,7 @@
     </div>
 
     <TDToggleArea
-      :collapsed="!isShowSidebar"
+      :collapsed="!showSideBar"
       edge="left"
       @toggle="toggleSidebar"
     />
@@ -111,7 +111,7 @@ export default {
   data() {
     return {
       sidebarItems: getSidebarItems(),
-      isShowSidebar: true,
+      showSideBar: true,
       hoveredItem: null,
       flyoutStyle: {},
       _leaveTimer: null,
@@ -137,20 +137,13 @@ export default {
 
     async processWhenCreated() {
       let me = this;
-      let toggleSidebarState = await me.$tdCache.get(
-        me.$tdEnum.cacheConfig.IsShowSidebar,
-      );
-      if (toggleSidebarState) {
-        me.isShowSidebar = toggleSidebarState.value;
-      }
+      me.showSideBar = await me.$tdUtility.getUserSettings("showSideBar");
     },
 
     async toggleSidebar() {
       let me = this;
-      me.isShowSidebar = !me.isShowSidebar;
-      await me.$tdCache.set(me.$tdEnum.cacheConfig.IsShowSidebar, {
-        value: me.isShowSidebar,
-      });
+      me.showSideBar = !me.showSideBar;
+      await me.$tdUtility.saveUserSettings("showSideBar", me.showSideBar);
     },
 
     onGroupMouseEnter(event, item) {

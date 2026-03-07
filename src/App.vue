@@ -36,7 +36,6 @@ export default {
   components: { TDHeader, TDSidebar, TDToggleArea, TDDynamicTabView },
   created() {
     let me = this;
-    me.logSomeInfo();
     me.processWhenRunApp();
   },
   data() {
@@ -59,22 +58,14 @@ export default {
     async toggleHeader() {
       let me = this;
       me.showHeader = !me.showHeader;
-      await me.$tdCache.set(me.$tdEnum.cacheConfig.IsShowHeader, {
-        value: me.showHeader,
-      });
-    },
-    logSomeInfo() {
-      let me = this;
+      await me.$tdUtility.saveUserSettings("showHeader", me.showHeader);
     },
     /**
      * Xử lý 1 số kịch bản khi khởi chạy ứng dụng
      */
     async processWhenRunApp() {
       let me = this;
-      let toggleHeader = await me.$tdCache.get(me.$tdEnum.cacheConfig.IsShowHeader);
-      if (toggleHeader) {
-        me.showHeader = toggleHeader.value;
-      }
+      me.showHeader = await me.$tdUtility.getUserSettings("showHeader");
       await TDAppStartup.initialize();
     },
   },
