@@ -274,6 +274,7 @@ export function getSidebarItems() {
           groupPath: item.groupPath,
           groupTitleKey: item.groupTitleKey,
           defaultPath: `/${item.groupPath}/${item.children[0].path}`,
+          children: item.children,
         };
       }
       // type === "route"
