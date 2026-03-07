@@ -31,13 +31,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
             @click="activateTab(tab.id)"
             v-tooltip="$t(tab.helpKey)"
           >
-            <!-- Drag handle indicator -->
-            <span class="td-drag-handle">
-              <span></span><span></span><span></span>
-            </span>
-
             <span class="td-tab-label">{{ $t(tab.titleKey) }}</span>
-
             <button
               class="td-tab-close"
               @click.stop="closeTab(tab.id)"
@@ -45,7 +39,6 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
             >
               <span class="td-icon td-close-icon"> </span>
             </button>
-
             <!-- Drop indicator line -->
             <div
               v-if="dragOverIndex === index && draggingId !== tab.id"
@@ -366,36 +359,6 @@ export default {
   &.td-tab-shift-left {
     transform: translateX(-8px);
   }
-
-  /* Hover while drag is over */
-  &.td-tab-drag-over {
-    /* handled by drop indicator */
-  }
-}
-
-/* ── Drag handle (3 dots) ── */
-.td-drag-handle {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  justify-content: center;
-  padding-right: 2px;
-  cursor: grab;
-
-  span {
-    display: block;
-    width: 3px;
-    height: 3px;
-    border-radius: 50%;
-    background: currentColor;
-    opacity: 0;
-    transition: opacity 0.15s ease;
-  }
-}
-
-.td-tab-item:hover .td-drag-handle span,
-.td-tab-item.td-tab-active .td-drag-handle span {
-  opacity: 0.4;
 }
 
 /* ── Drop indicator line ── */
