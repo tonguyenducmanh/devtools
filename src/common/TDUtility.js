@@ -33,7 +33,13 @@ class TDUtility {
       }
     };
   }
-
+  /**
+   * Lấy ra tiêu đề app mặc định
+   */
+  defaultTitleApp() {
+    const appName = window.__env.appName;
+    return `${window.__env.author} | ${appName}`;
+  }
   /**
    * go to source code link
    */

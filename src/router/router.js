@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import i18nData from "@/i18n/i18nData.js";
+import tdUtility from "@/common/TDUtility.js";
 
 // ─── Cấu hình sidebar ─────────────────────────────────────────────────────────
 // type: "group"  → nhóm nhiều tool, hiển thị tab bar khi vào
@@ -248,12 +248,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const appName = window.__env.appName;
-  if (to?.meta?.titleKey && i18nData.global.te(to.meta.titleKey)) {
-    document.title = i18nData.global.t(to.meta.titleKey);
-  } else if (appName) {
-    document.title = `${window.__env.author} | ${appName}`;
-  }
+  document.title = tdUtility.defaultTitleApp();
   next();
 });
 

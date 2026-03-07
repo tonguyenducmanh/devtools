@@ -80,6 +80,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
 
 <script>
 import { computed, ref } from "vue";
+import tdUtility from "@/common/TDUtility.js";
 import { useTabManager } from "@/stores/TDTabManager.js";
 
 export default {
@@ -90,7 +91,16 @@ export default {
 
     const tabs = computed(() => state.tabs);
     const activeTabId = computed(() => state.activeTabId);
-    const isTabMode = computed(() => state.tabs.length > 0);
+    const isTabMode = computed(() => {
+      let isMultiTab = state.tabs.length > 0;
+      let defaulAppName = tdUtility.defaultTitleApp();
+      if (isMultiTab) {
+        document.title = `${window.__env.author} | Multi tabs`;
+      } else {
+        document.title = defaulAppName;
+      }
+      return isMultiTab;
+    });
 
     // Drag state
     const draggingId = ref(null);
