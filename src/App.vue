@@ -31,7 +31,6 @@ import TDDynamicTabView from "@/views/misc/TDDynamicTabView.vue";
 import "@/common/TDPrototype.js";
 import TDAppStartup from "@/common/TDAppStartup.js";
 import TDToggleArea from "@/components/TDToggleArea.vue";
-import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
 
 export default {
   components: { TDHeader, TDSidebar, TDToggleArea, TDDynamicTabView },
@@ -72,24 +71,10 @@ export default {
      */
     async processWhenRunApp() {
       let me = this;
-      let cacheAgentUrl = await me.$tdCache.get(
-        me.$tdEnum.cacheConfig.AgentUrl,
-      );
-      let setConfig = TDCURLUtil.setGlobalInfoBeforeRequest({
-        agentURL: cacheAgentUrl,
-      });
-      let currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
-      if (!currentTheme) {
-        currentTheme = window.__env.defaultValue.theme;
-        await me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
-      }
-      let toggleHeader = await me.$tdCache.get(
-        me.$tdEnum.cacheConfig.IsShowHeader,
-      );
+      let toggleHeader = await me.$tdCache.get(me.$tdEnum.cacheConfig.IsShowHeader);
       if (toggleHeader) {
         me.showHeader = toggleHeader.value;
       }
-      me.$tdUtility.setTheme(currentTheme);
       await TDAppStartup.initialize();
     },
   },

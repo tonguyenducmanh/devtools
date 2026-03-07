@@ -1,5 +1,8 @@
 import { toast } from "@/common/ToastPlugin.js";
 import i18nData from "@/i18n/i18nData.js";
+import cache from "@/common/cache/TDCache.js";
+import enumeration from "@/common/TDEnum.js";
+
 /**
  * các method TDutility dùng cho toàn bộ frontend
  * Created by tdmanh 19.09.2024
@@ -353,6 +356,26 @@ class TDUtility {
   }
   reloadApp() {
     window.location.reload();
+  }
+  /**
+   * lấy ra thiết lập hiện tại
+   */
+  async getUserSettings(key) {
+    let currentUserSetting = {
+      theme: "light",
+      currentLanguage: "vi",
+      agentURL: window.__env?.APITesting?.agentServer,
+      wrapTab: true,
+    };
+    let cacheData = await cache.get(enumeration.cacheConfig.UserSettings);
+    if (cacheData) {
+      currentUserSetting = Object.assign(currentUserSetting, cacheData);
+    }
+    if (key) {
+      return currentUserSetting[key];
+    } else {
+      return currentUserSetting;
+    }
   }
 }
 

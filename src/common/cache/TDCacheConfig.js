@@ -10,18 +10,6 @@ import tdEnum from "@/common/TDEnum.js";
  */
 
 export const TDCacheConfig = {
-  Language: {
-    KeyFormat: "Language",
-    CacheLevel: tdEnum.cacheType.local,
-    ExpireTime: 0,
-    Note: "cài đặt ngôn ngữ của app",
-  },
-  Theme: {
-    KeyFormat: "Theme",
-    CacheLevel: tdEnum.cacheType.local,
-    ExpireTime: 0,
-    Note: "cài đặt chủ đề của app",
-  },
   QRHistory: {
     KeyFormat: "QRHistory",
     CacheLevel: tdEnum.cacheType.indexedDB,
@@ -112,16 +100,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool mock api",
   },
-  AgentUrl: {
-    KeyFormat: "AgentUrl",
+  UserSettings: {
+    KeyFormat: "UserSettings",
     CacheLevel: tdEnum.cacheType.local,
     ExpireTime: 0,
-    Note: "cache cấu hình url server agent",
-  },
-  WrapTab: {
-    KeyFormat: "WrapTab",
-    CacheLevel: tdEnum.cacheType.local,
-    ExpireTime: 0,
-    Note: "cache cấu hình wrap tab khi xem multiple tab",
+    Note: "cache cấu hình thiết lập của user",
   },
 };

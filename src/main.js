@@ -64,7 +64,7 @@ import "@/common/TDMonacoEditor.js";
   currentApp.use(ToastPlugin);
 
   // Lấy ngôn ngữ hiện tại
-  let currentLanguage = await cache.get(enumeration.cacheConfig.Language);
+  let currentLanguage = await utility.getUserSettings("currentLanguage");
   let locale = currentLanguage ? currentLanguage : enumeration.language.vi;
   await loadLocale(locale);
 

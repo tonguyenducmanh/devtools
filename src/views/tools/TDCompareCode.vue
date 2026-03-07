@@ -53,7 +53,7 @@ export default {
       me.unmountEditor();
       if (me.firstCodeFile && me.secondCodeFile) {
         let me = this;
-        me.currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
+        me.currentTheme = await me.$tdUtility.getUserSettings("theme");
         monaco.languages.register({ id: me.language });
         let configObject = {
           theme: me.currentTheme == me.$tdEnum.theme.dark ? "vs-dark" : "vs",

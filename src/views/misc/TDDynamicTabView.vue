@@ -97,10 +97,7 @@ export default {
   methods: {
     async processWhenMouted() {
       let me = this;
-      let cacheWrapTab = await me.$tdCache.get(me.$tdEnum.cacheConfig.WrapTab);
-      if (cacheWrapTab && cacheWrapTab.hasOwnProperty("value")) {
-        me.wrapTab = cacheWrapTab.value;
-      }
+      me.wrapTab = await me.$tdUtility.getUserSettings("wrapTab");
     },
   },
   setup() {

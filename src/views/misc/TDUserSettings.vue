@@ -116,23 +116,9 @@ export default {
     },
     async processWhenCreated() {
       let me = this;
-      let cacheAgentUrl = await me.$tdCache.get(
-        me.$tdEnum.cacheConfig.AgentUrl,
-      );
-      if (cacheAgentUrl) {
-        me.currentUserSetting.agentURL = cacheAgentUrl;
-      }
-      me.currentUserSetting.theme = await me.$tdCache.get(
-        me.$tdEnum.cacheConfig.Theme,
-      );
-      if (!me.currentUserSetting.theme) {
-        me.currentUserSetting.theme = window.__env.defaultValue.theme;
-        await me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
-      }
-      me.currentUserSetting.currentLanguage = await me.getCurrentLanguage();
-      let cacheWrapTab = await me.$tdCache.get(me.$tdEnum.cacheConfig.WrapTab);
-      if (cacheWrapTab && cacheWrapTab.hasOwnProperty("value")) {
-        me.currentUserSetting.wrapTab = cacheWrapTab.value;
+      let cacheData = await me.$tdUtility.getUserSettings();
+      if (cacheData) {
+        me.currentUserSetting = Object.assign(me.currentUserSetting, cacheData);
       }
     },
     goToSource() {
@@ -141,59 +127,23 @@ export default {
     },
     async saveSetting() {
       let me = this;
-      await me.saveLanguage();
-      await me.saveTheme();
-      await me.handleChangeAgentURL();
-      await me.saveMultiTab();
+      me.saveTheme();
+      me.handleChangeAgentURL();
+      await me.$tdCache.set(
+        me.$tdEnum.cacheConfig.UserSettings,
+        me.currentUserSetting,
+      );
       me.$tdUtility.reloadApp();
     },
-    async saveMultiTab() {
+    handleChangeAgentURL() {
       let me = this;
-      let dataCache = {
-        value: me.currentUserSetting.wrapTab,
-      };
-      await me.$tdCache.set(me.$tdEnum.cacheConfig.WrapTab, dataCache);
-    },
-    async getCurrentLanguage() {
-      let me = this;
-      let currentLanguage = await this.$tdCache.get(
-        this.$tdEnum.cacheConfig.Language,
-      );
-      if (currentLanguage) {
-        return currentLanguage;
-      }
-      return this.$tdEnum.language.vi;
-    },
-
-    async saveLanguage() {
-      let me = this;
-      await me.$tdCache.set(
-        me.$tdEnum.cacheConfig.Language,
-        me.currentUserSetting.currentLanguage,
-      );
-      await loadLocale(me.currentUserSetting.currentLanguage);
-    },
-    async handleChangeAgentURL() {
-      let me = this;
-      await me.$tdCache.set(
-        me.$tdEnum.cacheConfig.AgentUrl,
-        me.currentUserSetting.agentURL,
-      );
       TDCURLUtil.setGlobalInfoBeforeRequest({
         agentURL: me.currentUserSetting.agentURL,
       });
     },
-    async saveTheme() {
+    saveTheme() {
       let me = this;
-      await me.$tdCache.set(
-        me.$tdEnum.cacheConfig.Theme,
-        me.currentUserSetting.theme,
-      );
       me.$tdUtility.setTheme(me.currentUserSetting.theme);
-      this.$tdEventBus.emit(
-        this.$tdEnum.eventGlobal.changeTheme,
-        me.currentUserSetting.theme,
-      );
     },
   },
   mounted() {},

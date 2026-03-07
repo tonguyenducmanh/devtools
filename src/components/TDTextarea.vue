@@ -211,7 +211,7 @@ export default {
     async updateHighlight() {
       let me = this;
       if (me.enableHighlight) {
-        me.currentTheme = await me.$tdCache.get(me.$tdEnum.cacheConfig.Theme);
+        me.currentTheme = await me.$tdUtility.getUserSettings("theme");
         monaco.languages.register({ id: me.language });
         let isDarkTheme = me.currentTheme == me.$tdEnum.theme.dark;
         let myThemeName = "my-theme";

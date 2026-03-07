@@ -1,5 +1,4 @@
 export const EnumCacheConfig = {
-  Theme: 0,
   QRHistory: 1,
   IsShowSidebar: 2,
   OneTimeAuthen: 3,
@@ -8,7 +7,6 @@ export const EnumCacheConfig = {
   JSONToExcelHistory: 6,
   JSONToPostgreSQLHistory: 7,
   CodeFormatterHistory: 8,
-  Language: 9,
   HTMLPreviewHistory: 10,
   APIHistory: 11,
   APIPromodeHistory: 13,
@@ -16,6 +14,5 @@ export const EnumCacheConfig = {
   APIConfigLayout: 16,
   IsShowHeader: 17,
   APIMockConfigLayout: 18,
-  AgentUrl: 19,
-  WrapTab: 20,
+  UserSettings: 21,
 };
