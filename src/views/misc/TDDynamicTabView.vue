@@ -32,6 +32,11 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
             @click="activateTab(tab.id)"
             v-tooltip="$t(tab.helpKey)"
           >
+            <div
+              v-if="dragOverIndex === index && draggingId !== tab.id"
+              class="td-drop-indicator td-drop-indicator-before"
+            ></div>
+
             <span class="td-tab-label">{{ $t(tab.titleKey) }}</span>
             <button
               class="td-tab-close"
@@ -40,10 +45,17 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
             >
               <span class="td-icon td-close-icon"> </span>
             </button>
-            <!-- Drop indicator line -->
+          </div>
+
+          <div
+            class="td-tab-drop-sentinel"
+            :class="{
+              'td-tab-drop-sentinel-active': dragOverIndex === tabs.length,
+            }"
+          >
             <div
-              v-if="dragOverIndex === index && draggingId !== tab.id"
-              class="td-drop-indicator"
+              v-if="dragOverIndex === tabs.length && draggingId !== null"
+              class="td-drop-indicator td-drop-indicator-end"
             ></div>
           </div>
         </div>
@@ -160,28 +172,72 @@ export default {
       if (!bar) return;
 
       const tabEls = [...bar.querySelectorAll(".td-tab-item")];
+      if (tabEls.length === 0) {
+        dragOverIndex.value = 0;
+        return;
+      }
 
-      let closestIndex = tabs.value.length;
-      let closestDistance = Infinity;
+      const mx = event.clientX;
+      const my = event.clientY;
 
-      for (let i = 0; i < tabEls.length; i++) {
-        const rect = tabEls[i].getBoundingClientRect();
+      // Build row groups by clustering tabs that share the same vertical band.
+      // A new row starts when the tab's vertical midpoint doesn't fall within
+      // any existing row's [top, bottom] range.
+      const rects = tabEls.map((el) => el.getBoundingClientRect());
+      const rows = []; // [{ top, bottom, tabs: [{rect, index}] }]
 
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-
-        const dx = event.clientX - centerX;
-        const dy = event.clientY - centerY;
-
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestIndex = i;
+      for (let i = 0; i < rects.length; i++) {
+        const r = rects[i];
+        const midY = r.top + r.height / 2;
+        let placed = false;
+        for (const row of rows) {
+          if (midY >= row.top && midY <= row.bottom) {
+            row.tabs.push({ rect: r, index: i });
+            placed = true;
+            break;
+          }
+        }
+        if (!placed) {
+          rows.push({
+            top: r.top,
+            bottom: r.bottom,
+            tabs: [{ rect: r, index: i }],
+          });
         }
       }
 
-      dragOverIndex.value = closestIndex;
+      // Find which row the cursor is vertically closest to
+      let bestRow = rows[0];
+      let bestRowDist = Infinity;
+      for (const row of rows) {
+        let dy = 0;
+        if (my < row.top) dy = row.top - my;
+        else if (my > row.bottom) dy = my - row.bottom;
+        // else cursor is inside the row → dy = 0
+        if (dy < bestRowDist) {
+          bestRowDist = dy;
+          bestRow = row;
+        }
+      }
+
+      // Within the best row, determine insert index by midpoint X.
+      // Default to after the last tab in this row.
+      const rowTabs = bestRow.tabs; // already in DOM order (left→right)
+      let insertIndex = rowTabs[rowTabs.length - 1].index + 1;
+
+      for (let i = 0; i < rowTabs.length; i++) {
+        const midX = rowTabs[i].rect.left + rowTabs[i].rect.width / 2;
+        if (mx < midX) {
+          insertIndex = rowTabs[i].index;
+          break;
+        }
+      }
+
+      // Clamp to [0, tabs.length] so both ends are reachable
+      dragOverIndex.value = Math.max(
+        0,
+        Math.min(insertIndex, tabs.value.length),
+      );
     }
 
     function onDragLeave(event) {
@@ -197,7 +253,7 @@ export default {
       const from = draggingIndex.value;
       let to = dragOverIndex.value;
 
-      // Adjust: when moving right, insertion index shifts by 1
+      // When moving right, the removal of the source shifts indices by 1
       if (to > from) to -= 1;
 
       if (from !== to) {
@@ -223,11 +279,8 @@ export default {
         return false;
       const from = draggingIndex.value;
       const to = dragOverIndex.value;
-      if (from < to) {
-        // Moving right: items between from+1 and to-1 shift left
-        return false;
-      }
-      // Moving left: items from to to from-1 shift right
+      if (from < to) return false;
+      // Moving left: items from [to, from-1] shift right
       return (
         index >= to &&
         index < from &&
@@ -241,7 +294,7 @@ export default {
       const from = draggingIndex.value;
       const to = dragOverIndex.value;
       if (from > to) return false;
-      // Moving right: items from from+1 to to-1 shift left
+      // Moving right: items from [from+1, to-1] shift left
       return (
         index > from && index < to && draggingId.value !== tabs.value[index]?.id
       );
@@ -390,7 +443,6 @@ export default {
 /* ── Drop indicator line ── */
 .td-drop-indicator {
   position: absolute;
-  left: -3px;
   top: 20%;
   height: 60%;
   width: 2px;
@@ -399,6 +451,16 @@ export default {
   box-shadow: 0 0 6px var(--primary-color, #00c9a7);
   animation: td-indicator-pulse 0.6s ease infinite alternate;
   pointer-events: none;
+}
+
+/* Before-tab indicator: sits at left edge of the tab */
+.td-drop-indicator-before {
+  left: -3px;
+}
+
+/* End-of-list indicator: sits at left edge of the sentinel */
+.td-drop-indicator-end {
+  left: 0;
 }
 
 @keyframes td-indicator-pulse {
@@ -410,6 +472,16 @@ export default {
     opacity: 1;
     transform: scaleY(1.05);
   }
+}
+
+/* ── Sentinel (drop zone after last tab) ── */
+.td-tab-drop-sentinel {
+  position: relative;
+  flex-shrink: 0;
+  width: 12px; /* small but hittable */
+  height: 100%;
+  min-height: 28px;
+  align-self: stretch;
 }
 
 /* ── Tab label ── */
