@@ -22,6 +22,14 @@
         />
       </div>
       <div class="flex user-setting-item">
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="currentUserSetting.wrapTab"
+          :label="$t('i18nUserSettings.settings.wrapTab')"
+          :noMargin="true"
+        ></TDCheckbox>
+      </div>
+      <div class="flex user-setting-item">
         <div>{{ $t("i18nUserSettings.settings.language") }}</div>
         <TDComboBox
           :width="200"
@@ -76,6 +84,7 @@ export default {
         theme: "light",
         currentLanguage: "vi",
         agentURL: window.__env?.APITesting?.agentServer,
+        wrapTab: true,
       },
       themeOption: [
         { value: "light", label: me.$t("i18nUserSettings.themeSetting.light") },
@@ -121,6 +130,10 @@ export default {
         await me.$tdCache.set(me.$tdEnum.cacheConfig.Theme, currentTheme);
       }
       me.currentUserSetting.currentLanguage = await me.getCurrentLanguage();
+      let cacheWrapTab = await me.$tdCache.get(me.$tdEnum.cacheConfig.WrapTab);
+      if (cacheWrapTab && cacheWrapTab.hasOwnProperty("value")) {
+        me.currentUserSetting.wrapTab = cacheWrapTab.value;
+      }
     },
     goToSource() {
       let me = this;
@@ -131,7 +144,15 @@ export default {
       await me.saveLanguage();
       await me.saveTheme();
       await me.handleChangeAgentURL();
+      await me.saveMultiTab();
       me.$tdUtility.reloadApp();
+    },
+    async saveMultiTab() {
+      let me = this;
+      let dataCache = {
+        value: me.currentUserSetting.wrapTab,
+      };
+      await me.$tdCache.set(me.$tdEnum.cacheConfig.WrapTab, dataCache);
     },
     async getCurrentLanguage() {
       let me = this;

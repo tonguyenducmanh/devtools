@@ -8,6 +8,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
       <div v-if="isTabMode" class="flex td-tab-wrap">
         <div
           class="td-tab-bar"
+          :class="{ 'td-tab-bar-wrap': wrapTab }"
           ref="tabBarRef"
           @dragover.prevent="onDragOver"
           @drop.prevent="onDrop"
@@ -85,7 +86,23 @@ import { useTabManager } from "@/stores/TDTabManager.js";
 
 export default {
   name: "TDDynamicTabView",
-
+  created() {
+    this.processWhenMouted();
+  },
+  data() {
+    return {
+      wrapTab: true,
+    };
+  },
+  methods: {
+    async processWhenMouted() {
+      let me = this;
+      let cacheWrapTab = await me.$tdCache.get(me.$tdEnum.cacheConfig.WrapTab);
+      if (cacheWrapTab && cacheWrapTab.hasOwnProperty("value")) {
+        me.wrapTab = cacheWrapTab.value;
+      }
+    },
+  },
   setup() {
     const { state, activateTab, closeTab } = useTabManager();
 
@@ -288,6 +305,7 @@ export default {
 .td-tab-wrap {
   width: 100%;
   margin-bottom: var(--padding);
+  gap: var(--padding);
 }
 
 .td-tab-bar {
@@ -300,14 +318,10 @@ export default {
   flex-shrink: 0;
   overflow-x: auto;
   overflow-y: hidden;
+}
 
-  &::-webkit-scrollbar {
-    height: 3px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--bg-layer-color);
-    border-radius: 2px;
-  }
+.td-tab-bar-wrap {
+  flex-wrap: wrap;
 }
 
 /* ── Tab item ── */

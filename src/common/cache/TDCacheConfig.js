@@ -118,4 +118,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình url server agent",
   },
+  WrapTab: {
+    KeyFormat: "WrapTab",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình wrap tab khi xem multiple tab",
+  },
 };

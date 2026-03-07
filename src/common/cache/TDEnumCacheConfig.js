@@ -17,4 +17,5 @@ export const EnumCacheConfig = {
   IsShowHeader: 17,
   APIMockConfigLayout: 18,
   AgentUrl: 19,
+  WrapTab: 20,
 };

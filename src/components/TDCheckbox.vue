@@ -1,7 +1,10 @@
 <template>
   <span
     class="td-checkbox-container"
-    :class="{ 'td-checkbox-read-only': readOnly }"
+    :class="{
+      'td-checkbox-read-only': readOnly,
+      'td-checkbox-no-margin': noMargin,
+    }"
   >
     <label
       class="td-label no-select"
@@ -76,6 +79,10 @@ export default {
     width: {
       type: String,
       default: "100%",
+    },
+    noMargin: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -235,6 +242,11 @@ export default {
       }
     }
   }
+}
+
+.td-checkbox-no-margin {
+  padding: unset;
+  margin: unset;
 }
 
 .td-label-checked .td-checkbox {
