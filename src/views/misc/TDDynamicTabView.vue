@@ -285,6 +285,7 @@ export default {
 /* ── Layout ── */
 .td-tab-wrap {
   width: 100%;
+  margin-bottom: var(--padding);
 }
 
 .td-tab-bar {
