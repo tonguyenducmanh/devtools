@@ -142,13 +142,13 @@ export default {
     background-color 0.15s ease,
     color 0.15s ease;
   user-select: none;
+  .td-tab-close {
+    opacity: 0.6;
+  }
 
   &:hover {
     background-color: var(--bg-layer-color);
     color: var(--text-color);
-    .td-tab-close {
-      opacity: 0.6;
-    }
   }
 
   &.td-tab-active {
