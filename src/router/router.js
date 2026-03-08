@@ -108,6 +108,12 @@ const sidebarConfig = [
         meta: { titleKey: "i18nCommon.feature.JSONToPostgreSQL" },
       },
       {
+        path: "toonelinestring",
+        name: "jsontoonelinestring",
+        component: () => import("@/views/tools/TDJSONToOneLineString.vue"),
+        meta: { titleKey: "i18nCommon.feature.JSONToOneLineString" },
+      },
+      {
         path: "toexcel",
         name: "jsontoexcel",
         component: () => import("@/views/tools/TDJSONToExcel.vue"),
