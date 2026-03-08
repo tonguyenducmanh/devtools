@@ -37,7 +37,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
               class="td-drop-indicator td-drop-indicator-before"
             ></div>
 
-            <span class="td-tab-label">{{ $t(tab.titleKey) }}</span>
+            <span class="td-tab-label">{{ getTabLabel(tab) }}</span>
             <button
               class="td-tab-close"
               @click.stop="closeTab(tab.id)"
@@ -81,7 +81,11 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
           v-show="activeTabId === tab.id"
           class="td-tab-pane"
         >
-          <component :is="tab.resolvedComponent" v-if="tab.resolvedComponent" />
+          <component
+            :is="tab.resolvedComponent"
+            v-if="tab.resolvedComponent"
+            @updateTabTitle="(payload) => onTabTitleUpdate(tab.id, payload)"
+          />
         </div>
       </template>
 
@@ -95,6 +99,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
 import { computed, ref } from "vue";
 import tdUtility from "@/common/TDUtility.js";
 import { useTabManager } from "@/stores/TDTabManager.js";
+import i18nData from "@/i18n/i18nData.js";
 
 export default {
   name: "TDDynamicTabView",
@@ -113,7 +118,8 @@ export default {
     },
   },
   setup() {
-    const { state, activateTab, closeTab, exitTabMode } = useTabManager();
+    const { state, activateTab, closeTab, exitTabMode, setTabTitle } =
+      useTabManager();
 
     const tabs = computed(() => state.tabs);
     const activeTabId = computed(() => state.activeTabId);
@@ -127,6 +133,43 @@ export default {
       }
       return isMultiTab;
     });
+
+    /**
+     * Lắng nghe emit "update:tabTitle" từ component con.
+     * Payload có thể là:
+     *   - string              → thay thế hoàn toàn tên tab
+     *   - { title, append }   → append=true: nối sau tên mặc định, append=false/undefined: thay thế
+     *   - null / undefined    → reset về tên mặc định
+     */
+    function onTabTitleUpdate(tabId, payload) {
+      if (payload === null || payload === undefined) {
+        setTabTitle(tabId, null);
+        return;
+      }
+      if (typeof payload === "string") {
+        setTabTitle(tabId, { title: payload, append: false });
+        return;
+      }
+      // payload là object { title, append }
+      setTabTitle(tabId, {
+        title: payload.title ?? "",
+        append: !!payload.append,
+      });
+    }
+
+    /**
+     * Tính label hiển thị trên tab.
+     * Nếu có customTitle:
+     *   - append=true  → "<tên mặc định> – <customTitle>"
+     *   - append=false → chỉ hiện customTitle
+     * Nếu không có customTitle: dùng $t(titleKey)
+     */
+    function getTabLabel(tab) {
+      if (!tab.customTitle) return i18nData.global.t(tab.titleKey);
+      const { title, append } = tab.customTitle;
+      if (append) return `${i18nData.global.t(tab.titleKey)} – ${title}`;
+      return title;
+    }
 
     // Drag state
     const draggingId = ref(null);
@@ -307,6 +350,8 @@ export default {
       activateTab,
       closeTab,
       exitTabMode,
+      getTabLabel,
+      onTabTitleUpdate,
       // drag
       tabBarRef,
       draggingId,

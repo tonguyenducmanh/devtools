@@ -1360,6 +1360,11 @@ export default {
         }
 
         this.$tdToast.success(this.$t("i18nCommon.toastMessage.success"));
+        // emit sự kiện thay đổi tên tab đang mở
+        this.$emit("updateTabTitle", {
+          title: this.requestName,
+          append: true,
+        });
       } catch (error) {
         if (error.message === "Request cancelled by user") {
           this.responseText = this.$t("i18nCommon.apiTesting.requestCanceled");
