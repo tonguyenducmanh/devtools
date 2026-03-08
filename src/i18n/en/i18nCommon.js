@@ -4,6 +4,8 @@ export default {
       addNewTab: "Add new tab",
       closeTab: "Close this tab",
       closeAllTabs: "Close all tabs",
+      openInDynamicTab: "Open in dynamic tab",
+      duplicateTab: "Dupplicate tab",
     },
     group: {
       QRCode: "QR tooling",

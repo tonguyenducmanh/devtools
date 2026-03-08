@@ -97,6 +97,30 @@ export function useTabManager() {
     state.activeTabId = null;
   }
 
+  /**
+   * Nhân bản 1 tab theo id — mở tab mới với cùng component, đặt active
+   * @param {string} id - id của tab cần nhân bản
+   * @returns {string|null} id của tab mới, hoặc null nếu không tìm thấy
+   */
+  async function duplicateTab(id) {
+    const source = state.tabs.find((t) => t.id === id);
+    if (!source) return null;
+
+    const newId = genId();
+    const tab = {
+      ...source,
+      id: newId,
+      customTitle: null, // reset custom title cho bản clone
+    };
+
+    // Chèn ngay sau tab gốc
+    const idx = state.tabs.findIndex((t) => t.id === id);
+    state.tabs.splice(idx + 1, 0, tab);
+    state.activeTabId = newId;
+
+    return newId;
+  }
+
   return {
     state,
     openTab,
@@ -104,5 +128,6 @@ export function useTabManager() {
     activateTab,
     exitTabMode,
     setTabTitle,
+    duplicateTab,
   };
 }

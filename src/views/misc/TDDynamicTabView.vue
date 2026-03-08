@@ -30,6 +30,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
             @dragstart="onDragStart($event, tab.id, index)"
             @dragend="onDragEnd"
             @click="activateTab(tab.id)"
+            @contextmenu.prevent="openContextMenu($event, tab)"
             v-tooltip="$t(tab.helpKey)"
           >
             <div
@@ -71,6 +72,29 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
       </div>
     </Transition>
 
+    <!-- Context menu cho dynamic tab -->
+    <Teleport to="body">
+      <div
+        v-if="contextMenu.visible"
+        class="td-ctx-menu"
+        :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }"
+        @click.stop
+      >
+        <button class="td-ctx-item" @click="handleDuplicate">
+          {{ $t("i18nCommon.tabManager.duplicateTab") }}
+        </button>
+        <button class="td-ctx-item td-ctx-item-danger" @click="handleClose">
+          {{ $t("i18nCommon.tabManager.closeTab") }}
+        </button>
+      </div>
+      <div
+        v-if="contextMenu.visible"
+        class="td-ctx-overlay"
+        @click="closeContextMenu"
+        @contextmenu.prevent="closeContextMenu"
+      />
+    </Teleport>
+
     <!-- Content area -->
     <div class="td-tab-content">
       <!-- Tab mode: render sẵn tất cả bằng v-show -->
@@ -96,7 +120,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
 </template>
 
 <script>
-import { computed, ref } from "vue";
+import { computed, ref, reactive } from "vue";
 import tdUtility from "@/common/TDUtility.js";
 import { useTabManager } from "@/stores/TDTabManager.js";
 import i18nData from "@/i18n/i18nData.js";
@@ -118,8 +142,14 @@ export default {
     },
   },
   setup() {
-    const { state, activateTab, closeTab, exitTabMode, setTabTitle } =
-      useTabManager();
+    const {
+      state,
+      activateTab,
+      closeTab,
+      exitTabMode,
+      setTabTitle,
+      duplicateTab,
+    } = useTabManager();
 
     const tabs = computed(() => state.tabs);
     const activeTabId = computed(() => state.activeTabId);
@@ -133,6 +163,46 @@ export default {
       }
       return isMultiTab;
     });
+
+    // ── Context menu ──
+    const contextMenu = reactive({
+      visible: false,
+      x: 0,
+      y: 0,
+      tabId: null,
+    });
+
+    function openContextMenu(event, tab) {
+      const menuW = 200;
+      const menuH = 88;
+      const x = Math.min(event.clientX, window.innerWidth - menuW - 8);
+      const y = Math.min(event.clientY, window.innerHeight - menuH - 8);
+
+      contextMenu.visible = true;
+      contextMenu.x = x;
+      contextMenu.y = y;
+      contextMenu.tabId = tab.id;
+
+      // Kích hoạt tab được right-click để user thấy tab nào đang được chọn
+      activateTab(tab.id);
+    }
+
+    function closeContextMenu() {
+      contextMenu.visible = false;
+      contextMenu.tabId = null;
+    }
+
+    async function handleDuplicate() {
+      const id = contextMenu.tabId;
+      closeContextMenu();
+      await duplicateTab(id);
+    }
+
+    function handleClose() {
+      const id = contextMenu.tabId;
+      closeContextMenu();
+      closeTab(id);
+    }
 
     /**
      * Lắng nghe emit "update:tabTitle" từ component con.
@@ -364,6 +434,12 @@ export default {
       onDragEnd,
       shouldShiftRight,
       shouldShiftLeft,
+      // context menu
+      contextMenu,
+      openContextMenu,
+      closeContextMenu,
+      handleDuplicate,
+      handleClose,
     };
   },
 };
@@ -597,5 +673,61 @@ export default {
 .td-tab-pane {
   width: 100%;
   height: 100%;
+}
+
+/* ── Context menu ── */
+.td-ctx-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+}
+
+.td-ctx-menu {
+  position: fixed;
+  z-index: 11;
+  min-width: 200px;
+  background-color: var(--bg-main-color);
+  border: 1px solid var(--bg-layer-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: calc(var(--padding) / 2);
+  animation: td-ctx-pop 0.1s ease;
+}
+
+@keyframes td-ctx-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.td-ctx-item {
+  display: flex;
+  align-items: center;
+  gap: var(--padding);
+  width: 100%;
+  padding: var(--padding);
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  font-size: var(--font-size-medium-rare);
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  text-align: left;
+  transition: background-color 0.12s ease;
+
+  &:hover {
+    background-color: var(--bg-layer-color);
+  }
+}
+
+.td-ctx-icon {
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0.75;
 }
 </style>

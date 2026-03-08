@@ -4,6 +4,8 @@ export default {
       addNewTab: "Mở tab mới",
       closeTab: "Đóng tab này",
       closeAllTabs: "Đóng tất cả các tab",
+      openInDynamicTab: "Mở trong tab động",
+      duplicateTab: "Nhân bản tab",
     },
     group: {
       QRCode: "Công cụ QR",
