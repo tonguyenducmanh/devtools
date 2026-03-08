@@ -180,6 +180,8 @@ import { Buffer } from "buffer";
 import * as OTPAuth from "otpauth";
 import { toRaw } from "vue";
 import googleAuthen from "@/common/proto/googleAuth.js";
+import TDUtility from "@/common/TDUtility.js";
+
 export default {
   name: "TDOneTimePassword",
   created() {
@@ -254,6 +256,13 @@ export default {
     },
   },
   mounted() {},
+  watch: {
+    filterOtp(oldVal, newVal) {
+      if (oldVal != newVal) {
+        this.emitTabTitle(this);
+      }
+    },
+  },
   beforeUnmount() {
     let me = this;
     // Clean up interval when the component is destroyed
@@ -266,6 +275,13 @@ export default {
     me.saveUsername();
   },
   methods: {
+    emitTabTitle: TDUtility.debounce((me) => {
+      // emit sự kiện thay đổi tên tab đang mở
+      me.$emit("updateTabTitle", {
+        title: me.filterOtp,
+        append: true,
+      });
+    }, 500),
     handleDragOver(e) {
       let me = this;
       e.preventDefault();
