@@ -283,7 +283,7 @@ export default {
       splitHorizontal: true,
       wrapText: true,
       escapeUnicode: false,
-      selectedLanguage: LANGUAGE_MODE.JavaScript,
+      selectedLanguage: LANGUAGE_MODE.CSharp,
       inputJSON: null,
       outputString: null,
     };
