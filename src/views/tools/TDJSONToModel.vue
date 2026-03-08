@@ -540,7 +540,6 @@ export default {
         2,
       );
       me.convertToModel();
-      me.$tdToast.success(me.$t("i18nCommon.toastMessage.applyMockSuccess"));
     },
   },
 

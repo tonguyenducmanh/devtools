@@ -164,7 +164,6 @@ export default {
         2,
       );
       me.convertToOneLine();
-      me.$tdToast.success(me.$t("i18nCommon.toastMessage.applyMockSuccess"));
     },
 
     /**
