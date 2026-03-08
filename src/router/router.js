@@ -114,6 +114,12 @@ const sidebarConfig = [
         meta: { titleKey: "i18nCommon.feature.JSONToOneLineString" },
       },
       {
+        path: "tomodel",
+        name: "jsontomodel",
+        component: () => import("@/views/tools/TDJSONToModel.vue"),
+        meta: { titleKey: "i18nCommon.feature.JSONToModel" },
+      },
+      {
         path: "toexcel",
         name: "jsontoexcel",
         component: () => import("@/views/tools/TDJSONToExcel.vue"),
