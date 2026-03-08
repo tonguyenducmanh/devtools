@@ -224,10 +224,11 @@ export default {
     /**
      * PascalCase từ bất kỳ key nào: snake_case, camelCase, kebab-case
      */
-    toPascalCase(str) {
+    toPascalCase(str, alwayBuild) {
       if (
         (this.csharp.usePascalCase && this.selectedLanguage == LANG.CSharp) ||
-        this.selectedLanguage == LANG.Go
+        this.selectedLanguage == LANG.Go ||
+        alwayBuild
       ) {
         return str
           .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ""))
@@ -332,7 +333,7 @@ export default {
 
     buildCSharpClass(obj, className, classes) {
       const me = this;
-      const pascal = me.toPascalCase(className);
+      const pascal = me.toPascalCase(className, true);
       const keyword = me.csharp.useRecord ? "record" : "class";
       const props = [];
 
@@ -349,7 +350,7 @@ export default {
           (typeInfo.isArray && typeInfo.base === "object")
         ) {
           // Nested class
-          const nestedName = me.toPascalCase(key);
+          const nestedName = me.toPascalCase(key, true);
           const sampleObj = typeInfo.isArray ? value : value;
           me.buildCSharpClass(sampleObj, nestedName, classes);
           csType = typeInfo.isArray ? `List<${nestedName}>` : nestedName;
