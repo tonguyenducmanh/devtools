@@ -80,6 +80,12 @@
             ></TDCheckbox>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
+              v-model="csharp.usePascalCase"
+              :label="$t('i18nCommon.JSONToModel.usePascalCase')"
+              @change="convertToModel"
+            ></TDCheckbox>
+            <TDCheckbox
+              :variant="$tdEnum.checkboxType.switch"
               v-model="csharp.useNullable"
               :label="$t('i18nCommon.JSONToModel.useNullable')"
               @change="convertToModel"
@@ -219,9 +225,16 @@ export default {
      * PascalCase từ bất kỳ key nào: snake_case, camelCase, kebab-case
      */
     toPascalCase(str) {
-      return str
-        .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ""))
-        .replace(/^(.)/, (c) => c.toUpperCase());
+      if (
+        (this.csharp.usePascalCase && this.selectedLanguage == LANG.CSharp) ||
+        this.selectedLanguage == LANG.Go
+      ) {
+        return str
+          .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ""))
+          .replace(/^(.)/, (c) => c.toUpperCase());
+      } else {
+        return str;
+      }
     },
 
     /**
@@ -251,8 +264,13 @@ export default {
       if (typeof value === "boolean")
         return { base: "bool", isArray: false, isObject: false };
       if (typeof value === "number") {
+        if (!Number.isInteger(value)) {
+          return { base: "double", isArray: false, isObject: false };
+        }
+        // Số nguyên vượt giới hạn int32 (-2^31..2^31-1) => dùng long
+        const isLong = value > 2147483647 || value < -2147483648;
         return {
-          base: Number.isInteger(value) ? "int" : "double",
+          base: isLong ? "long" : "int",
           isArray: false,
           isObject: false,
         };
@@ -382,6 +400,7 @@ export default {
       const typeMap = {
         string: "string",
         int: "int",
+        long: "long",
         double: "double",
         bool: "bool",
         datetime: "DateTime",
@@ -477,6 +496,7 @@ export default {
       const typeMap = {
         string: "string",
         int: "int64",
+        long: "int64",
         double: "float64",
         bool: "bool",
         datetime: "time.Time",
@@ -537,6 +557,7 @@ export default {
       // C# specific
       csharp: {
         useJsonProperty: false,
+        usePascalCase: false,
         useNullable: false,
         useRecord: false,
         useDataAnnotation: false,
@@ -577,7 +598,7 @@ export default {
   width: 100%;
   gap: calc(var(--padding) / 2);
 }
-.sidebar-input{
+.sidebar-input {
   width: 100%;
   box-sizing: border-box;
   display: flex;

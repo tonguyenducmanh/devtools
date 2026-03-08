@@ -472,6 +472,7 @@ export default {
       useJsonProperty: "[JsonProperty] attr",
       useNullable: "Kiểu nullable",
       useRecord: "Dùng record thay class",
+      usePascalCase: "Pascal case",
       useDataAnnotation: "DataAnnotation",
       namespace: "Namespace",
       useJsonTag: "JSON tag",
