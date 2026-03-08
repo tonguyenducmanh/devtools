@@ -167,7 +167,7 @@ export default {
     function getTabLabel(tab) {
       if (!tab.customTitle) return i18nData.global.t(tab.titleKey);
       const { title, append } = tab.customTitle;
-      if (append) return `${i18nData.global.t(tab.titleKey)} – ${title}`;
+      if (append) return `${i18nData.global.t(tab.titleKey)} - ${title}`;
       return title;
     }
 
