@@ -668,6 +668,7 @@ import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDMockAPIProMode from "@/common/mock/TDMockAPIProMode.js";
 import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
 import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
+import TDUtility from "@/common/TDUtility.js";
 
 export default {
   name: "TDAPITesting",
@@ -743,6 +744,13 @@ export default {
   async mounted() {
     this.agentAPI = new TDServerTestingAPI();
     await this.loadAllTestingData();
+  },
+  watch: {
+    requestName(oldVal, newVal) {
+      if (oldVal != newVal) {
+        this.emitTabTitle(this);
+      }
+    },
   },
   computed: {
     /**
@@ -826,6 +834,13 @@ export default {
     }
   },
   methods: {
+    emitTabTitle: TDUtility.debounce((me) => {
+      // emit sự kiện thay đổi tên tab đang mở
+      me.$emit("updateTabTitle", {
+        title: me.requestName,
+        append: true,
+      });
+    }, 500),
     handleResize(sizes) {
       this.requestSectionSize = sizes.leftSize;
       this.responseSectionSize = sizes.rightSize;
@@ -1360,11 +1375,6 @@ export default {
         }
 
         this.$tdToast.success(this.$t("i18nCommon.toastMessage.success"));
-        // emit sự kiện thay đổi tên tab đang mở
-        this.$emit("updateTabTitle", {
-          title: this.requestName,
-          append: true,
-        });
       } catch (error) {
         if (error.message === "Request cancelled by user") {
           this.responseText = this.$t("i18nCommon.apiTesting.requestCanceled");
