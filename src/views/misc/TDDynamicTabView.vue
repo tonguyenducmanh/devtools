@@ -157,7 +157,6 @@ export default {
         {
           key: "close",
           label: i18nData.global.t("i18nCommon.tabManager.closeTab"),
-          danger: true,
           action: () => closeTab(tab.id),
         },
       ]);

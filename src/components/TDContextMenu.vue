@@ -11,7 +11,6 @@
           v-for="item in state.items"
           :key="item.key"
           class="td-ctx-item"
-          :class="item.danger ? 'td-ctx-item-danger' : ''"
           @click="handleClick(item)"
         >
           <span
@@ -42,7 +41,7 @@ export const contextMenuState = reactive({
   visible: false,
   x: 0,
   y: 0,
-  items: [], // [{ key, label, icon?, danger?, action }]
+  items: [], // [{ key, label, icon?, action }]
 });
 
 export default {
@@ -135,10 +134,6 @@ export default {
 
   &:hover {
     background-color: var(--bg-layer-color);
-  }
-
-  &.td-ctx-item-danger {
-    color: var(--danger-color, #e74c3c);
   }
 }
 
