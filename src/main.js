@@ -21,6 +21,7 @@ import TDPopup from "@/components/TDPopup.vue";
 import i18nData, { loadLocale } from "@/i18n/i18nData.js";
 import eventBus from "@/common/event/TDEventBus.js";
 import ToastPlugin from "@/common/ToastPlugin.js";
+import TDContextMenuPlugin from "@/common/TDContextMenuPlugin.js";
 import TDClickOutside from "@/directives/TDClickOutside.js";
 import TDTooltip from "@/directives/TDTooltip.js";
 import "@/common/TDMonacoEditor.js";
@@ -62,6 +63,9 @@ import "@/common/TDMonacoEditor.js";
 
   // using toastmessage
   currentApp.use(ToastPlugin);
+
+  // context menu
+  currentApp.use(TDContextMenuPlugin);
 
   // Lấy ngôn ngữ hiện tại
   let currentLanguage = await utility.getUserSettings("currentLanguage");

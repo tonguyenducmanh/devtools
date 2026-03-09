@@ -21,35 +21,15 @@
     <div class="td-tab-content">
       <component :is="activeComponent" v-if="activeComponent" />
     </div>
-
-    <!-- Context menu -->
-    <Teleport to="body">
-      <div
-        v-if="contextMenu.visible"
-        class="td-ctx-menu"
-        :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }"
-        @click.stop
-      >
-        <button class="td-ctx-item" @click="addToDynamicTab">
-          {{ $t("i18nCommon.tabManager.openInDynamicTab") }}
-        </button>
-      </div>
-      <!-- Overlay để đóng menu khi click ra ngoài -->
-      <div
-        v-if="contextMenu.visible"
-        class="td-ctx-overlay"
-        @click="closeContextMenu"
-        @contextmenu.prevent="closeContextMenu"
-      />
-    </Teleport>
   </div>
 </template>
 
 <script>
-import { shallowRef, watch, computed, reactive } from "vue";
+import { shallowRef, watch, computed, inject } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { getGroupConfig } from "@/router/router.js";
 import { useTabManager } from "@/stores/TDTabManager.js";
+import i18nData from "@/i18n/i18nData.js";
 
 export default {
   name: "TDStaticTabView",
@@ -59,42 +39,26 @@ export default {
     const router = useRouter();
     const { openTab } = useTabManager();
 
+    // Lấy context menu từ plugin toàn cục
+    const tdContextMenu = inject("tdContextMenu");
+
     const activeComponent = shallowRef(null);
     const groupChildren = shallowRef([]);
-
     const activeToolPath = computed(() => route.meta?.toolPath ?? null);
 
-    // ── Context menu state ──
-    const contextMenu = reactive({
-      visible: false,
-      x: 0,
-      y: 0,
-      child: null, // child config đang được right-click
-    });
-
+    // ── Context menu ── dùng plugin thay vì tự quản lý state
     function openContextMenu(event, child) {
-      // Tính vị trí menu, tránh tràn màn hình
-      const menuW = 220;
-      const menuH = 48;
-      const x = Math.min(event.clientX, window.innerWidth - menuW - 8);
-      const y = Math.min(event.clientY, window.innerHeight - menuH - 8);
-
-      contextMenu.visible = true;
-      contextMenu.x = x;
-      contextMenu.y = y;
-      contextMenu.child = child;
+      tdContextMenu.open(event, [
+        {
+          key: "open-dynamic",
+          label: i18nData.global.t("i18nCommon.tabManager.openInDynamicTab"),
+          action: () => addToDynamicTab(child),
+        },
+      ]);
     }
 
-    function closeContextMenu() {
-      contextMenu.visible = false;
-      contextMenu.child = null;
-    }
-
-    async function addToDynamicTab() {
-      const child = contextMenu.child;
-      closeContextMenu();
+    async function addToDynamicTab(child) {
       if (!child) return;
-
       await openTab({
         titleKey: child.meta.titleKey,
         helpKey: child.meta.helpKey ?? null,
@@ -113,7 +77,6 @@ export default {
 
     async function syncFromRoute() {
       loadGroupConfig();
-
       const child = groupChildren.value.find(
         (c) => c.path === activeToolPath.value,
       );
@@ -137,10 +100,7 @@ export default {
       groupChildren,
       activeToolPath,
       navigateTo,
-      contextMenu,
       openContextMenu,
-      closeContextMenu,
-      addToDynamicTab,
     };
   },
 };
@@ -221,61 +181,5 @@ export default {
   margin-top: var(--padding);
   width: 100%;
   height: 100%;
-}
-
-/* ── Context menu ── */
-.td-ctx-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 10;
-}
-
-.td-ctx-menu {
-  position: fixed;
-  z-index: 11;
-  min-width: 200px;
-  background-color: var(--bg-main-color);
-  border: 1px solid var(--bg-layer-color);
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-  padding: calc(var(--padding) / 2);
-  animation: td-ctx-pop 0.1s ease;
-}
-
-@keyframes td-ctx-pop {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.td-ctx-item {
-  display: flex;
-  align-items: center;
-  gap: var(--padding);
-  width: 100%;
-  padding: var(--padding);
-  border: none;
-  background: transparent;
-  color: var(--text-color);
-  font-size: var(--font-size-medium-rare);
-  cursor: pointer;
-  border-radius: var(--border-radius);
-  text-align: left;
-  transition: background-color 0.12s ease;
-
-  &:hover {
-    background-color: var(--bg-layer-color);
-  }
-}
-
-.td-ctx-icon {
-  font-size: 14px;
-  line-height: 1;
-  opacity: 0.75;
 }
 </style>

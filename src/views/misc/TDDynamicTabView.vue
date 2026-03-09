@@ -72,29 +72,6 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
       </div>
     </Transition>
 
-    <!-- Context menu cho dynamic tab -->
-    <Teleport to="body">
-      <div
-        v-if="contextMenu.visible"
-        class="td-ctx-menu"
-        :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }"
-        @click.stop
-      >
-        <button class="td-ctx-item" @click="handleDuplicate">
-          {{ $t("i18nCommon.tabManager.duplicateTab") }}
-        </button>
-        <button class="td-ctx-item td-ctx-item-danger" @click="handleClose">
-          {{ $t("i18nCommon.tabManager.closeTab") }}
-        </button>
-      </div>
-      <div
-        v-if="contextMenu.visible"
-        class="td-ctx-overlay"
-        @click="closeContextMenu"
-        @contextmenu.prevent="closeContextMenu"
-      />
-    </Teleport>
-
     <!-- Content area -->
     <div class="td-tab-content">
       <!-- Tab mode: render sẵn tất cả bằng v-show -->
@@ -120,7 +97,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
 </template>
 
 <script>
-import { computed, ref, reactive } from "vue";
+import { computed, ref, inject } from "vue";
 import tdUtility from "@/common/TDUtility.js";
 import { useTabManager } from "@/stores/TDTabManager.js";
 import i18nData from "@/i18n/i18nData.js";
@@ -151,6 +128,9 @@ export default {
       duplicateTab,
     } = useTabManager();
 
+    // Lấy context menu từ plugin toàn cục
+    const tdContextMenu = inject("tdContextMenu");
+
     const tabs = computed(() => state.tabs);
     const activeTabId = computed(() => state.activeTabId);
     const isTabMode = computed(() => {
@@ -164,52 +144,27 @@ export default {
       return isMultiTab;
     });
 
-    // ── Context menu ──
-    const contextMenu = reactive({
-      visible: false,
-      x: 0,
-      y: 0,
-      tabId: null,
-    });
-
+    // ── Context menu ── dùng plugin thay vì tự quản lý state
     function openContextMenu(event, tab) {
-      const menuW = 200;
-      const menuH = 88;
-      const x = Math.min(event.clientX, window.innerWidth - menuW - 8);
-      const y = Math.min(event.clientY, window.innerHeight - menuH - 8);
+      activateTab(tab.id); // highlight tab đang được right-click
 
-      contextMenu.visible = true;
-      contextMenu.x = x;
-      contextMenu.y = y;
-      contextMenu.tabId = tab.id;
-
-      // Kích hoạt tab được right-click để user thấy tab nào đang được chọn
-      activateTab(tab.id);
-    }
-
-    function closeContextMenu() {
-      contextMenu.visible = false;
-      contextMenu.tabId = null;
-    }
-
-    async function handleDuplicate() {
-      const id = contextMenu.tabId;
-      closeContextMenu();
-      await duplicateTab(id);
-    }
-
-    function handleClose() {
-      const id = contextMenu.tabId;
-      closeContextMenu();
-      closeTab(id);
+      tdContextMenu.open(event, [
+        {
+          key: "duplicate",
+          label: i18nData.global.t("i18nCommon.tabManager.duplicateTab"),
+          action: () => duplicateTab(tab.id),
+        },
+        {
+          key: "close",
+          label: i18nData.global.t("i18nCommon.tabManager.closeTab"),
+          danger: true,
+          action: () => closeTab(tab.id),
+        },
+      ]);
     }
 
     /**
      * Lắng nghe emit "update:tabTitle" từ component con.
-     * Payload có thể là:
-     *   - string              → thay thế hoàn toàn tên tab
-     *   - { title, append }   → append=true: nối sau tên mặc định, append=false/undefined: thay thế
-     *   - null / undefined    → reset về tên mặc định
      */
     function onTabTitleUpdate(tabId, payload) {
       if (payload === null || payload === undefined) {
@@ -220,20 +175,12 @@ export default {
         setTabTitle(tabId, { title: payload, append: false });
         return;
       }
-      // payload là object { title, append }
       setTabTitle(tabId, {
         title: payload.title ?? "",
         append: !!payload.append,
       });
     }
 
-    /**
-     * Tính label hiển thị trên tab.
-     * Nếu có customTitle:
-     *   - append=true  → "<tên mặc định> – <customTitle>"
-     *   - append=false → chỉ hiện customTitle
-     * Nếu không có customTitle: dùng $t(titleKey)
-     */
     function getTabLabel(tab) {
       if (!tab.customTitle) return i18nData.global.t(tab.titleKey);
       const { title, append } = tab.customTitle;
@@ -247,13 +194,10 @@ export default {
     const dragOverIndex = ref(-1);
     const tabBarRef = ref(null);
 
-    // ── Drag & Drop ──────────────────────────────────────────────
-
     function onDragStart(event, tabId, index) {
       draggingId.value = tabId;
       draggingIndex.value = index;
 
-      // Ghost image: clone the tab element, slightly transparent
       const el = event.currentTarget;
       const ghost = el.cloneNode(true);
       ghost.style.position = "absolute";
@@ -271,10 +215,7 @@ export default {
         el.offsetWidth / 2,
         el.offsetHeight / 2,
       );
-
-      // Clean up ghost after a tick
       setTimeout(() => document.body.removeChild(ghost), 0);
-
       event.dataTransfer.effectAllowed = "move";
     }
 
@@ -293,11 +234,8 @@ export default {
       const mx = event.clientX;
       const my = event.clientY;
 
-      // Build row groups by clustering tabs that share the same vertical band.
-      // A new row starts when the tab's vertical midpoint doesn't fall within
-      // any existing row's [top, bottom] range.
       const rects = tabEls.map((el) => el.getBoundingClientRect());
-      const rows = []; // [{ top, bottom, tabs: [{rect, index}] }]
+      const rows = [];
 
       for (let i = 0; i < rects.length; i++) {
         const r = rects[i];
@@ -319,65 +257,55 @@ export default {
         }
       }
 
-      // Find which row the cursor is vertically closest to
       let bestRow = rows[0];
       let bestRowDist = Infinity;
       for (const row of rows) {
         let dy = 0;
         if (my < row.top) dy = row.top - my;
         else if (my > row.bottom) dy = my - row.bottom;
-        // else cursor is inside the row → dy = 0
         if (dy < bestRowDist) {
           bestRowDist = dy;
           bestRow = row;
         }
       }
 
-      // Within the best row, determine insert index by midpoint X.
-      // Default to after the last tab in this row.
-      const rowTabs = bestRow.tabs; // already in DOM order (left→right)
-      let insertIndex = rowTabs[rowTabs.length - 1].index + 1;
+      const rowTabs = bestRow.tabs;
+      let newIndex = rowTabs[rowTabs.length - 1].index + 1;
 
       for (let i = 0; i < rowTabs.length; i++) {
-        const midX = rowTabs[i].rect.left + rowTabs[i].rect.width / 2;
+        const { rect, index } = rowTabs[i];
+        const midX = rect.left + rect.width / 2;
         if (mx < midX) {
-          insertIndex = rowTabs[i].index;
+          newIndex = index;
           break;
         }
       }
 
-      // Clamp to [0, tabs.length] so both ends are reachable
-      dragOverIndex.value = Math.max(
-        0,
-        Math.min(insertIndex, tabs.value.length),
-      );
+      dragOverIndex.value = newIndex;
     }
 
     function onDragLeave(event) {
-      // Only clear if leaving the bar itself (not entering a child)
-      if (!tabBarRef.value?.contains(event.relatedTarget)) {
+      const bar = tabBarRef.value;
+      if (bar && !bar.contains(event.relatedTarget)) {
         dragOverIndex.value = -1;
       }
     }
 
-    function onDrop(event) {
-      if (draggingIndex.value === -1 || dragOverIndex.value === -1) return;
-
+    function onDrop() {
       const from = draggingIndex.value;
-      let to = dragOverIndex.value;
+      const to = dragOverIndex.value;
 
-      // When moving right, the removal of the source shifts indices by 1
-      if (to > from) to -= 1;
-
-      if (from !== to) {
-        const arr = state.tabs;
-        const [moved] = arr.splice(from, 1);
-        arr.splice(to, 0, moved);
+      if (from === -1 || to === -1 || from === to || from + 1 === to) {
+        onDragEnd();
+        return;
       }
 
-      draggingId.value = null;
-      draggingIndex.value = -1;
-      dragOverIndex.value = -1;
+      const newTabs = [...state.tabs];
+      const [moved] = newTabs.splice(from, 1);
+      const insertAt = to > from ? to - 1 : to;
+      newTabs.splice(insertAt, 0, moved);
+      state.tabs = newTabs;
+      onDragEnd();
     }
 
     function onDragEnd() {
@@ -386,28 +314,21 @@ export default {
       dragOverIndex.value = -1;
     }
 
-    // Shift animation helpers
     function shouldShiftRight(index) {
-      if (draggingIndex.value === -1 || dragOverIndex.value === -1)
-        return false;
       const from = draggingIndex.value;
       const to = dragOverIndex.value;
       if (from < to) return false;
-      // Moving left: items from [to, from-1] shift right
       return (
-        index >= to &&
         index < from &&
+        index >= to &&
         draggingId.value !== tabs.value[index]?.id
       );
     }
 
     function shouldShiftLeft(index) {
-      if (draggingIndex.value === -1 || dragOverIndex.value === -1)
-        return false;
       const from = draggingIndex.value;
       const to = dragOverIndex.value;
       if (from > to) return false;
-      // Moving right: items from [from+1, to-1] shift left
       return (
         index > from && index < to && draggingId.value !== tabs.value[index]?.id
       );
@@ -422,6 +343,7 @@ export default {
       exitTabMode,
       getTabLabel,
       onTabTitleUpdate,
+      openContextMenu,
       // drag
       tabBarRef,
       draggingId,
@@ -434,12 +356,6 @@ export default {
       onDragEnd,
       shouldShiftRight,
       shouldShiftLeft,
-      // context menu
-      contextMenu,
-      openContextMenu,
-      closeContextMenu,
-      handleDuplicate,
-      handleClose,
     };
   },
 };
@@ -527,10 +443,6 @@ export default {
   &:hover {
     background-color: var(--bg-layer-color);
     color: var(--text-color);
-
-    .td-drag-handle span {
-      opacity: 0.5;
-    }
   }
 
   &.td-tab-active {
@@ -543,7 +455,6 @@ export default {
     }
   }
 
-  /* Being dragged */
   &.td-tab-dragging {
     opacity: 0.35;
     cursor: grabbing;
@@ -551,7 +462,6 @@ export default {
     background-color: var(--bg-layer-color);
   }
 
-  /* Shift animations for neighbours */
   &.td-tab-shift-right {
     transform: translateX(8px);
   }
@@ -574,12 +484,10 @@ export default {
   pointer-events: none;
 }
 
-/* Before-tab indicator: sits at left edge of the tab */
 .td-drop-indicator-before {
   left: -3px;
 }
 
-/* End-of-list indicator: sits at left edge of the sentinel */
 .td-drop-indicator-end {
   left: 0;
 }
@@ -595,11 +503,11 @@ export default {
   }
 }
 
-/* ── Sentinel (drop zone after last tab) ── */
+/* ── Sentinel ── */
 .td-tab-drop-sentinel {
   position: relative;
   flex-shrink: 0;
-  width: 12px; /* small but hittable */
+  width: 12px;
   height: 100%;
   min-height: 28px;
   align-self: stretch;
@@ -634,7 +542,6 @@ export default {
   }
 }
 
-/* Show close button when tab hovered or active */
 .td-tab-item:hover .td-tab-close,
 .td-tab-item.td-tab-active .td-tab-close {
   opacity: 0.5;
@@ -673,61 +580,5 @@ export default {
 .td-tab-pane {
   width: 100%;
   height: 100%;
-}
-
-/* ── Context menu ── */
-.td-ctx-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 10;
-}
-
-.td-ctx-menu {
-  position: fixed;
-  z-index: 11;
-  min-width: 200px;
-  background-color: var(--bg-main-color);
-  border: 1px solid var(--bg-layer-color);
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-  padding: calc(var(--padding) / 2);
-  animation: td-ctx-pop 0.1s ease;
-}
-
-@keyframes td-ctx-pop {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.td-ctx-item {
-  display: flex;
-  align-items: center;
-  gap: var(--padding);
-  width: 100%;
-  padding: var(--padding);
-  border: none;
-  background: transparent;
-  color: var(--text-color);
-  font-size: var(--font-size-medium-rare);
-  cursor: pointer;
-  border-radius: var(--border-radius);
-  text-align: left;
-  transition: background-color 0.12s ease;
-
-  &:hover {
-    background-color: var(--bg-layer-color);
-  }
-}
-
-.td-ctx-icon {
-  font-size: 14px;
-  line-height: 1;
-  opacity: 0.75;
 }
 </style>
