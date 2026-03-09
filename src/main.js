@@ -1,8 +1,8 @@
 import { createApp } from "vue";
 import App from "@/App.vue";
 import cache from "@/common/cache/TDCache.js";
-import enumeration from "@/common/TDEnum.js";
-import utility from "@/common/TDUtility.js";
+import tdEnum from "@/common/TDEnum.js";
+import tdUtility from "@/common/TDUtility.js";
 import router from "@/router/router.js";
 import TDButton from "@/components/TDButton.vue";
 import TDTextarea from "@/components/TDTextarea.vue";
@@ -18,13 +18,14 @@ import TDTableViewer from "@/components/TDTableViewer.vue";
 import TDResizer from "@/components/TDResizer.vue";
 import TDVirtualScroll from "@/components/TDVirtualScroll.vue";
 import TDPopup from "@/components/TDPopup.vue";
-import i18nData, { loadLocale } from "@/i18n/i18nData.js";
-import eventBus from "@/common/event/TDEventBus.js";
+import i18nData, { loadLocaleDefault } from "@/i18n/i18nData.js";
+import tdEventbus from "@/common/event/TDEventBus.js";
 import TDToastPlugin from "@/common/plugin/TDToastPlugin.js";
 import TDContextMenuPlugin from "@/common/plugin/TDContextMenuPlugin.js";
 import TDClickOutside from "@/directives/TDClickOutside.js";
 import TDTooltip from "@/directives/TDTooltip.js";
-import "@/common/TDMonacoEditor.js";
+import "@/common/plugin/TDMonacoEditor.js";
+
 // Async IIFE
 (async () => {
   const currentApp = createApp(App);
@@ -35,9 +36,9 @@ import "@/common/TDMonacoEditor.js";
 
   // add 1 vài global object
   currentApp.config.globalProperties.$tdCache = cache;
-  currentApp.config.globalProperties.$tdEnum = enumeration;
-  currentApp.config.globalProperties.$tdUtility = utility;
-  currentApp.config.globalProperties.$tdEventBus = eventBus;
+  currentApp.config.globalProperties.$tdEnum = tdEnum;
+  currentApp.config.globalProperties.$tdUtility = tdUtility;
+  currentApp.config.globalProperties.$tdEventBus = tdEventbus;
 
   // add 1 vài component global
   currentApp.component("TDButton", TDButton);
@@ -67,10 +68,8 @@ import "@/common/TDMonacoEditor.js";
   // context menu
   currentApp.use(TDContextMenuPlugin);
 
-  // Lấy ngôn ngữ hiện tại
-  let currentLanguage = await utility.getUserSettings("currentLanguage");
-  let locale = currentLanguage ? currentLanguage : enumeration.language.vi;
-  await loadLocale(locale);
+  // load ngôn ngữ
+  await loadLocaleDefault();
 
   currentApp.mount("#app");
 })();

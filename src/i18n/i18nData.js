@@ -1,5 +1,6 @@
 import { reactive, computed } from "vue";
 import i18nGlobal from "@/i18n/global/i18nGlobal.js";
+import utility from "@/common/TDUtility.js";
 
 /**
  * Tự quản lý logic đa ngôn ngữ thay vì xài thư viện bên ngoài
@@ -70,6 +71,16 @@ let i18nData = {
     app.provide("i18n", i18nData);
   },
 };
+
+/**
+ * Load ngôn ngữ mặc định
+ */
+export async function loadLocaleDefault() {
+  // Lấy ngôn ngữ hiện tại
+  let currentLanguage = await utility.getUserSettings("currentLanguage");
+  let locale = currentLanguage ? currentLanguage : enumeration.language.vi;
+  await loadLocale(locale);
+}
 
 /**
  * Load dữ liệu i18n cho 1 ngôn ngữ mới
