@@ -20,8 +20,8 @@ import TDVirtualScroll from "@/components/TDVirtualScroll.vue";
 import TDPopup from "@/components/TDPopup.vue";
 import i18nData, { loadLocale } from "@/i18n/i18nData.js";
 import eventBus from "@/common/event/TDEventBus.js";
-import ToastPlugin from "@/common/ToastPlugin.js";
-import TDContextMenuPlugin from "@/common/TDContextMenuPlugin.js";
+import TDToastPlugin from "@/common/plugin/TDToastPlugin.js";
+import TDContextMenuPlugin from "@/common/plugin/TDContextMenuPlugin.js";
 import TDClickOutside from "@/directives/TDClickOutside.js";
 import TDTooltip from "@/directives/TDTooltip.js";
 import "@/common/TDMonacoEditor.js";
@@ -62,7 +62,7 @@ import "@/common/TDMonacoEditor.js";
   currentApp.use(i18nData);
 
   // using toastmessage
-  currentApp.use(ToastPlugin);
+  currentApp.use(TDToastPlugin);
 
   // context menu
   currentApp.use(TDContextMenuPlugin);

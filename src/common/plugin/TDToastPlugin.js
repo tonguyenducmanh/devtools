@@ -111,7 +111,7 @@ export const toast = {
 };
 
 // Plugin cho Vue 3
-export const ToastPlugin = {
+export const TDToastPlugin = {
   install(app) {
     // Thêm vào global properties
     app.config.globalProperties.$tdToast = toast;
@@ -121,4 +121,4 @@ export const ToastPlugin = {
   },
 };
 
-export default ToastPlugin;
+export default TDToastPlugin;

@@ -1,4 +1,4 @@
-import { toast } from "@/common/ToastPlugin.js";
+import { toast } from "@/common/plugin/TDToastPlugin.js";
 import i18nData from "@/i18n/i18nData.js";
 import cache from "@/common/cache/TDCache.js";
 import enumeration from "@/common/TDEnum.js";
