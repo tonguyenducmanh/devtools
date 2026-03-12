@@ -18,7 +18,7 @@
           }}</span>
           <div class="td-search-shortcut">
             <span>CTRL/⌘</span>
-            <span>K</span>
+            <span>P</span>
           </div>
         </div>
       </div>
@@ -49,7 +49,7 @@ export default {
     let me = this;
   },
   mounted() {
-    // Thêm keyboard shortcut Cmd+K / Ctrl+K
+    // Thêm keyboard shortcut Cmd+P / Ctrl+P
     document.addEventListener("keydown", this.handleGlobalKeydown);
   },
   beforeUnmount() {
@@ -85,8 +85,8 @@ export default {
     },
 
     handleGlobalKeydown(event) {
-      // Cmd+K hoặc Ctrl+K để mở search
-      if ((event.metaKey || event.ctrlKey) && event.key === "k") {
+      // Cmd+P hoặc Ctrl+P để mở search
+      if ((event.metaKey || event.ctrlKey) && event.key === "p") {
         event.preventDefault();
         this.openSearchModal();
       }
