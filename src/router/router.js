@@ -230,7 +230,7 @@ const allRoutes = sidebarConfig.flatMap((item) => {
   }
 
   if (item.type === "group") {
-    // Group: redirect root + mỗi child dùng TDStaticTabView
+    // Group: redirect root
     const firstChildFullPath = `/${item.groupPath}/${item.children[0].path}`;
     const groupRootRoute = {
       path: `/${item.groupPath}`,
@@ -239,7 +239,7 @@ const allRoutes = sidebarConfig.flatMap((item) => {
     const childRoutes = item.children.map((child) => ({
       path: `/${item.groupPath}/${child.path}`,
       name: child.name,
-      component: () => import("@/views/misc/TDStaticTabView.vue"),
+      component: child.component,
       meta: {
         ...child.meta,
         groupKey: item.groupKey,
@@ -260,10 +260,8 @@ const router = createRouter({
 });
 const { exitTabMode } = useTabManager();
 
-// xử lý logic khi user chủ động bấm vào router cụ thể thì xử lý trước khi chuyển sang
+// Chỉ cập nhật title khi chuyển route, không thoát tab mode nữa
 router.beforeEach((to, from, next) => {
-  // thoát chế độ làm việc multi tab nếu có
-  exitTabMode();
   document.title = tdUtility.defaultTitleApp();
   next();
 });
@@ -320,6 +318,9 @@ export function getAllSearchableRoutes() {
         fullPath: `/${item.groupPath}/${child.path}`,
         meta: child.meta,
         groupTitleKey: item.groupTitleKey,
+        groupPath: item.groupPath,
+        path: child.path,
+        component: child.component,
       }));
     }
     if (item.type === "route" && !item.hide) {
@@ -329,6 +330,9 @@ export function getAllSearchableRoutes() {
           fullPath: item.pathVisible ?? item.path,
           meta: item.meta,
           groupTitleKey: null,
+          groupPath: "",
+          path: item.path,
+          component: item.component,
         },
       ];
     }

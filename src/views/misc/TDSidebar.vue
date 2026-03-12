@@ -14,9 +14,9 @@
             @mouseenter="onGroupMouseEnter($event, item)"
             @mouseleave="onGroupMouseLeave"
           >
-            <RouterLink class="flex td-item-content" :to="item.defaultPath">
+            <a href="#" class="flex td-item-content" @click.prevent="onOpenGroupChildTab(item, item.children[0])">
               <span>{{ $t(item.groupTitleKey) }}</span>
-            </RouterLink>
+            </a>
           </div>
 
           <!-- Standalone route item: link + nút pin -->
@@ -25,14 +25,15 @@
             class="td-sidebar-item td-sidebar-item--route"
             :class="{ 'td-item-active': isStandaloneActive(item.route) }"
           >
-            <RouterLink
+            <a
+              href="#"
               class="td-item-content flex"
-              :to="item.route.pathVisible ?? item.route.path"
               v-tooltip="
                 item.route.meta.helpKey
                   ? $t(item.route.meta.helpKey)
                   : undefined
               "
+              @click.prevent="onOpenRouteTab(item.route)"
             >
               <span>{{ $t(item.route.meta.titleKey) }}</span>
               <button
@@ -42,7 +43,7 @@
               >
                 <span class="td-icon td-plus-icon"> </span>
               </button>
-            </RouterLink>
+            </a>
           </div>
         </template>
       </div>
@@ -69,16 +70,16 @@
             :key="child.name"
             class="td-sidebar-flyout-row"
           >
-            <RouterLink
+            <a
+              href="#"
               class="td-sidebar-flyout-item"
-              :to="`/${hoveredItem.groupPath}/${child.path}`"
-              @click="hoveredItem = null"
+              @click.prevent="onOpenGroupChildTab(hoveredItem, child)"
               v-tooltip="
                 child.meta.helpKey ? $t(child.meta.helpKey) : undefined
               "
             >
               {{ $t(child.meta.titleKey) }}
-            </RouterLink>
+            </a>
 
             <button
               class="td-flyout-pin-btn"
@@ -104,8 +105,8 @@ export default {
   components: { TDToggleArea },
 
   setup() {
-    const { openTab } = useTabManager();
-    return { openTab };
+    const { openTab, state } = useTabManager();
+    return { openTab, state };
   },
 
   data() {
@@ -124,15 +125,20 @@ export default {
 
   methods: {
     isGroupActive(groupKey) {
-      return this.$route.meta?.groupKey === groupKey;
+      const activeTabId = this.state.activeTabId;
+      if (!activeTabId) return false;
+      const activeTab = this.state.tabs.find(t => t.id === activeTabId);
+      if (!activeTab) return false;
+      const groupItem = this.sidebarItems.find(i => i.type === 'group' && i.groupKey === groupKey);
+      return activeTab.groupPath && groupItem && activeTab.groupPath === groupItem.groupPath;
     },
 
     isStandaloneActive(route) {
-      const target = route.pathVisible ?? route.path;
-      return (
-        this.$route.path === target ||
-        this.$route.matched.some((r) => r.path === target)
-      );
+      const activeTabId = this.state.activeTabId;
+      if (!activeTabId) return false;
+      const activeTab = this.state.tabs.find(t => t.id === activeTabId);
+      if (!activeTab) return false;
+      return activeTab.path === route.path && !activeTab.groupPath;
     },
 
     async processWhenCreated() {

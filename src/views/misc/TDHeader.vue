@@ -33,8 +33,13 @@
 
 <script>
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
+import { useTabManager } from "@/stores/TDTabManager.js";
 export default {
   name: "TDHeader",
+  setup() {
+    const { openTab, exitTabMode } = useTabManager();
+    return { openTab, exitTabMode };
+  },
   computed: {
     appName() {
       return window.__env.appName;
@@ -58,11 +63,16 @@ export default {
   methods: {
     goToWelcome() {
       let me = this;
-      me.$router.push("/");
+      me.exitTabMode();
     },
     goToUserSetting() {
       let me = this;
-      me.$router.push("/TDUserSettings");
+      me.openTab({
+        titleKey: "i18nCommon.feature.userSettings",
+        groupPath: "",
+        path: "/TDUserSettings",
+        component: () => import("@/views/misc/TDUserSettings.vue"),
+      });
     },
 
     // Search methods

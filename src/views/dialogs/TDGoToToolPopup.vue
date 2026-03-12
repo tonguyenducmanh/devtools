@@ -65,6 +65,7 @@
 
 <script>
 import { getAllSearchableRoutes } from "@/router/router.js";
+import { useTabManager } from "@/stores/TDTabManager.js";
 
 export default {
   name: "TDGoToToolPopup",
@@ -74,6 +75,11 @@ export default {
       type: Object,
       required: true,
     },
+  },
+
+  setup() {
+    const { openTab } = useTabManager();
+    return { openTab };
   },
 
   data() {
@@ -153,8 +159,13 @@ export default {
     },
 
     selectRoute(route) {
-      // Dùng fullPath thay vì route.path vì tool trong group có path dạng /group/tool
-      this.$router.push(route.fullPath);
+      this.openTab({
+        titleKey: route.meta.titleKey,
+        helpKey: route.meta.helpKey,
+        groupPath: route.groupPath || "",
+        path: route.path,
+        component: route.component
+      });
       this.handleClose();
     },
   },

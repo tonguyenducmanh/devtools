@@ -90,20 +90,22 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
         </div>
       </template>
 
-      <!-- Normal mode: router-view như cũ -->
-      <RouterView v-else />
+      <!-- zero tabs mode: show Welcome -->
+      <TDWelcome v-else />
     </div>
   </div>
 </template>
 
 <script>
 import { computed, ref, inject } from "vue";
+import TDWelcome from "@/views/misc/TDWelcome.vue";
 import tdUtility from "@/common/TDUtility.js";
 import { useTabManager } from "@/stores/TDTabManager.js";
 import i18nData from "@/i18n/i18nData.js";
 
 export default {
   name: "TDDynamicTabView",
+  components: { TDWelcome },
   created() {
     this.processWhenMouted();
   },
