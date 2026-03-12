@@ -3,7 +3,6 @@ import App from "@/App.vue";
 import cache from "@/common/cache/TDCache.js";
 import tdEnum from "@/common/TDEnum.js";
 import tdUtility from "@/common/TDUtility.js";
-import router from "@/router/router.js";
 import TDButton from "@/components/TDButton.vue";
 import TDTextarea from "@/components/TDTextarea.vue";
 import TDInput from "@/components/TDInput.vue";
@@ -55,9 +54,6 @@ import "@/common/plugin/TDMonacoEditor.js";
   currentApp.component("TDTableViewer", TDTableViewer);
   currentApp.component("TDResizer", TDResizer);
   currentApp.component("TDVirtualScroll", TDVirtualScroll);
-
-  // router link
-  currentApp.use(router);
 
   // globalization language
   currentApp.use(i18nData);

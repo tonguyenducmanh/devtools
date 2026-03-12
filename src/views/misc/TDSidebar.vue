@@ -14,9 +14,9 @@
             @mouseenter="onGroupMouseEnter($event, item)"
             @mouseleave="onGroupMouseLeave"
           >
-            <a href="#" class="flex td-item-content" @click.prevent="onOpenGroupChildTab(item, item.children[0])">
+            <div class="flex td-item-content" @click="onOpenGroupChildTab(item, item.children[0])">
               <span>{{ $t(item.groupTitleKey) }}</span>
-            </a>
+            </div>
           </div>
 
           <!-- Standalone route item: link + nút pin -->
@@ -25,25 +25,24 @@
             class="td-sidebar-item td-sidebar-item--route"
             :class="{ 'td-item-active': isStandaloneActive(item.route) }"
           >
-            <a
-              href="#"
+            <div
               class="td-item-content flex"
               v-tooltip="
                 item.route.meta.helpKey
                   ? $t(item.route.meta.helpKey)
                   : undefined
               "
-              @click.prevent="onOpenRouteTab(item.route)"
+              @click="onOpenRouteTab(item.route)"
             >
               <span>{{ $t(item.route.meta.titleKey) }}</span>
               <button
                 class="td-sidebar-pin-btn"
                 v-tooltip="$t('i18nCommon.tabManager.addNewTab')"
-                @click.prevent.stop="onOpenRouteTab(item.route)"
+                @click.stop="onOpenRouteTab(item.route)"
               >
                 <span class="td-icon td-plus-icon"> </span>
               </button>
-            </a>
+            </div>
           </div>
         </template>
       </div>
@@ -70,21 +69,20 @@
             :key="child.name"
             class="td-sidebar-flyout-row"
           >
-            <a
-              href="#"
+            <div
               class="td-sidebar-flyout-item"
-              @click.prevent="onOpenGroupChildTab(hoveredItem, child)"
+              @click="onOpenGroupChildTab(hoveredItem, child)"
               v-tooltip="
                 child.meta.helpKey ? $t(child.meta.helpKey) : undefined
               "
             >
               {{ $t(child.meta.titleKey) }}
-            </a>
+            </div>
 
             <button
               class="td-flyout-pin-btn"
               v-tooltip="$t('i18nCommon.tabManager.addNewTab')"
-              @click.prevent.stop="onOpenGroupChildTab(hoveredItem, child)"
+              @click.stop="onOpenGroupChildTab(hoveredItem, child)"
             >
               <span class="td-icon td-plus-icon"> </span>
             </button>
@@ -96,7 +94,7 @@
 </template>
 
 <script>
-import { getSidebarItems } from "@/router/router.js";
+import { getSidebarItems } from "@/config/tools.js";
 import TDToggleArea from "@/components/TDToggleArea.vue";
 import { useTabManager } from "@/stores/TDTabManager.js";
 
@@ -138,7 +136,7 @@ export default {
       if (!activeTabId) return false;
       const activeTab = this.state.tabs.find(t => t.id === activeTabId);
       if (!activeTab) return false;
-      return activeTab.path === route.path && !activeTab.groupPath;
+      return activeTab.toolKey === route.name && !activeTab.groupKey;
     },
 
     async processWhenCreated() {
@@ -195,8 +193,8 @@ export default {
       this.openTab({
         titleKey: child.meta.titleKey,
         helpKey: child.meta?.helpKey,
-        groupPath: groupItem.groupPath,
-        path: child.path,
+        groupKey: groupItem.groupKey,
+        toolKey: child.name,
         component: child.component,
       });
       this.hoveredItem = null;
@@ -207,8 +205,8 @@ export default {
       this.openTab({
         titleKey: route.meta.titleKey,
         helpKey: route.meta?.helpKey,
-        groupPath: "",
-        path: route.path,
+        groupKey: "",
+        toolKey: route.name,
         // Standalone route dùng component trực tiếp từ route config
         component: route.component,
       });
@@ -274,6 +272,7 @@ export default {
     text-decoration: none;
     color: var(--text-color);
     min-width: 0;
+    cursor: pointer;
   }
 
   &:hover .td-item-content,
@@ -369,6 +368,7 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: pointer;
 }
 
 .td-flyout-pin-btn {

@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import { getAllSearchableRoutes } from "@/router/router.js";
+import { getAllSearchableRoutes } from "@/config/tools.js";
 import { useTabManager } from "@/stores/TDTabManager.js";
 
 export default {
@@ -162,8 +162,8 @@ export default {
       this.openTab({
         titleKey: route.meta.titleKey,
         helpKey: route.meta.helpKey,
-        groupPath: route.groupPath || "",
-        path: route.path,
+        groupKey: route.groupKey || "",
+        toolKey: route.name,
         component: route.component
       });
       this.handleClose();

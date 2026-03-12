@@ -28,7 +28,7 @@ export function useTabManager() {
   /**
    * mở 1 tab mới
    */
-  async function openTab({ titleKey, helpKey, groupPath, path, component }) {
+  async function openTab({ titleKey, helpKey, groupKey, toolKey, component }) {
     const id = genId();
 
     // Load component trước, rồi mới push vào state
@@ -38,11 +38,10 @@ export function useTabManager() {
 
     const tab = {
       id,
-      toolKey: `${groupPath}/${path}`,
+      toolKey,
+      groupKey: groupKey || "",
       titleKey,
       helpKey,
-      groupPath,
-      path,
       component,
       resolvedComponent: markRaw(resolvedComponent),
       // title tùy chỉnh do component emit lên, null = dùng titleKey mặc định
