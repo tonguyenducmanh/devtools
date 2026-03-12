@@ -10,7 +10,6 @@
           <div
             v-if="item.type === 'group'"
             class="td-sidebar-item"
-            :class="{ 'td-item-active': isGroupActive(item.groupKey) }"
             @mouseenter="onGroupMouseEnter($event, item)"
             @mouseleave="onGroupMouseLeave"
           >
@@ -23,7 +22,6 @@
           <div
             v-else
             class="td-sidebar-item td-sidebar-item--route"
-            :class="{ 'td-item-active': isStandaloneActive(item.route) }"
           >
             <div
               class="td-item-content flex"
@@ -88,8 +86,8 @@ export default {
   components: { TDToggleArea },
 
   setup() {
-    const { openTab, state } = useTabManager();
-    return { openTab, state };
+    const { openTab } = useTabManager();
+    return { openTab };
   },
 
   data() {
@@ -107,23 +105,6 @@ export default {
   },
 
   methods: {
-    isGroupActive(groupKey) {
-      const activeTabId = this.state.activeTabId;
-      if (!activeTabId) return false;
-      const activeTab = this.state.tabs.find(t => t.id === activeTabId);
-      if (!activeTab) return false;
-      const groupItem = this.sidebarItems.find(i => i.type === 'group' && i.groupKey === groupKey);
-      return activeTab.groupPath && groupItem && activeTab.groupPath === groupItem.groupPath;
-    },
-
-    isStandaloneActive(route) {
-      const activeTabId = this.state.activeTabId;
-      if (!activeTabId) return false;
-      const activeTab = this.state.tabs.find(t => t.id === activeTabId);
-      if (!activeTab) return false;
-      return activeTab.toolKey === route.name && !activeTab.groupKey;
-    },
-
     async processWhenCreated() {
       let me = this;
       me.showSideBar = await me.$tdUtility.getUserSettings("showSideBar");
@@ -276,13 +257,8 @@ export default {
     cursor: pointer;
   }
 
-  &:hover .td-item-content,
-  &.td-item-active .td-item-content {
+  &:hover .td-item-content {
     background-color: var(--bg-layer-color);
-  }
-
-  &.td-item-active {
-    font-weight: 600;
   }
 
   // Nút pin chỉ hiện khi hover vào item
