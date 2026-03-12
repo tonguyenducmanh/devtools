@@ -437,7 +437,7 @@ export default {
   align-items: center;
   gap: 5px;
   padding: var(--padding);
-  cursor: grab;
+  cursor: pointer;
   white-space: nowrap;
   color: var(--text-secondary-color);
   border-radius: var(--border-radius) var(--border-radius) 0 0;
