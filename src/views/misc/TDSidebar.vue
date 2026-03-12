@@ -14,7 +14,7 @@
             @mouseenter="onGroupMouseEnter($event, item)"
             @mouseleave="onGroupMouseLeave"
           >
-            <div class="flex td-item-content" @click="onOpenGroupChildTab(item, item.children[0])">
+            <div class="flex td-item-content" @click="onOpenGroup(item)">
               <span>{{ $t(item.groupTitleKey) }}</span>
             </div>
           </div>
@@ -35,13 +35,6 @@
               @click="onOpenRouteTab(item.route)"
             >
               <span>{{ $t(item.route.meta.titleKey) }}</span>
-              <button
-                class="td-sidebar-pin-btn"
-                v-tooltip="$t('i18nCommon.tabManager.addNewTab')"
-                @click.stop="onOpenRouteTab(item.route)"
-              >
-                <span class="td-icon td-plus-icon"> </span>
-              </button>
             </div>
           </div>
         </template>
@@ -78,14 +71,6 @@
             >
               {{ $t(child.meta.titleKey) }}
             </div>
-
-            <button
-              class="td-flyout-pin-btn"
-              v-tooltip="$t('i18nCommon.tabManager.addNewTab')"
-              @click.stop="onOpenGroupChildTab(hoveredItem, child)"
-            >
-              <span class="td-icon td-plus-icon"> </span>
-            </button>
           </div>
         </div>
       </Transition>
@@ -186,6 +171,22 @@ export default {
       this._leaveTimer = setTimeout(() => {
         this.hoveredItem = null;
       }, 120);
+    },
+
+    // Mở tất cả tab từ group
+    async onOpenGroup(groupItem) {
+      if (!groupItem.children || groupItem.children.length === 0) return;
+      for (let i = 0; i < groupItem.children.length; i++) {
+        const child = groupItem.children[i];
+         await this.openTab({
+          titleKey: child.meta.titleKey,
+          helpKey: child.meta?.helpKey,
+          groupKey: groupItem.groupKey,
+          toolKey: child.name,
+          component: child.component,
+          isActive: i === 0, // Chỉ focus tab đầu tiên
+        });
+      }
     },
 
     // Mở tab từ group flyout item

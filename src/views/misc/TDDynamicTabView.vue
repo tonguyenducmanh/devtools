@@ -97,7 +97,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
 </template>
 
 <script>
-import { computed, ref, inject } from "vue";
+import { computed, ref, inject, watch as vueWatch } from "vue";
 import TDWelcome from "@/views/misc/TDWelcome.vue";
 import tdUtility from "@/common/TDUtility.js";
 import { useTabManager } from "@/stores/TDTabManager.js";
@@ -128,6 +128,7 @@ export default {
       exitTabMode,
       setTabTitle,
       duplicateTab,
+      resolveTabComponent
     } = useTabManager();
 
     // Lấy context menu từ plugin toàn cục
@@ -145,6 +146,17 @@ export default {
       }
       return isMultiTab;
     });
+
+    // Theo dõi tab đang active, nếu tab đó chưa được load component (resolveComponent === null)
+    // thì gọi component() để lấy về module.
+    vueWatch(
+      activeTabId,
+      async (newId) => {
+         if (!newId) return;
+         await resolveTabComponent(newId);
+      },
+      { immediate: true },
+    );
 
     // ── Context menu ── dùng plugin thay vì tự quản lý state
     function openContextMenu(event, tab) {

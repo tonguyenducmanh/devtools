@@ -28,13 +28,8 @@ export function useTabManager() {
   /**
    * mở 1 tab mới
    */
-  async function openTab({ titleKey, helpKey, groupKey, toolKey, component }) {
+  async function openTab({ titleKey, helpKey, groupKey, toolKey, component, isActive = true }) {
     const id = genId();
-
-    // Load component trước, rồi mới push vào state
-    // → khi Vue render lần đầu, resolvedComponent đã có sẵn, không có "đang tải"
-    const mod = await component();
-    const resolvedComponent = mod.default ?? mod;
 
     const tab = {
       id,
@@ -43,13 +38,20 @@ export function useTabManager() {
       titleKey,
       helpKey,
       component,
-      resolvedComponent: markRaw(resolvedComponent),
-      // title tùy chỉnh do component emit lên, null = dùng titleKey mặc định
+      // Khi không active, đánh dấu resolvedComponent là null để Dynamic Tab View lazy load sau này
+      resolvedComponent: null,
       customTitle: null,
     };
 
+    if (isActive) {
+      const mod = await component();
+      tab.resolvedComponent = markRaw(mod.default ?? mod);
+    }
+
     state.tabs.push(tab);
-    state.activeTabId = id;
+    if (isActive) {
+      state.activeTabId = id;
+    }
 
     return id;
   }
@@ -97,6 +99,21 @@ export function useTabManager() {
   }
 
   /**
+   * Tải component lazy của một tab
+   */
+  async function resolveTabComponent(id) {
+    const tab = state.tabs.find((t) => t.id === id);
+    if (!tab || tab.resolvedComponent) return;
+
+    try {
+      const mod = await tab.component();
+      tab.resolvedComponent = markRaw(mod.default ?? mod);
+    } catch (e) {
+      console.error("Failed to load component for tab", tab, e);
+    }
+  }
+
+  /**
    * Nhân bản 1 tab theo id — mở tab mới với cùng component, đặt active
    * @param {string} id - id của tab cần nhân bản
    * @returns {string|null} id của tab mới, hoặc null nếu không tìm thấy
@@ -110,7 +127,11 @@ export function useTabManager() {
       ...source,
       id: newId,
       customTitle: null, // reset custom title cho bản clone
+      resolvedComponent: null, // Clone bắt buộc tải lại/đợi render để mount cái mới
     };
+
+    const mod = await source.component();
+    tab.resolvedComponent = markRaw(mod.default ?? mod);
 
     // Chèn ngay sau tab gốc
     const idx = state.tabs.findIndex((t) => t.id === id);
@@ -128,5 +149,6 @@ export function useTabManager() {
     exitTabMode,
     setTabTitle,
     duplicateTab,
+    resolveTabComponent,
   };
 }
