@@ -2,13 +2,17 @@ package web
 
 import (
 	"embed"
+	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"td_config"
 	"td_core_service/td_common"
+	"time"
 )
 
 //go:embed all:dist
@@ -29,8 +33,36 @@ func RunWebApp() {
 
 	addr := td_common.BuildRunningAddressServer("Server Web UI", &port)
 
+	// Phải dùng goroutine để mở browser TRƯỚC khi gọi ListenAndServe,
+	// vì ListenAndServe là blocking call — nó chạy vô hạn để phục vụ request
+	// và không bao giờ return trong lúc server đang hoạt động bình thường.
+	// Nếu đặt openBrowser() sau ListenAndServe thì sẽ không bao giờ được gọi.
+	// Goroutine chờ 500ms để server kịp bind port, rồi mở browser song song.
+	url := fmt.Sprintf("http://localhost:%d", port)
+	go func() {
+		time.Sleep(500 * time.Millisecond) // chờ server bind port xong
+		openBrowser(url)
+	}()
+
+	// Blocking call: giữ server chạy và lắng nghe request cho đến khi có lỗi
 	if err := http.ListenAndServe(addr, handler); err != nil {
 		log.Fatal(err)
+	}
+}
+
+// openBrowser mở trình duyệt mặc định, hỗ trợ Windows, macOS, Linux
+func openBrowser(url string) {
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "windows":
+		cmd = exec.Command("cmd", "/c", "start", url)
+	case "darwin":
+		cmd = exec.Command("open", url)
+	default: // linux và các OS khác
+		cmd = exec.Command("xdg-open", url)
+	}
+	if err := cmd.Start(); err != nil {
+		td_common.LogDebug(fmt.Sprintf("Không thể mở trình duyệt tự động: %v", err))
 	}
 }
 
