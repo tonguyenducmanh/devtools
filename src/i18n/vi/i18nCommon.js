@@ -80,6 +80,11 @@ export default {
       textManipulation: "Xử lý văn bản",
       APITesting: "API testing",
       APIMocking: "API mocking",
+      agentDownload: {
+        title: "Tải Agent",
+        redirecting: "Đang chuyển hướng...",
+        clickHere: "Bấm vào đây nếu không tự động chuyển hướng",
+      },
     },
     example: "ví dụ",
     base64ToImage: {

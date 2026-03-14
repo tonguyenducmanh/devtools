@@ -80,6 +80,11 @@ export default {
       textManipulation: "Text manipulation",
       APITesting: "API testing",
       APIMocking: "API mocking",
+      agentDownload: {
+        title: "Download Agent",
+        redirecting: "Redirecting...",
+        clickHere: "Click here if not automatically redirected",
+      },
     },
     example: "example",
     base64ToImage: {
