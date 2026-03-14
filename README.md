@@ -6,8 +6,6 @@ This is a Client-Daemon Application.
 
 ![alt text](imgs/demo-app.png)
 
-![alt text](imgs/demo-tab-view.png)
-
 [https://tool.tomanh.com/](https://tool.tomanh.com/)
 
 ## Setup
