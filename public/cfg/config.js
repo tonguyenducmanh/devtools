@@ -23,4 +23,7 @@
   window.__env.APITesting = {
     agentServer: "http://localhost:7777",
   };
+  window.__env.quoteConfig = {
+    showQuote: true,
+  };
 })(this);

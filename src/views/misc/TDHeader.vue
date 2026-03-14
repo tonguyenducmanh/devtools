@@ -23,6 +23,16 @@
         </div>
       </div>
     </div>
+
+    <!-- Quote Marquee -->
+    <div class="td-quote-container" v-if="showQuote && quoteOfDay">
+      <div class="td-quote-marquee">
+        <span class="td-quote-text">
+          {{ quoteOfDay.q }} — {{ quoteOfDay.a }}
+        </span>
+      </div>
+    </div>
+
     <div
       class="td-icon td-setting-icon"
       @click="goToUserSetting"
@@ -34,6 +44,7 @@
 <script>
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import { useTabManager } from "@/stores/TDTabManager.js";
+import { getQuoteOfDay } from "@/common/TDQuotes.js";
 export default {
   name: "TDHeader",
   setup() {
@@ -43,6 +54,12 @@ export default {
   computed: {
     appName() {
       return window.__env.appName;
+    },
+    showQuote() {
+      return window.__env?.quoteConfig?.showQuote ?? true;
+    },
+    quoteOfDay() {
+      return getQuoteOfDay();
     },
   },
   created() {
@@ -157,6 +174,48 @@ export default {
         }
       }
     }
+  }
+
+  .td-quote-container {
+    flex: 1;
+    overflow: hidden;
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 10%,
+      black 90%,
+      transparent
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 10%,
+      black 90%,
+      transparent
+    );
+
+    .td-quote-marquee {
+      display: inline-block;
+      white-space: nowrap;
+      animation: td-quote-scroll 30s linear infinite;
+      will-change: transform;
+
+      .td-quote-text {
+        font-size: 14px;
+        font-style: italic;
+        color: var(--text-secondary-color);
+        padding-right: 50px;
+      }
+    }
+  }
+}
+
+@keyframes td-quote-scroll {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
   }
 }
 
