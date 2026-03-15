@@ -29,7 +29,7 @@
       ></TDUpload>
       <TDButton
         :noMargin="true"
-        :readOnly="!hasFiles || isProcessing"
+        :readOnly="ocrResults.length === 0 || isProcessing"
         @click="processOCR"
         :label="$t('i18nCommon.OpticalCharacterRecognition.process')"
       ></TDButton>
@@ -104,19 +104,6 @@ export default {
     document.removeEventListener("paste", me.handlePasteEvent);
   },
   mounted() {},
-  computed: {
-    hasFiles() {
-      let me = this;
-      if (
-        me.$refs.uploadArea &&
-        typeof me.$refs.uploadArea.getFileSelected === "function"
-      ) {
-        const files = me.$refs.uploadArea.getFileSelected();
-        return files && files.length > 0;
-      }
-      return false;
-    },
-  },
   methods: {
     copyResult(text) {
       let me = this;
