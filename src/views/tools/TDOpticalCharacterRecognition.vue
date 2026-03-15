@@ -466,7 +466,7 @@ export default {
       selectedLanguage: "vie",
       selectedPSM: "PSM_AUTO_OSD",
       confidenceThreshold: 90,
-      useWhitelist: true,
+      useWhitelist: false,
       whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀẢÃÁẠẮẰẲẴẶÂẦẨẪẬĐÈẺẼÉẸÊỀỂỄẾỆÌỈĨÍỊÒỎÕÓỌÔỔỖỐỘƠỜỞỠỚỢÙỦŨÚỤỪỬỮƯỰỲỴỶỸÝ0123456789.,;:\'"()[]{}/\\-+=*!@#$%^&_`|~<>? \t\n\r',
       languageOptions: [
         {
@@ -513,7 +513,7 @@ export default {
       isProcessing: false,
       progress: 0,
       isDragOver: false,
-      enablePreprocessing: true,
+      enablePreprocessing: false,
       isShowSidebar: true,
       magnifierEl: null,
       magnifierSrc: null,
