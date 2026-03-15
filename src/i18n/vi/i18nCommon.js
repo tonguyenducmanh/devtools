@@ -146,6 +146,8 @@ export default {
       copyAll: "Sao chép tất cả",
       process: "Nhận dạng",
       processing: "Đang xử lý...",
+      preprocessing: "Tiền xử lý ảnh",
+      language: "Ngôn ngữ",
       confidence: "Độ chính xác",
       lang: {
         vie: "Tiếng Việt",

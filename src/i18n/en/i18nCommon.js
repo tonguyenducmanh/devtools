@@ -146,6 +146,8 @@ export default {
       copyAll: "Copy All",
       process: "Recognize",
       processing: "Processing...",
+      preprocessing: "Image preprocessing",
+      language: "Language",
       confidence: "Confidence",
       lang: {
         vie: "Tiếng Việt",
