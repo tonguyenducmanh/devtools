@@ -139,12 +139,11 @@
               ></TDCheckbox>
             </div>
           </div>
-          <div class="sidebar-info">
+          <div class="flex sidebar-info">
             <span class="info-label"
               >{{ $t("i18nCommon.OpticalCharacterRecognition.library") }}:</span
             >
             <span class="info-value">Tesseract.js</span>
-            <span class="info-warning">{{ $t('i18nHelp.feature.OpticalCharacterRecognition') }}</span>
           </div>
         </div>
       </template>
