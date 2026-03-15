@@ -280,9 +280,6 @@ export default {
           });
         }
       });
-      if (me.ocrResults.length > 0) {
-        me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-      }
     },
     preprocessImage(file) {
       return new Promise((resolve, reject) => {
@@ -375,9 +372,6 @@ export default {
             let imageSource = item.file;
 
             if (me.enablePreprocessing) {
-              me.$tdToast.success(
-                me.$t("i18nCommon.OpticalCharacterRecognition.preprocessing"),
-              );
               imageSource = await me.preprocessImage(item.file);
             }
 
