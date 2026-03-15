@@ -123,6 +123,7 @@
               >{{ $t("i18nCommon.OpticalCharacterRecognition.library") }}:</span
             >
             <span class="info-value">Tesseract.js</span>
+            <span class="info-warning">{{ $t('i18nHelp.feature.OpticalCharacterRecognition') }}</span>
           </div>
         </div>
       </template>
@@ -559,6 +560,7 @@ export default {
 .td-sub-sidebar {
   height: 100%;
   width: 100%;
+  padding: var(--padding);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -584,6 +586,11 @@ export default {
   font-size: 12px;
   font-weight: bold;
   color: var(--focus-color);
+}
+.info-warning {
+  font-size: 11px;
+  color: var(--warning-color);
+  margin-top: 4px;
 }
 .sidebar-item {
   width: 100%;

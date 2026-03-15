@@ -100,6 +100,7 @@ const sidebarConfig = [
         component: () => import("@/views/tools/TDOpticalCharacterRecognition.vue"),
         meta: {
           titleKey: "i18nCommon.feature.OpticalCharacterRecognition",
+          helpKey: "i18nHelp.feature.OpticalCharacterRecognition",
         },
       },
     ],
