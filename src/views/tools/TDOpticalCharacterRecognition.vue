@@ -62,7 +62,7 @@
               :placeHolder="
                 $t('i18nCommon.OpticalCharacterRecognition.placeHolder')
               "
-              height="200px"
+              height="500px"
             ></TDTextarea>
             <div class="ocr-item-actions">
               <span class="confidence" v-if="item.confidence">
@@ -590,8 +590,8 @@ export default {
   border-radius: var(--border-radius);
 }
 .ocr-image-section {
-  width: 200px;
-  min-width: 200px;
+  width: 300px;
+  min-width: 300px;
   display: flex;
   align-items: flex-start;
   justify-content: center;
