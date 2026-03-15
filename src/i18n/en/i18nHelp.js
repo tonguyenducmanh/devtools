@@ -1,6 +1,8 @@
 export default {
   i18nHelp: {
     feature: {
+      OpticalCharacterRecognition:
+        "Vietnamese OCR tool, may have errors. Please retrain on your specific dataset for better results.",
       AppDataMiner: "View all the data stored in the application's database",
       cosinSimilarity:
         "Calculates the similarity between two n-dimensional vectors",

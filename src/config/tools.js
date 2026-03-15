@@ -92,6 +92,21 @@ const sidebarConfig = [
   },
   {
     type: "group",
+    groupKey: "qrcode",
+    groupTitleKey: "i18nCommon.group.ArtificialIntelligence",
+    children: [
+      {
+        name: "opticalcharacterrecognition",
+        component: () => import("@/views/tools/TDOpticalCharacterRecognition.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.OpticalCharacterRecognition",
+          helpKey: "i18nHelp.feature.OpticalCharacterRecognition",
+        },
+      },
+    ],
+  },
+  {
+    type: "group",
     groupKey: "json",
     groupTitleKey: "i18nCommon.group.JSON",
     children: [
