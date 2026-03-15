@@ -2,7 +2,7 @@ export default {
   i18nHelp: {
     feature: {
       OpticalCharacterRecognition:
-        "Công cụ OCR tiếng Việt, có thể có sai sót. Vui lòng training lại trên tập data cụ thể để đạt kết quả tốt hơn.",
+        "Công cụ OCR tiếng Việt, có thể có sai sót.",
       AppDataMiner:
         "Xem toàn bộ dữ liệu được lưu trữ trong cơ sở dữ liệu của ứng dụng",
       cosinSimilarity: "Tính toán độ tương đồng giữa 2 vector cùng có n chiều",
