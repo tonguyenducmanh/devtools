@@ -540,6 +540,7 @@ export default {
   width: 100%;
   gap: var(--padding);
   flex-wrap: wrap;
+  margin-bottom: var(--padding);
 }
 .upload-area {
   flex: 1;
