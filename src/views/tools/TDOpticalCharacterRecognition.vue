@@ -242,6 +242,7 @@ export default {
       if (files && files.length > 0) {
         me.$refs.uploadArea.setFileSelected(files);
         me.previewImages(files);
+        me.processOCR();
       }
     },
     previewImages(files) {
