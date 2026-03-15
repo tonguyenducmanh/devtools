@@ -121,6 +121,16 @@
             </div>
             <div class="sidebar-item">
               <TDCheckbox
+                v-model="useWhitelist"
+                :label="
+                  $t('i18nCommon.OpticalCharacterRecognition.useWhitelist')
+                "
+                :variant="$tdEnum.checkboxType.switch"
+                :noMargin="true"
+              ></TDCheckbox>
+            </div>
+            <div class="sidebar-item">
+              <TDCheckbox
                 v-model="enablePreprocessing"
                 :label="
                   $t('i18nCommon.OpticalCharacterRecognition.preprocessing')
@@ -242,13 +252,11 @@ export default {
     copyResult(text) {
       let me = this;
       me.$tdUtility.copyToClipboard(text);
-      me.$tdToast.success(me.$t("i18nCommon.toastMessage.copy"));
     },
     copyAllResults() {
       let me = this;
       const allText = me.ocrResults.map((item) => item.text).join("\n\n");
       me.$tdUtility.copyToClipboard(allText);
-      me.$tdToast.success(me.$t("i18nCommon.toastMessage.copy"));
     },
     handleImageSelected(files) {
       let me = this;
@@ -289,15 +297,51 @@ export default {
 
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const data = imageData.data;
+          const width = canvas.width;
+          const height = canvas.height;
 
+          // 1. Grayscale + Increase Contrast
+          const contrast = 1.5;
+          const intercept = 128 * (1 - contrast);
           for (let i = 0; i < data.length; i += 4) {
             const r = data[i];
             const g = data[i + 1];
             const b = data[i + 2];
-            const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+            
+            // Grayscale
+            let gray = 0.299 * r + 0.587 * g + 0.114 * b;
+            
+            // Increase contrast
+            gray = gray * contrast + intercept;
+            gray = Math.max(0, Math.min(255, gray));
+            
             data[i] = gray;
             data[i + 1] = gray;
             data[i + 2] = gray;
+          }
+
+          // 2. Denoising (simple median filter)
+          const tempData = new Uint8ClampedArray(data);
+          const kernelSize = 3;
+          const half = Math.floor(kernelSize / 2);
+          
+          for (let y = half; y < height - half; y++) {
+            for (let x = half; x < width - half; x++) {
+              const values = [];
+              for (let ky = -half; ky <= half; ky++) {
+                for (let kx = -half; kx <= half; kx++) {
+                  const idx = ((y + ky) * width + (x + kx)) * 4;
+                  values.push(tempData[idx]);
+                }
+              }
+              values.sort((a, b) => a - b);
+              const median = values[Math.floor(values.length / 2)];
+              
+              const idx = (y * width + x) * 4;
+              data[idx] = median;
+              data[idx + 1] = median;
+              data[idx + 2] = median;
+            }
           }
 
           ctx.putImageData(imageData, 0, 0);
@@ -350,6 +394,7 @@ export default {
                   }
                 },
                 tessedit_pageseg_mode: me.selectedPSM,
+                tessedit_char_whitelist: me.useWhitelist ? me.whitelist : undefined,
               },
             );
             const rawConfidence = Math.round(result.data.confidence);
@@ -428,6 +473,8 @@ export default {
       selectedLanguage: "vie",
       selectedPSM: "PSM_AUTO_OSD",
       confidenceThreshold: 90,
+      useWhitelist: true,
+      whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀẢÃÁẠẮẰẲẴẶÂẦẨẪẬĐÈẺẼÉẸÊỀỂỄẾỆÌỈĨÍỊÒỎÕÓỌÔỔỖỐỘƠỜỞỠỚỢÙỦŨÚỤỪỬỮƯỰỲỴỶỸÝ0123456789.,;:\'"()[]{}/\\-+=*!@#$%^&_`|~<>? \t\n\r',
       languageOptions: [
         {
           value: "vie",

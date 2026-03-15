@@ -152,6 +152,7 @@ export default {
       library: "OCR Library",
       confidence: "Confidence",
       confidenceThreshold: "Confidence threshold",
+      useWhitelist: "Only whitelist chars",
       lang: {
         vie: "Tiếng Việt",
         eng: "English",

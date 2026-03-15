@@ -152,6 +152,7 @@ export default {
       library: "Thư viện OCR",
       confidence: "Độ chính xác",
       confidenceThreshold: "Ngưỡng confidence",
+      useWhitelist: "Chỉ ký tự whitelist",
       lang: {
         vie: "Tiếng Việt",
         eng: "English",
