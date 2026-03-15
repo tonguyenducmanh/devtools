@@ -48,9 +48,9 @@
           class="ocr-item"
         >
           <div class="ocr-image-section">
-            <img 
-              :src="item.previewUrl" 
-              class="preview" 
+            <img
+              :src="item.previewUrl"
+              class="preview"
               @mouseenter="showMagnifier($event, item.previewUrl)"
               @mousemove="moveMagnifier"
               @mouseleave="hideMagnifier"
@@ -84,26 +84,45 @@
     <TDSubSidebar v-model="isShowSidebar">
       <template v-slot:main>
         <div class="flex flex-col td-sub-sidebar">
-          <div class="sidebar-item flex" style="justify-content: space-between">
-            <span class="sidebar-label">{{
-              $t("i18nCommon.OpticalCharacterRecognition.language")
-            }}</span>
-            <TDComboBox
-              v-model="selectedLanguage"
-              :options="languageOptions"
-              :width="150"
-              :noMargin="true"
-            />
+          <div class="sidebar-section">
+            <div class="sidebar-item">
+              <span class="sidebar-label">{{
+                $t("i18nCommon.OpticalCharacterRecognition.language")
+              }}</span>
+              <TDComboBox
+                v-model="selectedLanguage"
+                :options="languageOptions"
+                :width="150"
+                :noMargin="true"
+              />
+            </div>
+            <div class="sidebar-item">
+              <span class="sidebar-label">{{
+                $t("i18nCommon.OpticalCharacterRecognition.psm")
+              }}</span>
+              <TDComboBox
+                v-model="selectedPSM"
+                :options="psmOptions"
+                :width="150"
+                :noMargin="true"
+              />
+            </div>
+            <div class="sidebar-item">
+              <TDCheckbox
+                v-model="enablePreprocessing"
+                :label="
+                  $t('i18nCommon.OpticalCharacterRecognition.preprocessing')
+                "
+                :variant="$tdEnum.checkboxType.switch"
+                :noMargin="true"
+              ></TDCheckbox>
+            </div>
           </div>
-          <div class="sidebar-item">
-            <TDCheckbox
-              v-model="enablePreprocessing"
-              :label="
-                $t('i18nCommon.OpticalCharacterRecognition.preprocessing')
-              "
-              :variant="$tdEnum.checkboxType.switch"
-              :noMargin="true"
-            ></TDCheckbox>
+          <div class="sidebar-info">
+            <span class="info-label"
+              >{{ $t("i18nCommon.OpticalCharacterRecognition.library") }}:</span
+            >
+            <span class="info-value">Tesseract.js</span>
           </div>
         </div>
       </template>
@@ -132,7 +151,7 @@ export default {
     showMagnifier(e, src) {
       let me = this;
       me.hideMagnifier();
-      
+
       const el = document.createElement("div");
       el.className = "magnifier";
       el.style.position = "fixed";
@@ -147,27 +166,27 @@ export default {
       el.style.border = "2px solid var(--focus-color)";
       el.style.borderRadius = "4px";
       el.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.3)";
-      
+
       document.body.appendChild(el);
       me.magnifierEl = el;
       me.magnifierSrc = src;
-      
+
       me.moveMagnifier(e);
       el.style.display = "block";
     },
     moveMagnifier(e) {
       let me = this;
       if (!me.magnifierEl) return;
-      
+
       const el = me.magnifierEl;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const magSize = 500;
       const offset = 20;
-      
+
       let left = e.clientX + offset;
       let top = e.clientY + offset;
-      
+
       if (left + magSize > vw - 10) {
         left = e.clientX - magSize - offset;
         if (left < 10) left = 10;
@@ -178,24 +197,24 @@ export default {
       }
       if (left < 10) left = 10;
       if (top < 10) top = 10;
-      
+
       el.style.left = `${left}px`;
       el.style.top = `${top}px`;
-      
+
       const img = e.target;
       const rect = img.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width;
       const y = (e.clientY - rect.top) / rect.height;
-      
+
       const zoomLevelX = magSize / rect.width;
       const zoomLevelY = magSize / rect.height;
       const zoomLevel = Math.max(zoomLevelX, zoomLevelY);
-      
+
       const bgWidth = rect.width * zoomLevel;
       const bgHeight = rect.height * zoomLevel;
       const posX = x * bgWidth - magSize / 2;
       const posY = y * bgHeight - magSize / 2;
-      
+
       el.style.backgroundSize = `${bgWidth}px ${bgHeight}px`;
       el.style.backgroundPosition = `${-posX}px ${-posY}px`;
     },
@@ -316,7 +335,7 @@ export default {
                     me.progress = Math.round(overallProgress);
                   }
                 },
-                tessedit_pageseg_mode: "PSM_AUTO_OSD",
+                tessedit_pageseg_mode: me.selectedPSM,
               },
             );
             item.text = result.data.text;
@@ -385,6 +404,7 @@ export default {
     return {
       ocrResults: [],
       selectedLanguage: "vie",
+      selectedPSM: "PSM_AUTO_OSD",
       languageOptions: [
         {
           value: "vie",
@@ -393,6 +413,38 @@ export default {
         {
           value: "eng",
           label: this.$t("i18nCommon.OpticalCharacterRecognition.lang.eng"),
+        },
+      ],
+      psmOptions: [
+        {
+          value: "PSM_AUTO_OSD",
+          label: this.$t(
+            "i18nCommon.OpticalCharacterRecognition.psmOptions.autoOsd",
+          ),
+        },
+        {
+          value: "PSM_AUTO",
+          label: this.$t(
+            "i18nCommon.OpticalCharacterRecognition.psmOptions.auto",
+          ),
+        },
+        {
+          value: "PSM_SINGLE_BLOCK",
+          label: this.$t(
+            "i18nCommon.OpticalCharacterRecognition.psmOptions.singleBlock",
+          ),
+        },
+        {
+          value: "PSM_SINGLE_LINE",
+          label: this.$t(
+            "i18nCommon.OpticalCharacterRecognition.psmOptions.singleLine",
+          ),
+        },
+        {
+          value: "PSM_SPARSE_TEXT",
+          label: this.$t(
+            "i18nCommon.OpticalCharacterRecognition.psmOptions.sparseText",
+          ),
         },
       ],
       isProcessing: false,
@@ -505,19 +557,40 @@ export default {
 }
 .td-sub-sidebar {
   height: 100%;
-  justify-content: flex-start;
   width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   gap: var(--padding);
+}
+.sidebar-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding);
+}
+.sidebar-info {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.info-label {
+  font-size: 12px;
+  color: var(--text-secondary-color);
+}
+.info-value {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--focus-color);
 }
 .sidebar-item {
   width: 100%;
-}
-.sidebar-item.flex {
-  gap: var(--padding);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .sidebar-label {
   white-space: nowrap;
-  display: flex;
-  align-items: center;
 }
 </style>

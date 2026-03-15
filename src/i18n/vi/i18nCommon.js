@@ -148,10 +148,19 @@ export default {
       processing: "Đang xử lý...",
       preprocessing: "Tiền xử lý ảnh",
       language: "Ngôn ngữ",
+      psm: "Chế độ quét",
+      library: "Thư viện OCR",
       confidence: "Độ chính xác",
       lang: {
         vie: "Tiếng Việt",
         eng: "English",
+      },
+      psmOptions: {
+        autoOsd: "OSD",
+        auto: "Tự động",
+        singleBlock: "Khối đơn",
+        singleLine: "Dòng đơn",
+        sparseText: "Text thưa",
       },
     },
     jsonToExcel: {

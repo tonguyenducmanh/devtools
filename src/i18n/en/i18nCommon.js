@@ -148,10 +148,19 @@ export default {
       processing: "Processing...",
       preprocessing: "Image preprocessing",
       language: "Language",
+      psm: "Scan mode",
+      library: "OCR Library",
       confidence: "Confidence",
       lang: {
         vie: "Tiếng Việt",
         eng: "English",
+      },
+      psmOptions: {
+        autoOsd: "OSD",
+        auto: "Auto",
+        singleBlock: "Single Block",
+        singleLine: "Single Line",
+        sparseText: "Sparse Text",
       },
     },
     jsonToExcel: {
