@@ -77,15 +77,9 @@ export default {
       let me = this;
       let result = "";
       if (me.selectedFiles && me.selectedFiles.length > 0) {
-        if (me.selectedFiles.length == 1) {
-          result = `${me.selectedFiles[0].name} (${me.formatFileSize(
-            me.selectedFiles[0].size,
-          )})`;
-        } else {
-          result = `${me.$t("i18nCommon.fileSelected")}: ${
-            me.selectedFiles.length
-          }`;
-        }
+        result = `${me.$t("i18nCommon.fileSelected")}: ${
+          me.selectedFiles.length
+        }`;
       }
       return result;
     },
