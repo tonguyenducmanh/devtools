@@ -62,7 +62,6 @@
               :placeHolder="
                 $t('i18nCommon.OpticalCharacterRecognition.placeHolder')
               "
-              :readOnly="true"
               height="200px"
             ></TDTextarea>
             <div class="ocr-item-actions">
