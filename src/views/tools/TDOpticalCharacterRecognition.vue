@@ -108,6 +108,18 @@
               />
             </div>
             <div class="sidebar-item">
+              <span class="sidebar-label">{{
+                $t("i18nCommon.OpticalCharacterRecognition.confidenceThreshold")
+              }}</span>
+              <TDInput
+                v-model="confidenceThreshold"
+                :inputType="'number'"
+                :width="50"
+                :noMargin="true"
+                :placeHolder="'90'"
+              />
+            </div>
+            <div class="sidebar-item">
               <TDCheckbox
                 v-model="enablePreprocessing"
                 :label="
@@ -340,8 +352,16 @@ export default {
                 tessedit_pageseg_mode: me.selectedPSM,
               },
             );
-            item.text = result.data.text;
-            item.confidence = Math.round(result.data.confidence);
+            const rawConfidence = Math.round(result.data.confidence);
+            let text = result.data.text;
+            if (result.data.words && result.data.words.length > 0) {
+              const filteredWords = result.data.words
+                .filter(word => word.confidence >= me.confidenceThreshold)
+                .map(word => word.text);
+              text = filteredWords.join(" ");
+            }
+            item.text = text;
+            item.confidence = rawConfidence;
           } catch (error) {
             console.error("OCR Error:", error);
             item.text = "Error: " + error.message;
@@ -407,6 +427,7 @@ export default {
       ocrResults: [],
       selectedLanguage: "vie",
       selectedPSM: "PSM_AUTO_OSD",
+      confidenceThreshold: 90,
       languageOptions: [
         {
           value: "vie",

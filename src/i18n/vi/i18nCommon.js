@@ -151,6 +151,7 @@ export default {
       psm: "Chế độ quét",
       library: "Thư viện OCR",
       confidence: "Độ chính xác",
+      confidenceThreshold: "Ngưỡng confidence",
       lang: {
         vie: "Tiếng Việt",
         eng: "English",

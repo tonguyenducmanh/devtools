@@ -151,6 +151,7 @@ export default {
       psm: "Scan mode",
       library: "OCR Library",
       confidence: "Confidence",
+      confidenceThreshold: "Confidence threshold",
       lang: {
         vie: "Tiếng Việt",
         eng: "English",
