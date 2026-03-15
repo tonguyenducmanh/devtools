@@ -138,12 +138,6 @@ export default {
     const activeTabId = computed(() => state.activeTabId);
     const isTabMode = computed(() => {
       let isMultiTab = state.tabs.length > 0;
-      let defaulAppName = tdUtility.defaultTitleApp();
-      if (isMultiTab) {
-        document.title = `${window.__env.author} | Multi tabs`;
-      } else {
-        document.title = defaulAppName;
-      }
       return isMultiTab;
     });
 

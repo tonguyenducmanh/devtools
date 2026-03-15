@@ -16,6 +16,8 @@ class TDAppStartup {
     utility.setTheme(userSetting["theme"]);
     // đảm bảo rằng __env là một đối tượng bất biến
     utility.freezeDeepObject(window.__env);
+    let defaulAppName = utility.defaultTitleApp();
+    document.title = defaulAppName;
   }
 }
 
