@@ -22,8 +22,6 @@
 import TDSidebar from "@/views/misc/TDSidebar.vue";
 import TDDynamicTabView from "@/views/misc/TDDynamicTabView.vue";
 import TDFooterApp from "@/views/misc/TDFooterApp.vue";
-import TDShortcutAction from "@/common/TDShortcutAction.js";
-import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import "@/common/TDPrototype.js";
 import TDAppStartup from "@/common/TDAppStartup.js";
 
@@ -31,7 +29,6 @@ export default {
   components: { TDSidebar, TDDynamicTabView, TDFooterApp },
   created() {
     let me = this;
-    me.registerShortcuts();
     me.processWhenRunApp();
   },
   data() {
@@ -40,8 +37,10 @@ export default {
     };
   },
   async mounted() {
+    // Đợi toàn bộ DOM + component con render xong
     await this.$nextTick();
 
+    // Có thể delay nhẹ để tránh giật UI (tuỳ chọn)
     setTimeout(() => {
       this.appLoading = false;
     }, 500);
@@ -51,20 +50,6 @@ export default {
     async processWhenRunApp() {
       let me = this;
       await TDAppStartup.initialize();
-    },
-    registerShortcuts() {
-      TDShortcutAction.register("openSearch", {
-        key: "p",
-        labelKey: "i18nCommon.footer.search",
-        tooltipKey: "i18nCommon.footer.searchTooltip",
-        requireCtrl: true,
-        action: () => {
-          TDDialogUtil.showPopup({
-            dialogType: TDDialogEnum.TDGoToToolPopup,
-            ownerForm: this,
-          });
-        },
-      });
     },
   },
 };

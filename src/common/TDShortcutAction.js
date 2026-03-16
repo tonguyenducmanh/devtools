@@ -65,10 +65,10 @@ class TDShortcutAction {
 
   handleKeydown(event) {
     for (const [name, config] of this.activeShortcuts) {
-      const ctrlMatch = config.requireCtrl ? (event.metaKey || event.ctrlKey) : !event.ctrlKey && !event.metaKey && !event.shiftKey;
-      const shiftMatch = config.requireShift ? event.shiftKey : !event.shiftKey;
-      
-      if (ctrlMatch && shiftMatch && event.key === config.key) {
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.key === config.key
+      ) {
         event.preventDefault();
         if (config.action) {
           config.action();
