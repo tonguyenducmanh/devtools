@@ -5,14 +5,7 @@
         <div class="loader"></div>
       </div>
     </transition>
-    <div class="td-header-wrap" :class="{ 'td-header-hidden': !showHeader }">
-      <TDHeader v-show="showHeader" />
-      <TDToggleArea
-        :collapsed="!showHeader"
-        edge="top"
-        @toggle="toggleHeader"
-      />
-    </div>
+
     <div class="flex td-content-wrap">
       <div class="td-sidebar-wrap">
         <TDSidebar />
@@ -26,16 +19,14 @@
 </template>
 
 <script>
-import TDHeader from "@/views/misc/TDHeader.vue";
 import TDSidebar from "@/views/misc/TDSidebar.vue";
 import TDDynamicTabView from "@/views/misc/TDDynamicTabView.vue";
 import TDFooterApp from "@/views/misc/TDFooterApp.vue";
 import "@/common/TDPrototype.js";
 import TDAppStartup from "@/common/TDAppStartup.js";
-import TDToggleArea from "@/components/TDToggleArea.vue";
 
 export default {
-  components: { TDHeader, TDSidebar, TDToggleArea, TDDynamicTabView, TDFooterApp },
+  components: { TDSidebar, TDDynamicTabView, TDFooterApp },
   created() {
     let me = this;
     me.processWhenRunApp();
@@ -43,7 +34,6 @@ export default {
   data() {
     return {
       appLoading: true,
-      showHeader: true,
     };
   },
   async mounted() {
@@ -57,17 +47,8 @@ export default {
   },
 
   methods: {
-    async toggleHeader() {
-      let me = this;
-      me.showHeader = !me.showHeader;
-      await me.$tdUtility.saveUserSettings("showHeader", me.showHeader);
-    },
-    /**
-     * Xử lý 1 số kịch bản khi khởi chạy ứng dụng
-     */
     async processWhenRunApp() {
       let me = this;
-      me.showHeader = await me.$tdUtility.getUserSettings("showHeader");
       await TDAppStartup.initialize();
     },
   },

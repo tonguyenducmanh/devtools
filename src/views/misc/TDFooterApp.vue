@@ -1,48 +1,57 @@
 <template>
   <div class="td-footer-app">
     <div class="td-footer-shortcuts">
-        <div
-          v-for="shortcut in shortcuts"
-          :key="shortcut.key"
-          class="td-shortcut-item"
-          @click="shortcut.action"
-          v-tooltip="$t(shortcut.tooltipKey)"
-        >
+      <div
+        v-for="shortcut in activeShortcuts"
+        :key="shortcut.key"
+        class="td-shortcut-item"
+        @click="shortcut.action"
+        v-tooltip="$t(shortcut.tooltipKey)"
+      >
         <span class="td-shortcut-keys">
-          <span
-            v-for="(key, idx) in shortcut.keys"
-            :key="idx"
-            class="td-shortcut-key"
-          >
-            {{ key }}
-          </span>
+          <span class="td-shortcut-key">Ctrl</span>
+          <span class="td-shortcut-key">{{ shortcut.key.toUpperCase() }}</span>
         </span>
         <span class="td-shortcut-label">{{ $t(shortcut.labelKey) }}</span>
       </div>
+    </div>
+    <div class="td-footer-actions">
+      <div
+        class="td-icon td-setting-icon"
+        @click="goToUserSetting"
+        v-tooltip="$t('i18nCommon.feature.userSettings')"
+      ></div>
     </div>
   </div>
 </template>
 
 <script>
+import { useTabManager } from "@/stores/TDTabManager.js";
+import TDShortcutAction from "@/common/TDShortcutAction.js";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 
 export default {
   name: "TDFooterApp",
+  setup() {
+    const { openTab } = useTabManager();
+    return { openTab };
+  },
   data() {
     return {
-      shortcuts: [
+      globalShortcuts: [
         {
-          key: "search",
-          keys: ["Ctrl", "P"],
+          key: "p",
           labelKey: "i18nCommon.footer.search",
           tooltipKey: "i18nCommon.footer.searchTooltip",
           action: this.openSearchPopup,
         },
       ],
+      activeShortcuts: [],
     };
   },
   mounted() {
     window.addEventListener("keydown", this.handleGlobalKeydown, true);
+    this.updateActiveShortcuts();
   },
   beforeUnmount() {
     window.removeEventListener("keydown", this.handleGlobalKeydown, true);
@@ -60,6 +69,29 @@ export default {
         this.openSearchPopup();
       }
     },
+    updateActiveShortcuts() {
+      const componentShortcuts = TDShortcutAction.getActiveShortcuts().map(s => ({
+        key: s.key,
+        labelKey: s.labelKey,
+        tooltipKey: s.tooltipKey,
+        action: s.action,
+      }));
+      this.activeShortcuts = [...this.globalShortcuts, ...componentShortcuts];
+    },
+    goToUserSetting() {
+      let me = this;
+      me.openTab({
+        titleKey: "i18nCommon.feature.userSettings",
+        groupPath: "",
+        path: "/TDUserSettings",
+        component: () => import("@/views/misc/TDUserSettings.vue"),
+      });
+    },
+  },
+  created() {
+    TDShortcutAction.onChange(() => {
+      this.updateActiveShortcuts();
+    });
   },
 };
 </script>
@@ -119,5 +151,21 @@ export default {
 .td-shortcut-label {
   font-size: var(--font-size-medium-rare);
   color: var(--text-secondary-color);
+}
+
+.td-footer-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.td-setting-icon {
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+  }
 }
 </style>
