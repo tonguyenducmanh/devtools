@@ -1,6 +1,6 @@
 <template>
   <div class="flex td-header-container">
-    <div class="flex td-app-name">
+    <div class="td-app-name">
       <div class="td-logo" @click="goToWelcome"></div>
       <div
         class="td-app-title"
@@ -9,104 +9,169 @@
       >
         {{ appName }}
       </div>
-      <!-- Search Box -->
-      <div class="td-search-container">
-        <div class="td-search-box" @click="openSearchModal">
-          <div class="td-icon td-search-icon"></div>
-          <span class="td-search-placeholder">{{
-            $t("i18nCommon.search.placeholder")
-          }}</span>
-          <div class="td-search-shortcut">
-            <span>CTRL/⌘</span>
-            <span>P</span>
-          </div>
+      <div class="td-header-menu">
+        <div
+          class="td-menu-item"
+          @mouseenter="onSettingsMouseEnter"
+          @mouseleave="onSettingsMouseLeave"
+        >
+          <span>{{ $t('i18nCommon.settings.title') }}</span>
+        </div>
+        <div
+          class="td-menu-item"
+          @mouseenter="onHelpMouseEnter"
+          @mouseleave="onHelpMouseLeave"
+        >
+          <span>{{ $t('i18nCommon.help.title') }}</span>
         </div>
       </div>
     </div>
 
-    <!-- Quote Marquee -->
-    <div class="td-quote-container" v-if="showQuote && quoteOfDay">
-      <div class="td-quote-marquee">
-        <span class="td-quote-text">
-          {{ quoteOfDay.q }} — {{ quoteOfDay.a }}
-        </span>
-      </div>
-    </div>
-
-    <div
-      class="td-icon td-setting-icon"
-      @click="goToUserSetting"
-      v-tooltip="$t('i18nCommon.feature.userSettings')"
-    ></div>
+    <!-- Flyout Menu -->
+    <Teleport to="body">
+      <Transition name="td-flyout">
+        <div
+          v-if="hoveredMenu"
+          class="td-header-flyout"
+          :style="flyoutStyle"
+          @mouseenter="onFlyoutMouseEnter"
+          @mouseleave="onFlyoutMouseLeave"
+        >
+          <template v-if="hoveredMenu === 'help'">
+            <div
+              class="td-flyout-item"
+              @click="onGoToSource"
+            >
+              {{ $t('i18nCommon.tdheader.goToSource') }}
+            </div>
+            <div
+              class="td-flyout-item"
+              @click="onDownloadAgent"
+            >
+              {{ $t('i18nCommon.feature.agentDownload.title') }}
+            </div>
+            <div
+              class="td-flyout-item"
+              @click="onPingAgent"
+            >
+              {{ $t('i18nCommon.ping') }}
+            </div>
+            <div
+              class="td-flyout-item"
+              @click="onReloadApp"
+            >
+              {{ $t('i18nCommon.help.reloadApp') }}
+            </div>
+          </template>
+          <template v-else-if="hoveredMenu === 'settings'">
+            <div
+              class="td-flyout-item"
+              @click="goToUserSettings"
+            >
+              {{ $t('i18nCommon.feature.userSettings') }}
+            </div>
+          </template>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
 <script>
-import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import { useTabManager } from "@/stores/TDTabManager.js";
-import { getQuoteOfDay } from "@/common/TDQuotes.js";
+import TDAgentAPI from "@/common/api/request/AgentAPI/TDAgentAPI.js";
+
 export default {
   name: "TDHeader",
   setup() {
     const { openTab, exitTabMode } = useTabManager();
     return { openTab, exitTabMode };
   },
+  data() {
+    return {
+      hoveredMenu: null,
+      flyoutStyle: {},
+      _leaveTimer: null,
+    };
+  },
   computed: {
     appName() {
       return window.__env.appName;
     },
-    showQuote() {
-      return window.__env?.quoteConfig?.showQuote ?? true;
-    },
-    quoteOfDay() {
-      return getQuoteOfDay();
-    },
-  },
-  created() {
-    let me = this;
-  },
-  mounted() {
-    // Thêm keyboard shortcut Cmd+P / Ctrl+P
-    document.addEventListener("keydown", this.handleGlobalKeydown);
-  },
-  beforeUnmount() {
-    document.removeEventListener("keydown", this.handleGlobalKeydown);
-  },
-  props: {},
-  data() {
-    let me = this;
-    return {};
   },
   methods: {
     goToWelcome() {
-      let me = this;
-      me.exitTabMode();
+      this.exitTabMode();
     },
-    goToUserSetting() {
-      let me = this;
-      me.openTab({
+    goToUserSettings() {
+      this.openTab({
         titleKey: "i18nCommon.feature.userSettings",
         groupPath: "",
         path: "/TDUserSettings",
         component: () => import("@/views/misc/TDUserSettings.vue"),
       });
+      this.hoveredMenu = null;
     },
-
-    // Search methods
-    openSearchModal() {
-      // nếu không tồn tại request thì show popup tạo mới
-      TDDialogUtil.showPopup({
-        dialogType: TDDialogEnum.TDGoToToolPopup,
-        ownerForm: this,
-      });
+    onGoToSource() {
+      this.$tdUtility.goToSource();
+      this.hoveredMenu = null;
     },
-
-    handleGlobalKeydown(event) {
-      // Cmd+P hoặc Ctrl+P để mở search
-      if ((event.metaKey || event.ctrlKey) && event.key === "p") {
-        event.preventDefault();
-        this.openSearchModal();
+    onDownloadAgent() {
+      const url = window.__env?.githubSource?.releasesUrl;
+      window.open(url, "_blank");
+      this.hoveredMenu = null;
+    },
+    async onPingAgent() {
+      try {
+        let res = await new TDAgentAPI().heathCheck();
+        if (res && res.success && res.data) {
+          this.$tdToast.success(res.data);
+        } else {
+          this.$tdToast.success(res);
+        }
+      } catch (ex) {
+        this.$tdUtility.showErrorNotFoundAgentServer();
       }
+      this.hoveredMenu = null;
+    },
+    onReloadApp() {
+      this.$tdUtility.reloadApp();
+      this.hoveredMenu = null;
+    },
+    showFlyout(menu, event) {
+      clearTimeout(this._leaveTimer);
+      const rect = event.currentTarget.getBoundingClientRect();
+      this.flyoutStyle = {
+        position: "fixed",
+        top: `${rect.bottom + 4}px`,
+        left: `${rect.left}px`,
+        zIndex: 1000,
+      };
+      this.hoveredMenu = menu;
+    },
+    onHelpMouseEnter(event) {
+      this.showFlyout("help", event);
+    },
+    onHelpMouseLeave() {
+      this._leaveTimer = setTimeout(() => {
+        this.hoveredMenu = null;
+      }, 120);
+    },
+    onSettingsMouseEnter(event) {
+      this.showFlyout("settings", event);
+    },
+    onSettingsMouseLeave() {
+      this._leaveTimer = setTimeout(() => {
+        this.hoveredMenu = null;
+      }, 120);
+    },
+    onFlyoutMouseEnter() {
+      clearTimeout(this._leaveTimer);
+    },
+    onFlyoutMouseLeave() {
+      this._leaveTimer = setTimeout(() => {
+        this.hoveredMenu = null;
+      }, 120);
     },
   },
 };
@@ -121,111 +186,79 @@ export default {
   padding: var(--padding) calc(var(--padding) * 1.5);
 
   .td-app-name {
-    column-gap: var(--padding);
+    display: flex;
+    align-items: center;
+    gap: var(--padding);
     .td-logo {
-      width: 40px;
-      height: 40px;
+      width: 24px;
+      height: 24px;
       background: url(@/assets/favicon.ico);
       background-size: cover;
       cursor: pointer;
     }
     .td-app-title {
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
     }
   }
 
-  .td-search-container {
-    position: relative;
-    width: 200px;
-    margin: 0 var(--padding);
-
-    .td-search-box {
-      display: flex;
-      align-items: center;
-      padding: 8px 12px;
-      background-color: var(--bg-thirt-color);
-      border: 1px solid transparent;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      transition: all 0.2s ease;
-
-      &:hover {
-        border: 1px solid var(--focus-color);
-      }
-
-      .td-search-placeholder {
-        flex: 1;
-        font-size: 14px;
-      }
-
-      .td-search-shortcut {
-        display: flex;
-        gap: 2px;
-        span {
-          padding: 4px 6px;
-          background-color: var(--bg-layer-color);
-          border: 1px solid var(--border-color);
-          border-radius: 4px;
-          font-size: 11px;
-          font-weight: 500;
-          color: var(--text-color-secondary);
-        }
-      }
-    }
+  .td-header-menu {
+    display: flex;
+    align-items: center;
+    gap: var(--padding);
   }
 
-  .td-quote-container {
-    flex: 1;
-    overflow: hidden;
-    mask-image: linear-gradient(
-      to right,
-      transparent,
-      black 10%,
-      black 90%,
-      transparent
-    );
-    -webkit-mask-image: linear-gradient(
-      to right,
-      transparent,
-      black 10%,
-      black 90%,
-      transparent
-    );
+  .td-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: var(--font-size-medium-rare);
+    color: var(--text-color);
+    transition: background-color 0.15s ease;
 
-    .td-quote-marquee {
-      display: inline-block;
-      white-space: nowrap;
-      animation: td-quote-scroll 30s linear infinite;
-      will-change: transform;
-
-      .td-quote-text {
-        font-size: 14px;
-        font-style: italic;
-        color: var(--text-secondary-color);
-        padding-right: 50px;
-      }
+    &:hover {
+      background-color: var(--bg-layer-color);
     }
   }
 }
+</style>
 
-@keyframes td-quote-scroll {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
+<style lang="scss">
+.td-flyout-enter-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.td-flyout-leave-active {
+  transition: opacity 0.1s ease, transform 0.1s ease;
+}
+.td-flyout-enter-from,
+.td-flyout-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 
-// Responsive
-@media (max-width: 768px) {
-  .td-search-container {
-    max-width: 200px;
-    .td-search-shortcut {
-      display: none;
-    }
+.td-header-flyout {
+  background-color: var(--bg-main-color);
+  border: 1px solid var(--bg-layer-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 4px;
+  min-width: 160px;
+}
+
+.td-flyout-item {
+  display: block;
+  padding: 8px 12px;
+  font-size: var(--font-size-medium-rare);
+  color: var(--text-color);
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+
+  &:hover {
+    background-color: var(--bg-layer-color);
   }
 }
 </style>

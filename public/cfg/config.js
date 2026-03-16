@@ -15,6 +15,7 @@
   };
   window.__env.githubSource = {
     url: "https://github.com/tonguyenducmanh/devtools",
+    releasesUrl: "https://github.com/tonguyenducmanh/devtools/releases",
   };
   window.__env.oneTimePasswordAuthen = {
     showDecodedInfo: false,

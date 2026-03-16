@@ -55,6 +55,13 @@ export default {
         switch: "Switch language",
       },
     },
+    help: {
+      title: "Help",
+      reloadApp: "Reload page",
+    },
+    settings: {
+      title: "Settings",
+    },
     feature: {
       welcome: "Welcome",
       userSettings: "User setting",

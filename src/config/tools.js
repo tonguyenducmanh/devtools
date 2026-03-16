@@ -20,15 +20,6 @@ const sidebarConfig = [
   },
   {
     type: "route",
-    name: "agentdownload",
-    component: () => import("@/views/tools/TDAgentDownload.vue"),
-    meta: {
-      titleKey: "i18nCommon.feature.agentDownload.title",
-      helpKey: "i18nCommon.apiTesting.toolTipDownloadAgent",
-    },
-  },
-  {
-    type: "route",
     name: "TDOneTimePassword",
     component: () => import("@/views/tools/TDOneTimePassword.vue"),
     meta: {

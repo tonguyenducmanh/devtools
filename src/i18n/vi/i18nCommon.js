@@ -55,6 +55,13 @@ export default {
         switch: "Đổi ngôn ngữ",
       },
     },
+    help: {
+      title: "Trợ giúp",
+      reloadApp: "Tải lại trang",
+    },
+    settings: {
+      title: "Thiết lập",
+    },
     feature: {
       welcome: "Tổng quan",
       userSettings: "Thiết lập ứng dụng",

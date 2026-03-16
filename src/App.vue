@@ -5,13 +5,8 @@
         <div class="loader"></div>
       </div>
     </transition>
-    <div class="td-header-wrap" :class="{ 'td-header-hidden': !showHeader }">
-      <TDHeader v-show="showHeader" />
-      <TDToggleArea
-        :collapsed="!showHeader"
-        edge="top"
-        @toggle="toggleHeader"
-      />
+    <div class="td-header-wrap">
+      <TDHeader />
     </div>
     <div class="flex td-content-wrap">
       <div class="td-sidebar-wrap">
@@ -21,19 +16,23 @@
         <TDDynamicTabView />
       </div>
     </div>
+    <div class="td-footer-wrap">
+      <TDFooterApp />
+    </div>
   </div>
 </template>
 
 <script>
 import TDHeader from "@/views/misc/TDHeader.vue";
+import TDFooterApp from "@/views/misc/TDFooterApp.vue";
 import TDSidebar from "@/views/misc/TDSidebar.vue";
 import TDDynamicTabView from "@/views/misc/TDDynamicTabView.vue";
+import TDDialogUtil from "@/common/TDDialogUtil.js";
 import "@/common/TDPrototype.js";
 import TDAppStartup from "@/common/TDAppStartup.js";
-import TDToggleArea from "@/components/TDToggleArea.vue";
 
 export default {
-  components: { TDHeader, TDSidebar, TDToggleArea, TDDynamicTabView },
+  components: { TDHeader, TDFooterApp, TDSidebar, TDDynamicTabView },
   created() {
     let me = this;
     me.processWhenRunApp();
@@ -41,7 +40,6 @@ export default {
   data() {
     return {
       appLoading: true,
-      showHeader: true,
     };
   },
   async mounted() {
@@ -52,20 +50,17 @@ export default {
     setTimeout(() => {
       this.appLoading = false;
     }, 500);
+
+    // Set global app context for dialogs
+    TDDialogUtil.setAppContext(this.$root.$.appContext);
   },
 
   methods: {
-    async toggleHeader() {
-      let me = this;
-      me.showHeader = !me.showHeader;
-      await me.$tdUtility.saveUserSettings("showHeader", me.showHeader);
-    },
     /**
      * Xử lý 1 số kịch bản khi khởi chạy ứng dụng
      */
     async processWhenRunApp() {
       let me = this;
-      me.showHeader = await me.$tdUtility.getUserSettings("showHeader");
       await TDAppStartup.initialize();
     },
   },
@@ -95,10 +90,7 @@ export default {
     position: relative;
     border-radius: calc(var(--border-radius) * 1.5);
     width: 100%;
-    height: 50px;
-  }
-  .td-header-hidden {
-    height: 1px;
+    height: 32px;
   }
   .td-content-wrap {
     padding: var(--padding);
@@ -123,6 +115,11 @@ export default {
       border-radius: calc(var(--border-radius) * 1.5);
       background-color: var(--bg-main-color);
     }
+  }
+  .td-footer-wrap {
+    width: 100%;
+    height: 32px;
+    flex-shrink: 0;
   }
 }
 .td-fade-loading-enter-active,

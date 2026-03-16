@@ -34,6 +34,11 @@ class TDDialogUtil {
      */
     this.activeDialogs = new Map();
     this.dialogCounter = 0;
+    this.globalAppContext = null;
+  }
+
+  setAppContext(context) {
+    this.globalAppContext = context;
   }
 
   async loadComponent(dialogType) {
@@ -73,6 +78,8 @@ class TDDialogUtil {
     // kế thừa appContext (i18n, store, directive…)
     if (ownerForm?.$?.appContext) {
       Object.assign(app._context, ownerForm.$.appContext);
+    } else if (this.globalAppContext) {
+      Object.assign(app._context, this.globalAppContext);
     }
 
     app.mount(container);

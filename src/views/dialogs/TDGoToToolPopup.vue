@@ -73,7 +73,8 @@ export default {
   props: {
     ownerForm: {
       type: Object,
-      required: true,
+      required: false,
+      default: null,
     },
   },
 
