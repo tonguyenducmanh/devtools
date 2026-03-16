@@ -32,6 +32,8 @@
         :disabled="readOnly"
         :style="borderRadiusStyle"
         @input="changeInputValue"
+        @focus="handleFocus"
+        @blur="handleBlur"
         @scroll="handleScroll"
         @dragover="handleDragOver"
         @dragleave="handleDragLeave"
@@ -57,6 +59,7 @@
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
 import * as monaco from "monaco-editor";
 import TDUtility from "@/common/TDUtility.js";
+import TDShortcutAction from "@/common/TDShortcutAction.js";
 
 export default {
   name: "TDTextarea",
@@ -69,8 +72,10 @@ export default {
   mounted() {
     let me = this;
     this.updateHighlight();
+    this.registerShortcut();
   },
   beforeUnmount() {
+    this.unregisterShortcut();
   },
   computed: {
     styleComputed() {
@@ -163,6 +168,35 @@ export default {
     },
   },
   methods: {
+    registerShortcut() {
+      TDShortcutAction.register("uuid", {
+        key: "u",
+        labelKey: "i18nCommon.footer.uuid",
+        tooltipKey: "i18nCommon.footer.uuidTooltip",
+        action: this.handleUUIDShortcut,
+      });
+    },
+    unregisterShortcut() {
+      TDShortcutAction.unregister("uuid");
+    },
+    handleUUIDShortcut() {
+      const uuid = TDUtility.newGuid();
+      const textarea = this.$refs[this.inputId];
+      if (textarea) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const value = textarea.value;
+        textarea.value = value.substring(0, start) + uuid + value.substring(end);
+        textarea.selectionStart = textarea.selectionEnd = start + uuid.length;
+        textarea.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    },
+    handleFocus() {
+      this.registerShortcut();
+    },
+    handleBlur() {
+      this.unregisterShortcut();
+    },
     focus() {
       let me = this;
       if (me.$refs[me.inputId]) {
