@@ -23,10 +23,6 @@ export default {
     copy: "Copy",
     footerHelp:
       "Select the row number to copy the entire row, select a specific cell to copy a single cell.",
-    footer: {
-      search: "Search",
-      searchTooltip: "Open search (Ctrl+P)",
-    },
     noDataAvailable: "No data available",
     history: {
       title: "History",
