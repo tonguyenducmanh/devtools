@@ -23,6 +23,10 @@ export default {
     copy: "Sao chép",
     footerHelp:
       "Chọn vào số dòng để copy cả dòng, chọn vào 1 cell cụ thể để copy 1 cell",
+    footer: {
+      search: "Tìm kiếm",
+      searchTooltip: "Mở tìm kiếm (Ctrl+P)",
+    },
     noDataAvailable: "Không có dữ liệu",
     history: {
       title: "Lịch sử",

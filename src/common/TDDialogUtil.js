@@ -34,6 +34,32 @@ class TDDialogUtil {
      */
     this.activeDialogs = new Map();
     this.dialogCounter = 0;
+    this._boundKeyHandler = null;
+  }
+
+  initGlobalListeners() {
+    if (this._boundKeyHandler) return;
+    this._boundKeyHandler = (event) => {
+      if (event.key === "Escape" && this.activeDialogs.size > 0) {
+        const topDialogId = this.getTopDialogId();
+        if (topDialogId) {
+          this.closeById(topDialogId);
+        }
+      }
+    };
+    document.addEventListener("keydown", this._boundKeyHandler);
+  }
+
+  removeGlobalListeners() {
+    if (this._boundKeyHandler) {
+      document.removeEventListener("keydown", this._boundKeyHandler);
+      this._boundKeyHandler = null;
+    }
+  }
+
+  getTopDialogId() {
+    const ids = Array.from(this.activeDialogs.keys());
+    return ids[ids.length - 1];
   }
 
   async loadComponent(dialogType) {
@@ -87,6 +113,8 @@ class TDDialogUtil {
       container,
     });
 
+    this.initGlobalListeners();
+
     return dialogId;
   }
 
@@ -101,6 +129,10 @@ class TDDialogUtil {
     dialog.container.remove();
 
     this.activeDialogs.delete(dialogId);
+
+    if (this.activeDialogs.size === 0) {
+      this.removeGlobalListeners();
+    }
     return true;
   }
 
@@ -111,6 +143,7 @@ class TDDialogUtil {
     for (const dialogId of this.activeDialogs.keys()) {
       this.closeById(dialogId);
     }
+    this.removeGlobalListeners();
   }
 
   /**

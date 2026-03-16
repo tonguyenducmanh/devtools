@@ -9,19 +9,6 @@
       >
         {{ appName }}
       </div>
-      <!-- Search Box -->
-      <div class="td-search-container">
-        <div class="td-search-box" @click="openSearchModal">
-          <div class="td-icon td-search-icon"></div>
-          <span class="td-search-placeholder">{{
-            $t("i18nCommon.search.placeholder")
-          }}</span>
-          <div class="td-search-shortcut">
-            <span>CTRL/⌘</span>
-            <span>P</span>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Quote Marquee -->
@@ -42,7 +29,6 @@
 </template>
 
 <script>
-import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import { useTabManager } from "@/stores/TDTabManager.js";
 import { getQuoteOfDay } from "@/common/TDQuotes.js";
 export default {
@@ -62,21 +48,7 @@ export default {
       return getQuoteOfDay();
     },
   },
-  created() {
-    let me = this;
-  },
-  mounted() {
-    // Thêm keyboard shortcut Cmd+P / Ctrl+P
-    document.addEventListener("keydown", this.handleGlobalKeydown);
-  },
-  beforeUnmount() {
-    document.removeEventListener("keydown", this.handleGlobalKeydown);
-  },
-  props: {},
-  data() {
-    let me = this;
-    return {};
-  },
+
   methods: {
     goToWelcome() {
       let me = this;
@@ -90,23 +62,6 @@ export default {
         path: "/TDUserSettings",
         component: () => import("@/views/misc/TDUserSettings.vue"),
       });
-    },
-
-    // Search methods
-    openSearchModal() {
-      // nếu không tồn tại request thì show popup tạo mới
-      TDDialogUtil.showPopup({
-        dialogType: TDDialogEnum.TDGoToToolPopup,
-        ownerForm: this,
-      });
-    },
-
-    handleGlobalKeydown(event) {
-      // Cmd+P hoặc Ctrl+P để mở search
-      if ((event.metaKey || event.ctrlKey) && event.key === "p") {
-        event.preventDefault();
-        this.openSearchModal();
-      }
     },
   },
 };

@@ -21,6 +21,7 @@
         <TDDynamicTabView />
       </div>
     </div>
+    <TDFooterApp />
   </div>
 </template>
 
@@ -28,12 +29,13 @@
 import TDHeader from "@/views/misc/TDHeader.vue";
 import TDSidebar from "@/views/misc/TDSidebar.vue";
 import TDDynamicTabView from "@/views/misc/TDDynamicTabView.vue";
+import TDFooterApp from "@/views/misc/TDFooterApp.vue";
 import "@/common/TDPrototype.js";
 import TDAppStartup from "@/common/TDAppStartup.js";
 import TDToggleArea from "@/components/TDToggleArea.vue";
 
 export default {
-  components: { TDHeader, TDSidebar, TDToggleArea, TDDynamicTabView },
+  components: { TDHeader, TDSidebar, TDToggleArea, TDDynamicTabView, TDFooterApp },
   created() {
     let me = this;
     me.processWhenRunApp();
@@ -82,6 +84,7 @@ export default {
   font-size: var(--font-size-medium);
   background-color: var(--bg-layer-color);
   position: relative;
+  min-height: 0;
   .td-loading-app {
     position: absolute;
     top: 0;
