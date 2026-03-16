@@ -6,6 +6,7 @@
         :key="shortcut.key"
         class="td-shortcut-item"
         @click="shortcut.action"
+        v-tooltip="$t(shortcut.tooltipKey)"
       >
         <span class="td-shortcut-keys">
           <span v-if="shortcut.requireCtrl" class="td-shortcut-key">Ctrl</span>
