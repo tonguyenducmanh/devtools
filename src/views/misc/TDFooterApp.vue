@@ -9,7 +9,7 @@
         v-tooltip="$t(shortcut.tooltipKey)"
       >
         <span class="td-shortcut-keys">
-          <span class="td-shortcut-key">Ctrl</span>
+          <span v-if="shortcut.requireCtrl" class="td-shortcut-key">Ctrl</span>
           <span class="td-shortcut-key">{{ shortcut.key.toUpperCase() }}</span>
         </span>
         <span class="td-shortcut-label">{{ $t(shortcut.labelKey) }}</span>
@@ -38,45 +38,22 @@ export default {
   },
   data() {
     return {
-      globalShortcuts: [
-        {
-          key: "p",
-          labelKey: "i18nCommon.footer.search",
-          tooltipKey: "i18nCommon.footer.searchTooltip",
-          action: this.openSearchPopup,
-        },
-      ],
       activeShortcuts: [],
     };
   },
   mounted() {
-    window.addEventListener("keydown", this.handleGlobalKeydown, true);
     this.updateActiveShortcuts();
   },
-  beforeUnmount() {
-    window.removeEventListener("keydown", this.handleGlobalKeydown, true);
-  },
   methods: {
-    openSearchPopup() {
-      TDDialogUtil.showPopup({
-        dialogType: TDDialogEnum.TDGoToToolPopup,
-        ownerForm: this,
-      });
-    },
-    handleGlobalKeydown(event) {
-      if ((event.metaKey || event.ctrlKey) && event.key === "p") {
-        event.preventDefault();
-        this.openSearchPopup();
-      }
-    },
     updateActiveShortcuts() {
       const componentShortcuts = TDShortcutAction.getActiveShortcuts().map(s => ({
         key: s.key,
         labelKey: s.labelKey,
         tooltipKey: s.tooltipKey,
+        requireCtrl: s.requireCtrl,
         action: s.action,
       }));
-      this.activeShortcuts = [...this.globalShortcuts, ...componentShortcuts];
+      this.activeShortcuts = [...componentShortcuts];
     },
     goToUserSetting() {
       let me = this;
