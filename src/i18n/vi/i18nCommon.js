@@ -26,8 +26,6 @@ export default {
     footer: {
       search: "Tìm kiếm",
       searchTooltip: "Mở tìm kiếm (Ctrl+P)",
-      uuid: "UUID",
-      uuidTooltip: "Tạo UUID (Ctrl+U)",
     },
     noDataAvailable: "Không có dữ liệu",
     history: {

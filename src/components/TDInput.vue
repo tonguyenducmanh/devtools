@@ -14,8 +14,6 @@
       :placeholder="placeHolder || $t('i18nCommon.typeInput')"
       :value="modelValue"
       @input="changeInputValue"
-      @focus="handleFocus"
-      @blur="handleBlur"
       :disabled="readOnly"
       spellcheck="false"
       :type="inputType"
@@ -31,18 +29,14 @@
 
 <script>
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
-import TDShortcutAction from "@/common/TDShortcutAction.js";
 
 export default {
   name: "TDInput",
   mixins: [TDStylePremitiveMixin],
 
-  mounted() {
-    this.registerShortcut();
-  },
-  beforeUnmount() {
-    this.unregisterShortcut();
-  },
+  created() {},
+  mounted() {},
+  methods: {},
   computed: {
     inputId() {
       return `td-input-${this.$.uid}`;
@@ -86,35 +80,6 @@ export default {
   },
   watch: {},
   methods: {
-    registerShortcut() {
-      TDShortcutAction.register("uuid", {
-        key: "u",
-        labelKey: "i18nCommon.footer.uuid",
-        tooltipKey: "i18nCommon.footer.uuidTooltip",
-        action: this.handleUUIDShortcut,
-      });
-    },
-    unregisterShortcut() {
-      TDShortcutAction.unregister("uuid");
-    },
-    handleUUIDShortcut() {
-      const uuid = this.$tdUtility.newGuid();
-      const input = this.$refs[this.inputId];
-      if (input) {
-        const start = input.selectionStart;
-        const end = input.selectionEnd;
-        const value = input.value;
-        input.value = value.substring(0, start) + uuid + value.substring(end);
-        input.selectionStart = input.selectionEnd = start + uuid.length;
-        input.dispatchEvent(new Event("input", { bubbles: true }));
-      }
-    },
-    handleFocus() {
-      this.registerShortcut();
-    },
-    handleBlur() {
-      this.unregisterShortcut();
-    },
     changeInputValue(e) {
       let me = this;
       let valueEmit = e.target.value;

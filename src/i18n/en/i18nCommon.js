@@ -26,8 +26,6 @@ export default {
     footer: {
       search: "Search",
       searchTooltip: "Open search (Ctrl+P)",
-      uuid: "UUID",
-      uuidTooltip: "Generate UUID (Ctrl+U)",
     },
     noDataAvailable: "No data available",
     history: {
