@@ -17,12 +17,10 @@
     </div>
     <div class="td-footer-actions">
       <div
-        class="td-setting-item"
+        class="td-icon td-setting-icon"
         @click="goToUserSetting"
-      >
-        <div class="td-icon td-setting-icon"></div>
-        <span class="td-setting-label">{{ $t('i18nCommon.feature.userSettings') }}</span>
-      </div>
+        v-tooltip="$t('i18nCommon.feature.userSettings')"
+      ></div>
     </div>
   </div>
 </template>
@@ -138,30 +136,12 @@ export default {
   align-items: center;
 }
 
-.td-setting-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-
-  &:hover {
-    background-color: var(--bg-layer-color);
-  }
-}
-
-.td-setting-label {
-  font-size: var(--font-size-medium-rare);
-  color: var(--text-secondary-color);
-}
-
 .td-setting-icon {
+  cursor: pointer;
   opacity: 0.7;
   transition: opacity 0.2s ease;
 
-  .td-setting-item:hover & {
+  &:hover {
     opacity: 1;
   }
 }
