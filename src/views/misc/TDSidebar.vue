@@ -13,7 +13,10 @@
             @mouseenter="onGroupMouseEnter($event, item)"
             @mouseleave="onGroupMouseLeave"
           >
-            <div class="flex td-item-content" @click="onOpenGroup(item)">
+            <div
+              class="flex no-select td-item-content"
+              @click="onOpenGroup(item)"
+            >
               <span>{{ $t(item.groupTitleKey) }}</span>
             </div>
           </div>
@@ -21,7 +24,7 @@
           <!-- Standalone route item: link + nút pin -->
           <div v-else class="td-sidebar-item td-sidebar-item--route">
             <div
-              class="td-item-content flex"
+              class="no-select td-item-content flex"
               v-tooltip="
                 item.route.meta.helpKey
                   ? $t(item.route.meta.helpKey)
@@ -55,7 +58,7 @@
           <div
             v-for="child in hoveredItem.children"
             :key="child.name"
-            class="td-sidebar-flyout-row"
+            class="no-select td-sidebar-flyout-row"
           >
             <div
               class="td-sidebar-flyout-item"
