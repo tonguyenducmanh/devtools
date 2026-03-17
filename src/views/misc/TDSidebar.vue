@@ -19,10 +19,7 @@
           </div>
 
           <!-- Standalone route item: link + nút pin -->
-          <div
-            v-else
-            class="td-sidebar-item td-sidebar-item--route"
-          >
+          <div v-else class="td-sidebar-item td-sidebar-item--route">
             <div
               class="td-item-content flex"
               v-tooltip="
@@ -80,6 +77,7 @@
 import { getSidebarItems } from "@/config/tools.js";
 import TDToggleArea from "@/components/TDToggleArea.vue";
 import { useTabManager } from "@/stores/TDTabManager.js";
+import _ from "@/common/TDCommonFunction.js";
 
 export default {
   name: "TDSidebar",
@@ -155,11 +153,11 @@ export default {
     },
 
     // Mở tất cả tab từ group
-    async onOpenGroup(groupItem) {
+    onOpenGroup: _.debounce(async function (groupItem) {
       if (!groupItem.children || groupItem.children.length === 0) return;
       for (let i = 0; i < groupItem.children.length; i++) {
         const child = groupItem.children[i];
-         await this.openTab({
+        await this.openTab({
           titleKey: child.meta.titleKey,
           helpKey: child.meta?.helpKey,
           groupKey: groupItem.groupKey,
@@ -168,10 +166,10 @@ export default {
           isActive: i === 0, // Chỉ focus tab đầu tiên
         });
       }
-    },
+    }, 300),
 
     // Mở tab từ group flyout item
-    onOpenGroupChildTab(groupItem, child) {
+    onOpenGroupChildTab: _.debounce(function (groupItem, child) {
       this.openTab({
         titleKey: child.meta.titleKey,
         helpKey: child.meta?.helpKey,
@@ -180,10 +178,10 @@ export default {
         component: child.component,
       });
       this.hoveredItem = null;
-    },
+    }, 300),
 
     // Mở tab từ standalone route item
-    onOpenRouteTab(route) {
+    onOpenRouteTab: _.debounce(function (route) {
       this.openTab({
         titleKey: route.meta.titleKey,
         helpKey: route.meta?.helpKey,
@@ -192,7 +190,7 @@ export default {
         // Standalone route dùng component trực tiếp từ route config
         component: route.component,
       });
-    },
+    }, 300),
   },
 };
 </script>
