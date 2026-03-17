@@ -47,6 +47,7 @@
             <div
               class="td-flyout-item"
               @click="onDownloadAgent"
+              v-tooltip="$t('i18nCommon.apiTesting.toolTipDownloadAgent')"
             >
               {{ $t('i18nCommon.feature.agentDownload.title') }}
             </div>
