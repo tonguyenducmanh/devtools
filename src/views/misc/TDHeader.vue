@@ -11,18 +11,13 @@
       </div>
       <div class="td-header-menu">
         <div
+          v-for="(items, menuKey) in menuConfig"
+          :key="menuKey"
           class="td-menu-item"
-          @mouseenter="onSettingsMouseEnter"
-          @mouseleave="onSettingsMouseLeave"
+          @mouseenter="onMenuMouseEnter(menuKey, $event)"
+          @mouseleave="onMenuMouseLeave"
         >
-          <span>{{ $t('i18nCommon.settings.title') }}</span>
-        </div>
-        <div
-          class="td-menu-item"
-          @mouseenter="onHelpMouseEnter"
-          @mouseleave="onHelpMouseLeave"
-        >
-          <span>{{ $t('i18nCommon.help.title') }}</span>
+          <span>{{ $t(`i18nCommon.${menuKey}.title`) }}</span>
         </div>
       </div>
     </div>
@@ -37,41 +32,15 @@
           @mouseenter="onFlyoutMouseEnter"
           @mouseleave="onFlyoutMouseLeave"
         >
-          <template v-if="hoveredMenu === 'help'">
-            <div
-              class="td-flyout-item"
-              @click="onGoToSource"
-            >
-              {{ $t('i18nCommon.tdheader.goToSource') }}
-            </div>
-            <div
-              class="td-flyout-item"
-              @click="onDownloadAgent"
-              v-tooltip="$t('i18nCommon.apiTesting.toolTipDownloadAgent')"
-            >
-              {{ $t('i18nCommon.feature.agentDownload.title') }}
-            </div>
-            <div
-              class="td-flyout-item"
-              @click="onPingAgent"
-            >
-              {{ $t('i18nCommon.ping') }}
-            </div>
-            <div
-              class="td-flyout-item"
-              @click="onReloadApp"
-            >
-              {{ $t('i18nCommon.help.reloadApp') }}
-            </div>
-          </template>
-          <template v-else-if="hoveredMenu === 'settings'">
-            <div
-              class="td-flyout-item"
-              @click="goToUserSettings"
-            >
-              {{ $t('i18nCommon.feature.userSettings') }}
-            </div>
-          </template>
+          <div
+            v-for="item in currentMenuItems"
+            :key="item.key"
+            class="td-flyout-item"
+            v-tooltip="item.tooltip"
+            @click="item.action"
+          >
+            {{ $t(item.labelKey) }}
+          </div>
         </div>
       </Transition>
     </Teleport>
@@ -93,51 +62,84 @@ export default {
       hoveredMenu: null,
       flyoutStyle: {},
       _leaveTimer: null,
+      menuConfig: {},
     };
   },
   computed: {
     appName() {
       return window.__env.appName;
     },
+    currentMenuItems() {
+      return this.menuConfig[this.hoveredMenu] ?? [];
+    },
+  },
+  mounted() {
+    this.menuConfig = {
+      settings: [
+        {
+          key: "userSettings",
+          labelKey: "i18nCommon.feature.userSettings",
+          action: () => {
+            this.openTab({
+              titleKey: "i18nCommon.feature.userSettings",
+              groupPath: "",
+              path: "/TDUserSettings",
+              component: () => import("@/views/misc/TDUserSettings.vue"),
+            });
+            this.hoveredMenu = null;
+          },
+        },
+      ],
+      help: [
+        {
+          key: "goToSource",
+          labelKey: "i18nCommon.tdheader.goToSource",
+          action: () => {
+            this.$tdUtility.goToSource();
+            this.hoveredMenu = null;
+          },
+        },
+        {
+          key: "downloadAgent",
+          labelKey: "i18nCommon.feature.agentDownload.title",
+          tooltip: this.$t("i18nCommon.apiTesting.toolTipDownloadAgent"),
+          action: () => {
+            const url = window.__env?.githubSource?.releasesUrl;
+            window.open(url, "_blank");
+            this.hoveredMenu = null;
+          },
+        },
+        {
+          key: "pingAgent",
+          labelKey: "i18nCommon.ping",
+          action: async () => {
+            try {
+              const res = await new TDAgentAPI().heathCheck();
+              if (res?.success && res?.data) {
+                this.$tdToast.success(res.data);
+              } else {
+                this.$tdToast.success(res);
+              }
+            } catch {
+              this.$tdUtility.showErrorNotFoundAgentServer();
+            }
+            this.hoveredMenu = null;
+          },
+        },
+        {
+          key: "reloadApp",
+          labelKey: "i18nCommon.help.reloadApp",
+          action: () => {
+            this.$tdUtility.reloadApp();
+            this.hoveredMenu = null;
+          },
+        },
+      ],
+    };
   },
   methods: {
     goToWelcome() {
       this.exitTabMode();
-    },
-    goToUserSettings() {
-      this.openTab({
-        titleKey: "i18nCommon.feature.userSettings",
-        groupPath: "",
-        path: "/TDUserSettings",
-        component: () => import("@/views/misc/TDUserSettings.vue"),
-      });
-      this.hoveredMenu = null;
-    },
-    onGoToSource() {
-      this.$tdUtility.goToSource();
-      this.hoveredMenu = null;
-    },
-    onDownloadAgent() {
-      const url = window.__env?.githubSource?.releasesUrl;
-      window.open(url, "_blank");
-      this.hoveredMenu = null;
-    },
-    async onPingAgent() {
-      try {
-        let res = await new TDAgentAPI().heathCheck();
-        if (res && res.success && res.data) {
-          this.$tdToast.success(res.data);
-        } else {
-          this.$tdToast.success(res);
-        }
-      } catch (ex) {
-        this.$tdUtility.showErrorNotFoundAgentServer();
-      }
-      this.hoveredMenu = null;
-    },
-    onReloadApp() {
-      this.$tdUtility.reloadApp();
-      this.hoveredMenu = null;
     },
     showFlyout(menu, event) {
       clearTimeout(this._leaveTimer);
@@ -150,18 +152,10 @@ export default {
       };
       this.hoveredMenu = menu;
     },
-    onHelpMouseEnter(event) {
-      this.showFlyout("help", event);
+    onMenuMouseEnter(menuKey, event) {
+      this.showFlyout(menuKey, event);
     },
-    onHelpMouseLeave() {
-      this._leaveTimer = setTimeout(() => {
-        this.hoveredMenu = null;
-      }, 120);
-    },
-    onSettingsMouseEnter(event) {
-      this.showFlyout("settings", event);
-    },
-    onSettingsMouseLeave() {
+    onMenuMouseLeave() {
       this._leaveTimer = setTimeout(() => {
         this.hoveredMenu = null;
       }, 120);
