@@ -514,7 +514,7 @@ export default {
 .td-tab-drop-sentinel {
   position: relative;
   flex-shrink: 0;
-  width: 12px;
+  width: 1px;
   height: 100%;
   min-height: 28px;
   align-self: stretch;
