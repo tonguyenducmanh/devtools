@@ -84,15 +84,9 @@ export default {
       ],
       help: [
         {
-          key: "goToSource",
-          labelKey: "i18nCommon.tdheader.goToSource",
-          action: this.goToSourceFunc,
-        },
-        {
-          key: "downloadAgent",
-          labelKey: "i18nCommon.feature.agentDownload.title",
-          tooltip: this.$t("i18nCommon.apiTesting.toolTipDownloadAgent"),
-          action: this.downloadAgentFunc,
+          key: "genUUID",
+          labelKey: "i18nCommon.help.genUUID",
+          action: this.genUUIDFunc,
         },
         {
           key: "pingAgent",
@@ -104,10 +98,25 @@ export default {
           labelKey: "i18nCommon.help.reloadApp",
           action: this.reloadAppFunc,
         },
+        {
+          key: "goToSource",
+          labelKey: "i18nCommon.tdheader.goToSource",
+          action: this.goToSourceFunc,
+        },
+        {
+          key: "downloadAgent",
+          labelKey: "i18nCommon.feature.agentDownload.title",
+          tooltip: this.$t("i18nCommon.apiTesting.toolTipDownloadAgent"),
+          action: this.downloadAgentFunc,
+        },
       ],
     };
   },
   methods: {
+    genUUIDFunc() {
+      let me = this;
+      me.$tdUtility.copyToClipboard(me.$tdUtility.newGuid());
+    },
     goToWelcome() {
       this.exitTabMode();
     },

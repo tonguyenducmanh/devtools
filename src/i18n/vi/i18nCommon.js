@@ -58,6 +58,7 @@ export default {
     help: {
       title: "Trợ giúp",
       reloadApp: "Tải lại trang",
+      genUUID: "Tạo UUID",
     },
     settings: {
       title: "Thiết lập",

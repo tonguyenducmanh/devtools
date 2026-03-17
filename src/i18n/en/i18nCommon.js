@@ -58,6 +58,7 @@ export default {
     help: {
       title: "Help",
       reloadApp: "Reload page",
+      genUUID: "Gen UUID",
     },
     settings: {
       title: "Settings",
