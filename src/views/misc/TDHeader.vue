@@ -79,60 +79,30 @@ export default {
         {
           key: "userSettings",
           labelKey: "i18nCommon.feature.userSettings",
-          action: () => {
-            this.openTab({
-              titleKey: "i18nCommon.feature.userSettings",
-              groupPath: "",
-              path: "/TDUserSettings",
-              component: () => import("@/views/misc/TDUserSettings.vue"),
-            });
-            this.hoveredMenu = null;
-          },
+          action: this.userSettingsFunc,
         },
       ],
       help: [
         {
           key: "goToSource",
           labelKey: "i18nCommon.tdheader.goToSource",
-          action: () => {
-            this.$tdUtility.goToSource();
-            this.hoveredMenu = null;
-          },
+          action: this.goToSourceFunc,
         },
         {
           key: "downloadAgent",
           labelKey: "i18nCommon.feature.agentDownload.title",
           tooltip: this.$t("i18nCommon.apiTesting.toolTipDownloadAgent"),
-          action: () => {
-            const url = window.__env?.githubSource?.releasesUrl;
-            window.open(url, "_blank");
-            this.hoveredMenu = null;
-          },
+          action: this.downloadAgentFunc,
         },
         {
           key: "pingAgent",
           labelKey: "i18nCommon.ping",
-          action: async () => {
-            try {
-              const res = await new TDAgentAPI().heathCheck();
-              if (res?.success && res?.data) {
-                this.$tdToast.success(res.data);
-              } else {
-                this.$tdToast.success(res);
-              }
-            } catch {
-              this.$tdUtility.showErrorNotFoundAgentServer();
-            }
-            this.hoveredMenu = null;
-          },
+          action: this.pingAgentFunc,
         },
         {
           key: "reloadApp",
           labelKey: "i18nCommon.help.reloadApp",
-          action: () => {
-            this.$tdUtility.reloadApp();
-            this.hoveredMenu = null;
-          },
+          action: this.reloadAppFunc,
         },
       ],
     };
@@ -140,6 +110,41 @@ export default {
   methods: {
     goToWelcome() {
       this.exitTabMode();
+    },
+    userSettingsFunc() {
+      this.openTab({
+        titleKey: "i18nCommon.feature.userSettings",
+        groupPath: "",
+        path: "/TDUserSettings",
+        component: () => import("@/views/misc/TDUserSettings.vue"),
+      });
+      this.hoveredMenu = null;
+    },
+    goToSourceFunc() {
+      this.$tdUtility.goToSource();
+      this.hoveredMenu = null;
+    },
+    downloadAgentFunc() {
+      const url = window.__env?.githubSource?.releasesUrl;
+      window.open(url, "_blank");
+      this.hoveredMenu = null;
+    },
+    async pingAgentFunc() {
+      try {
+        const res = await new TDAgentAPI().heathCheck();
+        if (res?.success && res?.data) {
+          this.$tdToast.success(res.data);
+        } else {
+          this.$tdToast.success(res);
+        }
+      } catch {
+        this.$tdUtility.showErrorNotFoundAgentServer();
+      }
+      this.hoveredMenu = null;
+    },
+    reloadAppFunc() {
+      this.$tdUtility.reloadApp();
+      this.hoveredMenu = null;
     },
     showFlyout(menu, event) {
       clearTimeout(this._leaveTimer);
@@ -223,10 +228,14 @@ export default {
 
 <style lang="scss">
 .td-flyout-enter-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 .td-flyout-leave-active {
-  transition: opacity 0.1s ease, transform 0.1s ease;
+  transition:
+    opacity 0.1s ease,
+    transform 0.1s ease;
 }
 .td-flyout-enter-from,
 .td-flyout-leave-to {
