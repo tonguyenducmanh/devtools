@@ -56,7 +56,7 @@
 <script>
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
 import * as monaco from "monaco-editor";
-import TDUtility from "@/common/TDUtility.js";
+import _ from "@/common/TDCommonFunction.js";
 
 export default {
   name: "TDTextarea",
@@ -248,12 +248,12 @@ export default {
         me.unmountEditor();
       }
     },
-    updateEditorVal: TDUtility.debounce(function () {
+    updateEditorVal: _.debounce(function () {
       if (this.editor) {
         this.editor.setValue(this.modelValue ? this.modelValue : "");
       }
     }, 300),
-    updateValToEditor: TDUtility.debounce(function () {
+    updateValToEditor: _.debounce(function () {
       this.updateValueFromEditor(true);
     }, 300),
 

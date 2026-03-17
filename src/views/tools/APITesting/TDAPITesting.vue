@@ -666,7 +666,7 @@ import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDMockAPIProMode from "@/common/mock/TDMockAPIProMode.js";
 import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
 import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
-import TDUtility from "@/common/TDUtility.js";
+import _ from "@/common/TDCommonFunction.js";
 
 export default {
   name: "TDAPITesting",
@@ -832,7 +832,7 @@ export default {
     }
   },
   methods: {
-    emitTabTitle: TDUtility.debounce(function () {
+    emitTabTitle: _.debounce(function () {
       let me = this;
       // emit sự kiện thay đổi tên tab đang mở
       me.$emit("updateTabTitle", {

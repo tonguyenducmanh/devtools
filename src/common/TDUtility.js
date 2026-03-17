@@ -5,37 +5,10 @@ import enumeration from "@/common/TDEnum.js";
 import { getUserSettingDefault } from "@/common/TDUserSettingDefault.js";
 /**
  * các method TDutility dùng cho toàn bộ frontend
+ * tất cả các file vue đều inject sẵn class này vào dùng
  * Created by tdmanh 19.09.2024
  */
 class TDUtility {
-  /**
-   * Debounce function (thuần JS)
-   * @param {Function} fn - hàm cần debounce
-   * @param {number} timeDelay - thời gian delay (ms)
-   * @param {boolean} immediate - gọi ngay lần đầu (tuỳ chọn)
-   */
-  debounce(fn, timeDelay = 300, immediate = false) {
-    let timer = null;
-
-    return function (...args) {
-      const context = this;
-
-      const callNow = immediate && !timer;
-
-      clearTimeout(timer);
-
-      timer = setTimeout(() => {
-        timer = null;
-        if (!immediate) {
-          fn.apply(context, args);
-        }
-      }, timeDelay);
-
-      if (callNow) {
-        fn.apply(context, args);
-      }
-    };
-  }
   /**
    * Lấy ra tiêu đề app mặc định
    */

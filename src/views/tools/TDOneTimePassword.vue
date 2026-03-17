@@ -180,7 +180,7 @@ import { Buffer } from "buffer";
 import * as OTPAuth from "otpauth";
 import { toRaw } from "vue";
 import googleAuthen from "@/common/proto/googleAuth.js";
-import TDUtility from "@/common/TDUtility.js";
+import _ from "@/common/TDCommonFunction.js";
 
 export default {
   name: "TDOneTimePassword",
@@ -275,7 +275,7 @@ export default {
     me.saveUsername();
   },
   methods: {
-    emitTabTitle: TDUtility.debounce(function () {
+    emitTabTitle: _.debounce(function () {
       let me = this;
       // emit sự kiện thay đổi tên tab đang mở
       me.$emit("updateTabTitle", {

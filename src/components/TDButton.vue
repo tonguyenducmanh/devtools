@@ -17,7 +17,7 @@
 <script>
 import tdEnum from "@/common/TDEnum.js";
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
-import TDUtility from "@/common/TDUtility.js";
+import _ from "@/common/TDCommonFunction.js";
 
 export default {
   name: "TDButton",
@@ -50,7 +50,7 @@ export default {
     return {};
   },
   methods: {
-    handleClick: TDUtility.debounce(function (e) {
+    handleClick: _.debounce(function (e) {
       let me = this;
       e.preventDefault();
       me.$emit("click", e);
