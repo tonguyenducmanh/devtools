@@ -116,6 +116,7 @@ export default {
     genUUIDFunc() {
       let me = this;
       me.$tdUtility.copyToClipboard(me.$tdUtility.newGuid());
+      this.hoveredMenu = null;
     },
     goToWelcome() {
       this.exitTabMode();
