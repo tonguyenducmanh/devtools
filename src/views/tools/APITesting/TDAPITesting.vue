@@ -97,7 +97,6 @@
             <TDButton
               @click="openFormImportCURL"
               :type="$tdEnum.buttonType.secondary"
-              :debounceTime="100"
               :noMargin="true"
               :readOnly="isLoading"
               :label="$t('i18nCommon.apiTesting.CURL')"
@@ -105,7 +104,6 @@
             <TDButton
               @click="copyCURLFromNormalMode"
               :type="$tdEnum.buttonType.secondary"
-              :debounceTime="100"
               :noMargin="true"
               :readOnly="!(apiUrl && httpMethod) || isLoading"
               :label="$t('i18nCommon.apiTesting.copyCURLFromAPI')"
@@ -834,13 +832,14 @@ export default {
     }
   },
   methods: {
-    emitTabTitle: TDUtility.debounce((me) => {
+    emitTabTitle: TDUtility.debounce(function () {
+      let me = this;
       // emit sự kiện thay đổi tên tab đang mở
       me.$emit("updateTabTitle", {
         title: me.requestName,
         append: true,
       });
-    }, 500),
+    }, 300),
     handleResize(sizes) {
       this.requestSectionSize = sizes.leftSize;
       this.responseSectionSize = sizes.rightSize;

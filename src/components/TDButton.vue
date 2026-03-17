@@ -17,22 +17,16 @@
 <script>
 import tdEnum from "@/common/TDEnum.js";
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
+import TDUtility from "@/common/TDUtility.js";
 
 export default {
   name: "TDButton",
   mixins: [TDStylePremitiveMixin],
-  created() {
-    let me = this;
-    me.debouncedFunc = me.$tdUtility.debounce((e) => {
-      e.preventDefault();
-      me.$emit("click", e);
-    }, me.debounceTime);
-  },
+  created() {},
   mounted() {},
   emits: ["click"],
   beforeUnmount() {
     let me = this;
-    me.debouncedFunc = null;
   },
   props: {
     readOnly: {
@@ -47,26 +41,20 @@ export default {
       type: String,
       default: tdEnum.buttonType.primary,
     },
-    debounceTime: {
-      type: Number,
-      default: 200,
-    },
     noMargin: {
       type: Boolean,
       default: false,
     },
   },
   data() {
-    return {
-      debouncedFunc: null,
-    };
+    return {};
   },
   methods: {
-    handleClick(e) {
+    handleClick: TDUtility.debounce(function (e) {
       let me = this;
       e.preventDefault();
-      me.debouncedFunc(e);
-    },
+      me.$emit("click", e);
+    }, 300),
   },
 };
 </script>
