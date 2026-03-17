@@ -28,7 +28,23 @@ export function useTabManager() {
   /**
    * mở 1 tab mới
    */
-  async function openTab({ titleKey, helpKey, groupKey, toolKey, component, isActive = true }) {
+  async function openTab({
+    titleKey,
+    helpKey,
+    groupKey,
+    toolKey,
+    component,
+    isActive = true,
+    checkExisting = true,
+  }) {
+    if (checkExisting && toolKey) {
+      const existingTab = state.tabs.find((t) => t.toolKey === toolKey);
+      if (existingTab) {
+        state.activeTabId = existingTab.id;
+        return existingTab.id;
+      }
+    }
+
     const id = genId();
 
     const tab = {
