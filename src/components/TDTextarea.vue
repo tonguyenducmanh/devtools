@@ -151,9 +151,7 @@ export default {
     },
     language(value, oldVal) {
       if (this.editor && value && oldVal && value != oldVal) {
-        this.editor.updateOptions({
-          language: value,
-        });
+        monaco.editor.setModelLanguage(this.editorModel, value);
       }
     },
   },
