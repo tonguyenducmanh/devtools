@@ -81,6 +81,11 @@ export default {
           labelKey: "i18nCommon.feature.userSettings",
           action: this.userSettingsFunc,
         },
+        {
+          key: "appDataMiner",
+          labelKey: "i18nCommon.feature.AppDataMiner",
+          action: this.appDataMinerFunc,
+        },
       ],
       help: [
         {
@@ -127,6 +132,15 @@ export default {
         groupPath: "",
         path: "/TDUserSettings",
         component: () => import("@/views/misc/TDUserSettings.vue"),
+      });
+      this.hoveredMenu = null;
+    },
+    appDataMinerFunc() {
+      this.openTab({
+        titleKey: "i18nCommon.feature.AppDataMiner",
+        groupPath: "api",
+        path: "/appdataminer",
+        component: () => import("@/views/tools/TDAppDataMiner.vue"),
       });
       this.hoveredMenu = null;
     },

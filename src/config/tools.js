@@ -48,14 +48,6 @@ const sidebarConfig = [
           helpKey: "i18nHelp.feature.APIMocking",
         },
       },
-      {
-        name: "appdataminer",
-        component: () => import("@/views/tools/TDAppDataMiner.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.AppDataMiner",
-          helpKey: "i18nHelp.feature.AppDataMiner",
-        },
-      },
     ],
   },
   {
