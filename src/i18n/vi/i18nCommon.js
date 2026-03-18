@@ -68,6 +68,7 @@ export default {
       userSettings: "Thiết lập ứng dụng",
       OpticalCharacterRecognition: "Nhận dạng ký tự quang học (OCR)",
       textgenerator: "Tạo văn bản",
+      blanktext: "Văn bản trống",
       AppDataMiner: "Dữ liệu ứng dụng",
       cosinSimilarity: "Độ tương đồng",
       oneTimePassword: "Tạo mã OTP",
@@ -523,6 +524,12 @@ export default {
       useOmitempty: "Thêm omitempty vào tag",
       usePointer: "Pointer field",
       packageName: "Tên package",
+    },
+    blanktext: {
+      selectLanguage: "Chọn ngôn ngữ",
+      placeholder: "Nhập nội dung văn bản...",
+      download: "Tải xuống",
+      downloaded: "Đã tải xuống",
     },
   },
 };

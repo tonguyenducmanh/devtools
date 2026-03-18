@@ -88,13 +88,22 @@ const sidebarConfig = [
     children: [
       {
         name: "opticalcharacterrecognition",
-        component: () => import("@/views/tools/TDOpticalCharacterRecognition.vue"),
+        component: () =>
+          import("@/views/tools/TDOpticalCharacterRecognition.vue"),
         meta: {
           titleKey: "i18nCommon.feature.OpticalCharacterRecognition",
           helpKey: "i18nHelp.feature.OpticalCharacterRecognition",
         },
       },
     ],
+  },
+  {
+    type: "route",
+    name: "TDBlankText",
+    component: () => import("@/views/tools/TDBlankText.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.blanktext",
+    },
   },
   {
     type: "group",

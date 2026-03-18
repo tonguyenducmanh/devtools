@@ -68,6 +68,7 @@ export default {
       userSettings: "User setting",
       OpticalCharacterRecognition: "Optical Character Recognition (OCR)",
       textgenerator: "Text Generator",
+      blanktext: "Blank text",
       AppDataMiner: "App data miner",
       cosinSimilarity: "Cosine Similarity",
       oneTimePassword: "One time password",
@@ -525,6 +526,12 @@ export default {
       useOmitempty: "Add omitempty to tag",
       usePointer: "Pointer field",
       packageName: "Package name",
+    },
+    blanktext: {
+      selectLanguage: "Select language",
+      placeholder: "Enter text content...",
+      download: "Download",
+      downloaded: "Downloaded",
     },
   },
 };

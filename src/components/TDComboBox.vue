@@ -204,6 +204,8 @@ export default {
       min-width: 100%; /* Ít nhất phải bằng chiều rộng ô input */
       width: max-content; /* Tự mở rộng theo nội dung dài nhất */
       max-width: 300px; /* (Tùy chọn) Giới hạn tối đa để không tràn màn hình */
+      max-height: 300px;
+      overflow-y: auto;
       margin-top: 4px;
       border: 1px solid var(--border-color);
       background: var(--bg-main-color);
