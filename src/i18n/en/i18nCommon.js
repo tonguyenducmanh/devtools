@@ -6,6 +6,7 @@ export default {
       closeAllTabs: "Close all tabs",
       openInDynamicTab: "Open in dynamic tab",
       duplicateTab: "Dupplicate tab",
+      showTabNumber: "Show tab number",
     },
     group: {
       QRCode: "QR tooling",

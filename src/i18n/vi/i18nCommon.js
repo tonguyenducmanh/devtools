@@ -6,6 +6,7 @@ export default {
       closeAllTabs: "Đóng tất cả các tab",
       openInDynamicTab: "Mở trong tab động",
       duplicateTab: "Nhân bản tab",
+      showTabNumber: "Đánh số thứ tự tab",
     },
     group: {
       QRCode: "Công cụ QR",

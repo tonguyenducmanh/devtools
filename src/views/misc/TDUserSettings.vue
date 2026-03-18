@@ -30,6 +30,14 @@
         ></TDCheckbox>
       </div>
       <div class="flex user-setting-item">
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="currentUserSetting.showTabNumber"
+          :label="$t('i18nCommon.tabManager.showTabNumber')"
+          :noMargin="true"
+        ></TDCheckbox>
+      </div>
+      <div class="flex user-setting-item">
         <div>{{ $t("i18nUserSettings.settings.language") }}</div>
         <TDComboBox
           :width="200"

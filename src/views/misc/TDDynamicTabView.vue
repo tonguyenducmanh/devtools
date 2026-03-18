@@ -38,6 +38,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
               class="td-drop-indicator td-drop-indicator-before"
             ></div>
 
+            <span v-if="showTabNumber" class="td-tab-number">{{ index + 1 }}. </span>
             <span class="td-tab-label">{{ getTabLabel(tab) }}</span>
             <button
               class="td-tab-close"
@@ -112,12 +113,14 @@ export default {
   data() {
     return {
       wrapTab: true,
+      showTabNumber: false,
     };
   },
   methods: {
     async processWhenMouted() {
       let me = this;
       me.wrapTab = await me.$tdUtility.getUserSettings("wrapTab");
+      me.showTabNumber = await me.$tdUtility.getUserSettings("showTabNumber");
     },
   },
   setup() {
@@ -521,6 +524,10 @@ export default {
 }
 
 /* ── Tab label ── */
+.td-tab-number {
+  color: #00c9a7;
+}
+
 .td-tab-label {
   font-size: var(--font-size-medium-rare);
 }

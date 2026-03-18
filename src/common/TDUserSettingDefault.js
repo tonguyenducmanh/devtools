@@ -8,5 +8,6 @@ export function getUserSettingDefault() {
     agentURL: window.__env?.APITesting?.agentServer,
     wrapTab: true,
     showSideBar: true,
+    showTabNumber: true,
   };
 }
