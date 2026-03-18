@@ -87,15 +87,27 @@ export default {
           action: this.appDataMinerFunc,
         },
       ],
-      help: [
+      edit: [
         {
           key: "genUUID",
           labelKey: "i18nCommon.help.genUUID",
           action: this.genUUIDFunc,
         },
         {
+          key: "getCurrentDate",
+          labelKey: "i18nCommon.utilities.getCurrentDate",
+          action: this.getCurrentDateFunc,
+        },
+        {
+          key: "getCurrentDateTime",
+          labelKey: "i18nCommon.utilities.getCurrentDateTime",
+          action: this.getCurrentDateTimeFunc,
+        },
+      ],
+      help: [
+        {
           key: "pingAgent",
-          labelKey: "i18nCommon.ping",
+          labelKey: "i18nCommon.apiTesting.pingAgent",
           action: this.pingAgentFunc,
         },
         {
@@ -121,6 +133,18 @@ export default {
     genUUIDFunc() {
       let me = this;
       me.$tdUtility.copyToClipboard(me.$tdUtility.newGuid());
+      this.hoveredMenu = null;
+    },
+    getCurrentDateFunc() {
+      const now = new Date();
+      const formatted = now.toISOString().split("T")[0];
+      this.$tdUtility.copyToClipboard(formatted);
+      this.hoveredMenu = null;
+    },
+    getCurrentDateTimeFunc() {
+      const now = new Date();
+      const formatted = now.toISOString().slice(0, 19).replace("T", " ");
+      this.$tdUtility.copyToClipboard(formatted);
       this.hoveredMenu = null;
     },
     goToWelcome() {
