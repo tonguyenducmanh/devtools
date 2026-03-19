@@ -209,12 +209,12 @@ export default {
       margin-top: 4px;
       border: 1px solid var(--border-color);
       background: var(--bg-main-color);
-      border-radius: var(--border-radius);
+      border-radius: var(--border-radius-component);
       .td-dropdown-item:first-child {
-        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        border-radius: var(--border-radius-component) var(--border-radius-component) 0 0;
       }
       .td-dropdown-item:last-child {
-        border-radius: 0 0 var(--border-radius) var(--border-radius);
+        border-radius: 0 0 var(--border-radius-component) var(--border-radius-component);
       }
     }
     .td-combobox-droptop {

@@ -250,7 +250,7 @@ export default {
     justify-content: space-between;
     column-gap: var(--padding);
     padding: var(--padding);
-    border-radius: calc(var(--border-radius) * 1.5);
+    border-radius: var(--border-radius-component);
     text-decoration: none;
     color: var(--text-color);
     min-width: 0;
@@ -325,7 +325,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 4px;
-  border-radius: var(--border-radius);
+  border-radius: var(--border-radius-component);
 
   &:hover {
     background-color: var(--bg-layer-color);

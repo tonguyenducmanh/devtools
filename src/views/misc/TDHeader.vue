@@ -261,7 +261,7 @@ export default {
     display: flex;
     align-items: center;
     padding: 4px 10px;
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-component);
     cursor: pointer;
     font-size: var(--font-size-medium-rare);
     color: var(--text-color);
@@ -307,7 +307,7 @@ export default {
   color: var(--text-color);
   white-space: nowrap;
   cursor: pointer;
-  border-radius: var(--border-radius);
+  border-radius: var(--border-radius-component);
 
   &:hover {
     background-color: var(--bg-layer-color);
