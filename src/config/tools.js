@@ -87,6 +87,14 @@ const sidebarConfig = [
           helpKey: "i18nHelp.feature.OpticalCharacterRecognition",
         },
       },
+      {
+        name: "cosinsimilarity",
+        component: () => import("@/views/tools/TDCosinSimilarity.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.cosinSimilarity",
+          helpKey: "i18nHelp.feature.cosinSimilarity",
+        },
+      },
     ],
   },
   {
@@ -181,16 +189,6 @@ const sidebarConfig = [
         meta: { titleKey: "i18nCommon.feature.textgenerator" },
       },
     ],
-  },
-
-  {
-    type: "route",
-    name: "cosinsimilarity",
-    component: () => import("@/views/tools/TDCosinSimilarity.vue"),
-    meta: {
-      titleKey: "i18nCommon.feature.cosinSimilarity",
-      helpKey: "i18nHelp.feature.cosinSimilarity",
-    },
   },
   {
     type: "route",

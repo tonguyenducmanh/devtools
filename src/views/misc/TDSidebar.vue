@@ -209,9 +209,9 @@ export default {
 }
 .td-sidebar {
   position: relative;
-  width: 250px;
-  min-width: 250px;
-  max-width: 250px;
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
   height: 100%;
   background-color: var(--bg-main-color);
   display: flex;
