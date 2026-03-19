@@ -229,7 +229,6 @@ export default {
     overflow-y: auto;
     overflow-x: hidden;
     width: 100%;
-    max-height: calc(100vh - 60px);
   }
 }
 
