@@ -72,7 +72,6 @@ export default {
   background-color: var(--btn-color);
   color: white;
   border: none;
-  border-radius: var(--border-radius);
   cursor: pointer;
   font-size: 16px;
   transition: all 0.2s ease;

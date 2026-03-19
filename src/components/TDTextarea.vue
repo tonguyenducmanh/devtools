@@ -323,7 +323,6 @@ export default {
     height: 100%;
     margin: 0;
     border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
   }
 
   textarea {
@@ -332,7 +331,6 @@ export default {
     width: 100%;
     height: 100%;
     padding: var(--padding);
-    border-radius: var(--border-radius);
     background-color: var(--bg-thirt-color);
     color: var(--text-primary-color);
     font-size: var(--font-size-medium);

@@ -102,7 +102,7 @@ export default {
      */
     getBorderRadius(styleEnums) {
       let me = this;
-      let styleBorder = "var(--border-radius)";
+      let styleBorder = "var(--border-radius-component)";
       let style = {
         "border-radius": styleBorder,
       };
@@ -146,7 +146,7 @@ export default {
       return style;
     },
     setStyleForCurrentBorder(styleEnums, currentBorder, allStyles) {
-      let styleBorder = "var(--border-radius)";
+      let styleBorder = "var(--border-radius-component)";
       if (styleEnums.includes(currentBorder)) {
         allStyles.push(styleBorder);
       } else {
