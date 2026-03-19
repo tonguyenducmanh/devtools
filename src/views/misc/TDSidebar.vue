@@ -10,6 +10,7 @@
           <div
             v-if="item.type === 'group'"
             class="td-sidebar-item"
+            :class="{ 'td-sidebar-item--active': hoveredItem === item }"
             @mouseenter="onGroupMouseEnter($event, item)"
             @mouseleave="onGroupMouseLeave"
           >
@@ -258,6 +259,10 @@ export default {
   }
 
   &:hover .td-item-content {
+    background-color: var(--bg-layer-color);
+  }
+
+  &--active .td-item-content {
     background-color: var(--bg-layer-color);
   }
 

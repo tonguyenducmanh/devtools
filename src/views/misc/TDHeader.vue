@@ -14,6 +14,7 @@
           v-for="(items, menuKey) in menuConfig"
           :key="menuKey"
           class="td-menu-item"
+          :class="{ 'td-menu-item--active': hoveredMenu === menuKey }"
           @mouseenter="onMenuMouseEnter(menuKey, $event)"
           @mouseleave="onMenuMouseLeave"
         >
@@ -268,6 +269,10 @@ export default {
     transition: background-color 0.15s ease;
 
     &:hover {
+      background-color: var(--bg-layer-color);
+    }
+
+    &--active {
       background-color: var(--bg-layer-color);
     }
   }
