@@ -139,12 +139,7 @@
               ></TDCheckbox>
             </div>
           </div>
-          <div class="flex sidebar-info">
-            <span class="info-label"
-              >{{ $t("i18nCommon.OpticalCharacterRecognition.library") }}:</span
-            >
-            <span class="info-value">Tesseract.js</span>
-          </div>
+          <div class="flex sidebar-info"></div>
         </div>
       </template>
     </TDSubSidebar>
@@ -302,14 +297,14 @@ export default {
             const r = data[i];
             const g = data[i + 1];
             const b = data[i + 2];
-            
+
             // Grayscale
             let gray = 0.299 * r + 0.587 * g + 0.114 * b;
-            
+
             // Increase contrast
             gray = gray * contrast + intercept;
             gray = Math.max(0, Math.min(255, gray));
-            
+
             data[i] = gray;
             data[i + 1] = gray;
             data[i + 2] = gray;
@@ -319,7 +314,7 @@ export default {
           const tempData = new Uint8ClampedArray(data);
           const kernelSize = 3;
           const half = Math.floor(kernelSize / 2);
-          
+
           for (let y = half; y < height - half; y++) {
             for (let x = half; x < width - half; x++) {
               const values = [];
@@ -331,7 +326,7 @@ export default {
               }
               values.sort((a, b) => a - b);
               const median = values[Math.floor(values.length / 2)];
-              
+
               const idx = (y * width + x) * 4;
               data[idx] = median;
               data[idx + 1] = median;
@@ -386,15 +381,17 @@ export default {
                   }
                 },
                 tessedit_pageseg_mode: me.selectedPSM,
-                tessedit_char_whitelist: me.useWhitelist ? me.whitelist : undefined,
+                tessedit_char_whitelist: me.useWhitelist
+                  ? me.whitelist
+                  : undefined,
               },
             );
             const rawConfidence = Math.round(result.data.confidence);
             let text = result.data.text;
             if (result.data.words && result.data.words.length > 0) {
               const filteredWords = result.data.words
-                .filter(word => word.confidence >= me.confidenceThreshold)
-                .map(word => word.text);
+                .filter((word) => word.confidence >= me.confidenceThreshold)
+                .map((word) => word.text);
               text = filteredWords.join(" ");
             }
             item.text = text;
@@ -466,7 +463,8 @@ export default {
       selectedPSM: "PSM_AUTO_OSD",
       confidenceThreshold: 90,
       useWhitelist: false,
-      whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀẢÃÁẠẮẰẲẴẶÂẦẨẪẬĐÈẺẼÉẸÊỀỂỄẾỆÌỈĨÍỊÒỎÕÓỌÔỔỖỐỘƠỜỞỠỚỢÙỦŨÚỤỪỬỮƯỰỲỴỶỸÝ0123456789.,;:\'"()[]{}/\\-+=*!@#$%^&_`|~<>? \t\n\r',
+      whitelist:
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀẢÃÁẠẮẰẲẴẶÂẦẨẪẬĐÈẺẼÉẸÊỀỂỄẾỆÌỈĨÍỊÒỎÕÓỌÔỔỖỐỘƠỜỞỠỚỢÙỦŨÚỤỪỬỮƯỰỲỴỶỸÝ0123456789.,;:'\"()[]{}/\\-+=*!@#$%^&_`|~<>? \t\n\r",
       languageOptions: [
         {
           value: "vie",
