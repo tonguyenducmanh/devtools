@@ -64,10 +64,8 @@ export default {
     settings: {
       title: "Thiết lập",
     },
-    edit: {
-      title: "Tiện ích",
-    },
     utilities: {
+      title: "Tiện ích",
       getCurrentDate: "Lấy ngày hiện tại",
       getCurrentDateTime: "Lấy ngày và giờ hiện tại",
     },

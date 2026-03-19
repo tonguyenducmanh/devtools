@@ -87,7 +87,7 @@ export default {
           action: this.appDataMinerFunc,
         },
       ],
-      edit: [
+      utilities: [
         {
           key: "genUUID",
           labelKey: "i18nCommon.help.genUUID",

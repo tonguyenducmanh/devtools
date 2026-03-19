@@ -64,10 +64,8 @@ export default {
     settings: {
       title: "Settings",
     },
-    edit: {
-      title: "Utilities",
-    },
     utilities: {
+      title: "Utilities",
       getCurrentDate: "Get current date",
       getCurrentDateTime: "Get current date and time",
     },
