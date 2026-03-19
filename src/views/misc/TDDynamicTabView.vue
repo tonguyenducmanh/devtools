@@ -414,7 +414,7 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: flex-end;
-  gap: 0;
+  gap: 1px;
   border-bottom: 2px solid var(--bg-layer-color);
   flex-shrink: 0;
   overflow-x: auto;
