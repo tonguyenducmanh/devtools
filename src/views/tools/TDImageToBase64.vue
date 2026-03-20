@@ -35,30 +35,15 @@ export default {
   name: "TDImageToBase64",
   created() {
     let me = this;
-    document.addEventListener("paste", me.handlePasteEvent);
   },
   beforeUnmount() {
     let me = this;
-    document.removeEventListener("paste", me.handlePasteEvent);
   },
   mounted() {},
   methods: {
     haddleCopyEvent() {
       let me = this;
       me.$tdUtility.copyToClipboard(me.base64Result);
-    },
-    handlePasteEvent(e) {
-      let me = this;
-      e.preventDefault();
-      const items = e.clipboardData.items;
-
-      for (let item of items) {
-        if (item.type.includes("image")) {
-          const blob = item.getAsFile();
-          me.handleImageToBase64(blob);
-          break;
-        }
-      }
     },
     handleDragOver(e) {
       let me = this;

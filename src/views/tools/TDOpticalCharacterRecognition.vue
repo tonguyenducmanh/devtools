@@ -155,11 +155,9 @@ export default {
   components: { TDSubSidebar },
   created() {
     let me = this;
-    document.addEventListener("paste", me.handlePasteEvent);
   },
   beforeUnmount() {
     let me = this;
-    document.removeEventListener("paste", me.handlePasteEvent);
     me.hideMagnifier();
   },
   mounted() {},
@@ -406,25 +404,6 @@ export default {
 
         me.isProcessing = false;
         me.$tdToast.success(me.$t("i18nCommon.toastMessage.converted"));
-      }
-    },
-    handlePasteEvent(e) {
-      let me = this;
-      e.preventDefault();
-      const items = e.clipboardData.items;
-
-      for (let item of items) {
-        if (item.type.includes("image")) {
-          const blob = item.getAsFile();
-          if (
-            me.$refs.uploadArea &&
-            typeof me.$refs.uploadArea.setFileSelected === "function"
-          ) {
-            me.$refs.uploadArea.setFileSelected(blob);
-            me.previewImages([blob]);
-          }
-          break;
-        }
       }
     },
     handleDragOver(e) {
