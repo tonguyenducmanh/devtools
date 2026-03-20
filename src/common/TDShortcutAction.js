@@ -37,12 +37,12 @@ class TDShortcutAction {
   }
 
   notifyListeners() {
-    this.listeners.forEach(cb => cb());
+    this.listeners.forEach((cb) => cb());
   }
 
   updateListeners() {
     const needsListening = this.activeShortcuts.size > 0;
-    
+
     if (needsListening && !this.isListening) {
       this.startListening();
     } else if (!needsListening && this.isListening) {
@@ -67,10 +67,11 @@ class TDShortcutAction {
 
   handleKeydown(event) {
     for (const [name, config] of this.activeShortcuts) {
-      const ctrlMatch = config.requireCtrl ? (event.metaKey || event.ctrlKey) : !event.ctrlKey && !event.metaKey && !event.shiftKey;
-      const shiftMatch = config.requireShift ? event.shiftKey : !event.shiftKey;
-      
-      if (ctrlMatch && shiftMatch && event.key === config.key) {
+      const ctrlMatch = config.requireCtrl
+        ? event.metaKey || event.ctrlKey
+        : !event.ctrlKey && !event.metaKey && !event.shiftKey;
+
+      if (ctrlMatch && event.key === config.key) {
         event.preventDefault();
         if (config.action) {
           config.action();
