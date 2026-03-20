@@ -45,12 +45,22 @@
         </div>
       </Transition>
     </Teleport>
+
+    <!-- Search Button -->
+    <div class="td-header-actions">
+      <div
+        class="td-icon td-search-icon"
+        v-tooltip="$t('i18nCommon.search.placeholder') + ' (Ctrl+P)'"
+        @click="showSearch"
+      ></div>
+    </div>
   </div>
 </template>
 
 <script>
 import { useTabManager } from "@/stores/TDTabManager.js";
 import TDAgentAPI from "@/common/api/request/AgentAPI/TDAgentAPI.js";
+import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 
 export default {
   name: "TDHeader",
@@ -195,6 +205,11 @@ export default {
       this.$tdUtility.reloadApp();
       this.hoveredMenu = null;
     },
+    showSearch() {
+      TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDGoToToolPopup,
+      });
+    },
     showFlyout(menu, event) {
       clearTimeout(this._leaveTimer);
       const rect = event.currentTarget.getBoundingClientRect();
@@ -275,6 +290,12 @@ export default {
     &--active {
       background-color: var(--bg-layer-color);
     }
+  }
+
+  .td-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--padding);
   }
 }
 </style>
