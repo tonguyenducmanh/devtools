@@ -8,6 +8,7 @@
         width="100%"
         :enableHighlight="enableHighlight"
         :language="language"
+        :wrapText="wrapText"
       ></TDTextarea>
     </div>
     <div class="flex tool-footer">
@@ -31,6 +32,12 @@
         :type="$tdEnum.buttonType.secondary"
         :label="$t('i18nCommon.blanktext.download')"
       ></TDButton>
+      <div>
+        <TDCheckbox
+          v-model="wrapText"
+          :label="$t('i18nCommon.wrapText')"
+        ></TDCheckbox>
+      </div>
     </div>
   </div>
 </template>
@@ -41,6 +48,7 @@ export default {
     return {
       content: "",
       enableHighlight: true,
+      wrapText: true,
       language: "plaintext",
       methodOptions: [
         { value: "plaintext", label: "Plain Text" },
