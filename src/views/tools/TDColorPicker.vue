@@ -4,9 +4,6 @@
     <div class="flex td-color-picker">
       <div v-show="!imageLoaded" class="upload-area-container">
         <TDUpload
-          @dragover="handleDragOver"
-          @dragleave="handleDragLeave"
-          @drop="handleDrop"
           @selected="processFile"
           ref="uploadArea"
           class="upload-area"
@@ -134,35 +131,6 @@ export default {
     haddleCopyEvent(value) {
       let me = this;
       me.$tdUtility.copyToClipboard(value);
-    },
-    handleDragOver(e) {
-      let me = this;
-      e.preventDefault();
-      me.isDragOver = true;
-    },
-
-    handleDragLeave(e) {
-      let me = this;
-      e.preventDefault();
-      me.isDragOver = false;
-    },
-    handleDrop(e) {
-      e.preventDefault();
-      let me = this;
-      const files = Array.from(e.dataTransfer.files).filter((file) =>
-        file.type.includes("image")
-      );
-
-      if (files && files.length > 0) {
-        if (
-          me.$refs.uploadArea &&
-          typeof me.$refs.uploadArea.setFileSelected === "function"
-        ) {
-          let currentFile = [files[0]];
-          me.$refs.uploadArea.setFileSelected(); // chỉ lưu 1 file
-          me.processFile(currentFile);
-        }
-      }
     },
     processFile(files) {
       let me = this;

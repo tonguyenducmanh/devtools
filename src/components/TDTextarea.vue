@@ -33,11 +33,7 @@
         :style="borderRadiusStyle"
         @input="changeInputValue"
         @scroll="handleScroll"
-        @dragover="handleDragOver"
-        @dragleave="handleDragLeave"
-        @drop="handleDrop"
         :class="{
-          'drag-over': isDragOver,
           'fix-size': !resizeable,
           'td-textarea-nowrap-text': !wrapText,
           'with-highlight': enableHighlight,
@@ -132,7 +128,6 @@ export default {
   data() {
     return {
       value: null,
-      isDragOver: false,
     };
   },
   watch: {
@@ -165,22 +160,6 @@ export default {
     changeInputValue(e) {
       let me = this;
       me.$emit("update:modelValue", e.target.value);
-    },
-    handleDragOver(e) {
-      let me = this;
-      e.preventDefault();
-      me.isDragOver = true;
-    },
-    handleDragLeave(e) {
-      let me = this;
-      e.preventDefault();
-      me.isDragOver = false;
-    },
-    handleDrop(e) {
-      let me = this;
-      e.preventDefault();
-      me.isDragOver = false;
-      me.$emit("dropValue", e);
     },
     handleTab(e) {
       const TAB_SIZE = "  ";
@@ -351,11 +330,6 @@ export default {
   textarea:focus {
     outline: none;
     border: 1px solid var(--focus-color);
-  }
-
-  .drag-over {
-    outline: 2px dashed black;
-    background-color: rgba(100, 100, 100, 0.6);
   }
 
   .fix-size {

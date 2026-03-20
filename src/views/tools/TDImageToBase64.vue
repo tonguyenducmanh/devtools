@@ -1,15 +1,17 @@
 <template>
   <div class="flex flex-col container">
-    <div class="flex paste-box">
-      <div
-        ref="drop-zone"
-        class="drop-zone"
-        @dragover="handleDragOver"
-        @dragleave="handleDragLeave"
-        @drop="handleDrop"
-      >
-        <p v-if="!srcImg">{{ $t("i18nCommon.imageToBase64.dropZone") }}</p>
-        <img v-if="srcImg" :src="srcImg" class="preview" ref="preview" />
+    <div class="flex upload-data">
+      <div class="flex flex-col upload-area">
+        <div>
+          <TDUpload
+            @selected="processFile"
+            ref="uploadArea"
+            class="upload-area"
+          ></TDUpload>
+        </div>
+        <div>
+          <img v-if="srcImg" :src="srcImg" class="preview" />
+        </div>
       </div>
       <div class="result-container">
         <TDTextarea
@@ -45,24 +47,15 @@ export default {
       let me = this;
       me.$tdUtility.copyToClipboard(me.base64Result);
     },
-    handleDragOver(e) {
+    processFile(files) {
       let me = this;
-      e.preventDefault();
-      me.isDragOver = true;
-    },
-
-    handleDragLeave(e) {
-      let me = this;
-      e.preventDefault();
-      me.isDragOver = false;
-    },
-    handleDrop(e) {
-      e.preventDefault();
-      let me = this;
-      const files = e.dataTransfer.files;
-      if (files[0] && files[0].type.includes("image")) {
-        me.handleImageToBase64(files[0]);
+      let data = null;
+      if (Array.isArray(files)) {
+        data = files[0];
+      } else {
+        data = files;
       }
+      me.handleImageToBase64(data);
     },
     handleImageToBase64(blob) {
       let me = this;
@@ -86,49 +79,19 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .container {
   width: 100%;
   height: 100%;
-}
-.paste-box {
-  gap: var(--padding);
-  width: 100%;
-  flex: 1;
-}
-
-.drop-zone {
-  border: 1px dashed var(--bg-active-color);
-  padding: 1.5rem;
-  text-align: center;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
-
-.drop-zone:hover {
-  border-color: var(--focus-color);
-  background-color: var(--bg-hover-color);
-}
-
-.drop-zone p {
-  color: #666;
-}
-
-.preview {
-  width: 500px;
-  height: auto;
-  padding: var(--padding);
-}
-
-.result-container {
-  display: flex;
-  width: 100%;
-  height: 100%;
+  .upload-data {
+    gap: var(--padding);
+    flex: 1;
+    .upload-area {
+      .preview{
+      }
+    }
+    .result-container {
+    }
+  }
 }
 </style>

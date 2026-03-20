@@ -4,14 +4,9 @@
       <div class="flex tool-ocr-header">
         <TDUpload
           :noMargin="true"
-          @dragover="handleDragOver"
-          @dragleave="handleDragLeave"
-          @drop="handleDrop"
           @selected="handleImageSelected"
           ref="uploadArea"
           class="upload-area"
-          :labelEmpty="$t('i18nCommon.OpticalCharacterRecognition.dropZone')"
-          :label="$t('i18nCommon.oneTimePassword.dropZone.label')"
           multiple
         ></TDUpload>
         <TDButton
@@ -406,34 +401,6 @@ export default {
         me.$tdToast.success(me.$t("i18nCommon.toastMessage.converted"));
       }
     },
-    handleDragOver(e) {
-      let me = this;
-      e.preventDefault();
-      me.isDragOver = true;
-    },
-
-    handleDragLeave(e) {
-      let me = this;
-      e.preventDefault();
-      me.isDragOver = false;
-    },
-    handleDrop(e) {
-      e.preventDefault();
-      let me = this;
-      const files = Array.from(e.dataTransfer.files).filter((file) =>
-        file.type.includes("image"),
-      );
-
-      if (files.length) {
-        if (
-          me.$refs.uploadArea &&
-          typeof me.$refs.uploadArea.setFileSelected === "function"
-        ) {
-          me.$refs.uploadArea.setFileSelected(files);
-          me.previewImages(files);
-        }
-      }
-    },
   },
   data() {
     return {
@@ -488,7 +455,6 @@ export default {
       ],
       isProcessing: false,
       progress: 0,
-      isDragOver: false,
       enablePreprocessing: false,
       isShowSidebar: true,
       magnifierEl: null,

@@ -122,8 +122,7 @@ export default {
     },
     colorPicker: {
       title: "Công cụ chọn màu!",
-      uploadLabel:
-        "Chọn hoặc kéo thả hình ảnh vào đây, PNG, JPG, GIF tối đa 10MB",
+      uploadLabel: "Chọn ảnh",
       uploadButton: "Tải lên",
       colorPalette: "Bảng màu",
       selectedColor: "Màu đã chọn",
@@ -150,12 +149,10 @@ export default {
     },
     imageToBase64: {
       title: "Công cụ chuyển đổi ảnh sang Base64!",
-      dropZone: "Kéo thả ảnh vào đây",
       placeHolder: "Kết quả Base64 sẽ hiển thị ở đây",
       copyButton: "Sao chép Base64",
     },
     OpticalCharacterRecognition: {
-      dropZone: "Kéo thả ảnh vào đây",
       placeHolder: "Kết quả sẽ hiển thị ở đây",
       placeholder: "Vui lòng upload ảnh để nhận dạng",
       copyButton: "Sao chép",
@@ -282,10 +279,6 @@ export default {
     qrCodeToText: {
       title: "Công cụ chuyển đổi mã QR sang văn bản!",
       note: "Lưu ý: thứ tự upload dựa vào thứ tự sắp xếp trên máy tính, vui lòng chọn sắp xếp theo ngày tăng dần để nối chuỗi đúng file",
-      dropZone: {
-        placeholder: "Kéo thả ảnh ảnh vừa copy vào đây",
-        label: "Chọn ảnh mã QR",
-      },
       convert: "Chuyển đổi",
       copy: "Sao chép",
       result: "Kết quả sẽ xuất hiện sau khi upload ảnh",
@@ -299,10 +292,6 @@ export default {
         googleQR: "QR authen",
         google: "Text auth",
         manual: "Tự nhập",
-      },
-      dropZone: {
-        label: "Chọn ảnh QR code",
-        placeholder: "Kéo thả ảnh hoặc tải lên",
       },
       filter: "Lọc",
       auth: {

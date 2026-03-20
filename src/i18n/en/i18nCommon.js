@@ -122,7 +122,7 @@ export default {
     },
     colorPicker: {
       title: "Color picker tool!",
-      uploadLabel: "Choose an image or drag it here, PNG, JPG, GIF up to 10MB",
+      uploadLabel: "Choose an image",
       uploadButton: "Upload",
       colorPalette: "Color Palette",
       selectedColor: "Selected Color",
@@ -150,12 +150,10 @@ export default {
     },
     imageToBase64: {
       title: "Image To base64 tool!",
-      dropZone: "Drag & drop image here",
       placeHolder: "Base64 output will appear here",
       copyButton: "Copy Base64",
     },
     OpticalCharacterRecognition: {
-      dropZone: "Drag & drop image here",
       placeHolder: "Output will appear here",
       placeholder: "Please upload images to recognize",
       copyButton: "Copy",
@@ -283,10 +281,6 @@ export default {
     qrCodeToText: {
       title: "QRCode To Text tool!",
       note: "Note: Upload order is based on computer sorting order, please choose ascending date sort to concatenate files correctly",
-      dropZone: {
-        placeholder: "Drop images here",
-        label: "Select QR code image",
-      },
       convert: "Convert",
       copy: "Copy",
       result: "Result will appear here",
@@ -300,10 +294,6 @@ export default {
         googleQR: "QR authen",
         google: "Text auth",
         manual: "Manual",
-      },
-      dropZone: {
-        label: "Select QR code image",
-        placeholder: "Drop image here or upload",
       },
       filter: "Filter",
       auth: {

@@ -9,11 +9,6 @@
         ></TDTextarea>
       </div>
       <div
-        ref="drop-zone"
-        class="drop-zone"
-        @dragover="handleDragOver"
-        @dragleave="handleDragLeave"
-        @drop="handleDrop"
       >
         <p v-if="!srcImg">{{ $t("i18nCommon.base64ToImage.result") }}</p>
         <img v-if="srcImg" :src="srcImg" class="preview" ref="preview" />
@@ -106,28 +101,6 @@ h1 {
   margin-bottom: 2rem;
 }
 
-.drop-zone {
-  border: 1px dashed var(--bg-active-color);
-  padding: 1.5rem;
-  text-align: center;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
-
-.drop-zone:hover {
-  border-color: var(--focus-color);
-  background-color: var(--bg-hover-color);
-}
-
-.drop-zone p {
-  color: #666;
-}
 
 .preview {
   width: 500px;

@@ -16,15 +16,10 @@
         <div v-if="sourceOTPImport == 'googleqrcode'" class="flex flex-one">
           <TDUpload
             :noMargin="true"
-            @dragover="handleDragOver"
-            @dragleave="handleDragLeave"
-            @drop="handleDrop"
             @selected="convertQRCode"
             ref="uploadArea"
             class="upload-area"
             maxHeight="200px"
-            :labelEmpty="$t('i18nCommon.oneTimePassword.dropZone.placeholder')"
-            :label="$t('i18nCommon.oneTimePassword.dropZone.label')"
             multiple
             :borderRadiusPosition="[
               $tdEnum.BorderRadiusPosition.TopRight,
@@ -283,34 +278,6 @@ export default {
         append: true,
       });
     }, 300),
-    handleDragOver(e) {
-      let me = this;
-      e.preventDefault();
-      me.isDragOver = true;
-    },
-
-    handleDragLeave(e) {
-      let me = this;
-      e.preventDefault();
-      me.isDragOver = false;
-    },
-    handleDrop(e) {
-      e.preventDefault();
-      let me = this;
-      const files = Array.from(e.dataTransfer.files).filter((file) =>
-        file.type.includes("image"),
-      );
-
-      if (files.length) {
-        if (
-          me.$refs.uploadArea &&
-          typeof me.$refs.uploadArea.setFileSelected === "function"
-        ) {
-          me.$refs.uploadArea.setFileSelected(files); // truyền mảng files
-          me.convertQRCode();
-        }
-      }
-    },
     async convertQRCode() {
       let me = this;
       if (
@@ -699,7 +666,6 @@ export default {
           label: this.$t("i18nCommon.oneTimePassword.importOptions.manual"),
         },
       ],
-      isDragOver: false,
     };
   },
 };

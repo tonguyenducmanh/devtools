@@ -5,13 +5,8 @@
         <div class="flex tool-qr-header">
           <div class="flex-one">
             <TDUpload
-              @dragover="handleDragOver"
-              @dragleave="handleDragLeave"
-              @drop="handleDrop"
               ref="uploadArea"
               class="upload-area"
-              :labelEmpty="$t('i18nCommon.qrCodeToText.dropZone.placeholder')"
-              :label="$t('i18nCommon.qrCodeToText.dropZone.label')"
               multiple
               @selected="convertQRCode"
             ></TDUpload>
@@ -71,34 +66,6 @@ export default {
   },
   mounted() {},
   methods: {
-    handleDragOver(e) {
-      let me = this;
-      e.preventDefault();
-      me.isDragOver = true;
-    },
-
-    handleDragLeave(e) {
-      let me = this;
-      e.preventDefault();
-      me.isDragOver = false;
-    },
-    handleDrop(e) {
-      e.preventDefault();
-      let me = this;
-      const files = Array.from(e.dataTransfer.files).filter((file) =>
-        file.type.includes("image"),
-      );
-
-      if (files.length) {
-        if (
-          me.$refs.uploadArea &&
-          typeof me.$refs.uploadArea.setFileSelected === "function"
-        ) {
-          me.$refs.uploadArea.setFileSelected(files); // truyền mảng files
-          me.convertQRCode();
-        }
-      }
-    },
     /**
      * Tạo QR code từ text
      */
@@ -210,7 +177,6 @@ export default {
       isRemoveEmpty: false,
       historyItems: [],
       qrCodeItems: [],
-      isDragOver: false,
       isCompressText:
         window.__env &&
         window.__env.textToQRConfig &&
