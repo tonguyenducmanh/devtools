@@ -50,8 +50,8 @@
       <div class="qrcode-box" :style="secondSectionResizeStyle">
         <TDVirtualScroll
           :items="qrCodeItems"
-          :itemHeight="QRSizeInPixel"
-          :itemWidth="QRSizeInPixel"
+          :itemHeight="currentConfigLayout.QRSizeInPixel"
+          :itemWidth="currentConfigLayout.QRSizeInPixel"
           :gap="10"
           :bufferSize="0"
         >
