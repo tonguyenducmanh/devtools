@@ -47,5 +47,27 @@ export default {
       textManipulation:
         "Xử lý hàng loạt đoạn văn bản tương tự nhau theo mẫu có sẵn",
     },
+    oneTimePassword: {
+      purpose: {
+        title: "Công cụ OTP là gì?",
+        content: "Công cụ giúp tạo mã OTP (One-Time Password) 6 ký tự, tự động thay đổi mỗi 30 giây. Hỗ trợ import tài khoản từ Google Authenticator thông qua QR code, URL hoặc nhập thủ công.",
+      },
+      importData: {
+        title: "Nhập dữ liệu",
+        scanQR: "Quét QR Code - Upload file ảnh chứa mã QR từ Google Authenticator để tự động nhập tài khoản.",
+        pasteURL: "Dán URL - Dán link otpauth-migration:// từ Google Authenticator để import tài khoản.",
+        manual: "Nhập thủ công - Điền thông tin issuer, name và secret để thêm tài khoản mới.",
+      },
+      security: {
+        title: "Bảo mật",
+        description: "Dữ liệu OTP được mã hóa và lưu trữ cục bộ trên thiết bị của bạn. Bạn cần nhập mật khẩu (mật khẩu do bạn tự tạo) để mã hóa dữ liệu cache phía trình duyệt và mở tài khoản đã lưu.",
+      },
+      quickUse: {
+        title: "Sử dụng nhanh",
+        copyOTP: "Nhấp vào bất kỳ mã OTP nào để sao chép vào clipboard.",
+        autoRefresh: "Mã OTP tự động làm mới mỗi 30 giây.",
+        note: "Thanh progress phía trên hiển thị thời gian còn lại trước khi mã OTP thay đổi.",
+      },
+    },
   },
 };

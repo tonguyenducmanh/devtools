@@ -1,171 +1,178 @@
 <template>
-  <div class="container">
-    <div class="flex flex-col otp-header">
-      <div class="flex td-first-header">
-        <TDComboBox
-          :width="120"
-          :noMargin="true"
-          v-model="sourceOTPImport"
-          :options="radioImports"
-          class="td-source-otp"
-          :borderRadiusPosition="[
-            $tdEnum.BorderRadiusPosition.TopLeft,
-            $tdEnum.BorderRadiusPosition.BottomLeft,
-          ]"
-        />
-        <div v-if="sourceOTPImport == 'googleqrcode'" class="flex flex-one">
-          <TDUpload
+  <div class="flex td-otp">
+    <div class="container">
+      <div class="flex flex-col otp-header">
+        <div class="flex td-first-header">
+          <TDComboBox
+            :width="120"
             :noMargin="true"
-            @selected="convertQRCode"
-            ref="uploadArea"
-            class="upload-area"
-            maxHeight="200px"
-            multiple
+            v-model="sourceOTPImport"
+            :options="radioImports"
+            class="td-source-otp"
             :borderRadiusPosition="[
-              $tdEnum.BorderRadiusPosition.TopRight,
-              $tdEnum.BorderRadiusPosition.BottomRight,
+              $tdEnum.BorderRadiusPosition.TopLeft,
+              $tdEnum.BorderRadiusPosition.BottomLeft,
             ]"
-          ></TDUpload>
-          <div>
+          />
+          <div v-if="sourceOTPImport == 'googleqrcode'" class="flex flex-one">
+            <TDUpload
+              :noMargin="true"
+              @selected="convertQRCode"
+              ref="uploadArea"
+              class="upload-area"
+              maxHeight="200px"
+              multiple
+              :borderRadiusPosition="[
+                $tdEnum.BorderRadiusPosition.TopRight,
+                $tdEnum.BorderRadiusPosition.BottomRight,
+              ]"
+            ></TDUpload>
+            <div>
+              <TDButton
+                :noMargin="true"
+                :type="$tdEnum.buttonType.secondary"
+                :label="$t('i18nCommon.oneTimePassword.auth.add')"
+                @click="decodeGoogleAuth"
+              />
+            </div>
+          </div>
+          <div v-if="sourceOTPImport == 'google'" class="flex flex-one">
+            <TDInput
+              :noMargin="true"
+              v-model="migrationURL"
+              :placeHolder="$t('i18nCommon.oneTimePassword.urlPlaceholder')"
+              :borderRadiusPosition="[
+                $tdEnum.BorderRadiusPosition.TopRight,
+                $tdEnum.BorderRadiusPosition.BottomRight,
+              ]"
+            />
+            <div>
+              <TDButton
+                :noMargin="true"
+                :type="$tdEnum.buttonType.secondary"
+                :label="$t('i18nCommon.oneTimePassword.auth.add')"
+                :readOnly="!migrationURL"
+                @click="decodeGoogleAuth"
+              />
+            </div>
+          </div>
+          <div v-if="sourceOTPImport == 'manual'" class="flex flex-one">
+            <TDInput
+              :noMargin="true"
+              :borderRadiusPosition="[
+                $tdEnum.BorderRadiusPosition.TopRight,
+              $tdEnum.BorderRadiusPosition.BottomRight,
+              ]"
+              v-model="addNewObject.issuer"
+              :placeHolder="$t('i18nCommon.oneTimePassword.inputs.issuer')"
+            />
+            <TDInput
+              :noMargin="true"
+              v-model="addNewObject.name"
+              :placeHolder="$t('i18nCommon.oneTimePassword.inputs.name')"
+            />
+            <TDInput
+              :noMargin="true"
+              v-model="addNewObject.secret"
+              :placeHolder="$t('i18nCommon.oneTimePassword.inputs.secret')"
+            />
             <TDButton
               :noMargin="true"
               :type="$tdEnum.buttonType.secondary"
+              :readOnly="
+                !addNewObject || !addNewObject.name || !addNewObject.secret
+              "
               :label="$t('i18nCommon.oneTimePassword.auth.add')"
-              @click="decodeGoogleAuth"
+              @click="addNewTOTP"
             />
           </div>
         </div>
-        <div v-if="sourceOTPImport == 'google'" class="flex flex-one">
+        <div class="flex td-second-header">
           <TDInput
+            v-model="filterOtp"
             :noMargin="true"
-            v-model="migrationURL"
-            :placeHolder="$t('i18nCommon.oneTimePassword.urlPlaceholder')"
-            :borderRadiusPosition="[
-              $tdEnum.BorderRadiusPosition.TopRight,
-              $tdEnum.BorderRadiusPosition.BottomRight,
-            ]"
+            :placeHolder="$t('i18nCommon.oneTimePassword.filter')"
           />
-          <div>
-            <TDButton
-              :noMargin="true"
-              :type="$tdEnum.buttonType.secondary"
-              :label="$t('i18nCommon.oneTimePassword.auth.add')"
-              :readOnly="!migrationURL"
-              @click="decodeGoogleAuth"
-            />
-          </div>
-        </div>
-        <div v-if="sourceOTPImport == 'manual'" class="flex flex-one">
           <TDInput
+            v-model="username"
             :noMargin="true"
-            :borderRadiusPosition="[
-              $tdEnum.BorderRadiusPosition.TopRight,
-              $tdEnum.BorderRadiusPosition.BottomRight,
-            ]"
-            v-model="addNewObject.issuer"
-            :placeHolder="$t('i18nCommon.oneTimePassword.inputs.issuer')"
+            :placeHolder="$t('i18nCommon.oneTimePassword.auth.username')"
           />
           <TDInput
             :noMargin="true"
-            v-model="addNewObject.name"
-            :placeHolder="$t('i18nCommon.oneTimePassword.inputs.name')"
-          />
-          <TDInput
-            :noMargin="true"
-            v-model="addNewObject.secret"
-            :placeHolder="$t('i18nCommon.oneTimePassword.inputs.secret')"
+            v-model="password"
+            :inputType="'password'"
+            :placeHolder="$t('i18nCommon.oneTimePassword.auth.password')"
+            @keyup.enter="openAuthenSaved"
           />
           <TDButton
+            :label="$t('i18nCommon.oneTimePassword.auth.open')"
+            :readOnly="!password || !username"
+            @click="openAuthenSaved"
             :noMargin="true"
+          />
+          <TDButton
             :type="$tdEnum.buttonType.secondary"
-            :readOnly="
-              !addNewObject || !addNewObject.name || !addNewObject.secret
-            "
-            :label="$t('i18nCommon.oneTimePassword.auth.add')"
-            @click="addNewTOTP"
+            :label="$t('i18nCommon.oneTimePassword.auth.save')"
+            :readOnly="!password || !username"
+            @click="saveAuthen"
+            :noMargin="true"
           />
         </div>
+        <div class="flex td-decoded-data">
+          <TDTextarea
+            v-if="isShowDecoded"
+            :placeHolder="$t('i18nCommon.oneTimePassword.decodeData')"
+            v-model="decodedDataString"
+            :label="$t('i18nCommon.oneTimePassword.decodeData')"
+            isLabelTop
+            :readOnly="true"
+            height="400px"
+          ></TDTextarea>
+        </div>
+        <div v-if="isShowProgress" class="otp-progress-wrapper">
+          <progress :value="progress" max="100"></progress>
+        </div>
       </div>
-      <div class="flex td-second-header">
+      <div class="main-otp-container">
+        <div class="flex otp-container">
+          <template v-for="(item, index) in optShowList">
+            <div
+              class="otp-item"
+              @click="handleCopyEvent(item.otp)"
+              v-tooltip="item.displayName"
+            >
+              <div class="otp-left">
+                <div class="otp-name">{{ item.displayName }}</div>
+                <div class="otp-type">{{ item.type }}</div>
+              </div>
+              <div v-if="item.type.compareNotSentive('HOTP')">NotSupported</div>
+              <div v-else class="otp-value">
+                {{ item.otp }}
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+      <div class="flex footer-section">
         <TDInput
-          v-model="filterOtp"
           :noMargin="true"
-          :placeHolder="$t('i18nCommon.oneTimePassword.filter')"
-        />
-        <TDInput
-          v-model="username"
-          :noMargin="true"
-          :placeHolder="$t('i18nCommon.oneTimePassword.auth.username')"
-        />
-        <TDInput
-          :noMargin="true"
-          v-model="password"
-          :inputType="'password'"
-          :placeHolder="$t('i18nCommon.oneTimePassword.auth.password')"
-          @keyup.enter="openAuthenSaved"
+          v-model="filterRemove"
+          :placeHolder="placeHolderRemove"
         />
         <TDButton
-          :label="$t('i18nCommon.oneTimePassword.auth.open')"
-          :readOnly="!password || !username"
-          @click="openAuthenSaved"
           :noMargin="true"
-        />
-        <TDButton
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.oneTimePassword.auth.save')"
-          :readOnly="!password || !username"
-          @click="saveAuthen"
-          :noMargin="true"
+          :label="$t('i18nCommon.oneTimePassword.remove.button')"
+          :readOnly="!filterRemove"
+          @click="removeByFilter"
         />
       </div>
-      <div class="flex td-decoded-data">
-        <TDTextarea
-          v-if="isShowDecoded"
-          :placeHolder="$t('i18nCommon.oneTimePassword.decodeData')"
-          v-model="decodedDataString"
-          :label="$t('i18nCommon.oneTimePassword.decodeData')"
-          isLabelTop
-          :readOnly="true"
-          height="400px"
-        ></TDTextarea>
-      </div>
-      <div v-if="isShowProgress" class="otp-progress-wrapper">
-        <progress :value="progress" max="100"></progress>
-      </div>
     </div>
-    <div class="main-otp-container">
-      <div class="flex otp-container">
-        <template v-for="(item, index) in optShowList">
-          <div
-            class="otp-item"
-            @click="handleCopyEvent(item.otp)"
-            v-tooltip="item.displayName"
-          >
-            <div class="otp-left">
-              <div class="otp-name">{{ item.displayName }}</div>
-              <div class="otp-type">{{ item.type }}</div>
-            </div>
-            <div v-if="item.type.compareNotSentive('HOTP')">NotSupported</div>
-            <div v-else class="otp-value">
-              {{ item.otp }}
-            </div>
-          </div>
-        </template>
-      </div>
-    </div>
-    <div class="flex footer-section">
-      <TDInput
-        :noMargin="true"
-        v-model="filterRemove"
-        :placeHolder="placeHolderRemove"
-      />
-      <TDButton
-        :noMargin="true"
-        :label="$t('i18nCommon.oneTimePassword.remove.button')"
-        :readOnly="!filterRemove"
-        @click="removeByFilter"
-      />
-    </div>
+    <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:main>
+        <TDOneTimePasswordHelp />
+      </template>
+    </TDSubSidebar>
   </div>
 </template>
 
@@ -176,9 +183,12 @@ import * as OTPAuth from "otpauth";
 import { toRaw } from "vue";
 import googleAuthen from "@/common/proto/googleAuth.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDOneTimePasswordHelp from "@/views/helps/TDOneTimePasswordHelp.vue";
 export default {
   extends: TDToolBase,
   name: "TDOneTimePassword",
+  components: { TDSubSidebar, TDOneTimePasswordHelp },
   created() {
     let me = this;
     me.processWhenMounted();
@@ -624,6 +634,7 @@ export default {
   },
   data() {
     return {
+      isShowSidebar: true,
       filterOtp: null,
       migrationURL: null,
       decodedData: null,
@@ -664,11 +675,16 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.td-otp {
+  width: 100%;
+  height: 100%;
+}
 .container {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
+  flex: 1;
 }
 .note {
   color: var(--warning-color);

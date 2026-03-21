@@ -1,5 +1,5 @@
 <template>
-  <div class="td-welcome-help">
+  <div class="td-help">
     <div class="help-content">
       <div class="help-section">
         <h3 class="section-subtitle">
@@ -70,61 +70,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.td-welcome-help {
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-}
-
-.help-content {
-  padding: var(--padding);
-}
-
-.section-title {
-  font-size: var(--font-size-l-medium);
-  font-weight: 600;
-  margin-bottom: var(--padding);
-  padding-bottom: var(--padding);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.help-section {
-  margin-bottom: var(--padding-large);
-}
-
-.section-subtitle {
-  font-size: var(--font-size-medium-rare);
-  font-weight: 600;
-  margin-bottom: var(--padding-medium);
-  color: var(--text-color);
-}
-
-.section-text {
-  font-size: var(--font-size-medium-rare);
-  line-height: 1.6;
-  color: var(--text-secondary-color);
-  margin-bottom: var(--padding-medium);
-}
-
-.section-list {
-  gap: var(--padding);
-  margin-bottom: var(--padding-medium);
-}
-
-.section-item {
-  font-size: var(--font-size-medium-rare);
-  line-height: 1.6;
-  color: var(--text-secondary-color);
-  padding: var(--padding-medium) var(--padding-x-medium);
-  border-left: 2px solid var(--border-color);
-  margin-bottom: 2px;
-  background: var(--bg-layer-color);
-  border-radius: 0 var(--border-radius-component) var(--border-radius-component) 0;
-}
-
-.section-note {
-  font-size: var(--font-size-small);
-  color: var(--text-color-light);
-  font-style: italic;
-}
+@import "@/styles/help.scss";
 </style>

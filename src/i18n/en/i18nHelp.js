@@ -46,5 +46,27 @@ export default {
       textManipulation:
         "Process a batch of similar text snippets using a pre-defined template",
     },
+    oneTimePassword: {
+      purpose: {
+        title: "What is OTP Tool?",
+        content: "A tool to generate 6-character OTP (One-Time Password) codes that automatically refresh every 30 seconds. Supports importing accounts from Google Authenticator via QR code, URL, or manual entry.",
+      },
+      importData: {
+        title: "Import Data",
+        scanQR: "Scan QR Code - Upload an image file containing the QR code from Google Authenticator to automatically import accounts.",
+        pasteURL: "Paste URL - Paste the otpauth-migration:// link from Google Authenticator to import accounts.",
+        manual: "Manual Entry - Fill in issuer, name, and secret to add a new account.",
+      },
+      security: {
+        title: "Security",
+        description: "OTP data is encrypted and stored locally on your device. You need to enter a password (user-created) to encrypt browser cache data and open saved accounts.",
+      },
+      quickUse: {
+        title: "Quick Use",
+        copyOTP: "Click on any OTP code to copy it to clipboard.",
+        autoRefresh: "OTP codes automatically refresh every 30 seconds.",
+        note: "The progress bar above shows the remaining time before the OTP code changes.",
+      },
+    },
   },
 };
