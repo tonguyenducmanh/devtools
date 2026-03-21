@@ -111,6 +111,8 @@ export default {
       convert: "Convert",
       placeHolder: "Paste your Base64 string here",
       result: "Result converted",
+      input: "Input Base64",
+      output: "Output Image",
     },
     codeFormatter: {
       title: "Code formatter tool!",
@@ -152,6 +154,8 @@ export default {
       title: "Image To base64 tool!",
       placeHolder: "Base64 output will appear here",
       copyButton: "Copy Base64",
+      input: "Input Image",
+      output: "Output Base64",
     },
     OpticalCharacterRecognition: {
       placeHolder: "Output will appear here",

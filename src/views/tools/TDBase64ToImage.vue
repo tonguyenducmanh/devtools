@@ -1,20 +1,27 @@
 <template>
-  <div class="flex flex-col container">
-    <div class="flex paste-box">
-      <div class="result-container">
+  <div class="container">
+    <div class="io-section">
+      <div class="panel left-panel">
         <TDTextarea
-          ref="base64-output"
+          isLabelTop
+          :label="$t('i18nCommon.base64ToImage.input')"
           :placeHolder="$t('i18nCommon.base64ToImage.placeHolder')"
           v-model="base64Result"
         ></TDTextarea>
       </div>
-      <div
-      >
-        <p v-if="!srcImg">{{ $t("i18nCommon.base64ToImage.result") }}</p>
-        <img v-if="srcImg" :src="srcImg" class="preview" ref="preview" />
+      <div class="panel right-panel">
+        <label class="panel-label">{{
+          $t("i18nCommon.base64ToImage.result")
+        }}</label>
+        <div class="preview-container">
+          <img v-if="srcImg" :src="srcImg" class="preview" ref="preview" />
+          <div v-else class="placeholder">
+            {{ $t("i18nCommon.base64ToImage.result") }}
+          </div>
+        </div>
       </div>
     </div>
-    <div class="flex">
+    <div class="tool-footer">
       <TDButton
         @click="handleConvert"
         :label="$t('i18nCommon.base64ToImage.convert')"
@@ -32,6 +39,7 @@
     </div>
   </div>
 </template>
+
 <script>
 export default {
   name: "TDBase64ToImage",
@@ -44,7 +52,6 @@ export default {
   mounted() {},
   methods: {
     async applyMock() {
-      // Lazy-load module
       const { TDMockBase64ToImage } = await import(
         /* webpackChunkName: "mock-base64-to-image" */
         "@/common/mock/TDMockBase64ToImage.js"
@@ -64,7 +71,6 @@ export default {
       let me = this;
       if (!me.base64Result) return;
 
-      // Create temporary link
       let link = document.createElement("a");
       link.href = me.base64Result;
       link.download = "image." + me.getImageExtension(me.base64Result);
@@ -85,38 +91,89 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .container {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
-.paste-box {
-  gap: var(--padding);
-  width: 100%;
+
+/* ── Two-panel row ── */
+.io-section {
+  display: flex;
+  flex-direction: row;
   flex: 1;
+  min-height: 0; /* critical: lets flex children shrink below content size */
+  column-gap: var(--padding);
+  overflow: hidden;
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 2rem;
+.panel {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 calc(50% - var(--padding) / 2);
+  width: calc(50% - var(--padding) / 2);
+  min-width: 0; /* prevent text/image overflow from expanding the panel */
+  min-height: 0;
+  overflow: hidden;
 }
 
+/* Left panel: textarea fills the panel completely */
+.left-panel :deep(.td-textarea-wrapper),
+.left-panel :deep(textarea) {
+  height: 100%;
+  resize: none;
+}
+
+/* Right panel */
+.right-panel {
+  gap: var(--padding);
+}
+
+.panel-label {
+  flex-shrink: 0;
+  font-size: var(--font-size, 14px);
+  color: var(--td-text-color);
+}
+
+.preview-container {
+  flex: 1;
+  min-height: 0; /* critical: lets the container shrink and not overflow */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--td-background-color);
+  border: 1px solid var(--td-border-color);
+  border-radius: var(--border-radius);
+  padding: var(--padding);
+  overflow: hidden;
+}
 
 .preview {
-  width: 500px;
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
   height: auto;
-  padding: var(--padding);
-}
-
-.preview img {
-  width: 100%;
-  height: 100%;
   object-fit: contain;
 }
 
-.result-container {
+.placeholder {
+  color: var(--td-text-secondary-color);
+  text-align: center;
+  user-select: none;
+}
+
+/* ── Footer buttons ── */
+.tool-footer {
   display: flex;
-  width: 100%;
-  height: 100%;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: var(--padding);
+  margin-top: var(--padding);
 }
 </style>

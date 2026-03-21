@@ -111,6 +111,8 @@ export default {
       convert: "Chuyển đổi",
       placeHolder: "Dán mã Base64 vào đây",
       result: "Kết quả chuyển đổi",
+      input: "Mã Base64 đầu vào",
+      output: "Hình ảnh đầu ra",
     },
     codeFormatter: {
       title: "Công cụ định dạng mã!",
@@ -151,6 +153,8 @@ export default {
       title: "Công cụ chuyển đổi ảnh sang Base64!",
       placeHolder: "Kết quả Base64 sẽ hiển thị ở đây",
       copyButton: "Sao chép Base64",
+      input: "Hình ảnh đầu vào",
+      output: "Mã Base64 đầu ra",
     },
     OpticalCharacterRecognition: {
       placeHolder: "Kết quả sẽ hiển thị ở đây",
