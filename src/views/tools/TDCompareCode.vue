@@ -1,34 +1,44 @@
 <template>
-  <div class="flex flex-col container">
-    <div class="highlight-layer" ref="textareaWrap"></div>
-    <div class="flex">
-      <TDComboBox
-        :width="200"
-        v-model="language"
-        :options="methodOptions"
-        @selected="compare"
-        :isDropTop="true"
-      />
-      <TDCheckbox
-        v-model="wrapText"
-        :label="$t('i18nCommon.apiTesting.wrapText')"
-        @change="updateLayout"
-      ></TDCheckbox>
-      <TDButton
-        @click="applyMock"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.compareCode.example')"
-      ></TDButton>
+  <div class="flex td-compare-code">
+    <div class="flex flex-col container">
+      <div class="highlight-layer" ref="textareaWrap"></div>
+      <div class="flex">
+        <TDComboBox
+          :width="200"
+          v-model="language"
+          :options="methodOptions"
+          @selected="compare"
+          :isDropTop="true"
+        />
+        <TDCheckbox
+          v-model="wrapText"
+          :label="$t('i18nCommon.apiTesting.wrapText')"
+          @change="updateLayout"
+        ></TDCheckbox>
+        <TDButton
+          @click="applyMock"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.compareCode.example')"
+        ></TDButton>
+      </div>
     </div>
+    <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:main>
+        <TDCompareCodeHelp />
+      </template>
+    </TDSubSidebar>
   </div>
 </template>
 
 <script>
 import * as monaco from "monaco-editor";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDCompareCodeHelp from "@/views/helps/TDCompareCodeHelp.vue";
 export default {
   extends: TDToolBase,
   name: "TDCompareCode",
+  components: { TDSubSidebar, TDCompareCodeHelp },
   created() {
     let me = this;
   },
@@ -112,6 +122,7 @@ export default {
   },
   data() {
     return {
+      isShowSidebar: true,
       firstCodeFile: null,
       secondCodeFile: null,
       diffOutputHtml: null,
@@ -146,9 +157,14 @@ export default {
 };
 </script>
 <style scoped>
+.td-compare-code {
+  width: 100%;
+  height: 100%;
+}
 .container {
   width: 100%;
   height: 100%;
+  flex: 1;
   border-radius: 0;
   box-shadow: none;
 }

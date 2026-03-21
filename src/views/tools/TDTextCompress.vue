@@ -1,63 +1,73 @@
 <template>
-  <div class="flex flex-col container">
-    <!-- <div class="title">{{ $t("i18nCommon.textCompress.title") }}</div> -->
-    <div class="paste-box">
-      <div class="flex compress-input">
-        <TDTextarea
-          :placeHolder="$t('i18nCommon.textCompress.input.compress')"
-          v-model="inputSource"
-        ></TDTextarea>
-        <TDTextarea
-          :placeHolder="$t('i18nCommon.textCompress.input.decompress')"
-          v-model="outputSource"
-        ></TDTextarea>
+  <div class="flex td-text-compress">
+    <div class="flex flex-col container">
+      <!-- <div class="title">{{ $t("i18nCommon.textCompress.title") }}</div> -->
+      <div class="paste-box">
+        <div class="flex compress-input">
+          <TDTextarea
+            :placeHolder="$t('i18nCommon.textCompress.input.compress')"
+            v-model="inputSource"
+          ></TDTextarea>
+          <TDTextarea
+            :placeHolder="$t('i18nCommon.textCompress.input.decompress')"
+            v-model="outputSource"
+          ></TDTextarea>
+        </div>
+      </div>
+      <div>
+        <TDRadioGroup
+          v-model="compressAlgorithms"
+          :label="$t('i18nCommon.textCompress.input.algorithm')"
+          :options="radioImports"
+        />
+      </div>
+      <div class="flex group-btn">
+        <TDButton
+          @click="handleCompress"
+          :label="$t('i18nCommon.textCompress.buttons.compress')"
+        ></TDButton>
+        <TDButton
+          @click="handleDempress"
+          :label="$t('i18nCommon.textCompress.buttons.decompress')"
+        ></TDButton>
+        <TDButton
+          @click="applyMock"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.textCompress.buttons.example')"
+        ></TDButton>
+        <TDButton
+          @click="handleCopyEvent(inputSource)"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.textCompress.buttons.copyInput')"
+        ></TDButton>
+        <TDButton
+          @click="handleCopyEvent(outputSource)"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.textCompress.buttons.copyOutput')"
+        ></TDButton>
+      </div>
+      <div class="flex compress-info" v-if="compressRatio">
+        <div>{{ inputLengthText }}</div>
+        <div>{{ outputLengthText }}</div>
+        <div>{{ compressRatio }}</div>
       </div>
     </div>
-    <div>
-      <TDRadioGroup
-        v-model="compressAlgorithms"
-        :label="$t('i18nCommon.textCompress.input.algorithm')"
-        :options="radioImports"
-      />
-    </div>
-    <div class="flex group-btn">
-      <TDButton
-        @click="handleCompress"
-        :label="$t('i18nCommon.textCompress.buttons.compress')"
-      ></TDButton>
-      <TDButton
-        @click="handleDempress"
-        :label="$t('i18nCommon.textCompress.buttons.decompress')"
-      ></TDButton>
-      <TDButton
-        @click="applyMock"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.textCompress.buttons.example')"
-      ></TDButton>
-      <TDButton
-        @click="handleCopyEvent(inputSource)"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.textCompress.buttons.copyInput')"
-      ></TDButton>
-      <TDButton
-        @click="handleCopyEvent(outputSource)"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.textCompress.buttons.copyOutput')"
-      ></TDButton>
-    </div>
-    <div class="flex compress-info" v-if="compressRatio">
-      <div>{{ inputLengthText }}</div>
-      <div>{{ outputLengthText }}</div>
-      <div>{{ compressRatio }}</div>
-    </div>
+    <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:main>
+        <TDTextCompressHelp />
+      </template>
+    </TDSubSidebar>
   </div>
 </template>
 <script>
 import TDCompress from "@/common/compress/TDCompress.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDTextCompressHelp from "@/views/helps/TDTextCompressHelp.vue";
 export default {
   extends: TDToolBase,
   name: "TDTextCompress",
+  components: { TDSubSidebar, TDTextCompressHelp },
   created() {
     let me = this;
   },
@@ -129,6 +139,7 @@ export default {
   },
   data() {
     return {
+      isShowSidebar: true,
       inputSource: null,
       outputSource: null,
       compressAlgorithms: this.$tdEnum.compressType.gzip,
@@ -148,9 +159,14 @@ export default {
 };
 </script>
 <style scoped>
+.td-text-compress {
+  width: 100%;
+  height: 100%;
+}
 .container {
   width: 100%;
   height: 100%;
+  flex: 1;
   border-radius: 0;
 
   box-shadow: none;

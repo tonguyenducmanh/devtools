@@ -1,80 +1,91 @@
 <template>
-  <div class="flex flex-col container">
-    <div class="mb-medium td-input-source">
-      <TDTextarea
-        :placeHolder="$t('i18nCommon.textManipulation.inputSource')"
-        v-model="inputSource"
-        class="td-input-source-textbox"
-      >
-      </TDTextarea>
-      <div class="td-row-num">
-        {{ totalRow }}
+  <div class="flex td-text-manipulation">
+    <div class="flex flex-col container">
+      <div class="mb-medium td-input-source">
+        <TDTextarea
+          :placeHolder="$t('i18nCommon.textManipulation.inputSource')"
+          v-model="inputSource"
+          class="td-input-source-textbox"
+        >
+        </TDTextarea>
+        <div class="td-row-num">
+          {{ totalRow }}
+        </div>
+        <div class="flex td-seperate">
+          <TDInput
+            v-model="columnSeperator"
+            :label="$t('i18nCommon.textManipulation.columnSeperator')"
+            placeHolder=" "
+            class="td-column-seperate"
+          />
+          <TDInput
+            v-model="rowSeperator"
+            :label="$t('i18nCommon.textManipulation.rowSeperator')"
+            placeHolder=" "
+            class="td-column-seperate"
+          />
+        </div>
       </div>
-      <div class="flex td-seperate">
-        <TDInput
-          v-model="columnSeperator"
-          :label="$t('i18nCommon.textManipulation.columnSeperator')"
-          placeHolder=" "
-          class="td-column-seperate"
-        />
-        <TDInput
-          v-model="rowSeperator"
-          :label="$t('i18nCommon.textManipulation.rowSeperator')"
-          placeHolder=" "
-          class="td-column-seperate"
-        />
-      </div>
-    </div>
 
-    <div class="mb-medium td-input-source">
-      <TDTextarea
-        :placeHolder="$t('i18nCommon.textManipulation.expressionSource')"
-        v-model="expressionSource"
-        class="td-input-source-textbox"
-      ></TDTextarea>
-      <div class="flex td-seperate">
-        <TDInput
-          v-model="outputRowSeperator"
-          :label="$t('i18nCommon.textManipulation.rowSeperator')"
-          placeHolder=" "
-          class="td-column-seperate"
-        />
+      <div class="mb-medium td-input-source">
+        <TDTextarea
+          :placeHolder="$t('i18nCommon.textManipulation.expressionSource')"
+          v-model="expressionSource"
+          class="td-input-source-textbox"
+        ></TDTextarea>
+        <div class="flex td-seperate">
+          <TDInput
+            v-model="outputRowSeperator"
+            :label="$t('i18nCommon.textManipulation.rowSeperator')"
+            placeHolder=" "
+            class="td-column-seperate"
+          />
+        </div>
+      </div>
+      <div class="td-input-source">
+        <TDTextarea
+          :placeHolder="$t('i18nCommon.textManipulation.outputSource')"
+          v-model="outputSource"
+          :readOnly="true"
+        ></TDTextarea>
+      </div>
+      <div class="flex">
+        <TDButton
+          @click="manipulate"
+          :label="$t('i18nCommon.textManipulation.manipulate')"
+        ></TDButton>
+        <TDButton
+          @click="handleCopyResult"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.jsonToPostgreSQL.copy')"
+        ></TDButton>
+        <TDButton
+          @click="applyExample"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.example')"
+        ></TDButton>
       </div>
     </div>
-    <div class="td-input-source">
-      <TDTextarea
-        :placeHolder="$t('i18nCommon.textManipulation.outputSource')"
-        v-model="outputSource"
-        :readOnly="true"
-      ></TDTextarea>
-    </div>
-    <div class="flex">
-      <TDButton
-        @click="manipulate"
-        :label="$t('i18nCommon.textManipulation.manipulate')"
-      ></TDButton>
-      <TDButton
-        @click="handleCopyResult"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.jsonToPostgreSQL.copy')"
-      ></TDButton>
-      <TDButton
-        @click="applyExample"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.example')"
-      ></TDButton>
-    </div>
+    <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:main>
+        <TDTextManipulationHelp />
+      </template>
+    </TDSubSidebar>
   </div>
 </template>
 
 <script>
 import mock from "@/common/mock/TDMockTextManipulation.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDTextManipulationHelp from "@/views/helps/TDTextManipulationHelp.vue";
 export default {
   extends: TDToolBase,
   name: "TDTextManipulation",
+  components: { TDSubSidebar, TDTextManipulationHelp },
   data() {
     return {
+      isShowSidebar: true,
       inputSource: "",
       expressionSource: "",
       columnSeperator: ",",
@@ -236,9 +247,14 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.td-text-manipulation {
+  width: 100%;
+  height: 100%;
+}
 .container {
   width: 100%;
   height: 100%;
+  flex: 1;
 }
 .td-input-source {
   position: relative;

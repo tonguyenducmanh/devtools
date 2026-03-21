@@ -1,61 +1,71 @@
 <template>
-  <div class="flex flex-col container">
-    <div class="flex input-container">
-      <TDTextarea
-        :placeHolder="$t('i18nCommon.codeFormatter.inputCode')"
-        v-model="inputSource"
-        height="100%"
-        width="50%"
-        :enableHighlight="enableHighlight"
-        :language="language"
-      ></TDTextarea>
-      <TDTextarea
-        :placeHolder="$t('i18nCommon.codeFormatter.outputCode')"
-        v-model="outputSource"
-        height="100%"
-        width="50%"
-        :enableHighlight="enableHighlight"
-        :language="language"
-        :readOnly="true"
-      ></TDTextarea>
-    </div>
-    <div class="flex tool-header">
-      <TDComboBox
-        :width="200"
-        v-model="language"
-        :options="methodOptions"
-        :isDropTop="true"
-      />
-      <div class="flex">
-        <TDButton
-          @click="handleFormat"
-          :label="$t('i18nCommon.codeFormatter.formatCode')"
-        ></TDButton>
-        <TDCheckbox
-          v-model="enableHighlight"
-          :label="$t('i18nCommon.enableHighlight')"
-        ></TDCheckbox>
-        <TDButton
-          @click="applyMock"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.example')"
-        ></TDButton>
-        <TDButton
-          @click="handleCopyEvent(outputSource)"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.codeFormatter.copyOutput')"
-        ></TDButton>
+  <div class="flex td-code-formatter">
+    <div class="flex flex-col container">
+      <div class="flex input-container">
+        <TDTextarea
+          :placeHolder="$t('i18nCommon.codeFormatter.inputCode')"
+          v-model="inputSource"
+          height="100%"
+          width="50%"
+          :enableHighlight="enableHighlight"
+          :language="language"
+        ></TDTextarea>
+        <TDTextarea
+          :placeHolder="$t('i18nCommon.codeFormatter.outputCode')"
+          v-model="outputSource"
+          height="100%"
+          width="50%"
+          :enableHighlight="enableHighlight"
+          :language="language"
+          :readOnly="true"
+        ></TDTextarea>
+      </div>
+      <div class="flex tool-header">
+        <TDComboBox
+          :width="200"
+          v-model="language"
+          :options="methodOptions"
+          :isDropTop="true"
+        />
+        <div class="flex">
+          <TDButton
+            @click="handleFormat"
+            :label="$t('i18nCommon.codeFormatter.formatCode')"
+          ></TDButton>
+          <TDCheckbox
+            v-model="enableHighlight"
+            :label="$t('i18nCommon.enableHighlight')"
+          ></TDCheckbox>
+          <TDButton
+            @click="applyMock"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.example')"
+          ></TDButton>
+          <TDButton
+            @click="handleCopyEvent(outputSource)"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.codeFormatter.copyOutput')"
+          ></TDButton>
+        </div>
       </div>
     </div>
+    <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:main>
+        <TDCodeFormatterHelp />
+      </template>
+    </TDSubSidebar>
   </div>
 </template>
 <script>
 // import sqlFormatter từ thư viện
 import { format as sqlFormat } from "sql-formatter";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDCodeFormatterHelp from "@/views/helps/TDCodeFormatterHelp.vue";
 export default {
   extends: TDToolBase,
   name: "TDCodeFormatter",
+  components: { TDSubSidebar, TDCodeFormatterHelp },
   created() {
     let me = this;
   },
@@ -137,6 +147,7 @@ export default {
   },
   data() {
     return {
+      isShowSidebar: true,
       inputSource: null,
       outputSource: null,
       enableHighlight: true,
@@ -150,9 +161,14 @@ export default {
 };
 </script>
 <style scoped>
+.td-code-formatter {
+  width: 100%;
+  height: 100%;
+}
 .container {
   width: 100%;
   height: 100%;
+  flex: 1;
 }
 .input-container {
   flex: 1;

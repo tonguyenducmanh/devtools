@@ -1,84 +1,91 @@
 <template>
-  <div class="container">
-    <!-- <div class="title">{{ $t("i18nCommon.colorPicker.title") }}</div> -->
-    <div class="flex td-color-picker">
-      <div v-show="!imageLoaded" class="upload-area-container">
-        <TDUpload
-          @selected="processFile"
-          ref="uploadArea"
-          class="upload-area"
-          maxHeight="100vh"
-          :labelEmpty="$t('i18nCommon.colorPicker.uploadLabel')"
-          :label="$t('i18nCommon.colorPicker.uploadButton')"
-        ></TDUpload>
-      </div>
-      <div v-if="imageLoaded" class="flex color-picker-container">
-        <div class="flex flex-col image-container">
-          <div class="flex image-wrapper" ref="imageWrapper">
-            <canvas
-              ref="canvas"
-              @mousemove="handleMouseMove"
-              @mouseleave="hideMagnifier"
-              @click="selectColor"
-              class="main-canvas"
-            ></canvas>
-            <MagnifyingGlass
-              v-if="showMagnifier"
-              :x="magnifierX"
-              :y="magnifierY"
-              :canvas="canvas"
-              :mouse-x="mouseX"
-              :mouse-y="mouseY"
-              :canvasRect="canvasRect"
-            />
-          </div>
-          <div
-            v-if="colorPalette && colorPalette.length > 0"
-            class="flex palette-info"
-          >
-            <div>{{ $t("i18nCommon.colorPicker.colorPalette") }}</div>
+  <div class="flex td-color-picker-wrapper">
+    <div class="container">
+      <!-- <div class="title">{{ $t("i18nCommon.colorPicker.title") }}</div> -->
+      <div class="flex td-color-picker">
+        <div v-show="!imageLoaded" class="upload-area-container">
+          <TDUpload
+            @selected="processFile"
+            ref="uploadArea"
+            class="upload-area"
+            maxHeight="100vh"
+            :labelEmpty="$t('i18nCommon.colorPicker.uploadLabel')"
+            :label="$t('i18nCommon.colorPicker.uploadButton')"
+          ></TDUpload>
+        </div>
+        <div v-if="imageLoaded" class="flex color-picker-container">
+          <div class="flex flex-col image-container">
+            <div class="flex image-wrapper" ref="imageWrapper">
+              <canvas
+                ref="canvas"
+                @mousemove="handleMouseMove"
+                @mouseleave="hideMagnifier"
+                @click="selectColor"
+                class="main-canvas"
+              ></canvas>
+              <MagnifyingGlass
+                v-if="showMagnifier"
+                :x="magnifierX"
+                :y="magnifierY"
+                :canvas="canvas"
+                :mouse-x="mouseX"
+                :mouse-y="mouseY"
+                :canvasRect="canvasRect"
+              />
+            </div>
+            <div
+              v-if="colorPalette && colorPalette.length > 0"
+              class="flex palette-info"
+            >
+              <div>{{ $t("i18nCommon.colorPicker.colorPalette") }}</div>
 
-            <div class="flex palette-grid">
-              <div
-                v-for="(color, index) in colorPalette"
-                :key="index"
-                class="palette-color"
-                :style="{ backgroundColor: color.hex }"
-                @click="handleColorSelected(color)"
-                :title="color.hex"
-              >
-                <div class="color-overlay">
-                  <span class="color-hex">{{ color.hex }}</span>
+              <div class="flex palette-grid">
+                <div
+                  v-for="(color, index) in colorPalette"
+                  :key="index"
+                  class="palette-color"
+                  :style="{ backgroundColor: color.hex }"
+                  @click="handleColorSelected(color)"
+                  :title="color.hex"
+                >
+                  <div class="color-overlay">
+                    <span class="color-hex">{{ color.hex }}</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="flex flex-col color-info-section">
-          <div>{{ $t("i18nCommon.colorPicker.selectedColor") }}</div>
-          <template v-if="selectedColor">
-            <div>{{ selectedColor.hex }}</div>
-            <div
-              class="color-preview"
-              :style="{ backgroundColor: selectedColor.hex }"
-            ></div>
+          <div class="flex flex-col color-info-section">
+            <div>{{ $t("i18nCommon.colorPicker.selectedColor") }}</div>
+            <template v-if="selectedColor">
+              <div>{{ selectedColor.hex }}</div>
+              <div
+                class="color-preview"
+                :style="{ backgroundColor: selectedColor.hex }"
+              ></div>
+              <TDButton
+                v-if="selectedColor"
+                ref="copy-btn"
+                @click="haddleCopyEvent(selectedColor.hex)"
+                :label="$t('i18nCommon.colorPicker.copyColor')"
+              ></TDButton>
+            </template>
             <TDButton
-              v-if="selectedColor"
-              ref="copy-btn"
-              @click="haddleCopyEvent(selectedColor.hex)"
-              :label="$t('i18nCommon.colorPicker.copyColor')"
-            ></TDButton>
-          </template>
-          <TDButton
-            :type="$tdEnum.buttonType.secondary"
-            @click="resetImage"
-            :label="$t('i18nCommon.colorPicker.uploadNewImage')"
-            class="btn btn-secondary"
-          >
-          </TDButton>
+              :type="$tdEnum.buttonType.secondary"
+              @click="resetImage"
+              :label="$t('i18nCommon.colorPicker.uploadNewImage')"
+              class="btn btn-secondary"
+            >
+            </TDButton>
+          </div>
         </div>
       </div>
     </div>
+    <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:main>
+        <TDColorPickerHelp />
+      </template>
+    </TDSubSidebar>
   </div>
 </template>
 
@@ -90,13 +97,18 @@ import {
   rgbToHsl,
 } from "@/common/color/TDColorUtils.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDColorPickerHelp from "@/views/helps/TDColorPickerHelp.vue";
 export default {
   extends: TDToolBase,
   components: {
     MagnifyingGlass,
+    TDSubSidebar,
+    TDColorPickerHelp,
   },
   data() {
     return {
+      isShowSidebar: true,
       imageLoaded: false,
       canvas: null,
       ctx: null,
@@ -262,11 +274,16 @@ export default {
 </script>
 
 <style scoped>
+.td-color-picker-wrapper {
+  width: 100%;
+  height: 100%;
+}
 .container {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
+  flex: 1;
   overflow: auto;
 }
 .td-color-picker {

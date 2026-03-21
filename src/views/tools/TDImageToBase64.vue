@@ -1,49 +1,59 @@
 <template>
-  <div class="container">
-    <div class="io-section">
-      <div class="panel left-panel">
-        <label class="panel-label">{{
-          $t("i18nCommon.imageToBase64.input")
-        }}</label>
-        <div>
-          <TDUpload
-            @selected="processFile"
-            ref="uploadArea"
-            class="upload-area"
-          ></TDUpload>
-        </div>
-        <div class="preview-container">
-          <img v-if="srcImg" :src="srcImg" class="preview" />
-          <div v-else class="placeholder">
-            {{ $t("i18nCommon.imageToBase64.placeHolder") }}
+  <div class="flex td-image-to-base64">
+    <div class="container">
+      <div class="io-section">
+        <div class="panel left-panel">
+          <label class="panel-label">{{
+            $t("i18nCommon.imageToBase64.input")
+          }}</label>
+          <div>
+            <TDUpload
+              @selected="processFile"
+              ref="uploadArea"
+              class="upload-area"
+            ></TDUpload>
+          </div>
+          <div class="preview-container">
+            <img v-if="srcImg" :src="srcImg" class="preview" />
+            <div v-else class="placeholder">
+              {{ $t("i18nCommon.imageToBase64.placeHolder") }}
+            </div>
           </div>
         </div>
+        <div class="panel right-panel">
+          <TDTextarea
+            isLabelTop
+            :label="$t('i18nCommon.imageToBase64.output')"
+            :placeHolder="$t('i18nCommon.imageToBase64.placeHolder')"
+            v-model="base64Result"
+            :readOnly="true"
+          ></TDTextarea>
+        </div>
       </div>
-      <div class="panel right-panel">
-        <TDTextarea
-          isLabelTop
-          :label="$t('i18nCommon.imageToBase64.output')"
-          :placeHolder="$t('i18nCommon.imageToBase64.placeHolder')"
-          v-model="base64Result"
-          :readOnly="true"
-        ></TDTextarea>
+      <div class="tool-footer">
+        <TDButton
+          ref="copy-btn"
+          @click="haddleCopyEvent"
+          :label="$t('i18nCommon.imageToBase64.copyButton')"
+        ></TDButton>
       </div>
     </div>
-    <div class="tool-footer">
-      <TDButton
-        ref="copy-btn"
-        @click="haddleCopyEvent"
-        :label="$t('i18nCommon.imageToBase64.copyButton')"
-      ></TDButton>
-    </div>
+    <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:main>
+        <TDImageToBase64Help />
+      </template>
+    </TDSubSidebar>
   </div>
 </template>
 
 <script>
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDImageToBase64Help from "@/views/helps/TDImageToBase64Help.vue";
 export default {
   extends: TDToolBase,
   name: "TDImageToBase64",
+  components: { TDSubSidebar, TDImageToBase64Help },
   created() {
     let me = this;
   },
@@ -80,6 +90,7 @@ export default {
   },
   data() {
     return {
+      isShowSidebar: true,
       base64Result: null,
       srcImg: null,
     };
@@ -88,11 +99,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.td-image-to-base64 {
+  width: 100%;
+  height: 100%;
+}
 .container {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
+  flex: 1;
   overflow: hidden;
 }
 

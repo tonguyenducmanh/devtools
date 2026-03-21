@@ -1,57 +1,68 @@
 <template>
-  <div class="flex flex-col container">
-    <!-- <div class="title">{{ $t("i18nCommon.feature.cosinSimilarity") }}</div> -->
+  <div class="flex td-cosin-similarity">
+    <div class="flex flex-col container">
+      <!-- <div class="title">{{ $t("i18nCommon.feature.cosinSimilarity") }}</div> -->
 
-    <div class="flex io-section">
-      <TDTextarea
-        isLabelTop
-        :label="$t('i18nCommon.cosinSimilarity.firstVector')"
-        :placeHolder="$t('i18nCommon.cosinSimilarity.vectorPlaceholder')"
-        v-model="firstVector"
-      ></TDTextarea>
+      <div class="flex io-section">
+        <TDTextarea
+          isLabelTop
+          :label="$t('i18nCommon.cosinSimilarity.firstVector')"
+          :placeHolder="$t('i18nCommon.cosinSimilarity.vectorPlaceholder')"
+          v-model="firstVector"
+        ></TDTextarea>
 
-      <TDTextarea
-        isLabelTop
-        :label="$t('i18nCommon.cosinSimilarity.secondVector')"
-        :placeHolder="$t('i18nCommon.cosinSimilarity.vectorPlaceholder')"
-        v-model="secondVector"
-      ></TDTextarea>
-    </div>
+        <TDTextarea
+          isLabelTop
+          :label="$t('i18nCommon.cosinSimilarity.secondVector')"
+          :placeHolder="$t('i18nCommon.cosinSimilarity.vectorPlaceholder')"
+          v-model="secondVector"
+        ></TDTextarea>
+      </div>
 
-    <div class="flex result-section">
-      <div class="result-container">
-        <label>{{ $t("i18nCommon.cosinSimilarity.result") }}</label>
-        <div class="result">{{ similarity }}</div>
+      <div class="flex result-section">
+        <div class="result-container">
+          <label>{{ $t("i18nCommon.cosinSimilarity.result") }}</label>
+          <div class="result">{{ similarity }}</div>
+        </div>
+      </div>
+
+      <div class="flex">
+        <TDButton
+          @click="calculateSimilarity"
+          :label="$t('i18nCommon.cosinSimilarity.calculate')"
+        ></TDButton>
+        <TDButton
+          @click="handleCopyResult"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.jsonToPostgreSQL.copy')"
+        ></TDButton>
+        <TDButton
+          @click="applyExample"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.example')"
+        ></TDButton>
       </div>
     </div>
-
-    <div class="flex">
-      <TDButton
-        @click="calculateSimilarity"
-        :label="$t('i18nCommon.cosinSimilarity.calculate')"
-      ></TDButton>
-      <TDButton
-        @click="handleCopyResult"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.jsonToPostgreSQL.copy')"
-      ></TDButton>
-      <TDButton
-        @click="applyExample"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.example')"
-      ></TDButton>
-    </div>
+    <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:main>
+        <TDCosinSimilarityHelp />
+      </template>
+    </TDSubSidebar>
   </div>
 </template>
 
 <script>
 import mock from "@/common/mock/TDMockCosinSimilarity.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDCosinSimilarityHelp from "@/views/helps/TDCosinSimilarityHelp.vue";
 export default {
   extends: TDToolBase,
   name: "TDCosinSimilarity",
+  components: { TDSubSidebar, TDCosinSimilarityHelp },
   data() {
     return {
+      isShowSidebar: true,
       firstVector: "",
       secondVector: "",
       similarity: "",
@@ -135,9 +146,14 @@ export default {
 </script>
 
 <style scoped>
+.td-cosin-similarity {
+  width: 100%;
+  height: 100%;
+}
 .container {
   width: 100%;
   height: 100%;
+  flex: 1;
 }
 
 .io-section {

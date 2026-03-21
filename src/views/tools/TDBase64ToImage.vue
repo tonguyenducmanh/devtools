@@ -1,50 +1,60 @@
 <template>
-  <div class="container">
-    <div class="io-section">
-      <div class="panel left-panel">
-        <TDTextarea
-          isLabelTop
-          :label="$t('i18nCommon.base64ToImage.input')"
-          :placeHolder="$t('i18nCommon.base64ToImage.placeHolder')"
-          v-model="base64Result"
-        ></TDTextarea>
-      </div>
-      <div class="panel right-panel">
-        <label class="panel-label">{{
-          $t("i18nCommon.base64ToImage.result")
-        }}</label>
-        <div class="preview-container">
-          <img v-if="srcImg" :src="srcImg" class="preview" ref="preview" />
-          <div v-else class="placeholder">
-            {{ $t("i18nCommon.base64ToImage.result") }}
+  <div class="flex td-base64-to-image">
+    <div class="container">
+      <div class="io-section">
+        <div class="panel left-panel">
+          <TDTextarea
+            isLabelTop
+            :label="$t('i18nCommon.base64ToImage.input')"
+            :placeHolder="$t('i18nCommon.base64ToImage.placeHolder')"
+            v-model="base64Result"
+          ></TDTextarea>
+        </div>
+        <div class="panel right-panel">
+          <label class="panel-label">{{
+            $t("i18nCommon.base64ToImage.result")
+          }}</label>
+          <div class="preview-container">
+            <img v-if="srcImg" :src="srcImg" class="preview" ref="preview" />
+            <div v-else class="placeholder">
+              {{ $t("i18nCommon.base64ToImage.result") }}
+            </div>
           </div>
         </div>
       </div>
+      <div class="tool-footer">
+        <TDButton
+          @click="handleConvert"
+          :label="$t('i18nCommon.base64ToImage.convert')"
+        ></TDButton>
+        <TDButton
+          :type="$tdEnum.buttonType.secondary"
+          @click="handleDownloadImage"
+          :label="$t('i18nCommon.base64ToImage.donwloadImage')"
+        ></TDButton>
+        <TDButton
+          @click="applyMock"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.example')"
+        ></TDButton>
+      </div>
     </div>
-    <div class="tool-footer">
-      <TDButton
-        @click="handleConvert"
-        :label="$t('i18nCommon.base64ToImage.convert')"
-      ></TDButton>
-      <TDButton
-        :type="$tdEnum.buttonType.secondary"
-        @click="handleDownloadImage"
-        :label="$t('i18nCommon.base64ToImage.donwloadImage')"
-      ></TDButton>
-      <TDButton
-        @click="applyMock"
-        :type="$tdEnum.buttonType.secondary"
-        :label="$t('i18nCommon.example')"
-      ></TDButton>
-    </div>
+    <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:main>
+        <TDBase64ToImageHelp />
+      </template>
+    </TDSubSidebar>
   </div>
 </template>
 
 <script>
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDBase64ToImageHelp from "@/views/helps/TDBase64ToImageHelp.vue";
 export default {
   extends: TDToolBase,
   name: "TDBase64ToImage",
+  components: { TDSubSidebar, TDBase64ToImageHelp },
   created() {
     let me = this;
   },
@@ -87,6 +97,7 @@ export default {
   },
   data() {
     return {
+      isShowSidebar: true,
       base64Result: null,
       srcImg: null,
     };
@@ -95,11 +106,16 @@ export default {
 </script>
 
 <style scoped>
+.td-base64-to-image {
+  width: 100%;
+  height: 100%;
+}
 .container {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
+  flex: 1;
   overflow: hidden;
 }
 
