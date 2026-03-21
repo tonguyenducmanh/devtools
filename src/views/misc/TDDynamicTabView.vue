@@ -79,16 +79,16 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
     <div class="td-tab-content">
       <!-- Tab mode: render sẵn tất cả bằng v-show -->
       <template v-if="isTabMode">
-        <template v-for="tab in tabs" :key="tab.id">
-          <KeepAlive>
-            <component
-              class="td-tab-pane"
-              v-if="tab.id === activeTabId"
-              :is="tab.resolvedComponent"
-              @updateTabTitle="(payload) => onTabTitleUpdate(tab.id, payload)"
-            />
-          </KeepAlive>
-        </template>
+        <KeepAlive>
+          <component
+            v-if="activeTab"
+            :is="activeTab.resolvedComponent"
+            :key="activeTab.id"
+            :tab-id="activeTab.id"
+            class="td-tab-pane"
+            @updateTabTitle="(payload) => onTabTitleUpdate(tab.id, payload)"
+          />
+        </KeepAlive>
       </template>
 
       <!-- zero tabs mode: show Welcome -->
@@ -100,7 +100,6 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
 <script>
 import { computed, ref, inject, watch as vueWatch } from "vue";
 import TDWelcome from "@/views/misc/TDWelcome.vue";
-import tdUtility from "@/common/TDUtility.js";
 import { useTabManager } from "@/stores/TDTabManager.js";
 import i18nData from "@/i18n/i18nData.js";
 
@@ -139,6 +138,9 @@ export default {
 
     const tabs = computed(() => state.tabs);
     const activeTabId = computed(() => state.activeTabId);
+    const activeTab = computed(() => {
+      return tabs.value.find((t) => t.id === activeTabId.value);
+    });
     const isTabMode = computed(() => {
       let isMultiTab = state.tabs.length > 0;
       return isMultiTab;
@@ -346,6 +348,7 @@ export default {
 
     return {
       tabs,
+      activeTab,
       activeTabId,
       isTabMode,
       activateTab,
