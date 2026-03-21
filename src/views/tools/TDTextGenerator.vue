@@ -40,7 +40,9 @@
 </template>
 <script>
 import TDMockTextGenerate from "@/common/mock/TDMockTextGenerate.js";
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDTextGenerator",
   components: {},
   created() {

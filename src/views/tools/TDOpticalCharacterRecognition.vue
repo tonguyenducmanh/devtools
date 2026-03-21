@@ -144,8 +144,9 @@
 <script>
 import Tesseract from "tesseract.js";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
-
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDOpticalCharacterRecognition",
   components: { TDSubSidebar },
   created() {

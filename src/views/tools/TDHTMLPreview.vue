@@ -72,7 +72,9 @@
   </div>
 </template>
 <script>
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDHTMLPreview",
   created() {
     let me = this;

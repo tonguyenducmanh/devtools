@@ -175,9 +175,9 @@ import { Buffer } from "buffer";
 import * as OTPAuth from "otpauth";
 import { toRaw } from "vue";
 import googleAuthen from "@/common/proto/googleAuth.js";
-import _ from "@/common/TDCommonFunction.js";
-
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDOneTimePassword",
   created() {
     let me = this;
@@ -254,7 +254,7 @@ export default {
   watch: {
     filterOtp(oldVal, newVal) {
       if (oldVal != newVal) {
-        this.emitTabTitle(this);
+        this.reBuildTabTitle(this.filterOtp);
       }
     },
   },
@@ -270,14 +270,6 @@ export default {
     me.saveUsername();
   },
   methods: {
-    emitTabTitle: _.debounce(function () {
-      let me = this;
-      // emit sự kiện thay đổi tên tab đang mở
-      me.$emit("updateTabTitle", {
-        title: me.filterOtp,
-        append: true,
-      });
-    }, 300),
     async convertQRCode() {
       let me = this;
       if (

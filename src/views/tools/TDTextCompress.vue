@@ -54,8 +54,9 @@
 </template>
 <script>
 import TDCompress from "@/common/compress/TDCompress.js";
-
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDTextCompress",
   created() {
     let me = this;

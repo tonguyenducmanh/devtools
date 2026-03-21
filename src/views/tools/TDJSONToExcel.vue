@@ -86,8 +86,9 @@
 <script>
 import ExcelJS from "exceljs";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
-
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDJSONToExcel",
   components: { TDSubSidebar },
 
@@ -171,7 +172,7 @@ export default {
       worksheet.columns = headers.map((field) => {
         const maxLen = Math.max(
           field.length,
-          ...arr.map((row) => (row[field] ? String(row[field]).length : 0))
+          ...arr.map((row) => (row[field] ? String(row[field]).length : 0)),
         );
         return { header: field, key: field, width: maxLen + 2 };
       });
@@ -200,7 +201,7 @@ export default {
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet(
           "Sheet1",
-          me.getConfigWorkSheet()
+          me.getConfigWorkSheet(),
         );
 
         me.configBoldColumn(worksheet, arrObj);
@@ -211,7 +212,7 @@ export default {
         me.$tdUtility.createDownloadFileFromBuffer(
           buffer,
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          me.fileName
+          me.fileName,
         );
 
         me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));

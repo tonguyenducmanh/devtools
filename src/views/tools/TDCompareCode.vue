@@ -25,8 +25,9 @@
 
 <script>
 import * as monaco from "monaco-editor";
-
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDCompareCode",
   created() {
     let me = this;

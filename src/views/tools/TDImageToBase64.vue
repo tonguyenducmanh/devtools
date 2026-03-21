@@ -40,7 +40,9 @@
 </template>
 
 <script>
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDImageToBase64",
   created() {
     let me = this;

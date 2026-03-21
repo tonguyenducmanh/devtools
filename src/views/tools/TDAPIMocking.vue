@@ -289,16 +289,16 @@ import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
 import TDServerMockAPI from "@/common/api/request/AgentAPI/TDServerMockAPI.js";
 import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
-import _ from "@/common/TDCommonFunction.js";
-
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDAPIMocking",
   components: { TDSubSidebar, TDArrow },
   mixins: [TDLayoutConfigMixin],
   watch: {
     requestName(oldVal, newVal) {
       if (oldVal != newVal) {
-        this.emitTabTitle(this);
+        this.reBuildTabTitle(this.requestName);
       }
     },
   },
@@ -435,14 +435,6 @@ export default {
   },
   beforeUnmount() {},
   methods: {
-    emitTabTitle: _.debounce(function () {
-      let me = this;
-      // emit sự kiện thay đổi tên tab đang mở
-      me.$emit("updateTabTitle", {
-        title: me.requestName,
-        append: true,
-      });
-    }, 300),
     handleResize(sizes) {
       this.requestSectionSize = sizes.leftSize;
       this.responseSectionSize = sizes.rightSize;

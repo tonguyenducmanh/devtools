@@ -69,7 +69,9 @@
 
 <script>
 import mock from "@/common/mock/TDMockTextManipulation.js";
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDTextManipulation",
   data() {
     return {

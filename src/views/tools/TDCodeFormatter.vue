@@ -52,9 +52,9 @@
 <script>
 // import sqlFormatter từ thư viện
 import { format as sqlFormat } from "sql-formatter";
-import tdEnum from "@/common/TDEnum.js";
-
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDCodeFormatter",
   created() {
     let me = this;

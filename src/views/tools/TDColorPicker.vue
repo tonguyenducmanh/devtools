@@ -89,8 +89,9 @@ import {
   rgbToHex,
   rgbToHsl,
 } from "@/common/color/TDColorUtils.js";
-
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   components: {
     MagnifyingGlass,
   },

@@ -54,8 +54,9 @@
 <script>
 import TDCompress from "@/common/compress/TDCompress.js";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
-
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDQRCodeToText",
   components: { TDSubSidebar },
   created() {

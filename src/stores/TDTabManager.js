@@ -4,6 +4,7 @@
  */
 
 import { reactive, markRaw } from "vue";
+import tdUtility from "@/common/TDUtility.js";
 
 // biến toàn cục lưu trữ danh sách các tab đang làm việc
 // thay vì dùng viewrouter render 1 trang duy nhất
@@ -12,13 +13,11 @@ const state = reactive({
   activeTabId: null,
 });
 
-let _idCounter = 0;
-
 /**
  * tạo ra id ngẫu nhiên cho từng tab
  */
 function genId() {
-  return `tab-${Date.now()}-${_idCounter++}`;
+  return tdUtility.newGuid();
 }
 
 /**

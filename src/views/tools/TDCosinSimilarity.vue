@@ -46,7 +46,9 @@
 
 <script>
 import mock from "@/common/mock/TDMockCosinSimilarity.js";
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDCosinSimilarity",
   data() {
     return {
@@ -68,7 +70,7 @@ export default {
         // Validate vectors
         if (!vector1 || !vector2 || vector1.length !== vector2.length) {
           this.$tdToast.error(
-            this.$t("i18nCommon.cosinSimilarity.invalidVectors")
+            this.$t("i18nCommon.cosinSimilarity.invalidVectors"),
           );
           return;
         }
@@ -125,7 +127,7 @@ export default {
       this.firstVector = mock.firstVector.join(", ");
       this.secondVector = mock.secondVector.join(", ");
       this.$tdToast.success(
-        this.$t("i18nCommon.toastMessage.applyMockSuccess")
+        this.$t("i18nCommon.toastMessage.applyMockSuccess"),
       );
     },
   },

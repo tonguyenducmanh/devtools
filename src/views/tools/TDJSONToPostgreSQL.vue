@@ -118,7 +118,9 @@
 </template>
 <script>
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDJSONToPostgreSQL",
   components: { TDSubSidebar },
   created() {
@@ -194,7 +196,7 @@ export default {
         const blob = new Blob([me.outputSQL], { type: "text/plain" });
         me.$tdUtility.createDownloadFileFromBlob(
           blob,
-          `${me.tableName || "export"}.sql`
+          `${me.tableName || "export"}.sql`,
         );
       }
     },
@@ -225,8 +227,8 @@ export default {
               (v) =>
                 typeof v === "string" &&
                 /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
-                  v
-                )
+                  v,
+                ),
             )
           ) {
             dataType = "uuid";
@@ -234,7 +236,7 @@ export default {
             values.every(
               (v) =>
                 typeof v === "string" &&
-                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(v)
+                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(v),
             )
           ) {
             dataType = "timestamp";

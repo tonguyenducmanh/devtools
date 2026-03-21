@@ -42,9 +42,9 @@
   </div>
 </template>
 <script>
-import _ from "@/common/TDCommonFunction.js";
-
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDBlankText",
   data() {
     return {
@@ -79,19 +79,11 @@ export default {
   watch: {
     content(oldVal, newVal) {
       if (oldVal != newVal) {
-        this.emitTabTitle(this);
+        this.reBuildTabTitle(this.content);
       }
     },
   },
   methods: {
-    emitTabTitle: _.debounce(function () {
-      let me = this;
-      // emit sự kiện thay đổi tên tab đang mở
-      me.$emit("updateTabTitle", {
-        title: me.content,
-        append: true,
-      });
-    }, 300),
     handleCopy() {
       let me = this;
       if (me.content) {

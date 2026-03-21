@@ -92,8 +92,9 @@ const LANGUAGE_MODE = {
   Java: "java",
   Raw: "raw",
 };
-
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDJSONToOneLineString",
   components: { TDSubSidebar },
   created() {},

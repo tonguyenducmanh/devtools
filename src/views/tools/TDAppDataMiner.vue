@@ -50,8 +50,9 @@
 
 <script>
 import TDServerAppDataMiner from "@/common/api/request/AgentAPI/TDServerAppDataMiner.js";
-
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDAppDataMiner",
   components: {},
   mixins: [],

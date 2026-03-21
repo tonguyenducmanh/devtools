@@ -159,8 +159,9 @@ const LANG = {
   CSharp: "csharp",
   Go: "go",
 };
-
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
+  extends: TDToolBase,
   name: "TDJSONToModel",
   components: { TDSubSidebar },
   created() {},

@@ -84,11 +84,9 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
             v-if="activeTab"
             :is="activeTab.resolvedComponent"
             :key="activeTab.id"
-            :tab-id="activeTab.id"
+            :tabId="activeTab.id"
             class="td-tab-pane"
-            @updateTabTitle="
-              (payload) => onTabTitleUpdate(activeTab.id, payload)
-            "
+            @updateTabTitle="(payload) => onTabTitleUpdate(payload)"
           />
         </KeepAlive>
       </template>
@@ -180,10 +178,9 @@ export default {
     /**
      * Lắng nghe emit "update:tabTitle" từ component con.
      */
-    function onTabTitleUpdate(tabId, payload) {
+    function onTabTitleUpdate(payload) {
       // 1. Kiểm tra trường hợp null/undefined
       if (payload === null || payload === undefined) {
-        setTabTitle(tabId, null);
         return;
       }
 
@@ -193,14 +190,8 @@ export default {
         return str.length > 20 ? str.substring(0, 20) + "..." : str;
       };
 
-      // 3. Xử lý nếu payload là string trực tiếp
-      if (typeof payload === "string") {
-        setTabTitle(tabId, { title: formatTitle(payload), append: false });
-        return;
-      }
-
-      // 4. Xử lý nếu payload là một object
-      setTabTitle(tabId, {
+      // 3. Xử lý nếu payload là một object
+      setTabTitle(payload.tabId, {
         title: formatTitle(payload.title),
         append: !!payload.append,
       });
