@@ -156,20 +156,18 @@ export default {
       }, 120);
     },
 
-    // Mở tất cả tab từ group
+    // Mở tất từ group
     onOpenGroup: _.debounce(async function (groupItem) {
       if (!groupItem.children || groupItem.children.length === 0) return;
-      for (let i = 0; i < groupItem.children.length; i++) {
-        const child = groupItem.children[i];
-        await this.openTab({
-          titleKey: child.meta.titleKey,
-          helpKey: child.meta?.helpKey,
-          groupKey: groupItem.groupKey,
-          toolKey: child.name,
-          component: child.component,
-          isActive: i === 0, // Chỉ focus tab đầu tiên
-        });
-      }
+      // chỉ mở tab đầu tiên
+      const child = groupItem.children[0];
+      await this.openTab({
+        titleKey: child.meta.titleKey,
+        helpKey: child.meta?.helpKey,
+        groupKey: groupItem.groupKey,
+        toolKey: child.name,
+        component: child.component,
+      });
     }, 300),
 
     // Mở tab từ group flyout item

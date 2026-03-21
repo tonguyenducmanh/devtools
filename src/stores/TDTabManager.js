@@ -33,7 +33,6 @@ export function useTabManager() {
     groupKey,
     toolKey,
     component,
-    isActive = true,
     checkExisting = true,
   }) {
     if (checkExisting && toolKey) {
@@ -53,20 +52,14 @@ export function useTabManager() {
       titleKey,
       helpKey,
       component,
-      // Khi không active, đánh dấu resolvedComponent là null để Dynamic Tab View lazy load sau này
       resolvedComponent: null,
       customTitle: null,
     };
 
-    if (isActive) {
-      const mod = await component();
-      tab.resolvedComponent = markRaw(mod.default ?? mod);
-    }
-
+    const mod = await component();
+    tab.resolvedComponent = markRaw(mod.default ?? mod);
     state.tabs.push(tab);
-    if (isActive) {
-      state.activeTabId = id;
-    }
+    state.activeTabId = id;
 
     return id;
   }
