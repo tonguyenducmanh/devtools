@@ -1,20 +1,34 @@
 <template>
-  <div class="flex flex-col wrap-container">
-    <div class="container">
-      <div class="main-line-title">Dev Tools</div>
-      <p class="description">{{ displayText }}<span class="cursor">|</span></p>
+  <div class="flex td-welcome">
+    <div class="flex flex-col wrap-container">
+      <div class="container">
+        <div class="main-line-title">Dev Tools</div>
+        <p class="description">
+          {{ displayText }}<span class="cursor">|</span>
+        </p>
+      </div>
+      <p class="agreement">{{ $t("i18nCommon.agreement") }}</p>
     </div>
-    <p class="agreement">{{ $t("i18nCommon.agreement") }}</p>
+    <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:main>
+        <TDWelcomeHelp />
+      </template>
+    </TDSubSidebar>
   </div>
 </template>
 
 <script>
+import TDWelcomeHelp from "@/views/helps/TDWelcomeHelp.vue";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+
 export default {
   name: "TDWelcome",
+  components: { TDWelcomeHelp, TDSubSidebar },
   data() {
     return {
       languageList: Object.keys(this.$tdEnum.language).sort(),
       // Thêm biến để quản lý text hiển thị
+      isShowSidebar: true,
       displayText: "",
     };
   },
@@ -58,10 +72,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/* Giữ nguyên các style cũ của bạn */
-.wrap-container {
+.td-welcome {
   width: 100%;
   height: 100%;
+}
+/* Giữ nguyên các style cũ của bạn */
+.wrap-container {
+  height: 100%;
+  flex: 1;
 }
 .agreement {
   color: var(--text-color-light);
@@ -113,7 +131,7 @@ body[data-theme="dark"] .agreement {
   flex: 1;
 }
 .main-line-title {
-  font-size: 150px;
+  font-size: 10cqw;
   font-family: var(--straight-font);
   font-weight: 600;
   position: relative;
@@ -149,7 +167,7 @@ body[data-theme="dark"] {
 
 .description {
   font-family: var(--straight-font);
-  font-size: 40px;
+  font-size: 2cqw;
   min-height: 50px;
 }
 
