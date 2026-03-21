@@ -14,10 +14,10 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.welcome.quickStart.title") }}
         </h3>
-        <ul class="section-list">
-          <li>{{ $t("i18nHelp.welcome.quickStart.selectTool") }}</li>
-          <li>{{ $t("i18nHelp.welcome.quickStart.searchTool") }}</li>
-        </ul>
+        <div class="flex flex-col section-list">
+          <div class="section-item">{{ $t("i18nHelp.welcome.quickStart.selectTool") }}</div>
+          <div class="section-item">{{ $t("i18nHelp.welcome.quickStart.searchTool") }}</div>
+        </div>
         <p class="section-note">{{ $t("i18nHelp.welcome.quickStart.note") }}</p>
       </div>
 
@@ -31,11 +31,11 @@
         <p class="section-text">
           {{ $t("i18nHelp.welcome.multiTab.rightClick") }}
         </p>
-        <ul class="section-list">
-          <li>{{ $t("i18nHelp.welcome.multiTab.duplicateTab") }}</li>
-          <li>{{ $t("i18nHelp.welcome.multiTab.closeTab") }}</li>
-          <li>{{ $t("i18nHelp.welcome.multiTab.closeAllTabs") }}</li>
-        </ul>
+        <div class="flex flex-col section-list">
+          <div class="section-item">{{ $t("i18nHelp.welcome.multiTab.duplicateTab") }}</div>
+          <div class="section-item">{{ $t("i18nHelp.welcome.multiTab.closeTab") }}</div>
+          <div class="section-item">{{ $t("i18nHelp.welcome.multiTab.closeAllTabs") }}</div>
+        </div>
         <p class="section-text">
           {{ $t("i18nHelp.welcome.multiTab.dragReorder") }}
         </p>
@@ -45,10 +45,10 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.welcome.agent.title") }}
         </h3>
-        <ul class="section-list">
-          <li>{{ $t("i18nHelp.welcome.agent.webOnly") }}</li>
-          <li>{{ $t("i18nHelp.welcome.agent.needAgent") }}</li>
-        </ul>
+        <div class="flex flex-col section-list">
+          <div class="section-item">{{ $t("i18nHelp.welcome.agent.webOnly") }}</div>
+          <div class="section-item">{{ $t("i18nHelp.welcome.agent.needAgent") }}</div>
+        </div>
         <p class="section-text">
           {{ $t("i18nHelp.welcome.agent.downloadAgent") }}
         </p>
@@ -81,7 +81,7 @@ export default {
 }
 
 .section-title {
-  font-size: 18px;
+  font-size: var(--font-size-l-medium);
   font-weight: 600;
   margin-bottom: var(--padding);
   padding-bottom: var(--padding);
@@ -89,38 +89,41 @@ export default {
 }
 
 .help-section {
-  margin-bottom: calc(var(--padding) * 1.5);
+  margin-bottom: var(--padding-large);
 }
 
 .section-subtitle {
-  font-size: 14px;
+  font-size: var(--font-size-medium-rare);
   font-weight: 600;
-  margin-bottom: calc(var(--padding) * 0.75);
+  margin-bottom: var(--padding-medium);
   color: var(--text-color);
 }
 
 .section-text {
-  font-size: 13px;
+  font-size: var(--font-size-medium-rare);
   line-height: 1.6;
   color: var(--text-secondary-color);
-  margin-bottom: calc(var(--padding) * 0.5);
+  margin-bottom: var(--padding-medium);
 }
 
 .section-list {
-  list-style: disc;
-  padding-left: calc(var(--padding) * 1.5);
-  margin-bottom: calc(var(--padding) * 0.5);
+  gap: var(--padding);
+  margin-bottom: var(--padding-medium);
+}
 
-  li {
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--text-secondary-color);
-    margin-bottom: calc(var(--padding) * 0.25);
-  }
+.section-item {
+  font-size: var(--font-size-medium-rare);
+  line-height: 1.6;
+  color: var(--text-secondary-color);
+  padding: var(--padding-medium) var(--padding-x-medium);
+  border-left: 2px solid var(--border-color);
+  margin-bottom: 2px;
+  background: var(--bg-layer-color);
+  border-radius: 0 var(--border-radius-component) var(--border-radius-component) 0;
 }
 
 .section-note {
-  font-size: 12px;
+  font-size: var(--font-size-small);
   color: var(--text-color-light);
   font-style: italic;
 }
