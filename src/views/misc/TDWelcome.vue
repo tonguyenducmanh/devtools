@@ -9,7 +9,7 @@
       </div>
       <p class="agreement">{{ $t("i18nCommon.agreement") }}</p>
     </div>
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar v-model="currentConfigLayout.isShowSidebar" @toggleSidebar="toggleSidebar">
       <template v-slot:main>
         <TDWelcomeHelp />
       </template>
@@ -20,20 +20,28 @@
 <script>
 import TDWelcomeHelp from "@/views/helps/TDWelcomeHelp.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
 
 export default {
   name: "TDWelcome",
+  mixins: [TDLayoutConfigMixin],
   components: { TDWelcomeHelp, TDSubSidebar },
   data() {
     return {
+      keyCacheLayout: this.$tdEnum.cacheConfig.WelcomeLayout,
       languageList: Object.keys(this.$tdEnum.language).sort(),
-      // Thêm biến để quản lý text hiển thị
-      isShowSidebar: true,
       displayText: "",
+      currentConfigLayout: {
+        isShowSidebar: true,
+      },
     };
   },
   created() {},
   methods: {
+    async toggleSidebar() {
+      let me = this;
+      await me.updateConfigLayout();
+    },
     // Logic tạo hiệu ứng gõ chữ
     async runTypingEffect() {
       const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

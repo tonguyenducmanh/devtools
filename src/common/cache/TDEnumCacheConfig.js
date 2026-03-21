@@ -30,4 +30,5 @@ export const EnumCacheConfig = {
   ImageToBase64ConfigLayout: 36,
   OneTimePasswordConfigLayout: 37,
   OpticalCharacterRecognitionConfigLayout: 38,
+  WelcomeLayout: 39,
 };

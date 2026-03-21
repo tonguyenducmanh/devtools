@@ -118,6 +118,12 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool text manipulation",
   },
+  WelcomeLayout: {
+    KeyFormat: "WelcomeLayout",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout WelcomeLayout",
+  },
   TextCompressConfigLayout: {
     KeyFormat: "TextCompressConfigLayout",
     CacheLevel: tdEnum.cacheType.local,
