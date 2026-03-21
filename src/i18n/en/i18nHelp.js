@@ -1,5 +1,34 @@
 export default {
   i18nHelp: {
+    welcome: {
+      purpose: {
+        title: "Why this app exists?",
+        content:
+          "Dev Tools is a suite of utilities designed to assist developers during the software development process. Instead of installing multiple separate applications for each feature or writing complex scripts that take time, you can use the built-in tools right here.",
+      },
+      quickStart: {
+        title: "Quick Start",
+        selectTool: "Select a tool from the sidebar menu on the left to get started.",
+        searchTool: "Press Ctrl + P (or Cmd + P on Mac) to open the search box, type the tool name you need and press Enter to open it quickly.",
+        note: "Tip: Use ↑↓ to navigate between search results.",
+      },
+      multiTab: {
+        title: "Working with Multiple Tabs",
+        description:
+          "The application supports opening multiple tools simultaneously as tabs. This allows you to avoid opening multiple browser windows to use different features at the same time.",
+        rightClick: "Right-click on a tab name to open the context menu with the following options:",
+        duplicateTab: "Duplicate tab - Create a copy of the current tab",
+        closeTab: "Close tab - Close the selected tab",
+        closeAllTabs: "Close all - Close all open tabs",
+        dragReorder: "Drag and drop tabs to reorder them.",
+      },
+      agent: {
+        title: "The tools in this app are divided into 2 types:",
+        webOnly: "Web-based - No additional installation required, works directly in the browser.",
+        needAgent: "Requires Agent - Need to download and run the Agent app (desktop application) as backend, helping to bypass browser limitations such as CORS, SSL, fake headers,...",
+        downloadAgent: "To download the Agent, click on the Help menu in the top header and select \"Download Agent\".",
+      },
+    },
     feature: {
       OpticalCharacterRecognition: "Vietnamese OCR tool, may have errors.",
       AppDataMiner: "View all the data stored in the application's database",
