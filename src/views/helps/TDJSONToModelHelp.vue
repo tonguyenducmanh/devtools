@@ -15,9 +15,15 @@
           {{ $t("i18nHelp.jsonToModel.howToUse.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.jsonToModel.howToUse.input") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.jsonToModel.howToUse.selectLanguage") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.jsonToModel.howToUse.convert") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.jsonToModel.howToUse.input") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.jsonToModel.howToUse.selectLanguage") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.jsonToModel.howToUse.convert") }}
+          </div>
         </div>
       </div>
 
@@ -26,9 +32,15 @@
           {{ $t("i18nHelp.jsonToModel.features.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.jsonToModel.features.languages") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.jsonToModel.features.namespace") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.jsonToModel.features.options") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.jsonToModel.features.languages") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.jsonToModel.features.namespace") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.jsonToModel.features.options") }}
+          </div>
         </div>
       </div>
     </div>
@@ -42,5 +54,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/help.scss";
+@use "@/styles/help.scss";
 </style>

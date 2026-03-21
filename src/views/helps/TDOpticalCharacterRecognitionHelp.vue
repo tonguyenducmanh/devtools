@@ -15,8 +15,12 @@
           {{ $t("i18nHelp.ocr.howToUse.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.ocr.howToUse.upload") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.ocr.howToUse.process") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.ocr.howToUse.upload") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.ocr.howToUse.process") }}
+          </div>
           <div class="section-item">{{ $t("i18nHelp.ocr.howToUse.copy") }}</div>
         </div>
       </div>
@@ -26,10 +30,16 @@
           {{ $t("i18nHelp.ocr.features.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.ocr.features.language") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.ocr.features.language") }}
+          </div>
           <div class="section-item">{{ $t("i18nHelp.ocr.features.psm") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.ocr.features.whitelist") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.ocr.features.preprocessing") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.ocr.features.whitelist") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.ocr.features.preprocessing") }}
+          </div>
         </div>
       </div>
     </div>
@@ -43,5 +53,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/help.scss";
+@use "@/styles/help.scss";
 </style>

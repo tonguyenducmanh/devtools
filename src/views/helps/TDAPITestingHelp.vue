@@ -15,9 +15,15 @@
           {{ $t("i18nHelp.apiTesting.modes.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.apiTesting.modes.normal") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.apiTesting.modes.curl") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.apiTesting.modes.proMode") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.apiTesting.modes.normal") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.apiTesting.modes.curl") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.apiTesting.modes.proMode") }}
+          </div>
         </div>
       </div>
 
@@ -26,9 +32,15 @@
           {{ $t("i18nHelp.apiTesting.features.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.apiTesting.features.collection") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.apiTesting.features.history") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.apiTesting.features.import") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.apiTesting.features.collection") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.apiTesting.features.history") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.apiTesting.features.import") }}
+          </div>
         </div>
       </div>
 
@@ -51,5 +63,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/help.scss";
+@use "@/styles/help.scss";
 </style>

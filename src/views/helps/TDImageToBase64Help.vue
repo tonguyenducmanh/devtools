@@ -15,9 +15,15 @@
           {{ $t("i18nHelp.imageToBase64.howToUse.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.imageToBase64.howToUse.select") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.imageToBase64.howToUse.preview") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.imageToBase64.howToUse.copy") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.imageToBase64.howToUse.select") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.imageToBase64.howToUse.preview") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.imageToBase64.howToUse.copy") }}
+          </div>
         </div>
       </div>
 
@@ -25,7 +31,9 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.imageToBase64.note.title") }}
         </h3>
-        <p class="section-note">{{ $t("i18nHelp.imageToBase64.note.content") }}</p>
+        <p class="section-note">
+          {{ $t("i18nHelp.imageToBase64.note.content") }}
+        </p>
       </div>
     </div>
   </div>
@@ -38,5 +46,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/help.scss";
+@use "@/styles/help.scss";
 </style>

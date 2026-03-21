@@ -15,7 +15,9 @@
           {{ $t("i18nHelp.compareCode.supportedFormats.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.compareCode.supportedFormats.list") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.compareCode.supportedFormats.list") }}
+          </div>
         </div>
       </div>
 
@@ -24,8 +26,12 @@
           {{ $t("i18nHelp.compareCode.features.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.compareCode.features.highlight") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.compareCode.features.wrapText") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.compareCode.features.highlight") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.compareCode.features.wrapText") }}
+          </div>
         </div>
       </div>
     </div>
@@ -39,5 +45,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/help.scss";
+@use "@/styles/help.scss";
 </style>

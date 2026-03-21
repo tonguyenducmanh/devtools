@@ -15,9 +15,15 @@
           {{ $t("i18nHelp.textGenerator.howToUse.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.textGenerator.howToUse.selectType") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.textGenerator.howToUse.enterCount") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.textGenerator.howToUse.generate") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textGenerator.howToUse.selectType") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textGenerator.howToUse.enterCount") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textGenerator.howToUse.generate") }}
+          </div>
         </div>
       </div>
 
@@ -26,8 +32,12 @@
           {{ $t("i18nHelp.textGenerator.generationTypes.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.textGenerator.generationTypes.word") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.textGenerator.generationTypes.paragraph") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textGenerator.generationTypes.word") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textGenerator.generationTypes.paragraph") }}
+          </div>
         </div>
       </div>
     </div>
@@ -41,5 +51,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/help.scss";
+@use "@/styles/help.scss";
 </style>

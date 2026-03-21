@@ -15,9 +15,15 @@
           {{ $t("i18nHelp.cosinSimilarity.howToUse.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.cosinSimilarity.howToUse.enterFirst") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.cosinSimilarity.howToUse.enterSecond") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.cosinSimilarity.howToUse.calculate") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.cosinSimilarity.howToUse.enterFirst") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.cosinSimilarity.howToUse.enterSecond") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.cosinSimilarity.howToUse.calculate") }}
+          </div>
         </div>
       </div>
 
@@ -28,7 +34,9 @@
         <p class="section-text">
           {{ $t("i18nHelp.cosinSimilarity.inputFormat.content") }}
         </p>
-        <p class="section-note">{{ $t("i18nHelp.cosinSimilarity.inputFormat.note") }}</p>
+        <p class="section-note">
+          {{ $t("i18nHelp.cosinSimilarity.inputFormat.note") }}
+        </p>
       </div>
     </div>
   </div>
@@ -41,5 +49,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/help.scss";
+@use "@/styles/help.scss";
 </style>

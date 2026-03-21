@@ -15,9 +15,15 @@
           {{ $t("i18nHelp.textToQRCode.howToUse.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.textToQRCode.howToUse.input") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.textToQRCode.howToUse.generate") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.textToQRCode.howToUse.copyDownload") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textToQRCode.howToUse.input") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textToQRCode.howToUse.generate") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textToQRCode.howToUse.copyDownload") }}
+          </div>
         </div>
       </div>
 
@@ -26,9 +32,15 @@
           {{ $t("i18nHelp.textToQRCode.features.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.textToQRCode.features.compress") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.textToQRCode.features.header") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.textToQRCode.features.batch") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textToQRCode.features.compress") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textToQRCode.features.header") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textToQRCode.features.batch") }}
+          </div>
         </div>
       </div>
     </div>
@@ -42,5 +54,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/help.scss";
+@use "@/styles/help.scss";
 </style>

@@ -15,9 +15,15 @@
           {{ $t("i18nHelp.jsonToPostgreSQL.howToUse.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.jsonToPostgreSQL.howToUse.input") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.jsonToPostgreSQL.howToUse.configure") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.jsonToPostgreSQL.howToUse.convert") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.jsonToPostgreSQL.howToUse.input") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.jsonToPostgreSQL.howToUse.configure") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.jsonToPostgreSQL.howToUse.convert") }}
+          </div>
         </div>
       </div>
 
@@ -26,9 +32,15 @@
           {{ $t("i18nHelp.jsonToPostgreSQL.features.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.jsonToPostgreSQL.features.createTable") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.jsonToPostgreSQL.features.deleteScript") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.jsonToPostgreSQL.features.fileUpload") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.jsonToPostgreSQL.features.createTable") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.jsonToPostgreSQL.features.deleteScript") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.jsonToPostgreSQL.features.fileUpload") }}
+          </div>
         </div>
       </div>
     </div>
@@ -42,5 +54,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/help.scss";
+@use "@/styles/help.scss";
 </style>

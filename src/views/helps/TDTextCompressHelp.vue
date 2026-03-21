@@ -15,8 +15,12 @@
           {{ $t("i18nHelp.textCompress.howToUse.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.textCompress.howToUse.compress") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.textCompress.howToUse.decompress") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textCompress.howToUse.compress") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textCompress.howToUse.decompress") }}
+          </div>
         </div>
       </div>
 
@@ -25,9 +29,15 @@
           {{ $t("i18nHelp.textCompress.algorithms.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.textCompress.algorithms.gzip") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.textCompress.algorithms.deflate") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.textCompress.algorithms.deflateRaw") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textCompress.algorithms.gzip") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textCompress.algorithms.deflate") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.textCompress.algorithms.deflateRaw") }}
+          </div>
         </div>
       </div>
     </div>
@@ -41,5 +51,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/help.scss";
+@use "@/styles/help.scss";
 </style>

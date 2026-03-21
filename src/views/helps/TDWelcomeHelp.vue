@@ -15,8 +15,12 @@
           {{ $t("i18nHelp.welcome.quickStart.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.welcome.quickStart.selectTool") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.welcome.quickStart.searchTool") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.welcome.quickStart.selectTool") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.welcome.quickStart.searchTool") }}
+          </div>
         </div>
         <p class="section-note">{{ $t("i18nHelp.welcome.quickStart.note") }}</p>
       </div>
@@ -32,9 +36,15 @@
           {{ $t("i18nHelp.welcome.multiTab.rightClick") }}
         </p>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.welcome.multiTab.duplicateTab") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.welcome.multiTab.closeTab") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.welcome.multiTab.closeAllTabs") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.welcome.multiTab.duplicateTab") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.welcome.multiTab.closeTab") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.welcome.multiTab.closeAllTabs") }}
+          </div>
         </div>
         <p class="section-text">
           {{ $t("i18nHelp.welcome.multiTab.dragReorder") }}
@@ -46,8 +56,12 @@
           {{ $t("i18nHelp.welcome.agent.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.welcome.agent.webOnly") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.welcome.agent.needAgent") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.welcome.agent.webOnly") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.welcome.agent.needAgent") }}
+          </div>
         </div>
         <p class="section-text">
           {{ $t("i18nHelp.welcome.agent.downloadAgent") }}
@@ -70,5 +84,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/styles/help.scss";
+@use "@/styles/help.scss";
 </style>

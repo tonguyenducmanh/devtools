@@ -15,9 +15,15 @@
           {{ $t("i18nHelp.apiMocking.howToUse.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.apiMocking.howToUse.createMock") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.apiMocking.howToUse.configure") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.apiMocking.howToUse.saveMock") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.apiMocking.howToUse.createMock") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.apiMocking.howToUse.configure") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.apiMocking.howToUse.saveMock") }}
+          </div>
         </div>
       </div>
 
@@ -49,5 +55,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/help.scss";
+@use "@/styles/help.scss";
 </style>

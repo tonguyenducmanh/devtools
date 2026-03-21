@@ -15,9 +15,15 @@
           {{ $t("i18nHelp.oneTimePassword.importData.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.oneTimePassword.importData.scanQR") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.oneTimePassword.importData.pasteURL") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.oneTimePassword.importData.manual") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.oneTimePassword.importData.scanQR") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.oneTimePassword.importData.pasteURL") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.oneTimePassword.importData.manual") }}
+          </div>
         </div>
       </div>
 
@@ -35,10 +41,16 @@
           {{ $t("i18nHelp.oneTimePassword.quickUse.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.oneTimePassword.quickUse.copyOTP") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.oneTimePassword.quickUse.autoRefresh") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.oneTimePassword.quickUse.copyOTP") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.oneTimePassword.quickUse.autoRefresh") }}
+          </div>
         </div>
-        <p class="section-note">{{ $t("i18nHelp.oneTimePassword.quickUse.note") }}</p>
+        <p class="section-note">
+          {{ $t("i18nHelp.oneTimePassword.quickUse.note") }}
+        </p>
       </div>
     </div>
   </div>
@@ -57,5 +69,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/help.scss";
+@use "@/styles/help.scss";
 </style>

@@ -15,9 +15,15 @@
           {{ $t("i18nHelp.colorPicker.howToUse.title") }}
         </h3>
         <div class="flex flex-col section-list">
-          <div class="section-item">{{ $t("i18nHelp.colorPicker.howToUse.upload") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.colorPicker.howToUse.click") }}</div>
-          <div class="section-item">{{ $t("i18nHelp.colorPicker.howToUse.copy") }}</div>
+          <div class="section-item">
+            {{ $t("i18nHelp.colorPicker.howToUse.upload") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.colorPicker.howToUse.click") }}
+          </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.colorPicker.howToUse.copy") }}
+          </div>
         </div>
       </div>
 
@@ -43,5 +49,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/styles/help.scss";
+@use "@/styles/help.scss";
 </style>
