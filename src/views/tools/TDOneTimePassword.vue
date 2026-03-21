@@ -168,7 +168,10 @@
         />
       </div>
     </div>
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:main>
         <TDOneTimePasswordHelp />
       </template>
@@ -634,13 +637,16 @@ export default {
   },
   data() {
     return {
-      isShowSidebar: true,
+      keyCacheLayout: this.$tdEnum.cacheConfig.OneTimePasswordConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+      },
       filterOtp: null,
       migrationURL: null,
       decodedData: null,
       decodedDataString: null,
       password: null,
-      username: null, // Thêm trường username
+      username: null,
       timeoutId: null,
       filterRemove: null,
       progress: 0,

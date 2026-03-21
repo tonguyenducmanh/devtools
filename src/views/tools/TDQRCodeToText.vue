@@ -31,39 +31,43 @@
         ></TDTextarea>
       </div>
     </div>
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:menu>
         <div class="td-sidebar-menu">
           <TDSlideOption
             :showIcon="true"
-            v-model="currentSidebarOption"
+            v-model="currentConfigLayout.currentSidebarOption"
             :options="sidebarOptions"
             :noMargin="true"
+            @change="updateConfigLayout"
           />
         </div>
       </template>
       <template v-slot:main>
         <div
           class="flex flex-col td-sub-sidebar"
-          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
         >
           <TDQRCodeToTextHelp />
         </div>
         <div
           class="flex flex-col td-sub-sidebar"
-          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
         >
           <TDCheckbox
-            v-model="isCompressText"
+            v-model="currentConfigLayout.isCompressText"
             :variant="$tdEnum.checkboxType.switch"
             :label="$t('i18nCommon.qrCodeToText.compressText')"
-            @input="convertQRCode"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
-            v-model="hasHeaderInQR"
+            v-model="currentConfigLayout.hasHeaderInQR"
             :variant="$tdEnum.checkboxType.switch"
             :label="$t('i18nCommon.qrCodeToText.hasHeaderInQR')"
-            @input="convertQRCode"
+            @change="updateConfigLayout"
           ></TDCheckbox>
         </div>
       </template>
@@ -112,24 +116,21 @@ export default {
         me.$refs.uploadArea &&
         typeof me.$refs.uploadArea.getFileSelected === "function"
       ) {
-        // Lazy-load module
         const { imagesQRToText } = await import(
           /* webpackChunkName: "mock-qr-code-util" */
           "@/common/qrcode/TDQRCodeUtil.js"
         );
-        // Lọc kết quả hợp lệ
         try {
           let rawResults = await imagesQRToText(me.$refs.uploadArea);
           if (rawResults && rawResults.length > 0) {
             let finalOutput = "";
-            if (me.hasHeaderInQR) {
+            if (me.currentConfigLayout.hasHeaderInQR) {
               finalOutput = me.recoveryFullTextFromQRWithHeader(rawResults);
             } else {
-              // Nếu không có header nào hoặc checkbox không được chọn, nối trực tiếp như cũ
               finalOutput = rawResults.join("");
             }
 
-            if (me.isCompressText) {
+            if (me.currentConfigLayout.isCompressText) {
               me.textOutput = await TDCompress.decompressText(
                 finalOutput,
                 me.$tdEnum.compressType.gzip,
@@ -209,17 +210,20 @@ export default {
   },
   data() {
     return {
-      isShowSidebar: true,
-      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
+      keyCacheLayout: this.$tdEnum.cacheConfig.QRCodeToTextConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+        currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
+        isCompressText:
+          window.__env &&
+          window.__env.textToQRConfig &&
+          window.__env.textToQRConfig.isCompressText,
+        hasHeaderInQR: true,
+      },
       textOutput: null,
       isRemoveEmpty: false,
       historyItems: [],
       qrCodeItems: [],
-      isCompressText:
-        window.__env &&
-        window.__env.textToQRConfig &&
-        window.__env.textToQRConfig.isCompressText,
-      hasHeaderInQR: true,
     };
   },
 };

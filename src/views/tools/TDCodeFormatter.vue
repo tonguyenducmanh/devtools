@@ -7,7 +7,7 @@
           v-model="inputSource"
           height="100%"
           width="50%"
-          :enableHighlight="enableHighlight"
+          :enableHighlight="currentConfigLayout.enableHighlight"
           :language="language"
         ></TDTextarea>
         <TDTextarea
@@ -15,7 +15,7 @@
           v-model="outputSource"
           height="100%"
           width="50%"
-          :enableHighlight="enableHighlight"
+          :enableHighlight="currentConfigLayout.enableHighlight"
           :language="language"
           :readOnly="true"
         ></TDTextarea>
@@ -33,7 +33,7 @@
             :label="$t('i18nCommon.codeFormatter.formatCode')"
           ></TDButton>
           <TDCheckbox
-            v-model="enableHighlight"
+            v-model="currentConfigLayout.enableHighlight"
             :label="$t('i18nCommon.enableHighlight')"
           ></TDCheckbox>
           <TDButton
@@ -49,7 +49,10 @@
         </div>
       </div>
     </div>
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:main>
         <TDCodeFormatterHelp />
       </template>
@@ -147,10 +150,13 @@ export default {
   },
   data() {
     return {
-      isShowSidebar: true,
+      keyCacheLayout: this.$tdEnum.cacheConfig.CodeFormatterConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+        enableHighlight: true,
+      },
       inputSource: null,
       outputSource: null,
-      enableHighlight: true,
       language: "pgsql",
       methodOptions: [
         { value: "pgsql", label: "Postgres SQL" },

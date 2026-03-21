@@ -39,7 +39,10 @@
         ></TDButton>
       </div>
     </div>
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:main>
         <TDBase64ToImageHelp />
       </template>
@@ -97,7 +100,10 @@ export default {
   },
   data() {
     return {
-      isShowSidebar: true,
+      keyCacheLayout: this.$tdEnum.cacheConfig.Base64ToImageConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+      },
       base64Result: null,
       srcImg: null,
     };

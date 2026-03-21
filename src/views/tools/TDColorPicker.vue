@@ -81,7 +81,10 @@
         </div>
       </div>
     </div>
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:main>
         <TDColorPickerHelp />
       </template>
@@ -108,7 +111,10 @@ export default {
   },
   data() {
     return {
-      isShowSidebar: true,
+      keyCacheLayout: this.$tdEnum.cacheConfig.ColorPickerConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+      },
       imageLoaded: false,
       canvas: null,
       ctx: null,

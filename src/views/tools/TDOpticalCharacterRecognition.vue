@@ -75,27 +75,31 @@
         </div>
       </div>
     </div>
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:menu>
         <div class="td-sidebar-menu">
           <TDSlideOption
             :showIcon="true"
-            v-model="currentSidebarOption"
+            v-model="currentConfigLayout.currentSidebarOption"
             :options="sidebarOptions"
             :noMargin="true"
+            @change="updateConfigLayout"
           />
         </div>
       </template>
       <template v-slot:main>
         <div
           class="flex flex-col td-sub-sidebar"
-          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
         >
           <TDOpticalCharacterRecognitionHelp />
         </div>
         <div
           class="flex flex-col td-sub-sidebar"
-          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
         >
           <div class="sidebar-section">
             <div class="sidebar-item">
@@ -134,22 +138,24 @@
             </div>
             <div class="sidebar-item">
               <TDCheckbox
-                v-model="useWhitelist"
+                v-model="currentConfigLayout.useWhitelist"
                 :label="
                   $t('i18nCommon.OpticalCharacterRecognition.useWhitelist')
                 "
                 :variant="$tdEnum.checkboxType.switch"
                 :noMargin="true"
+                @change="updateConfigLayout"
               ></TDCheckbox>
             </div>
             <div class="sidebar-item">
               <TDCheckbox
-                v-model="enablePreprocessing"
+                v-model="currentConfigLayout.enablePreprocessing"
                 :label="
                   $t('i18nCommon.OpticalCharacterRecognition.preprocessing')
                 "
                 :variant="$tdEnum.checkboxType.switch"
                 :noMargin="true"
+                @change="updateConfigLayout"
               ></TDCheckbox>
             </div>
           </div>
@@ -394,7 +400,7 @@ export default {
           try {
             let imageSource = item.file;
 
-            if (me.enablePreprocessing) {
+            if (me.currentConfigLayout.enablePreprocessing) {
               imageSource = await me.preprocessImage(item.file);
             }
 
@@ -411,7 +417,7 @@ export default {
                   }
                 },
                 tessedit_pageseg_mode: me.selectedPSM,
-                tessedit_char_whitelist: me.useWhitelist
+                tessedit_char_whitelist: me.currentConfigLayout.useWhitelist
                   ? me.whitelist
                   : undefined,
               },
@@ -441,12 +447,17 @@ export default {
   },
   data() {
     return {
-      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
+      keyCacheLayout: this.$tdEnum.cacheConfig.OpticalCharacterRecognitionConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+        currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
+        useWhitelist: false,
+        enablePreprocessing: false,
+      },
       ocrResults: [],
       selectedLanguage: "vie",
       selectedPSM: "PSM_AUTO_OSD",
       confidenceThreshold: 90,
-      useWhitelist: false,
       whitelist:
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀẢÃÁẠẮẰẲẴẶÂẦẨẪẬĐÈẺẼÉẸÊỀỂỄẾỆÌỈĨÍỊÒỎÕÓỌÔỔỖỐỘƠỜỞỠỚỢÙỦŨÚỤỪỬỮƯỰỲỴỶỸÝ0123456789.,;:'\"()[]{}/\\-+=*!@#$%^&_`|~<>? \t\n\r",
       languageOptions: [
@@ -493,8 +504,6 @@ export default {
       ],
       isProcessing: false,
       progress: 0,
-      enablePreprocessing: false,
-      isShowSidebar: true,
       magnifierEl: null,
       magnifierSrc: null,
     };

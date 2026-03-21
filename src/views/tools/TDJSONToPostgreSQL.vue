@@ -1,16 +1,19 @@
 <template>
   <div class="flex container">
     <div class="flex flex-col main-area">
-      <div class="flex io-section" :class="{ 'flex-col': splitHorizontal }">
-        <template v-if="!enableFileUpload">
+      <div
+        class="flex io-section"
+        :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
+      >
+        <template v-if="!currentConfigLayout.enableFileUpload">
           <TDTextarea
             isLabelTop
-            :enableHighlight="enableHighlight"
+            :enableHighlight="currentConfigLayout.enableHighlight"
             language="json"
             :label="$t('i18nCommon.jsonToPostgreSQL.inputLabel')"
             :placeHolder="$t('i18nCommon.jsonToPostgreSQL.inputPlaceholder')"
             v-model="inputJSON"
-            :wrapText="wrapText"
+            :wrapText="currentConfigLayout.wrapText"
           ></TDTextarea>
         </template>
         <template v-else>
@@ -22,21 +25,21 @@
             />
           </div>
         </template>
-        <template v-if="!enableFileUpload">
+        <template v-if="!currentConfigLayout.enableFileUpload">
           <TDTextarea
             isLabelTop
             :label="$t('i18nCommon.jsonToPostgreSQL.outputLabel')"
             :readOnly="true"
-            :enableHighlight="enableHighlight"
+            :enableHighlight="currentConfigLayout.enableHighlight"
             language="sql"
             :placeHolder="$t('i18nCommon.jsonToPostgreSQL.outputPlaceholder')"
             v-model="outputSQL"
-            :wrapText="wrapText"
+            :wrapText="currentConfigLayout.wrapText"
           ></TDTextarea>
         </template>
       </div>
       <div class="flex">
-        <template v-if="!enableFileUpload">
+        <template v-if="!currentConfigLayout.enableFileUpload">
           <TDButton
             :label="$t('i18nCommon.jsonToPostgreSQL.convert')"
             @click="convertToPostgresSQL"
@@ -61,57 +64,73 @@
         ></TDButton>
       </div>
     </div>
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:menu>
         <div class="td-sidebar-menu">
           <TDSlideOption
             :showIcon="true"
-            v-model="currentSidebarOption"
+            v-model="currentConfigLayout.currentSidebarOption"
             :options="sidebarOptions"
             :noMargin="true"
+            @change="updateConfigLayout"
           />
         </div>
       </template>
       <template v-slot:main>
         <div
           class="flex flex-col td-sidebar-content"
-          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.Help
+          "
         >
           <TDJSONToPostgreSQLHelp />
         </div>
         <div
           class="flex flex-col td-sidebar-content"
-          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.Setting
+          "
         >
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="wrapText"
+            v-model="currentConfigLayout.wrapText"
             :label="$t('i18nCommon.apiTesting.wrapText')"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="enableHighlight"
+            v-model="currentConfigLayout.enableHighlight"
             :label="$t('i18nCommon.enableHighlight')"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="enableFileUpload"
+            v-model="currentConfigLayout.enableFileUpload"
             :label="$t('i18nCommon.jsonToPostgreSQL.useFileUpload')"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="enableCreateTable"
+            v-model="currentConfigLayout.enableCreateTable"
             :label="$t('i18nCommon.jsonToPostgreSQL.createTable')"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="enableDeleteScript"
+            v-model="currentConfigLayout.enableDeleteScript"
             :label="$t('i18nCommon.jsonToPostgreSQL.deleteOld')"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="splitHorizontal"
+            v-model="currentConfigLayout.splitHorizontal"
             :label="$t('i18nCommon.splitHorizontal')"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <div class="flex flex-col group-info">
             <TDInput
@@ -190,8 +209,8 @@ export default {
           config.tableName = me.tableName;
           config.schemaName = me.schemaName;
           config.primaryKeyField = me.primaryKeyField;
-          config.enableDeleteScript = me.enableDeleteScript;
-          config.enableCreateTable = me.enableCreateTable;
+          config.enableDeleteScript = me.currentConfigLayout.enableDeleteScript;
+          config.enableCreateTable = me.currentConfigLayout.enableCreateTable;
           me.outputSQL = me.buildScriptPostgreSQLScript(input, config);
           me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
         }
@@ -403,11 +422,17 @@ export default {
   },
   data() {
     return {
-      isShowSidebar: true,
-      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
-      enableHighlight: true,
-      splitHorizontal: true,
-      wrapText: true,
+      keyCacheLayout: this.$tdEnum.cacheConfig.JSONToPostgreSQLConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+        currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
+        enableHighlight: true,
+        splitHorizontal: true,
+        wrapText: true,
+        enableCreateTable: false,
+        enableDeleteScript: true,
+        enableFileUpload: false,
+      },
       STRING_JOIN: ", ",
       STRING_JOIN_BREAKLINE: ";\n",
       NULL_VALUE: "null",
@@ -417,9 +442,6 @@ export default {
       primaryKeyField: null,
       inputJSON: null,
       outputSQL: null,
-      enableCreateTable: false,
-      enableDeleteScript: true,
-      enableFileUpload: false,
     };
   },
 };

@@ -68,38 +68,43 @@
         </TDVirtualScroll>
       </div>
     </div>
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:menu>
         <div class="td-sidebar-menu">
           <TDSlideOption
             :showIcon="true"
-            v-model="currentSidebarOption"
+            v-model="currentConfigLayout.currentSidebarOption"
             :options="sidebarOptions"
             :noMargin="true"
+            @change="updateConfigLayout"
           />
         </div>
       </template>
       <template v-slot:main>
         <div
           class="flex flex-col td-sub-sidebar"
-          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
         >
           <TDTextToQRCodeHelp />
         </div>
         <div
           class="flex flex-col td-sub-sidebar"
-          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
         >
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="isCompressText"
+            v-model="currentConfigLayout.isCompressText"
             :label="$t('i18nCommon.textToQRCode.compressText')"
-            @input="toggleCompressText"
+            @change="toggleCompressText"
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="addHeaderToQR"
+            v-model="currentConfigLayout.addHeaderToQR"
             :label="$t('i18nCommon.textToQRCode.addHeaderToQR')"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <div class="flex flex-col input-config">
             <div class="flex input-config-item">
@@ -107,7 +112,7 @@
                 $t("i18nCommon.textToQRCode.input.maxLength")
               }}</span>
               <TDInput
-                v-model="maxLengthUserConfig"
+                v-model="currentConfigLayout.maxLengthUserConfig"
                 :inputType="'number'"
                 class="value-input-config max-length-input"
                 :placeHolder="'1000'"
@@ -119,7 +124,7 @@
                 $t("i18nCommon.textToQRCode.QRSizeInPixel")
               }}</span>
               <TDInput
-                v-model="QRSizeInPixel"
+                v-model="currentConfigLayout.QRSizeInPixel"
                 :inputType="'number'"
                 class="value-input-config max-length-input"
                 :placeHolder="350"
@@ -131,7 +136,7 @@
                 $t("i18nCommon.textToQRCode.exampleWordCount")
               }}</span>
               <TDInput
-                v-model="exampleWordCount"
+                v-model="currentConfigLayout.exampleWordCount"
                 :inputType="'number'"
                 class="value-input-config max-length-input"
                 :placeHolder="10"
@@ -178,7 +183,7 @@ export default {
     async applyMock() {
       let me = this;
       let dataMock = {
-        textGenQR: TDMockTextGenerate.generateLoremWords(me.exampleWordCount),
+        textGenQR: TDMockTextGenerate.generateLoremWords(me.currentConfigLayout.exampleWordCount),
       };
       this.$tdUtility.applyMock(this, dataMock);
     },
@@ -187,6 +192,7 @@ export default {
       if (me.textGenQR) {
         await me.generateQRCode(null);
       }
+      me.updateConfigLayout();
     },
     /**
      * Tạo QR code từ text
@@ -194,36 +200,30 @@ export default {
     async generateQRCode(textInput) {
       let me = this;
       let maxTextOneChunk = Number(
-        me.maxLengthUserConfig ?? window.__env.textToQRConfig.maxTextOneChunk,
+        me.currentConfigLayout.maxLengthUserConfig ?? window.__env.textToQRConfig.maxTextOneChunk,
       );
       if (!maxTextOneChunk || isNaN(maxTextOneChunk) || maxTextOneChunk <= 0) {
-        maxTextOneChunk = 1000; // fallback mặc định
+        maxTextOneChunk = 1000;
       }
 
-      // Nếu có header, giảm maxLength đi 19 ký tự (độ dài của YYYYMMDDHHmmss-NNN-)
       const HEADER_LENGTH = 19;
       let effectiveMaxTextOneChunk = maxTextOneChunk;
-      if (me.addHeaderToQR) {
-        effectiveMaxTextOneChunk = Math.max(1, maxTextOneChunk - HEADER_LENGTH); // Đảm bảo không nhỏ hơn 1
+      if (me.currentConfigLayout.addHeaderToQR) {
+        effectiveMaxTextOneChunk = Math.max(1, maxTextOneChunk - HEADER_LENGTH);
       }
 
-      // Lấy giá trị từ các input
       let text = me.getUserInput(textInput);
       let textBuild = await me.buildTextBeforeGenQR(text);
-      // reset
       me.qrCodeItems = [];
 
-      // build ra ngày giờ hiện tại để thêm vào header
       let timestamp = me.getCurrentTimestampForHeader();
 
-      // Nếu độ dài text lớn hơn 1000, chia thành nhiều phần
       let chunks = me.splitTextIntoChunks(
         textBuild,
         effectiveMaxTextOneChunk,
-        me.addHeaderToQR,
+        me.currentConfigLayout.addHeaderToQR,
         timestamp,
       );
-      // Tạo QR code cho từng phần
       chunks.forEach((chunk) => {
         me.generateQRCodeJS(chunk);
       });
@@ -257,7 +257,7 @@ export default {
     async buildTextBeforeGenQR(text) {
       let me = this;
       let textTransformed = text;
-      if (me.isCompressText && textTransformed) {
+      if (me.currentConfigLayout.isCompressText && textTransformed) {
         textTransformed = await TDCompress.compressText(
           text,
           me.$tdEnum.compressType.gzip,
@@ -382,8 +382,8 @@ export default {
     QRImageStyle() {
       let me = this;
       let style = {
-        width: `${me.QRSizeInPixel}px`,
-        height: `${me.QRSizeInPixel}px`,
+        width: `${me.currentConfigLayout.QRSizeInPixel}px`,
+        height: `${me.currentConfigLayout.QRSizeInPixel}px`,
       };
       return style;
     },
@@ -406,20 +406,23 @@ export default {
   },
   data() {
     return {
-      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
-      firstSectionSize: 50, // Phần request chiếm 50%
-      secondSectionSize: 50, // Phần response chiếm 50%
-      isShowSidebar: true,
+      keyCacheLayout: this.$tdEnum.cacheConfig.TextToQRCodeConfigLayout,
+      currentConfigLayout: {
+        currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
+        isShowSidebar: true,
+        maxLengthUserConfig: window.__env.textToQRConfig.maxTextOneChunk,
+        QRSizeInPixel: 350,
+        exampleWordCount: 10,
+        isCompressText:
+          window.__env &&
+          window.__env.textToQRConfig &&
+          window.__env.textToQRConfig.isCompressText,
+        addHeaderToQR: true,
+      },
+      firstSectionSize: 50,
+      secondSectionSize: 50,
       textGenQR: null,
       qrCodeItems: [],
-      maxLengthUserConfig: window.__env.textToQRConfig.maxTextOneChunk,
-      QRSizeInPixel: 350,
-      exampleWordCount: 10,
-      isCompressText:
-        window.__env &&
-        window.__env.textToQRConfig &&
-        window.__env.textToQRConfig.isCompressText,
-      addHeaderToQR: true,
     };
   },
 };

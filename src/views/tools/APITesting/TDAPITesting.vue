@@ -674,14 +674,12 @@
  import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
  import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
  import TDMockAPIProMode from "@/common/mock/TDMockAPIProMode.js";
- import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
  import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
  import TDToolBase from "@/views/tools/base/TDToolBase.vue";
  import TDAPITestingHelp from "@/views/helps/TDAPITestingHelp.vue";
  export default {
    extends: TDToolBase,
    name: "TDAPITesting",
-   mixins: [TDLayoutConfigMixin],
    components: {
      TDSubSidebar,
      TDArrow,
@@ -852,10 +850,6 @@
     handleResize(sizes) {
       this.requestSectionSize = sizes.leftSize;
       this.responseSectionSize = sizes.rightSize;
-    },
-    async toggleSidebar() {
-      let me = this;
-      await me.updateConfigLayout();
     },
     async addNewCollection(collectionName) {
       let me = this;

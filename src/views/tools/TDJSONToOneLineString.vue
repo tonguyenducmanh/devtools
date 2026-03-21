@@ -1,25 +1,25 @@
 <template>
   <div class="flex container">
     <div class="flex flex-col main-area">
-      <div class="flex io-section" :class="{ 'flex-col': splitHorizontal }">
+      <div class="flex io-section" :class="{ 'flex-col': currentConfigLayout.splitHorizontal }">
         <TDTextarea
           isLabelTop
-          :enableHighlight="enableHighlight"
+          :enableHighlight="currentConfigLayout.enableHighlight"
           language="json"
           :label="$t('i18nCommon.JSONToOneLineString.inputLabel')"
           :placeHolder="$t('i18nCommon.JSONToOneLineString.inputPlaceholder')"
           v-model="inputJSON"
-          :wrapText="wrapText"
+          :wrapText="currentConfigLayout.wrapText"
         ></TDTextarea>
         <TDTextarea
           isLabelTop
           :label="$t('i18nCommon.JSONToOneLineString.outputLabel')"
           :readOnly="true"
-          :enableHighlight="enableHighlight"
+          :enableHighlight="currentConfigLayout.enableHighlight"
           :language="outputHighlightLanguage"
           :placeHolder="$t('i18nCommon.JSONToOneLineString.outputPlaceholder')"
           v-model="outputString"
-          :wrapText="wrapText"
+          :wrapText="currentConfigLayout.wrapText"
         ></TDTextarea>
       </div>
       <div class="flex">
@@ -39,29 +39,32 @@
         ></TDButton>
       </div>
     </div>
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:menu>
         <div class="td-sidebar-menu">
           <TDSlideOption
             :showIcon="true"
-            v-model="currentSidebarOption"
+            v-model="currentConfigLayout.currentSidebarOption"
             :options="sidebarOptions"
             :noMargin="true"
+            @change="updateConfigLayout"
           />
         </div>
       </template>
       <template v-slot:main>
         <div
           class="flex flex-col td-sidebar-content"
-          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
         >
           <TDJSONToOneLineStringHelp />
         </div>
         <div
           class="flex flex-col td-sidebar-content"
-          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
         >
-          <!-- Chọn ngôn ngữ output -->
           <div class="flex flex-col group-section">
             <TDComboBox
               v-model="selectedLanguage"
@@ -72,27 +75,29 @@
               @selected="convertToOneLine"
             ></TDComboBox>
           </div>
-          <!-- Cài đặt hiển thị -->
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="wrapText"
+            v-model="currentConfigLayout.wrapText"
             :label="$t('i18nCommon.apiTesting.wrapText')"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="enableHighlight"
+            v-model="currentConfigLayout.enableHighlight"
             :label="$t('i18nCommon.enableHighlight')"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="splitHorizontal"
+            v-model="currentConfigLayout.splitHorizontal"
             :label="$t('i18nCommon.splitHorizontal')"
+            @change="updateConfigLayout"
           ></TDCheckbox>
-          <!-- Tùy chọn format output -->
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="escapeUnicode"
+            v-model="currentConfigLayout.escapeUnicode"
             :label="$t('i18nCommon.JSONToOneLineString.escapeUnicode')"
+            @change="updateConfigLayout"
           ></TDCheckbox>
         </div>
       </template>
@@ -251,7 +256,7 @@ export default {
         // Stringify thành 1 dòng JSON chuẩn
         let oneLine = JSON.stringify(parsed);
 
-        if (me.escapeUnicode) {
+        if (me.currentConfigLayout.escapeUnicode) {
           oneLine = me.escapeUnicodeChars(oneLine);
         }
 
@@ -312,12 +317,15 @@ export default {
   },
   data() {
     return {
-      isShowSidebar: true,
-      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
-      enableHighlight: true,
-      splitHorizontal: true,
-      wrapText: true,
-      escapeUnicode: false,
+      keyCacheLayout: this.$tdEnum.cacheConfig.JSONToOneLineStringConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+        currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
+        enableHighlight: true,
+        splitHorizontal: true,
+        wrapText: true,
+        escapeUnicode: false,
+      },
       selectedLanguage: LANGUAGE_MODE.CSharp,
       inputJSON: null,
       outputString: null,

@@ -293,19 +293,17 @@
 </template>
 
 <script>
- import TDSubSidebar from "@/components/TDSubSidebar.vue";
- import TDArrow from "@/components/TDArrow.vue";
- import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
- import TDServerMockAPI from "@/common/api/request/AgentAPI/TDServerMockAPI.js";
- import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
- import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
- import TDToolBase from "@/views/tools/base/TDToolBase.vue";
- import TDAPIMockingHelp from "@/views/helps/TDAPIMockingHelp.vue";
- export default {
-   extends: TDToolBase,
-   name: "TDAPIMocking",
-   components: { TDSubSidebar, TDArrow, TDAPIMockingHelp },
-  mixins: [TDLayoutConfigMixin],
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDArrow from "@/components/TDArrow.vue";
+import TDServerMockAPI from "@/common/api/request/AgentAPI/TDServerMockAPI.js";
+import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
+import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDAPIMockingHelp from "@/views/helps/TDAPIMockingHelp.vue";
+export default {
+  extends: TDToolBase,
+  name: "TDAPIMocking",
+  components: { TDSubSidebar, TDArrow, TDAPIMockingHelp },
   watch: {
     requestName(oldVal, newVal) {
       if (oldVal != newVal) {
@@ -454,10 +452,6 @@
     handleResize(sizes) {
       this.requestSectionSize = sizes.leftSize;
       this.responseSectionSize = sizes.rightSize;
-    },
-    async toggleSidebar() {
-      let me = this;
-      await me.updateConfigLayout();
     },
     /**
      * Toggle mở/đóng nhóm

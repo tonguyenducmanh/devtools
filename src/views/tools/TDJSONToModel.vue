@@ -1,25 +1,25 @@
 <template>
   <div class="flex container">
     <div class="flex flex-col main-area">
-      <div class="flex io-section" :class="{ 'flex-col': splitHorizontal }">
+      <div class="flex io-section" :class="{ 'flex-col': currentConfigLayout.splitHorizontal }">
         <TDTextarea
           isLabelTop
-          :enableHighlight="enableHighlight"
+          :enableHighlight="currentConfigLayout.enableHighlight"
           language="json"
           :label="$t('i18nCommon.JSONToModel.inputLabel')"
           :placeHolder="$t('i18nCommon.JSONToModel.inputPlaceholder')"
           v-model="inputJSON"
-          :wrapText="wrapText"
+          :wrapText="currentConfigLayout.wrapText"
         ></TDTextarea>
         <TDTextarea
           isLabelTop
           :label="$t('i18nCommon.JSONToModel.outputLabel')"
           :readOnly="true"
-          :enableHighlight="enableHighlight"
+          :enableHighlight="currentConfigLayout.enableHighlight"
           :language="outputHighlightLanguage"
           :placeHolder="$t('i18nCommon.JSONToModel.outputPlaceholder')"
           v-model="outputModel"
-          :wrapText="wrapText"
+          :wrapText="currentConfigLayout.wrapText"
         ></TDTextarea>
       </div>
       <div class="flex">
@@ -40,30 +40,32 @@
       </div>
     </div>
 
-    <!-- SubSidebar: cài đặt -->
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:menu>
         <div class="td-sidebar-menu">
           <TDSlideOption
             :showIcon="true"
-            v-model="currentSidebarOption"
+            v-model="currentConfigLayout.currentSidebarOption"
             :options="sidebarOptions"
             :noMargin="true"
+            @change="updateConfigLayout"
           />
         </div>
       </template>
       <template v-slot:main>
         <div
           class="flex flex-col td-sidebar-content"
-          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
         >
           <TDJSONToModelHelp />
         </div>
         <div
           class="flex flex-col td-sidebar-content"
-          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
         >
-          <!-- Chọn ngôn ngữ output -->
           <div class="flex flex-col group-section">
             <TDComboBox
               :width="250"
@@ -75,7 +77,6 @@
             ></TDComboBox>
           </div>
 
-          <!-- Tên class gốc -->
           <div class="sidebar-input">
             <TDInput
               v-model="rootClassName"
@@ -83,87 +84,88 @@
             />
           </div>
 
-          <!-- C# options -->
           <template v-if="selectedLanguage === LANG.CSharp">
             <div class="sidebar-input">
               <TDInput
-                v-model="csharp.namespace"
+                v-model="currentConfigLayout.csharp.namespace"
                 :placeHolder="$t('i18nCommon.JSONToModel.namespace')"
               />
             </div>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
-              v-model="csharp.useJsonProperty"
+              v-model="currentConfigLayout.csharp.useJsonProperty"
               :label="$t('i18nCommon.JSONToModel.useJsonProperty')"
               @change="convertToModel"
             ></TDCheckbox>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
-              v-model="csharp.usePascalCase"
+              v-model="currentConfigLayout.csharp.usePascalCase"
               :label="$t('i18nCommon.JSONToModel.usePascalCase')"
               @change="convertToModel"
             ></TDCheckbox>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
-              v-model="csharp.useNullable"
+              v-model="currentConfigLayout.csharp.useNullable"
               :label="$t('i18nCommon.JSONToModel.useNullable')"
               @change="convertToModel"
             ></TDCheckbox>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
-              v-model="csharp.useRecord"
+              v-model="currentConfigLayout.csharp.useRecord"
               :label="$t('i18nCommon.JSONToModel.useRecord')"
               @change="convertToModel"
             ></TDCheckbox>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
-              v-model="csharp.useDataAnnotation"
+              v-model="currentConfigLayout.csharp.useDataAnnotation"
               :label="$t('i18nCommon.JSONToModel.useDataAnnotation')"
               @change="convertToModel"
             ></TDCheckbox>
           </template>
 
-          <!-- Go options -->
           <template v-if="selectedLanguage === LANG.Go">
             <div class="sidebar-input">
               <TDInput
-                v-model="golang.packageName"
+                v-model="currentConfigLayout.golang.packageName"
                 :placeHolder="$t('i18nCommon.JSONToModel.packageName')"
               />
             </div>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
-              v-model="golang.useJsonTag"
+              v-model="currentConfigLayout.golang.useJsonTag"
               :label="$t('i18nCommon.JSONToModel.useJsonTag')"
               @change="convertToModel"
             ></TDCheckbox>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
-              v-model="golang.useOmitempty"
+              v-model="currentConfigLayout.golang.useOmitempty"
               :label="$t('i18nCommon.JSONToModel.useOmitempty')"
               @change="convertToModel"
             ></TDCheckbox>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
-              v-model="golang.usePointer"
+              v-model="currentConfigLayout.golang.usePointer"
               :label="$t('i18nCommon.JSONToModel.usePointer')"
               @change="convertToModel"
             ></TDCheckbox>
           </template>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="wrapText"
+            v-model="currentConfigLayout.wrapText"
             :label="$t('i18nCommon.apiTesting.wrapText')"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="enableHighlight"
+            v-model="currentConfigLayout.enableHighlight"
             :label="$t('i18nCommon.enableHighlight')"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="splitHorizontal"
+            v-model="currentConfigLayout.splitHorizontal"
             :label="$t('i18nCommon.splitHorizontal')"
+            @change="updateConfigLayout"
           ></TDCheckbox>
         </div>
       </template>
@@ -261,7 +263,7 @@ export default {
      */
     toPascalCase(str, alwayBuild) {
       if (
-        (this.csharp.usePascalCase && this.selectedLanguage == LANG.CSharp) ||
+        (this.currentConfigLayout.csharp.usePascalCase && this.selectedLanguage == LANG.CSharp) ||
         this.selectedLanguage == LANG.Go ||
         alwayBuild
       ) {
@@ -341,14 +343,14 @@ export default {
       const lines = [];
 
       // using
-      if (me.csharp.useJsonProperty) lines.push("using Newtonsoft.Json;");
-      if (me.csharp.useDataAnnotation)
+      if (me.currentConfigLayout.csharp.useJsonProperty) lines.push("using Newtonsoft.Json;");
+      if (me.currentConfigLayout.csharp.useDataAnnotation)
         lines.push("using System.ComponentModel.DataAnnotations;");
-      if (me.csharp.useJsonProperty || me.csharp.useDataAnnotation)
+      if (me.currentConfigLayout.csharp.useJsonProperty || me.currentConfigLayout.csharp.useDataAnnotation)
         lines.push("");
 
       // namespace
-      if (me.csharp.namespace?.trim()) {
+      if (me.currentConfigLayout.csharp.namespace?.trim()) {
         lines.push(`namespace ${me.csharp.namespace.trim()}`);
         lines.push("{");
         blocks.forEach((cls) => {
@@ -369,7 +371,7 @@ export default {
     buildCSharpClass(obj, className, classes) {
       const me = this;
       const pascal = me.toPascalCase(className, true);
-      const keyword = me.csharp.useRecord ? "record" : "class";
+      const keyword = me.currentConfigLayout.csharp.useRecord ? "record" : "class";
       const props = [];
 
       const source = Array.isArray(obj) ? obj[0] : obj;
@@ -384,7 +386,6 @@ export default {
           typeInfo.isObject ||
           (typeInfo.isArray && typeInfo.base === "object")
         ) {
-          // Nested class
           const nestedName = me.toPascalCase(key, true);
           const sampleObj = typeInfo.isArray ? value : value;
           me.buildCSharpClass(sampleObj, nestedName, classes);
@@ -393,24 +394,21 @@ export default {
           csType = me.csharpPrimitive(typeInfo.base, typeInfo.isArray);
         }
 
-        // nullable
         const nullable =
-          me.csharp.useNullable && !typeInfo.isArray && csType !== "string"
+          me.currentConfigLayout.csharp.useNullable && !typeInfo.isArray && csType !== "string"
             ? "?"
             : "";
 
         const propLines = [];
 
-        // [JsonProperty]
-        if (me.csharp.useJsonProperty) {
+        if (me.currentConfigLayout.csharp.useJsonProperty) {
           propLines.push(`    [JsonProperty("${key}")]`);
         }
-        // [Required] nếu DataAnnotation
-        if (me.csharp.useDataAnnotation && typeInfo.base === "string") {
+        if (me.currentConfigLayout.csharp.useDataAnnotation && typeInfo.base === "string") {
           propLines.push(`    [MaxLength(256)]`);
         }
 
-        if (me.csharp.useRecord) {
+        if (me.currentConfigLayout.csharp.useRecord) {
           propLines.push(`    ${csType}${nullable} ${propName},`);
         } else {
           propLines.push(
@@ -422,7 +420,7 @@ export default {
       });
 
       let classBody;
-      if (me.csharp.useRecord) {
+      if (me.currentConfigLayout.csharp.useRecord) {
         classBody = `public ${keyword} ${pascal}(\n${props.join("\n")}\n);`;
       } else {
         classBody = `public ${keyword} ${pascal}\n{\n${props.join("\n")}\n}`;
@@ -458,11 +456,10 @@ export default {
       me.buildGoStruct(parsed, rootName, structs);
 
       const lines = [];
-      const pkg = me.golang.packageName?.trim() || "model";
+      const pkg = me.currentConfigLayout.golang.packageName?.trim() || "model";
       lines.push(`package ${pkg}`);
       lines.push("");
 
-      // import nếu cần time
       const needTime = structs.some((s) => s.includes("time.Time"));
       if (needTime) {
         lines.push(`import "time"`);
@@ -485,7 +482,6 @@ export default {
       const source = Array.isArray(obj) ? obj[0] : obj;
       if (!source || typeof source !== "object") return pascal;
 
-      // Tính độ rộng tối đa tên field để căn cột
       const fieldNames = Object.keys(source).map((k) => me.toPascalCase(k));
       const maxNameLen = Math.max(...fieldNames.map((n) => n.length));
 
@@ -506,18 +502,15 @@ export default {
           goType = me.goPrimitive(typeInfo.base, typeInfo.isArray);
         }
 
-        // pointer cho nullable
-        if (me.golang.usePointer && !typeInfo.isArray && goType !== "string") {
+        if (me.currentConfigLayout.golang.usePointer && !typeInfo.isArray && goType !== "string") {
           goType = `*${goType}`;
         }
 
-        // căn cột type
         const paddedName = fieldName.padEnd(maxNameLen);
 
-        // json tag
         let tag = "";
-        if (me.golang.useJsonTag) {
-          const omit = me.golang.useOmitempty ? ",omitempty" : "";
+        if (me.currentConfigLayout.golang.useJsonTag) {
+          const omit = me.currentConfigLayout.golang.useOmitempty ? ",omitempty" : "";
           tag = ` \`json:"${key}${omit}"\``;
         }
 
@@ -581,31 +574,32 @@ export default {
   data() {
     return {
       LANG,
-      isShowSidebar: true,
-      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
-      enableHighlight: true,
-      splitHorizontal: true,
-      wrapText: true,
+      keyCacheLayout: this.$tdEnum.cacheConfig.JSONToModelConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+        currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
+        enableHighlight: true,
+        splitHorizontal: true,
+        wrapText: true,
+        csharp: {
+          useJsonProperty: false,
+          usePascalCase: false,
+          useNullable: false,
+          useRecord: false,
+          useDataAnnotation: false,
+          namespace: "",
+        },
+        golang: {
+          useJsonTag: true,
+          useOmitempty: false,
+          usePointer: false,
+          packageName: "model",
+        },
+      },
       selectedLanguage: LANG.CSharp,
       rootClassName: "RootModel",
       inputJSON: null,
       outputModel: null,
-      // C# specific
-      csharp: {
-        useJsonProperty: false,
-        usePascalCase: false,
-        useNullable: false,
-        useRecord: false,
-        useDataAnnotation: false,
-        namespace: "",
-      },
-      // Go specific
-      golang: {
-        useJsonTag: true,
-        useOmitempty: false,
-        usePointer: false,
-        packageName: "model",
-      },
     };
   },
 };

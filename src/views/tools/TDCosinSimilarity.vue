@@ -43,7 +43,10 @@
         ></TDButton>
       </div>
     </div>
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:main>
         <TDCosinSimilarityHelp />
       </template>
@@ -62,7 +65,10 @@ export default {
   components: { TDSubSidebar, TDCosinSimilarityHelp },
   data() {
     return {
-      isShowSidebar: true,
+      keyCacheLayout: this.$tdEnum.cacheConfig.CosinSimilarityConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+      },
       firstVector: "",
       secondVector: "",
       similarity: "",

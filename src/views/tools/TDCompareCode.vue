@@ -11,7 +11,7 @@
           :isDropTop="true"
         />
         <TDCheckbox
-          v-model="wrapText"
+          v-model="currentConfigLayout.wrapText"
           :label="$t('i18nCommon.apiTesting.wrapText')"
           @change="updateLayout"
         ></TDCheckbox>
@@ -22,7 +22,10 @@
         ></TDButton>
       </div>
     </div>
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:main>
         <TDCompareCodeHelp />
       </template>
@@ -72,7 +75,7 @@ export default {
           originalEditable: true,
           automaticLayout: true,
         };
-        if (me.wrapText) {
+        if (me.currentConfigLayout.wrapText) {
           configObject.wordWrap = "on";
           configObject.wordWrapColumn = 0;
           configObject.wrappingIndent = "none";
@@ -98,9 +101,10 @@ export default {
     },
     updateLayout() {
       let me = this;
+      me.updateConfigLayout();
       if (me.editor) {
         me.editor.updateOptions({
-          wordWrap: me.wrapText ? "on" : "off",
+          wordWrap: me.currentConfigLayout.wrapText ? "on" : "off",
         });
       }
     },
@@ -122,7 +126,11 @@ export default {
   },
   data() {
     return {
-      isShowSidebar: true,
+      keyCacheLayout: this.$tdEnum.cacheConfig.CompareCodeConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+        wrapText: true,
+      },
       firstCodeFile: null,
       secondCodeFile: null,
       diffOutputHtml: null,
@@ -130,7 +138,6 @@ export default {
       oldTitle: "old.txt",
       newTitle: "new.txt",
       language: "pgsql",
-      wrapText: true,
       methodOptions: [
         { value: "text/plan", label: "text/plan" },
         { value: "sql", label: "sql" },

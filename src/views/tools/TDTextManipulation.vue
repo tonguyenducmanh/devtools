@@ -66,7 +66,10 @@
         ></TDButton>
       </div>
     </div>
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:main>
         <TDTextManipulationHelp />
       </template>
@@ -85,7 +88,10 @@ export default {
   components: { TDSubSidebar, TDTextManipulationHelp },
   data() {
     return {
-      isShowSidebar: true,
+      keyCacheLayout: this.$tdEnum.cacheConfig.TextManipulationConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+      },
       inputSource: "",
       expressionSource: "",
       columnSeperator: ",",

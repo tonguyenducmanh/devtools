@@ -2,14 +2,13 @@
   <div class="flex container">
     <div class="flex flex-col main-tool">
       <div class="input-area">
-        <!-- Nhập JSON trực tiếp -->
-        <template v-if="!enableFileUpload">
+        <template v-if="!currentConfigLayout.enableFileUpload">
           <TDTextarea
             isLabelTop
             :label="$t('i18nCommon.jsonToExcel.inputLabel')"
             :placeHolder="$t('i18nCommon.jsonToExcel.inputPlaceholder')"
-            :wrapText="wrapText"
-            :enableHighlight="enableHighlight"
+            :wrapText="currentConfigLayout.wrapText"
+            :enableHighlight="currentConfigLayout.enableHighlight"
             language="json"
             v-model="jsonSource"
           />
@@ -28,7 +27,7 @@
       </div>
 
       <div class="flex">
-        <template v-if="!enableFileUpload">
+        <template v-if="!currentConfigLayout.enableFileUpload">
           <TDButton
             :label="$t('i18nCommon.jsonToExcel.convert')"
             @click="convertToExcel"
@@ -43,58 +42,73 @@
       </div>
     </div>
 
-    <!-- Sidebar -->
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:menu>
         <div class="td-sidebar-menu">
           <TDSlideOption
             :showIcon="true"
-            v-model="currentSidebarOption"
+            v-model="currentConfigLayout.currentSidebarOption"
             :options="sidebarOptions"
             :noMargin="true"
+            @change="updateConfigLayout"
           />
         </div>
       </template>
       <template v-slot:main>
         <div
           class="flex flex-col td-sub-sidebar"
-          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.Help
+          "
         >
           <TDJSONToExcelHelp />
         </div>
         <div
           class="flex flex-col td-sub-sidebar"
-          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.Setting
+          "
         >
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="wrapText"
+            v-model="currentConfigLayout.wrapText"
             :label="$t('i18nCommon.apiTesting.wrapText')"
+            @change="updateConfigLayout"
           />
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="enableHighlight"
+            v-model="currentConfigLayout.enableHighlight"
             :label="$t('i18nCommon.enableHighlight')"
+            @change="updateConfigLayout"
           />
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="enableFileUpload"
+            v-model="currentConfigLayout.enableFileUpload"
             :label="$t('i18nCommon.jsonToPostgreSQL.useFileUpload')"
+            @change="updateConfigLayout"
           />
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="isBoldColName"
+            v-model="currentConfigLayout.isBoldColName"
             :label="$t('i18nCommon.jsonToExcel.boldColumns')"
+            @change="updateConfigLayout"
           />
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="isFitColWidth"
+            v-model="currentConfigLayout.isFitColWidth"
             :label="$t('i18nCommon.jsonToExcel.fitColumns')"
+            @change="updateConfigLayout"
           />
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="isFreezeFirstRow"
+            v-model="currentConfigLayout.isFreezeFirstRow"
             :label="$t('i18nCommon.jsonToExcel.freezeRow')"
+            @change="updateConfigLayout"
           />
         </div>
       </template>
@@ -196,14 +210,14 @@ export default {
     },
 
     configBoldColumn(worksheet, arr) {
-      if (!this.isBoldColName) return;
+      if (!this.currentConfigLayout.isBoldColName) return;
       const headers = this.getHeaderKeys(arr);
       const headerRow = worksheet.addRow(headers);
       headerRow.eachCell((cell) => (cell.font = { bold: true }));
     },
 
     autoFitColumn(worksheet, arr) {
-      if (!this.isFitColWidth) return;
+      if (!this.currentConfigLayout.isFitColWidth) return;
       const headers = this.getHeaderKeys(arr);
       worksheet.columns = headers.map((field) => {
         const maxLen = Math.max(
@@ -222,7 +236,7 @@ export default {
     },
 
     getConfigWorkSheet() {
-      return this.isFreezeFirstRow
+      return this.currentConfigLayout.isFreezeFirstRow
         ? { views: [{ state: "frozen", ySplit: 1 }] }
         : null;
     },
@@ -261,16 +275,18 @@ export default {
 
   data() {
     return {
-      isShowSidebar: true,
-      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
-      enableHighlight: true,
-      enableFileUpload: false,
-      wrapText: true,
-
+      keyCacheLayout: this.$tdEnum.cacheConfig.JSONToExcelConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+        currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
+        enableHighlight: true,
+        enableFileUpload: false,
+        wrapText: true,
+        isBoldColName: true,
+        isFitColWidth: true,
+        isFreezeFirstRow: true,
+      },
       jsonSource: "",
-      isBoldColName: true,
-      isFitColWidth: true,
-      isFreezeFirstRow: true,
       fileName: "du-lieu.xlsx",
     };
   },

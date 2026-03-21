@@ -1,20 +1,18 @@
 <!-- Component base cho tất cả các tool -->
 <script>
 import _ from "@/common/TDCommonFunction.js";
+import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
 
 export default {
   name: "TDToolBase",
+  mixins: [TDLayoutConfigMixin],
   props: {
-    // id uuid được build động để nhận diện đây là tool nào
     tabId: {
       type: String,
       default: null,
     },
   },
   methods: {
-    /**
-     * rebuild title của tab khi có thay đổi
-     */
     reBuildTabTitle: _.debounce(function (content) {
       let me = this;
       me.$emit("updateTabTitle", {
@@ -23,6 +21,10 @@ export default {
         append: true,
       });
     }, 300),
+    async toggleSidebar() {
+      let me = this;
+      await me.updateConfigLayout();
+    },
   },
 };
 </script>

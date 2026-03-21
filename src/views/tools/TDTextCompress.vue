@@ -52,7 +52,10 @@
         <div>{{ compressRatio }}</div>
       </div>
     </div>
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:main>
         <TDTextCompressHelp />
       </template>
@@ -139,7 +142,10 @@ export default {
   },
   data() {
     return {
-      isShowSidebar: true,
+      keyCacheLayout: this.$tdEnum.cacheConfig.TextCompressConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+      },
       inputSource: null,
       outputSource: null,
       compressAlgorithms: this.$tdEnum.compressType.gzip,

@@ -38,7 +38,10 @@
         ></TDButton>
       </div>
     </div>
-    <TDSubSidebar v-model="isShowSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:main>
         <TDTextGeneratorHelp />
       </template>
@@ -101,9 +104,11 @@ export default {
   },
   data() {
     return {
-      isShowSidebar: true,
+      keyCacheLayout: this.$tdEnum.cacheConfig.TextGeneratorConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+      },
       randomTextGenerated: null,
-      exampleCount: 10,
       exampleCount: 10,
       genType: "word",
       genTypeOption: [
