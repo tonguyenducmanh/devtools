@@ -368,6 +368,16 @@
         </div>
       </template>
       <template v-slot:main>
+        <!-- phần help -->
+        <div
+          class="td-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.APISidebarOption.Help
+          "
+        >
+          <TDAPITestingHelp />
+        </div>
         <!-- phần bộ sưu tập các request -->
         <div
           class="flex flex-col td-sidebar-content"
@@ -655,29 +665,31 @@
 </template>
 
 <script>
-import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
-import TDSubSidebar from "@/components/TDSubSidebar.vue";
-import TDArrow from "@/components/TDArrow.vue";
-import JSZip from "jszip";
-import TDAPIResponseStatus from "@/views/tools/APITesting/TDAPIResponseStatus.vue";
-import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
-import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
-import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
-import TDMockAPIProMode from "@/common/mock/TDMockAPIProMode.js";
-import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
-import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
-import TDToolBase from "@/views/tools/base/TDToolBase.vue";
-export default {
-  extends: TDToolBase,
-  name: "TDAPITesting",
-  mixins: [TDLayoutConfigMixin],
-  components: {
-    TDSubSidebar,
-    TDArrow,
-    TDAPIResponse,
-    TDAPIResponseStatus,
-    TDHistorySidebar,
-  },
+ import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
+ import TDSubSidebar from "@/components/TDSubSidebar.vue";
+ import TDArrow from "@/components/TDArrow.vue";
+ import JSZip from "jszip";
+ import TDAPIResponseStatus from "@/views/tools/APITesting/TDAPIResponseStatus.vue";
+ import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
+ import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
+ import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
+ import TDMockAPIProMode from "@/common/mock/TDMockAPIProMode.js";
+ import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
+ import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
+ import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+ import TDAPITestingHelp from "@/views/helps/TDAPITestingHelp.vue";
+ export default {
+   extends: TDToolBase,
+   name: "TDAPITesting",
+   mixins: [TDLayoutConfigMixin],
+   components: {
+     TDSubSidebar,
+     TDArrow,
+     TDAPIResponse,
+     TDAPIResponseStatus,
+     TDHistorySidebar,
+     TDAPITestingHelp,
+   },
 
   data() {
     return {
@@ -798,6 +810,11 @@ export default {
     sidebarOptions() {
       let me = this;
       let options = [];
+      options.push({
+        value: this.$tdEnum.APISidebarOption.Help,
+        label: this.$t("i18nCommon.apiTesting.sidebarOption.help"),
+        icon: "td-help-icon",
+      });
       options.push({
         value: this.$tdEnum.APISidebarOption.Setting,
         label: this.$t("i18nCommon.apiTesting.sidebarOption.setting"),

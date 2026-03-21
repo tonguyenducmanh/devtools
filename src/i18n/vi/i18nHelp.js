@@ -220,5 +220,47 @@ export default {
         note: "Cả 2 vector phải có cùng số chiều (số phần tử).",
       },
     },
+    apiMocking: {
+      purpose: {
+        title: "Mock API là gì?",
+        content: "Công cụ tạo mock API giúp fake data ở những môi trường không thể call ra API bên ngoài internet. Dữ liệu được lưu trữ phía backend (Agent).",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        createMock: "Chọn HTTP method, nhập endpoint và cấu hình request/response.",
+        configure: "Sử dụng panel bên trái để quản lý các mock API đã tạo.",
+        saveMock: "Nhấn Save để lưu mock API, sau đó có thể copy CURL để gọi.",
+      },
+      collection: {
+        title: "Quản lý Collection",
+        description: "Tổ chức các mock API theo nhóm (group) để dễ quản lý. Có thể tạo nhóm mới, xóa nhóm và xóa mock API.",
+      },
+      requirement: {
+        title: "Yêu cầu",
+        note: "Công cụ này cần tải và chạy app Agent (ứng dụng desktop) để làm backend. Vui lòng bấm menu Trợ giúp ở header để tải Agent.",
+      },
+    },
+    apiTesting: {
+      purpose: {
+        title: "Test API là gì?",
+        content: "Công cụ gọi API bypass CORS, SSL. Hỗ trợ 3 chế độ: Normal Mode, CURL Mode và Pro Mode (chạy script JavaScript).",
+      },
+      modes: {
+        title: "Các chế độ",
+        normal: "Normal Mode - Gọi API đơn lẻ với cấu hình Header và Body.",
+        curl: "CURL Mode - Dán trực tiếp câu lệnh CURL để gọi API.",
+        proMode: "Pro Mode - Viết script JavaScript để gọi hàng loạt API theo kịch bản.",
+      },
+      features: {
+        title: "Tính năng",
+        collection: "Lưu trữ và quản lý các request đã tạo theo nhóm.",
+        history: "Lịch sử các request đã gọi, hỗ trợ gọi lại nhanh.",
+        import: "Hỗ trợ import từ Postman (JSON) hoặc ZIP collection CURL.",
+      },
+      requirement: {
+        title: "Yêu cầu",
+        note: "Công cụ này cần tải và chạy app Agent (ứng dụng desktop) để làm backend. Vui lòng bấm menu Trợ giúp ở header để tải Agent.",
+      },
+    },
   },
 };

@@ -412,6 +412,7 @@ export default {
       delete: "Xoá",
       add: "Thêm",
       sidebarOption: {
+        help: "Trợ giúp",
         collection: "Bộ sưu tập",
         setting: "Cài đặt",
         history: "Lịch sử",
@@ -458,6 +459,7 @@ export default {
       deleteGroupErr: "Lỗi xóa nhóm",
       wrapText: "Xuống dòng",
       sidebarOption: {
+        help: "Trợ giúp",
         setting: "Cài đặt",
         collection: "Bộ sưu tập",
         history: "Lịch sử",

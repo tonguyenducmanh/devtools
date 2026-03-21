@@ -415,6 +415,7 @@ export default {
       delete: "Delete",
       add: "Add",
       sidebarOption: {
+        help: "Help",
         collection: "Collection",
         setting: "Setting",
         history: "History",
@@ -461,6 +462,7 @@ export default {
       deleteGroupErr: "Error deleting group",
       wrapText: "Wrap text",
       sidebarOption: {
+        help: "Help",
         setting: "Setting",
         collection: "Collection",
         history: "History",

@@ -92,6 +92,7 @@ class TDEnum {
     BottomRight: 4,
   };
   APISidebarOption = {
+    Help: 0,
     Collection: 1,
     History: 2,
     Setting: 3,

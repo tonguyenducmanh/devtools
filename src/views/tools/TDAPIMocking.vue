@@ -133,6 +133,16 @@
         </div>
       </template>
       <template v-slot:main>
+        <!-- phần help -->
+        <div
+          class="td-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.APISidebarOption.Help
+          "
+        >
+          <TDAPIMockingHelp />
+        </div>
         <!-- phần bộ sưu tập các request -->
         <div
           class="flex flex-col td-sidebar-content"
@@ -283,17 +293,18 @@
 </template>
 
 <script>
-import TDSubSidebar from "@/components/TDSubSidebar.vue";
-import TDArrow from "@/components/TDArrow.vue";
-import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
-import TDServerMockAPI from "@/common/api/request/AgentAPI/TDServerMockAPI.js";
-import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
-import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
-import TDToolBase from "@/views/tools/base/TDToolBase.vue";
-export default {
-  extends: TDToolBase,
-  name: "TDAPIMocking",
-  components: { TDSubSidebar, TDArrow },
+ import TDSubSidebar from "@/components/TDSubSidebar.vue";
+ import TDArrow from "@/components/TDArrow.vue";
+ import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
+ import TDServerMockAPI from "@/common/api/request/AgentAPI/TDServerMockAPI.js";
+ import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
+ import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
+ import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+ import TDAPIMockingHelp from "@/views/helps/TDAPIMockingHelp.vue";
+ export default {
+   extends: TDToolBase,
+   name: "TDAPIMocking",
+   components: { TDSubSidebar, TDArrow, TDAPIMockingHelp },
   mixins: [TDLayoutConfigMixin],
   watch: {
     requestName(oldVal, newVal) {
@@ -352,14 +363,19 @@ export default {
       let me = this;
       let options = [];
       options.push({
-        value: this.$tdEnum.APISidebarOption.Setting,
-        label: this.$t("i18nCommon.APIMocking.sidebarOption.setting"),
-        icon: "td-setting-icon",
+        value: this.$tdEnum.APISidebarOption.Help,
+        label: this.$t("i18nCommon.apiMocking.sidebarOption.help"),
+        icon: "td-help-icon",
       });
       options.push({
         value: this.$tdEnum.APISidebarOption.Collection,
         label: this.$t("i18nCommon.APIMocking.sidebarOption.collection"),
         icon: "td-folder-icon",
+      });
+      options.push({
+        value: this.$tdEnum.APISidebarOption.Setting,
+        label: this.$t("i18nCommon.APIMocking.sidebarOption.setting"),
+        icon: "td-setting-icon",
       });
       return options;
     },

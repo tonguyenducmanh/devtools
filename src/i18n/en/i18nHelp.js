@@ -219,5 +219,47 @@ export default {
         note: "Both vectors must have the same dimensions (number of elements).",
       },
     },
+    apiMocking: {
+      purpose: {
+        title: "What is API Mocking?",
+        content: "A tool to create mock APIs to fake data in environments where it's not possible to call external APIs. Data is stored on the backend (Agent).",
+      },
+      howToUse: {
+        title: "How to Use",
+        createMock: "Select HTTP method, enter endpoint and configure request/response.",
+        configure: "Use the left panel to manage created mock APIs.",
+        saveMock: "Press Save to save mock API, then copy CURL to call it.",
+      },
+      collection: {
+        title: "Collection Management",
+        description: "Organize mock APIs into groups for easy management. You can create new groups, delete groups and mock APIs.",
+      },
+      requirement: {
+        title: "Requirements",
+        note: "This tool requires downloading and running the Agent app (desktop application) as backend. Please click Help menu in the header to download Agent.",
+      },
+    },
+    apiTesting: {
+      purpose: {
+        title: "What is API Testing?",
+        content: "A tool to call APIs bypass CORS, SSL. Supports 3 modes: Normal Mode, CURL Mode and Pro Mode (run JavaScript scripts).",
+      },
+      modes: {
+        title: "Modes",
+        normal: "Normal Mode - Call single API with Header and Body configuration.",
+        curl: "CURL Mode - Paste CURL command directly to call API.",
+        proMode: "Pro Mode - Write JavaScript scripts to call multiple APIs in a scenario.",
+      },
+      features: {
+        title: "Features",
+        collection: "Store and manage created requests by groups.",
+        history: "History of called requests, support quick re-call.",
+        import: "Support import from Postman (JSON) or ZIP CURL collection.",
+      },
+      requirement: {
+        title: "Requirements",
+        note: "This tool requires downloading and running the Agent app (desktop application) as backend. Please click Help menu in the header to download Agent.",
+      },
+    },
   },
 };
