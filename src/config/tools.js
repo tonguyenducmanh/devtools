@@ -192,12 +192,6 @@ const sidebarConfig = [
   },
   {
     type: "route",
-    name: "uuidv4generator",
-    component: () => import("@/views/tools/TDUUIDv4Generator.vue"),
-    meta: { titleKey: "i18nCommon.feature.UUIDV4Generator" },
-  },
-  {
-    type: "route",
     name: "TDHTMLPreview",
     component: () => import("@/views/tools/TDHTMLPreview.vue"),
     meta: { titleKey: "i18nCommon.feature.HTMLPreview" },

@@ -246,12 +246,6 @@ export default {
         outputLength: "Độ dài text output {0}",
       },
     },
-    uuidGenerator: {
-      title: "Công cụ tạo UUIDv4!",
-      buttons: {
-        generate: "Tạo mã",
-      },
-    },
     htmlPreview: {
       title: "Công cụ xem trước HTML!",
       inputHTML: "Nhập HTML của bạn vào đây",

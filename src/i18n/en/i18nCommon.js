@@ -248,12 +248,6 @@ export default {
         outputLength: "Output text length {0}",
       },
     },
-    uuidGenerator: {
-      title: "UUID generator tool!",
-      buttons: {
-        generate: "Generate",
-      },
-    },
     htmlPreview: {
       title: "HTML Preview tool!",
       inputHTML: "Enter your HTML here",
