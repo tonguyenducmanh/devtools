@@ -62,8 +62,27 @@
       </div>
     </div>
     <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:menu>
+        <div class="td-sidebar-menu">
+          <TDSlideOption
+            :showIcon="true"
+            v-model="currentSidebarOption"
+            :options="sidebarOptions"
+            :noMargin="true"
+          />
+        </div>
+      </template>
       <template v-slot:main>
-        <div class="flex flex-col td-sidebar-content">
+        <div
+          class="flex flex-col td-sidebar-content"
+          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+        >
+          <TDJSONToPostgreSQLHelp />
+        </div>
+        <div
+          class="flex flex-col td-sidebar-content"
+          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+        >
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
             v-model="wrapText"
@@ -117,12 +136,29 @@
   </div>
 </template>
 <script>
-import TDSubSidebar from "@/components/TDSubSidebar.vue";
-import TDToolBase from "@/views/tools/base/TDToolBase.vue";
-export default {
-  extends: TDToolBase,
-  name: "TDJSONToPostgreSQL",
-  components: { TDSubSidebar },
+ import TDSubSidebar from "@/components/TDSubSidebar.vue";
+ import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+ import TDJSONToPostgreSQLHelp from "@/views/helps/TDJSONToPostgreSQLHelp.vue";
+ export default {
+   extends: TDToolBase,
+   name: "TDJSONToPostgreSQL",
+   components: { TDSubSidebar, TDJSONToPostgreSQLHelp },
+   computed: {
+     sidebarOptions() {
+       let options = [];
+       options.push({
+         value: this.$tdEnum.ToolSidebarOption.Help,
+         label: this.$t("i18nCommon.sidebarOption.help"),
+         icon: "td-help-icon",
+       });
+       options.push({
+         value: this.$tdEnum.ToolSidebarOption.Setting,
+         label: this.$t("i18nCommon.sidebarOption.setting"),
+         icon: "td-setting-icon",
+       });
+       return options;
+     },
+   },
   created() {
     let me = this;
   },
@@ -368,6 +404,7 @@ export default {
   data() {
     return {
       isShowSidebar: true,
+      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
       enableHighlight: true,
       splitHorizontal: true,
       wrapText: true,
@@ -419,6 +456,7 @@ export default {
   width: 100%;
   height: 100%;
   justify-content: flex-start;
+  overflow: auto;
 }
 .group-info {
   width: 100%;

@@ -97,6 +97,10 @@ class TDEnum {
     History: 2,
     Setting: 3,
   };
+  ToolSidebarOption = {
+    Help: 0,
+    Setting: 1,
+  };
 }
 
 export default new TDEnum();

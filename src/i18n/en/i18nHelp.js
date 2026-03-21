@@ -261,5 +261,130 @@ export default {
         note: "This tool requires downloading and running the Agent app (desktop application) as backend. Please click Help menu in the header to download Agent.",
       },
     },
+    qrCodeToText: {
+      purpose: {
+        title: "What is QR Code Reader?",
+        content: "A tool to read multiple QR codes and automatically combine them into a text. Supports decoding compressed data from the QR generation tool.",
+      },
+      howToUse: {
+        title: "How to Use",
+        upload: "Upload image files containing QR codes to read (supports multiple images).",
+        scan: "Click Convert to scan and merge content from QR codes.",
+        copy: "Click Copy to copy the result.",
+      },
+      features: {
+        title: "Features",
+        compress: "Automatically decompress data if text was compressed before.",
+        header: "Support sorting QR fragments by header (creation date and sequence number).",
+      },
+    },
+    textToQRCode: {
+      purpose: {
+        title: "What is QR Code Generator?",
+        content: "A tool to generate multiple QR codes from text. Supports marking QR codes by creation date and sequence, encoding content for increased accuracy.",
+      },
+      howToUse: {
+        title: "How to Use",
+        input: "Enter the text to generate QR codes.",
+        generate: "Click Generate to create QR codes.",
+        copyDownload: "Click on a QR code to copy, click Download All to download all.",
+      },
+      features: {
+        title: "Features",
+        compress: "Compress data before generating QR to reduce number of codes.",
+        header: "Add header (timestamp + sequence) to each QR code to support merging when reading.",
+        batch: "Automatically split text into multiple QR codes if content is too long.",
+      },
+    },
+    ocr: {
+      purpose: {
+        title: "What is OCR?",
+        content: "Optical Character Recognition tool to extract text from images. Supports Vietnamese and English.",
+      },
+      howToUse: {
+        title: "How to Use",
+        upload: "Upload images to recognize (supports multiple images).",
+        process: "Click Process to run OCR.",
+        copy: "Click on each result or Copy All to copy all.",
+      },
+      features: {
+        title: "Features",
+        language: "Supports multiple languages: Vietnamese, English.",
+        psm: "Customize page segmentation mode (PSM).",
+        whitelist: "Only recognize characters in the allowed list.",
+        preprocessing: "Image preprocessing to improve accuracy (grayscale, contrast enhancement, denoising).",
+      },
+    },
+    jsonToPostgreSQL: {
+      purpose: {
+        title: "What is JSON to PostgreSQL?",
+        content: "A tool to convert JSON data into PostgreSQL SQL statements (INSERT, CREATE TABLE, DELETE).",
+      },
+      howToUse: {
+        title: "How to Use",
+        input: "Paste JSON directly or upload a JSON file.",
+        configure: "Configure table name, schema, primary key and other options.",
+        convert: "Click Convert to generate SQL script.",
+      },
+      features: {
+        title: "Features",
+        createTable: "Auto-generate CREATE TABLE script with appropriate data types.",
+        deleteScript: "Generate DELETE script to remove old data before INSERT.",
+        fileUpload: "Support uploading JSON file to process.",
+      },
+    },
+    jsonToOneLineString: {
+      purpose: {
+        title: "What is JSON to String?",
+        content: "A tool to convert JSON to a single-line string in the syntax of various programming languages.",
+      },
+      howToUse: {
+        title: "How to Use",
+        input: "Paste JSON or JS object into the input field.",
+        selectLanguage: "Select output language (JavaScript, C#, Go, Python, Java, Raw).",
+        convert: "Click Convert to transform.",
+      },
+      features: {
+        title: "Features",
+        languages: "Supports multiple languages: JavaScript, C#, Go, Python, Java, Raw.",
+        escapeUnicode: "Option to escape Unicode characters to \\uXXXX.",
+      },
+    },
+    jsonToExcel: {
+      purpose: {
+        title: "What is JSON to Excel?",
+        content: "A tool to convert JSON data to Excel file (.xlsx).",
+      },
+      howToUse: {
+        title: "How to Use",
+        input: "Paste JSON or upload a JSON file.",
+        convert: "Click Convert to generate Excel file.",
+        download: "Excel file will be downloaded automatically.",
+      },
+      features: {
+        title: "Features",
+        boldHeader: "Bold header row.",
+        autoWidth: "Auto-fit column widths.",
+        freezeRow: "Freeze the first row when scrolling.",
+      },
+    },
+    jsonToModel: {
+      purpose: {
+        title: "What is JSON to Model?",
+        content: "A tool to convert JSON to model class for multiple programming languages.",
+      },
+      howToUse: {
+        title: "How to Use",
+        input: "Paste JSON into the input field.",
+        selectLanguage: "Select output language (C#, TypeScript, Java, Go, Rust).",
+        convert: "Click Convert to generate model class.",
+      },
+      features: {
+        title: "Features",
+        languages: "Supports multiple languages: C#, TypeScript, Java, Go, Rust.",
+        namespace: "Customize namespace/class name.",
+        options: "Many options: PascalCase, nullable, JsonProperty, record type...",
+      },
+    },
   },
 };

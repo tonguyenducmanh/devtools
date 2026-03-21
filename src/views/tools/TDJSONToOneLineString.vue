@@ -40,8 +40,27 @@
       </div>
     </div>
     <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:menu>
+        <div class="td-sidebar-menu">
+          <TDSlideOption
+            :showIcon="true"
+            v-model="currentSidebarOption"
+            :options="sidebarOptions"
+            :noMargin="true"
+          />
+        </div>
+      </template>
       <template v-slot:main>
-        <div class="flex flex-col td-sidebar-content">
+        <div
+          class="flex flex-col td-sidebar-content"
+          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+        >
+          <TDJSONToOneLineStringHelp />
+        </div>
+        <div
+          class="flex flex-col td-sidebar-content"
+          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+        >
           <!-- Chọn ngôn ngữ output -->
           <div class="flex flex-col group-section">
             <TDComboBox
@@ -83,6 +102,8 @@
 
 <script>
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDJSONToOneLineStringHelp from "@/views/helps/TDJSONToOneLineStringHelp.vue";
 
 const LANGUAGE_MODE = {
   JavaScript: "javascript",
@@ -92,15 +113,28 @@ const LANGUAGE_MODE = {
   Java: "java",
   Raw: "raw",
 };
-import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
   extends: TDToolBase,
   name: "TDJSONToOneLineString",
-  components: { TDSubSidebar },
+  components: { TDSubSidebar, TDJSONToOneLineStringHelp },
   created() {},
   beforeUnmount() {},
   mounted() {},
   computed: {
+    sidebarOptions() {
+      let options = [];
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Help,
+        label: this.$t("i18nCommon.sidebarOption.help"),
+        icon: "td-help-icon",
+      });
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Setting,
+        label: this.$t("i18nCommon.sidebarOption.setting"),
+        icon: "td-setting-icon",
+      });
+      return options;
+    },
     languageOptions() {
       return [
         {
@@ -279,6 +313,7 @@ export default {
   data() {
     return {
       isShowSidebar: true,
+      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
       enableHighlight: true,
       splitHorizontal: true,
       wrapText: true,
@@ -306,12 +341,14 @@ export default {
   height: 100%;
 }
 .td-sidebar-content {
-  width: 100%;
   height: 100%;
   justify-content: flex-start;
+  width: 100%;
+  overflow: auto;
 }
 .group-section {
   width: 100%;
+  margin-top: var(--padding);
   gap: calc(var(--padding) / 2);
   margin-bottom: var(--padding);
 }

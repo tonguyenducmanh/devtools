@@ -25,6 +25,10 @@ export default {
     footerHelp:
       "Chọn vào số dòng để copy cả dòng, chọn vào 1 cell cụ thể để copy 1 cell",
     noDataAvailable: "Không có dữ liệu",
+    sidebarOption: {
+      help: "Trợ giúp",
+      setting: "Cài đặt",
+    },
     history: {
       title: "Lịch sử",
       show: "Lịch sử",

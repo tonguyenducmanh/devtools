@@ -25,6 +25,10 @@ export default {
     footerHelp:
       "Select the row number to copy the entire row, select a specific cell to copy a single cell.",
     noDataAvailable: "No data available",
+    sidebarOption: {
+      help: "Help",
+      setting: "Setting",
+    },
     history: {
       title: "History",
       show: "History",

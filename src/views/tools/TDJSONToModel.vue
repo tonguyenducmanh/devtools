@@ -42,8 +42,27 @@
 
     <!-- SubSidebar: cài đặt -->
     <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:menu>
+        <div class="td-sidebar-menu">
+          <TDSlideOption
+            :showIcon="true"
+            v-model="currentSidebarOption"
+            :options="sidebarOptions"
+            :noMargin="true"
+          />
+        </div>
+      </template>
       <template v-slot:main>
-        <div class="flex flex-col td-sidebar-content">
+        <div
+          class="flex flex-col td-sidebar-content"
+          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+        >
+          <TDJSONToModelHelp />
+        </div>
+        <div
+          class="flex flex-col td-sidebar-content"
+          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+        >
           <!-- Chọn ngôn ngữ output -->
           <div class="flex flex-col group-section">
             <TDComboBox
@@ -153,23 +172,38 @@
 </template>
 
 <script>
-import TDSubSidebar from "@/components/TDSubSidebar.vue";
+ import TDSubSidebar from "@/components/TDSubSidebar.vue";
+ import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+ import TDJSONToModelHelp from "@/views/helps/TDJSONToModelHelp.vue";
 
-const LANG = {
-  CSharp: "csharp",
-  Go: "go",
-};
-import TDToolBase from "@/views/tools/base/TDToolBase.vue";
-export default {
-  extends: TDToolBase,
-  name: "TDJSONToModel",
-  components: { TDSubSidebar },
-  created() {},
-  beforeUnmount() {},
-  mounted() {},
+ const LANG = {
+   CSharp: "csharp",
+   Go: "go",
+ };
+ export default {
+   extends: TDToolBase,
+   name: "TDJSONToModel",
+   components: { TDSubSidebar, TDJSONToModelHelp },
+   created() {},
+   beforeUnmount() {},
+   mounted() {},
 
-  computed: {
-    languageOptions() {
+   computed: {
+     sidebarOptions() {
+       let options = [];
+       options.push({
+         value: this.$tdEnum.ToolSidebarOption.Help,
+         label: this.$t("i18nCommon.sidebarOption.help"),
+         icon: "td-help-icon",
+       });
+       options.push({
+         value: this.$tdEnum.ToolSidebarOption.Setting,
+         label: this.$t("i18nCommon.sidebarOption.setting"),
+         icon: "td-setting-icon",
+       });
+       return options;
+     },
+     languageOptions() {
       return [
         { label: "C#", value: LANG.CSharp },
         { label: "Go", value: LANG.Go },
@@ -548,6 +582,7 @@ export default {
     return {
       LANG,
       isShowSidebar: true,
+      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
       enableHighlight: true,
       splitHorizontal: true,
       wrapText: true,
@@ -594,10 +629,12 @@ export default {
   width: 100%;
   height: 100%;
   justify-content: flex-start;
+  overflow: auto;
 }
 .group-section {
   width: 100%;
   gap: calc(var(--padding) / 2);
+  margin-top: var(--padding);
 }
 .sidebar-input {
   width: 100%;

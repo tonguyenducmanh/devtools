@@ -262,5 +262,130 @@ export default {
         note: "Công cụ này cần tải và chạy app Agent (ứng dụng desktop) để làm backend. Vui lòng bấm menu Trợ giúp ở header để tải Agent.",
       },
     },
+    qrCodeToText: {
+      purpose: {
+        title: "Đọc QR Code là gì?",
+        content: "Công cụ đọc hàng loạt mã QR và tự động nối lại thành đoạn văn bản. Hỗ trợ giải mã dữ liệu đã được nén từ tool tạo mã QR.",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        upload: "Upload file ảnh chứa mã QR cần đọc (hỗ trợ nhiều ảnh).",
+        scan: "Nhấn nút Convert để quét và ghép nối nội dung từ các mã QR.",
+        copy: "Nhấn nút Copy để sao chép kết quả.",
+      },
+      features: {
+        title: "Tính năng",
+        compress: "Tự động giải nén dữ liệu nếu text được nén trước đó.",
+        header: "Hỗ trợ sắp xếp các mảnh QR theo header (ngày tạo và số thứ tự).",
+      },
+    },
+    textToQRCode: {
+      purpose: {
+        title: "Tạo QR Code là gì?",
+        content: "Công cụ tạo hàng loạt mã QR từ đoạn văn bản. Hỗ trợ đánh dấu mã QR theo ngày tạo và số thứ tự, mã hóa nội dung để tăng độ chính xác.",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        input: "Nhập đoạn text cần tạo mã QR.",
+        generate: "Nhấn Generate để tạo các mã QR.",
+        copyDownload: "Click vào mã QR để copy, nhấn Download All để tải tất cả.",
+      },
+      features: {
+        title: "Tính năng",
+        compress: "Nén dữ liệu trước khi tạo QR để giảm số lượng mã.",
+        header: "Thêm header (timestamp + thứ tự) vào mỗi mã QR để hỗ trợ ghép nối khi đọc.",
+        batch: "Tự động chia text thành nhiều mã QR nếu nội dung quá dài.",
+      },
+    },
+    ocr: {
+      purpose: {
+        title: "OCR là gì?",
+        content: "Công cụ nhận dạng ký tự quang học (OCR) giúp trích xuất text từ ảnh. Hỗ trợ tiếng Việt và tiếng Anh.",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        upload: "Upload ảnh cần nhận dạng (hỗ trợ nhiều ảnh).",
+        process: "Nhấn Process để xử lý OCR.",
+        copy: "Click vào từng kết quả hoặc Copy All để sao chép toàn bộ.",
+      },
+      features: {
+        title: "Tính năng",
+        language: "Hỗ trợ nhiều ngôn ngữ: Tiếng Việt, Tiếng Anh.",
+        psm: "Tùy chỉnh chế độ phân đoạn trang (PSM).",
+        whitelist: "Chỉ nhận dạng các ký tự trong danh sách cho phép.",
+        preprocessing: "Tiền xử lý ảnh để tăng độ chính xác (grayscale, tăng contrast, khử nhiễu).",
+      },
+    },
+    jsonToPostgreSQL: {
+      purpose: {
+        title: "JSON to PostgreSQL là gì?",
+        content: "Công cụ chuyển đổi dữ liệu JSON thành câu lệnh SQL (INSERT, CREATE TABLE, DELETE) cho PostgreSQL.",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        input: "Dán JSON trực tiếp hoặc upload file JSON.",
+        configure: "Cấu hình tên bảng, schema, primary key và các tùy chọn khác.",
+        convert: "Nhấn Convert để tạo script SQL.",
+      },
+      features: {
+        title: "Tính năng",
+        createTable: "Tự động tạo script CREATE TABLE với kiểu dữ liệu phù hợp.",
+        deleteScript: "Tạo script DELETE để xóa dữ liệu cũ trước khi INSERT.",
+        fileUpload: "Hỗ trợ upload file JSON để xử lý.",
+      },
+    },
+    jsonToOneLineString: {
+      purpose: {
+        title: "JSON to String là gì?",
+        content: "Công cụ chuyển đổi JSON thành chuỗi string một dòng theo cú pháp của nhiều ngôn ngữ lập trình khác nhau.",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        input: "Dán JSON hoặc JS object vào ô input.",
+        selectLanguage: "Chọn ngôn ngữ đầu ra (JavaScript, C#, Go, Python, Java, Raw).",
+        convert: "Nhấn Convert để chuyển đổi.",
+      },
+      features: {
+        title: "Tính năng",
+        languages: "Hỗ trợ nhiều ngôn ngữ: JavaScript, C#, Go, Python, Java, Raw.",
+        escapeUnicode: "Tùy chọn escape các ký tự Unicode thành \\uXXXX.",
+      },
+    },
+    jsonToExcel: {
+      purpose: {
+        title: "JSON to Excel là gì?",
+        content: "Công cụ chuyển đổi dữ liệu JSON thành file Excel (.xlsx).",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        input: "Dán JSON hoặc upload file JSON.",
+        convert: "Nhấn Convert để tạo file Excel.",
+        download: "File Excel sẽ được tải xuống tự động.",
+      },
+      features: {
+        title: "Tính năng",
+        boldHeader: "In đậm dòng header.",
+        autoWidth: "Tự động điều chỉnh độ rộng cột.",
+        freezeRow: "Cố định dòng đầu tiên khi cuộn.",
+      },
+    },
+    jsonToModel: {
+      purpose: {
+        title: "JSON to Model là gì?",
+        content: "Công cụ chuyển đổi JSON thành class model (model class) cho nhiều ngôn ngữ lập trình.",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        input: "Dán JSON vào ô input.",
+        selectLanguage: "Chọn ngôn ngữ đầu ra (C#, TypeScript, Java, Go, Rust).",
+        convert: "Nhấn Convert để tạo model class.",
+      },
+      features: {
+        title: "Tính năng",
+        languages: "Hỗ trợ nhiều ngôn ngữ: C#, TypeScript, Java, Go, Rust.",
+        namespace: "Tùy chỉnh namespace/class name.",
+        options: "Nhiều tùy chọn: PascalCase, nullable, JsonProperty, record type...",
+      },
+    },
   },
 };

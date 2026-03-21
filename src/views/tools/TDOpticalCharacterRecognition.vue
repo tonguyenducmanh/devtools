@@ -76,8 +76,27 @@
       </div>
     </div>
     <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:menu>
+        <div class="td-sidebar-menu">
+          <TDSlideOption
+            :showIcon="true"
+            v-model="currentSidebarOption"
+            :options="sidebarOptions"
+            :noMargin="true"
+          />
+        </div>
+      </template>
       <template v-slot:main>
-        <div class="flex flex-col td-sub-sidebar">
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+        >
+          <TDOpticalCharacterRecognitionHelp />
+        </div>
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+        >
           <div class="sidebar-section">
             <div class="sidebar-item">
               <span class="sidebar-label">{{
@@ -142,13 +161,30 @@
 </template>
 
 <script>
-import Tesseract from "tesseract.js";
-import TDSubSidebar from "@/components/TDSubSidebar.vue";
-import TDToolBase from "@/views/tools/base/TDToolBase.vue";
-export default {
-  extends: TDToolBase,
-  name: "TDOpticalCharacterRecognition",
-  components: { TDSubSidebar },
+ import Tesseract from "tesseract.js";
+ import TDSubSidebar from "@/components/TDSubSidebar.vue";
+ import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+ import TDOpticalCharacterRecognitionHelp from "@/views/helps/TDOpticalCharacterRecognitionHelp.vue";
+ export default {
+   extends: TDToolBase,
+   name: "TDOpticalCharacterRecognition",
+   components: { TDSubSidebar, TDOpticalCharacterRecognitionHelp },
+   computed: {
+     sidebarOptions() {
+       let options = [];
+       options.push({
+         value: this.$tdEnum.ToolSidebarOption.Help,
+         label: this.$t("i18nCommon.sidebarOption.help"),
+         icon: "td-help-icon",
+       });
+       options.push({
+         value: this.$tdEnum.ToolSidebarOption.Setting,
+         label: this.$t("i18nCommon.sidebarOption.setting"),
+         icon: "td-setting-icon",
+       });
+       return options;
+     },
+   },
   created() {
     let me = this;
   },
@@ -405,6 +441,7 @@ export default {
   },
   data() {
     return {
+      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
       ocrResults: [],
       selectedLanguage: "vie",
       selectedPSM: "PSM_AUTO_OSD",
@@ -565,13 +602,14 @@ export default {
 .td-sub-sidebar {
   height: 100%;
   width: 100%;
-  padding: var(--padding);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--padding);
+  overflow: auto;
 }
 .sidebar-section {
+  margin-top: var(--padding);
   width: 100%;
   display: flex;
   flex-direction: column;

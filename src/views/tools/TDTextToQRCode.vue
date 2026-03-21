@@ -69,8 +69,27 @@
       </div>
     </div>
     <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:menu>
+        <div class="td-sidebar-menu">
+          <TDSlideOption
+            :showIcon="true"
+            v-model="currentSidebarOption"
+            :options="sidebarOptions"
+            :noMargin="true"
+          />
+        </div>
+      </template>
       <template v-slot:main>
-        <div class="flex flex-col td-sub-sidebar">
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+        >
+          <TDTextToQRCodeHelp />
+        </div>
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+        >
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
             v-model="isCompressText"
@@ -132,10 +151,11 @@ import TDCompress from "@/common/compress/TDCompress.js";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDMockTextGenerate from "@/common/mock/TDMockTextGenerate.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDTextToQRCodeHelp from "@/views/helps/TDTextToQRCodeHelp.vue";
 export default {
   extends: TDToolBase,
   name: "TDTextToQRCode",
-  components: { TDSubSidebar },
+  components: { TDSubSidebar, TDTextToQRCodeHelp },
   created() {
     let me = this;
   },
@@ -345,6 +365,20 @@ export default {
     },
   },
   computed: {
+    sidebarOptions() {
+      let options = [];
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Help,
+        label: this.$t("i18nCommon.sidebarOption.help"),
+        icon: "td-help-icon",
+      });
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Setting,
+        label: this.$t("i18nCommon.sidebarOption.setting"),
+        icon: "td-setting-icon",
+      });
+      return options;
+    },
     QRImageStyle() {
       let me = this;
       let style = {
@@ -372,6 +406,7 @@ export default {
   },
   data() {
     return {
+      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
       firstSectionSize: 50, // Phần request chiếm 50%
       secondSectionSize: 50, // Phần response chiếm 50%
       isShowSidebar: true,
@@ -463,6 +498,7 @@ export default {
   height: 100%;
   justify-content: flex-start;
   width: 100%;
+  overflow: auto;
 }
 .input-config {
   width: 100%;

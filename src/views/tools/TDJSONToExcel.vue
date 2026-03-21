@@ -45,8 +45,27 @@
 
     <!-- Sidebar -->
     <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:menu>
+        <div class="td-sidebar-menu">
+          <TDSlideOption
+            :showIcon="true"
+            v-model="currentSidebarOption"
+            :options="sidebarOptions"
+            :noMargin="true"
+          />
+        </div>
+      </template>
       <template v-slot:main>
-        <div class="flex flex-col td-sub-sidebar">
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+        >
+          <TDJSONToExcelHelp />
+        </div>
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+        >
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
             v-model="wrapText"
@@ -87,10 +106,27 @@
 import ExcelJS from "exceljs";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDJSONToExcelHelp from "@/views/helps/TDJSONToExcelHelp.vue";
 export default {
   extends: TDToolBase,
   name: "TDJSONToExcel",
-  components: { TDSubSidebar },
+  components: { TDSubSidebar, TDJSONToExcelHelp },
+  computed: {
+    sidebarOptions() {
+      let options = [];
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Help,
+        label: this.$t("i18nCommon.sidebarOption.help"),
+        icon: "td-help-icon",
+      });
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Setting,
+        label: this.$t("i18nCommon.sidebarOption.setting"),
+        icon: "td-setting-icon",
+      });
+      return options;
+    },
+  },
 
   methods: {
     async applyMock() {
@@ -226,6 +262,7 @@ export default {
   data() {
     return {
       isShowSidebar: true,
+      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
       enableHighlight: true,
       enableFileUpload: false,
       wrapText: true,
@@ -270,5 +307,6 @@ export default {
   height: 100%;
   justify-content: flex-start;
   width: 100%;
+  overflow: auto;
 }
 </style>

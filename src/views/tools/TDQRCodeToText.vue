@@ -32,8 +32,27 @@
       </div>
     </div>
     <TDSubSidebar v-model="isShowSidebar">
+      <template v-slot:menu>
+        <div class="td-sidebar-menu">
+          <TDSlideOption
+            :showIcon="true"
+            v-model="currentSidebarOption"
+            :options="sidebarOptions"
+            :noMargin="true"
+          />
+        </div>
+      </template>
       <template v-slot:main>
-        <div class="flex flex-col td-sub-sidebar">
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+        >
+          <TDQRCodeToTextHelp />
+        </div>
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+        >
           <TDCheckbox
             v-model="isCompressText"
             :variant="$tdEnum.checkboxType.switch"
@@ -52,13 +71,30 @@
   </div>
 </template>
 <script>
-import TDCompress from "@/common/compress/TDCompress.js";
-import TDSubSidebar from "@/components/TDSubSidebar.vue";
-import TDToolBase from "@/views/tools/base/TDToolBase.vue";
-export default {
-  extends: TDToolBase,
-  name: "TDQRCodeToText",
-  components: { TDSubSidebar },
+ import TDCompress from "@/common/compress/TDCompress.js";
+ import TDSubSidebar from "@/components/TDSubSidebar.vue";
+ import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+ import TDQRCodeToTextHelp from "@/views/helps/TDQRCodeToTextHelp.vue";
+ export default {
+   extends: TDToolBase,
+   name: "TDQRCodeToText",
+   components: { TDSubSidebar, TDQRCodeToTextHelp },
+   computed: {
+     sidebarOptions() {
+       let options = [];
+       options.push({
+         value: this.$tdEnum.ToolSidebarOption.Help,
+         label: this.$t("i18nCommon.sidebarOption.help"),
+         icon: "td-help-icon",
+       });
+       options.push({
+         value: this.$tdEnum.ToolSidebarOption.Setting,
+         label: this.$t("i18nCommon.sidebarOption.setting"),
+         icon: "td-setting-icon",
+       });
+       return options;
+     },
+   },
   created() {
     let me = this;
   },
@@ -174,6 +210,7 @@ export default {
   data() {
     return {
       isShowSidebar: true,
+      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
       textOutput: null,
       isRemoveEmpty: false,
       historyItems: [],
@@ -216,6 +253,7 @@ export default {
   height: 100%;
   justify-content: flex-start;
   width: 100%;
+  overflow: auto;
 }
 .tool-qr-header {
   width: 100%;
