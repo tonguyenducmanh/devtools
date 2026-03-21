@@ -4,7 +4,7 @@ This project provides a collection of useful tools for developers, aggregated wi
 
 This is a Client-Daemon Application.
 
-![alt text](imgs/demo.png)
+![alt text](imgs/demo-shot.png)
 
 [https://tool.tomanh.com/](https://tool.tomanh.com/)
 
