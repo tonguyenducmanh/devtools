@@ -313,7 +313,7 @@ export default {
   data() {
     return {
       isShowSidebar: true,
-      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
+      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
       enableHighlight: true,
       splitHorizontal: true,
       wrapText: true,

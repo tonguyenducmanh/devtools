@@ -172,38 +172,38 @@
 </template>
 
 <script>
- import TDSubSidebar from "@/components/TDSubSidebar.vue";
- import TDToolBase from "@/views/tools/base/TDToolBase.vue";
- import TDJSONToModelHelp from "@/views/helps/TDJSONToModelHelp.vue";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDJSONToModelHelp from "@/views/helps/TDJSONToModelHelp.vue";
 
- const LANG = {
-   CSharp: "csharp",
-   Go: "go",
- };
- export default {
-   extends: TDToolBase,
-   name: "TDJSONToModel",
-   components: { TDSubSidebar, TDJSONToModelHelp },
-   created() {},
-   beforeUnmount() {},
-   mounted() {},
+const LANG = {
+  CSharp: "csharp",
+  Go: "go",
+};
+export default {
+  extends: TDToolBase,
+  name: "TDJSONToModel",
+  components: { TDSubSidebar, TDJSONToModelHelp },
+  created() {},
+  beforeUnmount() {},
+  mounted() {},
 
-   computed: {
-     sidebarOptions() {
-       let options = [];
-       options.push({
-         value: this.$tdEnum.ToolSidebarOption.Help,
-         label: this.$t("i18nCommon.sidebarOption.help"),
-         icon: "td-help-icon",
-       });
-       options.push({
-         value: this.$tdEnum.ToolSidebarOption.Setting,
-         label: this.$t("i18nCommon.sidebarOption.setting"),
-         icon: "td-setting-icon",
-       });
-       return options;
-     },
-     languageOptions() {
+  computed: {
+    sidebarOptions() {
+      let options = [];
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Help,
+        label: this.$t("i18nCommon.sidebarOption.help"),
+        icon: "td-help-icon",
+      });
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Setting,
+        label: this.$t("i18nCommon.sidebarOption.setting"),
+        icon: "td-setting-icon",
+      });
+      return options;
+    },
+    languageOptions() {
       return [
         { label: "C#", value: LANG.CSharp },
         { label: "Go", value: LANG.Go },
@@ -582,7 +582,7 @@
     return {
       LANG,
       isShowSidebar: true,
-      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
+      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
       enableHighlight: true,
       splitHorizontal: true,
       wrapText: true,

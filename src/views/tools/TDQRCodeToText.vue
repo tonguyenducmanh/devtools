@@ -71,30 +71,30 @@
   </div>
 </template>
 <script>
- import TDCompress from "@/common/compress/TDCompress.js";
- import TDSubSidebar from "@/components/TDSubSidebar.vue";
- import TDToolBase from "@/views/tools/base/TDToolBase.vue";
- import TDQRCodeToTextHelp from "@/views/helps/TDQRCodeToTextHelp.vue";
- export default {
-   extends: TDToolBase,
-   name: "TDQRCodeToText",
-   components: { TDSubSidebar, TDQRCodeToTextHelp },
-   computed: {
-     sidebarOptions() {
-       let options = [];
-       options.push({
-         value: this.$tdEnum.ToolSidebarOption.Help,
-         label: this.$t("i18nCommon.sidebarOption.help"),
-         icon: "td-help-icon",
-       });
-       options.push({
-         value: this.$tdEnum.ToolSidebarOption.Setting,
-         label: this.$t("i18nCommon.sidebarOption.setting"),
-         icon: "td-setting-icon",
-       });
-       return options;
-     },
-   },
+import TDCompress from "@/common/compress/TDCompress.js";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDQRCodeToTextHelp from "@/views/helps/TDQRCodeToTextHelp.vue";
+export default {
+  extends: TDToolBase,
+  name: "TDQRCodeToText",
+  components: { TDSubSidebar, TDQRCodeToTextHelp },
+  computed: {
+    sidebarOptions() {
+      let options = [];
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Help,
+        label: this.$t("i18nCommon.sidebarOption.help"),
+        icon: "td-help-icon",
+      });
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Setting,
+        label: this.$t("i18nCommon.sidebarOption.setting"),
+        icon: "td-setting-icon",
+      });
+      return options;
+    },
+  },
   created() {
     let me = this;
   },
@@ -210,7 +210,7 @@
   data() {
     return {
       isShowSidebar: true,
-      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
+      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
       textOutput: null,
       isRemoveEmpty: false,
       historyItems: [],

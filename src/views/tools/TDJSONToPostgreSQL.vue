@@ -136,29 +136,29 @@
   </div>
 </template>
 <script>
- import TDSubSidebar from "@/components/TDSubSidebar.vue";
- import TDToolBase from "@/views/tools/base/TDToolBase.vue";
- import TDJSONToPostgreSQLHelp from "@/views/helps/TDJSONToPostgreSQLHelp.vue";
- export default {
-   extends: TDToolBase,
-   name: "TDJSONToPostgreSQL",
-   components: { TDSubSidebar, TDJSONToPostgreSQLHelp },
-   computed: {
-     sidebarOptions() {
-       let options = [];
-       options.push({
-         value: this.$tdEnum.ToolSidebarOption.Help,
-         label: this.$t("i18nCommon.sidebarOption.help"),
-         icon: "td-help-icon",
-       });
-       options.push({
-         value: this.$tdEnum.ToolSidebarOption.Setting,
-         label: this.$t("i18nCommon.sidebarOption.setting"),
-         icon: "td-setting-icon",
-       });
-       return options;
-     },
-   },
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDJSONToPostgreSQLHelp from "@/views/helps/TDJSONToPostgreSQLHelp.vue";
+export default {
+  extends: TDToolBase,
+  name: "TDJSONToPostgreSQL",
+  components: { TDSubSidebar, TDJSONToPostgreSQLHelp },
+  computed: {
+    sidebarOptions() {
+      let options = [];
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Help,
+        label: this.$t("i18nCommon.sidebarOption.help"),
+        icon: "td-help-icon",
+      });
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Setting,
+        label: this.$t("i18nCommon.sidebarOption.setting"),
+        icon: "td-setting-icon",
+      });
+      return options;
+    },
+  },
   created() {
     let me = this;
   },
@@ -404,7 +404,7 @@
   data() {
     return {
       isShowSidebar: true,
-      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
+      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
       enableHighlight: true,
       splitHorizontal: true,
       wrapText: true,

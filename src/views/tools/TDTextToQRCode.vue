@@ -406,7 +406,7 @@ export default {
   },
   data() {
     return {
-      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
+      currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
       firstSectionSize: 50, // Phần request chiếm 50%
       secondSectionSize: 50, // Phần response chiếm 50%
       isShowSidebar: true,
