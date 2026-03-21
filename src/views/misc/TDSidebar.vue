@@ -78,7 +78,7 @@
 </template>
 
 <script>
-import { getSidebarItems } from "@/config/tools.js";
+import { getSidebarItems } from "@/stores/TDToolConfigs.js";
 import TDToggleArea from "@/components/TDToggleArea.vue";
 import { useTabManager } from "@/stores/TDTabManager.js";
 import _ from "@/common/TDCommonFunction.js";

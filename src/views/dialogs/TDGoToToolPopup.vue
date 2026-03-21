@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import { getAllSearchableRoutes } from "@/config/tools.js";
+import { getAllSearchableRoutes } from "@/stores/TDToolConfigs.js";
 import { useTabManager } from "@/stores/TDTabManager.js";
 
 export default {
