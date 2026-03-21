@@ -131,6 +131,8 @@ import JSZip from "jszip";
 import TDCompress from "@/common/compress/TDCompress.js";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDMockTextGenerate from "@/common/mock/TDMockTextGenerate.js";
+import _ from "@/common/TDCommonFunction.js";
+
 export default {
   name: "TDTextToQRCode",
   components: { TDSubSidebar },
@@ -140,8 +142,23 @@ export default {
   beforeUnmount() {
     let me = this;
   },
+  watch: {
+    textGenQR(oldVal, newVal) {
+      if (oldVal != newVal) {
+        this.emitTabTitle(this);
+      }
+    },
+  },
   mounted() {},
   methods: {
+    emitTabTitle: _.debounce(function () {
+      let me = this;
+      // emit sự kiện thay đổi tên tab đang mở
+      me.$emit("updateTabTitle", {
+        title: me.textGenQR,
+        append: true,
+      });
+    }, 300),
     handleResize(sizes) {
       this.firstSectionSize = sizes.leftSize;
       this.secondSectionSize = sizes.rightSize;

@@ -181,16 +181,27 @@ export default {
      * Lắng nghe emit "update:tabTitle" từ component con.
      */
     function onTabTitleUpdate(tabId, payload) {
+      // 1. Kiểm tra trường hợp null/undefined
       if (payload === null || payload === undefined) {
         setTabTitle(tabId, null);
         return;
       }
+
+      // 2. Hàm helper để cắt chuỗi nếu dài hơn 20 ký tự
+      const formatTitle = (text) => {
+        const str = text ?? "";
+        return str.length > 20 ? str.substring(0, 20) + "..." : str;
+      };
+
+      // 3. Xử lý nếu payload là string trực tiếp
       if (typeof payload === "string") {
-        setTabTitle(tabId, { title: payload, append: false });
+        setTabTitle(tabId, { title: formatTitle(payload), append: false });
         return;
       }
+
+      // 4. Xử lý nếu payload là một object
       setTabTitle(tabId, {
-        title: payload.title ?? "",
+        title: formatTitle(payload.title),
         append: !!payload.append,
       });
     }
