@@ -86,7 +86,9 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
             :key="activeTab.id"
             :tab-id="activeTab.id"
             class="td-tab-pane"
-            @updateTabTitle="(payload) => onTabTitleUpdate(tab.id, payload)"
+            @updateTabTitle="
+              (payload) => onTabTitleUpdate(activeTab.id, payload)
+            "
           />
         </KeepAlive>
       </template>
