@@ -146,7 +146,7 @@ export default {
       },
       supported: {
         title: "Ngôn ngữ được hỗ trợ",
-        content: "PostgreSQL, MySQL với các tùy chọn indent, uppercase keyword.",
+        content: "PostgreSQL, MySQL.",
       },
     },
     textCompress: {
@@ -175,7 +175,7 @@ export default {
         title: "Cách sử dụng",
         input: "Nhập danh sách text cần xử lý (mỗi dòng 1 item), đặt separator cho cột và dòng.",
         expression: "Nhập biểu thức xử lý, dùng $0, $1, $2... để refer đến cột tương ứng.",
-        execute: "Nhấn Manipulate để xử lý và xem kết quả.",
+        execute: "Nhấn Xử lý để xử lý và xem kết quả.",
       },
       expressions: {
         title: "Các biểu thức được hỗ trợ",
@@ -228,7 +228,7 @@ export default {
       howToUse: {
         title: "Cách sử dụng",
         createMock: "Chọn HTTP method, nhập endpoint và cấu hình request/response.",
-        configure: "Sử dụng panel bên trái để quản lý các mock API đã tạo.",
+        configure: "Sử dụng panel bên phải để quản lý các mock API đã tạo.",
         saveMock: "Nhấn Save để lưu mock API, sau đó có thể copy CURL để gọi.",
       },
       collection: {
@@ -372,17 +372,17 @@ export default {
     jsonToModel: {
       purpose: {
         title: "JSON to Model là gì?",
-        content: "Công cụ chuyển đổi JSON thành class model (model class) cho nhiều ngôn ngữ lập trình.",
+        content: "Công cụ chuyển đổi JSON thành class model cho nhiều ngôn ngữ lập trình.",
       },
       howToUse: {
         title: "Cách sử dụng",
         input: "Dán JSON vào ô input.",
-        selectLanguage: "Chọn ngôn ngữ đầu ra (C#, TypeScript, Java, Go, Rust).",
+        selectLanguage: "Chọn ngôn ngữ đầu ra.",
         convert: "Nhấn Convert để tạo model class.",
       },
       features: {
         title: "Tính năng",
-        languages: "Hỗ trợ nhiều ngôn ngữ: C#, TypeScript, Java, Go, Rust.",
+        languages: "Hỗ trợ nhiều ngôn ngữ: C#,Go.",
         namespace: "Tùy chỉnh namespace/class name.",
         options: "Nhiều tùy chọn: PascalCase, nullable, JsonProperty, record type...",
       },

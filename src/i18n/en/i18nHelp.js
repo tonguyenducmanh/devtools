@@ -145,7 +145,7 @@ export default {
       },
       supported: {
         title: "Supported Languages",
-        content: "PostgreSQL, MySQL with options for indent and uppercase keyword.",
+        content: "PostgreSQL, MySQL.",
       },
     },
     textCompress: {
@@ -227,7 +227,7 @@ export default {
       howToUse: {
         title: "How to Use",
         createMock: "Select HTTP method, enter endpoint and configure request/response.",
-        configure: "Use the left panel to manage created mock APIs.",
+        configure: "Use the right panel to manage created mock APIs.",
         saveMock: "Press Save to save mock API, then copy CURL to call it.",
       },
       collection: {
@@ -376,12 +376,12 @@ export default {
       howToUse: {
         title: "How to Use",
         input: "Paste JSON into the input field.",
-        selectLanguage: "Select output language (C#, TypeScript, Java, Go, Rust).",
+        selectLanguage: "Select output language.",
         convert: "Click Convert to generate model class.",
       },
       features: {
         title: "Features",
-        languages: "Supports multiple languages: C#, TypeScript, Java, Go, Rust.",
+        languages: "Supports multiple languages: C#,Go.",
         namespace: "Customize namespace/class name.",
         options: "Many options: PascalCase, nullable, JsonProperty, record type...",
       },
