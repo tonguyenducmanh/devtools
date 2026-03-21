@@ -38,7 +38,9 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
               class="td-drop-indicator td-drop-indicator-before"
             ></div>
 
-            <span v-if="showTabNumber" class="td-tab-number">{{ index + 1 }}. </span>
+            <span v-if="showTabNumber" class="td-tab-number"
+              >{{ index + 1 }}.
+            </span>
             <span class="td-tab-label">{{ getTabLabel(tab) }}</span>
             <button
               class="td-tab-close"
@@ -77,18 +79,16 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
     <div class="td-tab-content">
       <!-- Tab mode: render sẵn tất cả bằng v-show -->
       <template v-if="isTabMode">
-        <div
-          v-for="tab in tabs"
-          :key="tab.id"
-          v-show="activeTabId === tab.id"
-          class="td-tab-pane"
-        >
-          <component
-            :is="tab.resolvedComponent"
-            v-if="tab.resolvedComponent"
-            @updateTabTitle="(payload) => onTabTitleUpdate(tab.id, payload)"
-          />
-        </div>
+        <template v-for="tab in tabs" :key="tab.id">
+          <KeepAlive>
+            <component
+              class="td-tab-pane"
+              v-if="tab.id === activeTabId"
+              :is="tab.resolvedComponent"
+              @updateTabTitle="(payload) => onTabTitleUpdate(tab.id, payload)"
+            />
+          </KeepAlive>
+        </template>
       </template>
 
       <!-- zero tabs mode: show Welcome -->
@@ -131,7 +131,7 @@ export default {
       exitTabMode,
       setTabTitle,
       duplicateTab,
-      resolveTabComponent
+      resolveTabComponent,
     } = useTabManager();
 
     // Lấy context menu từ plugin toàn cục
@@ -149,8 +149,8 @@ export default {
     vueWatch(
       activeTabId,
       async (newId) => {
-         if (!newId) return;
-         await resolveTabComponent(newId);
+        if (!newId) return;
+        await resolveTabComponent(newId);
       },
       { immediate: true },
     );
