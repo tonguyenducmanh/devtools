@@ -4,35 +4,6 @@
       <div class="rdp-container">
         <!-- Toolbar -->
         <div class="rdp-toolbar">
-          <span class="rdp-title">{{ $t("i18nCommon.remoteDesktop.title") }}</span>
-
-          <div class="rdp-fields">
-            <input
-              ref="hostInput"
-              v-model="host"
-              class="rdp-input"
-              type="text"
-              :placeholder="$t('i18nCommon.remoteDesktop.hostPlaceholder')"
-              @keydown.enter="handleConnect"
-            />
-            <input
-              ref="usernameInput"
-              v-model="username"
-              class="rdp-input"
-              type="text"
-              :placeholder="$t('i18nCommon.remoteDesktop.usernamePlaceholder')"
-              @keydown.enter="handleConnect"
-            />
-            <input
-              ref="passwordInput"
-              v-model="password"
-              class="rdp-input"
-              type="password"
-              :placeholder="$t('i18nCommon.remoteDesktop.passwordPlaceholder')"
-              @keydown.enter="handleConnect"
-            />
-          </div>
-
           <div class="rdp-actions">
             <button
               class="rdp-btn rdp-btn-connect"
@@ -48,8 +19,15 @@
             >
               {{ $t("i18nCommon.remoteDesktop.disconnect") }}
             </button>
-            <button class="rdp-btn rdp-btn-fullscreen" @click="toggleFullscreen">⛶</button>
-            <span class="rdp-status" :class="statusClass">{{ statusText }}</span>
+            <button
+              class="rdp-btn rdp-btn-fullscreen"
+              @click="toggleFullscreen"
+            >
+              ⛶
+            </button>
+            <span class="rdp-status" :class="statusClass">{{
+              statusText
+            }}</span>
           </div>
         </div>
 
@@ -79,7 +57,8 @@
             class="rdp-log-entry"
             :class="`rdp-log-${entry.type}`"
           >
-            <span class="rdp-log-time">{{ entry.time }}</span>{{ entry.message }}
+            <span class="rdp-log-time">{{ entry.time }}</span
+            >{{ entry.message }}
           </div>
         </div>
       </div>
@@ -102,13 +81,121 @@
       <template v-slot:main>
         <div
           class="flex flex-col td-sub-sidebar"
-          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.RemoteDesktopSidebarOption.Help
+          "
         >
           <TDRemoteDesktopRDPHelp />
         </div>
         <div
           class="flex flex-col td-sub-sidebar"
-          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.RemoteDesktopSidebarOption.Collection
+          "
+        >
+          <div class="td-rdp-collection">
+            <div class="flex flex-col td-collection-header">
+              <div class="td-connection-form">
+                <TDInput
+                  v-model="connectionName"
+                  :placeHolder="
+                    $t('i18nCommon.remoteDesktop.connectionNamePlaceholder')
+                  "
+                  :noMargin="true"
+                  class="rdp-connection-input"
+                />
+                <TDInput
+                  v-model="host"
+                  :placeHolder="$t('i18nCommon.remoteDesktop.hostPlaceholder')"
+                  :noMargin="true"
+                  class="rdp-connection-input"
+                />
+                <TDInput
+                  v-model="username"
+                  :placeHolder="
+                    $t('i18nCommon.remoteDesktop.usernamePlaceholder')
+                  "
+                  :noMargin="true"
+                  class="rdp-connection-input"
+                />
+                <TDInput
+                  v-model="password"
+                  :placeHolder="
+                    $t('i18nCommon.remoteDesktop.passwordPlaceholder')
+                  "
+                  :inputType="'password'"
+                  :noMargin="true"
+                  class="rdp-connection-input"
+                />
+                <div class="td-connection-actions">
+                  <TDButton
+                    :noMargin="true"
+                    @click="saveConnection"
+                    :label="$t('i18nCommon.remoteDesktop.saveConnection')"
+                  />
+                  <TDButton
+                    :noMargin="true"
+                    :type="$tdEnum.buttonType.secondary"
+                    @click="createNewConnection"
+                    :label="$t('i18nCommon.remoteDesktop.newConnection')"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="td-connection-list">
+              <div class="flex td-connection-list-header">
+                <span class="td-connection-list-title">{{
+                  $t("i18nCommon.remoteDesktop.collection.title")
+                }}</span>
+                <div
+                  @click="loadConnections"
+                  class="td-icon td-reload-icon"
+                  v-tooltip="$t('i18nCommon.remoteDesktop.collection.reload')"
+                ></div>
+              </div>
+              <div class="flex response-loading" v-if="isLoading">
+                <div class="loader"></div>
+              </div>
+              <div
+                v-else-if="connections.length === 0"
+                class="td-no-connections"
+              >
+                {{ $t("i18nCommon.remoteDesktop.collection.noConnections") }}
+              </div>
+              <div
+                v-else
+                v-for="(conn, index) in connections"
+                :key="index"
+                class="td-connection-item"
+                :class="{
+                  'td-connection-item-selected':
+                    currentConnectionId === conn.id,
+                }"
+                @click="loadConnection(conn)"
+              >
+                <div class="td-connection-info">
+                  <span class="td-connection-name">{{
+                    conn.connection_name
+                  }}</span>
+                  <span class="td-connection-host">{{ conn.host }}</span>
+                </div>
+                <div
+                  class="td-icon td-close-icon"
+                  @click.stop="confirmDeleteConnection(conn)"
+                  v-tooltip="$t('i18nCommon.remoteDesktop.deleteConnection')"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.RemoteDesktopSidebarOption.Setting
+          "
         >
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
@@ -116,6 +203,13 @@
             :label="$t('i18nCommon.remoteDesktop.autoReconnect')"
             @change="updateConfigLayout"
           ></TDCheckbox>
+          <TDComboBox
+            v-model="selectedResolution"
+            :options="resolutionOptions"
+            :noMargin="true"
+            :isEditable="false"
+            width="100%"
+          ></TDComboBox>
         </div>
       </template>
     </TDSubSidebar>
@@ -126,6 +220,8 @@
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDRemoteDesktopRDPHelp from "@/views/helps/TDRemoteDesktopRDPHelp.vue";
+import TDServerRDPAPI from "@/common/api/request/AgentAPI/TDServerRDPAPI.js";
+import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 
 export default {
   name: "TDRemoteDesktop",
@@ -137,8 +233,9 @@ export default {
       keyCacheLayout: this.$tdEnum.cacheConfig.RemoteDesktopConfigLayout,
       currentConfigLayout: {
         isShowSidebar: true,
-        currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
+        currentSidebarOption: this.$tdEnum.RemoteDesktopSidebarOption.Help,
         autoReconnect: false,
+        resolution: "1280x720",
       },
       host: "",
       username: "",
@@ -150,13 +247,72 @@ export default {
       canvasWidth: 1280,
       canvasHeight: 720,
       logEntries: [],
+      connections: [],
+      currentConnectionId: null,
+      connectionName: "",
+      isLoading: false,
+      agentAPI: null,
+      resolutions: [
+        { value: "800x600", label: "800x600", width: 800, height: 600 },
+        { value: "1024x768", label: "1024x768", width: 1024, height: 768 },
+        { value: "1280x720", label: "1280x720 (HD)", width: 1280, height: 720 },
+        { value: "1280x800", label: "1280x800", width: 1280, height: 800 },
+        { value: "1366x768", label: "1366x768", width: 1366, height: 768 },
+        { value: "1440x900", label: "1440x900", width: 1440, height: 900 },
+        {
+          value: "1600x900",
+          label: "1600x900 (HD+)",
+          width: 1600,
+          height: 900,
+        },
+        {
+          value: "1920x1080",
+          label: "1920x1080 (Full HD)",
+          width: 1920,
+          height: 1080,
+        },
+        {
+          value: "2560x1440",
+          label: "2560x1440 (2K)",
+          width: 2560,
+          height: 1440,
+        },
+        {
+          value: "3840x2160",
+          label: "3840x2160 (4K)",
+          width: 3840,
+          height: 2160,
+        },
+      ],
     };
   },
 
   computed: {
+    resolutionOptions() {
+      return this.resolutions.map((r) => ({
+        value: r.value,
+        label: r.label,
+      }));
+    },
+    selectedResolution: {
+      get() {
+        return this.currentConfigLayout.resolution || "1920x1080";
+      },
+      set(value) {
+        const res = this.resolutions.find((r) => r.value === value);
+        if (res) {
+          this.canvasWidth = res.width;
+          this.canvasHeight = res.height;
+        }
+        this.currentConfigLayout.resolution = value;
+        this.updateConfigLayout();
+      },
+    },
     statusText() {
-      if (this.isConnecting) return this.$t("i18nCommon.remoteDesktop.statusConnecting");
-      if (this.isConnected) return this.$t("i18nCommon.remoteDesktop.statusConnected");
+      if (this.isConnecting)
+        return this.$t("i18nCommon.remoteDesktop.statusConnecting");
+      if (this.isConnected)
+        return this.$t("i18nCommon.remoteDesktop.statusConnected");
       return this.$t("i18nCommon.remoteDesktop.statusDisconnected");
     },
     statusClass() {
@@ -167,22 +323,29 @@ export default {
     sidebarOptions() {
       let options = [];
       options.push({
-        value: this.$tdEnum.ToolSidebarOption.Help,
-        label: this.$t("i18nCommon.sidebarOption.help"),
+        value: this.$tdEnum.RemoteDesktopSidebarOption.Help,
+        label: this.$t("i18nCommon.remoteDesktop.sidebarOption.help"),
         icon: "td-help-icon",
       });
       options.push({
-        value: this.$tdEnum.ToolSidebarOption.Setting,
-        label: this.$t("i18nCommon.sidebarOption.setting"),
+        value: this.$tdEnum.RemoteDesktopSidebarOption.Collection,
+        label: this.$t("i18nCommon.remoteDesktop.sidebarOption.collection"),
+        icon: "td-folder-icon",
+      });
+      options.push({
+        value: this.$tdEnum.RemoteDesktopSidebarOption.Setting,
+        label: this.$t("i18nCommon.remoteDesktop.sidebarOption.setting"),
         icon: "td-setting-icon",
       });
       return options;
     },
   },
 
-  mounted() {
+  async mounted() {
+    this.agentAPI = new TDServerRDPAPI();
     this.setupInputHandlers();
     this.addLog(this.$t("i18nCommon.remoteDesktop.ready"), "info");
+    await this.loadConnections();
   },
 
   beforeUnmount() {
@@ -202,6 +365,123 @@ export default {
       });
     },
 
+    async loadConnections() {
+      let me = this;
+      me.isLoading = true;
+      try {
+        let response = await me.agentAPI.getAllRDPConnections();
+        let data = response?.data?.data ?? [];
+        if (response && response.success && Array.isArray(data)) {
+          me.connections.splice(0, me.connections.length, ...data);
+        }
+      } catch (error) {
+        console.error(
+          me.$t("i18nCommon.remoteDesktop.collection.loadError"),
+          error,
+        );
+        me.$tdUtility.showErrorNotFoundAgentServer();
+      } finally {
+        me.isLoading = false;
+      }
+    },
+
+    loadConnection(conn) {
+      let me = this;
+      me.currentConnectionId = conn.id;
+      me.connectionName = conn.connection_name;
+      me.host = conn.host;
+      me.username = conn.username || "";
+      me.password = conn.password || "";
+    },
+
+    createNewConnection() {
+      let me = this;
+      if (me.isConnected) {
+        me.handleDisconnect();
+      }
+      me.currentConnectionId = null;
+      me.connectionName = "";
+      me.host = "";
+      me.username = "";
+      me.password = "";
+    },
+
+    async saveConnection() {
+      let me = this;
+      if (!me.connectionName) {
+        me.$tdToast.warning(
+          me.$t("i18nCommon.remoteDesktop.connectionNameRequired"),
+        );
+        return;
+      }
+      if (!me.host) {
+        me.$tdToast.warning(me.$t("i18nCommon.remoteDesktop.hostRequired"));
+        return;
+      }
+
+      let connData = {
+        connection_name: me.connectionName,
+        host: me.host,
+        username: me.username,
+        password: me.password,
+      };
+
+      try {
+        if (me.currentConnectionId) {
+          connData.id = me.currentConnectionId;
+          let response = await me.agentAPI.updateRDPConnection(connData);
+          if (response && response.success) {
+            me.$tdToast.success(me.$t("i18nCommon.remoteDesktop.saveSuccess"));
+            await me.loadConnections();
+          }
+        } else {
+          let response = await me.agentAPI.createRDPConnection(connData);
+          if (response && response.success) {
+            me.$tdToast.success(me.$t("i18nCommon.remoteDesktop.saveSuccess"));
+            me.currentConnectionId = response.data?.data?.id;
+            await me.loadConnections();
+          }
+        }
+      } catch (error) {
+        console.error(me.$t("i18nCommon.remoteDesktop.saveError"), error);
+        me.$tdToast.error(me.$t("i18nCommon.remoteDesktop.saveError"));
+      }
+    },
+
+    confirmDeleteConnection(conn) {
+      let me = this;
+      TDDialogUtil.showConfirm({
+        title: me.$t("i18nCommon.remoteDesktop.deleteConnection"),
+        message: `${me.$t("i18nCommon.remoteDesktop.deleteConnection")} "${conn.connection_name}"?`,
+        onConfirm: async () => {
+          await me.deleteConnectionById(conn.id);
+        },
+      });
+    },
+
+    async deleteConnection() {
+      let me = this;
+      if (!me.currentConnectionId) return;
+      await me.deleteConnectionById(me.currentConnectionId);
+    },
+
+    async deleteConnectionById(id) {
+      let me = this;
+      try {
+        let response = await me.agentAPI.deleteRDPConnection(id);
+        if (response && response.success) {
+          me.$tdToast.success(me.$t("i18nCommon.remoteDesktop.deleteSuccess"));
+          if (me.currentConnectionId === id) {
+            me.createNewConnection();
+          }
+          await me.loadConnections();
+        }
+      } catch (error) {
+        console.error(me.$t("i18nCommon.remoteDesktop.deleteError"), error);
+        me.$tdToast.error(me.$t("i18nCommon.remoteDesktop.deleteError"));
+      }
+    },
+
     async handleConnect() {
       if (this.isConnected || this.isConnecting) return;
       const destination = this.host.trim();
@@ -209,7 +489,10 @@ export default {
       const password = this.password;
 
       if (!destination || !username) {
-        this.addLog(this.$t("i18nCommon.remoteDesktop.validationError"), "error");
+        this.addLog(
+          this.$t("i18nCommon.remoteDesktop.validationError"),
+          "error",
+        );
         return;
       }
 
@@ -229,11 +512,18 @@ export default {
         const canvas = this.$refs.rdpCanvas;
 
         const agentUrl = window.__tdInfo?.agentURL || "http://localhost:7777";
-        const proxyAddress = agentUrl.replace(/^http/, "ws").replace(/\/$/, "") + "/rdp/ws";
+        const proxyAddress =
+          agentUrl.replace(/^http/, "ws").replace(/\/$/, "") + "/rdp/ws";
 
-        this.addLog(`${this.$t("i18nCommon.remoteDesktop.connecting")} ${destination}`, "info");
+        this.addLog(
+          `${this.$t("i18nCommon.remoteDesktop.connecting")} ${destination}`,
+          "info",
+        );
 
-        const desktopSize = new DesktopSize(this.canvasWidth, this.canvasHeight);
+        const desktopSize = new DesktopSize(
+          this.canvasWidth,
+          this.canvasHeight,
+        );
         const enableCredsspExt = new Extension("enable_credssp", true);
 
         const builder = new SessionBuilder();
@@ -260,7 +550,7 @@ export default {
 
         this.addLog(
           `${this.$t("i18nCommon.remoteDesktop.connected")} ${ds.width}x${ds.height}`,
-          "success"
+          "success",
         );
 
         canvas.focus();
@@ -270,21 +560,21 @@ export default {
           .then((info) => {
             this.addLog(
               `${this.$t("i18nCommon.remoteDesktop.sessionEnded")}: ${info.reason()}`,
-              "warn"
+              "warn",
             );
             this.cleanup();
           })
           .catch((e) => {
             this.addLog(
               `${this.$t("i18nCommon.remoteDesktop.sessionError")}: ${this.formatError(e)}`,
-              "error"
+              "error",
             );
             this.cleanup();
           });
       } catch (e) {
         this.addLog(
           `${this.$t("i18nCommon.remoteDesktop.connectionFailed")}: ${this.formatError(e)}`,
-          "error"
+          "error",
         );
         this.cleanup();
       }
@@ -294,9 +584,15 @@ export default {
       if (this.session) {
         try {
           this.session.shutdown();
-          this.addLog(this.$t("i18nCommon.remoteDesktop.disconnectedByUser"), "warn");
+          this.addLog(
+            this.$t("i18nCommon.remoteDesktop.disconnectedByUser"),
+            "warn",
+          );
         } catch (e) {
-          this.addLog(`${this.$t("i18nCommon.remoteDesktop.disconnectError")}: ${this.formatError(e)}`, "error");
+          this.addLog(
+            `${this.$t("i18nCommon.remoteDesktop.disconnectError")}: ${this.formatError(e)}`,
+            "error",
+          );
         }
       }
       this.cleanup();
@@ -440,37 +736,109 @@ export default {
 
     getScancode(code) {
       const SCANCODE_MAP = {
-        Escape: 0x01, Digit1: 0x02, Digit2: 0x03, Digit3: 0x04,
-        Digit4: 0x05, Digit5: 0x06, Digit6: 0x07, Digit7: 0x08,
-        Digit8: 0x09, Digit9: 0x0a, Digit0: 0x0b, Minus: 0x0c,
-        Equal: 0x0d, Backspace: 0x0e, Tab: 0x0f,
-        KeyQ: 0x10, KeyW: 0x11, KeyE: 0x12, KeyR: 0x13,
-        KeyT: 0x14, KeyY: 0x15, KeyU: 0x16, KeyI: 0x17,
-        KeyO: 0x18, KeyP: 0x19, BracketLeft: 0x1a, BracketRight: 0x1b,
-        Enter: 0x1c, ControlLeft: 0x1d,
-        KeyA: 0x1e, KeyS: 0x1f, KeyD: 0x20, KeyF: 0x21,
-        KeyG: 0x22, KeyH: 0x23, KeyJ: 0x24, KeyK: 0x25,
-        KeyL: 0x26, Semicolon: 0x27, Quote: 0x28, Backquote: 0x29,
-        ShiftLeft: 0x2a, Backslash: 0x2b,
-        KeyZ: 0x2c, KeyX: 0x2d, KeyC: 0x2e, KeyV: 0x2f,
-        KeyB: 0x30, KeyN: 0x31, KeyM: 0x32, Comma: 0x33,
-        Period: 0x34, Slash: 0x35, ShiftRight: 0x36,
-        NumpadMultiply: 0x37, AltLeft: 0x38, Space: 0x39, CapsLock: 0x3a,
-        F1: 0x3b, F2: 0x3c, F3: 0x3d, F4: 0x3e,
-        F5: 0x3f, F6: 0x40, F7: 0x41, F8: 0x42,
-        F9: 0x43, F10: 0x44, NumLock: 0x45, ScrollLock: 0x46,
-        Numpad7: 0x47, Numpad8: 0x48, Numpad9: 0x49,
-        NumpadSubtract: 0x4a, Numpad4: 0x4b, Numpad5: 0x4c,
-        Numpad6: 0x4d, NumpadAdd: 0x4e, Numpad1: 0x4f,
-        Numpad2: 0x50, Numpad3: 0x51, Numpad0: 0x52,
-        NumpadDecimal: 0x53, F11: 0x57, F12: 0x58,
-        NumpadEnter: 0xe01c, ControlRight: 0xe01d,
-        NumpadDivide: 0xe035, PrintScreen: 0xe037,
-        AltRight: 0xe038, Home: 0xe047, ArrowUp: 0xe048,
-        PageUp: 0xe049, ArrowLeft: 0xe04b, ArrowRight: 0xe04d,
-        End: 0xe04f, ArrowDown: 0xe050, PageDown: 0xe051,
-        Insert: 0xe052, Delete: 0xe053,
-        MetaLeft: 0xe05b, MetaRight: 0xe05c, ContextMenu: 0xe05d,
+        Escape: 0x01,
+        Digit1: 0x02,
+        Digit2: 0x03,
+        Digit3: 0x04,
+        Digit4: 0x05,
+        Digit5: 0x06,
+        Digit6: 0x07,
+        Digit7: 0x08,
+        Digit8: 0x09,
+        Digit9: 0x0a,
+        Digit0: 0x0b,
+        Minus: 0x0c,
+        Equal: 0x0d,
+        Backspace: 0x0e,
+        Tab: 0x0f,
+        KeyQ: 0x10,
+        KeyW: 0x11,
+        KeyE: 0x12,
+        KeyR: 0x13,
+        KeyT: 0x14,
+        KeyY: 0x15,
+        KeyU: 0x16,
+        KeyI: 0x17,
+        KeyO: 0x18,
+        KeyP: 0x19,
+        BracketLeft: 0x1a,
+        BracketRight: 0x1b,
+        Enter: 0x1c,
+        ControlLeft: 0x1d,
+        KeyA: 0x1e,
+        KeyS: 0x1f,
+        KeyD: 0x20,
+        KeyF: 0x21,
+        KeyG: 0x22,
+        KeyH: 0x23,
+        KeyJ: 0x24,
+        KeyK: 0x25,
+        KeyL: 0x26,
+        Semicolon: 0x27,
+        Quote: 0x28,
+        Backquote: 0x29,
+        ShiftLeft: 0x2a,
+        Backslash: 0x2b,
+        KeyZ: 0x2c,
+        KeyX: 0x2d,
+        KeyC: 0x2e,
+        KeyV: 0x2f,
+        KeyB: 0x30,
+        KeyN: 0x31,
+        KeyM: 0x32,
+        Comma: 0x33,
+        Period: 0x34,
+        Slash: 0x35,
+        ShiftRight: 0x36,
+        NumpadMultiply: 0x37,
+        AltLeft: 0x38,
+        Space: 0x39,
+        CapsLock: 0x3a,
+        F1: 0x3b,
+        F2: 0x3c,
+        F3: 0x3d,
+        F4: 0x3e,
+        F5: 0x3f,
+        F6: 0x40,
+        F7: 0x41,
+        F8: 0x42,
+        F9: 0x43,
+        F10: 0x44,
+        NumLock: 0x45,
+        ScrollLock: 0x46,
+        Numpad7: 0x47,
+        Numpad8: 0x48,
+        Numpad9: 0x49,
+        NumpadSubtract: 0x4a,
+        Numpad4: 0x4b,
+        Numpad5: 0x4c,
+        Numpad6: 0x4d,
+        NumpadAdd: 0x4e,
+        Numpad1: 0x4f,
+        Numpad2: 0x50,
+        Numpad3: 0x51,
+        Numpad0: 0x52,
+        NumpadDecimal: 0x53,
+        F11: 0x57,
+        F12: 0x58,
+        NumpadEnter: 0xe01c,
+        ControlRight: 0xe01d,
+        NumpadDivide: 0xe035,
+        PrintScreen: 0xe037,
+        AltRight: 0xe038,
+        Home: 0xe047,
+        ArrowUp: 0xe048,
+        PageUp: 0xe049,
+        ArrowLeft: 0xe04b,
+        ArrowRight: 0xe04d,
+        End: 0xe04f,
+        ArrowDown: 0xe050,
+        PageDown: 0xe051,
+        Insert: 0xe052,
+        Delete: 0xe053,
+        MetaLeft: 0xe05b,
+        MetaRight: 0xe05c,
+        ContextMenu: 0xe05d,
         Pause: 0xe11d45,
       };
       return SCANCODE_MAP[code] ?? null;
@@ -498,7 +866,11 @@ export default {
   height: 100%;
   background: #0d1117;
   color: #e0e0e0;
-  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-family:
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
   overflow: hidden;
 }
 
@@ -562,7 +934,9 @@ export default {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition:
+    background 0.2s,
+    transform 0.1s;
 }
 
 .rdp-btn:active {
@@ -690,5 +1064,121 @@ export default {
   justify-content: flex-start;
   width: 100%;
   overflow: auto;
+}
+
+.td-rdp-collection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding);
+}
+
+.td-collection-header {
+  gap: var(--padding);
+  width: 100%;
+  margin-top: var(--padding);
+}
+
+.td-connection-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding);
+}
+
+.rdp-connection-input {
+  width: 100%;
+}
+
+.rdp-port-input {
+  width: 100px;
+}
+
+.td-connection-actions {
+  display: flex;
+  gap: var(--padding);
+  width: 100%;
+}
+
+.td-connection-list {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.td-no-connections {
+  padding: var(--padding);
+  text-align: center;
+  color: #6e7681;
+}
+
+.td-connection-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--padding);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  margin-bottom: var(--padding);
+}
+
+.td-connection-item:hover {
+  background-color: var(--bg-layer-color);
+}
+
+.td-connection-item-selected {
+  background-color: var(--bg-layer-color);
+  font-weight: 600;
+}
+
+.td-connection-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.td-connection-name {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.td-connection-host {
+  font-size: 12px;
+  color: #6e7681;
+}
+
+.response-loading {
+  width: 100%;
+  height: 100px;
+  background-color: var(--bg-layer-color);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+  justify-content: center;
+  align-items: center;
+}
+
+.td-setting-item {
+  margin-top: var(--padding);
+  padding: 0 var(--padding);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.td-connection-list-header {
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--padding);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.td-connection-list-title {
+  font-weight: 600;
+  font-size: 14px;
 }
 </style>

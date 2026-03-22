@@ -122,4 +122,22 @@ func InitDatabase() {
 		log.Printf("%q: %s\n", err, sqlStmtTestingGroup)
 		return
 	}
+
+	// 6. Tạo bảng RDP connections
+	sqlStmtRDPConnection := `
+	CREATE TABLE IF NOT EXISTS td_rdp_connection (
+		id TEXT PRIMARY KEY NOT NULL,
+		connection_name TEXT NOT NULL,
+		host TEXT NOT NULL,
+		username TEXT,
+		password TEXT,
+		created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+		modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+	`
+	_, err = db.Exec(sqlStmtRDPConnection)
+	if err != nil {
+		log.Printf("%q: %s\n", err, sqlStmtRDPConnection)
+		return
+	}
 }

@@ -48,4 +48,5 @@ func addRoute(app *http.ServeMux) {
 	router.InjectMockAPIRouter(app)
 	router.InjectAppDataMiner(app)
 	router.InjectRDPRouter(app)
+	router.InjectRDPConnectionRouter(app)
 }

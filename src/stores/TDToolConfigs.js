@@ -83,7 +83,6 @@ const sidebarConfig = [
         component: () => import("@/views/tools/TDRemoteDesktopRDP.vue"),
         meta: {
           titleKey: "i18nCommon.feature.remoteDesktopRDP",
-          helpKey: "i18nHelp.remoteDesktop.purpose.title",
         },
       },
     ],

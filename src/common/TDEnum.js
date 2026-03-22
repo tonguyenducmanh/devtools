@@ -101,6 +101,11 @@ class TDEnum {
     Help: 0,
     Setting: 1,
   };
+  RemoteDesktopSidebarOption = {
+    Help: 0,
+    Collection: 1,
+    Setting: 2,
+  };
 }
 
 export default new TDEnum();
