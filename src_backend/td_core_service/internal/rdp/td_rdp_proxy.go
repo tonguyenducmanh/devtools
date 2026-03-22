@@ -4,9 +4,9 @@ import (
 	"crypto/tls"
 	"encoding/asn1"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
+	"td_core_service/td_common"
 
 	"github.com/gorilla/websocket"
 )
@@ -18,10 +18,10 @@ const rdCleanPathVersion = 3390
 
 // RDCleanPath Request PDU (parse từ binary DER)
 type rdCleanPathRequest struct {
-	Destination         string
-	ProxyAuth           string
-	X224ConnectionReq   []byte
-	PreConnectionBlob   string
+	Destination       string
+	ProxyAuth         string
+	X224ConnectionReq []byte
+	PreConnectionBlob string
 }
 
 // upgrader cho WebSocket
@@ -39,39 +39,39 @@ var upgrader = websocket.Upgrader{
 func HandleRDPWebSocket(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Printf("[RDP] WebSocket upgrade failed: %v", err)
+		td_common.LogError(fmt.Sprintf("[RDP] WebSocket upgrade failed: %v", err))
 		return
 	}
 	defer ws.Close()
-	log.Println("[RDP] New WebSocket connection")
+	td_common.LogInfo("[RDP] New WebSocket connection")
 
 	// Đọc message đầu tiên: RDCleanPath Request (binary DER)
 	messageType, data, err := ws.ReadMessage()
 	if err != nil {
-		log.Printf("[RDP] Failed to read initial message: %v", err)
+		td_common.LogError(fmt.Sprintf("[RDP] Failed to read initial message: %v", err))
 		return
 	}
 	if messageType != websocket.BinaryMessage {
-		log.Printf("[RDP] Expected binary message, got type %d", messageType)
+		td_common.LogError(fmt.Sprintf("[RDP] Expected binary message, got type %d", messageType))
 		sendRDPError(ws, 1, 400)
 		return
 	}
 
-	log.Printf("[RDP] Received RDCleanPath request (%d bytes)", len(data))
+	td_common.LogInfo(fmt.Sprintf("[RDP] Received RDCleanPath request (%d bytes)", len(data)))
 
 	// Parse RDCleanPath request
 	req, err := parseRDCleanPathRequest(data)
 	if err != nil {
-		log.Printf("[RDP] Parse error: %v", err)
+		td_common.LogError(fmt.Sprintf("[RDP] Parse error: %v", err))
 		sendRDPError(ws, 1, 502)
 		return
 	}
-	log.Printf("[RDP] Destination: %s", req.Destination)
+	td_common.LogInfo(fmt.Sprintf("[RDP] Destination: %s", req.Destination))
 
 	// Parse host:port
 	host, port, err := parseDestination(req.Destination)
 	if err != nil {
-		log.Printf("[RDP] Invalid destination: %v", err)
+		td_common.LogError(fmt.Sprintf("[RDP] Invalid destination: %v", err))
 		sendRDPError(ws, 1, 400)
 		return
 	}
@@ -80,7 +80,7 @@ func HandleRDPWebSocket(w http.ResponseWriter, r *http.Request) {
 	addr := fmt.Sprintf("%s:%d", host, port)
 	x224Resp, certChain, tlsConn, err := performRDPHandshake(addr, req.X224ConnectionReq)
 	if err != nil {
-		log.Printf("[RDP] Handshake failed: %v", err)
+		td_common.LogError(fmt.Sprintf("[RDP] Handshake failed: %v", err))
 		sendRDPError(ws, 2, 502)
 		return
 	}
@@ -89,15 +89,15 @@ func HandleRDPWebSocket(w http.ResponseWriter, r *http.Request) {
 	// Build và gửi RDCleanPath Response
 	respPDU, err := buildRDCleanPathResponse(addr, x224Resp, certChain)
 	if err != nil {
-		log.Printf("[RDP] Build response error: %v", err)
+		td_common.LogError(fmt.Sprintf("[RDP] Build response error: %v", err))
 		sendRDPError(ws, 1, 500)
 		return
 	}
 	if err := ws.WriteMessage(websocket.BinaryMessage, respPDU); err != nil {
-		log.Printf("[RDP] Send response error: %v", err)
+		td_common.LogError(fmt.Sprintf("[RDP] Send response error: %v", err))
 		return
 	}
-	log.Printf("[RDP] RDCleanPath handshake done — starting relay")
+	td_common.LogInfo("[RDP] RDCleanPath handshake done — starting relay")
 
 	// Bidirectional relay: WebSocket ↔ TLS
 	setupRelay(ws, tlsConn)
@@ -127,7 +127,7 @@ func performRDPHandshake(addr string, x224Req []byte) (x224Resp []byte, certChai
 	}
 	x224Resp = make([]byte, n)
 	copy(x224Resp, buf[:n])
-	log.Printf("[RDP] X.224 confirm received (%d bytes)", n)
+	td_common.LogInfo(fmt.Sprintf("[RDP] X.224 confirm received (%d bytes)", n))
 
 	// 4. TLS upgrade trên connection TCP đã có
 	host, _, _ := net.SplitHostPort(addr)
@@ -139,13 +139,13 @@ func performRDPHandshake(addr string, x224Req []byte) (x224Resp []byte, certChai
 		tlsConn.Close()
 		return nil, nil, nil, fmt.Errorf("TLS handshake: %w", err)
 	}
-	log.Println("[RDP] TLS handshake done")
+	td_common.LogInfo("[RDP] TLS handshake done")
 
 	// 5. Extract cert chain
 	for _, cert := range tlsConn.ConnectionState().PeerCertificates {
 		certChain = append(certChain, cert.Raw)
 	}
-	log.Printf("[RDP] Extracted %d certificate(s)", len(certChain))
+	td_common.LogInfo(fmt.Sprintf("[RDP] Extracted %d certificate(s)", len(certChain)))
 
 	return x224Resp, certChain, tlsConn, nil
 }
@@ -163,12 +163,12 @@ func setupRelay(ws *websocket.Conn, tlsConn *tls.Conn) {
 			n, err := tlsConn.Read(buf)
 			if n > 0 {
 				if werr := ws.WriteMessage(websocket.BinaryMessage, buf[:n]); werr != nil {
-					log.Printf("[RDP relay] TLS→WS write error: %v", werr)
+					td_common.LogError(fmt.Sprintf("[RDP relay] TLS→WS write error: %v", werr))
 					return
 				}
 			}
 			if err != nil {
-				log.Printf("[RDP relay] TLS closed: %v", err)
+				td_common.LogError(fmt.Sprintf("[RDP relay] TLS closed: %v", err))
 				return
 			}
 		}
@@ -178,11 +178,11 @@ func setupRelay(ws *websocket.Conn, tlsConn *tls.Conn) {
 	for {
 		_, data, err := ws.ReadMessage()
 		if err != nil {
-			log.Printf("[RDP relay] WS closed: %v", err)
+			td_common.LogError(fmt.Sprintf("[RDP relay] WS closed: %v", err))
 			break
 		}
 		if _, werr := tlsConn.Write(data); werr != nil {
-			log.Printf("[RDP relay] WS→TLS write error: %v", werr)
+			td_common.LogError(fmt.Sprintf("[RDP relay] WS→TLS write error: %v", werr))
 			break
 		}
 	}
@@ -193,11 +193,11 @@ func setupRelay(ws *websocket.Conn, tlsConn *tls.Conn) {
 
 // rawRDCleanPathOuter dùng để decode outer SEQUENCE với các trường context-specific (raw)
 type rawTaggedField struct {
-	Class       int
-	Tag         int
-	IsCompound  bool
-	Bytes       []byte
-	FullBytes   []byte
+	Class      int
+	Tag        int
+	IsCompound bool
+	Bytes      []byte
+	FullBytes  []byte
 }
 
 func parseRDCleanPathRequest(data []byte) (*rdCleanPathRequest, error) {
