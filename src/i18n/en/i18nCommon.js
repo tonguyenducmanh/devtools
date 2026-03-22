@@ -584,6 +584,9 @@ export default {
         reload: "Reload list",
       },
       resolution: "Resolution",
+      fullscreen: "Fullscreen",
+      screenshot: "Screenshot",
+      screenshotSaved: "Screenshot saved",
     },
   },
 };

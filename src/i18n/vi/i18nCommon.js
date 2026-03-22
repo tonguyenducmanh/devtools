@@ -581,6 +581,9 @@ export default {
         reload: "Tải lại danh sách",
       },
       resolution: "Độ phân giải",
+      fullscreen: "Toàn màn hình",
+      screenshot: "Chụp ảnh",
+      screenshotSaved: "Đã lưu ảnh chụp màn hình",
     },
   },
 };

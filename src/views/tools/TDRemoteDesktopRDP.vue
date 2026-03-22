@@ -23,7 +23,13 @@
               class="rdp-btn rdp-btn-fullscreen"
               @click="toggleFullscreen"
             >
-              ⛶
+              {{ $t("i18nCommon.remoteDesktop.fullscreen") }}
+            </button>
+            <button
+              class="rdp-btn rdp-btn-screenshot"
+              @click="takeScreenshot"
+            >
+              {{ $t("i18nCommon.remoteDesktop.screenshot") }}
             </button>
             <span class="rdp-status" :class="statusClass">{{
               statusText
@@ -625,6 +631,17 @@ export default {
       }
     },
 
+    takeScreenshot() {
+      const canvas = this.$refs.rdpCanvas;
+      if (!canvas) return;
+      const dataUrl = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.download = `rdp-screenshot-${Date.now()}.png`;
+      link.href = dataUrl;
+      link.click();
+      this.addLog(this.$t("i18nCommon.remoteDesktop.screenshotSaved"), "success");
+    },
+
     formatError(e) {
       if (e && typeof e === "object" && "__wbg_ptr" in e) {
         try {
@@ -987,6 +1004,19 @@ export default {
 }
 
 .rdp-btn-fullscreen:hover {
+  background: #30363d;
+  color: #e0e0e0;
+}
+
+.rdp-btn-screenshot {
+  background: transparent;
+  color: #8b949e;
+  border: 1px solid #30363d;
+  font-size: 13px;
+  padding: 4px 12px;
+}
+
+.rdp-btn-screenshot:hover {
   background: #30363d;
   color: #e0e0e0;
 }
