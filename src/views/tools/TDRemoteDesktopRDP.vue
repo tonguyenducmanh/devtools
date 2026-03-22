@@ -249,7 +249,7 @@ export default {
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.RemoteDesktopSidebarOption.Help,
         showLog: false,
-        resolution: "1280x720",
+        resolution: "1920x1080",
       },
       host: "",
       username: "",
@@ -644,7 +644,10 @@ export default {
         this.session.applyInputs(tx);
         this.addLog("Sent Ctrl + Alt + Del", "info");
       } catch (e) {
-        this.addLog("Failed to send Ctrl+Alt+Del: " + this.formatError(e), "error");
+        this.addLog(
+          "Failed to send Ctrl+Alt+Del: " + this.formatError(e),
+          "error",
+        );
       }
     },
 
