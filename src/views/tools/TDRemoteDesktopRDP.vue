@@ -206,12 +206,6 @@
         >
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="currentConfigLayout.autoReconnect"
-            :label="$t('i18nCommon.remoteDesktop.autoReconnect')"
-            @change="updateConfigLayout"
-          ></TDCheckbox>
-          <TDCheckbox
-            :variant="$tdEnum.checkboxType.switch"
             v-model="currentConfigLayout.showLog"
             :label="$t('i18nCommon.remoteDesktop.showLog')"
             @change="updateConfigLayout"
@@ -247,7 +241,6 @@ export default {
       currentConfigLayout: {
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.RemoteDesktopSidebarOption.Help,
-        autoReconnect: false,
         showLog: false,
         resolution: "1280x720",
       },
