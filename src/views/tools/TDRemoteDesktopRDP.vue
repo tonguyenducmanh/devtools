@@ -23,39 +23,38 @@
         <!-- Toolbar -->
         <div class="rdp-toolbar">
           <div class="rdp-actions">
-            <button
-              class="rdp-btn rdp-btn-connect"
-              :disabled="isConnected || isConnecting"
+            <TDButton
+              :noMargin="true"
+              v-if="!isConnected && !isConnecting"
               @click="handleConnect"
-            >
-              {{ $t("i18nCommon.remoteDesktop.connect") }}
-            </button>
-            <button
-              class="rdp-btn rdp-btn-disconnect"
-              :disabled="!isConnected"
+              :label="$t('i18nCommon.remoteDesktop.connect')"
+            />
+            <TDButton
+              :noMargin="true"
+              :type="$tdEnum.buttonType.secondary"
+              v-else
               @click="handleDisconnect"
-            >
-              {{ $t("i18nCommon.remoteDesktop.disconnect") }}
-            </button>
-            <button
-              class="rdp-btn rdp-btn-fullscreen"
+              :label="$t('i18nCommon.remoteDesktop.disconnect')"
+            />
+            <TDButton
+              :noMargin="true"
+              :type="$tdEnum.buttonType.secondary"
               @click="toggleFullscreen"
-            >
-              {{ $t("i18nCommon.remoteDesktop.fullscreen") }}
-            </button>
-            <button class="rdp-btn rdp-btn-screenshot" @click="takeScreenshot">
-              {{ $t("i18nCommon.remoteDesktop.screenshot") }}
-            </button>
-            <button
-              class="rdp-btn rdp-btn-cad"
-              :disabled="!isConnected"
+              :label="$t('i18nCommon.remoteDesktop.fullscreen')"
+            />
+            <TDButton
+              :noMargin="true"
+              :type="$tdEnum.buttonType.secondary"
+              @click="takeScreenshot"
+              :label="$t('i18nCommon.remoteDesktop.screenshot')"
+            />
+            <TDButton
+              :noMargin="true"
+              :type="$tdEnum.buttonType.secondary"
               @click="sendCtrlAltDel"
-            >
-              Ctrl + Alt + Del
-            </button>
-            <span class="rdp-status" :class="statusClass">{{
-              statusText
-            }}</span>
+              :readOnly="!isConnected"
+              :label="'Ctrl + Alt + Del'"
+            />
           </div>
         </div>
 
@@ -258,8 +257,8 @@ export default {
       isConnecting: false,
       session: null,
       wasmInitialized: false,
-      canvasWidth: 1280,
-      canvasHeight: 720,
+      canvasWidth: 1920,
+      canvasHeight: 1080,
       logEntries: [],
       connections: [],
       currentConnectionId: null,
@@ -321,18 +320,6 @@ export default {
         this.currentConfigLayout.resolution = value;
         this.updateConfigLayout();
       },
-    },
-    statusText() {
-      if (this.isConnecting)
-        return this.$t("i18nCommon.remoteDesktop.statusConnecting");
-      if (this.isConnected)
-        return this.$t("i18nCommon.remoteDesktop.statusConnected");
-      return this.$t("i18nCommon.remoteDesktop.statusDisconnected");
-    },
-    statusClass() {
-      if (this.isConnecting) return "rdp-status-connecting";
-      if (this.isConnected) return "rdp-status-connected";
-      return "rdp-status-disconnected";
     },
     sidebarOptions() {
       let options = [];
@@ -901,13 +888,7 @@ export default {
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background: #0d1117;
-  color: #e0e0e0;
-  font-family:
-    "Segoe UI",
-    system-ui,
-    -apple-system,
-    sans-serif;
+  background: var(--bg-main-color);
   overflow: hidden;
 }
 
@@ -915,45 +896,9 @@ export default {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 14px;
-  background: #161b22;
-  border-bottom: 1px solid #30363d;
+  padding: var(--padding);
   flex-shrink: 0;
   flex-wrap: wrap;
-}
-
-.rdp-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #58a6ff;
-  white-space: nowrap;
-  margin-right: 6px;
-}
-
-.rdp-fields {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.rdp-input {
-  padding: 5px 10px;
-  border-radius: 6px;
-  border: 1px solid #30363d;
-  background: #0d1117;
-  color: #e0e0e0;
-  font-size: 13px;
-  width: 160px;
-  transition: border-color 0.2s;
-}
-
-.rdp-input:focus {
-  outline: none;
-  border-color: #58a6ff;
-}
-
-.rdp-input::placeholder {
-  color: #6e7681;
 }
 
 .rdp-actions {
@@ -961,109 +906,8 @@ export default {
   align-items: center;
   justify-content: center;
   width: 100%;
-  gap: 8px;
+  gap: var(--padding);
   flex-wrap: wrap;
-}
-
-.rdp-btn {
-  padding: 5px 14px;
-  border-radius: 6px;
-  border: none;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background 0.2s,
-    transform 0.1s;
-}
-
-.rdp-btn:active {
-  transform: scale(0.97);
-}
-
-.rdp-btn:disabled {
-  background: #30363d !important;
-  color: #6e7681 !important;
-  cursor: not-allowed;
-}
-
-.rdp-btn-connect {
-  background: #238636;
-  color: #fff;
-}
-
-.rdp-btn-connect:not(:disabled):hover {
-  background: #2ea043;
-}
-
-.rdp-btn-disconnect {
-  background: #da3633;
-  color: #fff;
-}
-
-.rdp-btn-disconnect:not(:disabled):hover {
-  background: #f85149;
-}
-
-.rdp-btn-fullscreen {
-  background: transparent;
-  color: #8b949e;
-  border: 1px solid #30363d;
-  font-size: 15px;
-  padding: 4px 9px;
-}
-
-.rdp-btn-fullscreen:hover {
-  background: #30363d;
-  color: #e0e0e0;
-}
-
-.rdp-btn-screenshot {
-  background: transparent;
-  color: #8b949e;
-  border: 1px solid #30363d;
-  font-size: 13px;
-  padding: 4px 12px;
-}
-
-.rdp-btn-cad {
-  background: transparent;
-  color: #8b949e;
-  border: 1px solid #30363d;
-  font-size: 13px;
-  padding: 4px 12px;
-}
-
-.rdp-btn-cad:not(:disabled):hover {
-  background: #30363d;
-  color: #e0e0e0;
-}
-.rdp-btn-screenshot:hover {
-  background: #30363d;
-  color: #e0e0e0;
-}
-
-.rdp-status {
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.rdp-status-disconnected {
-  background: #3d1a1a;
-  color: #f85149;
-}
-
-.rdp-status-connecting {
-  background: #3a3200;
-  color: #e3b341;
-}
-
-.rdp-status-connected {
-  background: #1a3a1a;
-  color: #3fb950;
 }
 
 .rdp-canvas-container {
@@ -1072,27 +916,25 @@ export default {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #000;
+  background: var(--bg-main-color);
 }
 
 .rdp-canvas {
   display: block;
-  background: #000;
   outline: none;
+  background: var(--bg-layer-color);
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
 }
 
 .rdp-log-panel {
-  background: #0d1117;
-  border-top: 1px solid #21262d;
+  background: var(--bg-layer-color);
+  border-radius: var(--border-radius);
   max-height: 140px;
   height: 140px;
   overflow-y: auto;
   padding: 6px 12px;
-  font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace;
-  font-size: 11px;
   line-height: 1.6;
   flex-shrink: 0;
 }
@@ -1103,24 +945,7 @@ export default {
 }
 
 .rdp-log-time {
-  color: #444d56;
-  margin-right: 6px;
-}
-
-.rdp-log-info {
-  color: #8b949e;
-}
-
-.rdp-log-success {
-  color: #3fb950;
-}
-
-.rdp-log-error {
-  color: #f85149;
-}
-
-.rdp-log-warn {
-  color: #e3b341;
+  margin-right: var(--padding);
 }
 
 .td-sub-sidebar {
