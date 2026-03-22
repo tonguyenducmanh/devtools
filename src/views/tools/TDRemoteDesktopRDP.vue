@@ -193,7 +193,7 @@
                 </div>
                 <div
                   class="td-icon td-close-icon"
-                  @click.stop="confirmDeleteConnection(conn)"
+                  @click.stop="deleteConnection(conn)"
                   v-tooltip="$t('i18nCommon.remoteDesktop.deleteConnection')"
                 ></div>
               </div>
@@ -237,7 +237,6 @@ import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDRemoteDesktopRDPHelp from "@/views/helps/TDRemoteDesktopRDPHelp.vue";
 import TDServerRDPAPI from "@/common/api/request/AgentAPI/TDServerRDPAPI.js";
-import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 
 export default {
   name: "TDRemoteDesktop",
@@ -465,21 +464,9 @@ export default {
       }
     },
 
-    confirmDeleteConnection(conn) {
+    async deleteConnection(conn) {
       let me = this;
-      TDDialogUtil.showConfirm({
-        title: me.$t("i18nCommon.remoteDesktop.deleteConnection"),
-        message: `${me.$t("i18nCommon.remoteDesktop.deleteConnection")} "${conn.connection_name}"?`,
-        onConfirm: async () => {
-          await me.deleteConnectionById(conn.id);
-        },
-      });
-    },
-
-    async deleteConnection() {
-      let me = this;
-      if (!me.currentConnectionId) return;
-      await me.deleteConnectionById(me.currentConnectionId);
+      await me.deleteConnectionById(conn.id);
     },
 
     async deleteConnectionById(id) {
