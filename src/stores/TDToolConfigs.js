@@ -196,6 +196,20 @@ const sidebarConfig = [
     component: () => import("@/views/tools/TDHTMLPreview.vue"),
     meta: { titleKey: "i18nCommon.feature.HTMLPreview" },
   },
+  {
+    type: "group",
+    groupKey: "remotedesktop",
+    groupTitleKey: "i18nCommon.group.RemoteDesktop",
+    children: [
+      {
+        name: "TDRemoteDesktop",
+        component: () => import("@/views/tools/TDRemoteDesktop.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.remoteDesktop",
+        },
+      },
+    ],
+  },
 ];
 
 /**
