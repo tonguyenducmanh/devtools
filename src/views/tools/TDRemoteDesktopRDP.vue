@@ -46,6 +46,13 @@
             <button class="rdp-btn rdp-btn-screenshot" @click="takeScreenshot">
               {{ $t("i18nCommon.remoteDesktop.screenshot") }}
             </button>
+            <button
+              class="rdp-btn rdp-btn-cad"
+              :disabled="!isConnected"
+              @click="sendCtrlAltDel"
+            >
+              Ctrl + Alt + Del
+            </button>
             <span class="rdp-status" :class="statusClass">{{
               statusText
             }}</span>
@@ -623,6 +630,24 @@ export default {
       );
     },
 
+    sendCtrlAltDel() {
+      if (!this.session) return;
+      try {
+        const { DeviceEvent, InputTransaction } = this._wasm;
+        const tx = new InputTransaction();
+        tx.addEvent(DeviceEvent.keyPressed(0x1d)); // ControlLeft
+        tx.addEvent(DeviceEvent.keyPressed(0x38)); // AltLeft
+        tx.addEvent(DeviceEvent.keyPressed(0xe053)); // Delete
+        tx.addEvent(DeviceEvent.keyReleased(0xe053));
+        tx.addEvent(DeviceEvent.keyReleased(0x38));
+        tx.addEvent(DeviceEvent.keyReleased(0x1d));
+        this.session.applyInputs(tx);
+        this.addLog("Sent Ctrl + Alt + Del", "info");
+      } catch (e) {
+        this.addLog("Failed to send Ctrl+Alt+Del: " + this.formatError(e), "error");
+      }
+    },
+
     formatError(e) {
       if (e && typeof e === "object" && "__wbg_ptr" in e) {
         try {
@@ -998,6 +1023,18 @@ export default {
   padding: 4px 12px;
 }
 
+.rdp-btn-cad {
+  background: transparent;
+  color: #8b949e;
+  border: 1px solid #30363d;
+  font-size: 13px;
+  padding: 4px 12px;
+}
+
+.rdp-btn-cad:not(:disabled):hover {
+  background: #30363d;
+  color: #e0e0e0;
+}
 .rdp-btn-screenshot:hover {
   background: #30363d;
   color: #e0e0e0;
