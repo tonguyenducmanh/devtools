@@ -2,6 +2,24 @@
   <div class="flex container">
     <div class="main-tool">
       <div class="rdp-container">
+        <!-- Canvas area -->
+        <div ref="canvasContainer" class="rdp-canvas-container">
+          <canvas
+            ref="rdpCanvas"
+            class="rdp-canvas"
+            :width="canvasWidth"
+            :height="canvasHeight"
+            tabindex="0"
+            @keydown="onCanvasKeydown"
+            @keyup="onCanvasKeyup"
+            @mousemove="onCanvasMousemove"
+            @mousedown="onCanvasMousedown"
+            @mouseup="onCanvasMouseup"
+            @wheel.prevent="onCanvasWheel"
+            @contextmenu.prevent="onCanvasContextmenu"
+          />
+        </div>
+
         <!-- Toolbar -->
         <div class="rdp-toolbar">
           <div class="rdp-actions">
@@ -25,34 +43,13 @@
             >
               {{ $t("i18nCommon.remoteDesktop.fullscreen") }}
             </button>
-            <button
-              class="rdp-btn rdp-btn-screenshot"
-              @click="takeScreenshot"
-            >
+            <button class="rdp-btn rdp-btn-screenshot" @click="takeScreenshot">
               {{ $t("i18nCommon.remoteDesktop.screenshot") }}
             </button>
             <span class="rdp-status" :class="statusClass">{{
               statusText
             }}</span>
           </div>
-        </div>
-
-        <!-- Canvas area -->
-        <div ref="canvasContainer" class="rdp-canvas-container">
-          <canvas
-            ref="rdpCanvas"
-            class="rdp-canvas"
-            :width="canvasWidth"
-            :height="canvasHeight"
-            tabindex="0"
-            @keydown="onCanvasKeydown"
-            @keyup="onCanvasKeyup"
-            @mousemove="onCanvasMousemove"
-            @mousedown="onCanvasMousedown"
-            @mouseup="onCanvasMouseup"
-            @wheel.prevent="onCanvasWheel"
-            @contextmenu.prevent="onCanvasContextmenu"
-          />
         </div>
 
         <!-- Log panel -->
@@ -224,7 +221,8 @@
             :options="resolutionOptions"
             :noMargin="true"
             :isEditable="false"
-            width="100%"
+            :width="100"
+            :usingStylePercent="true"
           ></TDComboBox>
         </div>
       </template>
@@ -626,7 +624,10 @@ export default {
       link.download = `rdp-screenshot-${Date.now()}.png`;
       link.href = dataUrl;
       link.click();
-      this.addLog(this.$t("i18nCommon.remoteDesktop.screenshotSaved"), "success");
+      this.addLog(
+        this.$t("i18nCommon.remoteDesktop.screenshotSaved"),
+        "success",
+      );
     },
 
     formatError(e) {
@@ -937,8 +938,9 @@ export default {
 .rdp-actions {
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 100%;
   gap: 8px;
-  margin-left: auto;
   flex-wrap: wrap;
 }
 
@@ -1053,6 +1055,7 @@ export default {
   background: #0d1117;
   border-top: 1px solid #21262d;
   max-height: 140px;
+  height: 140px;
   overflow-y: auto;
   padding: 6px 12px;
   font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace;
