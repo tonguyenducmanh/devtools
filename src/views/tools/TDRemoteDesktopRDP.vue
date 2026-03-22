@@ -530,6 +530,28 @@ export default {
           canvas.style.cursor = style || "default";
         });
 
+        builder.remoteClipboardChangedCallback((clipboardData) => {
+          try {
+            const items = clipboardData.items();
+            for (const item of items) {
+              if (
+                item.mimeType() === "text/plain" ||
+                item.mimeType().includes("text")
+              ) {
+                const text = item.value();
+                if (text) {
+                  navigator.clipboard.writeText(text).catch((err) => {
+                    this.addLog("Failed to write to local clipboard: " + err, "error");
+                  });
+                }
+                break;
+              }
+            }
+          } catch (e) {
+            this.addLog("Error handling remote clipboard change: " + e, "error");
+          }
+        });
+
         this.session = await builder.connect();
         const ds = this.session.desktopSize();
         this.canvasWidth = ds.width;
@@ -666,9 +688,40 @@ export default {
       if (!this.session) return;
       const scancode = this.getScancode(e.code);
       if (scancode === null) return;
+
+      // Intercept Ctrl+V or Cmd+V to sync clipboard before sending the keystroke
+      if ((e.ctrlKey || e.metaKey) && e.code === "KeyV") {
+        this.syncClipboardToRemoteAndPaste(scancode);
+        return;
+      }
+
       try {
         const { DeviceEvent, InputTransaction } = this._wasm;
         const event = DeviceEvent.keyPressed(scancode);
+        const tx = new InputTransaction();
+        tx.addEvent(event);
+        this.session.applyInputs(tx);
+      } catch (_) {}
+    },
+
+    async syncClipboardToRemoteAndPaste(vScancode) {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          const { ClipboardData } = this._wasm;
+          const content = new ClipboardData();
+          content.addText("text/plain", text);
+          await this.session.onClipboardPaste(content);
+        }
+      } catch (err) {
+        this.addLog("Could not read local clipboard: " + err, "warn");
+      }
+
+      // After syncing, send the V keydown to remote
+      if (!this.session) return;
+      try {
+        const { DeviceEvent, InputTransaction } = this._wasm;
+        const event = DeviceEvent.keyPressed(vScancode);
         const tx = new InputTransaction();
         tx.addEvent(event);
         this.session.applyInputs(tx);
