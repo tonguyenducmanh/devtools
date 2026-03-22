@@ -1,0 +1,623 @@
+<template>
+  <div class="rdp-container">
+    <!-- Toolbar -->
+    <div class="rdp-toolbar">
+      <span class="rdp-title">{{ $t("i18nCommon.remoteDesktop.title") }}</span>
+
+      <div class="rdp-fields">
+        <input
+          ref="hostInput"
+          v-model="host"
+          class="rdp-input"
+          type="text"
+          :placeholder="$t('i18nCommon.remoteDesktop.hostPlaceholder')"
+          @keydown.enter="handleConnect"
+        />
+        <input
+          ref="usernameInput"
+          v-model="username"
+          class="rdp-input"
+          type="text"
+          :placeholder="$t('i18nCommon.remoteDesktop.usernamePlaceholder')"
+          @keydown.enter="handleConnect"
+        />
+        <input
+          ref="passwordInput"
+          v-model="password"
+          class="rdp-input"
+          type="password"
+          :placeholder="$t('i18nCommon.remoteDesktop.passwordPlaceholder')"
+          @keydown.enter="handleConnect"
+        />
+      </div>
+
+      <div class="rdp-actions">
+        <button
+          class="rdp-btn rdp-btn-connect"
+          :disabled="isConnected || isConnecting"
+          @click="handleConnect"
+        >
+          {{ $t("i18nCommon.remoteDesktop.connect") }}
+        </button>
+        <button
+          class="rdp-btn rdp-btn-disconnect"
+          :disabled="!isConnected"
+          @click="handleDisconnect"
+        >
+          {{ $t("i18nCommon.remoteDesktop.disconnect") }}
+        </button>
+        <button class="rdp-btn rdp-btn-fullscreen" @click="toggleFullscreen">⛶</button>
+        <span class="rdp-status" :class="statusClass">{{ statusText }}</span>
+      </div>
+    </div>
+
+    <!-- Canvas area -->
+    <div ref="canvasContainer" class="rdp-canvas-container">
+      <canvas
+        ref="rdpCanvas"
+        class="rdp-canvas"
+        :width="canvasWidth"
+        :height="canvasHeight"
+        tabindex="0"
+        @keydown="onCanvasKeydown"
+        @keyup="onCanvasKeyup"
+        @mousemove="onCanvasMousemove"
+        @mousedown="onCanvasMousedown"
+        @mouseup="onCanvasMouseup"
+        @wheel.prevent="onCanvasWheel"
+        @contextmenu.prevent="onCanvasContextmenu"
+      />
+    </div>
+
+    <!-- Log panel -->
+    <div ref="logPanel" class="rdp-log-panel">
+      <div
+        v-for="(entry, idx) in logEntries"
+        :key="idx"
+        class="rdp-log-entry"
+        :class="`rdp-log-${entry.type}`"
+      >
+        <span class="rdp-log-time">{{ entry.time }}</span>{{ entry.message }}
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+
+export default {
+  name: "TDRemoteDesktop",
+  extends: TDToolBase,
+
+  data() {
+    return {
+      host: "",
+      username: "",
+      password: "",
+      isConnected: false,
+      isConnecting: false,
+      session: null,
+      wasmInitialized: false,
+      canvasWidth: 1280,
+      canvasHeight: 720,
+      logEntries: [],
+    };
+  },
+
+  computed: {
+    statusText() {
+      if (this.isConnecting) return this.$t("i18nCommon.remoteDesktop.statusConnecting");
+      if (this.isConnected) return this.$t("i18nCommon.remoteDesktop.statusConnected");
+      return this.$t("i18nCommon.remoteDesktop.statusDisconnected");
+    },
+    statusClass() {
+      if (this.isConnecting) return "rdp-status-connecting";
+      if (this.isConnected) return "rdp-status-connected";
+      return "rdp-status-disconnected";
+    },
+  },
+
+  mounted() {
+    this.setupInputHandlers();
+    this.addLog(this.$t("i18nCommon.remoteDesktop.ready"), "info");
+  },
+
+  beforeUnmount() {
+    this.handleDisconnect();
+  },
+
+  methods: {
+    // ── Logging ──────────────────────────────────────────────────────────────
+    addLog(message, type = "info") {
+      const time = new Date().toLocaleTimeString("en-US", { hour12: false });
+      this.logEntries.push({ time, message, type });
+      // Giới hạn 200 dòng log
+      if (this.logEntries.length > 200) {
+        this.logEntries.splice(0, this.logEntries.length - 200);
+      }
+      this.$nextTick(() => {
+        const panel = this.$refs.logPanel;
+        if (panel) panel.scrollTop = panel.scrollHeight;
+      });
+    },
+
+    // ── Kết nối RDP ──────────────────────────────────────────────────────────
+    async handleConnect() {
+      if (this.isConnected || this.isConnecting) return;
+      const destination = this.host.trim();
+      const username = this.username.trim();
+      const password = this.password;
+
+      if (!destination || !username) {
+        this.addLog(this.$t("i18nCommon.remoteDesktop.validationError"), "error");
+        return;
+      }
+
+      this.isConnecting = true;
+      try {
+        // Tự động build wasm file cùng web app nhờ Vite (Vite xử lý new URL(..., import.meta.url) bên trong)
+        if (!this.wasmInitialized) {
+          this.addLog(this.$t("i18nCommon.remoteDesktop.loadingWasm"), "info");
+          // Import dynamic để Vite tự parse và bundle rdp_client.js cùng file .wasm vào /assets/
+          const wasmModule = await import("@wasm/pkg/rdp_client.js");
+          await wasmModule.default();
+          wasmModule.setup("info");
+          this.wasmInitialized = true;
+          // Lưu các class vào instance để dùng lại
+          this._wasm = wasmModule;
+          this.addLog(this.$t("i18nCommon.remoteDesktop.wasmReady"), "success");
+        }
+
+        const { SessionBuilder, DesktopSize, Extension } = this._wasm;
+        const canvas = this.$refs.rdpCanvas;
+
+        // Lấy thông tin Agent server từ Setting
+        const agentUrl = window.__tdInfo?.agentURL || "http://localhost:7777";
+        // Convert proxy address: thay http(s) thành ws(s) và chèn thêm endpoint /rdp/ws
+        const proxyAddress = agentUrl.replace(/^http/, "ws").replace(/\/$/, "") + "/rdp/ws";
+
+        this.addLog(`${this.$t("i18nCommon.remoteDesktop.connecting")} ${destination}`, "info");
+
+        const desktopSize = new DesktopSize(this.canvasWidth, this.canvasHeight);
+        const enableCredsspExt = new Extension("enable_credssp", true);
+
+        const builder = new SessionBuilder();
+        builder.username(username);
+        builder.password(password);
+        builder.destination(destination);
+        builder.proxyAddress(proxyAddress);
+        builder.authToken("none");
+        builder.desktopSize(desktopSize);
+        builder.renderCanvas(canvas);
+        builder.extension(enableCredsspExt);
+
+        builder.setCursorStyleCallbackContext(canvas);
+        builder.setCursorStyleCallback((style) => {
+          canvas.style.cursor = style || "default";
+        });
+
+        this.session = await builder.connect();
+        const ds = this.session.desktopSize();
+        this.canvasWidth = ds.width;
+        this.canvasHeight = ds.height;
+        this.isConnected = true;
+        this.isConnecting = false;
+
+        this.addLog(
+          `${this.$t("i18nCommon.remoteDesktop.connected")} ${ds.width}x${ds.height}`,
+          "success"
+        );
+
+        canvas.focus();
+
+        // Chạy session event loop
+        this.session
+          .run()
+          .then((info) => {
+            this.addLog(
+              `${this.$t("i18nCommon.remoteDesktop.sessionEnded")}: ${info.reason()}`,
+              "warn"
+            );
+            this.cleanup();
+          })
+          .catch((e) => {
+            this.addLog(
+              `${this.$t("i18nCommon.remoteDesktop.sessionError")}: ${this.formatError(e)}`,
+              "error"
+            );
+            this.cleanup();
+          });
+      } catch (e) {
+        this.addLog(
+          `${this.$t("i18nCommon.remoteDesktop.connectionFailed")}: ${this.formatError(e)}`,
+          "error"
+        );
+        this.cleanup();
+      }
+    },
+
+    handleDisconnect() {
+      if (this.session) {
+        try {
+          this.session.shutdown();
+          this.addLog(this.$t("i18nCommon.remoteDesktop.disconnectedByUser"), "warn");
+        } catch (e) {
+          this.addLog(`${this.$t("i18nCommon.remoteDesktop.disconnectError")}: ${this.formatError(e)}`, "error");
+        }
+      }
+      this.cleanup();
+    },
+
+    cleanup() {
+      this.session = null;
+      this.isConnected = false;
+      this.isConnecting = false;
+    },
+
+    toggleFullscreen() {
+      const container = this.$refs.canvasContainer;
+      if (!container) return;
+      if (!document.fullscreenElement) {
+        container.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    },
+
+    formatError(e) {
+      if (e && typeof e === "object" && "__wbg_ptr" in e) {
+        try {
+          const kindNames = {
+            0: "General",
+            1: "WrongPassword",
+            2: "LogonFailure",
+            3: "AccessDenied",
+            4: "RDCleanPath",
+            5: "ProxyConnect",
+            6: "NegotiationFailure",
+          };
+          const kind = e.kind ? e.kind() : "Unknown";
+          const bt = e.backtrace ? e.backtrace() : "";
+          return `[${kindNames[kind] || kind}] ${bt}`;
+        } catch (_) {}
+      }
+      return e?.message || e?.toString() || String(e);
+    },
+
+    // ── Input handlers (Vue-style, gắn lên canvas ref) ───────────────────────
+    setupInputHandlers() {
+      // Handlers được gắn trực tiếp trong template qua @event binding.
+      // Không cần addEventListener thủ công — đây là cách Vue.
+    },
+
+    // ── Keyboard ─────────────────────────────────────────────────────────────
+    onCanvasKeydown(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!this.session) return;
+      const scancode = this.getScancode(e.code);
+      if (scancode === null) return;
+      try {
+        const { DeviceEvent, InputTransaction } = this._wasm;
+        const event = DeviceEvent.keyPressed(scancode);
+        const tx = new InputTransaction();
+        tx.addEvent(event);
+        this.session.applyInputs(tx);
+      } catch (_) {}
+    },
+
+    onCanvasKeyup(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!this.session) return;
+      const scancode = this.getScancode(e.code);
+      if (scancode === null) return;
+      try {
+        const { DeviceEvent, InputTransaction } = this._wasm;
+        const event = DeviceEvent.keyReleased(scancode);
+        const tx = new InputTransaction();
+        tx.addEvent(event);
+        this.session.applyInputs(tx);
+      } catch (_) {}
+    },
+
+    // ── Mouse ─────────────────────────────────────────────────────────────────
+    onCanvasMousemove(e) {
+      if (!this.session) return;
+      try {
+        const canvas = this.$refs.rdpCanvas;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = Math.round((e.clientX - rect.left) * scaleX);
+        const y = Math.round((e.clientY - rect.top) * scaleY);
+        const { DeviceEvent, InputTransaction } = this._wasm;
+        const event = DeviceEvent.mouseMove(x, y);
+        const tx = new InputTransaction();
+        tx.addEvent(event);
+        this.session.applyInputs(tx);
+      } catch (_) {}
+    },
+
+    onCanvasMousedown(e) {
+      e.preventDefault();
+      this.$refs.rdpCanvas?.focus();
+      if (!this.session) return;
+      try {
+        const { DeviceEvent, InputTransaction } = this._wasm;
+        const event = DeviceEvent.mouseButtonPressed(e.button);
+        const tx = new InputTransaction();
+        tx.addEvent(event);
+        this.session.applyInputs(tx);
+      } catch (_) {}
+    },
+
+    onCanvasMouseup(e) {
+      e.preventDefault();
+      if (!this.session) return;
+      try {
+        const { DeviceEvent, InputTransaction } = this._wasm;
+        const event = DeviceEvent.mouseButtonReleased(e.button);
+        const tx = new InputTransaction();
+        tx.addEvent(event);
+        this.session.applyInputs(tx);
+      } catch (_) {}
+    },
+
+    onCanvasWheel(e) {
+      e.preventDefault();
+      if (!this.session) return;
+      try {
+        const { DeviceEvent, InputTransaction } = this._wasm;
+        if (e.deltaY !== 0) {
+          const amount = e.deltaY > 0 ? -1 : 1;
+          const event = DeviceEvent.wheelRotations(true, amount, 1);
+          const tx = new InputTransaction();
+          tx.addEvent(event);
+          this.session.applyInputs(tx);
+        }
+        if (e.deltaX !== 0) {
+          const amount = e.deltaX > 0 ? -1 : 1;
+          const event = DeviceEvent.wheelRotations(false, amount, 1);
+          const tx = new InputTransaction();
+          tx.addEvent(event);
+          this.session.applyInputs(tx);
+        }
+      } catch (_) {}
+    },
+
+    onCanvasContextmenu(e) {
+      e.preventDefault();
+    },
+
+    // ── Scancode map ─────────────────────────────────────────────────────────
+    getScancode(code) {
+      const SCANCODE_MAP = {
+        Escape: 0x01, Digit1: 0x02, Digit2: 0x03, Digit3: 0x04,
+        Digit4: 0x05, Digit5: 0x06, Digit6: 0x07, Digit7: 0x08,
+        Digit8: 0x09, Digit9: 0x0a, Digit0: 0x0b, Minus: 0x0c,
+        Equal: 0x0d, Backspace: 0x0e, Tab: 0x0f,
+        KeyQ: 0x10, KeyW: 0x11, KeyE: 0x12, KeyR: 0x13,
+        KeyT: 0x14, KeyY: 0x15, KeyU: 0x16, KeyI: 0x17,
+        KeyO: 0x18, KeyP: 0x19, BracketLeft: 0x1a, BracketRight: 0x1b,
+        Enter: 0x1c, ControlLeft: 0x1d,
+        KeyA: 0x1e, KeyS: 0x1f, KeyD: 0x20, KeyF: 0x21,
+        KeyG: 0x22, KeyH: 0x23, KeyJ: 0x24, KeyK: 0x25,
+        KeyL: 0x26, Semicolon: 0x27, Quote: 0x28, Backquote: 0x29,
+        ShiftLeft: 0x2a, Backslash: 0x2b,
+        KeyZ: 0x2c, KeyX: 0x2d, KeyC: 0x2e, KeyV: 0x2f,
+        KeyB: 0x30, KeyN: 0x31, KeyM: 0x32, Comma: 0x33,
+        Period: 0x34, Slash: 0x35, ShiftRight: 0x36,
+        NumpadMultiply: 0x37, AltLeft: 0x38, Space: 0x39, CapsLock: 0x3a,
+        F1: 0x3b, F2: 0x3c, F3: 0x3d, F4: 0x3e,
+        F5: 0x3f, F6: 0x40, F7: 0x41, F8: 0x42,
+        F9: 0x43, F10: 0x44, NumLock: 0x45, ScrollLock: 0x46,
+        Numpad7: 0x47, Numpad8: 0x48, Numpad9: 0x49,
+        NumpadSubtract: 0x4a, Numpad4: 0x4b, Numpad5: 0x4c,
+        Numpad6: 0x4d, NumpadAdd: 0x4e, Numpad1: 0x4f,
+        Numpad2: 0x50, Numpad3: 0x51, Numpad0: 0x52,
+        NumpadDecimal: 0x53, F11: 0x57, F12: 0x58,
+        NumpadEnter: 0xe01c, ControlRight: 0xe01d,
+        NumpadDivide: 0xe035, PrintScreen: 0xe037,
+        AltRight: 0xe038, Home: 0xe047, ArrowUp: 0xe048,
+        PageUp: 0xe049, ArrowLeft: 0xe04b, ArrowRight: 0xe04d,
+        End: 0xe04f, ArrowDown: 0xe050, PageDown: 0xe051,
+        Insert: 0xe052, Delete: 0xe053,
+        MetaLeft: 0xe05b, MetaRight: 0xe05c, ContextMenu: 0xe05d,
+        Pause: 0xe11d45,
+      };
+      return SCANCODE_MAP[code] ?? null;
+    },
+  },
+};
+</script>
+
+<style scoped>
+/* ── Layout ──────────────────────────────────────────────────────────────────── */
+.rdp-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: #0d1117;
+  color: #e0e0e0;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────────────── */
+.rdp-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.rdp-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #58a6ff;
+  white-space: nowrap;
+  margin-right: 6px;
+}
+
+.rdp-fields {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rdp-input {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+  background: #0d1117;
+  color: #e0e0e0;
+  font-size: 13px;
+  width: 160px;
+  transition: border-color 0.2s;
+}
+.rdp-input:focus {
+  outline: none;
+  border-color: #58a6ff;
+}
+.rdp-input::placeholder {
+  color: #6e7681;
+}
+
+.rdp-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────────── */
+.rdp-btn {
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.rdp-btn:active {
+  transform: scale(0.97);
+}
+.rdp-btn:disabled {
+  background: #30363d !important;
+  color: #6e7681 !important;
+  cursor: not-allowed;
+}
+
+.rdp-btn-connect {
+  background: #238636;
+  color: #fff;
+}
+.rdp-btn-connect:not(:disabled):hover {
+  background: #2ea043;
+}
+
+.rdp-btn-disconnect {
+  background: #da3633;
+  color: #fff;
+}
+.rdp-btn-disconnect:not(:disabled):hover {
+  background: #f85149;
+}
+
+.rdp-btn-fullscreen {
+  background: transparent;
+  color: #8b949e;
+  border: 1px solid #30363d;
+  font-size: 15px;
+  padding: 4px 9px;
+}
+.rdp-btn-fullscreen:hover {
+  background: #30363d;
+  color: #e0e0e0;
+}
+
+/* ── Status badge ────────────────────────────────────────────────────────────── */
+.rdp-status {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rdp-status-disconnected {
+  background: #3d1a1a;
+  color: #f85149;
+}
+.rdp-status-connecting {
+  background: #3a3200;
+  color: #e3b341;
+}
+.rdp-status-connected {
+  background: #1a3a1a;
+  color: #3fb950;
+}
+
+/* ── Canvas container ────────────────────────────────────────────────────────── */
+.rdp-canvas-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #000;
+}
+
+.rdp-canvas {
+  display: block;
+  background: #000;
+  outline: none;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* ── Log panel ───────────────────────────────────────────────────────────────── */
+.rdp-log-panel {
+  background: #0d1117;
+  border-top: 1px solid #21262d;
+  max-height: 140px;
+  overflow-y: auto;
+  padding: 6px 12px;
+  font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  flex-shrink: 0;
+}
+
+.rdp-log-entry {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.rdp-log-time {
+  color: #444d56;
+  margin-right: 6px;
+}
+
+.rdp-log-info {
+  color: #8b949e;
+}
+.rdp-log-success {
+  color: #3fb950;
+}
+.rdp-log-error {
+  color: #f85149;
+}
+.rdp-log-warn {
+  color: #e3b341;
+}
+</style>

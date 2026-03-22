@@ -7,6 +7,7 @@ ROOT_DIR=$(pwd)
 # 1. Cấu hình đường dẫn
 WEB_APP_DIR="$ROOT_DIR/src_backend/td_core_service/internal/web/dist/"
 FRONTEND_DIST="$ROOT_DIR/dist"
+WASM_SRC="$ROOT_DIR/src_wasm/pkg"
 OUTPUT_DIR="$ROOT_DIR/out"
 
 # Đảm bảo thư mục output tồn tại

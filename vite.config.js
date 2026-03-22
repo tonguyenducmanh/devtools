@@ -9,6 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "@wasm": fileURLToPath(new URL("./src_wasm", import.meta.url)),
     },
   },
   css: {
@@ -18,4 +19,7 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    exclude: ['rdp_client']
+  }
 });
