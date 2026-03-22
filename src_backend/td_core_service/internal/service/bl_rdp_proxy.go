@@ -1,4 +1,4 @@
-package rdp
+package service
 
 import (
 	"crypto/tls"
