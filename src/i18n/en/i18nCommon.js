@@ -558,6 +558,7 @@ export default {
       validationError: "Please enter host and username",
       ready: "IronRDP Web Client ready. Enter credentials and click Connect.",
       autoReconnect: "Auto reconnect",
+      showLog: "Show log",
       connectionName: "Connection name",
       connectionNamePlaceholder: "Enter connection name",
       port: "Port",

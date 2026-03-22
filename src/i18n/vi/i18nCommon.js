@@ -555,6 +555,7 @@ export default {
       validationError: "Vui lòng nhập host và tên người dùng",
       ready: "IronRDP Web Client sẵn sàng. Nhập thông tin và bấm Kết nối.",
       autoReconnect: "Kết nối lại tự động",
+      showLog: "Hiển thị log",
       connectionName: "Tên kết nối",
       connectionNamePlaceholder: "Nhập tên kết nối",
       port: "Cổng",

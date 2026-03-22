@@ -50,7 +50,11 @@
         </div>
 
         <!-- Log panel -->
-        <div ref="logPanel" class="rdp-log-panel">
+        <div
+          v-if="currentConfigLayout.showLog"
+          ref="logPanel"
+          class="rdp-log-panel"
+        >
           <div
             v-for="(entry, idx) in logEntries"
             :key="idx"
@@ -203,6 +207,12 @@
             :label="$t('i18nCommon.remoteDesktop.autoReconnect')"
             @change="updateConfigLayout"
           ></TDCheckbox>
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="currentConfigLayout.showLog"
+            :label="$t('i18nCommon.remoteDesktop.showLog')"
+            @change="updateConfigLayout"
+          ></TDCheckbox>
           <TDComboBox
             v-model="selectedResolution"
             :options="resolutionOptions"
@@ -235,6 +245,7 @@ export default {
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.RemoteDesktopSidebarOption.Help,
         autoReconnect: false,
+        showLog: false,
         resolution: "1280x720",
       },
       host: "",
