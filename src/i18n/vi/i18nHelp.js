@@ -387,5 +387,31 @@ export default {
         options: "Nhiều tùy chọn: PascalCase, nullable, JsonProperty, record type...",
       },
     },
+    remoteDesktop: {
+      purpose: {
+        title: "Máy tính từ xa RDP là gì?",
+        content: "Công cụ kết nối máy tính từ xa qua giao thức RDP (Remote Desktop Protocol). Sử dụng IronRDP WebAssembly để kết nối trực tiếp từ trình duyệt.",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        inputHost: "Nhập địa chỉ host và port của máy muốn kết nối (vd: 192.168.1.1:3389).",
+        inputCredentials: "Nhập tên người dùng và mật khẩu để xác thực.",
+        connect: "Nhấn nút Kết nối để bắt đầu phiên làm việc từ xa.",
+        fullscreen: "Nhấn nút fullscreen để phóng to màn hình, nhấn ESC để thoát.",
+      },
+      features: {
+        title: "Tính năng",
+        keyboard: "Hỗ trợ điều khiển bàn phím đầy đủ.",
+        mouse: "Hỗ trợ chuột với click, scroll và di chuyển.",
+        clipboard: "Hỗ trợ clipboard để copy/paste text.",
+        agent: "Cần chạy Agent app để kết nối qua proxy.",
+      },
+      troubleshooting: {
+        title: "Xử lý sự cố",
+        connection: "Kiểm tra địa chỉ host và port đã đúng chưa.",
+        credentials: "Kiểm tra tên đăng nhập và mật khẩu.",
+        agent: "Đảm bảo Agent app đang chạy và kết nối được.",
+      },
+    },
   },
 };

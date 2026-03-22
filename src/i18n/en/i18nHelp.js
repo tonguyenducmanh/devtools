@@ -386,5 +386,31 @@ export default {
         options: "Many options: PascalCase, nullable, JsonProperty, record type...",
       },
     },
+    remoteDesktop: {
+      purpose: {
+        title: "What is Remote Desktop RDP?",
+        content: "A tool to connect to remote computers via RDP (Remote Desktop Protocol). Uses IronRDP WebAssembly to connect directly from the browser.",
+      },
+      howToUse: {
+        title: "How to Use",
+        inputHost: "Enter the host address and port of the computer to connect to (e.g. 192.168.1.1:3389).",
+        inputCredentials: "Enter username and password for authentication.",
+        connect: "Click Connect button to start the remote session.",
+        fullscreen: "Click fullscreen button to enlarge the display, press ESC to exit.",
+      },
+      features: {
+        title: "Features",
+        keyboard: "Full keyboard control support.",
+        mouse: "Mouse support with click, scroll and movement.",
+        clipboard: "Clipboard support for copy/paste text.",
+        agent: "Requires running Agent app to connect via proxy.",
+      },
+      troubleshooting: {
+        title: "Troubleshooting",
+        connection: "Check if the host address and port are correct.",
+        credentials: "Verify the username and password.",
+        agent: "Make sure the Agent app is running and connected.",
+      },
+    },
   },
 };

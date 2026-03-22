@@ -31,4 +31,5 @@ export const EnumCacheConfig = {
   OneTimePasswordConfigLayout: 37,
   OpticalCharacterRecognitionConfigLayout: 38,
   WelcomeLayout: 39,
+  RemoteDesktopConfigLayout: 40,
 };

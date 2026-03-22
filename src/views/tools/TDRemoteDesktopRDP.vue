@@ -1,97 +1,145 @@
 <template>
-  <div class="rdp-container">
-    <!-- Toolbar -->
-    <div class="rdp-toolbar">
-      <span class="rdp-title">{{ $t("i18nCommon.remoteDesktop.title") }}</span>
+  <div class="flex container">
+    <div class="main-tool">
+      <div class="rdp-container">
+        <!-- Toolbar -->
+        <div class="rdp-toolbar">
+          <span class="rdp-title">{{ $t("i18nCommon.remoteDesktop.title") }}</span>
 
-      <div class="rdp-fields">
-        <input
-          ref="hostInput"
-          v-model="host"
-          class="rdp-input"
-          type="text"
-          :placeholder="$t('i18nCommon.remoteDesktop.hostPlaceholder')"
-          @keydown.enter="handleConnect"
-        />
-        <input
-          ref="usernameInput"
-          v-model="username"
-          class="rdp-input"
-          type="text"
-          :placeholder="$t('i18nCommon.remoteDesktop.usernamePlaceholder')"
-          @keydown.enter="handleConnect"
-        />
-        <input
-          ref="passwordInput"
-          v-model="password"
-          class="rdp-input"
-          type="password"
-          :placeholder="$t('i18nCommon.remoteDesktop.passwordPlaceholder')"
-          @keydown.enter="handleConnect"
-        />
+          <div class="rdp-fields">
+            <input
+              ref="hostInput"
+              v-model="host"
+              class="rdp-input"
+              type="text"
+              :placeholder="$t('i18nCommon.remoteDesktop.hostPlaceholder')"
+              @keydown.enter="handleConnect"
+            />
+            <input
+              ref="usernameInput"
+              v-model="username"
+              class="rdp-input"
+              type="text"
+              :placeholder="$t('i18nCommon.remoteDesktop.usernamePlaceholder')"
+              @keydown.enter="handleConnect"
+            />
+            <input
+              ref="passwordInput"
+              v-model="password"
+              class="rdp-input"
+              type="password"
+              :placeholder="$t('i18nCommon.remoteDesktop.passwordPlaceholder')"
+              @keydown.enter="handleConnect"
+            />
+          </div>
+
+          <div class="rdp-actions">
+            <button
+              class="rdp-btn rdp-btn-connect"
+              :disabled="isConnected || isConnecting"
+              @click="handleConnect"
+            >
+              {{ $t("i18nCommon.remoteDesktop.connect") }}
+            </button>
+            <button
+              class="rdp-btn rdp-btn-disconnect"
+              :disabled="!isConnected"
+              @click="handleDisconnect"
+            >
+              {{ $t("i18nCommon.remoteDesktop.disconnect") }}
+            </button>
+            <button class="rdp-btn rdp-btn-fullscreen" @click="toggleFullscreen">⛶</button>
+            <span class="rdp-status" :class="statusClass">{{ statusText }}</span>
+          </div>
+        </div>
+
+        <!-- Canvas area -->
+        <div ref="canvasContainer" class="rdp-canvas-container">
+          <canvas
+            ref="rdpCanvas"
+            class="rdp-canvas"
+            :width="canvasWidth"
+            :height="canvasHeight"
+            tabindex="0"
+            @keydown="onCanvasKeydown"
+            @keyup="onCanvasKeyup"
+            @mousemove="onCanvasMousemove"
+            @mousedown="onCanvasMousedown"
+            @mouseup="onCanvasMouseup"
+            @wheel.prevent="onCanvasWheel"
+            @contextmenu.prevent="onCanvasContextmenu"
+          />
+        </div>
+
+        <!-- Log panel -->
+        <div ref="logPanel" class="rdp-log-panel">
+          <div
+            v-for="(entry, idx) in logEntries"
+            :key="idx"
+            class="rdp-log-entry"
+            :class="`rdp-log-${entry.type}`"
+          >
+            <span class="rdp-log-time">{{ entry.time }}</span>{{ entry.message }}
+          </div>
+        </div>
       </div>
-
-      <div class="rdp-actions">
-        <button
-          class="rdp-btn rdp-btn-connect"
-          :disabled="isConnected || isConnecting"
-          @click="handleConnect"
+    </div>
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
+      <template v-slot:menu>
+        <div class="td-sidebar-menu">
+          <TDSlideOption
+            :showIcon="true"
+            v-model="currentConfigLayout.currentSidebarOption"
+            :options="sidebarOptions"
+            :noMargin="true"
+            @change="updateConfigLayout"
+          />
+        </div>
+      </template>
+      <template v-slot:main>
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
         >
-          {{ $t("i18nCommon.remoteDesktop.connect") }}
-        </button>
-        <button
-          class="rdp-btn rdp-btn-disconnect"
-          :disabled="!isConnected"
-          @click="handleDisconnect"
+          <TDRemoteDesktopRDPHelp />
+        </div>
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
         >
-          {{ $t("i18nCommon.remoteDesktop.disconnect") }}
-        </button>
-        <button class="rdp-btn rdp-btn-fullscreen" @click="toggleFullscreen">⛶</button>
-        <span class="rdp-status" :class="statusClass">{{ statusText }}</span>
-      </div>
-    </div>
-
-    <!-- Canvas area -->
-    <div ref="canvasContainer" class="rdp-canvas-container">
-      <canvas
-        ref="rdpCanvas"
-        class="rdp-canvas"
-        :width="canvasWidth"
-        :height="canvasHeight"
-        tabindex="0"
-        @keydown="onCanvasKeydown"
-        @keyup="onCanvasKeyup"
-        @mousemove="onCanvasMousemove"
-        @mousedown="onCanvasMousedown"
-        @mouseup="onCanvasMouseup"
-        @wheel.prevent="onCanvasWheel"
-        @contextmenu.prevent="onCanvasContextmenu"
-      />
-    </div>
-
-    <!-- Log panel -->
-    <div ref="logPanel" class="rdp-log-panel">
-      <div
-        v-for="(entry, idx) in logEntries"
-        :key="idx"
-        class="rdp-log-entry"
-        :class="`rdp-log-${entry.type}`"
-      >
-        <span class="rdp-log-time">{{ entry.time }}</span>{{ entry.message }}
-      </div>
-    </div>
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="currentConfigLayout.autoReconnect"
+            :label="$t('i18nCommon.remoteDesktop.autoReconnect')"
+            @change="updateConfigLayout"
+          ></TDCheckbox>
+        </div>
+      </template>
+    </TDSubSidebar>
   </div>
 </template>
 
 <script>
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDRemoteDesktopRDPHelp from "@/views/helps/TDRemoteDesktopRDPHelp.vue";
 
 export default {
   name: "TDRemoteDesktop",
   extends: TDToolBase,
+  components: { TDSubSidebar, TDRemoteDesktopRDPHelp },
 
   data() {
     return {
+      keyCacheLayout: this.$tdEnum.cacheConfig.RemoteDesktopConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+        currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
+        autoReconnect: false,
+      },
       host: "",
       username: "",
       password: "",
@@ -116,6 +164,20 @@ export default {
       if (this.isConnected) return "rdp-status-connected";
       return "rdp-status-disconnected";
     },
+    sidebarOptions() {
+      let options = [];
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Help,
+        label: this.$t("i18nCommon.sidebarOption.help"),
+        icon: "td-help-icon",
+      });
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Setting,
+        label: this.$t("i18nCommon.sidebarOption.setting"),
+        icon: "td-setting-icon",
+      });
+      return options;
+    },
   },
 
   mounted() {
@@ -128,11 +190,9 @@ export default {
   },
 
   methods: {
-    // ── Logging ──────────────────────────────────────────────────────────────
     addLog(message, type = "info") {
       const time = new Date().toLocaleTimeString("en-US", { hour12: false });
       this.logEntries.push({ time, message, type });
-      // Giới hạn 200 dòng log
       if (this.logEntries.length > 200) {
         this.logEntries.splice(0, this.logEntries.length - 200);
       }
@@ -142,7 +202,6 @@ export default {
       });
     },
 
-    // ── Kết nối RDP ──────────────────────────────────────────────────────────
     async handleConnect() {
       if (this.isConnected || this.isConnecting) return;
       const destination = this.host.trim();
@@ -156,15 +215,12 @@ export default {
 
       this.isConnecting = true;
       try {
-        // Tự động build wasm file cùng web app nhờ Vite (Vite xử lý new URL(..., import.meta.url) bên trong)
         if (!this.wasmInitialized) {
           this.addLog(this.$t("i18nCommon.remoteDesktop.loadingWasm"), "info");
-          // Import dynamic để Vite tự parse và bundle rdp_client.js cùng file .wasm vào /assets/
           const wasmModule = await import("@wasm/pkg/rdp_client.js");
           await wasmModule.default();
           wasmModule.setup("info");
           this.wasmInitialized = true;
-          // Lưu các class vào instance để dùng lại
           this._wasm = wasmModule;
           this.addLog(this.$t("i18nCommon.remoteDesktop.wasmReady"), "success");
         }
@@ -172,9 +228,7 @@ export default {
         const { SessionBuilder, DesktopSize, Extension } = this._wasm;
         const canvas = this.$refs.rdpCanvas;
 
-        // Lấy thông tin Agent server từ Setting
         const agentUrl = window.__tdInfo?.agentURL || "http://localhost:7777";
-        // Convert proxy address: thay http(s) thành ws(s) và chèn thêm endpoint /rdp/ws
         const proxyAddress = agentUrl.replace(/^http/, "ws").replace(/\/$/, "") + "/rdp/ws";
 
         this.addLog(`${this.$t("i18nCommon.remoteDesktop.connecting")} ${destination}`, "info");
@@ -211,7 +265,6 @@ export default {
 
         canvas.focus();
 
-        // Chạy session event loop
         this.session
           .run()
           .then((info) => {
@@ -285,13 +338,8 @@ export default {
       return e?.message || e?.toString() || String(e);
     },
 
-    // ── Input handlers (Vue-style, gắn lên canvas ref) ───────────────────────
-    setupInputHandlers() {
-      // Handlers được gắn trực tiếp trong template qua @event binding.
-      // Không cần addEventListener thủ công — đây là cách Vue.
-    },
+    setupInputHandlers() {},
 
-    // ── Keyboard ─────────────────────────────────────────────────────────────
     onCanvasKeydown(e) {
       e.preventDefault();
       e.stopPropagation();
@@ -322,7 +370,6 @@ export default {
       } catch (_) {}
     },
 
-    // ── Mouse ─────────────────────────────────────────────────────────────────
     onCanvasMousemove(e) {
       if (!this.session) return;
       try {
@@ -391,7 +438,6 @@ export default {
       e.preventDefault();
     },
 
-    // ── Scancode map ─────────────────────────────────────────────────────────
     getScancode(code) {
       const SCANCODE_MAP = {
         Escape: 0x01, Digit1: 0x02, Digit2: 0x03, Digit3: 0x04,
@@ -433,8 +479,18 @@ export default {
 };
 </script>
 
-<style scoped>
-/* ── Layout ──────────────────────────────────────────────────────────────────── */
+<style scoped lang="scss">
+.container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.main-tool {
+  height: 100%;
+  width: 100%;
+}
+
 .rdp-container {
   display: flex;
   flex-direction: column;
@@ -446,7 +502,6 @@ export default {
   overflow: hidden;
 }
 
-/* ── Toolbar ─────────────────────────────────────────────────────────────────── */
 .rdp-toolbar {
   display: flex;
   align-items: center;
@@ -482,10 +537,12 @@ export default {
   width: 160px;
   transition: border-color 0.2s;
 }
+
 .rdp-input:focus {
   outline: none;
   border-color: #58a6ff;
 }
+
 .rdp-input::placeholder {
   color: #6e7681;
 }
@@ -498,7 +555,6 @@ export default {
   flex-wrap: wrap;
 }
 
-/* ── Buttons ─────────────────────────────────────────────────────────────────── */
 .rdp-btn {
   padding: 5px 14px;
   border-radius: 6px;
@@ -508,9 +564,11 @@ export default {
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
 }
+
 .rdp-btn:active {
   transform: scale(0.97);
 }
+
 .rdp-btn:disabled {
   background: #30363d !important;
   color: #6e7681 !important;
@@ -521,6 +579,7 @@ export default {
   background: #238636;
   color: #fff;
 }
+
 .rdp-btn-connect:not(:disabled):hover {
   background: #2ea043;
 }
@@ -529,6 +588,7 @@ export default {
   background: #da3633;
   color: #fff;
 }
+
 .rdp-btn-disconnect:not(:disabled):hover {
   background: #f85149;
 }
@@ -540,12 +600,12 @@ export default {
   font-size: 15px;
   padding: 4px 9px;
 }
+
 .rdp-btn-fullscreen:hover {
   background: #30363d;
   color: #e0e0e0;
 }
 
-/* ── Status badge ────────────────────────────────────────────────────────────── */
 .rdp-status {
   padding: 3px 10px;
   border-radius: 12px;
@@ -553,20 +613,22 @@ export default {
   font-weight: 600;
   white-space: nowrap;
 }
+
 .rdp-status-disconnected {
   background: #3d1a1a;
   color: #f85149;
 }
+
 .rdp-status-connecting {
   background: #3a3200;
   color: #e3b341;
 }
+
 .rdp-status-connected {
   background: #1a3a1a;
   color: #3fb950;
 }
 
-/* ── Canvas container ────────────────────────────────────────────────────────── */
 .rdp-canvas-container {
   flex: 1;
   display: flex;
@@ -585,7 +647,6 @@ export default {
   object-fit: contain;
 }
 
-/* ── Log panel ───────────────────────────────────────────────────────────────── */
 .rdp-log-panel {
   background: #0d1117;
   border-top: 1px solid #21262d;
@@ -611,13 +672,23 @@ export default {
 .rdp-log-info {
   color: #8b949e;
 }
+
 .rdp-log-success {
   color: #3fb950;
 }
+
 .rdp-log-error {
   color: #f85149;
 }
+
 .rdp-log-warn {
   color: #e3b341;
+}
+
+.td-sub-sidebar {
+  height: 100%;
+  justify-content: flex-start;
+  width: 100%;
+  overflow: auto;
 }
 </style>

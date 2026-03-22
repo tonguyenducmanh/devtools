@@ -75,6 +75,21 @@ const sidebarConfig = [
   },
   {
     type: "group",
+    groupKey: "remotedesktop",
+    groupTitleKey: "i18nCommon.group.RemoteDesktop",
+    children: [
+      {
+        name: "TDRemoteDesktopRDP",
+        component: () => import("@/views/tools/TDRemoteDesktopRDP.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.remoteDesktopRDP",
+          helpKey: "i18nHelp.remoteDesktop.purpose.title",
+        },
+      },
+    ],
+  },
+  {
+    type: "group",
     groupKey: "qrcode",
     groupTitleKey: "i18nCommon.group.ArtificialIntelligence",
     children: [
@@ -195,20 +210,6 @@ const sidebarConfig = [
     name: "TDHTMLPreview",
     component: () => import("@/views/tools/TDHTMLPreview.vue"),
     meta: { titleKey: "i18nCommon.feature.HTMLPreview" },
-  },
-  {
-    type: "group",
-    groupKey: "remotedesktop",
-    groupTitleKey: "i18nCommon.group.RemoteDesktop",
-    children: [
-      {
-        name: "TDRemoteDesktopRDP",
-        component: () => import("@/views/tools/TDRemoteDesktopRDP.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.remoteDesktopRDP",
-        },
-      },
-    ],
   },
 ];
 

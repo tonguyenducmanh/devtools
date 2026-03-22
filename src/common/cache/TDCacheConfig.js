@@ -202,4 +202,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool Optical Character Recognition",
   },
+  RemoteDesktopConfigLayout: {
+    KeyFormat: "RemoteDesktopConfigLayout",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool Remote Desktop RDP",
+  },
 };

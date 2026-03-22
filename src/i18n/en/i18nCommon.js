@@ -557,6 +557,7 @@ export default {
       sessionError: "Session error",
       validationError: "Please enter host and username",
       ready: "IronRDP Web Client ready. Enter credentials and click Connect.",
+      autoReconnect: "Auto reconnect",
     },
   },
 };

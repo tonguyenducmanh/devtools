@@ -554,6 +554,7 @@ export default {
       sessionError: "Lỗi phiên",
       validationError: "Vui lòng nhập host và tên người dùng",
       ready: "IronRDP Web Client sẵn sàng. Nhập thông tin và bấm Kết nối.",
+      autoReconnect: "Kết nối lại tự động",
     },
   },
 };
