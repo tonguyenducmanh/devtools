@@ -18,15 +18,7 @@ echo "Đang build Frontend..."
 npm install
 npm run web:build
 
-# 3. Copy WASM files vào dist/wasm để Go embed phục vụ tại /wasm/
-echo "Đang copy WASM files vào dist..."
-mkdir -p "$FRONTEND_DIST/wasm"
-cp "$WASM_SRC"/rdp_client.js "$FRONTEND_DIST/wasm/"
-cp "$WASM_SRC"/rdp_client_bg.wasm "$FRONTEND_DIST/wasm/"
-cp "$WASM_SRC"/rdp_client_bg.wasm.d.ts "$FRONTEND_DIST/wasm/"
-cp "$WASM_SRC"/rdp_client.d.ts "$FRONTEND_DIST/wasm/"
-
-# 4. Copy dist frontend vào backend
+# 3. Copy dist frontend vào backend
 echo "Đang copy frontend dist vào backend..."
 
 rm -rf "$WEB_APP_DIR"

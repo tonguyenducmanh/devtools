@@ -156,13 +156,11 @@ export default {
 
       this.isConnecting = true;
       try {
-        // Lazy-load WASM module
-        // Dùng ?url để Vite trả về đường dẫn public thay vì parse JS
+        // Tự động build wasm file cùng web app nhờ Vite (Vite xử lý new URL(..., import.meta.url) bên trong)
         if (!this.wasmInitialized) {
           this.addLog(this.$t("i18nCommon.remoteDesktop.loadingWasm"), "info");
-          const wasmUrl = (await import("@wasm/pkg/rdp_client.js?url")).default;
-          // Import dynamic module JS
-          const wasmModule = await import(/* @vite-ignore */ wasmUrl);
+          // Import dynamic để Vite tự parse và bundle rdp_client.js cùng file .wasm vào /assets/
+          const wasmModule = await import("@wasm/pkg/rdp_client.js");
           await wasmModule.default();
           wasmModule.setup("info");
           this.wasmInitialized = true;
@@ -174,10 +172,10 @@ export default {
         const { SessionBuilder, DesktopSize, Extension } = this._wasm;
         const canvas = this.$refs.rdpCanvas;
 
-        // Xây dựng WebSocket proxy URL
-        const apiPort = 7777; // port của API server daemon
-        const wsProtocol = location.protocol === "https:" ? "wss:" : "ws:";
-        const proxyAddress = `${wsProtocol}//localhost:${apiPort}/rdp/ws`;
+        // Lấy thông tin Agent server từ Setting
+        const agentUrl = window.__tdInfo?.agentURL || "http://localhost:7777";
+        // Convert proxy address: thay http(s) thành ws(s) và chèn thêm endpoint /rdp/ws
+        const proxyAddress = agentUrl.replace(/^http/, "ws").replace(/\/$/, "") + "/rdp/ws";
 
         this.addLog(`${this.$t("i18nCommon.remoteDesktop.connecting")} ${destination}`, "info");
 
