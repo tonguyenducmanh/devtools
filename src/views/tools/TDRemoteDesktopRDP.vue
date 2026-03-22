@@ -1063,7 +1063,6 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: var(--padding);
-  border-bottom: 1px solid var(--border-color);
 }
 
 .td-connection-list-title {
