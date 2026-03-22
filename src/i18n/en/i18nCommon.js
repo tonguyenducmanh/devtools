@@ -584,6 +584,8 @@ export default {
         reload: "Reload list",
       },
       resolution: "Resolution",
+      fullTab: "Full tab",
+      closeFullTab: "Exit full tab",
       fullscreen: "Fullscreen",
       screenshot: "Screenshot",
       screenshotSaved: "Screenshot saved",

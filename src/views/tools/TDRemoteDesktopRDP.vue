@@ -3,7 +3,11 @@
     <div class="main-tool">
       <div class="rdp-container">
         <!-- Canvas area -->
-        <div ref="canvasContainer" class="rdp-canvas-container">
+        <div
+          ref="canvasContainer"
+          class="rdp-canvas-container"
+          :class="{ 'rdp-canvas-container-full-tab': isFullTab }"
+        >
           <canvas
             ref="rdpCanvas"
             class="rdp-canvas"
@@ -18,6 +22,14 @@
             @wheel.prevent="onCanvasWheel"
             @contextmenu.prevent="onCanvasContextmenu"
           />
+          <div
+            v-if="isFullTab"
+            v-tooltip="$t('i18nCommon.remoteDesktop.closeFullTab')"
+            class="flex close-full-tab-btn"
+            @click="closeFullTab"
+          >
+            <span class="td-icon td-close-icon"> </span>
+          </div>
         </div>
 
         <!-- Toolbar -->
@@ -39,8 +51,8 @@
             <TDButton
               :noMargin="true"
               :type="$tdEnum.buttonType.secondary"
-              @click="toggleFullscreen"
-              :label="$t('i18nCommon.remoteDesktop.fullscreen')"
+              @click="openFullTab"
+              :label="$t('i18nCommon.remoteDesktop.fullTab')"
             />
             <TDButton
               :noMargin="true"
@@ -255,6 +267,7 @@ export default {
       password: "",
       isConnected: false,
       isConnecting: false,
+      isFullTab: false,
       session: null,
       wasmInitialized: false,
       canvasWidth: 1920,
@@ -541,14 +554,20 @@ export default {
                 const text = item.value();
                 if (text) {
                   navigator.clipboard.writeText(text).catch((err) => {
-                    this.addLog("Failed to write to local clipboard: " + err, "error");
+                    this.addLog(
+                      "Failed to write to local clipboard: " + err,
+                      "error",
+                    );
                   });
                 }
                 break;
               }
             }
           } catch (e) {
-            this.addLog("Error handling remote clipboard change: " + e, "error");
+            this.addLog(
+              "Error handling remote clipboard change: " + e,
+              "error",
+            );
           }
         });
 
@@ -614,15 +633,13 @@ export default {
       this.isConnected = false;
       this.isConnecting = false;
     },
-
-    toggleFullscreen() {
-      const container = this.$refs.canvasContainer;
-      if (!container) return;
-      if (!document.fullscreenElement) {
-        container.requestFullscreen().catch(() => {});
-      } else {
-        document.exitFullscreen().catch(() => {});
-      }
+    openFullTab() {
+      let me = this;
+      me.isFullTab = true;
+    },
+    closeFullTab() {
+      let me = this;
+      me.isFullTab = false;
     },
 
     takeScreenshot() {
@@ -970,6 +987,26 @@ export default {
   justify-content: center;
   overflow: hidden;
   background: var(--bg-main-color);
+}
+
+.rdp-canvas-container-full-tab {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  .close-full-tab-btn {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    background-color: var(--bg-layer-color);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+  }
 }
 
 .rdp-canvas {

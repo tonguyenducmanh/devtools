@@ -581,6 +581,8 @@ export default {
         reload: "Tải lại danh sách",
       },
       resolution: "Độ phân giải",
+      fullTab: "Xem full tab",
+      closeFullTab: "Thoát chế độ full tab",
       fullscreen: "Toàn màn hình",
       screenshot: "Chụp ảnh",
       screenshotSaved: "Đã lưu ảnh chụp màn hình",
