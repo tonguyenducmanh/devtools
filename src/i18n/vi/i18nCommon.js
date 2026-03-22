@@ -103,7 +103,7 @@ export default {
       textManipulation: "Xử lý văn bản",
       APITesting: "API testing",
       APIMocking: "API mocking",
-      remoteDesktop: "Màn hình từ xa",
+      remoteDesktopRDP: "Giao thức RDP",
       agentDownload: {
         title: "Tải Agent",
         redirecting: "Đang chuyển hướng...",

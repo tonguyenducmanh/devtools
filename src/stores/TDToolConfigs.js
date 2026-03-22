@@ -202,10 +202,10 @@ const sidebarConfig = [
     groupTitleKey: "i18nCommon.group.RemoteDesktop",
     children: [
       {
-        name: "TDRemoteDesktop",
-        component: () => import("@/views/tools/TDRemoteDesktop.vue"),
+        name: "TDRemoteDesktopRDP",
+        component: () => import("@/views/tools/TDRemoteDesktopRDP.vue"),
         meta: {
-          titleKey: "i18nCommon.feature.remoteDesktop",
+          titleKey: "i18nCommon.feature.remoteDesktopRDP",
         },
       },
     ],

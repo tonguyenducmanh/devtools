@@ -103,7 +103,7 @@ export default {
       textManipulation: "Text manipulation",
       APITesting: "API testing",
       APIMocking: "API mocking",
-      remoteDesktop: "Remote Desktop",
+      remoteDesktop: "Remote Desktop Protocol",
       agentDownload: {
         title: "Download Agent",
         redirecting: "Redirecting...",
