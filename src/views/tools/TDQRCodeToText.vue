@@ -8,6 +8,7 @@
               ref="uploadArea"
               class="upload-area"
               multiple
+              :labelEmpty="$t('i18nCommon.qrCodeToText.uploadLabel')"
               @selected="convertQRCode"
             ></TDUpload>
           </div>

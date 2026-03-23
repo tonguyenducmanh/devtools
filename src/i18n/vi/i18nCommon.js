@@ -288,6 +288,7 @@ export default {
       result: "Kết quả sẽ xuất hiện sau khi upload ảnh",
       compressText: "Nén dữ liệu",
       hasHeaderInQR: "Có header QR",
+      uploadLabel: "Tải ảnh lên hoặc Ctrl + V ảnh vào đây",
     },
     oneTimePassword: {
       title: "Mật khẩu một lần theo thời gian (TOTP) và theo HMAC (HOTP)!",
