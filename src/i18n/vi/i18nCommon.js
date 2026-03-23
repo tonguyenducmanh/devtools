@@ -585,8 +585,10 @@ export default {
       fullTab: "Xem full tab",
       closeFullTab: "Thoát chế độ full tab",
       fullscreen: "Toàn màn hình",
+      exitFullscreen: "Thoát toàn màn hình",
       screenshot: "Chụp ảnh",
       screenshotSaved: "Đã lưu ảnh chụp màn hình",
+      ctrlAltDel: "Gửi Ctrl + Alt + Del",
     },
   },
 };

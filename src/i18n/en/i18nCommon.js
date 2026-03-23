@@ -588,8 +588,10 @@ export default {
       fullTab: "Full tab",
       closeFullTab: "Exit full tab",
       fullscreen: "Fullscreen",
+      exitFullscreen: "Exit fullscreen",
       screenshot: "Screenshot",
       screenshotSaved: "Screenshot saved",
+      ctrlAltDel: "Send Ctrl + Alt + Del",
     },
   },
 };
