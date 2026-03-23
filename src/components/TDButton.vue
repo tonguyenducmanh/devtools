@@ -1,6 +1,6 @@
 <template>
   <button
-    @click="handleClick"
+    @click="debounceHandleClick"
     class="td-button noselect"
     :class="{
       'td-button-secondary': type == $tdEnum.buttonType.secondary,
@@ -22,11 +22,15 @@ import _ from "@/common/TDCommonFunction.js";
 export default {
   name: "TDButton",
   mixins: [TDStylePremitiveMixin],
-  created() {},
+  created() {
+    this.debounceHandleClick = _.debounce(this.handleClick, 300);
+  },
   mounted() {},
   emits: ["click"],
   beforeUnmount() {
-    let me = this;
+    if (this.debounceHandleClick?.cancel) {
+      this.debounceHandleClick.cancel();
+    }
   },
   props: {
     readOnly: {
@@ -50,11 +54,11 @@ export default {
     return {};
   },
   methods: {
-    handleClick: _.debounce(function (e) {
+    handleClick(e) {
       let me = this;
       e.preventDefault();
       me.$emit("click", e);
-    }, 300),
+    },
   },
 };
 </script>

@@ -58,7 +58,18 @@ export default {
   name: "TDTextarea",
   mixins: [TDStylePremitiveMixin],
 
-  created() {},
+  created() {
+    this.debounceUpdateEditorVal = _.debounce(this.updateEditorVal, 100);
+    this.debounceUpdateValToEditor = _.debounce(this.updateValToEditor, 100);
+  },
+  beforeUnmount() {
+    if (this.debounceUpdateEditorVal?.cancel) {
+      this.debounceUpdateEditorVal.cancel();
+    }
+    if (this.debounceUpdateValToEditor?.cancel) {
+      this.debounceUpdateValToEditor.cancel();
+    }
+  },
   mounted() {
     let me = this;
     this.updateHighlight();
@@ -132,7 +143,7 @@ export default {
   },
   watch: {
     modelValue(newVal, oldVal) {
-      this.updateEditorVal();
+      this.debounceUpdateEditorVal();
     },
     enableHighlight(value, oldVal) {
       this.updateHighlight();
@@ -219,7 +230,7 @@ export default {
         }
         me.editor = monaco.editor.create(me.$refs.textareaWrap, configObject);
         me.editor.onDidBlurEditorWidget((e) => {
-          me.updateValToEditor();
+          me.debounceUpdateValToEditor();
         });
       } else {
         me.unmountEditor();
