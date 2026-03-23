@@ -22,13 +22,36 @@
             @wheel.prevent="onCanvasWheel"
             @contextmenu.prevent="onCanvasContextmenu"
           />
-          <div
-            v-if="isFullTab"
-            v-tooltip="$t('i18nCommon.remoteDesktop.closeFullTab')"
-            class="flex close-full-tab-btn"
-            @click="closeFullTab"
-          >
-            <span class="td-icon td-close-icon"> </span>
+          <div v-if="isFullTab" class="fullscreen-toolbar">
+            <div
+              v-tooltip="$t('i18nCommon.remoteDesktop.exitFullscreen')"
+              class="flex toolbar-btn"
+              @click="closeFullTab"
+            >
+              <span class="td-icon td-exit-full-screen-icon"></span>
+            </div>
+            <div
+              v-tooltip="$t('i18nCommon.remoteDesktop.screenshot')"
+              class="flex toolbar-btn"
+              @click="takeScreenshot"
+            >
+              <span class="td-icon td-camera-icon"></span>
+            </div>
+            <div
+              v-tooltip="$t('i18nCommon.remoteDesktop.ctrlAltDel')"
+              class="flex toolbar-btn"
+              @click="sendCtrlAltDel"
+              :class="{ 'toolbar-btn-disabled': !isConnected }"
+            >
+              <span class="td-icon td-command-code-icon"></span>
+            </div>
+            <div
+              v-tooltip="$t('i18nCommon.remoteDesktop.fullscreen')"
+              class="flex toolbar-btn"
+              @click="toggleFullscreen"
+            >
+              <span class="td-icon td-full-screen-icon"></span>
+            </div>
           </div>
         </div>
 
@@ -646,6 +669,17 @@ export default {
     closeFullTab() {
       let me = this;
       me.isFullTab = false;
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+    },
+
+    toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
     },
 
     takeScreenshot() {
@@ -1012,6 +1046,29 @@ export default {
     height: 20px;
     background-color: var(--bg-layer-color);
     border-radius: 0 0 var(--border-radius) var(--border-radius);
+  }
+  .fullscreen-toolbar {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    background-color: var(--bg-layer-color);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    padding: 4px;
+    .toolbar-btn {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--border-radius);
+      &:hover {
+        background-color: var(--bg-main-color);
+      }
+    }
   }
 }
 
