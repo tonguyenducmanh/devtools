@@ -16,8 +16,15 @@ const state = reactive({
 /**
  * tạo ra id ngẫu nhiên cho từng tab
  */
-function genId() {
-  return tdUtility.newGuid();
+function genId(mod) {
+  let result = "";
+  let idForNewTab = tdUtility.newGuid();
+  if (mod && mod.default && mod.default.name) {
+    result = `${mod.default.name}-${idForNewTab}`;
+  } else {
+    result = idForNewTab;
+  }
+  return result;
 }
 
 /**
@@ -42,8 +49,9 @@ export function useTabManager() {
         return existingTab.id;
       }
     }
+    const mod = await component();
 
-    const id = genId();
+    const id = genId(mod);
 
     const tab = {
       id,
@@ -56,7 +64,6 @@ export function useTabManager() {
       customTitle: null,
     };
 
-    const mod = await component();
     tab.resolvedComponent = markRaw(mod.default ?? mod);
     state.tabs.push(tab);
     state.activeTabId = id;
@@ -130,7 +137,9 @@ export function useTabManager() {
     const source = state.tabs.find((t) => t.id === id);
     if (!source) return null;
 
-    const newId = genId();
+    const mod = await source.component();
+
+    const newId = genId(mod);
     const tab = {
       ...source,
       id: newId,
@@ -138,7 +147,6 @@ export function useTabManager() {
       resolvedComponent: null, // Clone bắt buộc tải lại/đợi render để mount cái mới
     };
 
-    const mod = await source.component();
     tab.resolvedComponent = markRaw(mod.default ?? mod);
 
     // Chèn ngay sau tab gốc

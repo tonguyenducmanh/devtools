@@ -12,7 +12,23 @@ export default {
       default: null,
     },
   },
+  beforeUnmount() {
+    // mặc định file này unmount là remove hết event
+    this.onTabLeave();
+  },
   methods: {
+    /**
+     * Hàm này được gọi khi tab được active hoặc khi component được mount (nếu đang active)
+     * Component con cần add event (ví dụ listener trên window/document) thì override lại
+     */
+    onTabEnter() {},
+
+    /**
+     * Hàm này được gọi khi tab bị inactive hoặc trước khi component bị unmount (nếu đang active)
+     * Component con cần remove event thì override lại
+     */
+    onTabLeave() {},
+
     reBuildTabTitle: _.debounce(function (content) {
       let me = this;
       me.$emit("updateTabTitle", {

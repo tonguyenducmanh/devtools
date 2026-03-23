@@ -82,6 +82,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
         <KeepAlive>
           <component
             v-if="activeTab"
+            :ref="setTabRef"
             :is="activeTab.resolvedComponent"
             :key="activeTab.id"
             :tabId="activeTab.id"
@@ -98,7 +99,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
 </template>
 
 <script>
-import { computed, ref, inject, watch as vueWatch } from "vue";
+import { computed, ref, inject, watch as vueWatch, nextTick } from "vue";
 import TDWelcome from "@/views/misc/TDWelcome.vue";
 import { useTabManager } from "@/stores/TDTabManager.js";
 import i18nData from "@/i18n/i18nData.js";
@@ -146,13 +147,47 @@ export default {
       return isMultiTab;
     });
 
+    // quản lý danh sách các tab đang mở theo $refs để sau có thể handle 1 số event custom
+    const tabRefs = {};
+    const setTabRef = (el) => {
+      if (el && el.$props && el.$props.tabId) {
+        tabRefs[el.$props.tabId] = el;
+      } else if (el && el.tabId) {
+        tabRefs[el.tabId] = el;
+      }
+    };
+
     // Theo dõi tab đang active, nếu tab đó chưa được load component (resolveComponent === null)
     // thì gọi component() để lấy về module.
     vueWatch(
       activeTabId,
-      async (newId) => {
+      async (newId, oldId) => {
+        // nếu có tab cũ thì remove event của tab cũ đi
+        if (oldId && tabRefs[oldId]) {
+          if (typeof tabRefs[oldId].onTabLeave === "function") {
+            try {
+              tabRefs[oldId].onTabLeave();
+            } catch (e) {
+              console.error("Error calling onTabLeave", e);
+            }
+          }
+        }
+
         if (!newId) return;
         await resolveTabComponent(newId);
+
+        nextTick(() => {
+          // nếu có tab mới thì add các event của tab mới
+          if (tabRefs[newId]) {
+            if (typeof tabRefs[newId].onTabEnter === "function") {
+              try {
+                tabRefs[newId].onTabEnter();
+              } catch (e) {
+                console.error("Error calling onTabEnter", e);
+              }
+            }
+          }
+        });
       },
       { immediate: true },
     );
@@ -362,6 +397,7 @@ export default {
       getTabLabel,
       onTabTitleUpdate,
       openContextMenu,
+      setTabRef,
       // drag
       tabBarRef,
       draggingId,
