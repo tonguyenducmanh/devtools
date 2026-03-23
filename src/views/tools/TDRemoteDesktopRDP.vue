@@ -1026,7 +1026,7 @@ export default {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: var(--bg-main-color);
+  background: #000;
 }
 
 .rdp-canvas-container-full-tab {
@@ -1075,7 +1075,7 @@ export default {
 .rdp-canvas {
   display: block;
   outline: none;
-  background: var(--bg-layer-color);
+  background: #000;
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
