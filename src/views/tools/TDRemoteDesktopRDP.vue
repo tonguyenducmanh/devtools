@@ -312,7 +312,13 @@ export default {
       ],
     };
   },
-
+  watch: {
+    connectionName(oldVal, newVal) {
+      if (oldVal != newVal) {
+        this.reBuildTabTitle(this.connectionName);
+      }
+    },
+  },
   computed: {
     resolutionOptions() {
       return this.resolutions.map((r) => ({
