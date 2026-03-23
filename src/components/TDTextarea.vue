@@ -225,14 +225,14 @@ export default {
         me.unmountEditor();
       }
     },
-    updateEditorVal: _.debounce(function () {
+    updateEditorVal() {
       if (this.editor) {
         this.editor.setValue(this.modelValue ? this.modelValue : "");
       }
-    }, 300),
-    updateValToEditor: _.debounce(function () {
+    },
+    updateValToEditor() {
       this.updateValueFromEditor(true);
-    }, 300),
+    },
 
     updateValueFromEditor(fromEditor = false) {
       let me = this;
