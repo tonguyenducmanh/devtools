@@ -1,5 +1,9 @@
 export default {
   i18nCommon: {
+    shotKey: {
+      showCommandEditor: "Hiển thị command editor",
+      findTextEditor: "Tìm kiếm trong editor",
+    },
     tabManager: {
       addNewTab: "Mở tab mới",
       closeTab: "Đóng tab này",

@@ -53,7 +53,7 @@
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
 import * as monaco from "monaco-editor";
 import _ from "@/common/TDCommonFunction.js";
-
+import TDShortcutAction from "@/common/TDShortcutAction.js";
 export default {
   name: "TDTextarea",
   mixins: [TDStylePremitiveMixin],
@@ -61,6 +61,10 @@ export default {
   created() {
     this.debounceUpdateEditorVal = _.debounce(this.updateEditorVal, 100);
     this.debounceUpdateValToEditor = _.debounce(this.updateValToEditor, 100);
+    this.debounceToggleEventShortcutShowOnFooter = _.debounce(
+      this.toggleEventShortcutShowOnFooter,
+      100,
+    );
   },
   beforeUnmount() {
     if (this.debounceUpdateEditorVal?.cancel) {
@@ -68,6 +72,9 @@ export default {
     }
     if (this.debounceUpdateValToEditor?.cancel) {
       this.debounceUpdateValToEditor.cancel();
+    }
+    if (this.debounceToggleEventShortcutShowOnFooter?.cancel) {
+      this.debounceToggleEventShortcutShowOnFooter.cancel();
     }
   },
   mounted() {
@@ -231,9 +238,38 @@ export default {
         me.editor = monaco.editor.create(me.$refs.textareaWrap, configObject);
         me.editor.onDidBlurEditorWidget((e) => {
           me.debounceUpdateValToEditor();
+          me.debounceToggleEventShortcutShowOnFooter(false);
+        });
+        me.editor.onDidFocusEditorText((e) => {
+          me.debounceToggleEventShortcutShowOnFooter(true);
         });
       } else {
         me.unmountEditor();
+      }
+    },
+    toggleEventShortcutShowOnFooter(isTurnOn) {
+      let me = this;
+      if (isTurnOn) {
+        // Đăng ký "ảo" để hiển thị lên danh sách shortcut
+        TDShortcutAction.register("monaco-command-palette" + me.inputId, {
+          key: "F1",
+          labelKey: me.$t("i18nCommon.shotKey.showCommandEditor"), // Hoặc i18n key của bạn
+          requireCtrl: false,
+          isVirtual: true, // flag để nhận biết monaco tự handle event, chỉ thêm vào để hiển thị danh sách event ở footer
+          action: null,
+        });
+
+        TDShortcutAction.register("monaco-find" + me.inputId, {
+          key: "f",
+          labelKey: me.$t("i18nCommon.shotKey.findTextEditor"),
+          requireCtrl: true,
+          isVirtual: true, // flag để nhận biết monaco tự handle event, chỉ thêm vào để hiển thị danh sách event ở footer
+          action: null,
+        });
+      } else {
+        // Gỡ bỏ khỏi danh sách hiển thị khi không còn focus
+        TDShortcutAction.unregister("monaco-command-palette" + me.inputId);
+        TDShortcutAction.unregister("monaco-find" + me.inputId);
       }
     },
     updateEditorVal() {

@@ -72,6 +72,10 @@ class TDShortcutAction {
         : !event.ctrlKey && !event.metaKey && !event.shiftKey;
 
       if (ctrlMatch && event.key === config.key) {
+        // nếu là phím ảo thì trôi xuống event của component handle event này thay vì chạy ở đây
+        if (config && config.isVirtual) {
+          return;
+        }
         event.preventDefault();
         if (config.action) {
           config.action();
