@@ -6,14 +6,13 @@ class TDShortcutAction {
     this.handlers = {};
     this.isListening = false;
     this.listeners = [];
-    this._notifyTimer = null;
   }
 
   register(name, config) {
     if (!this.activeShortcuts.has(name)) {
       this.activeShortcuts.set(name, config);
       this.updateListeners();
-      this._scheduleNotify();
+      this.notifyListeners();
     }
   }
 
@@ -21,20 +20,10 @@ class TDShortcutAction {
     if (this.activeShortcuts.has(name)) {
       this.activeShortcuts.delete(name);
       this.updateListeners();
-      this._scheduleNotify();
-    }
-  }
-  // Gom nhiều register/unregister liên tiếp → chỉ notify 1 lần
-  _scheduleNotify() {
-    if (this._notifyTimer) {
-      clearTimeout(this._notifyTimer);
-    }
-    this._notifyTimer = setTimeout(() => {
-      this._notifyTimer = null;
       this.notifyListeners();
-    }, 0); // setTimeout(0) = sau khi call stack hiện tại xong
+    }
   }
-  
+
   isActive(name) {
     return this.activeShortcuts.has(name);
   }
