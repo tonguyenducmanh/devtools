@@ -1,9 +1,5 @@
 export default {
   i18nCommon: {
-    shotKey: {
-      showCommandEditor: "Show command editor",
-      findTextEditor: "Find in editor",
-    },
     tabManager: {
       addNewTab: "Add new tab",
       closeTab: "Close this tab",
