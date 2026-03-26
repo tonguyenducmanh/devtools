@@ -2,12 +2,9 @@ import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 
 class TDShortcutAction {
   constructor() {
-    // danh sách các shortcut đang lưu trong store
     this.activeShortcuts = new Map();
-    // object lưu danh sách các hàm handler event
     this.handlers = {};
     this.isListening = false;
-    // danh sách các hàm callback được tạo khi có 1 component có nhu cầu lắng nghe computed danh sách event được thêm, xóa khỏi class này
     this.listeners = [];
 
     // --- Blink-free focus tracking ---
@@ -19,9 +16,6 @@ class TDShortcutAction {
 
   // ─── Core register / unregister ──────────────────────────────────────────
 
-  /**
-   * đăng ký 1 event mới
-   */
   register(name, config) {
     if (!this.activeShortcuts.has(name)) {
       this.activeShortcuts.set(name, config);
@@ -30,9 +24,6 @@ class TDShortcutAction {
     }
   }
 
-  /**
-   * remove 1 event đã có
-   */
   unregister(name) {
     if (this.activeShortcuts.has(name)) {
       this.activeShortcuts.delete(name);
@@ -89,24 +80,14 @@ class TDShortcutAction {
 
   // ─── Listeners / state ───────────────────────────────────────────────────
 
-  /**
-   * có đang active 1 event cụ thể không
-   */
   isActive(name) {
     return this.activeShortcuts.has(name);
   }
 
-  /**
-   * trả về danh sách shortcut đã add global
-   */
   getActiveShortcuts() {
     return Array.from(this.activeShortcuts.values());
   }
 
-  /**
-   * thêm hàm call back để sau này raise event khi có thay đổi về danh sách shortcut
-   * return hàm để loại bỏ call back đã add từ đầu
-   */
   onChange(callback) {
     this.listeners.push(callback);
     return () => {
@@ -114,10 +95,6 @@ class TDShortcutAction {
     };
   }
 
-  /**
-   * có bao nhiêu listener đang nghe về danh sách short cut thì gọi hàm call back tương ứng để raise event
-   * 1 dạng như computed của vue nhưng trigger chủ động
-   */
   notifyListeners() {
     this.listeners.forEach((cb) => cb());
   }
@@ -165,9 +142,6 @@ class TDShortcutAction {
 
   // ─── Default shortcuts ───────────────────────────────────────────────────
 
-  /**
-   * Khởi tạo 1 số shortcuts mặc định khi run app
-   */
   initDefaultShortcuts() {
     this.register("search", {
       key: "p",
