@@ -18,13 +18,13 @@
       class="textarea-wrapper"
       :class="{ 'td-textarea-hightlight-wrap-text': wrapText }"
     >
-      <!-- Editor area -->
+      <!-- Editor area (Monaco) -->
       <div
         v-show="enableHighlight"
         class="highlight-layer"
         ref="textareaWrap"
       ></div>
-      <!-- Actual textarea -->
+      <!-- Plain textarea -->
       <textarea
         v-if="!enableHighlight"
         :placeholder="placeHolder || $t('i18nCommon.typeInput')"
@@ -54,6 +54,7 @@ import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
 import * as monaco from "monaco-editor";
 import _ from "@/common/TDCommonFunction.js";
 import TDShortcutAction from "@/common/TDShortcutAction.js";
+
 export default {
   name: "TDTextarea",
   mixins: [TDStylePremitiveMixin],
@@ -61,26 +62,27 @@ export default {
   created() {
     this.debounceUpdateEditorVal = _.debounce(this.updateEditorVal, 100);
     this.debounceUpdateValToEditor = _.debounce(this.updateValToEditor, 100);
-    this.debounceToggleEventShortcutShowOnFooter = _.debounce(
-      this.toggleEventShortcutShowOnFooter,
-      100,
-    );
   },
-  beforeUnmount() {
-    if (this.debounceUpdateEditorVal?.cancel) {
-      this.debounceUpdateEditorVal.cancel();
-    }
-    if (this.debounceUpdateValToEditor?.cancel) {
-      this.debounceUpdateValToEditor.cancel();
-    }
-    if (this.debounceToggleEventShortcutShowOnFooter?.cancel) {
-      this.debounceToggleEventShortcutShowOnFooter.cancel();
-    }
-  },
+
   mounted() {
-    let me = this;
     this.updateHighlight();
   },
+
+  beforeUnmount() {
+    if (this.debounceUpdateEditorVal?.cancel)
+      this.debounceUpdateEditorVal.cancel();
+    if (this.debounceUpdateValToEditor?.cancel)
+      this.debounceUpdateValToEditor.cancel();
+
+    // Đảm bảo xóa shortcuts khi component bị destroy
+    // Dùng trực tiếp unregister (không cần blurGroup vì không còn focus event nào đến sau)
+    this._getShortcutNames().forEach((name) =>
+      TDShortcutAction.unregister(name),
+    );
+
+    this.unmountEditor();
+  },
+
   computed: {
     styleComputed() {
       let style = "";
@@ -97,6 +99,7 @@ export default {
       return `td-text-area-${this.$.uid}`;
     },
   },
+
   props: {
     placeHolder: {
       type: String,
@@ -143,166 +146,188 @@ export default {
       default: "javascript",
     },
   },
+
   data() {
     return {
       value: null,
     };
   },
+
   watch: {
-    modelValue(newVal, oldVal) {
+    modelValue() {
       this.debounceUpdateEditorVal();
     },
-    enableHighlight(value, oldVal) {
+    enableHighlight() {
       this.updateHighlight();
     },
-    wrapText(value, oldVal) {
+    wrapText(value) {
       if (this.editor) {
-        this.editor.updateOptions({
-          wordWrap: value ? "on" : "off",
-        });
+        this.editor.updateOptions({ wordWrap: value ? "on" : "off" });
       }
     },
     language(value, oldVal) {
-      if (this.editor && value && oldVal && value != oldVal) {
+      if (this.editor && value && oldVal && value !== oldVal) {
         monaco.editor.setModelLanguage(this.editorModel, value);
       }
     },
   },
+
   methods: {
+    // ─── Shortcut group helpers ───────────────────────────────────────────
+
+    /**
+     * Tên các shortcut thuộc về component này (dùng inputId để unique).
+     */
+    _getShortcutNames() {
+      return [
+        `monaco-command-palette-${this.inputId}`,
+        `monaco-find-${this.inputId}`,
+      ];
+    },
+
+    /**
+     * Shortcut configs tương ứng.
+     */
+    _buildShortcuts() {
+      return [
+        {
+          name: `monaco-command-palette-${this.inputId}`,
+          config: {
+            key: "F1",
+            labelKey: this.$t("i18nCommon.shotKey.showCommandEditor"),
+            requireCtrl: false,
+            isVirtual: true,
+            action: null,
+          },
+        },
+        {
+          name: `monaco-find-${this.inputId}`,
+          config: {
+            key: "f",
+            labelKey: this.$t("i18nCommon.shotKey.findTextEditor"),
+            requireCtrl: true,
+            isVirtual: true,
+            action: null,
+          },
+        },
+      ];
+    },
+
+    _onEditorFocus() {
+      TDShortcutAction.addEvent(this.inputId, this._buildShortcuts());
+    },
+
+    _onEditorBlur() {
+      TDShortcutAction.removeEvent(this.inputId, this._getShortcutNames());
+      this.debounceUpdateValToEditor();
+    },
+
+    // ─── Public API ───────────────────────────────────────────────────────
+
     focus() {
-      let me = this;
-      if (me.$refs[me.inputId]) {
-        me.$refs[me.inputId].focus();
-      }
+      if (this.$refs.textarea) this.$refs.textarea.focus();
     },
+
     changeInputValue(e) {
-      let me = this;
-      me.$emit("update:modelValue", e.target.value);
+      this.$emit("update:modelValue", e.target.value);
     },
+
     handleTab(e) {
       const TAB_SIZE = "  ";
       const el = e.target;
       const start = el.selectionStart;
       const end = el.selectionEnd;
-
       const newValue =
         el.value.slice(0, start) + TAB_SIZE + el.value.slice(end);
-
       this.$emit("update:modelValue", newValue);
-
       this.$nextTick(() => {
         el.selectionStart = el.selectionEnd = start + TAB_SIZE.length;
       });
     },
-    handleScroll(e) {},
+
+    handleScroll() {},
+
     getDefaultModelValueForEditor() {
-      let me = this;
-      let editorVal = me.modelValue;
-      return editorVal;
+      return this.modelValue;
     },
+
     async updateHighlight() {
-      let me = this;
-      if (me.enableHighlight) {
-        me.currentTheme = await me.$tdUtility.getUserSettings("theme");
-        monaco.languages.register({ id: me.language });
-        let isDarkTheme = me.currentTheme == me.$tdEnum.theme.dark;
-        let myThemeName = "my-theme";
+      if (this.enableHighlight) {
+        this.currentTheme = await this.$tdUtility.getUserSettings("theme");
+        monaco.languages.register({ id: this.language });
+        const isDarkTheme = this.currentTheme === this.$tdEnum.theme.dark;
+        const myThemeName = "my-theme";
         monaco.editor.defineTheme(myThemeName, {
           base: isDarkTheme ? "vs-dark" : "vs",
           inherit: true,
           rules: [],
           colors: {
-            "editor.background": isDarkTheme ? "#252525" : "#f6f6f7", // background chính
+            "editor.background": isDarkTheme ? "#252525" : "#f6f6f7",
           },
         });
         monaco.editor.setTheme(myThemeName);
-        me.editorModel = monaco.editor.createModel(
-          me.getDefaultModelValueForEditor(),
-          me.language,
+
+        this.editorModel = monaco.editor.createModel(
+          this.getDefaultModelValueForEditor(),
+          this.language,
         );
-        let configObject = {
-          model: me.editorModel,
-          language: me.language,
+
+        const configObject = {
+          model: this.editorModel,
+          language: this.language,
           theme: myThemeName,
           fontSize: 16,
           fontFamily:
             'ui-monospace, "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-          readOnly: me.readOnly,
+          readOnly: this.readOnly,
           automaticLayout: true,
         };
-        if (me.wrapText) {
+        if (this.wrapText) {
           configObject.wordWrap = "on";
           configObject.wordWrapColumn = 0;
           configObject.wrappingIndent = "none";
         }
-        me.editor = monaco.editor.create(me.$refs.textareaWrap, configObject);
-        me.editor.onDidBlurEditorWidget((e) => {
-          me.debounceUpdateValToEditor();
-          me.debounceToggleEventShortcutShowOnFooter(false);
-        });
-        me.editor.onDidFocusEditorText((e) => {
-          me.debounceToggleEventShortcutShowOnFooter(true);
-        });
-      } else {
-        me.unmountEditor();
-      }
-    },
-    toggleEventShortcutShowOnFooter(isTurnOn) {
-      let me = this;
-      if (isTurnOn) {
-        // Đăng ký "ảo" để hiển thị lên danh sách shortcut
-        TDShortcutAction.register("monaco-command-palette" + me.inputId, {
-          key: "F1",
-          labelKey: me.$t("i18nCommon.shotKey.showCommandEditor"), // Hoặc i18n key của bạn
-          requireCtrl: false,
-          isVirtual: true, // flag để nhận biết monaco tự handle event, chỉ thêm vào để hiển thị danh sách event ở footer
-          action: null,
-        });
 
-        TDShortcutAction.register("monaco-find" + me.inputId, {
-          key: "f",
-          labelKey: me.$t("i18nCommon.shotKey.findTextEditor"),
-          requireCtrl: true,
-          isVirtual: true, // flag để nhận biết monaco tự handle event, chỉ thêm vào để hiển thị danh sách event ở footer
-          action: null,
-        });
+        this.editor = monaco.editor.create(
+          this.$refs.textareaWrap,
+          configObject,
+        );
+
+        // ── Dùng _onEditorFocus / _onEditorBlur thay vì debounce riêng ──
+        this.editor.onDidBlurEditorWidget(() => this._onEditorBlur());
+        this.editor.onDidFocusEditorText(() => this._onEditorFocus());
       } else {
-        // Gỡ bỏ khỏi danh sách hiển thị khi không còn focus
-        TDShortcutAction.unregister("monaco-command-palette" + me.inputId);
-        TDShortcutAction.unregister("monaco-find" + me.inputId);
+        this.unmountEditor();
       }
     },
+
     updateEditorVal() {
       if (this.editor) {
-        this.editor.setValue(this.modelValue ? this.modelValue : "");
+        this.editor.setValue(this.modelValue ?? "");
       }
     },
+
     updateValToEditor() {
       this.updateValueFromEditor(true);
     },
 
-    updateValueFromEditor(fromEditor = false) {
-      let me = this;
-      if (me.editor) {
-        let editorVal = me.editor.getValue();
-        me.$emit("update:modelValue", editorVal);
+    updateValueFromEditor() {
+      if (this.editor) {
+        this.$emit("update:modelValue", this.editor.getValue());
       }
     },
+
     unmountEditor() {
-      let me = this;
-      if (me.editor) {
-        me.updateValueFromEditor();
-        me.editor.dispose();
+      if (this.editor) {
+        this.updateValueFromEditor();
+        this.editor.dispose();
       }
-      if (me.editorModel) {
-        me.editorModel.dispose();
+      if (this.editorModel) {
+        this.editorModel.dispose();
       }
-      me.editor = null;
-      me.editorModel = null;
+      this.editor = null;
+      this.editorModel = null;
     },
-  },
-  beforeUnmount() {
-    this.unmountEditor();
   },
 };
 </script>
@@ -324,6 +349,7 @@ export default {
   .td-label-top {
     padding-bottom: var(--padding);
   }
+
   .td-label-editor {
     position: absolute;
     bottom: var(--padding);
@@ -332,9 +358,11 @@ export default {
     font-size: var(--font-size-medium-rare);
     color: var(--text-secondary-color);
   }
+
   .td-label-editor:hover {
     opacity: 0.5;
   }
+
   .textarea-wrapper {
     position: relative;
     width: 100%;
@@ -388,6 +416,7 @@ export default {
   background-color: var(--bg-layer-color);
   border: 1px solid transparent;
 }
+
 .td-textarea-read-only {
   .highlight-layer {
     background-color: var(--bg-layer-color);
