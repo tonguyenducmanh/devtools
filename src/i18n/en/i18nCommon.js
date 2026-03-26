@@ -295,6 +295,7 @@ export default {
       compressText: "Compress text",
       hasHeaderInQR: "Use QR header",
       uploadLabel: "Upload image or Ctrl + V to paste image here",
+      shortcutPaste: "Paste image for read QR",
     },
     oneTimePassword: {
       title: "Time-based (TOTP) and HMAC-based (HOTP) One-Time Password!",

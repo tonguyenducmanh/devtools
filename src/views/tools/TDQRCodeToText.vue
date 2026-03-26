@@ -86,6 +86,7 @@ import TDCompress from "@/common/compress/TDCompress.js";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDQRCodeToTextHelp from "@/views/helps/TDQRCodeToTextHelp.vue";
+import TDShortcutAction from "@/common/TDShortcutAction.js";
 export default {
   extends: TDToolBase,
   name: "TDQRCodeToText",
@@ -121,6 +122,7 @@ export default {
     onTabEnter() {
       let me = this;
       document.addEventListener("paste", me.handlePasteEvent);
+      TDShortcutAction.addEvent(this.inputId, this._buildShortcuts());
     },
 
     /**
@@ -130,8 +132,32 @@ export default {
     onTabLeave() {
       let me = this;
       document.removeEventListener("paste", me.handlePasteEvent);
+      TDShortcutAction.removeEvent(this.inputId, this._getShortcutNames());
+    },
+    /**
+     * Tên các shortcut thuộc về component này (dùng inputId để unique).
+     */
+    _getShortcutNames() {
+      return [`tdqrcodetotext-paste`];
     },
 
+    /**
+     * Shortcut configs tương ứng.
+     */
+    _buildShortcuts() {
+      return [
+        {
+          name: `tdqrcodetotext-paste`,
+          config: {
+            key: "v",
+            labelKey: this.$t("i18nCommon.qrCodeToText.shortcutPaste"),
+            requireCtrl: true,
+            isVirtual: true,
+            action: null,
+          },
+        },
+      ];
+    },
     /**
      * Xử lý event paste mã QR
      */
