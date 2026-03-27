@@ -4,6 +4,8 @@
 
 Folder này chứa source code Rust để build IronRDP thành WebAssembly (WASM).
 
+Phiên phản IronRDP này được custom riêng cho mục đích sử dụng cá nhân
+
 ## Yêu cầu
 
 1. **Rust toolchain**: https://rustup.rs/
@@ -44,7 +46,7 @@ Sau khi build, import WASM module trong Vue component:
 ```javascript
 const wasmModule = await import("@wasm/pkg/rdp_client.js");
 await wasmModule.default();
-wasmModule.setup('info');
+wasmModule.setup("info");
 ```
 
 Đảm bảo `vite.config.js` có alias:
