@@ -1,0 +1,3 @@
+[submodule "/Users/tonguyenducmanh/Codes/devtools/src_wasm/external_repo"]
+	path = /Users/tonguyenducmanh/Codes/devtools/src_wasm/external_repo
+	url = https://github.com/tonguyenducmanh/IronRDP.git

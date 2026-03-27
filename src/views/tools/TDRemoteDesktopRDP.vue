@@ -568,9 +568,8 @@ export default {
         builder.extension(enableCredsspExt);
 
         builder.setCursorStyleCallbackContext(canvas);
-        builder.setCursorStyleCallback((style) => {
-          canvas.style.cursor = style || "default";
-        });
+        // không set curor ở đây để đảm bảo khi di chuột vào canvas thì hiển thị icon cursor của IronRDP thay vì cursor style của trình duyệt
+        builder.setCursorStyleCallback((style) => {});
 
         builder.remoteClipboardChangedCallback((clipboardData) => {
           try {
@@ -1027,6 +1026,8 @@ export default {
   justify-content: center;
   overflow: hidden;
   background: #000;
+  // không set curor ở đây để đảm bảo khi di chuột vào canvas thì hiển thị icon cursor của IronRDP thay vì cursor style của trình duyệt
+  cursor: none;
 }
 
 .rdp-canvas-container-full-tab {
