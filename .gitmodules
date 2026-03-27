@@ -1,3 +1,3 @@
 [submodule "src_wasm/iron_rdp/external_repo"]
-    path = src_wasm/iron_rdp/external_repo
-    url = https://github.com/tonguyenducmanh/IronRDP.git
+	path = src_wasm/iron_rdp/external_repo
+	url = https://github.com/tonguyenducmanh/IronRDP.git
