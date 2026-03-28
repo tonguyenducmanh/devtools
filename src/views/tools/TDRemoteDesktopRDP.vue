@@ -8,7 +8,8 @@
           class="rdp-canvas-container"
           :class="{
             'rdp-canvas-container-full-tab': isFullTab,
-            'rdp-canvas-container-cursor-none': currentConfigLayout.enableServerPointer,
+            'rdp-canvas-container-cursor-none':
+              currentConfigLayout.enableServerPointer,
           }"
         >
           <canvas
@@ -287,13 +288,6 @@
               :label="$t('i18nCommon.remoteDesktop.enableServerPointer')"
               @change="updateConfigLayout"
             ></TDCheckbox>
-            <TDCheckbox
-              :noMargin="true"
-              :variant="$tdEnum.checkboxType.switch"
-              v-model="currentConfigLayout.pointerSoftwareRendering"
-              :label="$t('i18nCommon.remoteDesktop.pointerSoftwareRendering')"
-              @change="updateConfigLayout"
-            ></TDCheckbox>
           </div>
         </div>
       </template>
@@ -323,7 +317,6 @@ export default {
         scaleFactor: 100,
         enableAudioPlayback: false,
         enableServerPointer: true,
-        pointerSoftwareRendering: false,
       },
       host: "",
       username: "",
@@ -627,9 +620,15 @@ export default {
         builder.renderCanvas(canvas);
         builder.extension(enableCredsspExt);
         builder.setDesktopScaleFactor(this.selectedScaleFactor);
-        builder.setEnableAudioPlayback(this.currentConfigLayout.enableAudioPlayback);
-        builder.setEnableServerPointer(this.currentConfigLayout.enableServerPointer);
-        builder.setPointerSoftwareRendering(this.currentConfigLayout.pointerSoftwareRendering);
+        builder.setEnableAudioPlayback(
+          this.currentConfigLayout.enableAudioPlayback,
+        );
+        builder.setEnableServerPointer(
+          this.currentConfigLayout.enableServerPointer,
+        );
+        builder.setPointerSoftwareRendering(
+          this.currentConfigLayout.enableServerPointer,
+        );
 
         builder.setCursorStyleCallbackContext(canvas);
         // không set curor ở đây để đảm bảo khi di chuột vào canvas thì hiển thị icon cursor của IronRDP thay vì cursor style của trình duyệt
@@ -1178,7 +1177,7 @@ export default {
   gap: var(--padding);
   margin: var(--padding);
   width: 100%;
-  .td-combobox{
+  .td-combobox {
     width: 100%;
   }
 }
