@@ -6,7 +6,10 @@
         <div
           ref="canvasContainer"
           class="rdp-canvas-container"
-          :class="{ 'rdp-canvas-container-full-tab': isFullTab }"
+          :class="{
+            'rdp-canvas-container-full-tab': isFullTab,
+            'rdp-canvas-container-cursor-none': currentConfigLayout.enableServerPointer,
+          }"
         >
           <canvas
             ref="rdpCanvas"
@@ -245,20 +248,53 @@
             $tdEnum.RemoteDesktopSidebarOption.Setting
           "
         >
-          <TDCheckbox
-            :variant="$tdEnum.checkboxType.switch"
-            v-model="currentConfigLayout.showLog"
-            :label="$t('i18nCommon.remoteDesktop.showLog')"
-            @change="updateConfigLayout"
-          ></TDCheckbox>
-          <TDComboBox
-            v-model="selectedResolution"
-            :options="resolutionOptions"
-            :noMargin="true"
-            :isEditable="false"
-            :width="100"
-            :usingStylePercent="true"
-          ></TDComboBox>
+          <div class="flex flex-col td-rdp-setting">
+            <TDCheckbox
+              :noMargin="true"
+              :variant="$tdEnum.checkboxType.switch"
+              v-model="currentConfigLayout.showLog"
+              :label="$t('i18nCommon.remoteDesktop.showLog')"
+              @change="updateConfigLayout"
+            ></TDCheckbox>
+            <TDComboBox
+              v-model="selectedResolution"
+              :options="resolutionOptions"
+              :noMargin="true"
+              :isEditable="false"
+              :width="100"
+              :usingStylePercent="true"
+            ></TDComboBox>
+            <TDComboBox
+              v-model="selectedScaleFactor"
+              :options="scaleFactorOptions"
+              :noMargin="true"
+              :isEditable="false"
+              :width="100"
+              :usingStylePercent="true"
+              :label="$t('i18nCommon.remoteDesktop.scaleFactor')"
+            ></TDComboBox>
+            <TDCheckbox
+              :variant="$tdEnum.checkboxType.switch"
+              v-model="currentConfigLayout.enableAudioPlayback"
+              :noMargin="true"
+              :label="$t('i18nCommon.remoteDesktop.enableAudioPlayback')"
+              @change="updateConfigLayout"
+            ></TDCheckbox>
+            <TDCheckbox
+              :noMargin="true"
+              :variant="$tdEnum.checkboxType.switch"
+              v-model="currentConfigLayout.enableServerPointer"
+              :label="$t('i18nCommon.remoteDesktop.enableServerPointer')"
+              @change="updateConfigLayout"
+            ></TDCheckbox>
+            <TDCheckbox
+              :noMargin="true"
+              :variant="$tdEnum.checkboxType.switch"
+              v-model="currentConfigLayout.pointerSoftwareRendering"
+              :label="$t('i18nCommon.remoteDesktop.pointerSoftwareRendering')"
+              @change="updateConfigLayout"
+            ></TDCheckbox>
+          </div>
         </div>
       </template>
     </TDSubSidebar>
@@ -284,6 +320,10 @@ export default {
         currentSidebarOption: this.$tdEnum.RemoteDesktopSidebarOption.Help,
         showLog: false,
         resolution: "1920x1080",
+        scaleFactor: 100,
+        enableAudioPlayback: false,
+        enableServerPointer: true,
+        pointerSoftwareRendering: false,
       },
       host: "",
       username: "",
@@ -362,6 +402,26 @@ export default {
         this.currentConfigLayout.resolution = value;
         this.updateConfigLayout();
       },
+    },
+    selectedScaleFactor: {
+      get() {
+        return this.currentConfigLayout.scaleFactor || 100;
+      },
+      set(value) {
+        this.currentConfigLayout.scaleFactor = value;
+        this.updateConfigLayout();
+      },
+    },
+    scaleFactorOptions() {
+      return [
+        { value: 100, label: "100%" },
+        { value: 125, label: "125%" },
+        { value: 150, label: "150%" },
+        { value: 175, label: "175%" },
+        { value: 200, label: "200%" },
+        { value: 250, label: "250%" },
+        { value: 300, label: "300%" },
+      ];
     },
     sidebarOptions() {
       let options = [];
@@ -566,6 +626,10 @@ export default {
         builder.desktopSize(desktopSize);
         builder.renderCanvas(canvas);
         builder.extension(enableCredsspExt);
+        builder.setDesktopScaleFactor(this.selectedScaleFactor);
+        builder.setEnableAudioPlayback(this.currentConfigLayout.enableAudioPlayback);
+        builder.setEnableServerPointer(this.currentConfigLayout.enableServerPointer);
+        builder.setPointerSoftwareRendering(this.currentConfigLayout.pointerSoftwareRendering);
 
         builder.setCursorStyleCallbackContext(canvas);
         // không set curor ở đây để đảm bảo khi di chuột vào canvas thì hiển thị icon cursor của IronRDP thay vì cursor style của trình duyệt
@@ -1026,7 +1090,9 @@ export default {
   justify-content: center;
   overflow: hidden;
   background: #000;
-  // không set curor ở đây để đảm bảo khi di chuột vào canvas thì hiển thị icon cursor của IronRDP thay vì cursor style của trình duyệt
+}
+
+.rdp-canvas-container-cursor-none {
   cursor: none;
 }
 
@@ -1108,7 +1174,14 @@ export default {
   width: 100%;
   overflow: auto;
 }
-
+.td-rdp-setting {
+  gap: var(--padding);
+  margin: var(--padding);
+  width: 100%;
+  .td-combobox{
+    width: 100%;
+  }
+}
 .td-rdp-collection {
   width: 100%;
   display: flex;

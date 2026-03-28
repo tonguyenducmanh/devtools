@@ -592,6 +592,10 @@ export default {
       screenshot: "Screenshot",
       screenshotSaved: "Screenshot saved",
       ctrlAltDel: "Send Ctrl + Alt + Del",
+      scaleFactor: "Display Scale",
+      enableAudioPlayback: "Enable Audio",
+      enableServerPointer: "Server Pointer",
+      pointerSoftwareRendering: "Pointer Software Rendering",
     },
   },
 };

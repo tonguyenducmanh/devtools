@@ -589,6 +589,10 @@ export default {
       screenshot: "Chụp ảnh",
       screenshotSaved: "Đã lưu ảnh chụp màn hình",
       ctrlAltDel: "Gửi Ctrl + Alt + Del",
+      scaleFactor: "Tỷ lệ hiển thị",
+      enableAudioPlayback: "Bật âm thanh",
+      enableServerPointer: "Con trỏ từ server",
+      pointerSoftwareRendering: "Con trỏ phần mềm",
     },
   },
 };
