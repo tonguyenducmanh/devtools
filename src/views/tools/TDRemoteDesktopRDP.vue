@@ -250,13 +250,6 @@
           "
         >
           <div class="flex flex-col td-rdp-setting">
-            <TDCheckbox
-              :noMargin="true"
-              :variant="$tdEnum.checkboxType.switch"
-              v-model="currentConfigLayout.showLog"
-              :label="$t('i18nCommon.remoteDesktop.showLog')"
-              @change="updateConfigLayout"
-            ></TDCheckbox>
             <TDComboBox
               v-model="selectedResolution"
               :options="resolutionOptions"
@@ -275,17 +268,17 @@
               :label="$t('i18nCommon.remoteDesktop.scaleFactor')"
             ></TDComboBox>
             <TDCheckbox
-              :variant="$tdEnum.checkboxType.switch"
-              v-model="currentConfigLayout.enableAudioPlayback"
               :noMargin="true"
-              :label="$t('i18nCommon.remoteDesktop.enableAudioPlayback')"
+              :variant="$tdEnum.checkboxType.switch"
+              v-model="currentConfigLayout.enableServerPointer"
+              :label="$t('i18nCommon.remoteDesktop.enableServerPointer')"
               @change="updateConfigLayout"
             ></TDCheckbox>
             <TDCheckbox
               :noMargin="true"
               :variant="$tdEnum.checkboxType.switch"
-              v-model="currentConfigLayout.enableServerPointer"
-              :label="$t('i18nCommon.remoteDesktop.enableServerPointer')"
+              v-model="currentConfigLayout.showLog"
+              :label="$t('i18nCommon.remoteDesktop.showLog')"
               @change="updateConfigLayout"
             ></TDCheckbox>
           </div>
