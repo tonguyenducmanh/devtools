@@ -1168,7 +1168,7 @@ export default {
 }
 .td-rdp-setting {
   gap: var(--padding);
-  margin: var(--padding);
+  margin-top: var(--padding);
   width: 100%;
   .td-combobox {
     width: 100%;
