@@ -162,6 +162,13 @@ export default {
   extends: TDToolBase,
   name: "TDJSONToPostgreSQL",
   components: { TDSubSidebar, TDJSONToPostgreSQLHelp },
+  watch: {
+    tableName(oldVal, newVal) {
+      if (oldVal != newVal) {
+        this.reBuildTabTitle(this.tableName);
+      }
+    },
+  },
   computed: {
     sidebarOptions() {
       let options = [];
