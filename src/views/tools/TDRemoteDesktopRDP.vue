@@ -8,13 +8,15 @@
           class="rdp-canvas-container"
           :class="{
             'rdp-canvas-container-full-tab': isFullTab,
-            'rdp-canvas-container-cursor-none':
-              currentConfigLayout.enableServerPointer,
           }"
         >
           <canvas
             ref="rdpCanvas"
             class="rdp-canvas"
+            :class="{
+              'rdp-canvas-cursor-none':
+                currentConfigLayout.enableServerPointer && isConnected,
+            }"
             :width="canvasWidth"
             :height="canvasHeight"
             tabindex="0"
@@ -1084,7 +1086,7 @@ export default {
   background: #000;
 }
 
-.rdp-canvas-container-cursor-none {
+.rdp-canvas-cursor-none {
   cursor: none;
 }
 
