@@ -1109,7 +1109,6 @@ export default {
     border-radius: 0 0 var(--border-radius) var(--border-radius);
   }
   .fullscreen-toolbar {
-    cursor: pointer;
     position: absolute;
     top: 0;
     left: 50%;
@@ -1119,6 +1118,36 @@ export default {
     background-color: var(--bg-layer-color);
     border-radius: 0 0 var(--border-radius) var(--border-radius);
     padding: 4px;
+
+    /* Hiệu ứng mượt mà */
+    transition: all 0.3s ease-in-out;
+    z-index: 1001;
+
+    /* Trạng thái mặc định: Thu nhỏ và đẩy lên trên */
+    /* Chúng ta để lộ khoảng 4-6px để người dùng biết chỗ mà di chuột vào */
+    clip-path: inset(0 0 80% 0);
+    opacity: 0.6;
+    transform: translateX(-50%) translateY(-2px);
+
+    &:hover {
+      /* Trạng thái khi di chuột vào: Hiển thị đầy đủ */
+      clip-path: inset(0 0 0 0);
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Thêm một "vùng đệm" giả để dễ di chuột vào hơn */
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: -10px; /* Kéo dài vùng nhận diện xuống dưới */
+      z-index: -1;
+    }
+
     .toolbar-btn {
       width: 28px;
       height: 28px;
