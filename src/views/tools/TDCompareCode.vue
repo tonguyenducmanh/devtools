@@ -137,7 +137,7 @@ export default {
       isCompareSideBySide: true,
       oldTitle: "old.txt",
       newTitle: "new.txt",
-      language: "pgsql",
+      language: "text/plan",
       methodOptions: [
         { value: "text/plan", label: "text/plan" },
         { value: "sql", label: "sql" },
