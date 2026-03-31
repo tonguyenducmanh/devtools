@@ -283,6 +283,13 @@
               :label="$t('i18nCommon.remoteDesktop.showLog')"
               @change="updateConfigLayout"
             ></TDCheckbox>
+            <TDCheckbox
+              :noMargin="true"
+              :variant="$tdEnum.checkboxType.switch"
+              v-model="currentConfigLayout.enableAudioPlayback"
+              :label="$t('i18nCommon.remoteDesktop.enableAudioPlayback')"
+              @change="updateConfigLayout"
+            ></TDCheckbox>
           </div>
         </div>
       </template>
