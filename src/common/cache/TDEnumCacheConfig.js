@@ -32,4 +32,5 @@ export const EnumCacheConfig = {
   OpticalCharacterRecognitionConfigLayout: 38,
   WelcomeLayout: 39,
   RemoteDesktopConfigLayout: 40,
+  JSONSortByKeyConfigLayout: 41,
 };

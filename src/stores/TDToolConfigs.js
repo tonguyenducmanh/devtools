@@ -119,7 +119,7 @@ const sidebarConfig = [
       titleKey: "i18nCommon.feature.blanktext",
     },
   },
-  {
+    {
     type: "group",
     groupKey: "json",
     groupTitleKey: "i18nCommon.group.JSON",
@@ -143,6 +143,11 @@ const sidebarConfig = [
         name: "jsontoexcel",
         component: () => import("@/views/tools/TDJSONToExcel.vue"),
         meta: { titleKey: "i18nCommon.feature.JSONToExcel" },
+      },
+      {
+        name: "jsonsortbykey",
+        component: () => import("@/views/tools/TDJSONSortByKey.vue"),
+        meta: { titleKey: "i18nCommon.feature.JSONSortByKey" },
       },
     ],
   },
