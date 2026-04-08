@@ -612,6 +612,8 @@ export default {
       enableAudioPlayback: "Enable Audio",
       enableServerPointer: "Server Pointer",
       pointerSoftwareRendering: "Pointer Software Rendering",
+      pin: "Pin toolbar",
+      unpin: "Unpin toolbar",
     },
   },
 };

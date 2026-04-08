@@ -610,6 +610,8 @@ export default {
       enableAudioPlayback: "Bật âm thanh",
       enableServerPointer: "Con trỏ từ server",
       pointerSoftwareRendering: "Con trỏ phần mềm",
+      pin: "Ghim thanh công cụ",
+      unpin: "Bỏ ghim thanh công cụ",
     },
   },
 };
