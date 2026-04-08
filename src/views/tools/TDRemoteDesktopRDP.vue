@@ -30,6 +30,22 @@
           />
           <div v-if="isFullTab" class="fullscreen-toolbar">
             <div
+              v-if="!isConnected && !isConnecting"
+              v-tooltip="$t('i18nCommon.remoteDesktop.connect')"
+              class="flex toolbar-btn"
+              @click="handleConnect"
+            >
+              <span class="td-icon td-connect-icon"></span>
+            </div>
+            <div
+              v-else
+              v-tooltip="$t('i18nCommon.remoteDesktop.disconnect')"
+              class="flex toolbar-btn"
+              @click="handleDisconnect"
+            >
+              <span class="td-icon td-disconnect-icon"></span>
+            </div>
+            <div
               v-tooltip="$t('i18nCommon.remoteDesktop.exitFullscreen')"
               class="flex toolbar-btn"
               @click="closeFullTab"
