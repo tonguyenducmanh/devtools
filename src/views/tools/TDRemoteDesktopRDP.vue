@@ -1147,8 +1147,7 @@ export default {
     }
   }
   .td-rdp-utility-area {
-    margin-left: 40px;
-    margin-right: 40px;
+    margin-right: 20px;
     gap: var(--padding);
     cursor: unset;
   }
