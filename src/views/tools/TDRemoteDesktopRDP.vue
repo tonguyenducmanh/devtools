@@ -1138,6 +1138,7 @@ export default {
     border-radius: var(--border-radius);
     &:hover {
       background-color: var(--bg-main-color);
+      border: 1px solid var(--border-color);
     }
   }
   .td-rdp-utility-area {
