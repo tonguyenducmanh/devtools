@@ -1073,6 +1073,7 @@ export default {
   justify-content: center;
   overflow: hidden;
   background: #000;
+  position: relative;
 }
 
 .rdp-canvas-container-full-tab {
