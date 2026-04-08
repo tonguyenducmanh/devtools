@@ -488,13 +488,18 @@ export default {
       }
     },
 
-    loadConnection(conn) {
+    async loadConnection(conn) {
       let me = this;
+      if (me.isConnected) {
+        me.handleDisconnect();
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
       me.currentConnectionId = conn.id;
       me.connectionName = conn.connection_name;
       me.host = conn.host;
       me.username = conn.username || "";
       me.password = conn.password || "";
+      await me.handleConnect();
     },
 
     createNewConnection() {
