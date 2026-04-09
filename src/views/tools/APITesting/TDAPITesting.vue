@@ -665,29 +665,29 @@
 </template>
 
 <script>
- import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
- import TDSubSidebar from "@/components/TDSubSidebar.vue";
- import TDArrow from "@/components/TDArrow.vue";
- import JSZip from "jszip";
- import TDAPIResponseStatus from "@/views/tools/APITesting/TDAPIResponseStatus.vue";
- import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
- import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
- import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
- import TDMockAPIProMode from "@/common/mock/TDMockAPIProMode.js";
- import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
- import TDToolBase from "@/views/tools/base/TDToolBase.vue";
- import TDAPITestingHelp from "@/views/helps/TDAPITestingHelp.vue";
- export default {
-   extends: TDToolBase,
-   name: "TDAPITesting",
-   components: {
-     TDSubSidebar,
-     TDArrow,
-     TDAPIResponse,
-     TDAPIResponseStatus,
-     TDHistorySidebar,
-     TDAPITestingHelp,
-   },
+import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDArrow from "@/components/TDArrow.vue";
+import JSZip from "jszip";
+import TDAPIResponseStatus from "@/views/tools/APITesting/TDAPIResponseStatus.vue";
+import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
+import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
+import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
+import TDMockAPIProMode from "@/common/mock/TDMockAPIProMode.js";
+import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
+import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDAPITestingHelp from "@/views/helps/TDAPITestingHelp.vue";
+export default {
+  extends: TDToolBase,
+  name: "TDAPITesting",
+  components: {
+    TDSubSidebar,
+    TDArrow,
+    TDAPIResponse,
+    TDAPIResponseStatus,
+    TDHistorySidebar,
+    TDAPITestingHelp,
+  },
 
   data() {
     return {
@@ -718,16 +718,15 @@
       },
       curlContent: "",
       methodOptions: [
-        { value: "GET", label: "GET", customStyle: { color: "#5EA572" } },
-        { value: "POST", label: "POST", customStyle: { color: "#AE7D0D" } },
-        { value: "PUT", label: "PUT", customStyle: { color: "#3676C7" } },
-        { value: "PATCH", label: "PATCH", customStyle: { color: "#825DAC" } },
-        { value: "DELETE", label: "DELETE", customStyle: { color: "#A64C43" } },
-        { value: "HEAD", label: "HEAD", customStyle: { color: "#459B60" } },
+        { value: "GET", label: "GET" },
+        { value: "POST", label: "POST" },
+        { value: "PUT", label: "PUT" },
+        { value: "PATCH", label: "PATCH" },
+        { value: "DELETE", label: "DELETE" },
+        { value: "HEAD", label: "HEAD" },
         {
           value: "OPTIONS",
           label: "OPTIONS",
-          customStyle: { color: "#C25E95" },
         },
       ],
       APIInfoOptions: [
