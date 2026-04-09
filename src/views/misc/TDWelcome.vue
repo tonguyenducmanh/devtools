@@ -147,22 +147,6 @@ body[data-theme="dark"] .agreement {
   visibility: visible;
   z-index: 1;
 }
-.main-line-title::before {
-  content: " ";
-  display: block;
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 30%;
-  margin-top: 7%;
-  background-color: var(--btn-color);
-  transform-origin: top left;
-  mix-blend-mode: color;
-  box-sizing: border-box;
-  transition: transform 0.6s cubic-bezier(0.075, 0.82, 0.165, 1) 0.5s;
-  transform: translateY(-50%) rotate(-4deg) scaleX(1);
-}
 body[data-theme="dark"] {
   .main-line-title {
     color: #33a16f;

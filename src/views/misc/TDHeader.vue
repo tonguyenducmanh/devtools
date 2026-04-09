@@ -1,7 +1,7 @@
 <template>
   <div class="flex td-header-container">
     <div class="td-app-name">
-      <div class="td-logo" @click="goToWelcome"></div>
+      <!-- <div class="td-logo" @click="goToWelcome"></div> -->
       <div
         class="td-app-title"
         @click="goToWelcome"
