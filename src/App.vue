@@ -105,7 +105,6 @@ export default {
     }
     .td-main {
       overflow: unset;
-      padding: var(--padding);
       flex: 1;
       display: flex;
       flex-direction: column;

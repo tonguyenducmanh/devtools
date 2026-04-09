@@ -71,6 +71,7 @@ body[data-theme="light"] {
   --bg-tooltip-color: #f3f3f3;
   --bg-tooltip-border-color: #c8c8c8;
   --tooltip-color: #616161;
+  --border-hard-color: rgb(40, 38, 38);
 }
 
 body[data-theme="dark"] {
@@ -96,6 +97,7 @@ body[data-theme="dark"] {
   --bg-tooltip-color: #252526;
   --bg-tooltip-border-color: #454545;
   --tooltip-color: #cccccc;
+  --border-hard-color: rgb(224, 224, 224);
 }
 
 body {

@@ -449,8 +449,9 @@ export default {
 /* ── Layout ── */
 .td-tab-wrap {
   width: 100%;
-  margin-bottom: var(--padding);
   gap: var(--padding);
+  background-color: var(--bg-layer-color);
+  border-radius: var(--border-radius);
 }
 
 .td-tab-bar {
@@ -502,8 +503,8 @@ export default {
   &.td-tab-active {
     color: var(--text-color);
     font-weight: 600;
-    background-color: var(--bg-layer-color);
-
+    background-color: var(--bg-main-color);
+    border-bottom: 2px solid var(--border-hard-color);
     .td-tab-close {
       opacity: 0.5;
     }
@@ -569,7 +570,7 @@ export default {
 
 /* ── Tab label ── */
 .td-tab-number {
-  color: #00c9a7;
+  color: var(--border-hard-color);
 }
 
 .td-tab-label {
@@ -617,7 +618,7 @@ export default {
   margin-right: 4px;
   align-self: center;
   border: 1px solid var(--border-color);
-  background: transparent;
+  background-color: var(--bg-main-color);
   color: var(--text-secondary-color);
   cursor: pointer;
   border-radius: var(--border-radius);
@@ -628,8 +629,9 @@ export default {
 
 /* ── Content ── */
 .td-tab-content {
+  box-sizing: border-box;
   flex: 1;
-  width: 100%;
+  margin: var(--padding);
   min-height: 0;
   position: relative;
   overflow: hidden;
