@@ -451,7 +451,6 @@ export default {
   width: 100%;
   gap: var(--padding);
   background-color: var(--bg-layer-color);
-  border-radius: var(--border-radius);
 }
 
 .td-tab-bar {
