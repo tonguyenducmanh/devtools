@@ -31,6 +31,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
             @dragend="onDragEnd"
             @click="activateTab(tab.id)"
             @contextmenu.prevent="openContextMenu($event, tab)"
+            @click.middle="closeTab(tab.id)"
             v-tooltip="$t(tab.helpKey)"
           >
             <div
