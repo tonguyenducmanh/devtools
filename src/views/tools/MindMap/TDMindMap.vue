@@ -225,6 +225,7 @@ export default {
       miniMapSvg: "",
       miniMapSvgStyle: {},
       miniMapViewBoxStyle: {},
+      resizeObserver: null,
     };
   },
 
@@ -262,6 +263,10 @@ export default {
 
   beforeUnmount() {
     this.stopAutoSave();
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
     if (this.mindMap) {
       this.mindMap.destroy();
       this.mindMap = null;
@@ -271,6 +276,9 @@ export default {
   methods: {
     // ─── Init ───────────────────────────────────────────────
     initMindMap(savedData) {
+      if (this.resizeObserver) {
+        this.resizeObserver.disconnect();
+      }
       const data = savedData || defaultMindMapData;
       this.mindMap = new MindMap({
         el: this.$refs.mindMapContainer,
@@ -291,6 +299,14 @@ export default {
           console.error("[MindMap]", code, err);
         },
       });
+      
+      // Resize observer
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this.mindMap) {
+          this.mindMap.resize();
+        }
+      });
+      this.resizeObserver.observe(this.$refs.mindMapContainer);
 
       // Bind events
       this.mindMap.on("scale", this.onScale);
