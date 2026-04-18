@@ -145,6 +145,9 @@ export default {
 
     onNodeContextMenu(e, node) {
       this.ctxMenuNode = node;
+      if (!node.nodeData?.isActive) {
+        node.active(e);
+      }
       this.$tdContextMenu.open(e, [
         {
           key: "edit",
@@ -169,17 +172,17 @@ export default {
         {
           key: "copy",
           label: this.$t("i18nCommon.mindMap.copy"),
-          action: () => this.execCommand("COPY_NODE"),
+          action: () => this.mindMap.renderer.copy(),
         },
         {
           key: "cut",
           label: this.$t("i18nCommon.mindMap.cut"),
-          action: () => this.execCommand("CUT_NODE"),
+          action: () => this.mindMap.renderer.cut(),
         },
         {
           key: "paste",
           label: this.$t("i18nCommon.mindMap.paste"),
-          action: () => this.execCommand("PASTE_NODE"),
+          action: () => this.mindMap.renderer.paste(),
         },
       ]);
     },
@@ -210,8 +213,8 @@ export default {
     },
 
     startEditNode() {
-      if (this.mindMap) {
-        this.mindMap.renderer.startTextEdit();
+      if (this.mindMap && this.ctxMenuNode) {
+        this.mindMap.renderer.textEdit.show({ node: this.ctxMenuNode });
       }
     },
 
