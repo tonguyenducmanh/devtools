@@ -1,92 +1,239 @@
 <template>
-  <div
-    class="td-mindmap-root"
-    @dragenter.stop.prevent="onDragEnter"
-    @dragleave.stop.prevent
-    @dragover.stop.prevent
-    @drop.stop.prevent
-  >
-    <!-- Toolbar -->
-    <TDMindMapToolbar
-      :scale="scalePercent"
-      :currentTheme="currentTheme"
-      :currentLayout="currentLayout"
-      @import="triggerImport"
-      @export="handleExport"
-      @undo="execCommand('BACK')"
-      @redo="execCommand('FORWARD')"
-      @addChild="execCommand('INSERT_CHILD_NODE')"
-      @addSibling="execCommand('INSERT_NODE')"
-      @deleteNode="execCommand('REMOVE_NODE')"
-      @zoomIn="zoomIn"
-      @zoomOut="zoomOut"
-      @fitCanvas="fitCanvas"
-      @themeChange="changeTheme"
-      @layoutChange="changeLayout"
-    />
-
-    <!-- Mind Map Canvas -->
-    <div class="td-mindmap-canvas" ref="mindMapContainer"></div>
-
-    <!-- Drag Overlay -->
+  <div class="flex td-mindmap-container">
+    <!-- phần thao tác chính của tool -->
     <div
-      class="td-mindmap-drag-overlay"
-      v-if="showDragOverlay"
-      @dragleave.stop.prevent="onDragLeave"
+      class="td-mindmap-root"
+      @dragenter.stop.prevent="onDragEnter"
+      @dragleave.stop.prevent
       @dragover.stop.prevent
-      @drop.stop.prevent="onDrop"
+      @drop.stop.prevent
     >
-      <div class="td-mindmap-drag-tip">
-        <span class="td-mindmap-drag-icon">📂</span>
-        <span>{{ $t("i18nCommon.mindMap.dragToImport") }}</span>
-        <span class="td-mindmap-drag-formats">{{
-          $t("i18nCommon.mindMap.supportedFormats")
-        }}</span>
-      </div>
-    </div>
+      <!-- Toolbar -->
+      <TDMindMapToolbar
+        :scale="scalePercent"
+        @newMindMap="handleNewMindMap"
+        @import="triggerImport"
+        @export="handleExport"
+        @undo="execCommand('BACK')"
+        @redo="execCommand('FORWARD')"
+        @addChild="execCommand('INSERT_CHILD_NODE')"
+        @addSibling="execCommand('INSERT_NODE')"
+        @deleteNode="execCommand('REMOVE_NODE')"
+        @zoomIn="zoomIn"
+        @zoomOut="zoomOut"
+        @fitCanvas="fitCanvas"
+      />
 
-    <!-- Hidden file input -->
-    <input
-      ref="fileInput"
-      type="file"
-      accept=".xmind,.smm,.json,.md"
-      style="display: none"
-      @change="handleFileInputChange"
-    />
+      <!-- Mind Map Canvas -->
+      <div class="td-mindmap-canvas" ref="mindMapContainer"></div>
+
+      <!-- Drag Overlay -->
+      <div
+        class="td-mindmap-drag-overlay"
+        v-if="showDragOverlay"
+        @dragleave.stop.prevent="onDragLeave"
+        @dragover.stop.prevent
+        @drop.stop.prevent="onDrop"
+      >
+        <div class="td-mindmap-drag-tip">
+          <span class="td-mindmap-drag-icon">📂</span>
+          <span>{{ $t("i18nCommon.mindMap.dragToImport") }}</span>
+          <span class="td-mindmap-drag-formats">{{
+            $t("i18nCommon.mindMap.supportedFormats")
+          }}</span>
+        </div>
+      </div>
+
+      <!-- Hidden file input -->
+      <input
+        ref="fileInput"
+        type="file"
+        accept=".xmind,.smm,.json,.md"
+        style="display: none"
+        @change="handleFileInputChange"
+      />
+    </div>
+    <!-- phần nội dung sidebar -->
+    <TDSubSidebar
+      ref="subSidebar"
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
+      <!-- slide tùy chọn như cài đặt hoặc history -->
+      <template v-slot:menu>
+        <div class="td-sidebar-menu">
+          <TDSlideOption
+            :showIcon="true"
+            v-model="currentConfigLayout.currentSidebarOption"
+            :options="sidebarOptions"
+            :noMargin="true"
+            @change="updateConfigLayout"
+          />
+        </div>
+      </template>
+      <template v-slot:main>
+        <!-- phần sidebar Setting -->
+        <div
+          class="td-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.MindMapSidebarOption.Setting
+          "
+        >
+          <div class="td-sidebar-setting-group">
+            <label class="td-sidebar-label">{{
+              $t("i18nCommon.mindMap.theme")
+            }}</label>
+            <TDComboBox
+              :modelValue="currentConfigLayout.currentTheme"
+              @update:modelValue="changeTheme"
+              :options="themeOptions"
+              :noMargin="true"
+              :isEditable="false"
+              :isCapitalizeText="false"
+              :usingStylePercent="true"
+            />
+          </div>
+          <div class="td-sidebar-setting-group">
+            <label class="td-sidebar-label">{{
+              $t("i18nCommon.mindMap.layout")
+            }}</label>
+            <TDComboBox
+              :modelValue="currentConfigLayout.currentLayout"
+              @update:modelValue="changeLayout"
+              :options="layoutOptions"
+              :noMargin="true"
+              :isEditable="false"
+              :isCapitalizeText="false"
+              :usingStylePercent="true"
+            />
+          </div>
+        </div>
+        <!-- phần sidebar History -->
+        <div
+          class="flex flex-col td-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.MindMapSidebarOption.History
+          "
+        >
+          <div
+            v-if="historyItems && historyItems.length > 0"
+            class="flex flex-col td-mm-history-list"
+          >
+            <div
+              v-for="item in historyItems"
+              :key="item.historyId"
+              class="flex td-mm-history-item"
+              @click="applyHistory(item)"
+            >
+              <div class="td-mm-history-info">
+                <span class="td-mm-history-title" v-tooltip="item.title">{{
+                  item.title
+                }}</span>
+                <span class="td-mm-history-time">{{ item.timeDisplay }}</span>
+              </div>
+              <div
+                class="td-icon td-close-icon"
+                @click.stop="deleteHistoryItem(item.historyId)"
+                v-tooltip="$t('i18nCommon.apiTesting.delete')"
+              ></div>
+            </div>
+          </div>
+          <div v-else class="td-mm-history-empty">
+            {{ $t("i18nCommon.noDataAvailable") }}
+          </div>
+          <TDButton
+            v-if="historyItems && historyItems.length > 0"
+            @click="clearAllHistory"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.deleteAll')"
+          ></TDButton>
+        </div>
+      </template>
+    </TDSubSidebar>
+    <!-- hết phần nội dung sidebar -->
   </div>
 </template>
 
 <script>
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDMindMapToolbar from "./TDMindMapToolbar.vue";
-import { MindMap, registerPlugins, defaultMindMapData } from "./mindMapInit.js";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDSlideOption from "@/components/TDSlideOption.vue";
+import TDComboBox from "@/components/TDComboBox.vue";
+import {
+  MindMap,
+  registerPlugins,
+  defaultMindMapData,
+  themeOptions,
+  layoutOptions,
+} from "./mindMapInit.js";
 import xmind from "simple-mind-map/src/parse/xmind.js";
 import markdown from "simple-mind-map/src/parse/markdown.js";
 
 // Register plugins once globally
 registerPlugins();
 
+const AUTO_SAVE_INTERVAL = 60 * 1000; // 1 phút
+const MAX_HISTORY_ITEMS = 50;
+
 export default {
   extends: TDToolBase,
   name: "TDMindMap",
-  components: { TDMindMapToolbar },
+  components: { TDMindMapToolbar, TDSubSidebar, TDSlideOption, TDComboBox },
 
   data() {
     return {
+      keyCacheLayout: this.$tdEnum.cacheConfig.MindMapConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+        currentSidebarOption: this.$tdEnum.MindMapSidebarOption.Setting,
+        currentTheme: "classic4",
+        currentLayout: "logicalStructure",
+      },
       mindMap: null,
       scalePercent: 100,
-      currentTheme: "classic4",
-      currentLayout: "logicalStructure",
       // Drag & drop
       showDragOverlay: false,
+      // History
+      historyItems: [],
+      autoSaveTimer: null,
+      // Options for sidebar
+      themeOptions,
+      layoutOptions,
     };
   },
 
+  computed: {
+    sidebarOptions() {
+      return [
+        {
+          value: this.$tdEnum.MindMapSidebarOption.Setting,
+          label: this.$t("i18nCommon.mindMap.sidebarOption.setting"),
+          icon: "td-setting-icon",
+        },
+        {
+          value: this.$tdEnum.MindMapSidebarOption.History,
+          label: this.$t("i18nCommon.mindMap.sidebarOption.history"),
+          icon: "td-history-icon",
+        },
+      ];
+    },
+  },
+
   mounted() {
-    this.initMindMap();
+    // Delay init to ensure container has computed dimensions
+    // ($nextTick is not enough due to tab system layout timing)
+    setTimeout(() => {
+      this.initMindMap();
+    }, 100);
+    this.loadHistory();
+    this.startAutoSave();
   },
 
   beforeUnmount() {
+    this.stopAutoSave();
     if (this.mindMap) {
       this.mindMap.destroy();
       this.mindMap = null;
@@ -100,9 +247,9 @@ export default {
       this.mindMap = new MindMap({
         el: this.$refs.mindMapContainer,
         data: data.root,
-        theme: this.currentTheme,
+        theme: this.currentConfigLayout.currentTheme,
         themeConfig: data.theme.config || {},
-        layout: data.layout,
+        layout: this.currentConfigLayout.currentLayout,
         fit: false,
         nodeTextEditZIndex: 1000,
         nodeNoteTooltipZIndex: 1000,
@@ -116,9 +263,6 @@ export default {
           console.error("[MindMap]", code, err);
         },
       });
-
-      this.currentTheme = data.theme.template;
-      this.currentLayout = data.layout;
 
       // Bind events
       this.mindMap.on("scale", this.onScale);
@@ -242,16 +386,29 @@ export default {
     // ─── Theme & Layout ─────────────────────────────────────
     changeTheme(theme) {
       if (this.mindMap) {
-        this.currentTheme = theme;
+        this.currentConfigLayout.currentTheme = theme;
         this.mindMap.setTheme(theme);
+        this.updateConfigLayout();
       }
     },
 
     changeLayout(layout) {
       if (this.mindMap) {
-        this.currentLayout = layout;
+        this.currentConfigLayout.currentLayout = layout;
         this.mindMap.setLayout(layout);
+        this.updateConfigLayout();
       }
+    },
+
+    // ─── New Mind Map ───────────────────────────────────────
+    async handleNewMindMap() {
+      // Lưu mindmap hiện tại vào history trước khi reset
+      await this.saveSnapshot();
+      // Tạo data mới nhưng giữ nguyên theme và layout hiện tại
+      const newData = JSON.parse(JSON.stringify(defaultMindMapData));
+      newData.theme.template = this.currentConfigLayout.currentTheme;
+      newData.layout = this.currentConfigLayout.currentLayout;
+      this.setMindMapData(newData);
     },
 
     // ─── Expand / Collapse ──────────────────────────────────
@@ -376,6 +533,120 @@ export default {
       }
     },
 
+    // ─── History (auto-save) ────────────────────────────────
+    startAutoSave() {
+      this.autoSaveTimer = setInterval(() => {
+        this.saveSnapshot();
+      }, AUTO_SAVE_INTERVAL);
+    },
+
+    stopAutoSave() {
+      if (this.autoSaveTimer) {
+        clearInterval(this.autoSaveTimer);
+        this.autoSaveTimer = null;
+      }
+    },
+
+    async saveSnapshot() {
+      if (!this.mindMap) return;
+      try {
+        const fullData = this.mindMap.getData(true);
+        const rootText = fullData?.root?.data?.text || "Mind Map";
+        const now = new Date();
+        const entry = {
+          historyId: this.$tdUtility.newGuid(),
+          timestamp: now.getTime(),
+          title: this.$tdUtility.stripHtml(rootText),
+          timeDisplay: this.formatTime(now),
+          data: fullData,
+        };
+
+        let history = await this.getHistoryFromCache();
+        history.push(entry);
+
+        // Giới hạn số lượng
+        while (history.length > MAX_HISTORY_ITEMS) {
+          history.shift();
+        }
+
+        await this.$tdCache.set(
+          this.$tdEnum.cacheConfig.MindMapHistory,
+          history,
+        );
+        this.historyItems = [...history].reverse();
+      } catch (err) {
+        console.error("[MindMap] Auto-save error:", err);
+      }
+    },
+
+    async loadHistory() {
+      try {
+        const history = await this.getHistoryFromCache();
+        this.historyItems = [...history].reverse();
+      } catch (err) {
+        console.error("[MindMap] Load history error:", err);
+      }
+    },
+
+    async getHistoryFromCache() {
+      let history = await this.$tdCache.get(
+        this.$tdEnum.cacheConfig.MindMapHistory,
+      );
+      if (history) {
+        if (!Array.isArray(history)) {
+          history = JSON.parse(history);
+        }
+      } else {
+        history = [];
+      }
+      return history;
+    },
+
+    applyHistory(item) {
+      if (item && item.data) {
+        this.setMindMapData(item.data);
+        // Cập nhật config nếu dữ liệu có theme/layout
+        if (item.data.theme?.template) {
+          this.currentConfigLayout.currentTheme = item.data.theme.template;
+        }
+        if (item.data.layout) {
+          this.currentConfigLayout.currentLayout = item.data.layout;
+        }
+        this.updateConfigLayout();
+        this.$tdToast.success(this.$t("i18nCommon.mindMap.historyRollback"));
+      }
+    },
+
+    async deleteHistoryItem(historyId) {
+      try {
+        let history = await this.getHistoryFromCache();
+        history = history.filter((x) => x.historyId !== historyId);
+        await this.$tdCache.set(
+          this.$tdEnum.cacheConfig.MindMapHistory,
+          history,
+        );
+        this.historyItems = [...history].reverse();
+        this.$tdToast.success(this.$t("i18nCommon.toastMessage.removed"));
+      } catch (err) {
+        console.error("[MindMap] Delete history error:", err);
+      }
+    },
+
+    async clearAllHistory() {
+      try {
+        await this.$tdCache.remove(this.$tdEnum.cacheConfig.MindMapHistory);
+        this.historyItems = [];
+        this.$tdToast.success(this.$t("i18nCommon.toastMessage.removed"));
+      } catch (err) {
+        console.error("[MindMap] Clear history error:", err);
+      }
+    },
+
+    formatTime(date) {
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())} ${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
+    },
+
     // ─── Drag & Drop ────────────────────────────────────────
     onDragEnter() {
       this.showDragOverlay = true;
@@ -402,8 +673,14 @@ export default {
 </script>
 
 <style scoped>
-.td-mindmap-root {
+.td-mindmap-container {
   width: 100%;
+  height: 100%;
+}
+
+.td-mindmap-root {
+  flex: 1;
+  min-width: 0;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -451,5 +728,80 @@ export default {
 .td-mindmap-drag-formats {
   font-size: 12px;
   color: var(--text-secondary-color, #999);
+}
+
+/* ─── Sidebar content ────────────────────────────────────── */
+.td-sidebar-content {
+  margin-top: var(--padding);
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+}
+
+.td-sidebar-setting-group {
+  margin-bottom: var(--padding);
+  width: 100%;
+}
+
+.td-sidebar-label {
+  display: block;
+  font-size: var(--font-size-small);
+  color: var(--text-secondary-color);
+  margin-bottom: 4px;
+}
+
+/* ─── History ────────────────────────────────────────────── */
+.td-mm-history-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  gap: 2px;
+  margin-bottom: var(--padding);
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.td-mm-history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--padding);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  gap: var(--padding);
+  transition: background 0.15s;
+  width: 100%;
+}
+
+.td-mm-history-item:hover {
+  background-color: var(--bg-layer-color);
+}
+
+.td-mm-history-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.td-mm-history-title {
+  font-size: var(--font-size-medium-rare);
+  color: var(--text-primary-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+}
+
+.td-mm-history-time {
+  font-size: var(--font-size-small);
+  color: var(--text-secondary-color);
+}
+
+.td-mm-history-empty {
+  padding: var(--padding-large);
+  text-align: center;
+  color: var(--text-secondary-color);
+  font-size: var(--font-size-small);
 }
 </style>

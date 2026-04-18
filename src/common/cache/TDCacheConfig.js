@@ -214,4 +214,16 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool Remote Desktop RDP",
   },
+  MindMapConfigLayout: {
+    KeyFormat: "MindMapConfigLayout",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool Mind Map",
+  },
+  MindMapHistory: {
+    KeyFormat: "MindMapHistory",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử auto-save mind map",
+  },
 };

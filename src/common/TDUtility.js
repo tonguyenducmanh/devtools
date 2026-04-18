@@ -16,6 +16,18 @@ class TDUtility {
     const appName = window.__env.appName;
     return `${appName} - ${window.__env.author}`;
   }
+
+  /**
+   * Xóa html trong string
+   * @param {string} htmlString chuỗi html
+   * @returns {string} chuỗi html đã xóa html
+   */
+  stripHtml(htmlString) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, "text/html");
+    return doc.body.textContent || "";
+  }
+
   /**
    * go to source code link
    */

@@ -143,7 +143,15 @@ export default {
       rootNode: "Root node",
       cut: "Cut",
       paste: "Paste",
-      copy: "Copy"
+      copy: "Copy",
+      newMindMap: "New mind map",
+      newMindMapConfirm: "Create a new mind map? Current work will be lost if not saved.",
+      autoSaved: "Auto saved",
+      historyRollback: "Rolled back to history",
+      sidebarOption: {
+        setting: "Setting",
+        history: "History",
+      },
     },
     example: "example",
     base64ToImage: {

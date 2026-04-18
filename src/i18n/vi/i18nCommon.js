@@ -143,7 +143,15 @@ export default {
       rootNode: "Nút gốc",
       cut: "Cắt",
       paste: "Dán",
-      copy: "Sao chép"
+      copy: "Sao chép",
+      newMindMap: "Tạo mới mind map",
+      newMindMapConfirm: "Tạo mind map mới? Dữ liệu hiện tại sẽ mất nếu chưa được lưu.",
+      autoSaved: "Đã tự động lưu",
+      historyRollback: "Đã quay về lịch sử",
+      sidebarOption: {
+        setting: "Cài đặt",
+        history: "Lịch sử",
+      },
     },
     example: "ví dụ",
     base64ToImage: {

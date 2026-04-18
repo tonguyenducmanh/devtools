@@ -1,5 +1,18 @@
 <template>
   <div class="td-mm-toolbar">
+    <!-- New mind map -->
+    <div class="td-mm-toolbar-group">
+      <div
+        class="flex toolbar-btn"
+        @click="$emit('newMindMap')"
+        v-tooltip="$t('i18nCommon.mindMap.newMindMap')"
+      >
+        <span class="td-icon td-new-file-icon"></span>
+      </div>
+    </div>
+
+    <div class="td-mm-toolbar-sep"></div>
+
     <!-- File actions -->
     <div class="td-mm-toolbar-group">
       <div
@@ -81,30 +94,6 @@
       </div>
     </div>
 
-    <div class="td-mm-toolbar-sep"></div>
-
-    <!-- Theme & Layout -->
-    <div class="td-mm-toolbar-group">
-      <TDComboBox
-        :modelValue="currentTheme"
-        @update:modelValue="$emit('themeChange', $event)"
-        :options="themeOptions"
-        :noMargin="true"
-        :isEditable="false"
-        :width="120"
-        :isCapitalizeText="false"
-      />
-      <TDComboBox
-        :modelValue="currentLayout"
-        @update:modelValue="$emit('layoutChange', $event)"
-        :options="layoutOptions"
-        :noMargin="true"
-        :isEditable="false"
-        :width="200"
-        :isCapitalizeText="false"
-      />
-    </div>
-
     <!-- Spacer -->
     <div class="td-mm-toolbar-spacer"></div>
 
@@ -129,18 +118,15 @@
 </template>
 
 <script>
-import { themeOptions, layoutOptions, exportFormats } from "./mindMapInit.js";
-import TDComboBox from "@/components/TDComboBox.vue";
+import { exportFormats } from "./mindMapInit.js";
 
 export default {
   name: "TDMindMapToolbar",
-  components: { TDComboBox },
   props: {
     scale: { type: Number, default: 100 },
-    currentTheme: { type: String, default: "dark2" },
-    currentLayout: { type: String, default: "logicalStructure" },
   },
   emits: [
+    "newMindMap",
     "import",
     "export",
     "undo",
@@ -151,13 +137,9 @@ export default {
     "zoomIn",
     "zoomOut",
     "fitCanvas",
-    "themeChange",
-    "layoutChange",
   ],
   data() {
     return {
-      themeOptions,
-      layoutOptions,
       exportFormats,
       showExportMenu: false,
     };
