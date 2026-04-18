@@ -1,5 +1,6 @@
 <template>
   <div class="flex td-welcome">
+    <TDDynamicBackgroundEffect />
     <div class="flex flex-col wrap-container">
       <div class="container">
         <div class="main-line-title">Dev Tools</div>
@@ -20,12 +21,13 @@
 <script>
 import TDWelcomeHelp from "@/views/helps/TDWelcomeHelp.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";
 import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
 
 export default {
   name: "TDWelcome",
   mixins: [TDLayoutConfigMixin],
-  components: { TDWelcomeHelp, TDSubSidebar },
+  components: { TDWelcomeHelp, TDSubSidebar, TDDynamicBackgroundEffect },
   data() {
     return {
       keyCacheLayout: this.$tdEnum.cacheConfig.WelcomeLayout,
@@ -83,6 +85,8 @@ export default {
 .td-welcome {
   width: 100%;
   height: 100%;
+  position: relative;
+  overflow: hidden;
 }
 /* Giữ nguyên các style cũ của bạn */
 .wrap-container {
