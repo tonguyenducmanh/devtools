@@ -248,7 +248,7 @@ export default {
   left: 0;
   margin-top: 4px;
   min-width: 180px;
-  background: var(--bg-layer-color);
+  background: var(--bg-main-color);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-component);
   padding: 4px 0;
@@ -265,6 +265,6 @@ export default {
 }
 
 .td-mm-dropdown-item:hover {
-  background: var(--bg-focus-color);
+  background: var(--bg-layer-color);
 }
 </style>
