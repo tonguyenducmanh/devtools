@@ -175,8 +175,9 @@ import markdown from "simple-mind-map/src/parse/markdown.js";
 // Register plugins once globally
 registerPlugins();
 
-const AUTO_SAVE_INTERVAL = 60 * 1000; // 1 phút
-const MAX_HISTORY_ITEMS = 50;
+const AUTO_SAVE_INTERVAL =
+  window.__env.mindMapConfig?.autoSaveIntervalInSecond * 1000 || 60000;
+const MAX_HISTORY_ITEMS = window.__env.mindMapConfig?.maxHistoryItems || 50;
 
 export default {
   extends: TDToolBase,

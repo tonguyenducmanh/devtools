@@ -27,4 +27,8 @@
   window.__env.quoteConfig = {
     showQuote: false,
   };
+  window.__env.mindMapConfig = {
+    autoSaveIntervalInSecond: 60,
+    maxHistoryItems: 200,
+  };
 })(this);
