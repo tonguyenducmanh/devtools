@@ -225,10 +225,15 @@ export default {
   mounted() {
     // Delay init to ensure container has computed dimensions
     // ($nextTick is not enough due to tab system layout timing)
-    setTimeout(() => {
-      this.initMindMap();
+    setTimeout(async () => {
+      // Load history và dùng bản ghi gần nhất nếu có
+      await this.loadHistory();
+      let initData = null;
+      if (this.historyItems && this.historyItems.length > 0) {
+        initData = this.historyItems[0].data; // historyItems đã reverse, [0] là mới nhất
+      }
+      this.initMindMap(initData);
     }, 100);
-    this.loadHistory();
     this.startAutoSave();
   },
 
@@ -242,15 +247,15 @@ export default {
 
   methods: {
     // ─── Init ───────────────────────────────────────────────
-    initMindMap() {
-      const data = defaultMindMapData;
+    initMindMap(savedData) {
+      const data = savedData || defaultMindMapData;
       this.mindMap = new MindMap({
         el: this.$refs.mindMapContainer,
         data: data.root,
         theme: this.currentConfigLayout.currentTheme,
         themeConfig: data.theme.config || {},
         layout: this.currentConfigLayout.currentLayout,
-        fit: false,
+        fit: true,
         nodeTextEditZIndex: 1000,
         nodeNoteTooltipZIndex: 1000,
         openRealtimeRenderOnNodeTextEdit: true,
@@ -499,7 +504,9 @@ export default {
       } else {
         this.mindMap.setData(data);
       }
-      this.mindMap.view.reset();
+      setTimeout(() => {
+        this.fitCanvas();
+      }, 100);
     },
 
     // ─── Export ──────────────────────────────────────────────
