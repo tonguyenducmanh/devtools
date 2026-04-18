@@ -74,6 +74,12 @@ const sidebarConfig = [
     ],
   },
   {
+    type: "route",
+    name: "TDMindMap",
+    component: () => import("@/views/tools/MindMap/TDMindMap.vue"),
+    meta: { titleKey: "i18nCommon.feature.MindMap" },
+  },
+  {
     type: "group",
     groupKey: "remotedesktop",
     groupTitleKey: "i18nCommon.group.RemoteDesktop",
@@ -119,7 +125,7 @@ const sidebarConfig = [
       titleKey: "i18nCommon.feature.blanktext",
     },
   },
-    {
+  {
     type: "group",
     groupKey: "json",
     groupTitleKey: "i18nCommon.group.JSON",

@@ -106,6 +106,10 @@ class TDEnum {
     Collection: 1,
     Setting: 2,
   };
+  MindMapSidebarOption = {
+    Setting: 0,
+    History: 1,
+  };
 }
 
 export default new TDEnum();

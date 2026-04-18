@@ -33,4 +33,6 @@ export const EnumCacheConfig = {
   WelcomeLayout: 39,
   RemoteDesktopConfigLayout: 40,
   JSONSortByKeyConfigLayout: 41,
+  MindMapConfigLayout: 42,
+  MindMapHistory: 43,
 };
