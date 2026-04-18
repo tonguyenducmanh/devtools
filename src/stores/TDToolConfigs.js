@@ -76,7 +76,7 @@ const sidebarConfig = [
   {
     type: "route",
     name: "TDMindMap",
-    component: () => import("@/views/tools/TDMindMap.vue"),
+    component: () => import("@/views/tools/MindMap/TDMindMap.vue"),
     meta: { titleKey: "i18nCommon.feature.MindMap" },
   },
   {
