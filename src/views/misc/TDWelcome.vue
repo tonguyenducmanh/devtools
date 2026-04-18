@@ -34,7 +34,7 @@ export default {
       languageList: Object.keys(this.$tdEnum.language).sort(),
       displayText: "",
       currentConfigLayout: {
-        isShowSidebar: true,
+        isShowSidebar: false,
       },
     };
   },

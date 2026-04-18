@@ -639,7 +639,7 @@ export default {
     return {
       keyCacheLayout: this.$tdEnum.cacheConfig.OneTimePasswordConfigLayout,
       currentConfigLayout: {
-        isShowSidebar: true,
+        isShowSidebar: false,
       },
       filterOtp: null,
       migrationURL: null,
