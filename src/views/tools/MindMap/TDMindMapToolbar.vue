@@ -182,13 +182,13 @@ export default {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: var(--padding);
-  background: var(--bg-layer-color);
-  border-bottom: 1px solid var(--border-color);
+  padding: 0 var(--padding);
+  background: var(--bg-main-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-component);
   flex-shrink: 0;
   flex-wrap: wrap;
-  min-height: 48px;
-  z-index: 10;
+  margin-bottom: var(--padding);
 }
 
 .td-mm-toolbar-group {
