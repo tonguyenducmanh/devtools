@@ -569,6 +569,15 @@ export default {
         };
 
         let history = await this.getHistoryFromCache();
+
+        // Kiểm tra xem có thay đổi so với bản ghi gần nhất không
+        if (history.length > 0) {
+          const lastHistory = history[history.length - 1];
+          if (JSON.stringify(lastHistory.data) === JSON.stringify(fullData)) {
+            return; // Bỏ qua nếu không có thay đổi gì
+          }
+        }
+
         history.push(entry);
 
         // Giới hạn số lượng
