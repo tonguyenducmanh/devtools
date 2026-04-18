@@ -94,8 +94,7 @@
       </div>
     </div>
 
-    <!-- Spacer -->
-    <div class="td-mm-toolbar-spacer"></div>
+    <div class="td-mm-toolbar-sep"></div>
 
     <!-- Zoom controls -->
     <div class="td-mm-toolbar-group">
