@@ -94,6 +94,24 @@
       </div>
     </div>
 
+    <!-- View actions -->
+    <div class="td-mm-toolbar-group">
+      <div
+        class="flex toolbar-btn"
+        @click="$emit('expandAll')"
+        v-tooltip="$t('i18nCommon.mindMap.expandAll')"
+      >
+        <span class="td-icon td-node-expand-icon"></span>
+      </div>
+      <div
+        class="flex toolbar-btn"
+        @click="$emit('collapseAll')"
+        v-tooltip="$t('i18nCommon.mindMap.collapseAll')"
+      >
+        <span class="td-icon td-node-collapse-icon"></span>
+      </div>
+    </div>
+
     <div class="td-mm-toolbar-sep"></div>
 
     <!-- Zoom controls -->
@@ -133,6 +151,8 @@ export default {
     "addChild",
     "addSibling",
     "deleteNode",
+    "expandAll",
+    "collapseAll",
     "zoomIn",
     "zoomOut",
     "fitCanvas",

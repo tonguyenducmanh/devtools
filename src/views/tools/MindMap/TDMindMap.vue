@@ -19,6 +19,8 @@
         @addChild="execCommand('INSERT_CHILD_NODE')"
         @addSibling="execCommand('INSERT_NODE')"
         @deleteNode="execCommand('REMOVE_NODE')"
+        @expandAll="expandAll"
+        @collapseAll="collapseAll"
         @zoomIn="zoomIn"
         @zoomOut="zoomOut"
         @fitCanvas="fitCanvas"
