@@ -142,7 +142,8 @@ export default {
       fileName: "File name",
       rootNode: "Root node",
       cut: "Cut",
-      paste: "Paste"
+      paste: "Paste",
+      copy: "Copy"
     },
     example: "example",
     base64ToImage: {

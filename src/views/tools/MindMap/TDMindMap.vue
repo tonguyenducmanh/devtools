@@ -28,26 +28,6 @@
     <!-- Mind Map Canvas -->
     <div class="td-mindmap-canvas" ref="mindMapContainer"></div>
 
-    <!-- Context Menu -->
-    <TDMindMapContextMenu
-      :visible="ctxMenuVisible"
-      :x="ctxMenuX"
-      :y="ctxMenuY"
-      :isNodeMenu="ctxMenuIsNode"
-      @close="ctxMenuVisible = false"
-      @editNode="startEditNode"
-      @addChild="execCommand('INSERT_CHILD_NODE')"
-      @addSibling="execCommand('INSERT_NODE')"
-      @deleteNode="execCommand('REMOVE_NODE')"
-      @copyNode="execCommand('COPY_NODE')"
-      @cutNode="execCommand('CUT_NODE')"
-      @pasteNode="execCommand('PASTE_NODE')"
-      @expandAll="expandAll"
-      @collapseAll="collapseAll"
-      @fitCanvas="fitCanvas"
-      @resetView="resetView"
-    />
-
     <!-- Drag Overlay -->
     <div
       class="td-mindmap-drag-overlay"
@@ -79,12 +59,7 @@
 <script>
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDMindMapToolbar from "./TDMindMapToolbar.vue";
-import TDMindMapContextMenu from "./TDMindMapContextMenu.vue";
-import {
-  MindMap,
-  registerPlugins,
-  defaultMindMapData,
-} from "./mindMapInit.js";
+import { MindMap, registerPlugins, defaultMindMapData } from "./mindMapInit.js";
 import xmind from "simple-mind-map/src/parse/xmind.js";
 import markdown from "simple-mind-map/src/parse/markdown.js";
 
@@ -94,20 +69,14 @@ registerPlugins();
 export default {
   extends: TDToolBase,
   name: "TDMindMap",
-  components: { TDMindMapToolbar, TDMindMapContextMenu },
+  components: { TDMindMapToolbar },
 
   data() {
     return {
       mindMap: null,
       scalePercent: 100,
-      currentTheme: "dark2",
+      currentTheme: "classic4",
       currentLayout: "logicalStructure",
-      // Context menu
-      ctxMenuVisible: false,
-      ctxMenuX: 0,
-      ctxMenuY: 0,
-      ctxMenuIsNode: false,
-      ctxMenuNode: null,
       // Drag & drop
       showDragOverlay: false,
     };
@@ -131,7 +100,7 @@ export default {
       this.mindMap = new MindMap({
         el: this.$refs.mindMapContainer,
         data: data.root,
-        theme: data.theme.template,
+        theme: this.currentTheme,
         themeConfig: data.theme.config || {},
         layout: data.layout,
         fit: false,
@@ -141,6 +110,8 @@ export default {
         enableAutoEnterTextEditWhenKeydown: true,
         initRootNodePosition: ["center", "center"],
         customInnerElsAppendTo: null,
+        defaultInsertBelowSecondLevelNodeText: "",
+        defaultInsertSecondLevelNodeText: "",
         errorHandler: (code, err) => {
           console.error("[MindMap]", code, err);
         },
@@ -152,8 +123,7 @@ export default {
       // Bind events
       this.mindMap.on("scale", this.onScale);
       this.mindMap.on("node_contextmenu", this.onNodeContextMenu);
-      this.mindMap.on("draw_click", this.onDrawClick);
-      this.mindMap.on("node_click", this.onNodeClick);
+      this.mindMap.on("contextmenu", this.onCanvasContextMenu);
 
       // Register keyboard shortcuts
       this.mindMap.keyCommand.addShortcut("Control+s", () => {
@@ -174,19 +144,69 @@ export default {
     },
 
     onNodeContextMenu(e, node) {
-      this.ctxMenuX = e.clientX;
-      this.ctxMenuY = e.clientY;
-      this.ctxMenuIsNode = true;
       this.ctxMenuNode = node;
-      this.ctxMenuVisible = true;
+      this.$tdContextMenu.open(e, [
+        {
+          key: "edit",
+          label: this.$t("i18nCommon.mindMap.editNode"),
+          action: () => this.startEditNode(),
+        },
+        {
+          key: "addChild",
+          label: this.$t("i18nCommon.mindMap.addChild"),
+          action: () => this.execCommand("INSERT_CHILD_NODE"),
+        },
+        {
+          key: "addSibling",
+          label: this.$t("i18nCommon.mindMap.addSibling"),
+          action: () => this.execCommand("INSERT_NODE"),
+        },
+        {
+          key: "delete",
+          label: this.$t("i18nCommon.mindMap.deleteNode"),
+          action: () => this.execCommand("REMOVE_NODE"),
+        },
+        {
+          key: "copy",
+          label: this.$t("i18nCommon.mindMap.copy"),
+          action: () => this.execCommand("COPY_NODE"),
+        },
+        {
+          key: "cut",
+          label: this.$t("i18nCommon.mindMap.cut"),
+          action: () => this.execCommand("CUT_NODE"),
+        },
+        {
+          key: "paste",
+          label: this.$t("i18nCommon.mindMap.paste"),
+          action: () => this.execCommand("PASTE_NODE"),
+        },
+      ]);
     },
 
-    onDrawClick() {
-      this.ctxMenuVisible = false;
-    },
-
-    onNodeClick() {
-      this.ctxMenuVisible = false;
+    onCanvasContextMenu(e) {
+      this.$tdContextMenu.open(e, [
+        {
+          key: "expandAll",
+          label: this.$t("i18nCommon.mindMap.expandAll"),
+          action: () => this.expandAll(),
+        },
+        {
+          key: "collapseAll",
+          label: this.$t("i18nCommon.mindMap.collapseAll"),
+          action: () => this.collapseAll(),
+        },
+        {
+          key: "fitCanvas",
+          label: this.$t("i18nCommon.mindMap.fitCanvas"),
+          action: () => this.fitCanvas(),
+        },
+        {
+          key: "resetView",
+          label: this.$t("i18nCommon.mindMap.resetView"),
+          action: () => this.resetView(),
+        },
+      ]);
     },
 
     startEditNode() {
@@ -332,7 +352,7 @@ export default {
             format,
             true,
             fileName,
-            "* { margin:0; padding:0; box-sizing:border-box; }"
+            "* { margin:0; padding:0; box-sizing:border-box; }",
           );
         } else if (format === "smm" || format === "json") {
           await this.mindMap.export(format, true, fileName, true);
@@ -347,7 +367,9 @@ export default {
         this.$tdToast.success(this.$t("i18nCommon.mindMap.exportSuccess"));
       } catch (err) {
         console.error("[MindMap] Export error:", err);
-        this.$tdToast.error(this.$t("i18nCommon.mindMap.exportError") || "Export error");
+        this.$tdToast.error(
+          this.$t("i18nCommon.mindMap.exportError") || "Export error",
+        );
       }
     },
 

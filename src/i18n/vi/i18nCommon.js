@@ -142,7 +142,8 @@ export default {
       fileName: "Tên file",
       rootNode: "Nút gốc",
       cut: "Cắt",
-      paste: "Dán"
+      paste: "Dán",
+      copy: "Sao chép"
     },
     example: "ví dụ",
     base64ToImage: {
