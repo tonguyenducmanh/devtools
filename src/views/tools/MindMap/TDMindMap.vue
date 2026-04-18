@@ -204,7 +204,7 @@ export default {
     return {
       keyCacheLayout: this.$tdEnum.cacheConfig.MindMapConfigLayout,
       currentConfigLayout: {
-        isShowSidebar: true,
+        isShowSidebar: false,
         currentSidebarOption: this.$tdEnum.MindMapSidebarOption.Setting,
         currentTheme: "classic4",
         currentLayout: "logicalStructure",
