@@ -101,6 +101,7 @@ export default {
       DownloadVSCodeExtension: "Tiện ích VS Code",
       UUIDV4Generator: "Trình tạo UUID",
       HTMLPreview: "Xem trước HTML",
+      MindMap: "Mind map",
       textManipulation: "Xử lý văn bản",
       APITesting: "API testing",
       APIMocking: "API mocking",

@@ -101,6 +101,7 @@ export default {
       DownloadVSCodeExtension: "VSCode Extension",
       UUIDV4Generator: "UUID generator",
       HTMLPreview: "HTML Preview",
+      MindMap: "Mind map",
       textManipulation: "Text manipulation",
       APITesting: "API testing",
       APIMocking: "API mocking",
@@ -542,7 +543,8 @@ export default {
       example: "Example",
       helpTitle: "JSON Sort by Key Tool",
       helpHowToUse: "How to use",
-      helpHowToUseContent: "Enter a JSON object or array in the input field and click Sort. All keys will be sorted alphabetically using localeCompare.",
+      helpHowToUseContent:
+        "Enter a JSON object or array in the input field and click Sort. All keys will be sorted alphabetically using localeCompare.",
       helpExample: "Example",
       helpExampleInput: '{\n  "z_key": "last",\n  "a_key": "first"\n}',
       helpExampleOutput: '{\n  "a_key": "first",\n  "z_key": "last"\n}',
