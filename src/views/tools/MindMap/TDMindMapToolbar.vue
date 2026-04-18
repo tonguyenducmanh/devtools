@@ -2,14 +2,26 @@
   <div class="td-mm-toolbar">
     <!-- File actions -->
     <div class="td-mm-toolbar-group">
-      <div class="flex toolbar-btn" @click="$emit('import')" v-tooltip="$t('i18nCommon.mindMap.importFile')">
+      <div
+        class="flex toolbar-btn"
+        @click="$emit('import')"
+        v-tooltip="$t('i18nCommon.mindMap.importFile')"
+      >
         <span class="td-icon td-import-icon"></span>
       </div>
       <div class="td-mm-dropdown-wrap">
-        <div class="flex toolbar-btn" @click="toggleExportMenu" v-tooltip="$t('i18nCommon.mindMap.exportAs')">
+        <div
+          class="flex toolbar-btn"
+          @click="toggleExportMenu"
+          v-tooltip="$t('i18nCommon.mindMap.exportAs')"
+        >
           <span class="td-icon td-export-icon"></span>
         </div>
-        <div class="td-mm-dropdown" v-if="showExportMenu" v-click-outside="closeExportMenu">
+        <div
+          class="td-mm-dropdown"
+          v-if="showExportMenu"
+          v-click-outside="closeExportMenu"
+        >
           <div
             v-for="fmt in exportFormats"
             :key="fmt.value"
@@ -26,10 +38,18 @@
 
     <!-- Edit actions -->
     <div class="td-mm-toolbar-group">
-      <div class="flex toolbar-btn" @click="$emit('undo')" v-tooltip="$t('i18nCommon.mindMap.undo')">
+      <div
+        class="flex toolbar-btn"
+        @click="$emit('undo')"
+        v-tooltip="$t('i18nCommon.mindMap.undo')"
+      >
         <span class="td-icon td-undo-icon"></span>
       </div>
-      <div class="flex toolbar-btn" @click="$emit('redo')" v-tooltip="$t('i18nCommon.mindMap.redo')">
+      <div
+        class="flex toolbar-btn"
+        @click="$emit('redo')"
+        v-tooltip="$t('i18nCommon.mindMap.redo')"
+      >
         <span class="td-icon td-redo-icon"></span>
       </div>
     </div>
@@ -38,14 +58,26 @@
 
     <!-- Node actions -->
     <div class="td-mm-toolbar-group">
-      <div class="flex toolbar-btn" @click="$emit('addChild')" v-tooltip="$t('i18nCommon.mindMap.addChild')">
-        <span class="td-icon td-plus-icon"></span>
+      <div
+        class="flex toolbar-btn"
+        @click="$emit('addSibling')"
+        v-tooltip="$t('i18nCommon.mindMap.addSibling')"
+      >
+        <span class="td-icon td-add-node-icon"></span>
       </div>
-      <div class="flex toolbar-btn" @click="$emit('addSibling')" v-tooltip="$t('i18nCommon.mindMap.addSibling')">
-        <span class="td-icon td-plus-icon"></span>
+      <div
+        class="flex toolbar-btn"
+        @click="$emit('addChild')"
+        v-tooltip="$t('i18nCommon.mindMap.addChild')"
+      >
+        <span class="td-icon td-add-node-child-icon"></span>
       </div>
-      <div class="flex toolbar-btn toolbar-btn-danger" @click="$emit('deleteNode')" v-tooltip="$t('i18nCommon.mindMap.deleteNode')">
-        <span class="td-icon td-close-icon"></span>
+      <div
+        class="flex toolbar-btn toolbar-btn-danger"
+        @click="$emit('deleteNode')"
+        v-tooltip="$t('i18nCommon.mindMap.deleteNode')"
+      >
+        <span class="td-icon td-delete-node-icon"></span>
       </div>
     </div>
 
@@ -60,7 +92,6 @@
         :noMargin="true"
         :isEditable="false"
         :width="120"
-        :label="$t('i18nCommon.mindMap.theme')"
         :isCapitalizeText="false"
       />
       <TDComboBox
@@ -69,8 +100,7 @@
         :options="layoutOptions"
         :noMargin="true"
         :isEditable="false"
-        :width="150"
-        :label="$t('i18nCommon.mindMap.layout')"
+        :width="200"
         :isCapitalizeText="false"
       />
     </div>
@@ -87,7 +117,11 @@
       <div class="flex toolbar-btn" @click="$emit('zoomIn')" v-tooltip="'+'">
         <span class="td-icon td-plus-icon"></span>
       </div>
-      <div class="flex toolbar-btn" @click="$emit('fitCanvas')" v-tooltip="$t('i18nCommon.mindMap.fitCanvas')">
+      <div
+        class="flex toolbar-btn"
+        @click="$emit('fitCanvas')"
+        v-tooltip="$t('i18nCommon.mindMap.fitCanvas')"
+      >
         <span class="td-icon td-full-screen-icon"></span>
       </div>
     </div>
@@ -107,10 +141,18 @@ export default {
     currentLayout: { type: String, default: "logicalStructure" },
   },
   emits: [
-    "import", "export", "undo", "redo",
-    "addChild", "addSibling", "deleteNode",
-    "zoomIn", "zoomOut", "fitCanvas",
-    "themeChange", "layoutChange",
+    "import",
+    "export",
+    "undo",
+    "redo",
+    "addChild",
+    "addSibling",
+    "deleteNode",
+    "zoomIn",
+    "zoomOut",
+    "fitCanvas",
+    "themeChange",
+    "layoutChange",
   ],
   data() {
     return {
