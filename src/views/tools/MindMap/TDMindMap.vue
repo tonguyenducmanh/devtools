@@ -25,7 +25,23 @@
       />
 
       <!-- Mind Map Canvas -->
-      <div class="td-mindmap-canvas" ref="mindMapContainer"></div>
+      <div class="td-mindmap-canvas" ref="mindMapContainer">
+        <!-- Mini Map Preview -->
+        <div
+          class="td-mm-minimap-wrap"
+          @mousedown.stop="onMiniMapMousedown"
+          @mousemove.stop="onMiniMapMousemove"
+          @mouseup.stop="onMiniMapMouseup"
+          @mouseleave.stop="onMiniMapMouseup"
+        >
+          <div
+            class="td-mm-minimap-svg"
+            v-html="miniMapSvg"
+            :style="miniMapSvgStyle"
+          ></div>
+          <div class="td-mm-minimap-viewbox" :style="miniMapViewBoxStyle"></div>
+        </div>
+      </div>
 
       <!-- Drag Overlay -->
       <div
@@ -203,6 +219,10 @@ export default {
       // Options for sidebar
       themeOptions,
       layoutOptions,
+      // Mini map
+      miniMapSvg: "",
+      miniMapSvgStyle: {},
+      miniMapViewBoxStyle: {},
     };
   },
 
@@ -274,6 +294,9 @@ export default {
       this.mindMap.on("scale", this.onScale);
       this.mindMap.on("node_contextmenu", this.onNodeContextMenu);
       this.mindMap.on("contextmenu", this.onCanvasContextMenu);
+      this.mindMap.on("data_change", this.updateMiniMap);
+      this.mindMap.on("view_data_change", this.updateMiniMap);
+      this.mindMap.on("node_tree_render_end", this.updateMiniMap);
 
       // Register keyboard shortcuts
       this.mindMap.keyCommand.addShortcut("Control+s", () => {
@@ -424,6 +447,52 @@ export default {
 
     collapseAll() {
       if (this.mindMap) this.execCommand("UNEXPAND_ALL");
+    },
+
+    // ─── Mini Map ───────────────────────────────────────────
+    updateMiniMap() {
+      if (!this.mindMap || !this.mindMap.miniMap) return;
+      try {
+        const {
+          svgHTML,
+          viewBoxStyle,
+          miniMapBoxScale,
+          miniMapBoxLeft,
+          miniMapBoxTop,
+        } = this.mindMap.miniMap.calculationMiniMap(200, 140);
+        this.miniMapSvg = svgHTML;
+        this.miniMapViewBoxStyle = viewBoxStyle;
+        this.miniMapSvgStyle = {
+          transform: `scale(${miniMapBoxScale})`,
+          left: miniMapBoxLeft + "px",
+          top: miniMapBoxTop + "px",
+        };
+      } catch (e) {
+        console.error("[MindMap] MiniMap error:", e);
+      }
+    },
+
+    onMiniMapMousedown(e) {
+      if (!this.mindMap || !this.mindMap.miniMap) return;
+      if (e.target.classList.contains("td-mm-minimap-viewbox")) {
+        this.mindMap.miniMap.onViewBoxMousedown(e);
+      } else {
+        this.mindMap.miniMap.onMousedown(e);
+      }
+    },
+
+    onMiniMapMousemove(e) {
+      if (!this.mindMap || !this.mindMap.miniMap) return;
+      if (this.mindMap.miniMap.isViewBoxMousedown) {
+        this.mindMap.miniMap.onViewBoxMousemove(e);
+      } else {
+        this.mindMap.miniMap.onMousemove(e);
+      }
+    },
+
+    onMiniMapMouseup(e) {
+      if (!this.mindMap || !this.mindMap.miniMap) return;
+      this.mindMap.miniMap.onMouseup(e);
     },
 
     // ─── Import ─────────────────────────────────────────────
@@ -711,6 +780,35 @@ export default {
   width: 100%;
   position: relative;
   overflow: hidden;
+}
+
+/* ─── Mini Map ───────────────────────────────────────────── */
+.td-mm-minimap-wrap {
+  position: absolute;
+  bottom: var(--padding);
+  right: var(--padding);
+  width: 200px;
+  height: 140px;
+  background: var(--bg-main-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-component);
+  box-shadow: var(--box-shadow);
+  z-index: 50;
+  overflow: hidden;
+  user-select: none;
+}
+
+.td-mm-minimap-svg {
+  position: absolute;
+  transform-origin: 0 0;
+}
+
+.td-mm-minimap-viewbox {
+  position: absolute;
+  border: 2px solid var(--focus-color, #0078d4);
+  background: rgba(0, 120, 212, 0.1);
+  cursor: move;
+  transition: all 0.1s linear;
 }
 
 /* ─── Drag overlay ───────────────────────────────────────── */
