@@ -12,7 +12,7 @@
       <div class="td-mm-dropdown-wrap">
         <div
           class="flex toolbar-btn"
-          @click="toggleExportMenu"
+          @click.stop="toggleExportMenu"
           v-tooltip="$t('i18nCommon.mindMap.exportAs')"
         >
           <span class="td-icon td-export-icon"></span>
