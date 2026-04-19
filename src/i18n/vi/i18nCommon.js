@@ -121,6 +121,8 @@ export default {
       addSibling: "Thêm nhánh cùng cấp",
       groupNode: "Gộp nhánh",
       deleteNode: "Xóa nhánh",
+      newNodeContent: "Nội dung mới",
+      newGroupNodeConent: "Nhóm mới",
       undo: "Hoàn tác",
       redo: "Làm lại",
       zoomIn: "Phóng to",

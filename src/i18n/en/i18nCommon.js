@@ -121,6 +121,8 @@ export default {
       addSibling: "Add sibling node",
       groupNode: "Group node",
       deleteNode: "Delete node",
+      newNodeContent: "New node",
+      newGroupNodeConent: "New group node",
       undo: "Undo",
       redo: "Redo",
       zoomIn: "Zoom In",

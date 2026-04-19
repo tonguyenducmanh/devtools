@@ -8,23 +8,11 @@
       @dragover.stop.prevent
       @drop.stop.prevent
     >
-      <!-- Toolbar -->
-      <TDMindMapToolbar
-        :scale="scalePercent"
-        @newMindMap="handleNewMindMap"
-        @import="triggerImport"
-        @export="handleExport"
-        @undo="execCommand('BACK')"
-        @redo="execCommand('FORWARD')"
-        @addChild="execCommand('INSERT_CHILD_NODE')"
-        @addSibling="execCommand('INSERT_NODE')"
-        @deleteNode="execCommand('REMOVE_NODE')"
-        @expandAll="expandAll"
-        @collapseAll="collapseAll"
-        @zoomIn="zoomIn"
-        @zoomOut="zoomOut"
-        @fitCanvas="fitCanvas"
-        @addGeneralization="addGeneralization"
+      <!-- Toolbar: dùng TDToolbar với config động -->
+      <TDToolbar
+        :groups="toolbarGroups"
+        :context="toolbarContext"
+        @action="onToolbarAction"
       />
 
       <!-- Mind Map Canvas -->
@@ -72,6 +60,7 @@
         @change="handleFileInputChange"
       />
     </div>
+
     <!-- phần nội dung sidebar -->
     <TDSubSidebar
       ref="subSidebar"
@@ -177,7 +166,7 @@
 
 <script>
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
-import TDMindMapToolbar from "./TDMindMapToolbar.vue";
+import TDToolbar from "@/components/TDToolbar.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDSlideOption from "@/components/TDSlideOption.vue";
 import TDComboBox from "@/components/TDComboBox.vue";
@@ -187,6 +176,7 @@ import {
   defaultMindMapData,
   themeOptions,
   layoutOptions,
+  exportFormats,
 } from "./mindMapInit.js";
 import xmind from "simple-mind-map/src/parse/xmind.js";
 import markdown from "simple-mind-map/src/parse/markdown.js";
@@ -201,7 +191,7 @@ const MAX_HISTORY_ITEMS = window.__env.mindMapConfig?.maxHistoryItems || 50;
 export default {
   extends: TDToolBase,
   name: "TDMindMap",
-  components: { TDMindMapToolbar, TDSubSidebar, TDSlideOption, TDComboBox },
+  components: { TDToolbar, TDSubSidebar, TDSlideOption, TDComboBox },
 
   data() {
     return {
@@ -245,6 +235,153 @@ export default {
         },
       ];
     },
+
+    // ─── Toolbar context (dữ liệu reactive truyền vào TDToolbar) ──
+    toolbarContext() {
+      return { scale: this.scalePercent };
+    },
+
+    // ─── Toolbar groups config ─────────────────────────────────────
+    toolbarGroups() {
+      return [
+        // Group 1: New file
+        {
+          key: "file-new",
+          showSeparator: false,
+          items: [
+            {
+              key: "newMindMap",
+              icon: "td-new-file-icon",
+              tooltip: this.$t("i18nCommon.mindMap.newMindMap"),
+              action: (ctx) => this.handleNewMindMap(),
+            },
+          ],
+        },
+
+        // Group 2: Import / Export
+        {
+          key: "file-io",
+          items: [
+            {
+              key: "import",
+              icon: "td-import-icon",
+              tooltip: this.$t("i18nCommon.mindMap.importFile"),
+              action: () => this.triggerImport(),
+            },
+            {
+              key: "export",
+              type: "dropdown",
+              icon: "td-export-icon",
+              tooltip: this.$t("i18nCommon.mindMap.exportAs"),
+              options: exportFormats,
+              // action nhận thêm option đã chọn
+              action: (ctx, item, opt) => this.handleExport(opt.value),
+            },
+          ],
+        },
+
+        // Group 3: Undo / Redo
+        {
+          key: "history",
+          items: [
+            {
+              key: "undo",
+              icon: "td-undo-icon",
+              tooltip: this.$t("i18nCommon.mindMap.undo"),
+              action: () => this.execCommand("BACK"),
+            },
+            {
+              key: "redo",
+              icon: "td-redo-icon",
+              tooltip: this.$t("i18nCommon.mindMap.redo"),
+              action: () => this.execCommand("FORWARD"),
+            },
+          ],
+        },
+
+        // Group 4: Node operations
+        {
+          key: "node-edit",
+          items: [
+            {
+              key: "addSibling",
+              icon: "td-add-node-icon",
+              tooltip: this.$t("i18nCommon.mindMap.addSibling"),
+              action: () => this.execCommand("INSERT_NODE"),
+            },
+            {
+              key: "addGeneralization",
+              icon: "td-node-merge-icon",
+              tooltip: this.$t("i18nCommon.mindMap.groupNode"),
+              action: () => this.addGeneralization(),
+            },
+            {
+              key: "addChild",
+              icon: "td-add-node-child-icon",
+              tooltip: this.$t("i18nCommon.mindMap.addChild"),
+              action: () => this.execCommand("INSERT_CHILD_NODE"),
+            },
+            {
+              key: "deleteNode",
+              icon: "td-delete-node-icon",
+              tooltip: this.$t("i18nCommon.mindMap.deleteNode"),
+              danger: true,
+              action: () => this.execCommand("REMOVE_NODE"),
+            },
+          ],
+        },
+
+        // Group 5: View (expand/collapse) — không có separator riêng
+        {
+          key: "view",
+          showSeparator: false,
+          items: [
+            {
+              key: "expandAll",
+              icon: "td-node-expand-icon",
+              tooltip: this.$t("i18nCommon.mindMap.expandAll"),
+              action: () => this.expandAll(),
+            },
+            {
+              key: "collapseAll",
+              icon: "td-node-collapse-icon",
+              tooltip: this.$t("i18nCommon.mindMap.collapseAll"),
+              action: () => this.collapseAll(),
+            },
+          ],
+        },
+
+        // Group 6: Zoom controls
+        {
+          key: "zoom",
+          items: [
+            {
+              key: "zoomOut",
+              icon: "td-minus-icon",
+              tooltip: "-",
+              action: () => this.zoomOut(),
+            },
+            {
+              key: "scaleLabel",
+              type: "label",
+              value: (ctx) => `${ctx.scale}%`,
+            },
+            {
+              key: "zoomIn",
+              icon: "td-plus-icon",
+              tooltip: "+",
+              action: () => this.zoomIn(),
+            },
+            {
+              key: "fitCanvas",
+              icon: "td-center-icon",
+              tooltip: this.$t("i18nCommon.mindMap.fitCanvas"),
+              action: () => this.fitCanvas(),
+            },
+          ],
+        },
+      ];
+    },
   },
 
   mounted() {
@@ -275,6 +412,26 @@ export default {
   },
 
   methods: {
+    onToolbarAction({ key, option }) {
+      const actionMap = {
+        newMindMap: () => this.handleNewMindMap(),
+        import: () => this.triggerImport(),
+        export: () => option && this.handleExport(option.value),
+        undo: () => this.execCommand("BACK"),
+        redo: () => this.execCommand("FORWARD"),
+        addSibling: () => this.execCommand("INSERT_NODE"),
+        addGeneralization: () => this.addGeneralization(),
+        addChild: () => this.execCommand("INSERT_CHILD_NODE"),
+        deleteNode: () => this.execCommand("REMOVE_NODE"),
+        expandAll: () => this.expandAll(),
+        collapseAll: () => this.collapseAll(),
+        zoomIn: () => this.zoomIn(),
+        zoomOut: () => this.zoomOut(),
+        fitCanvas: () => this.fitCanvas(),
+      };
+      actionMap[key]?.();
+    },
+
     // ─── Init ───────────────────────────────────────────────
     initMindMap(savedData) {
       if (this.resizeObserver) {
@@ -294,9 +451,15 @@ export default {
         enableAutoEnterTextEditWhenKeydown: true,
         initRootNodePosition: ["center", "center"],
         customInnerElsAppendTo: null,
-        defaultInsertBelowSecondLevelNodeText: "",
-        defaultInsertSecondLevelNodeText: "",
-        defaultGeneralizationText: "",
+        defaultInsertBelowSecondLevelNodeText: this.$t(
+          "i18nCommon.mindMap.newNodeContent",
+        ),
+        defaultInsertSecondLevelNodeText: this.$t(
+          "i18nCommon.mindMap.newNodeContent",
+        ),
+        defaultGeneralizationText: this.$t(
+          "i18nCommon.mindMap.newGroupNodeConent",
+        ),
         errorHandler: (code, err) => {
           console.error("[MindMap]", code, err);
         },
@@ -451,9 +614,7 @@ export default {
 
     // ─── New Mind Map ───────────────────────────────────────
     async handleNewMindMap() {
-      // Lưu mindmap hiện tại vào history trước khi reset
       await this.saveSnapshot();
-      // Tạo data mới nhưng giữ nguyên theme và layout hiện tại
       const newData = JSON.parse(JSON.stringify(defaultMindMapData));
       newData.theme.template = this.currentConfigLayout.currentTheme;
       newData.layout = this.currentConfigLayout.currentLayout;
@@ -468,6 +629,7 @@ export default {
     collapseAll() {
       if (this.mindMap) this.execCommand("UNEXPAND_ALL");
     },
+
     addGeneralization() {
       if (this.mindMap) this.execCommand("ADD_GENERALIZATION");
     },
