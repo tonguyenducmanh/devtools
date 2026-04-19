@@ -6,7 +6,7 @@ Dự án này cung cấp một bộ sưu tập các công cụ hữu ích dành 
 
 ![alt text](imgs/demo-shot.png)
 
-🔗 [https://tool.tomanh.com/](https://tool.tomanh.com/)
+🔗 [https://tomanh.com/](https://tomanh.com/)
 
 ---
 
