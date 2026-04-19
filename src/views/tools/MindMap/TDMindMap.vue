@@ -296,6 +296,7 @@ export default {
         customInnerElsAppendTo: null,
         defaultInsertBelowSecondLevelNodeText: "",
         defaultInsertSecondLevelNodeText: "",
+        defaultGeneralizationText: "",
         errorHandler: (code, err) => {
           console.error("[MindMap]", code, err);
         },
