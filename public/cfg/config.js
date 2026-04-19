@@ -29,6 +29,6 @@
   };
   window.__env.mindMapConfig = {
     autoSaveIntervalInSecond: 60,
-    maxHistoryItems: 200,
+    maxHistoryItems: 500,
   };
 })(this);
