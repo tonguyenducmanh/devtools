@@ -22,6 +22,7 @@
       </div>
       <div
         v-if="open"
+        ref="dropdown"
         class="td-combobox-dropdown"
         :class="{ 'td-combobox-droptop': isDropTop }"
       >
@@ -107,6 +108,22 @@ export default {
     return {
       open: false,
     };
+  },
+  watch: {
+    open(val) {
+      if (val) {
+        this.$nextTick(() => {
+          const dropdown = this.$refs.dropdown;
+          if (!dropdown) return;
+          const selectedEl = dropdown.querySelector(
+            ".td-combobox-option.selected",
+          );
+          if (selectedEl) {
+            selectedEl.scrollIntoView({ block: "start", inline: "nearest" });
+          }
+        });
+      }
+    },
   },
   computed: {
     selectedLabel() {
@@ -211,10 +228,12 @@ export default {
       background: var(--bg-main-color);
       border-radius: var(--border-radius-component);
       .td-dropdown-item:first-child {
-        border-radius: var(--border-radius-component) var(--border-radius-component) 0 0;
+        border-radius: var(--border-radius-component)
+          var(--border-radius-component) 0 0;
       }
       .td-dropdown-item:last-child {
-        border-radius: 0 0 var(--border-radius-component) var(--border-radius-component);
+        border-radius: 0 0 var(--border-radius-component)
+          var(--border-radius-component);
       }
     }
     .td-combobox-droptop {
