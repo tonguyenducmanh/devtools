@@ -5,8 +5,8 @@
   "description": "tool tomanh",
   "main": ".vite/build/main.js",
   "scripts": {
-    "web:dev": "vite",
-    "web:build": "vite build"
+    "dev": "vite",
+    "build": "vite build"
   },
   "keywords": [],
   "author": {

@@ -32,8 +32,8 @@ npm i
 ### Phiên bản Web (Frontend)
 
 ```bash
-npm run web:dev
-npm run web:build
+npm run dev
+npm run build
 ```
 
 ### API / Daemon (Backend)
