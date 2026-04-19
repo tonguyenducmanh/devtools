@@ -399,7 +399,8 @@ export default {
     this.startAutoSave();
   },
 
-  beforeUnmount() {
+  async beforeUnmount() {
+    await this.onTabLeave();
     this.stopAutoSave();
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
@@ -938,6 +939,9 @@ export default {
       if (this.mindMap) {
         this.mindMap.resize();
       }
+    },
+    async onTabLeave() {
+      await this.saveSnapshot();
     },
   },
 };
