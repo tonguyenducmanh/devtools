@@ -128,7 +128,7 @@
         @click="$emit('fitCanvas')"
         v-tooltip="$t('i18nCommon.mindMap.fitCanvas')"
       >
-        <span class="td-icon td-full-screen-icon"></span>
+        <span class="td-icon td-center-icon"></span>
       </div>
     </div>
   </div>
