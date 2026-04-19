@@ -119,6 +119,7 @@ export default {
       sibling: "Sibling node",
       addChild: "Add child node",
       addSibling: "Add sibling node",
+      groupNode: "Group node",
       deleteNode: "Delete node",
       undo: "Undo",
       redo: "Redo",
@@ -145,7 +146,8 @@ export default {
       paste: "Paste",
       copy: "Copy",
       newMindMap: "New mind map",
-      newMindMapConfirm: "Create a new mind map? Current work will be lost if not saved.",
+      newMindMapConfirm:
+        "Create a new mind map? Current work will be lost if not saved.",
       autoSaved: "Auto saved",
       historyRollback: "Rolled back to history",
       sidebarOption: {

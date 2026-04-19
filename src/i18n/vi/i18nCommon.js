@@ -119,6 +119,7 @@ export default {
       sibling: "Nhánh cùng cấp",
       addChild: "Thêm nhánh con",
       addSibling: "Thêm nhánh cùng cấp",
+      groupNode: "Gộp nhánh",
       deleteNode: "Xóa nhánh",
       undo: "Hoàn tác",
       redo: "Làm lại",
@@ -145,7 +146,8 @@ export default {
       paste: "Dán",
       copy: "Sao chép",
       newMindMap: "Tạo mới mind map",
-      newMindMapConfirm: "Tạo mind map mới? Dữ liệu hiện tại sẽ mất nếu chưa được lưu.",
+      newMindMapConfirm:
+        "Tạo mind map mới? Dữ liệu hiện tại sẽ mất nếu chưa được lưu.",
       autoSaved: "Đã tự động lưu",
       historyRollback: "Đã quay về lịch sử",
       sidebarOption: {

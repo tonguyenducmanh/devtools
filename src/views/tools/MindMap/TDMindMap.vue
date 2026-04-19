@@ -24,6 +24,7 @@
         @zoomIn="zoomIn"
         @zoomOut="zoomOut"
         @fitCanvas="fitCanvas"
+        @addGeneralization="addGeneralization"
       />
 
       <!-- Mind Map Canvas -->
@@ -299,7 +300,7 @@ export default {
           console.error("[MindMap]", code, err);
         },
       });
-      
+
       // Resize observer
       this.resizeObserver = new ResizeObserver(() => {
         if (this.mindMap) {
@@ -465,6 +466,9 @@ export default {
 
     collapseAll() {
       if (this.mindMap) this.execCommand("UNEXPAND_ALL");
+    },
+    addGeneralization() {
+      if (this.mindMap) this.execCommand("ADD_GENERALIZATION");
     },
 
     // ─── Mini Map ───────────────────────────────────────────

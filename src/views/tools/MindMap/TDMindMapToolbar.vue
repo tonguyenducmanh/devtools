@@ -80,6 +80,13 @@
       </div>
       <div
         class="flex toolbar-btn"
+        @click="$emit('addGeneralization')"
+        v-tooltip="$t('i18nCommon.mindMap.groupNode')"
+      >
+        <span class="td-icon td-node-merge-icon"></span>
+      </div>
+      <div
+        class="flex toolbar-btn"
         @click="$emit('addChild')"
         v-tooltip="$t('i18nCommon.mindMap.addChild')"
       >
@@ -156,6 +163,7 @@ export default {
     "zoomIn",
     "zoomOut",
     "fitCanvas",
+    "addGeneralization",
   ],
   data() {
     return {
