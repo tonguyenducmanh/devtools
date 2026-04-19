@@ -16,7 +16,7 @@ mkdir -p "$OUTPUT_DIR"
 # 2. Build Frontend
 echo "Đang build Frontend..."
 npm install
-npm run web:build
+npm run build
 
 # 3. Copy dist frontend vào backend
 echo "Đang copy frontend dist vào backend..."
