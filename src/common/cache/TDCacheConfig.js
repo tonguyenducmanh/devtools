@@ -226,4 +226,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử auto-save mind map",
   },
+  PostgreSQLTemplateConfigLayout: {
+    KeyFormat: "PostgreSQLTemplateConfigLayout",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool PostgreSQL Template",
+  },
 };

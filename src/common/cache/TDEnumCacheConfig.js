@@ -35,4 +35,5 @@ export const EnumCacheConfig = {
   JSONSortByKeyConfigLayout: 41,
   MindMapConfigLayout: 42,
   MindMapHistory: 43,
+  PostgreSQLTemplateConfigLayout: 44,
 };

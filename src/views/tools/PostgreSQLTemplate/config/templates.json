@@ -1,0 +1,14 @@
+{
+  "templates": [
+    {
+      "key": "func_generate_create_table",
+      "labelKey": "i18nCommon.postgreSQLTemplate.funcGenerateCreateTable",
+      "file": "sql/func_generate_create_table.sql"
+    },
+    {
+      "key": "query_all_info_table",
+      "labelKey": "i18nCommon.postgreSQLTemplate.queryAllInfoTable",
+      "file": "sql/query_all_info_table.sql"
+    }
+  ]
+}

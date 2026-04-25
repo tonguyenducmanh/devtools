@@ -16,6 +16,7 @@ export default {
       Text: "Xử lý văn bản",
       ArtificialIntelligence: "Tích hợp AI",
       RemoteDesktop: "Máy tính từ xa",
+      Database: "Cơ sở dữ liệu",
     },
     typeInput: "Nhập giá trị",
     edit: "Sửa",
@@ -106,6 +107,7 @@ export default {
       APITesting: "API testing",
       APIMocking: "API mocking",
       remoteDesktopRDP: "Giao thức RDP",
+      PostgreSQLTemplate: "Template PostgreSQL",
       agentDownload: {
         title: "Tải Agent",
         redirecting: "Đang chuyển hướng...",
@@ -597,7 +599,7 @@ export default {
       download: "Tải xuống",
       downloaded: "Đã tải xuống",
     },
-    remoteDesktop: {
+remoteDesktop: {
       title: "Máy tính từ xa (RDP)",
       hostPlaceholder: "Host",
       usernamePlaceholder: "Tên người dùng",
@@ -658,6 +660,15 @@ export default {
       pointerSoftwareRendering: "Con trỏ phần mềm",
       pin: "Ghim thanh công cụ",
       unpin: "Bỏ ghim thanh công cụ",
+    },
+    postgreSQLTemplate: {
+      funcGenerateCreateTable: "Tạo hàm Create Table",
+      queryAllInfoTable: "Query thông tin bảng",
+      selectTemplate: "Chọn template",
+      searchTemplate: "Tìm template",
+      noTemplateFound: "Không tìm thấy template",
+      sqlCode: "Mã SQL",
+      template: "Template",
     },
   },
 };

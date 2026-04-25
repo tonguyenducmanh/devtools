@@ -16,6 +16,7 @@ export default {
       Text: "Text transfrom",
       ArtificialIntelligence: "AI tooling",
       RemoteDesktop: "Remote Desktop",
+      Database: "Database",
     },
     typeInput: "Type value",
     edit: "Edit",
@@ -106,6 +107,7 @@ export default {
       APITesting: "API testing",
       APIMocking: "API mocking",
       remoteDesktop: "Remote Desktop Protocol",
+      PostgreSQLTemplate: "PostgreSQL Template",
       agentDownload: {
         title: "Download Agent",
         redirecting: "Redirecting...",
@@ -661,6 +663,15 @@ export default {
       pointerSoftwareRendering: "Pointer Software Rendering",
       pin: "Pin toolbar",
       unpin: "Unpin toolbar",
+    },
+    postgreSQLTemplate: {
+      funcGenerateCreateTable: "Generate Create Table Function",
+      queryAllInfoTable: "Query All Table Info",
+      selectTemplate: "Select template",
+      searchTemplate: "Search template",
+      noTemplateFound: "No template found",
+      sqlCode: "SQL Code",
+      template: "Template",
     },
   },
 };
