@@ -90,15 +90,7 @@
 <script>
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
-import templateConfig from "@/views/tools/PostgreSQLTemplate/config/templates.json";
-
-import funcGenerateCreateTableSql from "./sql/func_generate_create_table.sql?raw";
-import queryAllInfoTableSql from "./sql/query_all_info_table.sql?raw";
-
-const templateMap = {
-  "sql/func_generate_create_table.sql": funcGenerateCreateTableSql,
-  "sql/query_all_info_table.sql": queryAllInfoTableSql,
-};
+import templates from "./sql/templates.js";
 
 export default {
   extends: TDToolBase,
@@ -143,10 +135,7 @@ export default {
   methods: {
     loadTemplates() {
       let me = this;
-      me.templates = templateConfig.templates || [];
-      me.templates.forEach((t) => {
-        t.sql = templateMap[t.file] || "";
-      });
+      me.templates = templates || [];
       if (me.templates.length > 0) {
         me.selectedTemplateKey = me.templates[0].key;
         me.currentSQLCode = me.templates[0].sql || "";
