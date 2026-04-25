@@ -1,9 +1,10 @@
+// cấu hình import sql từ file raw
 const sqlModules = import.meta.glob("./sql/*.sql", {
   query: "?raw",
   import: "default",
   eager: true,
 });
-debugger;
+
 export default [
   {
     key: "func_generate_create_table",
