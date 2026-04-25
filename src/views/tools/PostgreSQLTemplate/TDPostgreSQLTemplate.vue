@@ -48,16 +48,15 @@
               v-for="template in filteredTemplates"
               :key="template.key"
               class="template-item"
-              :class="{ 'template-item-selected': selectedTemplateKey === template.key }"
+              :class="{
+                'template-item-selected': selectedTemplateKey === template.key,
+              }"
               @click="selectTemplate(template)"
             >
               {{ $t(template.labelKey) }}
             </div>
-            <div
-              v-if="filteredTemplates.length === 0"
-              class="no-template"
-            >
-              {{ $t('i18nCommon.postgreSQLTemplate.noTemplateFound') }}
+            <div v-if="filteredTemplates.length === 0" class="no-template">
+              {{ $t("i18nCommon.postgreSQLTemplate.noTemplateFound") }}
             </div>
           </div>
         </div>
@@ -128,7 +127,9 @@ export default {
     },
     selectedTemplateName() {
       if (!this.selectedTemplateKey) return "";
-      let template = this.templates.find((t) => t.key === this.selectedTemplateKey);
+      let template = this.templates.find(
+        (t) => t.key === this.selectedTemplateKey,
+      );
       return template ? this.$t(template.labelKey) : "";
     },
   },
@@ -156,7 +157,8 @@ export default {
       currentSQLCode: "",
       currentConfigLayout: {
         isShowSidebar: true,
-        currentSidebarOption: this.$tdEnum.PostgreSQLTemplateSidebarOption.Template,
+        currentSidebarOption:
+          this.$tdEnum.PostgreSQLTemplateSidebarOption.Template,
         enableHighlight: true,
         wrapText: true,
       },
@@ -165,7 +167,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .container {
   width: 100%;
   height: 100%;
@@ -197,7 +199,6 @@ export default {
 }
 .template-item {
   padding: var(--padding);
-  background-color: var(--bg-thirt-color);
   border-radius: var(--border-radius);
   cursor: pointer;
   transition: background-color 0.2s;
@@ -206,7 +207,6 @@ export default {
   background-color: var(--bg-layer-color);
 }
 .template-item-selected {
-  background-color: var(--bg-layer-color);
   font-weight: 600;
 }
 .no-template {
