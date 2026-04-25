@@ -90,7 +90,7 @@
 <script>
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
-import templates from "./sql/templates.js";
+import templates from "./templates.js";
 
 export default {
   extends: TDToolBase,

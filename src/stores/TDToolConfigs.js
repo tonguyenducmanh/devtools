@@ -158,6 +158,19 @@ const sidebarConfig = [
     ],
   },
   {
+    type: "group",
+    groupKey: "database",
+    groupTitleKey: "i18nCommon.group.Database",
+    children: [
+      {
+        name: "postgresqltemplate",
+        component: () =>
+          import("@/views/tools/PostgreSQLTemplate/TDPostgreSQLTemplate.vue"),
+        meta: { titleKey: "i18nCommon.feature.PostgreSQLTemplate" },
+      },
+    ],
+  },
+  {
     type: "route",
     name: "comparecode",
     component: () => import("@/views/tools/TDCompareCode.vue"),
@@ -220,19 +233,6 @@ const sidebarConfig = [
     name: "TDHTMLPreview",
     component: () => import("@/views/tools/TDHTMLPreview.vue"),
     meta: { titleKey: "i18nCommon.feature.HTMLPreview" },
-  },
-  {
-    type: "group",
-    groupKey: "database",
-    groupTitleKey: "i18nCommon.group.Database",
-    children: [
-      {
-        name: "postgresqltemplate",
-        component: () =>
-          import("@/views/tools/PostgreSQLTemplate/TDPostgreSQLTemplate.vue"),
-        meta: { titleKey: "i18nCommon.feature.PostgreSQLTemplate" },
-      },
-    ],
   },
 ];
 
