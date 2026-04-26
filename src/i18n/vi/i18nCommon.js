@@ -88,6 +88,7 @@ export default {
       textCompress: "Nén văn bản",
       compareCode: "So sánh mã",
       colorPicker: "Chọn màu",
+      componentShowcase: "Demo Component",
       JSONToPostgreSQL: "JSON sang Postgres",
       JSONToOneLineString: "JSON thành 1 dòng",
       JSONToModel: "JSON sang Model",
@@ -677,6 +678,14 @@ export default {
       noTemplateFound: "Không tìm thấy template",
       sqlCode: "Mã SQL",
       template: "Template",
+    },
+    dateTime: {
+      placeholder: "dd/mm/yyyy hh:mm:ss",
+      selectTime: "Chọn thời gian",
+      cancel: "Hủy",
+      confirm: "Xác nhận",
+      months: ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"],
+      days: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
     },
   },
 };

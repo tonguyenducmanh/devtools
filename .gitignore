@@ -531,3 +531,6 @@ FodyWeavers.xsd
 
 # debug go
 __debug*
+
+
+.sisyphus/

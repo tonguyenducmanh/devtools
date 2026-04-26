@@ -88,6 +88,7 @@ export default {
       textCompress: "Text Compress",
       compareCode: "Compare code",
       colorPicker: "Color picker",
+      componentShowcase: "Component Showcase",
       JSONToPostgreSQL: "JSON to Postgres",
       JSONMapping: "JSON Mapping",
       JSONToOneLineString: "JSON to one line string",
@@ -680,6 +681,14 @@ export default {
       noTemplateFound: "No template found",
       sqlCode: "SQL Code",
       template: "Template",
+    },
+    dateTime: {
+      placeholder: "dd/mm/yyyy hh:mm:ss",
+      selectTime: "Select time",
+      cancel: "Cancel",
+      confirm: "Confirm",
+      months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+      days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     },
   },
 };
