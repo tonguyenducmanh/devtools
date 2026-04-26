@@ -44,9 +44,9 @@
           :noMargin="true"
           :type="$tdEnum.buttonType.secondary"
           @click="importMock"
+          iconClass="td-import-icon"
           v-tooltip="$t('i18nCommon.APIMocking.tooltipImportMock')"
-          :label="$t('i18nCommon.APIMocking.importMock')"
-        />
+        ></TDButton>
         <TDButton
           v-if="currentMockId"
           @click="copyCURL"
