@@ -115,7 +115,6 @@ export default {
         redirecting: "Redirecting...",
         clickHere: "Click here if not automatically redirected",
       },
-      unixTimestamp: "Unix timestamp",
     },
     mindMap: {
       import: "Import",

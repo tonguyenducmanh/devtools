@@ -115,7 +115,6 @@ export default {
         redirecting: "Đang chuyển hướng...",
         clickHere: "Bấm vào đây nếu không tự động chuyển hướng",
       },
-      unixTimestamp: "Thời gian dạng unix",
     },
     mindMap: {
       import: "Nhập",
@@ -703,11 +702,6 @@ export default {
         "Tháng 12",
       ],
       days: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
-    },
-    unixTimestamp: {
-      unixTimeWantConvert: "Nhập ngày giờ dạng unix",
-      convert: "Chuyển đổi",
-      result: "Kết quả",
     },
   },
 };
