@@ -234,6 +234,13 @@ const sidebarConfig = [
     component: () => import("@/views/tools/TDHTMLPreview.vue"),
     meta: { titleKey: "i18nCommon.feature.HTMLPreview" },
   },
+  {
+    type: "route",
+    name: "component-showcase",
+    component: () => import("@/views/tools/TDComponentShowcase.vue"),
+    meta: { titleKey: "i18nCommon.feature.componentShowcase" },
+    hide: true,
+  },
 ];
 
 /**
