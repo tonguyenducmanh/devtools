@@ -151,6 +151,44 @@ export default {
       let me = this;
       me.$tdUtility.copyToClipboard(value);
     },
+    /**
+     * Hàm này được gọi khi tab được active hoặc khi component được mount (nếu đang active)
+     * Component con cần add event (ví dụ listener trên window/document) thì override lại
+     */
+    onTabEnter() {
+      let me = this;
+      document.addEventListener("paste", me.handlePasteEvent);
+    },
+
+    /**
+     * Hàm này được gọi khi tab bị inactive hoặc trước khi component bị unmount (nếu đang active)
+     * Component con cần remove event thì override lại
+     */
+    onTabLeave() {
+      let me = this;
+      document.removeEventListener("paste", me.handlePasteEvent);
+    },
+    /**
+     * Xử lý event paste mã QR
+     */
+    handlePasteEvent(e) {
+      let me = this;
+      e.preventDefault();
+      const items = e.clipboardData.items;
+      for (let item of items) {
+        if (item.type.includes("image")) {
+          const blob = item.getAsFile();
+          if (
+            me.$refs.uploadArea &&
+            typeof me.$refs.uploadArea.setFileSelected === "function"
+          ) {
+            me.$refs.uploadArea.setFileSelected(blob);
+            me.processFile([blob]);
+          }
+          break;
+        }
+      }
+    },
     processFile(files) {
       let me = this;
       let file = files[0];
