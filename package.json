@@ -25,7 +25,7 @@
     "exceljs": "^4.4.0",
     "jsqr": "^1.4.0",
     "jszip": "^3.10.1",
-    "monaco-editor": "^0.53.0",
+    "monaco-editor": "^0.55.1",
     "otpauth": "^9.4.1",
     "protobufjs": "^7.5.4",
     "qr-scanner": "^1.4.2",
