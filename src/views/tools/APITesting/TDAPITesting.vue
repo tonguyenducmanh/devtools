@@ -78,7 +78,7 @@
             :readOnly="!responseText"
             @click="copyMockData"
             :type="$tdEnum.buttonType.secondary"
-            :label="$t('i18nCommon.apiTesting.mock')"
+            iconClass="td-copy-icon"
             v-tooltip="$t('i18nCommon.apiTesting.copyMockData')"
           ></TDButton>
         </template>
