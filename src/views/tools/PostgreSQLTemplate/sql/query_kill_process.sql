@@ -3,12 +3,10 @@
 SELECT pg_cancel_backend(12345);
 
 -- Bước 2: nếu cancel không hiệu quả, dùng pg_terminate_backend để kill hẳn process
-SELECT pg_terminate_backend(12345);
+-- SELECT pg_terminate_backend(12345);
 
  
--- -------------------------------------------------------
 -- Kill tất cả các lệnh đang chạy quá X giây (ví dụ 300 giây / 5 phút)
--- (bỏ comment để sử dụng)
 -- SELECT
 --     pid,
 --     usename,

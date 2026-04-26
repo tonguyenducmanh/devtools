@@ -1,3 +1,4 @@
+-- function build script tạo bảng
 DROP FUNCTION IF EXISTS public.func_generate_create_table(p_schema_query text, p_table_query text, p_schema_result text, p_table_result text);
 CREATE OR REPLACE FUNCTION public.func_generate_create_table(
     p_schema_query text, p_table_query text, p_schema_result text, p_table_result text

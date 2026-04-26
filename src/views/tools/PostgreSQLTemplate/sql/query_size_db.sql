@@ -1,5 +1,4 @@
 -- query size của db
-
 SELECT 
     pg_database_size(pd.datname)/1024/1024 AS size_in_mb
 FROM 

@@ -1,3 +1,4 @@
+-- query danh sách lệnh đang chạy
 SELECT
     pid,
     usename AS username,
