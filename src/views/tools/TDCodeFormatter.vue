@@ -4,6 +4,7 @@
       <div class="flex input-container">
         <TDTextarea
           :placeHolder="$t('i18nCommon.codeFormatter.inputCode')"
+          :label="$t('i18nCommon.codeFormatter.inputCode')"
           v-model="inputSource"
           height="100%"
           width="50%"
@@ -12,6 +13,7 @@
         ></TDTextarea>
         <TDTextarea
           :placeHolder="$t('i18nCommon.codeFormatter.outputCode')"
+          :label="$t('i18nCommon.codeFormatter.outputCode')"
           v-model="outputSource"
           height="100%"
           width="50%"
