@@ -163,8 +163,9 @@
 
         <!-- Actions -->
         <div class="td-datetime-actions">
-          <button class="td-datetime-btn-cancel" @click="closePopup">{{ cancelText }}</button>
-          <button class="td-datetime-btn-confirm" @click="confirmSelection">{{ confirmText }}</button>
+          <TDButton label="Cancel" type="secondary" noMargin @click="closePopup" />
+          <TDButton label="Today" type="secondary" noMargin @click="goToToday" />
+          <TDButton label="Confirm" noMargin @click="confirmSelection" />
         </div>
       </div>
     </div>
@@ -174,10 +175,11 @@
 <script>
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
 import TDArrow from "./TDArrow.vue";
+import TDButton from "./TDButton.vue";
 
 export default {
   name: "TDDateTime",
-  components: { TDArrow },
+  components: { TDArrow, TDButton },
   mixins: [TDStylePremitiveMixin],
 
   props: {
@@ -255,6 +257,10 @@ export default {
 
     confirmText() {
       return this.i18nDateTime.confirm || "Confirm";
+    },
+
+    todayText() {
+      return this.i18nDateTime.today || "Today";
     },
 
     years() {
@@ -670,6 +676,24 @@ export default {
 
     confirmSelection() {
       this.emitValue();
+      this.closePopup();
+    },
+
+    goToToday() {
+      const now = new Date();
+      this.currentYear = now.getFullYear();
+      this.currentMonth = now.getMonth() + 1;
+      this.currentDay = now.getDate();
+      if (!this.dateOnly) {
+        this.currentHour = now.getHours();
+        this.currentMinute = now.getMinutes();
+        this.currentSecond = now.getSeconds();
+      } else {
+        this.currentHour = 0;
+        this.currentMinute = 0;
+        this.currentSecond = 0;
+      }
+      this.inputValue = this.formatValue();
       this.closePopup();
     },
 
