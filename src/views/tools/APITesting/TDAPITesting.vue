@@ -52,33 +52,36 @@
           iconClass="td-download-icon"
           v-tooltip="$t('i18nCommon.apiTesting.downloadReponse')"
         ></TDButton>
-        <!-- nút mở chế độ api import curl -->
-        <TDButton
-          @click="openFormImportCURL"
-          :type="$tdEnum.buttonType.secondary"
-          :noMargin="true"
-          :readOnly="isLoading"
-          iconClass="td-import-icon"
-          v-tooltip="$t('i18nCommon.apiTesting.CURL')"
-        ></TDButton>
-        <TDButton
-          @click="copyCURLFromNormalMode"
-          :type="$tdEnum.buttonType.secondary"
-          :noMargin="true"
-          :readOnly="!(apiUrl && httpMethod) || isLoading"
-          iconClass="td-export-icon"
-          v-tooltip="$t('i18nCommon.apiTesting.copyCURLFromAPI')"
-        ></TDButton>
-        <!-- nút copy dữ liệu làm mock data -->
-        <TDButton
+        <template
           v-if="currentConfigLayout.currentAPIMode != $tdEnum.APIMode.ProMode"
-          :noMargin="true"
-          :readOnly="!responseText"
-          @click="copyMockData"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.apiTesting.mock')"
-          v-tooltip="$t('i18nCommon.apiTesting.copyMockData')"
-        ></TDButton>
+        >
+          <!-- nút mở chế độ api import curl -->
+          <TDButton
+            @click="openFormImportCURL"
+            :type="$tdEnum.buttonType.secondary"
+            :noMargin="true"
+            :readOnly="isLoading"
+            iconClass="td-import-icon"
+            v-tooltip="$t('i18nCommon.apiTesting.CURL')"
+          ></TDButton>
+          <TDButton
+            @click="copyCURLFromNormalMode"
+            :type="$tdEnum.buttonType.secondary"
+            :noMargin="true"
+            :readOnly="!(apiUrl && httpMethod) || isLoading"
+            iconClass="td-export-icon"
+            v-tooltip="$t('i18nCommon.apiTesting.copyCURLFromAPI')"
+          ></TDButton>
+          <!-- nút copy dữ liệu làm mock data -->
+          <TDButton
+            :noMargin="true"
+            :readOnly="!responseText"
+            @click="copyMockData"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.apiTesting.mock')"
+            v-tooltip="$t('i18nCommon.apiTesting.copyMockData')"
+          ></TDButton>
+        </template>
       </div>
       <!-- hết phần danh sách nút đầu của api -->
       <!-- phần nội dung tùy thuộc vào từng loại api -->
