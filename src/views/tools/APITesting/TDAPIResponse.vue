@@ -9,6 +9,7 @@
       :enableHighlight="currentConfigLayout.enableHighlight"
       language="json"
       :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
+      :label="$t('i18nCommon.apiTesting.responsePlaceholder')"
       :readOnly="true"
       :wrapText="currentConfigLayout.wrapText"
     ></TDTextarea>
@@ -56,7 +57,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
 .response-loading {
   width: 100%;
   height: 100%;

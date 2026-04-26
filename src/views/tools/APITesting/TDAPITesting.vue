@@ -152,6 +152,7 @@
                 language="text/plan"
                 :wrapText="currentConfigLayout.wrapText"
                 :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
+                :label="$t('i18nCommon.apiTesting.headersPlaceholder')"
               ></TDTextarea>
               <!-- phần cấu hình body api -->
               <div
@@ -168,6 +169,7 @@
                   :enableHighlight="currentConfigLayout.enableHighlight"
                   language="json"
                   :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
+                  :label="$t('i18nCommon.apiTesting.bodyPlaceholder')"
                 ></TDTextarea>
                 <span
                   v-if="!currentConfigLayout.enableHighlight"
@@ -247,6 +249,7 @@
                 :enableHighlight="currentConfigLayout.enableHighlight"
                 language="shell"
                 :placeHolder="$t('i18nCommon.apiTesting.contentCURLExecute')"
+                :label="$t('i18nCommon.apiTesting.contentCURLExecute')"
               ></TDTextarea>
             </div>
             <!-- Resizer -->
@@ -316,6 +319,7 @@
                 :wrapText="currentConfigLayout.wrapText"
                 :enableHighlight="currentConfigLayout.enableHighlight"
                 :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
+                :label="$t('i18nCommon.apiTesting.scriptExecute')"
               ></TDTextarea>
             </div>
             <!-- Resizer -->

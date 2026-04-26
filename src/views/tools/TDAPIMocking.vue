@@ -93,6 +93,7 @@
           :enableHighlight="currentConfigLayout.enableHighlight"
           language="json"
           :placeHolder="$t('i18nCommon.APIMocking.bodyPlaceholder')"
+          :label="$t('i18nCommon.APIMocking.bodyPlaceholder')"
           :style="requestSectionSizeStyle"
         ></TDTextarea>
         <TDResizer
@@ -108,6 +109,7 @@
           :enableHighlight="currentConfigLayout.enableHighlight"
           language="json"
           :placeHolder="$t('i18nCommon.APIMocking.responsePlaceholder')"
+          :label="$t('i18nCommon.APIMocking.responsePlaceholder')"
           :style="responseSectionSizeStyle"
         ></TDTextarea>
       </div>
