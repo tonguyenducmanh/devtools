@@ -34,20 +34,23 @@
           :noMargin="true"
           @click="handleCancelRequest"
           :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.apiTesting.cancel')"
+          iconClass="td-cancel-icon"
+          v-tooltip="$t('i18nCommon.apiTesting.cancel')"
         />
         <TDButton
           v-else
           :noMargin="true"
           @click="handleSend"
-          :label="$t('i18nCommon.apiTesting.send')"
+          iconClass="td-send-icon"
+          v-tooltip="$t('i18nCommon.apiTesting.send')"
         ></TDButton>
         <!-- nút tải xuống response -->
         <TDButton
           :noMargin="true"
           @click="handleDownloadReponse"
           :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.apiTesting.downloadReponse')"
+          iconClass="td-download-icon"
+          v-tooltip="$t('i18nCommon.apiTesting.downloadReponse')"
         ></TDButton>
         <!-- nút copy dữ liệu làm mock data -->
         <TDButton

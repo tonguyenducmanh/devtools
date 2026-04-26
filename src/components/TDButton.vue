@@ -10,7 +10,10 @@
     :disabled="readOnly"
     :style="borderRadiusStyle"
   >
-    {{ label.capitalize() }}
+    <span v-if="iconClass" class="td-icon" :class="iconClass"></span>
+    <span v-else>
+      {{ label.capitalize() }}
+    </span>
   </button>
 </template>
 
@@ -47,6 +50,10 @@ export default {
     },
     noMargin: {
       type: Boolean,
+      default: false,
+    },
+    iconClass: {
+      type: String,
       default: false,
     },
   },
@@ -98,10 +105,15 @@ export default {
   border: 1px solid var(--focus-color);
   box-sizing: border-box;
 }
-
+.td-icon {
+  filter: invert(100%);
+}
 .td-button-secondary {
   background-color: var(--btn-secondary-color);
   color: var(--btn-secondary-text-color);
+  .td-icon {
+    filter: unset;
+  }
 }
 .td-button-secondary:hover {
   background-color: var(--btn-secondary-focus-color);
