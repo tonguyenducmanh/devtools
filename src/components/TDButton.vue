@@ -141,5 +141,8 @@ body[data-theme="dark"] .td-button-secondary:hover {
 .td-button-readonly {
   opacity: 0.5;
   cursor: not-allowed;
+  .td-icon {
+    cursor: not-allowed;
+  }
 }
 </style>
