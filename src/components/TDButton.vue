@@ -6,6 +6,7 @@
       'td-button-secondary': type == $tdEnum.buttonType.secondary,
       'td-button-readonly': readOnly,
       'td-button-no-margin': noMargin,
+      'td-button-icon': iconClass,
     }"
     :disabled="readOnly"
     :style="borderRadiusStyle"
@@ -54,7 +55,7 @@ export default {
     },
     iconClass: {
       type: String,
-      default: false,
+      default: "",
     },
   },
   data() {
@@ -105,8 +106,11 @@ export default {
   border: 1px solid var(--focus-color);
   box-sizing: border-box;
 }
-.td-icon {
-  filter: invert(100%);
+.td-button-icon {
+  padding: 0 var(--padding);
+  .td-icon {
+    filter: invert(100%);
+  }
 }
 .td-button-secondary {
   background-color: var(--btn-secondary-color);

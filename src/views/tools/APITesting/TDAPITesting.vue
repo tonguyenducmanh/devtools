@@ -52,6 +52,23 @@
           iconClass="td-download-icon"
           v-tooltip="$t('i18nCommon.apiTesting.downloadReponse')"
         ></TDButton>
+        <!-- nút mở chế độ api import curl -->
+        <TDButton
+          @click="openFormImportCURL"
+          :type="$tdEnum.buttonType.secondary"
+          :noMargin="true"
+          :readOnly="isLoading"
+          iconClass="td-import-icon"
+          v-tooltip="$t('i18nCommon.apiTesting.CURL')"
+        ></TDButton>
+        <TDButton
+          @click="copyCURLFromNormalMode"
+          :type="$tdEnum.buttonType.secondary"
+          :noMargin="true"
+          :readOnly="!(apiUrl && httpMethod) || isLoading"
+          iconClass="td-export-icon"
+          v-tooltip="$t('i18nCommon.apiTesting.copyCURLFromAPI')"
+        ></TDButton>
         <!-- nút copy dữ liệu làm mock data -->
         <TDButton
           v-if="currentConfigLayout.currentAPIMode != $tdEnum.APIMode.ProMode"
@@ -96,21 +113,6 @@
                 ]"
               ></TDInput>
             </div>
-            <!-- nút mở chế độ api import curl -->
-            <TDButton
-              @click="openFormImportCURL"
-              :type="$tdEnum.buttonType.secondary"
-              :noMargin="true"
-              :readOnly="isLoading"
-              :label="$t('i18nCommon.apiTesting.CURL')"
-            ></TDButton>
-            <TDButton
-              @click="copyCURLFromNormalMode"
-              :type="$tdEnum.buttonType.secondary"
-              :noMargin="true"
-              :readOnly="!(apiUrl && httpMethod) || isLoading"
-              :label="$t('i18nCommon.apiTesting.copyCURLFromAPI')"
-            ></TDButton>
           </div>
           <!-- phần nội dung  -->
           <div
