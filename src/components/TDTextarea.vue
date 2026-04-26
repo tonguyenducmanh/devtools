@@ -295,6 +295,10 @@ export default {
     z-index: 1;
     font-size: var(--font-size-medium-rare);
     color: var(--text-secondary-color);
+    background-color: var(--bg-layer-color);
+    padding: var(--padding-medium);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-component);
   }
   .td-label-editor:hover {
     opacity: 0.5;

@@ -107,7 +107,7 @@ export default {
       APITesting: "API testing",
       APIMocking: "API mocking",
       remoteDesktopRDP: "Giao thức RDP",
-      PostgreSQLTemplate: "Template PostgreSQL",
+      PostgreSQLTemplate: "Code mẫu PostgreSQL",
       agentDownload: {
         title: "Tải Agent",
         redirecting: "Đang chuyển hướng...",
@@ -599,7 +599,7 @@ export default {
       download: "Tải xuống",
       downloaded: "Đã tải xuống",
     },
-remoteDesktop: {
+    remoteDesktop: {
       title: "Máy tính từ xa (RDP)",
       hostPlaceholder: "Host",
       usernamePlaceholder: "Tên người dùng",
