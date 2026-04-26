@@ -16,6 +16,7 @@ import TDHistory from "@/components/TDHistory.vue";
 import TDTableViewer from "@/components/TDTableViewer.vue";
 import TDResizer from "@/components/TDResizer.vue";
 import TDVirtualScroll from "@/components/TDVirtualScroll.vue";
+import TDDateTime from "@/components/TDDateTime.vue";
 import TDPopup from "@/components/TDPopup.vue";
 import i18nData, { loadLocaleDefault } from "@/i18n/i18nData.js";
 import tdEventbus from "@/common/event/TDEventBus.js";
@@ -54,6 +55,7 @@ import "@/common/plugin/TDMonacoEditor.js";
   currentApp.component("TDTableViewer", TDTableViewer);
   currentApp.component("TDResizer", TDResizer);
   currentApp.component("TDVirtualScroll", TDVirtualScroll);
+  currentApp.component("TDDateTime", TDDateTime);
 
   // globalization language
   currentApp.use(i18nData);
