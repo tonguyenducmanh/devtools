@@ -15,13 +15,15 @@
           <TDButton
             :noMargin="true"
             @click="convertQRCode"
-            :label="$t('i18nCommon.qrCodeToText.convert')"
+            iconClass="td-send-icon"
+            v-tooltip="$t('i18nCommon.qrCodeToText.convert')"
           ></TDButton>
           <TDButton
             @click="copyResult"
             :noMargin="true"
             :type="$tdEnum.buttonType.secondary"
-            :label="$t('i18nCommon.qrCodeToText.copy')"
+            iconClass="td-copy-icon"
+            v-tooltip="$t('i18nCommon.qrCodeToText.copy')"
           ></TDButton>
         </div>
         <TDTextarea
