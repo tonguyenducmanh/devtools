@@ -9,5 +9,7 @@ FROM
 JOIN 
     pg_namespace n ON p.pronamespace = n.oid
 WHERE 
-    p.prosrc ILIKE '%0303987579%'
-    AND n.nspname NOT IN ('pg_catalog', 'information_schema');
+    p.prosrc ILIKE '%account_id%'
+    AND n.nspname NOT IN ('pg_catalog', 'information_schema')
+LIMIT 10;
+

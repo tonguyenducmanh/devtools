@@ -664,6 +664,12 @@ remoteDesktop: {
     postgreSQLTemplate: {
       funcGenerateCreateTable: "Tạo hàm Create Table",
       queryAllInfoTable: "Query thông tin bảng",
+      queryFunctionBody: "Query nội dung function",
+      queryFunctionContain: "Query hàm chứa từ khóa",
+      querySizeDb: "Query kích thước database",
+      querySizeTable: "Query kích thước bảng",
+      queryTableDataType: "Query kiểu dữ liệu bảng",
+      queryViewDefinition: "Query định nghĩa view",
       selectTemplate: "Chọn template",
       searchTemplate: "Tìm template",
       noTemplateFound: "Không tìm thấy template",

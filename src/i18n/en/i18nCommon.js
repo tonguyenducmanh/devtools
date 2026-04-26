@@ -667,6 +667,12 @@ export default {
     postgreSQLTemplate: {
       funcGenerateCreateTable: "Generate Create Table Function",
       queryAllInfoTable: "Query All Table Info",
+      queryFunctionBody: "Query Function Body",
+      queryFunctionContain: "Query Function Contains",
+      querySizeDb: "Query Database Size",
+      querySizeTable: "Query Table Size",
+      queryTableDataType: "Query Table Data Type",
+      queryViewDefinition: "Query View Definition",
       selectTemplate: "Select template",
       searchTemplate: "Search template",
       noTemplateFound: "No template found",

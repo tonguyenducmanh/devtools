@@ -194,7 +194,7 @@ export default {
   flex-direction: column;
   gap: var(--padding);
   margin-bottom: var(--padding);
-  max-height: 300px;
+  flex: 1;
   overflow-y: auto;
 }
 .template-item {

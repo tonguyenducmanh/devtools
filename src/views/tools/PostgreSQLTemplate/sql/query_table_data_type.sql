@@ -8,5 +8,6 @@ select
 from
 	pg_attribute
 where
-	attrelid = 'sme.account_suggestion_voucher_ba_ca'::regclass
-	and attname = 'bindingvector';
+	attrelid = 'public.your_table'::regclass
+	and attname = 'your_column_name'
+LIMIT 10;

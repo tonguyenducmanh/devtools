@@ -8,4 +8,5 @@ JOIN
     pg_namespace n ON n.oid = p.pronamespace
 WHERE 
     proname = 'your_function_name'  -- replace with your actual function name
-    AND n.nspname = 'your_schema_name'; -- optional, to filter by schema
+    AND n.nspname = 'your_schema_name' -- optional, to filter by schema
+LIMIT 10;
