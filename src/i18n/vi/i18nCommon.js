@@ -681,6 +681,7 @@ export default {
     },
     dateTime: {
       placeholder: "dd/mm/yyyy hh:mm:ss",
+      placeholderDateOnly: "dd/mm/yyyy",
       selectTime: "Chọn thời gian",
       cancel: "Hủy",
       confirm: "Xác nhận",

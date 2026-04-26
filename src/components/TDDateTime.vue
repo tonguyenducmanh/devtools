@@ -107,7 +107,7 @@
         </div>
 
         <!-- Time Section -->
-        <div class="td-datetime-time">
+        <div v-if="!dateOnly" class="td-datetime-time">
           <div class="td-datetime-time-header">{{ selectTimeText }}</div>
           <div class="td-datetime-time-picker">
             <!-- Hour -->
@@ -201,6 +201,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    dateOnly: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   emits: ["update:modelValue"],
@@ -235,6 +239,9 @@ export default {
     },
 
     placeholder() {
+      if (this.dateOnly) {
+        return this.i18nDateTime.placeholderDateOnly || "dd/mm/yyyy";
+      }
       return this.i18nDateTime.placeholder || "dd/mm/yyyy hh:mm:ss";
     },
 
@@ -335,13 +342,27 @@ export default {
   methods: {
     parseValue(val) {
       const parts = val.split(/[\/\s:]/);
-      if (parts.length >= 6) {
-        this.currentDay = parseInt(parts[0], 10);
-        this.currentMonth = parseInt(parts[1], 10);
-        this.currentYear = parseInt(parts[2], 10);
-        this.currentHour = parseInt(parts[3], 10);
-        this.currentMinute = parseInt(parts[4], 10);
-        this.currentSecond = parseInt(parts[5], 10);
+      
+      if (this.dateOnly) {
+        // dateOnly mode: format is DD/MM/YYYY
+        if (parts.length >= 3) {
+          this.currentDay = parseInt(parts[0], 10);
+          this.currentMonth = parseInt(parts[1], 10);
+          this.currentYear = parseInt(parts[2], 10);
+          this.currentHour = 0;
+          this.currentMinute = 0;
+          this.currentSecond = 0;
+        }
+      } else {
+        // Full datetime mode: format is DD/MM/YYYY HH:mm:ss
+        if (parts.length >= 6) {
+          this.currentDay = parseInt(parts[0], 10);
+          this.currentMonth = parseInt(parts[1], 10);
+          this.currentYear = parseInt(parts[2], 10);
+          this.currentHour = parseInt(parts[3], 10);
+          this.currentMinute = parseInt(parts[4], 10);
+          this.currentSecond = parseInt(parts[5], 10);
+        }
       }
     },
 
@@ -349,6 +370,11 @@ export default {
       const day = String(this.currentDay).padStart(2, "0");
       const month = String(this.currentMonth).padStart(2, "0");
       const year = this.currentYear;
+      
+      if (this.dateOnly) {
+        return `${day}/${month}/${year}`;
+      }
+      
       const hour = String(this.currentHour).padStart(2, "0");
       const minute = String(this.currentMinute).padStart(2, "0");
       const second = String(this.currentSecond).padStart(2, "0");
@@ -421,6 +447,15 @@ export default {
       if (len >= 5) {
         formatted += digits.substring(4, 8);
       }
+      
+      // DateOnly mode - stop here
+      if (this.dateOnly) {
+        this.inputValue = formatted;
+        this.parseInputToValues(formatted);
+        return;
+      }
+      
+      // Full datetime mode - continue with time
       if (len >= 8) {
         formatted += " ";
       }
@@ -456,6 +491,13 @@ export default {
     parseInputToValues(inputStr) {
       const parts = inputStr.split(/[\/\s:]/);
       
+      // Force time to 00:00:00 when dateOnly mode
+      if (this.dateOnly) {
+        this.currentHour = 0;
+        this.currentMinute = 0;
+        this.currentSecond = 0;
+      }
+      
       if (parts[0] && parts[0].length >= 1) {
         const day = parseInt(parts[0], 10);
         if (day >= 1 && day <= 31) {
@@ -475,6 +517,11 @@ export default {
         if (year >= 1900 && year <= 2100) {
           this.currentYear = year;
         }
+      }
+      
+      // Skip time parsing in dateOnly mode
+      if (this.dateOnly) {
+        return;
       }
       
       if (parts[3] && parts[3].length >= 1) {
@@ -631,9 +678,15 @@ export default {
       this.currentYear = now.getFullYear();
       this.currentMonth = now.getMonth() + 1;
       this.currentDay = now.getDate();
-      this.currentHour = now.getHours();
-      this.currentMinute = now.getMinutes();
-      this.currentSecond = now.getSeconds();
+      if (this.dateOnly) {
+        this.currentHour = 0;
+        this.currentMinute = 0;
+        this.currentSecond = 0;
+      } else {
+        this.currentHour = now.getHours();
+        this.currentMinute = now.getMinutes();
+        this.currentSecond = now.getSeconds();
+      }
     },
   },
 };

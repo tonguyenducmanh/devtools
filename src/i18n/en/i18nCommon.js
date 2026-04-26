@@ -684,6 +684,7 @@ export default {
     },
     dateTime: {
       placeholder: "dd/mm/yyyy hh:mm:ss",
+      placeholderDateOnly: "dd/mm/yyyy",
       selectTime: "Select time",
       cancel: "Cancel",
       confirm: "Confirm",
