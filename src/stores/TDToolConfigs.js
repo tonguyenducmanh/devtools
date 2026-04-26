@@ -171,6 +171,18 @@ const sidebarConfig = [
     ],
   },
   {
+    type: "group",
+    groupKey: "dateandtime",
+    groupTitleKey: "i18nCommon.group.DateAndTime",
+    children: [
+      {
+        name: "unixtimestamp",
+        component: () => import("@/views/tools/TDUnixTimestamp.vue"),
+        meta: { titleKey: "i18nCommon.feature.unixTimestamp" },
+      },
+    ],
+  },
+  {
     type: "route",
     name: "comparecode",
     component: () => import("@/views/tools/TDCompareCode.vue"),

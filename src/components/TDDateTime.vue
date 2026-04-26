@@ -38,27 +38,45 @@
           <!-- Month/Year Header -->
           <div class="td-datetime-calendar-header">
             <div class="td-datetime-nav" @click="prevMonth">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <polyline points="15 18 9 12 15 6" />
               </svg>
             </div>
             <div class="td-datetime-month-year">
-              <span class="td-datetime-month" @click="openMonthPicker">
-                {{ monthName }}
-              </span>
-              <span class="td-datetime-year" @click="openYearPicker">
-                {{ currentYear }}
-              </span>
+              <span class="td-datetime-month" @click="openMonthPicker">{{
+                monthName
+              }}</span>
+              <span class="td-datetime-year" @click="openYearPicker">{{
+                currentYear
+              }}</span>
             </div>
             <div class="td-datetime-nav" @click="nextMonth">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <polyline points="9 18 15 12 9 6" />
               </svg>
             </div>
           </div>
 
           <!-- Month Picker -->
-          <div v-if="viewMonthPicker" ref="monthPicker" class="td-datetime-month-picker">
+          <div
+            v-if="viewMonthPicker"
+            ref="monthPicker"
+            class="td-datetime-month-picker"
+          >
             <div
               v-for="(m, index) in monthNames"
               :key="index"
@@ -71,7 +89,11 @@
           </div>
 
           <!-- Year Picker -->
-          <div v-if="viewYearPicker" ref="yearPicker" class="td-datetime-year-picker">
+          <div
+            v-if="viewYearPicker"
+            ref="yearPicker"
+            class="td-datetime-year-picker"
+          >
             <div
               v-for="y in years"
               :key="y"
@@ -84,7 +106,11 @@
           </div>
 
           <!-- Day Grid -->
-          <div v-if="!viewMonthPicker && !viewYearPicker" ref="dayGrid" class="td-datetime-days">
+          <div
+            v-if="!viewMonthPicker && !viewYearPicker"
+            ref="dayGrid"
+            class="td-datetime-days"
+          >
             <div class="td-datetime-day-header">
               <span v-for="d in dayNames" :key="d">{{ d }}</span>
             </div>
@@ -95,8 +121,8 @@
                 class="td-datetime-day"
                 :class="{
                   'other-month': d.otherMonth,
-                  'selected': d.date === currentDay && !d.otherMonth,
-                  'today': d.isToday,
+                  selected: d.date === currentDay && !d.otherMonth,
+                  today: d.isToday,
                 }"
                 @click="!d.otherMonth && selectDay(d.date)"
               >
@@ -113,13 +139,29 @@
             <!-- Hour -->
             <div class="td-datetime-time-column">
               <div class="td-datetime-time-nav" @click="incHour">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <polyline points="18 15 12 9 6 15" />
                 </svg>
               </div>
-              <div class="td-datetime-time-value">{{ String(currentHour).padStart(2, '0') }}</div>
+              <div class="td-datetime-time-value">
+                {{ String(currentHour).padStart(2, "0") }}
+              </div>
               <div class="td-datetime-time-nav" @click="decHour">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
               </div>
@@ -130,13 +172,29 @@
             <!-- Minute -->
             <div class="td-datetime-time-column">
               <div class="td-datetime-time-nav" @click="incMinute">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <polyline points="18 15 12 9 6 15" />
                 </svg>
               </div>
-              <div class="td-datetime-time-value">{{ String(currentMinute).padStart(2, '0') }}</div>
+              <div class="td-datetime-time-value">
+                {{ String(currentMinute).padStart(2, "0") }}
+              </div>
               <div class="td-datetime-time-nav" @click="decMinute">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
               </div>
@@ -147,13 +205,29 @@
             <!-- Second -->
             <div class="td-datetime-time-column">
               <div class="td-datetime-time-nav" @click="incSecond">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <polyline points="18 15 12 9 6 15" />
                 </svg>
               </div>
-              <div class="td-datetime-time-value">{{ String(currentSecond).padStart(2, '0') }}</div>
+              <div class="td-datetime-time-value">
+                {{ String(currentSecond).padStart(2, "0") }}
+              </div>
               <div class="td-datetime-time-nav" @click="decSecond">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
               </div>
@@ -162,10 +236,22 @@
         </div>
 
         <!-- Actions -->
-        <div class="td-datetime-actions">
-          <TDButton label="Cancel" type="secondary" noMargin @click="closePopup" />
-          <TDButton label="Today" type="secondary" noMargin @click="goToToday" />
-          <TDButton label="Confirm" noMargin @click="confirmSelection" />
+        <div class="flex td-datetime-actions">
+          <TDButton
+            :label="cancelText"
+            type="secondary"
+            noMargin
+            @click="cancelSelection"
+          />
+          <div class="flex td-datetime-actions-positive">
+            <TDButton
+              :label="todayText"
+              type="secondary"
+              noMargin
+              @click="goToToday"
+            />
+            <TDButton :label="confirmText" noMargin @click="confirmSelection" />
+          </div>
         </div>
       </div>
     </div>
@@ -183,30 +269,12 @@ export default {
   mixins: [TDStylePremitiveMixin],
 
   props: {
-    label: {
-      type: String,
-      default: null,
-    },
-    modelValue: {
-      type: String,
-      default: null,
-    },
-    readOnly: {
-      type: Boolean,
-      default: false,
-    },
-    isLabelTop: {
-      type: Boolean,
-      default: false,
-    },
-    noMargin: {
-      type: Boolean,
-      default: false,
-    },
-    dateOnly: {
-      type: Boolean,
-      default: false,
-    },
+    label: { type: String, default: null },
+    modelValue: { type: Date, default: null },
+    readOnly: { type: Boolean, default: false },
+    isLabelTop: { type: Boolean, default: false },
+    noMargin: { type: Boolean, default: false },
+    dateOnly: { type: Boolean, default: false },
   },
 
   emits: ["update:modelValue"],
@@ -224,6 +292,8 @@ export default {
       currentHour: now.getHours(),
       currentMinute: now.getMinutes(),
       currentSecond: now.getSeconds(),
+      // Snapshot lưu khi mở popup, rollback về đây khi hủy
+      lastDateTime: null,
     };
   },
 
@@ -231,57 +301,37 @@ export default {
     i18nDateTime() {
       return this.$t("i18nCommon.dateTime");
     },
-
     monthNames() {
       return this.i18nDateTime.months || [];
     },
-
     dayNames() {
       return this.i18nDateTime.days || [];
     },
-
     placeholder() {
-      if (this.dateOnly) {
+      if (this.dateOnly)
         return this.i18nDateTime.placeholderDateOnly || "dd/mm/yyyy";
-      }
       return this.i18nDateTime.placeholder || "dd/mm/yyyy hh:mm:ss";
     },
-
     selectTimeText() {
-      return this.i18nDateTime.selectTime || "Select time";
+      return this.$t("i18nCommon.dateTime.selectTime");
     },
-
     cancelText() {
-      return this.i18nDateTime.cancel || "Cancel";
+      return this.$t("i18nCommon.dateTime.cancel");
     },
-
     confirmText() {
-      return this.i18nDateTime.confirm || "Confirm";
+      return this.$t("i18nCommon.dateTime.confirm");
     },
-
     todayText() {
-      return this.i18nDateTime.today || "Today";
+      return this.$t("i18nCommon.dateTime.today");
     },
-
     years() {
       const years = [];
-      for (let y = 1900; y <= 2100; y++) {
-        years.push(y);
-      }
+      for (let y = 1900; y <= 2100; y++) years.push(y);
       return years;
     },
-
     monthName() {
       return this.monthNames[this.currentMonth - 1];
     },
-
-    displayValue() {
-      if (!this.modelValue) {
-        return this.placeholder;
-      }
-      return this.modelValue;
-    },
-
     calendarDays() {
       const days = [];
       const firstDay = new Date(this.currentYear, this.currentMonth - 1, 1);
@@ -289,8 +339,11 @@ export default {
       const startDayOfWeek = firstDay.getDay();
       const totalDays = lastDay.getDate();
 
-      // Previous month days
-      const prevMonthLastDay = new Date(this.currentYear, this.currentMonth - 1, 0).getDate();
+      const prevMonthLastDay = new Date(
+        this.currentYear,
+        this.currentMonth - 1,
+        0,
+      ).getDate();
       for (let i = startDayOfWeek - 1; i >= 0; i--) {
         days.push({
           day: prevMonthLastDay - i,
@@ -300,32 +353,19 @@ export default {
         });
       }
 
-      // Current month days
       const today = new Date();
       for (let d = 1; d <= totalDays; d++) {
         const isToday =
           d === today.getDate() &&
           this.currentMonth === today.getMonth() + 1 &&
           this.currentYear === today.getFullYear();
-        days.push({
-          day: d,
-          date: d,
-          otherMonth: false,
-          isToday,
-        });
+        days.push({ day: d, date: d, otherMonth: false, isToday });
       }
 
-      // Next month days
       const remaining = 42 - days.length;
       for (let d = 1; d <= remaining; d++) {
-        days.push({
-          day: d,
-          date: d,
-          otherMonth: true,
-          isToday: false,
-        });
+        days.push({ day: d, date: d, otherMonth: true, isToday: false });
       }
-
       return days;
     },
   },
@@ -334,9 +374,14 @@ export default {
     modelValue: {
       immediate: true,
       handler(val) {
-        if (val) {
-          this.parseValue(val);
-          this.inputValue = val;
+        if (val instanceof Date && !isNaN(val)) {
+          this.currentDay = val.getDate();
+          this.currentMonth = val.getMonth() + 1;
+          this.currentYear = val.getFullYear();
+          this.currentHour = this.dateOnly ? 0 : val.getHours();
+          this.currentMinute = this.dateOnly ? 0 : val.getMinutes();
+          this.currentSecond = this.dateOnly ? 0 : val.getSeconds();
+          this.inputValue = this.formatValue();
         } else {
           this.resetValues();
           this.inputValue = "";
@@ -346,234 +391,169 @@ export default {
   },
 
   methods: {
-    parseValue(val) {
-      const parts = val.split(/[\/\s:]/);
-      
-      if (this.dateOnly) {
-        // dateOnly mode: format is DD/MM/YYYY
-        if (parts.length >= 3) {
-          this.currentDay = parseInt(parts[0], 10);
-          this.currentMonth = parseInt(parts[1], 10);
-          this.currentYear = parseInt(parts[2], 10);
-          this.currentHour = 0;
-          this.currentMinute = 0;
-          this.currentSecond = 0;
-        }
-      } else {
-        // Full datetime mode: format is DD/MM/YYYY HH:mm:ss
-        if (parts.length >= 6) {
-          this.currentDay = parseInt(parts[0], 10);
-          this.currentMonth = parseInt(parts[1], 10);
-          this.currentYear = parseInt(parts[2], 10);
-          this.currentHour = parseInt(parts[3], 10);
-          this.currentMinute = parseInt(parts[4], 10);
-          this.currentSecond = parseInt(parts[5], 10);
-        }
-      }
+    // Tạo snapshot của state hiện tại
+    saveSnapshot() {
+      this.lastDateTime = {
+        year: this.currentYear,
+        month: this.currentMonth,
+        day: this.currentDay,
+        hour: this.currentHour,
+        minute: this.currentMinute,
+        second: this.currentSecond,
+        inputValue: this.inputValue,
+      };
+    },
+
+    // Khôi phục từ snapshot
+    restoreSnapshot() {
+      if (!this.lastDateTime) return;
+      this.currentYear = this.lastDateTime.year;
+      this.currentMonth = this.lastDateTime.month;
+      this.currentDay = this.lastDateTime.day;
+      this.currentHour = this.lastDateTime.hour;
+      this.currentMinute = this.lastDateTime.minute;
+      this.currentSecond = this.lastDateTime.second;
+      this.inputValue = this.lastDateTime.inputValue;
+    },
+
+    buildDateObject() {
+      return new Date(
+        this.currentYear,
+        this.currentMonth - 1,
+        this.currentDay,
+        this.dateOnly ? 0 : this.currentHour,
+        this.dateOnly ? 0 : this.currentMinute,
+        this.dateOnly ? 0 : this.currentSecond,
+      );
+    },
+
+    emitValue() {
+      const dateObj = this.buildDateObject();
+      this.$emit("update:modelValue", isNaN(dateObj) ? null : dateObj);
     },
 
     formatValue() {
       const day = String(this.currentDay).padStart(2, "0");
       const month = String(this.currentMonth).padStart(2, "0");
       const year = this.currentYear;
-      
-      if (this.dateOnly) {
-        return `${day}/${month}/${year}`;
-      }
-      
+      if (this.dateOnly) return `${day}/${month}/${year}`;
       const hour = String(this.currentHour).padStart(2, "0");
       const minute = String(this.currentMinute).padStart(2, "0");
       const second = String(this.currentSecond).padStart(2, "0");
       return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
     },
 
-    emitValue() {
-      this.$emit("update:modelValue", this.formatValue());
+    // Cập nhật inputValue preview ngay khi thay đổi trong popup
+    refreshPreview() {
+      this.inputValue = this.formatValue();
     },
 
-    // Auto-scroll to selected item in picker
     scrollToSelected() {
       this.$nextTick(() => {
-        // Scroll year picker
         if (this.viewYearPicker) {
-          const yearPicker = this.$refs.yearPicker;
-          if (yearPicker) {
-            const selectedYear = yearPicker.querySelector(".td-datetime-year-option.selected");
-            if (selectedYear) {
-              selectedYear.scrollIntoView({ block: "center", inline: "nearest" });
-            }
-          }
+          const el = this.$refs.yearPicker?.querySelector(
+            ".td-datetime-year-option.selected",
+          );
+          el?.scrollIntoView({ block: "center", inline: "nearest" });
         }
-        // Scroll month picker
         if (this.viewMonthPicker) {
-          const monthPicker = this.$refs.monthPicker;
-          if (monthPicker) {
-            const selectedMonth = monthPicker.querySelector(".td-datetime-month-option.selected");
-            if (selectedMonth) {
-              selectedMonth.scrollIntoView({ block: "center", inline: "nearest" });
-            }
-          }
+          const el = this.$refs.monthPicker?.querySelector(
+            ".td-datetime-month-option.selected",
+          );
+          el?.scrollIntoView({ block: "center", inline: "nearest" });
         }
       });
     },
 
-    // Auto-format input as user types
     handleInput(e) {
-      let value = e.target.value;
-      
-      // Remove all non-digit characters for processing
-      const digits = value.replace(/\D/g, "");
-      
+      const digits = e.target.value.replace(/\D/g, "");
       if (digits.length === 0) {
         this.inputValue = "";
         return;
       }
 
-      // Build formatted value with auto-insert separators
       let formatted = "";
       const len = digits.length;
-      
-      // Day (2 digits)
-      if (len >= 1) {
-        formatted += digits.substring(0, 2);
-      }
-      if (len >= 2) {
-        formatted += "/";
-      }
-      
-      // Month (2 digits)  
-      if (len >= 3) {
-        formatted += digits.substring(2, 4);
-      }
-      if (len >= 4) {
-        formatted += "/";
-      }
-      
-      // Year (4 digits)
-      if (len >= 5) {
-        formatted += digits.substring(4, 8);
-      }
-      
-      // DateOnly mode - stop here
+      if (len >= 1) formatted += digits.substring(0, 2);
+      if (len >= 2) formatted += "/";
+      if (len >= 3) formatted += digits.substring(2, 4);
+      if (len >= 4) formatted += "/";
+      if (len >= 5) formatted += digits.substring(4, 8);
+
       if (this.dateOnly) {
         this.inputValue = formatted;
-        this.parseInputToValues(formatted);
+        this.parseInputToCurrentValues(formatted);
         return;
       }
-      
-      // Full datetime mode - continue with time
-      if (len >= 8) {
-        formatted += " ";
-      }
-      
-      // Hour (2 digits)
-      if (len >= 9) {
-        formatted += digits.substring(8, 10);
-      }
-      if (len >= 10) {
-        formatted += ":";
-      }
-      
-      // Minute (2 digits)
-      if (len >= 11) {
-        formatted += digits.substring(10, 12);
-      }
-      if (len >= 12) {
-        formatted += ":";
-      }
-      
-      // Second (2 digits)
-      if (len >= 13) {
-        formatted += digits.substring(12, 14);
-      }
+
+      if (len >= 8) formatted += " ";
+      if (len >= 9) formatted += digits.substring(8, 10);
+      if (len >= 10) formatted += ":";
+      if (len >= 11) formatted += digits.substring(10, 12);
+      if (len >= 12) formatted += ":";
+      if (len >= 13) formatted += digits.substring(12, 14);
 
       this.inputValue = formatted;
-
-      // Parse and update internal values for popup display
-      this.parseInputToValues(formatted);
+      this.parseInputToCurrentValues(formatted);
     },
 
-    // Parse input string to internal values
-    parseInputToValues(inputStr) {
+    parseInputToCurrentValues(inputStr) {
       const parts = inputStr.split(/[\/\s:]/);
-      
-      // Force time to 00:00:00 when dateOnly mode
       if (this.dateOnly) {
         this.currentHour = 0;
         this.currentMinute = 0;
         this.currentSecond = 0;
       }
-      
-      if (parts[0] && parts[0].length >= 1) {
-        const day = parseInt(parts[0], 10);
-        if (day >= 1 && day <= 31) {
-          this.currentDay = day;
-        }
+
+      if (parts[0]?.length >= 1) {
+        const d = parseInt(parts[0], 10);
+        if (d >= 1 && d <= 31) this.currentDay = d;
       }
-      
-      if (parts[1] && parts[1].length >= 1) {
-        const month = parseInt(parts[1], 10);
-        if (month >= 1 && month <= 12) {
-          this.currentMonth = month;
-        }
+      if (parts[1]?.length >= 1) {
+        const m = parseInt(parts[1], 10);
+        if (m >= 1 && m <= 12) this.currentMonth = m;
       }
-      
-      if (parts[2] && parts[2].length >= 1) {
-        const year = parseInt(parts[2], 10);
-        if (year >= 1900 && year <= 2100) {
-          this.currentYear = year;
-        }
+      if (parts[2]?.length >= 1) {
+        const y = parseInt(parts[2], 10);
+        if (y >= 1900 && y <= 2100) this.currentYear = y;
       }
-      
-      // Skip time parsing in dateOnly mode
-      if (this.dateOnly) {
-        return;
+      if (this.dateOnly) return;
+      if (parts[3]?.length >= 1) {
+        const h = parseInt(parts[3], 10);
+        if (h >= 0 && h <= 23) this.currentHour = h;
       }
-      
-      if (parts[3] && parts[3].length >= 1) {
-        const hour = parseInt(parts[3], 10);
-        if (hour >= 0 && hour <= 23) {
-          this.currentHour = hour;
-        }
+      if (parts[4]?.length >= 1) {
+        const m = parseInt(parts[4], 10);
+        if (m >= 0 && m <= 59) this.currentMinute = m;
       }
-      
-      if (parts[4] && parts[4].length >= 1) {
-        const minute = parseInt(parts[4], 10);
-        if (minute >= 0 && minute <= 59) {
-          this.currentMinute = minute;
-        }
-      }
-      
-      if (parts[5] && parts[5].length >= 1) {
-        const second = parseInt(parts[5], 10);
-        if (second >= 0 && second <= 59) {
-          this.currentSecond = second;
-        }
+      if (parts[5]?.length >= 1) {
+        const s = parseInt(parts[5], 10);
+        if (s >= 0 && s <= 59) this.currentSecond = s;
       }
     },
 
     handleKeydown(e) {
-      // Allow: backspace, delete, tab, escape, enter
-      if ([8, 46, 9, 27, 13].includes(e.keyCode) ||
-          // Allow: Ctrl/Cmd+A, Ctrl/Cmd+C, Ctrl/Cmd+V, Ctrl/Cmd+X
-          ((e.keyCode === 65 || e.keyCode === 67 || e.keyCode === 86 || e.keyCode === 88) && 
-           (e.ctrlKey || e.metaKey))) {
+      if (
+        [8, 46, 9, 27, 13].includes(e.keyCode) ||
+        ((e.keyCode === 65 ||
+          e.keyCode === 67 ||
+          e.keyCode === 86 ||
+          e.keyCode === 88) &&
+          (e.ctrlKey || e.metaKey))
+      )
         return;
-      }
-      // Block if not a number
-      if (e.keyCode < 48 || e.keyCode > 57) {
-        e.preventDefault();
-      }
+      if (e.keyCode < 48 || e.keyCode > 57) e.preventDefault();
     },
 
     togglePopup() {
       if (this.readOnly) return;
-      this.isOpen = !this.isOpen;
-      if (this.isOpen) {
-        this.parseInputToValues(this.inputValue);
-        this.$nextTick(() => {
-          this.scrollToSelectedDay();
-        });
+      if (!this.isOpen) {
+        // Lưu snapshot trước khi mở
+        this.saveSnapshot();
+        this.isOpen = true;
+        this.$nextTick(() => this.scrollToSelectedDay());
+      } else {
+        this.cancelSelection();
       }
       this.viewMonthPicker = false;
       this.viewYearPicker = false;
@@ -581,20 +561,24 @@ export default {
 
     scrollToSelectedDay() {
       this.$nextTick(() => {
-        const dayGrid = this.$refs.dayGrid;
-        if (dayGrid) {
-          const selectedDay = dayGrid.querySelector(".td-datetime-day.selected");
-          if (selectedDay) {
-            selectedDay.scrollIntoView({ block: "center", inline: "nearest" });
-          }
-        }
+        const el = this.$refs.dayGrid?.querySelector(
+          ".td-datetime-day.selected",
+        );
+        el?.scrollIntoView({ block: "center", inline: "nearest" });
       });
     },
 
-    closePopup() {
+    // Hủy: rollback về lastDateTime rồi đóng
+    cancelSelection() {
+      this.restoreSnapshot();
       this.isOpen = false;
       this.viewMonthPicker = false;
       this.viewYearPicker = false;
+    },
+
+    // Giữ closePopup để v-click-outside vẫn rollback
+    closePopup() {
+      this.cancelSelection();
     },
 
     openMonthPicker() {
@@ -612,89 +596,79 @@ export default {
     selectMonth(m) {
       this.currentMonth = m;
       this.viewMonthPicker = false;
-      this.inputValue = this.formatValue();
+      this.refreshPreview();
     },
 
     selectYear(y) {
       this.currentYear = y;
       this.viewYearPicker = false;
-      this.inputValue = this.formatValue();
+      this.refreshPreview();
     },
 
     selectDay(d) {
       this.currentDay = d;
-      this.inputValue = this.formatValue();
+      this.refreshPreview();
     },
 
     prevMonth() {
       if (this.currentMonth === 1) {
         this.currentMonth = 12;
         this.currentYear--;
-      } else {
-        this.currentMonth--;
-      }
+      } else this.currentMonth--;
     },
 
     nextMonth() {
       if (this.currentMonth === 12) {
         this.currentMonth = 1;
         this.currentYear++;
-      } else {
-        this.currentMonth++;
-      }
+      } else this.currentMonth++;
     },
 
     incHour() {
       this.currentHour = (this.currentHour + 1) % 24;
-      this.inputValue = this.formatValue();
+      this.refreshPreview();
     },
-
     decHour() {
       this.currentHour = (this.currentHour - 1 + 24) % 24;
-      this.inputValue = this.formatValue();
+      this.refreshPreview();
     },
-
     incMinute() {
       this.currentMinute = (this.currentMinute + 1) % 60;
-      this.inputValue = this.formatValue();
+      this.refreshPreview();
     },
-
     decMinute() {
       this.currentMinute = (this.currentMinute - 1 + 60) % 60;
-      this.inputValue = this.formatValue();
+      this.refreshPreview();
     },
-
     incSecond() {
       this.currentSecond = (this.currentSecond + 1) % 60;
-      this.inputValue = this.formatValue();
+      this.refreshPreview();
     },
-
     decSecond() {
       this.currentSecond = (this.currentSecond - 1 + 60) % 60;
-      this.inputValue = this.formatValue();
+      this.refreshPreview();
     },
 
+    // Confirm: cập nhật snapshot mới, emit và đóng
     confirmSelection() {
+      this.saveSnapshot();
       this.emitValue();
-      this.closePopup();
+      this.isOpen = false;
+      this.viewMonthPicker = false;
+      this.viewYearPicker = false;
     },
 
+    // Today: set giá trị hôm nay, preview ngay, không tự confirm
     goToToday() {
       const now = new Date();
       this.currentYear = now.getFullYear();
       this.currentMonth = now.getMonth() + 1;
       this.currentDay = now.getDate();
-      if (!this.dateOnly) {
-        this.currentHour = now.getHours();
-        this.currentMinute = now.getMinutes();
-        this.currentSecond = now.getSeconds();
-      } else {
-        this.currentHour = 0;
-        this.currentMinute = 0;
-        this.currentSecond = 0;
-      }
-      this.inputValue = this.formatValue();
-      this.closePopup();
+      this.currentHour = this.dateOnly ? 0 : now.getHours();
+      this.currentMinute = this.dateOnly ? 0 : now.getMinutes();
+      this.currentSecond = this.dateOnly ? 0 : now.getSeconds();
+      this.refreshPreview();
+      this.confirmSelection();
     },
 
     resetValues() {
@@ -702,15 +676,9 @@ export default {
       this.currentYear = now.getFullYear();
       this.currentMonth = now.getMonth() + 1;
       this.currentDay = now.getDate();
-      if (this.dateOnly) {
-        this.currentHour = 0;
-        this.currentMinute = 0;
-        this.currentSecond = 0;
-      } else {
-        this.currentHour = now.getHours();
-        this.currentMinute = now.getMinutes();
-        this.currentSecond = now.getSeconds();
-      }
+      this.currentHour = this.dateOnly ? 0 : now.getHours();
+      this.currentMinute = this.dateOnly ? 0 : now.getMinutes();
+      this.currentSecond = this.dateOnly ? 0 : now.getSeconds();
     },
   },
 };
@@ -735,7 +703,6 @@ export default {
 
   &.td-datetime-read-only {
     opacity: 0.6;
-
     .td-datetime-input {
       pointer-events: none;
     }
@@ -757,29 +724,26 @@ export default {
 
   .td-datetime-input {
     flex: 1;
-    padding: 10px 40px 10px 12px;
+    padding: var(--padding);
     border: 1px solid var(--border-color);
     background: var(--bg-thirt-color);
     border-radius: var(--border-radius-component);
     font-size: var(--font-size-medium);
     color: var(--text-primary-color);
     outline: none;
-    min-width: 280px;
+    min-width: 200px;
     transition: all 0.2s ease;
 
     &::placeholder {
       color: var(--text-secondary-color);
     }
-
     &:hover {
       border-color: var(--btn-color);
     }
-
     &:focus {
       border-color: var(--btn-color);
       box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
     }
-
     &.td-datetime-input-open {
       border-color: var(--btn-color);
       box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
@@ -833,7 +797,6 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
-
         &:hover {
           background: var(--bg-layer-color);
           color: var(--text-primary-color);
@@ -846,19 +809,10 @@ export default {
         font-size: var(--font-size-medium);
         font-weight: 500;
 
-        .td-datetime-month {
-          cursor: pointer;
-          color: var(--text-primary-color);
-
-          &:hover {
-            color: var(--btn-color);
-          }
-        }
-
+        .td-datetime-month,
         .td-datetime-year {
           cursor: pointer;
           color: var(--text-primary-color);
-
           &:hover {
             color: var(--btn-color);
           }
@@ -881,11 +835,9 @@ export default {
         cursor: pointer;
         border-radius: 4px;
         font-size: var(--font-size-medium-rare);
-
         &:hover {
           background: var(--bg-layer-color);
         }
-
         &.selected {
           background: var(--btn-color);
           color: white;
@@ -899,7 +851,6 @@ export default {
         grid-template-columns: repeat(7, 1fr);
         gap: 2px;
         margin-bottom: 8px;
-
         span {
           text-align: center;
           font-size: var(--font-size-small);
@@ -923,18 +874,15 @@ export default {
           &:hover:not(.other-month) {
             background: var(--bg-layer-color);
           }
-
           &.other-month {
             color: var(--text-secondary-color);
             opacity: 0.5;
             cursor: default;
           }
-
           &.selected {
             background: var(--btn-color);
             color: white;
           }
-
           &.today {
             border: 1px solid var(--btn-color);
           }
@@ -971,7 +919,6 @@ export default {
           color: var(--text-secondary-color);
           display: flex;
           align-items: center;
-
           &:hover {
             color: var(--btn-color);
           }
@@ -997,39 +944,13 @@ export default {
 
   .td-datetime-actions {
     display: flex;
-    justify-content: flex-end;
-    gap: 8px;
+    justify-content: space-between;
     border-top: 1px solid var(--border-color);
     padding-top: 12px;
+    width: 100%;
 
-    .td-datetime-btn-cancel,
-    .td-datetime-btn-confirm {
-      padding: 8px 16px;
-      border-radius: var(--border-radius-component);
-      font-size: var(--font-size-medium);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .td-datetime-btn-cancel {
-      background: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary-color);
-
-      &:hover {
-        background: var(--bg-layer-color);
-        color: var(--text-primary-color);
-      }
-    }
-
-    .td-datetime-btn-confirm {
-      background: var(--btn-color);
-      border: 1px solid var(--btn-color);
-      color: white;
-
-      &:hover {
-        opacity: 0.9;
-      }
+    .td-datetime-actions-positive {
+      gap: var(--padding);
     }
   }
 }
