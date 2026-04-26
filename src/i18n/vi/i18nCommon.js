@@ -670,6 +670,8 @@ export default {
       querySizeTable: "Query kích thước bảng",
       queryTableDataType: "Query kiểu dữ liệu bảng",
       queryViewDefinition: "Query định nghĩa view",
+      queryRunningQueries: "Query các câu lệnh đang chạy",
+      queryKillProcess: "Query kill process",
       selectTemplate: "Chọn template",
       searchTemplate: "Tìm template",
       noTemplateFound: "Không tìm thấy template",

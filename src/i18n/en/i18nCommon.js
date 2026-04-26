@@ -673,6 +673,8 @@ export default {
       querySizeTable: "Query Table Size",
       queryTableDataType: "Query Table Data Type",
       queryViewDefinition: "Query View Definition",
+      queryRunningQueries: "Query Running Queries",
+      queryKillProcess: "Query Kill Process",
       selectTemplate: "Select template",
       searchTemplate: "Search template",
       noTemplateFound: "No template found",

@@ -46,4 +46,14 @@ export default [
     labelKey: "i18nCommon.postgreSQLTemplate.queryViewDefinition",
     sql: sqlModules["./sql/query_view_definition.sql"],
   },
+  {
+    key: "query_running_queries",
+    labelKey: "i18nCommon.postgreSQLTemplate.queryRunningQueries",
+    sql: sqlModules["./sql/query_running_queries.sql"],
+  },
+  {
+    key: "query_kill_process",
+    labelKey: "i18nCommon.postgreSQLTemplate.queryKillProcess",
+    sql: sqlModules["./sql/query_kill_process.sql"],
+  },
 ];
