@@ -228,6 +228,32 @@ export default {
         iframeDoc.head.appendChild(style);
       }
 
+      // Xử lý sự kiện click vào các link
+      iframeDoc.addEventListener("click", (e) => {
+        const a = e.target.closest("a");
+        if (a && a.href) {
+          const hrefAttr = a.getAttribute("href");
+          
+          // Bỏ qua các link không trỏ đi đâu thực sự
+          if (hrefAttr && (hrefAttr.startsWith("#") || hrefAttr.startsWith("javascript:"))) {
+            // Nếu là anchor link, tự cuộn tới id
+            if (hrefAttr.startsWith("#")) {
+              e.preventDefault();
+              const targetId = hrefAttr.substring(1);
+              const targetEl = iframeDoc.getElementById(targetId);
+              if (targetEl) targetEl.scrollIntoView();
+            }
+            return;
+          }
+
+          // Ngăn hành vi mở trang mới trong iframe
+          e.preventDefault();
+          // Cập nhật URL ở thẻ cha và load lại luồng translate
+          this.url = a.href; 
+          this.fetchAndTranslate();
+        }
+      });
+
       setTimeout(
         () => {
           this.translateDOM(iframeDoc);
