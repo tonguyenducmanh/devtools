@@ -502,7 +502,6 @@ export default {
       position: relative;
       background-color: var(--bg-layer-color);
       border-radius: var(--border-radius);
-      overflow: auto;
 
       .td-loading-overlay {
         position: absolute;
