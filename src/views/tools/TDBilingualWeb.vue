@@ -11,7 +11,8 @@
         ></TDInput>
         <TDButton
           @click="fetchAndTranslate"
-          :label="$t('i18nCommon.bilingualWeb.fetchButton')"
+          iconClass="td-send-icon"
+          v-tooltip="$t('i18nCommon.bilingualWeb.fetchButton')"
           :isLoading="isLoading"
           :noMargin="true"
         ></TDButton>
