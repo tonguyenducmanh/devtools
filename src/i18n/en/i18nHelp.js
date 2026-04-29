@@ -410,8 +410,27 @@ export default {
       troubleshooting: {
         title: "Troubleshooting",
         connection: "Check if the host address and port are correct.",
-        credentials: "Verify the username and password.",
+        credentials: "Check the username and password.",
         agent: "Make sure the Agent app is running and connected.",
+      },
+    },
+    bilingualWeb: {
+      purpose: {
+        title: "What is Bilingual Web?",
+        content: "A tool that displays an actual website with 100% original layout, while translating the visible text into bilingual form without breaking the HTML/CSS structure.",
+      },
+      howToUse: {
+        title: "How to use",
+        input: "Enter the website URL to translate.",
+        fetch: "Click 'Fetch & Translate' to embed the website and automatically find text to translate.",
+        wait: "The system will automatically call the Agent to translate and inject the results directly below each original text.",
+      },
+      options: {
+        title: "Configuration Options",
+        delay: "Delay time - Wait time for dynamic websites (React, etc.) to finish loading UI before scanning for text.",
+        tags: "Block Tags - HTML tags that will be scanned for translation (e.g., P, H1, LI).",
+        classes: "Filter by Class - Specify class names to translate, separated by semicolons (;).",
+        ids: "Filter by ID - Specify ID names to translate, separated by semicolons (;).",
       },
     },
   },

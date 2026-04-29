@@ -1,3 +1,5 @@
+// file cấu hình enum của từng loại cache
+// bất cứ khi nào sửa enum trong file này, luôn phải check file @/common/cache/TDCacheConfig.js đã có cấu hình tương ứng chưa
 export const EnumCacheConfig = {
   QRHistory: 1,
   OneTimeAuthen: 3,
@@ -36,4 +38,5 @@ export const EnumCacheConfig = {
   MindMapConfigLayout: 42,
   MindMapHistory: 43,
   PostgreSQLTemplateConfigLayout: 44,
+  BilingualWebConfigLayout: 45,
 };

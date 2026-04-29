@@ -538,6 +538,10 @@ export default {
       fetchSuccess: "Dịch trang web thành công",
       fetchError: "Lỗi khi dịch trang web",
       infoTooltip: "Công cụ dịch song ngữ cho trang web tĩnh và động. Yêu cầu tải và chạy Agent.",
+      delayTime: "Delay (ms)",
+      blockTags: "Block Tags",
+      classFilters: "Lọc Class",
+      idFilters: "Lọc ID",
     },
     textgenerator: {
       resultPlaceholder: "Kết quả gen text ngẫu nhiên",

@@ -220,6 +220,12 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool Mind Map",
   },
+  BilingualWebConfigLayout: {
+    KeyFormat: "BilingualWebConfigLayout",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool Bilingual Web",
+  },
   MindMapHistory: {
     KeyFormat: "MindMapHistory",
     CacheLevel: tdEnum.cacheType.indexedDB,

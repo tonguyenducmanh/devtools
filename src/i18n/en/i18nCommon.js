@@ -541,6 +541,10 @@ export default {
       fetchSuccess: "Website translated successfully",
       fetchError: "Error translating website",
       infoTooltip: "Bilingual website translation tool. Requires Agent to function.",
+      delayTime: "Delay (ms)",
+      blockTags: "Block Tags",
+      classFilters: "Class Filter",
+      idFilters: "ID Filter",
     },
     textgenerator: {
       resultPlaceholder: "Result random text",
