@@ -124,6 +124,22 @@
             </div>
           </div>
         </div>
+        <div
+          class="flex flex-col td-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.History
+          "
+        >
+          <TDHistorySidebar
+            ref="history"
+            :applyFunction="handleApplyHistory"
+            titleKey="url"
+            :noMargin="true"
+            :isAppendDuplicate="true"
+            :cacheKey="$tdEnum.cacheConfig.BilingualWebHistory"
+          />
+        </div>
       </template>
     </TDSubSidebar>
   </div>
@@ -137,6 +153,7 @@ import TDSlideOption from "@/components/TDSlideOption.vue";
 import TDBilingualWebHelp from "@/views/helps/TDBilingualWebHelp.vue";
 import TDToolbar from "@/components/TDToolbar.vue";
 import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";
+import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 
 export default {
   extends: TDToolBase,
@@ -147,6 +164,7 @@ export default {
     TDBilingualWebHelp,
     TDToolbar,
     TDDynamicBackgroundEffect,
+    TDHistorySidebar,
   },
   computed: {
     sidebarOptions() {
@@ -160,6 +178,11 @@ export default {
         value: this.$tdEnum.ToolSidebarOption.Setting,
         label: this.$t("i18nCommon.sidebarOption.setting"),
         icon: "td-setting-icon",
+      });
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.History,
+        label: this.$t("i18nCommon.history.title"),
+        icon: "td-history-icon",
       });
       return options;
     },
@@ -175,12 +198,17 @@ export default {
               icon: "td-undo-icon",
               tooltip: this.$t("i18nCommon.bilingualWeb.undo"),
               action: () => this.handleUndoLink(),
+              class: this.historyPointer <= 0 ? "td-toolbar-btn-disabled" : "",
             },
             {
               key: "redo",
               icon: "td-redo-icon",
               tooltip: this.$t("i18nCommon.bilingualWeb.redo"),
               action: () => this.handleRedoLink(),
+              class:
+                this.historyPointer >= this.sessionHistory.length - 1
+                  ? "td-toolbar-btn-disabled"
+                  : "",
             },
           ],
         },
@@ -215,6 +243,8 @@ export default {
       isLoading: false,
       resultHtml: "",
       agentAPI: null,
+      sessionHistory: [],
+      historyPointer: -1,
     };
   },
   watch: {
@@ -241,6 +271,11 @@ export default {
   },
   mounted() {
     this.agentAPI = new TDBilingualWebAPI();
+    // Khởi tạo stack nếu đã có url mặc định
+    if (this.url) {
+      this.sessionHistory = [this.url];
+      this.historyPointer = 0;
+    }
   },
   methods: {
     onToolbarAction({ key, option }) {
@@ -252,18 +287,46 @@ export default {
       actionMap[key]?.();
     },
     handleUndoLink() {
-      let me = this;
-      // todo: undo link
+      if (!this.isLoading && this.historyPointer > 0) {
+        this.historyPointer--;
+        this.url = this.sessionHistory[this.historyPointer];
+        this.fetchAndTranslate(true);
+      }
     },
     handleRedoLink() {
-      let me = this;
-      // todo: redo link
+      if (
+        !this.isLoading &&
+        this.sessionHistory.length > 0 &&
+        this.historyPointer < this.sessionHistory.length - 1
+      ) {
+        this.historyPointer++;
+        this.url = this.sessionHistory[this.historyPointer];
+        this.fetchAndTranslate(true);
+      }
+    },
+    handleApplyHistory(url) {
+      if (this.isLoading) return;
+      this.url = url;
+      // Tìm vị trí của URL trong session history
+      const existingIndex = this.sessionHistory.lastIndexOf(url);
+      if (existingIndex !== -1) {
+        // Nếu đã có trong stack, nhảy tới index đó và coi như điều hướng lịch sử
+        this.historyPointer = existingIndex;
+        this.fetchAndTranslate(true);
+      } else {
+        // Nếu chưa có, coi như navigation mới
+        this.fetchAndTranslate();
+      }
     },
     handleFullScreen() {
       let me = this;
       me.isFullTab = !me.isFullTab;
     },
-    async fetchAndTranslate() {
+    async fetchAndTranslate(isHistoryNav = false) {
+      // Đảm bảo isHistoryNav là boolean (tránh nhận PointerEvent từ @click)
+      if (typeof isHistoryNav !== "boolean") {
+        isHistoryNav = false;
+      }
       if (!this.url) {
         this.$tdToast.warning(
           this.$t("i18nCommon.bilingualWeb.urlPlaceholder"),
@@ -390,6 +453,32 @@ export default {
           }
 
           this.resultHtml = html;
+
+          // Lưu vào lịch sử persistent (IndexedDB)
+          if (this.$refs.history) {
+            this.$refs.history.saveToHistory(this.url);
+          }
+
+          // Quản lý session history cho undo/redo
+          if (!isHistoryNav) {
+            // Chỉ thêm vào stack nếu URL khác với URL hiện tại ở pointer
+            if (
+              this.historyPointer === -1 ||
+              this.sessionHistory[this.historyPointer] !== this.url
+            ) {
+              // Nếu là navigation mới, xóa phần redo phía sau (giống Chrome)
+              if (this.historyPointer < this.sessionHistory.length - 1) {
+                this.sessionHistory = this.sessionHistory.slice(
+                  0,
+                  this.historyPointer + 1,
+                );
+              }
+              // Thêm URL vào stack
+              this.sessionHistory.push(this.url);
+              this.historyPointer = this.sessionHistory.length - 1;
+            }
+          }
+
           this.$tdToast.success(
             this.$t("i18nCommon.bilingualWeb.fetchSuccess"),
           );
@@ -627,5 +716,13 @@ export default {
   z-index: 1000;
   background-color: var(--bg-main-color);
   padding: var(--padding);
+}
+</style>
+
+<style lang="scss">
+.td-toolbar-btn-disabled {
+  opacity: 0.3 !important;
+  pointer-events: none !important;
+  cursor: default !important;
 }
 </style>

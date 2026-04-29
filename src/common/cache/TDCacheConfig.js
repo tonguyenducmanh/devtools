@@ -238,4 +238,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool PostgreSQL Template",
   },
+  BilingualWebHistory: {
+    KeyFormat: "BilingualWebHistory",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử dịch trang web song ngữ",
+  },
 };

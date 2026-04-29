@@ -100,6 +100,7 @@ class TDEnum {
   ToolSidebarOption = {
     Help: 0,
     Setting: 1,
+    History: 2,
   };
   RemoteDesktopSidebarOption = {
     Help: 0,

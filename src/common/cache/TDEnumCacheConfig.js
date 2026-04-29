@@ -39,4 +39,5 @@ export const EnumCacheConfig = {
   MindMapHistory: 43,
   PostgreSQLTemplateConfigLayout: 44,
   BilingualWebConfigLayout: 45,
+  BilingualWebHistory: 46,
 };
