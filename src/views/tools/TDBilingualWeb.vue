@@ -74,7 +74,9 @@
         >
           <div class="flex flex-col td-sidebar-settings">
             <div class="setting-item">
-              <div class="td-setting-label">{{ $t('i18nCommon.bilingualWeb.delayTime') }}</div>
+              <div class="td-setting-label">
+                {{ $t("i18nCommon.bilingualWeb.delayTime") }}
+              </div>
               <TDInput
                 :noMargin="true"
                 v-model="currentConfigLayout.delayTime"
@@ -83,7 +85,9 @@
               />
             </div>
             <div class="setting-item">
-              <div class="td-setting-label">{{ $t('i18nCommon.bilingualWeb.blockTags') }}</div>
+              <div class="td-setting-label">
+                {{ $t("i18nCommon.bilingualWeb.blockTags") }}
+              </div>
               <TDInput
                 :noMargin="true"
                 v-model="currentConfigLayout.blockTagsStr"
@@ -91,7 +95,9 @@
               />
             </div>
             <div class="setting-item">
-              <div class="td-setting-label">{{ $t('i18nCommon.bilingualWeb.classFilters') }}</div>
+              <div class="td-setting-label">
+                {{ $t("i18nCommon.bilingualWeb.classFilters") }}
+              </div>
               <TDInput
                 :noMargin="true"
                 placeHolder="VD: title;description"
@@ -100,7 +106,9 @@
               />
             </div>
             <div class="setting-item">
-              <div class="td-setting-label">{{ $t('i18nCommon.bilingualWeb.idFilters') }}</div>
+              <div class="td-setting-label">
+                {{ $t("i18nCommon.bilingualWeb.idFilters") }}
+              </div>
               <TDInput
                 :noMargin="true"
                 placeHolder="VD: header;footer"
@@ -197,7 +205,121 @@ export default {
       try {
         const response = await this.agentAPI.fetchBilingualWeb(this.url);
         if (response && response.success) {
-          this.resultHtml = response.data.data;
+          let html = response.data.data;
+
+          const injectedBaseUrl = this.url ? this.url.replace(/"/g, '\\"') : "";
+          const injectHTML =
+            `
+          <script>
+		// Patch Worker to prevent cross-origin SecurityError from crashing dynamic sites
+		const OriginalWorker = window.Worker;
+		if (OriginalWorker) {
+			window.Worker = function(scriptURL, options) {
+				try {
+					return new OriginalWorker(scriptURL, options);
+				} catch (e) {
+					console.warn("Intercepted Worker cross-origin error:", e);
+					return {
+						postMessage: function() {},
+						terminate: function() {},
+						addEventListener: function() {},
+						removeEventListener: function() {}
+					};
+				}
+			};
+		}
+		// Patch ServiceWorker just in case
+		if (navigator.serviceWorker && navigator.serviceWorker.register) {
+			const originalRegister = navigator.serviceWorker.register.bind(navigator.serviceWorker);
+			navigator.serviceWorker.register = function(url, options) {
+				return originalRegister(url, options).catch(err => {
+					console.warn("Intercepted ServiceWorker error:", err);
+					return null;
+				});
+			};
+		}
+              (function() {
+                const injectedBaseUrl = "${injectedBaseUrl}";
+                const OriginalURL = window.URL;
+                const originalWorker = window.Worker;
+
+                // Fix URL constructor for about:srcdoc
+                window.URL = function(url, base) {
+                  let resolvedBase = base;
+                  if (base === 'about:srcdoc' || base === window.location.href) {
+                    resolvedBase = (document.baseURI && document.baseURI !== 'about:srcdoc') ? document.baseURI : injectedBaseUrl;
+                  }
+                  if (resolvedBase !== undefined) {
+                    return new OriginalURL(url, resolvedBase);
+                  } else {
+                    try {
+                      return new OriginalURL(url);
+                    } catch (e) {
+                      const baseFallback = (document.baseURI && document.baseURI !== 'about:srcdoc') ? document.baseURI : injectedBaseUrl;
+                      return new OriginalURL(url, baseFallback);
+                    }
+                  }
+                };
+                Object.setPrototypeOf(window.URL, OriginalURL);
+                window.URL.prototype = OriginalURL.prototype;
+                window.URL.createObjectURL = OriginalURL.createObjectURL;
+                window.URL.revokeObjectURL = OriginalURL.revokeObjectURL;
+
+                // Fix Worker cross-origin
+                window.Worker = function(url, options) {
+                  try {
+                    const urlStr = typeof url === 'string' ? url : (url && url.href) ? url.href : String(url);
+                    const baseToUse = (document.baseURI && document.baseURI !== 'about:srcdoc') ? document.baseURI : injectedBaseUrl;
+                    const absoluteUrl = new OriginalURL(urlStr, baseToUse).href;
+                    const safeUrl = absoluteUrl.replace(/"/g, '\\"');
+                    const isModule = options && options.type === 'module';
+
+                    const preScript = "const workerBaseUrl = \\"" + safeUrl + "\\";\\n" +
+                      "const OriginalURLWorker = self.URL;\\n" +
+                      "self.URL = function(url, base) {\\n" +
+                      "  let resBase = base;\\n" +
+                      "  if (base === undefined || String(base).startsWith('blob:')) { resBase = workerBaseUrl; }\\n" +
+                      "  if (resBase !== undefined) { return new OriginalURLWorker(url, resBase); }\\n" +
+                      "  try { return new OriginalURLWorker(url); } catch(e) { return new OriginalURLWorker(url, workerBaseUrl); }\\n" +
+                      "};\\n" +
+                      "Object.setPrototypeOf(self.URL, OriginalURLWorker);\\n" +
+                      "self.URL.prototype = OriginalURLWorker.prototype;\\n" +
+                      "self.URL.createObjectURL = OriginalURLWorker.createObjectURL;\\n" +
+                      "self.URL.revokeObjectURL = OriginalURLWorker.revokeObjectURL;\\n" +
+                      "const originalFetch = self.fetch;\\n" +
+                      "self.fetch = function(input, init) {\\n" +
+                      "  try {\\n" +
+                      "    const urlStr = typeof input === 'string' ? input : (input instanceof OriginalURLWorker ? input.href : (input ? input.url : String(input)));\\n" +
+                      "    const resolvedUrl = new OriginalURLWorker(urlStr, workerBaseUrl).href;\\n" +
+                      "    if (typeof input === 'string' || input instanceof OriginalURLWorker || input instanceof self.URL) { input = resolvedUrl; }\\n" +
+                      "    else if (input instanceof Request) { input = new Request(resolvedUrl, input); }\\n" +
+                      "  } catch(e) {}\\n" +
+                      "  return originalFetch.call(self, input, init);\\n" +
+                      "};\\n";
+
+                    const scriptContent = isModule ? preScript + 'await import("' + safeUrl + '");' : preScript + 'importScripts("' + safeUrl + '");';
+                    const blob = new Blob([scriptContent], { type: 'application/javascript' });
+                    const blobUrl = OriginalURL.createObjectURL(blob);
+                    return new originalWorker(blobUrl, options);
+                  } catch (e) {
+                    console.error('Worker injection failed:', e);
+                    return new originalWorker(url, options);
+                  }
+                };
+              })();
+            </scr` +
+            `ipt>
+          `;
+
+          if (html.includes("<head>")) {
+            html = html.replace("<head>", "<head>" + injectHTML);
+          } else if (html.match(/<head[^>]*>/i)) {
+            html = html.replace(/(<head[^>]*>)/i, "$1" + injectHTML);
+          } else {
+            html = injectHTML + html;
+          }
+
+          this.resultHtml = html;
           this.$tdToast.success(
             this.$t("i18nCommon.bilingualWeb.fetchSuccess"),
           );
@@ -233,9 +355,12 @@ export default {
         const a = e.target.closest("a");
         if (a && a.href) {
           const hrefAttr = a.getAttribute("href");
-          
+
           // Bỏ qua các link không trỏ đi đâu thực sự
-          if (hrefAttr && (hrefAttr.startsWith("#") || hrefAttr.startsWith("javascript:"))) {
+          if (
+            hrefAttr &&
+            (hrefAttr.startsWith("#") || hrefAttr.startsWith("javascript:"))
+          ) {
             // Nếu là anchor link, tự cuộn tới id
             if (hrefAttr.startsWith("#")) {
               e.preventDefault();
@@ -249,7 +374,7 @@ export default {
           // Ngăn hành vi mở trang mới trong iframe
           e.preventDefault();
           // Cập nhật URL ở thẻ cha và load lại luồng translate
-          this.url = a.href; 
+          this.url = a.href;
           this.fetchAndTranslate();
         }
       });
