@@ -158,7 +158,7 @@ export default {
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
         delayTime: 1500,
-        blockTagsStr: "P,H1,H2,H3,H4,H5,H6,LI,TH,TD,DT,DD",
+        blockTagsStr: "P;H1;H2;H3;H4;H5;H6;LI;TH;TD;DT;DD",
         classFiltersStr: "",
         idFiltersStr: "",
       },
@@ -389,7 +389,7 @@ export default {
     },
     async translateDOM(doc) {
       const blockTags = (this.currentConfigLayout.blockTagsStr || "")
-        .split(",")
+        .split(";")
         .map((t) => t.trim().toUpperCase())
         .filter((t) => t);
       const customClasses = (this.currentConfigLayout.classFiltersStr || "")
