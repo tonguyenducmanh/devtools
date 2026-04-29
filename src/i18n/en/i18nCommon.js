@@ -110,6 +110,7 @@ export default {
       APIMocking: "API mocking",
       remoteDesktop: "Remote Desktop Protocol",
       PostgreSQLTemplate: "PostgreSQL Template",
+      BilingualWeb: "Bilingual Web",
       agentDownload: {
         title: "Download Agent",
         redirecting: "Redirecting...",
@@ -530,6 +531,16 @@ export default {
       refreshTableData: "Reload table list",
       showDataByTable: "Load data",
       queryDynamic: "Query",
+    },
+    bilingualWeb: {
+      title: "Bilingual Web Translation Tool!",
+      urlPlaceholder: "Enter website URL (e.g., https://...)",
+      fetchButton: "Translate Page",
+      resultPlaceholder: "Result will appear here...",
+      fetching: "Fetching and translating...",
+      fetchSuccess: "Website translated successfully",
+      fetchError: "Error translating website",
+      infoTooltip: "Bilingual website translation tool. Requires Agent to function.",
     },
     textgenerator: {
       resultPlaceholder: "Result random text",

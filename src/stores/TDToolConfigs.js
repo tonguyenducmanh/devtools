@@ -94,28 +94,13 @@ const sidebarConfig = [
     ],
   },
   {
-    type: "group",
-    groupKey: "qrcode",
-    groupTitleKey: "i18nCommon.group.ArtificialIntelligence",
-    children: [
-      {
-        name: "opticalcharacterrecognition",
-        component: () =>
-          import("@/views/tools/TDOpticalCharacterRecognition.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.OpticalCharacterRecognition",
-          helpKey: "i18nHelp.feature.OpticalCharacterRecognition",
-        },
-      },
-      {
-        name: "cosinsimilarity",
-        component: () => import("@/views/tools/TDCosinSimilarity.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.cosinSimilarity",
-          helpKey: "i18nHelp.feature.cosinSimilarity",
-        },
-      },
-    ],
+    type: "route",
+    name: "TDBilingualWeb",
+    component: () => import("@/views/tools/TDBilingualWeb.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.BilingualWeb",
+      helpKey: "i18nHelp.feature.BilingualWeb",
+    },
   },
   {
     type: "route",
@@ -233,6 +218,30 @@ const sidebarConfig = [
     name: "TDHTMLPreview",
     component: () => import("@/views/tools/TDHTMLPreview.vue"),
     meta: { titleKey: "i18nCommon.feature.HTMLPreview" },
+  },
+  {
+    type: "group",
+    groupKey: "qrcode",
+    groupTitleKey: "i18nCommon.group.ArtificialIntelligence",
+    children: [
+      {
+        name: "opticalcharacterrecognition",
+        component: () =>
+          import("@/views/tools/TDOpticalCharacterRecognition.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.OpticalCharacterRecognition",
+          helpKey: "i18nHelp.feature.OpticalCharacterRecognition",
+        },
+      },
+      {
+        name: "cosinsimilarity",
+        component: () => import("@/views/tools/TDCosinSimilarity.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.cosinSimilarity",
+          helpKey: "i18nHelp.feature.cosinSimilarity",
+        },
+      },
+    ],
   },
   {
     type: "route",

@@ -44,7 +44,9 @@ export default {
       QRCodeToText:
         "Read multiple QR codes and automatically combine them into a piece of text (prioritizing codes from the most recent creation date), decode the compressed data from the QR code generation tool.",
       textManipulation:
-        "Process a batch of similar text snippets using a pre-defined template",
+        "Batch process similar text blocks using a predefined template",
+      BilingualWeb:
+        "Bilingual website translation tool. Requires Agent to function.",
     },
     oneTimePassword: {
       purpose: {

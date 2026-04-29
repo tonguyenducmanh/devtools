@@ -110,6 +110,7 @@ export default {
       APIMocking: "API mocking",
       remoteDesktopRDP: "Giao thức RDP",
       PostgreSQLTemplate: "Code mẫu PostgreSQL",
+      BilingualWeb: "Web song ngữ",
       agentDownload: {
         title: "Tải Agent",
         redirecting: "Đang chuyển hướng...",
@@ -527,6 +528,16 @@ export default {
       refreshTableData: "Load lại danh sách bảng",
       showDataByTable: "Tải dữ liệu",
       queryDynamic: "Lấy dữ liệu",
+    },
+    bilingualWeb: {
+      title: "Công cụ dịch trang web song ngữ!",
+      urlPlaceholder: "Nhập đường dẫn trang web (ví dụ: https://...)",
+      fetchButton: "Dịch trang",
+      resultPlaceholder: "Kết quả sẽ hiển thị ở đây...",
+      fetching: "Đang tải và dịch...",
+      fetchSuccess: "Dịch trang web thành công",
+      fetchError: "Lỗi khi dịch trang web",
+      infoTooltip: "Công cụ dịch song ngữ cho trang web tĩnh và động. Yêu cầu tải và chạy Agent.",
     },
     textgenerator: {
       resultPlaceholder: "Kết quả gen text ngẫu nhiên",

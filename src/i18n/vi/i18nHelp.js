@@ -46,6 +46,8 @@ export default {
         "Đọc hàng loạt mã QR và tự động nối lại thành 1 đoạn văn bản (chỉ ưu tiên lấy các mã của ngày tạo gần nhất), giải mã dữ liệu đã được nén từ tool tạo mã QR",
       textManipulation:
         "Xử lý hàng loạt đoạn văn bản tương tự nhau theo mẫu có sẵn",
+      BilingualWeb:
+        "Công cụ dịch song ngữ cho trang web tĩnh và động. Yêu cầu tải và chạy Agent.",
     },
     oneTimePassword: {
       purpose: {
