@@ -1,7 +1,7 @@
 <template>
   <div class="flex td-welcome">
-    <TDDynamicBackgroundEffect />
     <div class="flex flex-col wrap-container">
+      <TDDynamicBackgroundEffect />
       <div class="container">
         <div class="main-line-title">Dev Tools</div>
         <p class="description">
@@ -10,7 +10,10 @@
       </div>
       <p class="agreement">{{ $t("i18nCommon.agreement") }}</p>
     </div>
-    <TDSubSidebar v-model="currentConfigLayout.isShowSidebar" @toggleSidebar="toggleSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:main>
         <TDWelcomeHelp />
       </template>

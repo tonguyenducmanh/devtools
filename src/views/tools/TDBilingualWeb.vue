@@ -2,8 +2,11 @@
   <div class="flex td-bilingual-container w-full h-full">
     <div
       class="flex flex-col flex-one overflow-hidden td-bilingual-main p-4 gap-4"
+      :class="{ 'td-bilingual-web-full-screen': isFullTab }"
     >
       <div class="flex td-tool-header">
+        <!-- Toolbar: dùng TDToolbar với config động -->
+        <TDToolbar :groups="toolbarGroups" @action="onToolbarAction" />
         <TDInput
           v-model="url"
           :placeHolder="$t('i18nCommon.bilingualWeb.urlPlaceholder')"
@@ -34,6 +37,8 @@
           frameborder="0"
         ></iframe>
         <div v-else class="td-empty-result">
+          <TDDynamicBackgroundEffect />
+
           {{ $t("i18nCommon.bilingualWeb.resultPlaceholder") }}
         </div>
       </div>
@@ -130,11 +135,19 @@ import TDBilingualWebAPI from "@/common/api/request/AgentAPI/TDBilingualWebAPI.j
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDSlideOption from "@/components/TDSlideOption.vue";
 import TDBilingualWebHelp from "@/views/helps/TDBilingualWebHelp.vue";
+import TDToolbar from "@/components/TDToolbar.vue";
+import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";
 
 export default {
   extends: TDToolBase,
   name: "TDBilingualWeb",
-  components: { TDSubSidebar, TDSlideOption, TDBilingualWebHelp },
+  components: {
+    TDSubSidebar,
+    TDSlideOption,
+    TDBilingualWebHelp,
+    TDToolbar,
+    TDDynamicBackgroundEffect,
+  },
   computed: {
     sidebarOptions() {
       let options = [];
@@ -150,10 +163,46 @@ export default {
       });
       return options;
     },
+    // ─── Toolbar groups config ─────────────────────────────────────
+    toolbarGroups() {
+      return [
+        // Group: Undo / Redo
+        {
+          key: "history",
+          items: [
+            {
+              key: "undo",
+              icon: "td-undo-icon",
+              tooltip: this.$t("i18nCommon.bilingualWeb.undo"),
+              action: () => this.handleUndoLink(),
+            },
+            {
+              key: "redo",
+              icon: "td-redo-icon",
+              tooltip: this.$t("i18nCommon.bilingualWeb.redo"),
+              action: () => this.handleRedoLink(),
+            },
+          ],
+        },
+        // Group: utility
+        {
+          key: "utility",
+          items: [
+            {
+              key: "fullscreen",
+              icon: "td-full-screen-icon",
+              tooltip: this.$t("i18nCommon.bilingualWeb.fullScreen"),
+              action: () => this.handleFullScreen(),
+            },
+          ],
+        },
+      ];
+    },
   },
   data() {
     return {
       keyCacheLayout: this.$tdEnum.cacheConfig.BilingualWebConfigLayout,
+      isFullTab: false,
       currentConfigLayout: {
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
@@ -194,6 +243,26 @@ export default {
     this.agentAPI = new TDBilingualWebAPI();
   },
   methods: {
+    onToolbarAction({ key, option }) {
+      const actionMap = {
+        undoLink: () => this.handleUndoLink(),
+        redoLink: () => this.handleRedoLink(),
+        fullScreen: () => this.handleFullScreen(),
+      };
+      actionMap[key]?.();
+    },
+    handleUndoLink() {
+      let me = this;
+      // todo: undo link
+    },
+    handleRedoLink() {
+      let me = this;
+      // todo: redo link
+    },
+    handleFullScreen() {
+      let me = this;
+      me.isFullTab = !me.isFullTab;
+    },
     async fetchAndTranslate() {
       if (!this.url) {
         this.$tdToast.warning(
@@ -501,7 +570,6 @@ export default {
       width: 100%;
       flex: 1;
       position: relative;
-      background-color: var(--bg-layer-color);
       border-radius: var(--border-radius);
 
       .td-loading-overlay {
@@ -524,14 +592,11 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--text-color-light);
-        font-style: italic;
       }
       .td-bilingual-result {
         width: 100%;
         height: 100%;
         border: none;
-        background-color: white;
       }
     }
   }
@@ -552,5 +617,15 @@ export default {
       }
     }
   }
+}
+.td-bilingual-web-full-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background-color: var(--bg-main-color);
+  padding: var(--padding);
 }
 </style>

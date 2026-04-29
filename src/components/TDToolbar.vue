@@ -260,7 +260,6 @@ export default {
   border-radius: var(--border-radius-component);
   flex-shrink: 0;
   flex-wrap: wrap;
-  margin-bottom: var(--padding);
 }
 
 .td-toolbar-group {
@@ -271,7 +270,7 @@ export default {
 
 .td-toolbar-sep {
   width: 1px;
-  height: 24px;
+  height: 35px;
   background: var(--border-color);
   margin: 0 var(--padding);
   flex-shrink: 0;
