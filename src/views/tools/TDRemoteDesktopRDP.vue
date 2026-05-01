@@ -7,6 +7,10 @@
           class="rdp-canvas-container"
           :class="{ 'rdp-canvas-container-full-tab': isFullTab }"
         >
+          <TDDynamicBackgroundEffect
+            :class="{ 'td-dynamic-effect-canvas': isHideEffectBackground }"
+          />
+
           <canvas
             ref="rdpCanvas"
             class="rdp-canvas"
@@ -306,11 +310,16 @@ import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDRemoteDesktopRDPHelp from "@/views/helps/TDRemoteDesktopRDPHelp.vue";
 import TDServerRDPAPI from "@/common/api/request/AgentAPI/TDServerRDPAPI.js";
+import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";
 
 export default {
   name: "TDRemoteDesktop",
   extends: TDToolBase,
-  components: { TDSubSidebar, TDRemoteDesktopRDPHelp },
+  components: {
+    TDSubSidebar,
+    TDRemoteDesktopRDPHelp,
+    TDDynamicBackgroundEffect,
+  },
 
   data() {
     return {
@@ -324,6 +333,7 @@ export default {
         enableAudioPlayback: false,
         enableServerPointer: true,
       },
+      isHideEffectBackground: false,
       host: "",
       username: "",
       password: "",
@@ -492,7 +502,7 @@ export default {
       let me = this;
       if (me.isConnected) {
         me.handleDisconnect();
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
       me.currentConnectionId = conn.id;
       me.connectionName = conn.connection_name;
@@ -679,6 +689,7 @@ export default {
         this.canvasWidth = ds.width;
         this.canvasHeight = ds.height;
         this.isConnected = true;
+        this.isHideEffectBackground = true;
         this.isConnecting = false;
 
         this.addLog(
@@ -1077,7 +1088,6 @@ export default {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #000;
   position: relative;
 }
 
@@ -1088,6 +1098,7 @@ export default {
   right: 0;
   bottom: 0;
   z-index: 1000;
+  background-color: #000;
 }
 
 .rdp-canvas-cursor-none {
@@ -1131,7 +1142,6 @@ export default {
     clip-path: inset(0 0 0 0);
     opacity: 1;
     transform: translateX(-50%) translateY(0);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   }
 
   .toolbar-btn {
@@ -1156,7 +1166,6 @@ export default {
 .rdp-canvas {
   display: block;
   outline: none;
-  background: #000;
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
@@ -1309,5 +1318,9 @@ export default {
 .td-connection-list-title {
   font-weight: 600;
   font-size: 14px;
+}
+
+.td-dynamic-effect-canvas {
+  display: none;
 }
 </style>
