@@ -38,8 +38,6 @@
         ></iframe>
         <div v-else class="td-empty-result">
           <TDDynamicBackgroundEffect />
-
-          {{ $t("i18nCommon.bilingualWeb.resultPlaceholder") }}
         </div>
       </div>
     </div>
