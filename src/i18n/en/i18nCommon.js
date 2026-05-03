@@ -529,8 +529,14 @@ export default {
     AppDataMiner: {
       selectTable: "Select table",
       refreshTableData: "Reload table list",
+      getData: "Get data",
       showDataByTable: "Load data",
       queryDynamic: "Query",
+      selectDataSource: "Data source",
+      dataSourceClipboard: "Clipboard data",
+      dataSourceServerAgent: "Agent data",
+      deleteClipboard: "Delete clipboard",
+      queryAgentSQl: "Script query data",
     },
     bilingualWeb: {
       undo: "Back previous link",

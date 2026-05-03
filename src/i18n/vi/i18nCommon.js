@@ -526,8 +526,14 @@ export default {
     AppDataMiner: {
       selectTable: "Chọn bảng",
       refreshTableData: "Load lại danh sách bảng",
+      getData: "Lấy dữ liệu",
       showDataByTable: "Tải dữ liệu",
       queryDynamic: "Lấy dữ liệu",
+      selectDataSource: "Nguồn dữ liệu",
+      dataSourceClipboard: "Dữ liệu clipboard",
+      dataSourceServerAgent: "Dữ liệu agent",
+      deleteClipboard: "Xóa clipboard",
+      queryAgentSQl: "Script query dữ liệu",
     },
     bilingualWeb: {
       undo: "Trở về link trước",

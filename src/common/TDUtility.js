@@ -120,7 +120,7 @@ class TDUtility {
    * @param {string} value văn bản cần copy
    * @param {boolean} showNoti có bắn noti kết quả không
    */
-  copyToClipboard(value, showNoti = true) {
+  copyToClipboard(value, showNoti = true, logEvent = true) {
     let me = this;
     let copySucess = true;
     try {
@@ -137,7 +137,9 @@ class TDUtility {
       }
     }
     try {
-      this.handleCopyTextToEvent(value);
+      if (logEvent) {
+        this.handleCopyTextToEvent(value);
+      }
     } catch (error) {
       console.log("Coy event to log error", error);
     }

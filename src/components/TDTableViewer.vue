@@ -335,6 +335,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    enableLogCopyData: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   data() {
@@ -622,10 +626,14 @@ export default {
     },
     handleDataSelected(row, column) {
       let data = this.formatCellValue(row, column);
-      this.$tdUtility.copyToClipboard(data);
+      this.$tdUtility.copyToClipboard(data, true, this.enableLogCopyData);
     },
     copyRow(row) {
-      this.$tdUtility.copyToClipboard(JSON.stringify(row));
+      this.$tdUtility.copyToClipboard(
+        JSON.stringify(row),
+        true,
+        this.enableLogCopyData,
+      );
     },
   },
 };
