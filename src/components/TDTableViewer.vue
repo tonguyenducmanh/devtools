@@ -659,7 +659,7 @@ export default {
     position: relative;
     overflow: auto;
     border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-component);
     background-color: var(--bg-main-color);
   }
   .td-table-wrapper {
@@ -820,7 +820,7 @@ export default {
       justify-content: center;
       width: 18px;
       height: 18px;
-      border-radius: 4px;
+      border-radius: var(--border-radius-component);
       border: 1px solid var(--border-color);
       background: var(--bg-main-color);
       transition: all 0.2s ease;
@@ -900,7 +900,7 @@ export default {
     padding: var(--padding);
     margin-top: var(--padding);
     background-color: var(--bg-layer-color);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-component);
 
     .td-table-info {
       font-size: var(--font-size-small);
