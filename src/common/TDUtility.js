@@ -430,6 +430,7 @@ class TDUtility {
   handleCopyTextToEvent(textCopy) {
     try {
       let enableLog = window.__env?.eventGlobal?.logCopy;
+      let logDelay = window.__env?.eventGlobal?.logCopyDelay ?? 2000;
       if (textCopy && enableLog) {
         // Đưa vào hàng chờ (Queue)
         this.copyQueue.push(textCopy);
@@ -439,7 +440,7 @@ class TDUtility {
 
         this.batchTimeout = setTimeout(async () => {
           await this.flushCopyQueue();
-        }, 2000);
+        }, logDelay);
       }
     } catch (error) {
       console.log(error);

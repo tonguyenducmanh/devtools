@@ -168,6 +168,7 @@ export default {
             content: text,
           }));
         }
+        me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
       } catch (error) {
         console.error("Lỗi tải lịch sử clipboard:", error);
       }
@@ -176,7 +177,6 @@ export default {
       let me = this;
       await cache.remove(me.$tdEnum.cacheConfig.CopyTextHistory);
       await me.loadClipboardHistory();
-      me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
     },
     async reloadTable() {
       let me = this;

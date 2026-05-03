@@ -33,5 +33,6 @@
   };
   window.__env.eventGlobal = {
     logCopy: true,
+    logCopyDelay: 500,
   };
 })(this);
