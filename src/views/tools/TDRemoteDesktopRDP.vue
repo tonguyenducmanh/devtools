@@ -666,12 +666,7 @@ export default {
               ) {
                 const text = item.value();
                 if (text) {
-                  navigator.clipboard.writeText(text).catch((err) => {
-                    this.addLog(
-                      "Failed to write to local clipboard: " + err,
-                      "error",
-                    );
-                  });
+                  this.$tdUtility.copyToClipboard(text, false);
                 }
                 break;
               }

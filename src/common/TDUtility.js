@@ -112,16 +112,24 @@ class TDUtility {
 
   /**
    * copy dữ liệu vào bộ nhớ tạm
-   * @param {string} value
+   * @param {string} value văn bản cần copy
+   * @param {boolean} showNoti có bắn noti kết quả không
    */
-  copyToClipboard(value) {
+  copyToClipboard(value, showNoti = true) {
     let me = this;
+    let copySucess = true;
     try {
       navigator.clipboard.writeText(value);
-      toast.success(i18nData.global.t("i18nCommon.toastMessage.copy"));
     } catch (error) {
+      copySucess = false;
       console.log(error);
-      toast.error(i18nData.global.t("i18nCommon.toastMessage.cannotCopy"));
+    }
+    if (showNoti) {
+      if (copySucess) {
+        toast.success(i18nData.global.t("i18nCommon.toastMessage.copy"));
+      } else {
+        toast.error(i18nData.global.t("i18nCommon.toastMessage.cannotCopy"));
+      }
     }
   }
 
