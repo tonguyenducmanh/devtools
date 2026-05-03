@@ -1,11 +1,4 @@
 {
-  "database_name": "dev_tool.db",
-  "endpoint_case_sensitive": false,
-  "show_ip_server": false,
-  "log_config": {
-    "log_console": true,
-    "level_log": ["info"]
-  },
   "api_config": {
     "port": 7777,
     "enable": true
@@ -17,5 +10,12 @@
   "mock_api_config": {
     "port": 8888,
     "enable_mock_not_care_body": true
-  }
+  },
+  "log_config": {
+    "log_console": true,
+    "level_log": ["info"]
+  },
+  "database_name": "dev_tool.db",
+  "endpoint_case_sensitive": false,
+  "show_ip_server": false
 }
