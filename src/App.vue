@@ -53,8 +53,11 @@ export default {
 
     // Set global app context for dialogs
     TDDialogUtil.setAppContext(this.$root.$.appContext);
+    document.addEventListener("copy", this.handleCopyEventGlobal);
   },
-
+  beforeUnmount() {
+    document.removeEventListener("copy", this.handleCopyEventGlobal);
+  },
   methods: {
     /**
      * Xử lý 1 số kịch bản khi khởi chạy ứng dụng
@@ -62,6 +65,11 @@ export default {
     async processWhenRunApp() {
       let me = this;
       await TDAppStartup.initialize();
+    },
+
+    handleCopyEventGlobal(event) {
+      let me = this;
+      me.$tdUtility.handleCopyEvent(event);
     },
   },
 };

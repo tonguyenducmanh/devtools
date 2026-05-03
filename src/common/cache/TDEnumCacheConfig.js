@@ -40,4 +40,5 @@ export const EnumCacheConfig = {
   PostgreSQLTemplateConfigLayout: 44,
   BilingualWebConfigLayout: 45,
   BilingualWebHistory: 46,
+  CopyTextHistory: 47,
 };

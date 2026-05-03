@@ -31,4 +31,7 @@
     autoSaveIntervalInSecond: 60,
     maxHistoryItems: 500,
   };
+  window.__env.eventGlobal = {
+    logCopy: true,
+  };
 })(this);
