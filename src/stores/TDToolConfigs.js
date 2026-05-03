@@ -20,6 +20,12 @@ const sidebarConfig = [
   },
   {
     type: "route",
+    name: "TDAppDataMiner",
+    component: () => import("@/views/tools/TDAppDataMiner.vue"),
+    meta: { titleKey: "i18nCommon.feature.AppDataMiner" },
+  },
+  {
+    type: "route",
     name: "TDOneTimePassword",
     component: () => import("@/views/tools/TDOneTimePassword.vue"),
     meta: {
