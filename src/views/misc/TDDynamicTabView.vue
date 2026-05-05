@@ -259,7 +259,6 @@ export default {
       ghost.style.transform = "rotate(2deg) scale(1.05)";
       ghost.style.pointerEvents = "none";
       ghost.style.background = "var(--bg-layer-color)";
-      ghost.style.borderRadius = "var(--border-radius)";
       ghost.style.padding = "var(--padding)";
       ghost.style.minWidth = el.offsetWidth + "px";
       document.body.appendChild(ghost);
