@@ -108,27 +108,13 @@ export default {
 }
 .td-button-icon {
   padding: 0 var(--padding);
-  .td-icon {
-    filter: invert(100%);
-  }
 }
 .td-button-secondary {
   background-color: var(--btn-secondary-color);
   color: var(--btn-secondary-text-color);
-  .td-icon {
-    filter: unset;
-  }
 }
 .td-button-secondary:hover {
   background-color: var(--btn-secondary-focus-color);
-}
-body[data-theme="dark"] .td-button-secondary {
-  background-color: var(--bg-thirt-color);
-}
-
-body[data-theme="dark"] .td-button-secondary:hover {
-  border: 1px solid var(--border-color);
-  background-color: #303130;
 }
 
 .td-button-secondary:active {
@@ -143,6 +129,28 @@ body[data-theme="dark"] .td-button-secondary:hover {
   cursor: not-allowed;
   .td-icon {
     cursor: not-allowed;
+  }
+}
+
+body[data-theme="light"] {
+  .td-button-icon {
+    .td-icon {
+      filter: brightness(0) invert(1);
+    }
+  }
+  .td-button-secondary {
+    .td-icon {
+      filter: brightness(0);
+    }
+  }
+}
+body[data-theme="dark"] {
+  .td-button-secondary {
+    background-color: var(--bg-thirt-color);
+  }
+  .td-button-secondary:hover {
+    border: 1px solid var(--border-color);
+    background-color: #303130;
   }
 }
 </style>
