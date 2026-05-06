@@ -174,7 +174,7 @@ const sidebarConfig = [
     children: [
       {
         name: "colorpicker",
-        component: () => import("@/views/tools/TDColorPicker.vue"),
+        component: () => import("@/views/tools/TDColorPickerFromImage.vue"),
         meta: { titleKey: "i18nCommon.feature.colorPicker" },
       },
       {

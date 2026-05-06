@@ -79,6 +79,17 @@
           <div class="flex flex-col td-sidebar-settings">
             <div class="setting-item">
               <div class="td-setting-label">
+                {{ $t("i18nCommon.bilingualWeb.bilingualTextColor") }}
+              </div>
+              <TDColorPicker
+                class="td-setting-color"
+                :noMargin="true"
+                v-model="currentConfigLayout.bilingualTextColor"
+                @change="updateConfigLayout"
+              ></TDColorPicker>
+            </div>
+            <div class="setting-item">
+              <div class="td-setting-label">
                 {{ $t("i18nCommon.bilingualWeb.delayTime") }}
               </div>
               <TDInput
@@ -236,6 +247,7 @@ export default {
         blockTagsStr: "P;H1;H2;H3;H4;H5;H6;LI;TH;TD;DT;DD",
         classFiltersStr: "",
         idFiltersStr: "",
+        bilingualTextColor: "#000000",
       },
       url: "",
       isLoading: false,
@@ -501,7 +513,7 @@ export default {
       // Inject CSS
       const style = iframeDoc.createElement("style");
       style.textContent = `
-        .bilingual-trans { display: block; font-weight: 500; color: #10b981; margin-top: 4px; font-size: 0.9em; opacity: 0.9; }
+        .bilingual-trans { display: block; font-weight: 500; color: ${this.currentConfigLayout.bilingualTextColor}; margin-top: 4px; font-size: 0.9em; opacity: 0.9; }
       `;
       if (iframeDoc.head) {
         iframeDoc.head.appendChild(style);
@@ -701,6 +713,9 @@ export default {
       .setting-item {
         width: 100%;
         margin-top: var(--padding);
+        .td-setting-color {
+          margin-top: var(--padding);
+        }
       }
     }
   }

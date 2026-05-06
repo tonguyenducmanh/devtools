@@ -555,6 +555,7 @@ export default {
       blockTags: "Block Tags",
       classFilters: "Class Filter",
       idFilters: "ID Filter",
+      bilingualTextColor: "Bilingual text color",
     },
     textgenerator: {
       resultPlaceholder: "Result random text",

@@ -7,6 +7,7 @@ import TDButton from "@/components/TDButton.vue";
 import TDTextarea from "@/components/TDTextarea.vue";
 import TDInput from "@/components/TDInput.vue";
 import TDCheckbox from "@/components/TDCheckbox.vue";
+import TDColorPicker from "@/components/TDColorPicker.vue";
 import TDUpload from "@/components/TDUpload.vue";
 import TDRadio from "@/components/TDRadio.vue";
 import TDRadioGroup from "@/components/TDRadioGroup.vue";
@@ -56,6 +57,7 @@ import "@/common/plugin/TDMonacoEditor.js";
   currentApp.component("TDResizer", TDResizer);
   currentApp.component("TDVirtualScroll", TDVirtualScroll);
   currentApp.component("TDDateTime", TDDateTime);
+  currentApp.component("TDColorPicker", TDColorPicker);
 
   // globalization language
   currentApp.use(i18nData);

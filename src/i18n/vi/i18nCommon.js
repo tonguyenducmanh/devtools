@@ -552,6 +552,7 @@ export default {
       blockTags: "Block Tags",
       classFilters: "Lọc Class",
       idFilters: "Lọc ID",
+      bilingualTextColor: "Màu text song ngữ",
     },
     textgenerator: {
       resultPlaceholder: "Kết quả gen text ngẫu nhiên",
