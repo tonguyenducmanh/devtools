@@ -19,7 +19,7 @@ class TDUtility {
    */
   defaultTitleApp() {
     const appName = window.__env.appName;
-    return `${appName} - ${window.__env.author}`;
+    return `${appName}`;
   }
 
   /**

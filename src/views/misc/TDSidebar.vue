@@ -43,6 +43,11 @@
     <TDToggleArea
       :collapsed="!showSideBar"
       edge="left"
+      v-tooltip="
+        showSideBar
+          ? $t('i18nCommon.sidebar.hide')
+          : $t('i18nCommon.sidebar.show')
+      "
       @toggle="toggleSidebar"
     />
 

@@ -63,6 +63,8 @@ export default {
       language: {
         switch: "Switch language",
       },
+      show: "Show sidebar menu",
+      hide: "Hide sidebar menu",
     },
     help: {
       title: "Help",

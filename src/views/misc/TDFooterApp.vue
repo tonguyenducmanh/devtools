@@ -32,8 +32,8 @@ export default {
   },
   computed: {
     currentTitle() {
-      const author = window.__env?.author || "";
-      return `From ${author} with luv`;
+      const versionApp = window.__env?.version || "";
+      return versionApp;
     },
   },
   mounted() {
@@ -41,13 +41,15 @@ export default {
   },
   methods: {
     updateActiveShortcuts() {
-      const componentShortcuts = TDShortcutAction.getActiveShortcuts().map(s => ({
-        key: s.key,
-        labelKey: s.labelKey,
-        tooltipKey: s.tooltipKey,
-        requireCtrl: s.requireCtrl,
-        action: s.action,
-      }));
+      const componentShortcuts = TDShortcutAction.getActiveShortcuts().map(
+        (s) => ({
+          key: s.key,
+          labelKey: s.labelKey,
+          tooltipKey: s.tooltipKey,
+          requireCtrl: s.requireCtrl,
+          action: s.action,
+        }),
+      );
       this.activeShortcuts = [...componentShortcuts];
     },
   },

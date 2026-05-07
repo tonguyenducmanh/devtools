@@ -63,6 +63,8 @@ export default {
       language: {
         switch: "Đổi ngôn ngữ",
       },
+      show: "Hiển thị menu công cụ",
+      hide: "Ẩn menu công cụ",
     },
     help: {
       title: "Trợ giúp",
