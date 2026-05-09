@@ -1,8 +1,8 @@
 <template>
   <div class="flex td-welcome">
     <div class="flex flex-col wrap-container">
-      <TDDynamicBackgroundEffect />
       <div class="container">
+        <TDDynamicBackgroundEffect />
         <div class="main-line-title">Dev Tools</div>
         <p class="description">
           {{ displayText }}<span class="cursor">|</span>
