@@ -5,7 +5,7 @@
   window.__env = window.__env || {};
   window.__env.appName = "Dev Tools";
   window.__env.author = "Tô Mạnh";
-  window.__env.version = "v10.1.7";
+  window.__env.version = "v10.1.8";
   window.__env.defaultValue = {
     theme: "light",
   };
