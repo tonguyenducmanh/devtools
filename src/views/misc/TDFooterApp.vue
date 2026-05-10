@@ -32,7 +32,7 @@ export default {
   },
   computed: {
     currentTitle() {
-      const versionApp = window.__env?.version || "";
+      const versionApp = window.__env?.footerQuote || "";
       return versionApp;
     },
   },

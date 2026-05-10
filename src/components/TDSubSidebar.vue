@@ -16,6 +16,7 @@
       <TDToggleArea
         :class="{ 'td-sub-sidebar-collaspe-toggle': !modelValue }"
         :collapsed="!modelValue"
+        v-tooltip="modelValue ? computedHideTooltip : computedShowTooltip"
         edge="right"
         @toggle="toggleSidebar"
       />
@@ -34,6 +35,14 @@ export default {
       type: Boolean,
       default: true,
     },
+    showTooltip: {
+      type: String,
+      default: null,
+    },
+    hideTooltip: {
+      type: String,
+      default: null,
+    },
   },
   data() {
     return {
@@ -47,7 +56,24 @@ export default {
       me.$emit("toggleSidebar");
     },
   },
-  computed: {},
+  computed: {
+    computedShowTooltip() {
+      let me = this;
+      if (me.showTooltip) {
+        return me.showTooltip;
+      } else {
+        return me.$t("i18nCommon.subSidebar.showTooltip");
+      }
+    },
+    computedHideTooltip() {
+      let me = this;
+      if (me.hideTooltip) {
+        return me.hideTooltip;
+      } else {
+        return me.$t("i18nCommon.subSidebar.hideTooltip");
+      }
+    },
+  },
 };
 </script>
 
@@ -77,7 +103,7 @@ export default {
 .td-sub-sidebar-collaspe {
   margin-left: unset;
 }
-.td-sub-sidebar-collaspe-toggle{
+.td-sub-sidebar-collaspe-toggle {
   margin-right: var(--padding);
 }
 .td-sidebar-menu {

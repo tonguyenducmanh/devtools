@@ -25,6 +25,10 @@ export default {
     selectedRecord: "Đã chọn",
     record: "Bản ghi",
     copy: "Sao chép",
+    subSidebar: {
+      showTooltip: "Hiển thị menu theo tool",
+      hideTooltip: "Ẩn menu theo tool",
+    },
     footerHelp:
       "Chọn vào số dòng để copy cả dòng, chọn vào 1 cell cụ thể để copy 1 cell",
     noDataAvailable: "Không có dữ liệu",

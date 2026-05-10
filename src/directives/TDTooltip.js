@@ -1,4 +1,5 @@
 let activeTooltip = null;
+let activeEl = null; // element đang được hover
 let rafId = null;
 let lastEvent = null;
 
@@ -72,6 +73,7 @@ export default {
       insertIntoBodyFirst(tooltip);
       updatePosition(tooltip, e, getOffset(el));
       activeTooltip = tooltip;
+      activeEl = el; // ghi nhận element đang hover
     };
 
     const onMove = (e) => {
@@ -91,6 +93,9 @@ export default {
         activeTooltip.remove();
         activeTooltip = null;
       }
+      if (activeEl === el) {
+        activeEl = null; // xóa tracking khi rời element
+      }
       if (rafId) {
         cancelAnimationFrame(rafId);
         rafId = null;
@@ -107,8 +112,9 @@ export default {
   updated(el, binding) {
     el.__tdTooltipValue__ = binding.value;
 
-    // Nếu tooltip đang hiển thị, cập nhật text ngay lập tức
-    if (activeTooltip) {
+    // Chỉ cập nhật tooltip nếu CHÍNH element này đang được hover
+    // Tránh trường hợp loop nhiều item, item cuối cùng ghi đè tooltip của item đang hover
+    if (activeTooltip && activeEl === el) {
       const text = getText(el);
       if (text) {
         activeTooltip.textContent = text;
@@ -116,6 +122,7 @@ export default {
       } else {
         activeTooltip.remove();
         activeTooltip = null;
+        activeEl = null;
       }
     }
   },
@@ -131,6 +138,9 @@ export default {
     if (activeTooltip) {
       activeTooltip.remove();
       activeTooltip = null;
+    }
+    if (activeEl === el) {
+      activeEl = null;
     }
 
     delete el.__tdTooltip__;
