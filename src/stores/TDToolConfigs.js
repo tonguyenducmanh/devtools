@@ -20,12 +20,6 @@ const sidebarConfig = [
   },
   {
     type: "route",
-    name: "TDAppDataMiner",
-    component: () => import("@/views/tools/TDAppDataMiner.vue"),
-    meta: { titleKey: "i18nCommon.feature.AppDataMiner" },
-  },
-  {
-    type: "route",
     name: "TDOneTimePassword",
     component: () => import("@/views/tools/TDOneTimePassword.vue"),
     meta: {
@@ -80,12 +74,6 @@ const sidebarConfig = [
     ],
   },
   {
-    type: "route",
-    name: "TDMindMap",
-    component: () => import("@/views/tools/MindMap/TDMindMap.vue"),
-    meta: { titleKey: "i18nCommon.feature.MindMap" },
-  },
-  {
     type: "group",
     groupKey: "remotedesktop",
     groupTitleKey: "i18nCommon.group.RemoteDesktop",
@@ -98,15 +86,6 @@ const sidebarConfig = [
         },
       },
     ],
-  },
-  {
-    type: "route",
-    name: "TDBilingualWeb",
-    component: () => import("@/views/tools/TDBilingualWeb.vue"),
-    meta: {
-      titleKey: "i18nCommon.feature.BilingualWeb",
-      helpKey: "i18nHelp.feature.BilingualWeb",
-    },
   },
   {
     type: "route",
@@ -221,6 +200,15 @@ const sidebarConfig = [
   },
   {
     type: "route",
+    name: "TDBilingualWeb",
+    component: () => import("@/views/tools/TDBilingualWeb.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.BilingualWeb",
+      helpKey: "i18nHelp.feature.BilingualWeb",
+    },
+  },
+  {
+    type: "route",
     name: "TDHTMLPreview",
     component: () => import("@/views/tools/TDHTMLPreview.vue"),
     meta: { titleKey: "i18nCommon.feature.HTMLPreview" },
@@ -230,15 +218,6 @@ const sidebarConfig = [
     groupKey: "qrcode",
     groupTitleKey: "i18nCommon.group.ArtificialIntelligence",
     children: [
-      {
-        name: "opticalcharacterrecognition",
-        component: () =>
-          import("@/views/tools/TDOpticalCharacterRecognition.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.OpticalCharacterRecognition",
-          helpKey: "i18nHelp.feature.OpticalCharacterRecognition",
-        },
-      },
       {
         name: "cosinsimilarity",
         component: () => import("@/views/tools/TDCosinSimilarity.vue"),
