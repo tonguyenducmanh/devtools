@@ -23,9 +23,9 @@ func GetTestingAPIController() *BaseCRUDController[model.TDAPITestingItem] {
 
 
 
-func customDeleteTestingGroup(id string, r *http.Request) error {
-	// Xóa group và các test bên trong nó qua db transaction
-	return database.DeleteTestingGroup(id)
+func beforeDeleteTestingGroup(id string, r *http.Request) error {
+	// Xóa các bảng liên quan trước ở tầng DL
+	return database.DeleteTestingItemsByGroupID(id)
 }
 
 // GetTestingGroupController trả về controller quản lý nhóm API testing
@@ -33,7 +33,7 @@ func GetTestingGroupController() *BaseCRUDController[model.TDAPITestingGroup] {
 	return &BaseCRUDController[model.TDAPITestingGroup]{
 		PathPrefix:   "api_testing_group",
 		Repo:         database.BaseRepository[model.TDAPITestingGroup]{},
-		CustomDelete: customDeleteTestingGroup,
+		BeforeDelete: beforeDeleteTestingGroup,
 	}
 }
 

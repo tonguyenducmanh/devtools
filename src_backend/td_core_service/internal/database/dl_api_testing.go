@@ -4,46 +4,11 @@ import (
 	"td_core_service/internal/model"
 )
 
-// Xóa nhóm API testing và các test thuộc nhóm đó
-func DeleteTestingGroup(id string) error {
-	db, err := GetConnectionDB()
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-
-	tx, err := db.Begin()
-	if err != nil {
-		return err
-	}
-
-	// 1. Xóa các testing api thuộc nhóm
-	sqlDeleteItems := `
-		DELETE FROM 
-			td_api_testing 
-		WHERE 
-			group_id = ?
-	`
-	_, err = tx.Exec(sqlDeleteItems, id)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	// 2. Xóa nhóm
-	sqlDeleteGroup := `
-		DELETE FROM 
-			td_api_testing_group 
-		WHERE 
-			id = ?
-	`
-	_, err = tx.Exec(sqlDeleteGroup, id)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	return tx.Commit()
+// Xóa các testing api thuộc nhóm đó
+func DeleteTestingItemsByGroupID(groupID string) error {
+	repoItems := BaseRepository[model.TDAPITestingItem]{}
+	_, err := repoItems.ExecRaw("DELETE FROM td_api_testing WHERE group_id = ?", groupID)
+	return err
 }
 
 // Import hàng loạt dữ liệu API testing (Groups + Items) trong 1 transaction

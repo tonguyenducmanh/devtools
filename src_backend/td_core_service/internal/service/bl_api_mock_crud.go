@@ -31,9 +31,9 @@ func GetMockAPIController() *BaseCRUDController[model.TDAPIMockItem] {
 
 // --- Hooks cho Mock API Group ---
 
-func customDeleteMockGroup(id string, r *http.Request) error {
-	// Sử dụng logic delete custom của mock group (xóa cả items trong group)
-	return database.DeleteMockGroup(id)
+func beforeDeleteMockGroup(id string, r *http.Request) error {
+	// Xóa các bảng liên quan trước ở tầng DL
+	return database.DeleteMockItemsByGroupID(id)
 }
 
 // GetMockGroupController trả về controller quản lý nhóm mock API
@@ -41,7 +41,7 @@ func GetMockGroupController() *BaseCRUDController[model.TDAPIMockGroup] {
 	return &BaseCRUDController[model.TDAPIMockGroup]{
 		PathPrefix:   "mock_group",
 		Repo:         database.BaseRepository[model.TDAPIMockGroup]{},
-		CustomDelete: customDeleteMockGroup,
+		BeforeDelete: beforeDeleteMockGroup,
 		AfterDelete:  triggerRestartMockServerOnDelete,
 	}
 }
