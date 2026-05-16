@@ -11,32 +11,17 @@ import (
 	"time"
 )
 
-// --- Hooks cho API Testing Item ---
 
-func beforeInsertTestingAPI(req *model.TDAPITestingItem, r *http.Request) error {
-	if req.ID == "" {
-		req.ID = fmt.Sprintf("test_%d", time.Now().UnixNano())
-	}
-	return nil
-}
 
 // GetTestingAPIController trả về controller quản lý API testing
 func GetTestingAPIController() *BaseCRUDController[model.TDAPITestingItem] {
 	return &BaseCRUDController[model.TDAPITestingItem]{
 		PathPrefix:   "api_testing",
 		Repo:         database.BaseRepository[model.TDAPITestingItem]{},
-		BeforeInsert: beforeInsertTestingAPI,
 	}
 }
 
-// --- Hooks cho API Testing Group ---
 
-func beforeInsertTestingGroup(req *model.TDAPITestingGroup, r *http.Request) error {
-	if req.ID == "" {
-		req.ID = fmt.Sprintf("group_%d", time.Now().UnixNano())
-	}
-	return nil
-}
 
 func customDeleteTestingGroup(id string, r *http.Request) error {
 	// Xóa group và các test bên trong nó qua db transaction
@@ -48,7 +33,6 @@ func GetTestingGroupController() *BaseCRUDController[model.TDAPITestingGroup] {
 	return &BaseCRUDController[model.TDAPITestingGroup]{
 		PathPrefix:   "api_testing_group",
 		Repo:         database.BaseRepository[model.TDAPITestingGroup]{},
-		BeforeInsert: beforeInsertTestingGroup,
 		CustomDelete: customDeleteTestingGroup,
 	}
 }

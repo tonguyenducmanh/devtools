@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"td_core_service/td_common"
 )
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -246,6 +247,18 @@ func (r *BaseRepository[T]) Insert(item *T) error {
 	defer db.Close()
 
 	cols := parseColumns[T]()
+
+	// Auto-generate UUID if PK is string and empty
+	v := reflect.ValueOf(item).Elem()
+	for _, c := range cols {
+		if c.isPK {
+			field := v.Field(c.fieldIndex)
+			if field.Kind() == reflect.String && field.String() == "" {
+				field.SetString(td_common.GenUUID())
+			}
+		}
+	}
+
 	vals := extractValues(item, cols)
 	_, err = db.Exec(buildInsert[T](cols), vals...)
 	return err
@@ -278,6 +291,15 @@ func (r *BaseRepository[T]) InsertBatch(items []T) error {
 	defer stmt.Close()
 
 	for i := range items {
+		v := reflect.ValueOf(&items[i]).Elem()
+		for _, c := range cols {
+			if c.isPK {
+				field := v.Field(c.fieldIndex)
+				if field.Kind() == reflect.String && field.String() == "" {
+					field.SetString(td_common.GenUUID())
+				}
+			}
+		}
 		vals := extractValues(&items[i], cols)
 		if _, err = stmt.Exec(vals...); err != nil {
 			tx.Rollback()
@@ -314,6 +336,15 @@ func (r *BaseRepository[T]) InsertOrIgnoreBatch(items []T) error {
 	defer stmt.Close()
 
 	for i := range items {
+		v := reflect.ValueOf(&items[i]).Elem()
+		for _, c := range cols {
+			if c.isPK {
+				field := v.Field(c.fieldIndex)
+				if field.Kind() == reflect.String && field.String() == "" {
+					field.SetString(td_common.GenUUID())
+				}
+			}
+		}
 		vals := extractValues(&items[i], cols)
 		if _, err = stmt.Exec(vals...); err != nil {
 			tx.Rollback()
