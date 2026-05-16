@@ -6,7 +6,7 @@ import (
 
 // Xóa các mock item thuộc nhóm đó
 func DeleteMockItemsByGroupID(groupID string) error {
-	repoItems := BaseRepository[model.TDAPIMockItem]{}
+	repoItems := TDDLBase[model.TDAPIMockItem]{}
 	_, err := repoItems.ExecRaw("DELETE FROM td_api_mock WHERE group_id = ?", groupID)
 	return err
 }

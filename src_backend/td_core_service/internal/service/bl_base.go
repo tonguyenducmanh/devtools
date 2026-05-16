@@ -9,9 +9,9 @@ import (
 
 // BaseCRUDController cung cấp các endpoint chuẩn (GET, POST, PUT, DELETE) cho một Model
 // Nó có các hook function để có thể override giống tính đa hình của OOP.
-type BaseCRUDController[T database.DBModel] struct {
+type BaseCRUDController[T database.TDModelBase] struct {
 	PathPrefix string
-	Repo       database.BaseRepository[T]
+	Repo       database.TDDLBase[T]
 
 	// Các hooks để override/chèn logic business
 	BeforeInsert func(req *T, r *http.Request) error

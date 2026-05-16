@@ -6,7 +6,7 @@ import (
 
 // Xóa các testing api thuộc nhóm đó
 func DeleteTestingItemsByGroupID(groupID string) error {
-	repoItems := BaseRepository[model.TDAPITestingItem]{}
+	repoItems := TDDLBase[model.TDAPITestingItem]{}
 	_, err := repoItems.ExecRaw("DELETE FROM td_api_testing WHERE group_id = ?", groupID)
 	return err
 }

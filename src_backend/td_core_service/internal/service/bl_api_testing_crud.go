@@ -11,17 +11,13 @@ import (
 	"time"
 )
 
-
-
 // GetTestingAPIController trả về controller quản lý API testing
 func GetTestingAPIController() *BaseCRUDController[model.TDAPITestingItem] {
 	return &BaseCRUDController[model.TDAPITestingItem]{
-		PathPrefix:   "api_testing",
-		Repo:         database.BaseRepository[model.TDAPITestingItem]{},
+		PathPrefix: "api_testing",
+		Repo:       database.TDDLBase[model.TDAPITestingItem]{},
 	}
 }
-
-
 
 func beforeDeleteTestingGroup(id string, r *http.Request) error {
 	// Xóa các bảng liên quan trước ở tầng DL
@@ -32,7 +28,7 @@ func beforeDeleteTestingGroup(id string, r *http.Request) error {
 func GetTestingGroupController() *BaseCRUDController[model.TDAPITestingGroup] {
 	return &BaseCRUDController[model.TDAPITestingGroup]{
 		PathPrefix:   "api_testing_group",
-		Repo:         database.BaseRepository[model.TDAPITestingGroup]{},
+		Repo:         database.TDDLBase[model.TDAPITestingGroup]{},
 		BeforeDelete: beforeDeleteTestingGroup,
 	}
 }

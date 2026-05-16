@@ -12,8 +12,8 @@ import (
 // Marker interface – mỗi model cần implement để khai báo metadata
 // ─────────────────────────────────────────────────────────────────────────────
 
-// DBModel là interface bắt buộc cho mọi model muốn dùng BaseRepository.
-type DBModel interface {
+// TDModelBase là interface bắt buộc cho mọi model muốn dùng TDDLBase.
+type TDModelBase interface {
 	// TableName trả về tên bảng trong database, vd: "td_api_mock"
 	TableName() string
 	// PrimaryKey trả về tên field JSON/db của khóa chính, vd: "id"
@@ -21,10 +21,10 @@ type DBModel interface {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// BaseRepository[T] — generic repository, T phải implement DBModel
+// TDDLBase[T] — generic repository, T phải implement TDModelBase
 // ─────────────────────────────────────────────────────────────────────────────
 
-type BaseRepository[T DBModel] struct{}
+type TDDLBase[T TDModelBase] struct{}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Internal helpers — reflection utils
@@ -39,7 +39,7 @@ type columnMeta struct {
 }
 
 // parseColumns dùng reflection để đọc tất cả field của struct T
-func parseColumns[T DBModel]() []columnMeta {
+func parseColumns[T TDModelBase]() []columnMeta {
 	var zero T
 	pkName := zero.PrimaryKey()
 
@@ -55,9 +55,9 @@ func parseColumns[T DBModel]() []columnMeta {
 		if tag == "" || tag == "-" {
 			continue
 		}
-		
+
 		colName := strings.Split(tag, ",")[0]
-		
+
 		// Bỏ qua không tự insert/update các trường created_date, modified_date
 		isAutoSet := colName == "created_date" || colName == "modified_date"
 
@@ -71,7 +71,7 @@ func parseColumns[T DBModel]() []columnMeta {
 	return cols
 }
 
-func scanRow[T DBModel](rows *sql.Rows, cols []columnMeta) (T, error) {
+func scanRow[T TDModelBase](rows *sql.Rows, cols []columnMeta) (T, error) {
 	var item T
 
 	v := reflect.ValueOf(&item).Elem()
@@ -88,7 +88,7 @@ func scanRow[T DBModel](rows *sql.Rows, cols []columnMeta) (T, error) {
 // Query helpers — build SQL
 // ─────────────────────────────────────────────────────────────────────────────
 
-func buildSelectAll[T DBModel](cols []columnMeta) string {
+func buildSelectAll[T TDModelBase](cols []columnMeta) string {
 	var zero T
 	colNames := make([]string, len(cols))
 	for i, c := range cols {
@@ -101,7 +101,7 @@ func buildSelectAll[T DBModel](cols []columnMeta) string {
 	)
 }
 
-func buildSelectByPK[T DBModel](cols []columnMeta) string {
+func buildSelectByPK[T TDModelBase](cols []columnMeta) string {
 	var zero T
 	colNames := make([]string, len(cols))
 	for i, c := range cols {
@@ -115,7 +115,7 @@ func buildSelectByPK[T DBModel](cols []columnMeta) string {
 	)
 }
 
-func buildInsert[T DBModel](cols []columnMeta) string {
+func buildInsert[T TDModelBase](cols []columnMeta) string {
 	var zero T
 	var colNames []string
 	var placeholders []string
@@ -133,7 +133,7 @@ func buildInsert[T DBModel](cols []columnMeta) string {
 	)
 }
 
-func buildUpdate[T DBModel](cols []columnMeta) string {
+func buildUpdate[T TDModelBase](cols []columnMeta) string {
 	var zero T
 	var setClauses []string
 	for _, c := range cols {
@@ -141,7 +141,7 @@ func buildUpdate[T DBModel](cols []columnMeta) string {
 			setClauses = append(setClauses, fmt.Sprintf("%s = ?", c.dbColumn))
 		}
 	}
-	
+
 	setClauses = append(setClauses, "modified_date = CURRENT_TIMESTAMP")
 	return fmt.Sprintf(
 		"UPDATE %s SET %s WHERE %s = ?",
@@ -151,7 +151,7 @@ func buildUpdate[T DBModel](cols []columnMeta) string {
 	)
 }
 
-func buildDelete[T DBModel]() string {
+func buildDelete[T TDModelBase]() string {
 	var zero T
 	return fmt.Sprintf(
 		"DELETE FROM %s WHERE %s = ?",
@@ -160,7 +160,7 @@ func buildDelete[T DBModel]() string {
 	)
 }
 
-func extractValues[T DBModel](item *T, cols []columnMeta) []any {
+func extractValues[T TDModelBase](item *T, cols []columnMeta) []any {
 	v := reflect.ValueOf(item).Elem()
 	var vals []any
 	for _, c := range cols {
@@ -171,7 +171,7 @@ func extractValues[T DBModel](item *T, cols []columnMeta) []any {
 	return vals
 }
 
-func extractUpdateValues[T DBModel](item *T, cols []columnMeta) []any {
+func extractUpdateValues[T TDModelBase](item *T, cols []columnMeta) []any {
 	v := reflect.ValueOf(item).Elem()
 	var vals []any
 	var pkVal any
@@ -187,10 +187,10 @@ func extractUpdateValues[T DBModel](item *T, cols []columnMeta) []any {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Public API — các method của BaseRepository[T]
+// Public API — các method của TDDLBase[T]
 // ─────────────────────────────────────────────────────────────────────────────
 
-func (r *BaseRepository[T]) GetAll() ([]T, error) {
+func (r *TDDLBase[T]) GetAll() ([]T, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
 		return nil, err
@@ -215,7 +215,7 @@ func (r *BaseRepository[T]) GetAll() ([]T, error) {
 	return results, nil
 }
 
-func (r *BaseRepository[T]) GetByID(id any) (*T, error) {
+func (r *TDDLBase[T]) GetByID(id any) (*T, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
 		return nil, err
@@ -239,7 +239,7 @@ func (r *BaseRepository[T]) GetByID(id any) (*T, error) {
 	return nil, nil // not found
 }
 
-func (r *BaseRepository[T]) Insert(item *T) error {
+func (r *TDDLBase[T]) Insert(item *T) error {
 	db, err := GetConnectionDB()
 	if err != nil {
 		return err
@@ -264,7 +264,7 @@ func (r *BaseRepository[T]) Insert(item *T) error {
 	return err
 }
 
-func (r *BaseRepository[T]) InsertBatch(items []T) error {
+func (r *TDDLBase[T]) InsertBatch(items []T) error {
 	if len(items) == 0 {
 		return nil
 	}
@@ -309,7 +309,7 @@ func (r *BaseRepository[T]) InsertBatch(items []T) error {
 	return tx.Commit()
 }
 
-func (r *BaseRepository[T]) InsertOrIgnoreBatch(items []T) error {
+func (r *TDDLBase[T]) InsertOrIgnoreBatch(items []T) error {
 	if len(items) == 0 {
 		return nil
 	}
@@ -354,7 +354,7 @@ func (r *BaseRepository[T]) InsertOrIgnoreBatch(items []T) error {
 	return tx.Commit()
 }
 
-func (r *BaseRepository[T]) Update(item *T) (int64, error) {
+func (r *TDDLBase[T]) Update(item *T) (int64, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
 		return 0, err
@@ -370,7 +370,7 @@ func (r *BaseRepository[T]) Update(item *T) (int64, error) {
 	return result.RowsAffected()
 }
 
-func (r *BaseRepository[T]) UpdateBatch(items []T) error {
+func (r *TDDLBase[T]) UpdateBatch(items []T) error {
 	if len(items) == 0 {
 		return nil
 	}
@@ -406,7 +406,7 @@ func (r *BaseRepository[T]) UpdateBatch(items []T) error {
 	return tx.Commit()
 }
 
-func (r *BaseRepository[T]) Delete(id any) (int64, error) {
+func (r *TDDLBase[T]) Delete(id any) (int64, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
 		return 0, err
@@ -420,7 +420,7 @@ func (r *BaseRepository[T]) Delete(id any) (int64, error) {
 	return result.RowsAffected()
 }
 
-func (r *BaseRepository[T]) DeleteBatch(ids []any) error {
+func (r *TDDLBase[T]) DeleteBatch(ids []any) error {
 	if len(ids) == 0 {
 		return nil
 	}
@@ -454,7 +454,7 @@ func (r *BaseRepository[T]) DeleteBatch(ids []any) error {
 	return tx.Commit()
 }
 
-func (r *BaseRepository[T]) QueryRaw(query string, args ...any) ([]map[string]any, error) {
+func (r *TDDLBase[T]) QueryRaw(query string, args ...any) ([]map[string]any, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
 		return nil, err
@@ -495,7 +495,7 @@ func (r *BaseRepository[T]) QueryRaw(query string, args ...any) ([]map[string]an
 	return results, nil
 }
 
-func (r *BaseRepository[T]) ExecRaw(query string, args ...any) (int64, error) {
+func (r *TDDLBase[T]) ExecRaw(query string, args ...any) (int64, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
 		return 0, err
