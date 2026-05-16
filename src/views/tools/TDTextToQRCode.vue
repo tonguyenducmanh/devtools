@@ -422,7 +422,7 @@ export default {
         currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
         isShowSidebar: true,
         maxLengthUserConfig: window.__env.textToQRConfig.maxTextOneChunk,
-        QRSizeInPixel: 200,
+        QRSizeInPixel: 300,
         exampleWordCount: 10,
         isCompressText:
           window.__env &&
