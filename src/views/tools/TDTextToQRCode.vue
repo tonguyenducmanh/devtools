@@ -14,21 +14,23 @@
               :noMargin="true"
               :readOnly="!textGenQR"
               @click="generateQRCode(null)"
-              :label="$t('i18nCommon.textToQRCode.buttons.generate')"
+              iconClass="td-send-icon"
+              v-tooltip="$t('i18nCommon.textToQRCode.buttons.generate')"
             ></TDButton>
             <TDButton
               :noMargin="true"
               @click="downloadAllQRCodes"
               :type="$tdEnum.buttonType.secondary"
               :readOnly="!qrCodeItems || !qrCodeItems.length"
-              :label="$t('i18nCommon.textToQRCode.buttons.downloadAll')"
-              class="download-all-btn"
+              iconClass="td-download-icon"
+              v-tooltip="$t('i18nCommon.textToQRCode.buttons.downloadAll')"
             ></TDButton>
             <TDButton
               :noMargin="true"
               @click="applyMock"
               :type="$tdEnum.buttonType.secondary"
-              :label="$t('i18nCommon.textToQRCode.buttons.example')"
+              iconClass="td-example-icon"
+              v-tooltip="$t('i18nCommon.textToQRCode.buttons.example')"
             ></TDButton>
           </div>
           <div v-if="qrCodeItems && qrCodeItems.length > 0">
@@ -86,13 +88,19 @@
       <template v-slot:main>
         <div
           class="flex flex-col td-sub-sidebar"
-          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.Help
+          "
         >
           <TDTextToQRCodeHelp />
         </div>
         <div
           class="flex flex-col td-sub-sidebar"
-          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.Setting
+          "
         >
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
@@ -183,7 +191,9 @@ export default {
     async applyMock() {
       let me = this;
       let dataMock = {
-        textGenQR: TDMockTextGenerate.generateLoremWords(me.currentConfigLayout.exampleWordCount),
+        textGenQR: TDMockTextGenerate.generateLoremWords(
+          me.currentConfigLayout.exampleWordCount,
+        ),
       };
       this.$tdUtility.applyMock(this, dataMock);
     },
@@ -200,7 +210,8 @@ export default {
     async generateQRCode(textInput) {
       let me = this;
       let maxTextOneChunk = Number(
-        me.currentConfigLayout.maxLengthUserConfig ?? window.__env.textToQRConfig.maxTextOneChunk,
+        me.currentConfigLayout.maxLengthUserConfig ??
+          window.__env.textToQRConfig.maxTextOneChunk,
       );
       if (!maxTextOneChunk || isNaN(maxTextOneChunk) || maxTextOneChunk <= 0) {
         maxTextOneChunk = 1000;
