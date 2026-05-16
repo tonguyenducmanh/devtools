@@ -821,14 +821,12 @@ async function readMultipleQRsFromFile(file, scanMultiple) {
   }
 
   const subFiles = await sliceImageByQuietZones(file);
-  const results = [];
   
-  for (const subFile of subFiles) {
-    const res = await readQRFromFile(subFile);
-    if (res) {
-      results.push(res);
-    }
-  }
+  const promises = subFiles.map(async (subFile) => {
+    return await readQRFromFile(subFile);
+  });
+
+  const results = (await Promise.all(promises)).filter(res => res);
 
   return results;
 }
