@@ -26,7 +26,11 @@
             v-tooltip="$t('i18nCommon.qrCodeToText.copy')"
           ></TDButton>
         </div>
+        <div class="flex flex-col response-loading" v-if="isLoading">
+          <div class="loader"></div>
+        </div>
         <TDTextarea
+          v-else
           class="input-area"
           :placeHolder="$t('i18nCommon.qrCodeToText.result')"
           v-model="textOutput"
@@ -164,6 +168,7 @@ export default {
         me.$refs.uploadArea &&
         typeof me.$refs.uploadArea.getFileSelected === "function"
       ) {
+        me.isLoading = true;
         const { imagesQRToText } = await import(
           /* webpackChunkName: "mock-qr-code-util" */
           "@/common/qrcode/TDQRCodeUtil.js"
@@ -191,6 +196,8 @@ export default {
         } catch (error) {
           console.error("Error in convertQRCode:", error);
           me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+        } finally {
+          me.isLoading = false;
         }
       }
     },
@@ -258,6 +265,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       keyCacheLayout: this.$tdEnum.cacheConfig.QRCodeToTextConfigLayout,
       currentConfigLayout: {
         isShowSidebar: true,
@@ -311,5 +319,12 @@ export default {
   width: 100%;
   justify-content: space-between;
   gap: var(--padding);
+}
+.response-loading {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-layer-color);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
 }
 </style>
