@@ -32,13 +32,13 @@ type TDDLBase[T TDModelBase] struct{}
 
 // columnMeta chứa thông tin 1 field đã được parse từ struct tag
 type columnMeta struct {
-	fieldIndex int    // vị trí field trong struct
+	fieldIndex []int  // vị trí field trong struct (slice để hỗ trợ embedded struct)
 	dbColumn   string // tên cột trong DB (lấy từ tag `json:"..."`)
 	isPK       bool   // có phải khóa chính không
 	isAutoSet  bool   // tự động sinh bởi DB, không tự insert/update
 }
 
-// parseColumns dùng reflection để đọc tất cả field của struct T
+// parseColumns dùng reflection để đọc tất cả field của struct T, kể cả field từ embedded struct
 func parseColumns[T TDModelBase]() []columnMeta {
 	var zero T
 	pkName := zero.PrimaryKey()
@@ -49,10 +49,14 @@ func parseColumns[T TDModelBase]() []columnMeta {
 	}
 
 	var cols []columnMeta
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
+	// VisibleFields duyệt đệ quy qua embedded struct (giống kế thừa class base C#)
+	for _, field := range reflect.VisibleFields(t) {
 		tag := field.Tag.Get("json")
 		if tag == "" || tag == "-" {
+			continue
+		}
+		// Bỏ qua embedded struct container (vd: TDBaseModel), chỉ lấy các field con
+		if field.Anonymous {
 			continue
 		}
 
@@ -62,7 +66,7 @@ func parseColumns[T TDModelBase]() []columnMeta {
 		isAutoSet := colName == "created_date" || colName == "modified_date"
 
 		cols = append(cols, columnMeta{
-			fieldIndex: i,
+			fieldIndex: field.Index, // slice path, hỗ trợ embedded struct
 			dbColumn:   colName,
 			isPK:       colName == pkName,
 			isAutoSet:  isAutoSet,
@@ -77,7 +81,7 @@ func scanRow[T TDModelBase](rows *sql.Rows, cols []columnMeta) (T, error) {
 	v := reflect.ValueOf(&item).Elem()
 	ptrs := make([]any, len(cols))
 	for i, col := range cols {
-		ptrs[i] = v.Field(col.fieldIndex).Addr().Interface()
+		ptrs[i] = v.FieldByIndex(col.fieldIndex).Addr().Interface()
 	}
 
 	err := rows.Scan(ptrs...)
@@ -165,7 +169,7 @@ func extractValues[T TDModelBase](item *T, cols []columnMeta) []any {
 	var vals []any
 	for _, c := range cols {
 		if !c.isAutoSet {
-			vals = append(vals, v.Field(c.fieldIndex).Interface())
+			vals = append(vals, v.FieldByIndex(c.fieldIndex).Interface())
 		}
 	}
 	return vals
@@ -177,9 +181,9 @@ func extractUpdateValues[T TDModelBase](item *T, cols []columnMeta) []any {
 	var pkVal any
 	for _, c := range cols {
 		if c.isPK {
-			pkVal = v.Field(c.fieldIndex).Interface()
+			pkVal = v.FieldByIndex(c.fieldIndex).Interface()
 		} else if !c.isAutoSet {
-			vals = append(vals, v.Field(c.fieldIndex).Interface())
+			vals = append(vals, v.FieldByIndex(c.fieldIndex).Interface())
 		}
 	}
 	vals = append(vals, pkVal)
@@ -252,7 +256,7 @@ func (r *TDDLBase[T]) Insert(item *T) error {
 	v := reflect.ValueOf(item).Elem()
 	for _, c := range cols {
 		if c.isPK {
-			field := v.Field(c.fieldIndex)
+			field := v.FieldByIndex(c.fieldIndex)
 			if field.Kind() == reflect.String && field.String() == "" {
 				field.SetString(td_common.GenUUID())
 			}
@@ -294,7 +298,7 @@ func (r *TDDLBase[T]) InsertBatch(items []T) error {
 		v := reflect.ValueOf(&items[i]).Elem()
 		for _, c := range cols {
 			if c.isPK {
-				field := v.Field(c.fieldIndex)
+				field := v.FieldByIndex(c.fieldIndex)
 				if field.Kind() == reflect.String && field.String() == "" {
 					field.SetString(td_common.GenUUID())
 				}
@@ -339,7 +343,7 @@ func (r *TDDLBase[T]) InsertOrIgnoreBatch(items []T) error {
 		v := reflect.ValueOf(&items[i]).Elem()
 		for _, c := range cols {
 			if c.isPK {
-				field := v.Field(c.fieldIndex)
+				field := v.FieldByIndex(c.fieldIndex)
 				if field.Kind() == reflect.String && field.String() == "" {
 					field.SetString(td_common.GenUUID())
 				}
