@@ -202,7 +202,8 @@ func (r *TDDLBase[T]) GetAll() ([]T, error) {
 	defer db.Close()
 
 	cols := parseColumns[T]()
-	rows, err := db.Query(buildSelectAll[T](cols))
+	sql := buildSelectAll[T](cols)
+	rows, err := db.Query(sql)
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +228,8 @@ func (r *TDDLBase[T]) GetByID(id any) (*T, error) {
 	defer db.Close()
 
 	cols := parseColumns[T]()
-	rows, err := db.Query(buildSelectByPK[T](cols), id)
+	sql := buildSelectByPK[T](cols)
+	rows, err := db.Query(sql, id)
 	if err != nil {
 		return nil, err
 	}
@@ -264,7 +266,8 @@ func (r *TDDLBase[T]) Insert(item *T) error {
 	}
 
 	vals := extractValues(item, cols)
-	_, err = db.Exec(buildInsert[T](cols), vals...)
+	sql := buildInsert[T](cols)
+	_, err = db.Exec(sql, vals...)
 	return err
 }
 
@@ -366,8 +369,9 @@ func (r *TDDLBase[T]) Update(item *T) (int64, error) {
 	defer db.Close()
 
 	cols := parseColumns[T]()
+	sql := buildUpdate[T](cols)
 	vals := extractUpdateValues(item, cols)
-	result, err := db.Exec(buildUpdate[T](cols), vals...)
+	result, err := db.Exec(sql, vals...)
 	if err != nil {
 		return 0, err
 	}
@@ -417,7 +421,8 @@ func (r *TDDLBase[T]) Delete(id any) (int64, error) {
 	}
 	defer db.Close()
 
-	result, err := db.Exec(buildDelete[T](), id)
+	sql := buildDelete[T]()
+	result, err := db.Exec(sql, id)
 	if err != nil {
 		return 0, err
 	}
