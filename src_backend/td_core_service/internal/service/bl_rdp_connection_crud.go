@@ -8,8 +8,8 @@ import (
 )
 
 // GetRDPConnectionController trả về controller quản lý RDP connection
-func GetRDPConnectionController() *BaseCRUDController[model.TDRDPConnection] {
-	return &BaseCRUDController[model.TDRDPConnection]{
+func GetRDPConnectionController() *TDBLBase[model.TDRDPConnection] {
+	return &TDBLBase[model.TDRDPConnection]{
 		PathPrefix: "rdp_connection",
 		Repo:       database.TDDLBase[model.TDRDPConnection]{},
 	}

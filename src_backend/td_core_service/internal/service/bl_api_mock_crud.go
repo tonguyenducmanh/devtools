@@ -19,8 +19,8 @@ func triggerRestartMockServerOnDelete(id string, r *http.Request) {
 }
 
 // GetMockAPIController trả về controller quản lý mock API
-func GetMockAPIController() *BaseCRUDController[model.TDAPIMockItem] {
-	return &BaseCRUDController[model.TDAPIMockItem]{
+func GetMockAPIController() *TDBLBase[model.TDAPIMockItem] {
+	return &TDBLBase[model.TDAPIMockItem]{
 		PathPrefix:  "mock_api",
 		Repo:        database.TDDLBase[model.TDAPIMockItem]{},
 		AfterInsert: func(req *model.TDAPIMockItem, r *http.Request) { triggerRestartMockServer(req, r) },
@@ -37,8 +37,8 @@ func beforeDeleteMockGroup(id string, r *http.Request) error {
 }
 
 // GetMockGroupController trả về controller quản lý nhóm mock API
-func GetMockGroupController() *BaseCRUDController[model.TDAPIMockGroup] {
-	return &BaseCRUDController[model.TDAPIMockGroup]{
+func GetMockGroupController() *TDBLBase[model.TDAPIMockGroup] {
+	return &TDBLBase[model.TDAPIMockGroup]{
 		PathPrefix:   "mock_group",
 		Repo:         database.TDDLBase[model.TDAPIMockGroup]{},
 		BeforeDelete: beforeDeleteMockGroup,

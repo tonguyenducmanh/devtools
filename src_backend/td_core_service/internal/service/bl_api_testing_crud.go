@@ -12,8 +12,8 @@ import (
 )
 
 // GetTestingAPIController trả về controller quản lý API testing
-func GetTestingAPIController() *BaseCRUDController[model.TDAPITestingItem] {
-	return &BaseCRUDController[model.TDAPITestingItem]{
+func GetTestingAPIController() *TDBLBase[model.TDAPITestingItem] {
+	return &TDBLBase[model.TDAPITestingItem]{
 		PathPrefix: "api_testing",
 		Repo:       database.TDDLBase[model.TDAPITestingItem]{},
 	}
@@ -25,8 +25,8 @@ func beforeDeleteTestingGroup(id string, r *http.Request) error {
 }
 
 // GetTestingGroupController trả về controller quản lý nhóm API testing
-func GetTestingGroupController() *BaseCRUDController[model.TDAPITestingGroup] {
-	return &BaseCRUDController[model.TDAPITestingGroup]{
+func GetTestingGroupController() *TDBLBase[model.TDAPITestingGroup] {
+	return &TDBLBase[model.TDAPITestingGroup]{
 		PathPrefix:   "api_testing_group",
 		Repo:         database.TDDLBase[model.TDAPITestingGroup]{},
 		BeforeDelete: beforeDeleteTestingGroup,

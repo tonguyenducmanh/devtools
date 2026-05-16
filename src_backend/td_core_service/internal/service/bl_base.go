@@ -7,9 +7,9 @@ import (
 	"td_core_service/internal/database"
 )
 
-// BaseCRUDController cung cấp các endpoint chuẩn (GET, POST, PUT, DELETE) cho một Model
+// TDBLBase cung cấp các endpoint chuẩn (GET, POST, PUT, DELETE) cho một Model
 // Nó có các hook function để có thể override giống tính đa hình của OOP.
-type BaseCRUDController[T database.TDModelBase] struct {
+type TDBLBase[T database.TDModelBase] struct {
 	PathPrefix string
 	Repo       database.TDDLBase[T]
 
@@ -25,14 +25,14 @@ type BaseCRUDController[T database.TDModelBase] struct {
 	CustomDelete func(id string, r *http.Request) error
 }
 
-func (c *BaseCRUDController[T]) RegisterRoutes(app *http.ServeMux) {
+func (c *TDBLBase[T]) RegisterRoutes(app *http.ServeMux) {
 	app.HandleFunc(fmt.Sprintf("GET /%s/get_all", c.PathPrefix), c.GetAll)
 	app.HandleFunc(fmt.Sprintf("POST /%s/create", c.PathPrefix), c.Create)
 	app.HandleFunc(fmt.Sprintf("PUT /%s/update", c.PathPrefix), c.Update)
 	app.HandleFunc(fmt.Sprintf("DELETE /%s/delete_by_id", c.PathPrefix), c.Delete)
 }
 
-func (c *BaseCRUDController[T]) GetAll(w http.ResponseWriter, r *http.Request) {
+func (c *TDBLBase[T]) GetAll(w http.ResponseWriter, r *http.Request) {
 	items, err := c.Repo.GetAll()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Lỗi query: %v", err), http.StatusInternalServerError)
@@ -46,7 +46,7 @@ func (c *BaseCRUDController[T]) GetAll(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (c *BaseCRUDController[T]) Create(w http.ResponseWriter, r *http.Request) {
+func (c *TDBLBase[T]) Create(w http.ResponseWriter, r *http.Request) {
 	var req T
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -79,7 +79,7 @@ func (c *BaseCRUDController[T]) Create(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (c *BaseCRUDController[T]) Update(w http.ResponseWriter, r *http.Request) {
+func (c *TDBLBase[T]) Update(w http.ResponseWriter, r *http.Request) {
 	var req T
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -116,7 +116,7 @@ func (c *BaseCRUDController[T]) Update(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (c *BaseCRUDController[T]) Delete(w http.ResponseWriter, r *http.Request) {
+func (c *TDBLBase[T]) Delete(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	if id == "" {
 		http.Error(w, "ID là bắt buộc", http.StatusBadRequest)
