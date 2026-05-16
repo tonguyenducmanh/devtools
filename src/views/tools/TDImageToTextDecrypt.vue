@@ -191,19 +191,41 @@ export default {
             startY = 0;
           let effectiveBlockSize = 0;
 
-          // Signature is Hot Pink (255, 0, 128)
-          // Wide tolerance to handle VM screenshot DPI scaling & JPEG compression
-          const isSignature = (idx) => {
-            return (
-              data[idx] >= 140 &&
-              data[idx + 1] <= 110 &&
-              data[idx + 2] >= 30 &&
-              data[idx + 2] <= 220 &&
-              data[idx] > data[idx + 1] + 50
-            );
+          // Helper: sample median R/G around a point
+          const sampleMedian = (cx, cy, sr) => {
+            let rVals = [], gVals = [];
+            for (let dy = -sr; dy <= sr; dy++) {
+              for (let dx = -sr; dx <= sr; dx++) {
+                let spx = Math.min(Math.max(cx + dx, 0), canvas.width - 1);
+                let spy = Math.min(Math.max(cy + dy, 0), canvas.height - 1);
+                let pidx = (spy * canvas.width + spx) * 4;
+                rVals.push(data[pidx]);
+                gVals.push(data[pidx + 1]);
+              }
+            }
+            rVals.sort((a, b) => a - b);
+            gVals.sort((a, b) => a - b);
+            return {
+              r: rVals[Math.floor(rVals.length / 2)],
+              g: gVals[Math.floor(gVals.length / 2)],
+            };
           };
 
-          // Estimate run length using median of multiple scan lines for robustness
+          // Helper: verify candidate origin has Version=1 at next block
+          const verifyCandidate = (sx, sy, ebs) => {
+            if (ebs < 1) return false;
+            let cx = Math.floor(sx + ebs * 1.5);
+            let cy = Math.floor(sy + ebs * 0.5);
+            if (cx >= canvas.width || cy >= canvas.height) return false;
+            let sr = Math.max(1, Math.floor(ebs / 4));
+            let { r: pr, g: pg } = sampleMedian(cx, cy, sr);
+            return Math.round(pr / 17) === 0 && Math.round(pg / 17) === 1;
+          };
+
+          // Helper: loose pinkish check (R >> G) for edge tracing
+          const isPinkEdge = (idx) => data[idx] - data[idx + 1] >= 35;
+
+          // Helper: estimate run length using median of 6 adjacent scanlines
           const estimateRunLength = (sx, sy, isHorizontal) => {
             let samples = [];
             for (let s = 0; s < 6; s++) {
@@ -212,14 +234,14 @@ export default {
                 let scanY = sy + s;
                 if (scanY >= canvas.height) break;
                 for (let tx = sx; tx < canvas.width; tx++) {
-                  if (isSignature((scanY * canvas.width + tx) * 4)) runLen++;
+                  if (isPinkEdge((scanY * canvas.width + tx) * 4)) runLen++;
                   else break;
                 }
               } else {
                 let scanX = sx + s;
                 if (scanX >= canvas.width) break;
                 for (let ty = sy; ty < canvas.height; ty++) {
-                  if (isSignature((ty * canvas.width + scanX) * 4)) runLen++;
+                  if (isPinkEdge((ty * canvas.width + scanX) * 4)) runLen++;
                   else break;
                 }
               }
@@ -230,45 +252,56 @@ export default {
             return samples[Math.floor(samples.length / 2)];
           };
 
-          for (let y = 0; y < canvas.height && !found; y++) {
-            for (let x = 0; x < canvas.width && !found; x++) {
+          // ── PHASE 1: Score every pixel for hot-pink likeness (no hard threshold) ──
+          // Ideal hot pink: R=255, G=0, B=128 → maximise (R-G), penalise |B-128|
+          let bestScore = -Infinity;
+          let allPixels = [];
+          for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
               let idx = (y * canvas.width + x) * 4;
-              if (isSignature(idx)) {
-                // Use multi-line median for robust block size under DPI scaling
-                let bw = estimateRunLength(x, y, true);
-                let bh = estimateRunLength(x, y, false);
+              let r = data[idx], g = data[idx + 1], b = data[idx + 2];
+              let score = (r - g) - Math.abs(b - 128) * 0.4;
+              if (score > bestScore) bestScore = score;
+              allPixels.push({ x, y, score });
+            }
+          }
 
-                let ebs = Math.round((bw + bh) / 2);
-                if (ebs >= 1) {
-                  // Verify pixel 1 (Version=1 → R=0, G=17): sample area with median
-                  let cx = Math.floor(x + ebs * 1.5);
-                  let cy = Math.floor(y + ebs * 0.5);
-                  if (cx < canvas.width && cy < canvas.height) {
-                    let sr = Math.max(1, Math.floor(ebs / 4));
-                    let rVals = [], gVals = [];
-                    for (let dy = -sr; dy <= sr; dy++) {
-                      for (let dx = -sr; dx <= sr; dx++) {
-                        let spx = Math.min(Math.max(cx + dx, 0), canvas.width - 1);
-                        let spy = Math.min(Math.max(cy + dy, 0), canvas.height - 1);
-                        let pidx = (spy * canvas.width + spx) * 4;
-                        rVals.push(data[pidx]);
-                        gVals.push(data[pidx + 1]);
-                      }
-                    }
-                    rVals.sort((a, b) => a - b);
-                    gVals.sort((a, b) => a - b);
-                    let pr = rVals[Math.floor(rVals.length / 2)];
-                    let pg = gVals[Math.floor(gVals.length / 2)];
-                    let high = Math.round(pr / 17);
-                    let low = Math.round(pg / 17);
-                    if (high === 0 && low === 1) {
-                      found = true;
-                      startX = x;
-                      startY = y;
-                      effectiveBlockSize = ebs;
-                    }
-                  }
-                }
+          // Keep top candidates (within 30 pts of best)
+          let candidates = allPixels
+            .filter(p => p.score >= bestScore - 30)
+            .sort((a, b) => b.score - a.score);
+
+          // ── PHASE 2: For each candidate find block edge & verify ──────────────
+          const triedKeys = new Set();
+          for (let { x, y } of candidates) {
+            if (found) break;
+            // Trace back to the TRUE top-left corner of the pink blob
+            let trueLeft = x;
+            while (trueLeft > 0 && isPinkEdge((y * canvas.width + (trueLeft - 1)) * 4)) trueLeft--;
+            let trueTop = y;
+            while (trueTop > 0 && isPinkEdge(((trueTop - 1) * canvas.width + trueLeft) * 4)) trueTop--;
+            let key = `${trueLeft},${trueTop}`;
+            if (triedKeys.has(key)) continue;
+            triedKeys.add(key);
+            // Estimate block size
+            let bw = estimateRunLength(trueLeft, trueTop, true);
+            let bh = estimateRunLength(trueLeft, trueTop, false);
+            let ebs = Math.round((bw + bh) / 2);
+            // Try a range around ebs to tolerate estimation error
+            let sizesToTry = new Set();
+            for (let base of [ebs, bw, bh]) {
+              for (let d = -4; d <= 4; d++) {
+                if (base + d >= 1) sizesToTry.add(base + d);
+              }
+            }
+            let sorted = [...sizesToTry].sort((a, b) => Math.abs(a - ebs) - Math.abs(b - ebs));
+            for (let sz of sorted) {
+              if (verifyCandidate(trueLeft, trueTop, sz)) {
+                found = true;
+                startX = trueLeft;
+                startY = trueTop;
+                effectiveBlockSize = sz;
+                break;
               }
             }
           }
