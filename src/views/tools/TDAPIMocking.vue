@@ -493,7 +493,7 @@ export default {
     },
     async loadMockData() {
       let me = this;
-      let response = await me.agentAPI.getAllMockAPIs();
+      let response = await me.agentAPI.mockItem.getAll();
       let mockData = response?.data?.data ?? [];
       if (response && response.success && Array.isArray(mockData)) {
         me.allMockAPIs.splice(0, me.allMockAPIs.length, ...mockData);
@@ -504,7 +504,7 @@ export default {
     async loadAllGroups() {
       let me = this;
       try {
-        let response = await me.agentAPI.getAllMockGroups();
+        let response = await me.agentAPI.mockGroup.getAll();
         let groupData = response?.data?.data ?? [];
         if (response && response.success && Array.isArray(groupData)) {
           me.allGroups.splice(0, me.allGroups.length, ...groupData);
@@ -521,7 +521,7 @@ export default {
       if (!me.newGroupName) return;
 
       try {
-        let response = await me.agentAPI.createMockGroup({
+        let response = await me.agentAPI.mockGroup.create({
           name: me.newGroupName,
         });
         if (response && response.success && response.data?.success) {
@@ -544,7 +544,7 @@ export default {
       if (!group) return;
 
       try {
-        let response = await me.agentAPI.deleteMockGroup(group.id);
+        let response = await me.agentAPI.mockGroup.deleteById(group.id);
         if (response && response.success && response.data?.success) {
           me.$tdToast.success(
             me.$t("i18nCommon.APIMocking.deleteGroupSuccess"),
@@ -615,7 +615,7 @@ export default {
         if (me.currentMockId) {
           // Cập nhật
           mockData.id = me.currentMockId;
-          let response = await me.agentAPI.updateMockAPI(mockData);
+          let response = await me.agentAPI.mockItem.update(mockData);
           if (response && response.success && response.data?.success) {
             me.$tdToast.success(
               me.$t("i18nCommon.APIMocking.updateMockSuccess"),
@@ -624,7 +624,7 @@ export default {
           }
         } else {
           // Tạo mới
-          let response = await me.agentAPI.createMockAPI(mockData);
+          let response = await me.agentAPI.mockItem.create(mockData);
           if (response && response.success && response.data?.success) {
             me.$tdToast.success(
               me.$t("i18nCommon.APIMocking.createMockSuccess"),
@@ -685,7 +685,7 @@ export default {
     async deleteMockAPI(id) {
       let me = this;
       try {
-        let response = await me.agentAPI.deleteMockAPI(id);
+        let response = await me.agentAPI.mockItem.deleteById(id);
         if (response && response.success && response.data?.success) {
           me.$tdToast.success(me.$t("i18nCommon.APIMocking.deleteMockSuccess"));
           if (me.currentMockId === id) {

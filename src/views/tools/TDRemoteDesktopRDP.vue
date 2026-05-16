@@ -482,7 +482,7 @@ export default {
       let me = this;
       me.isLoading = true;
       try {
-        let response = await me.agentAPI.getAllRDPConnections();
+        let response = await me.agentAPI.rdpConnection.getAll();
         let data = response?.data?.data ?? [];
         if (response && response.success && Array.isArray(data)) {
           me.connections.splice(0, me.connections.length, ...data);
@@ -547,13 +547,13 @@ export default {
       try {
         if (me.currentConnectionId) {
           connData.id = me.currentConnectionId;
-          let response = await me.agentAPI.updateRDPConnection(connData);
+          let response = await me.agentAPI.rdpConnection.update(connData);
           if (response && response.success) {
             me.$tdToast.success(me.$t("i18nCommon.remoteDesktop.saveSuccess"));
             await me.loadConnections();
           }
         } else {
-          let response = await me.agentAPI.createRDPConnection(connData);
+          let response = await me.agentAPI.rdpConnection.create(connData);
           if (response && response.success) {
             me.$tdToast.success(me.$t("i18nCommon.remoteDesktop.saveSuccess"));
             me.currentConnectionId = response.data?.data?.id;
@@ -574,7 +574,7 @@ export default {
     async deleteConnectionById(id) {
       let me = this;
       try {
-        let response = await me.agentAPI.deleteRDPConnection(id);
+        let response = await me.agentAPI.rdpConnection.deleteById(id);
         if (response && response.success) {
           me.$tdToast.success(me.$t("i18nCommon.remoteDesktop.deleteSuccess"));
           if (me.currentConnectionId === id) {
