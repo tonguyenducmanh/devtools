@@ -75,7 +75,20 @@
             :label="$t('i18nCommon.imageToTextDecrypt.autoCropBackground')"
             @change="updateConfigLayout"
           ></TDCheckbox>
-
+          <div class="flex flex-col input-config">
+            <div class="flex input-config-item">
+              <span class="title-input-config">{{
+                $t("i18nCommon.imageToTextDecrypt.blockSize")
+              }}</span>
+              <TDInput
+                v-model="currentConfigLayout.blockSize"
+                :inputType="'number'"
+                class="value-input-config"
+                :placeHolder="'4'"
+                :noMargin="true"
+              />
+            </div>
+          </div>
         </div>
       </template>
     </TDSubSidebar>
@@ -99,6 +112,7 @@ export default {
       currentConfigLayout: {
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
+        blockSize: 4,
         autoCropBackground: true,
       },
       textOutput: null,

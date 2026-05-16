@@ -330,7 +330,7 @@ export default {
         download: "Tải ảnh",
         example: "Ví dụ",
       },
-      blockSize: "Kích thước (px)",
+      blockSize: "Kích thước Pixel (px)",
       compressText: "Nén dữ liệu",
     },
     imageToTextDecrypt: {
@@ -339,7 +339,7 @@ export default {
       copy: "Sao chép",
       result: "Kết quả sẽ xuất hiện sau khi upload ảnh",
       uploadLabel: "Tải ảnh lên hoặc Ctrl + V ảnh vào đây",
-      blockSize: "Kích thước (px)",
+      blockSize: "Kích thước Pixel (px)",
       autoCropBackground: "Tự động cắt viền nền",
     },
     textToQRCode: {
