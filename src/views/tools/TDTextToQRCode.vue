@@ -2,14 +2,12 @@
   <div class="flex container">
     <div class="flex flex-col main-tool">
       <div class="flex flex-col input-section" :style="firstSectionResizeStyle">
-        <div class="input-area">
+        <div class="flex input-area">
           <TDTextarea
             :placeHolder="$t('i18nCommon.textToQRCode.input.placeholder')"
             v-model="textGenQR"
           ></TDTextarea>
-        </div>
-        <div class="flex group-footer-input">
-          <div class="flex button-generate">
+          <div class="flex flex-col button-generate">
             <TDButton
               :noMargin="true"
               :readOnly="!textGenQR"
@@ -33,7 +31,9 @@
               v-tooltip="$t('i18nCommon.textToQRCode.buttons.example')"
             ></TDButton>
           </div>
-          <div v-if="qrCodeItems && qrCodeItems.length > 0">
+        </div>
+        <div class="flex group-footer-input">
+          <div>
             {{
               $t("i18nCommon.textToQRCode.totalQRGen").format(
                 qrCodeItems.length,
@@ -430,8 +430,8 @@ export default {
           window.__env.textToQRConfig.isCompressText,
         addHeaderToQR: true,
       },
-      firstSectionSize: 50,
-      secondSectionSize: 50,
+      firstSectionSize: 30,
+      secondSectionSize: 70,
       textGenQR: null,
       qrCodeItems: [],
     };
@@ -462,7 +462,9 @@ export default {
 
 .input-area {
   width: 100%;
+  height: 100%;
   flex: 1;
+  gap: var(--padding);
 }
 .checkbox-wrapper {
   display: flex;
@@ -532,10 +534,12 @@ export default {
 }
 .group-footer-input {
   width: 100%;
-  justify-content: space-between;
+  justify-content: flex-start;
   margin: var(--padding) 0;
-  .button-generate {
-    gap: var(--padding);
-  }
+}
+.button-generate {
+  justify-content: flex-start;
+  height: 100%;
+  gap: var(--padding);
 }
 </style>
