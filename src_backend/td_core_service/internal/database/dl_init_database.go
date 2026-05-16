@@ -48,7 +48,7 @@ func InitDatabase() {
 		body_text TEXT,
 		response_text TEXT,
 		created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-		modififed_date DATETIME DEFAULT CURRENT_TIMESTAMP
+		modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
 	`
 	_, err = db.Exec(sqlStmt)
@@ -82,7 +82,7 @@ func InitDatabase() {
 		headers_text TEXT,
 		body_text TEXT,
 		created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-		modififed_date DATETIME DEFAULT CURRENT_TIMESTAMP
+		modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
 	`
 	_, err = db.Exec(sqlStmtTesting)
