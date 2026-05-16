@@ -683,9 +683,160 @@ async function readQRFromFile(file) {
 }
 
 /**
+ * Extract individual QR codes from an image by slicing along white gaps (quiet zones)
+ */
+async function sliceImageByQuietZones(file) {
+  const img = await createImageElementFromFile(file);
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  const width = img.width;
+  const height = img.height;
+  canvas.width = width;
+  canvas.height = height;
+  ctx.drawImage(img, 0, 0);
+
+  // If image is too small, just return it
+  if (width < 50 || height < 50) return [file];
+
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  const colSums = new Int32Array(width);
+  const rowSums = new Int32Array(height);
+
+  const threshold = 200; // Consider pixels darker than 200 as "content"
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = (y * width + x) * 4;
+      const r = data[idx];
+      const g = data[idx + 1];
+      const b = data[idx + 2];
+      const a = data[idx + 3];
+
+      // Ignore transparent pixels
+      if (a < 128) continue;
+
+      const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+      if (gray < threshold) {
+        colSums[x]++;
+        rowSums[y]++;
+      }
+    }
+  }
+
+  function findGaps(sums, length, maxNoise) {
+    const gaps = [];
+    let inGap = true;
+    let gapStart = 0;
+
+    for (let i = 0; i < length; i++) {
+      if (sums[i] <= maxNoise) {
+        if (!inGap) {
+          inGap = true;
+          gapStart = i;
+        }
+      } else {
+        if (inGap) {
+          inGap = false;
+          // Gap must be somewhat wide to be considered a quiet zone
+          if (i - gapStart >= Math.max(3, Math.floor(length * 0.005))) {
+            gaps.push({ start: gapStart, end: i - 1, center: Math.floor((gapStart + i - 1) / 2) });
+          }
+        }
+      }
+    }
+    if (inGap) {
+      gaps.push({ start: gapStart, end: length - 1, center: Math.floor((gapStart + length - 1) / 2) });
+    }
+    return gaps;
+  }
+
+  // Allow a tiny bit of noise
+  const maxNoiseCol = Math.max(1, Math.floor(height * 0.005));
+  const maxNoiseRow = Math.max(1, Math.floor(width * 0.005));
+
+  const colGaps = findGaps(colSums, width, maxNoiseCol);
+  const rowGaps = findGaps(rowSums, height, maxNoiseRow);
+
+  // Ensure we have bounding gaps at the edges
+  if (colGaps.length === 0 || colGaps[0].start > 0) colGaps.unshift({ center: 0 });
+  if (colGaps[colGaps.length - 1].end < width - 1) colGaps.push({ center: width });
+  
+  if (rowGaps.length === 0 || rowGaps[0].start > 0) rowGaps.unshift({ center: 0 });
+  if (rowGaps[rowGaps.length - 1].end < height - 1) rowGaps.push({ center: height });
+
+  const extractedBlobs = [];
+
+  for (let r = 0; r < rowGaps.length - 1; r++) {
+    const y1 = rowGaps[r].center;
+    const y2 = rowGaps[r + 1].center;
+    const regionHeight = y2 - y1;
+
+    for (let c = 0; c < colGaps.length - 1; c++) {
+      const x1 = colGaps[c].center;
+      const x2 = colGaps[c + 1].center;
+      const regionWidth = x2 - x1;
+
+      // Filter out regions that are too small to be a QR code
+      if (regionWidth > 50 && regionHeight > 50) {
+        // Check if this region actually has black pixels
+        let hasContent = false;
+        for (let x = x1; x < x2; x++) {
+          if (colSums[x] > maxNoiseCol) {
+            hasContent = true;
+            break;
+          }
+        }
+        if (!hasContent) continue;
+
+        const subCanvas = document.createElement("canvas");
+        subCanvas.width = regionWidth;
+        subCanvas.height = regionHeight;
+        const subCtx = subCanvas.getContext("2d");
+        
+        // Fill white background first (in case of transparency)
+        subCtx.fillStyle = "#ffffff";
+        subCtx.fillRect(0, 0, regionWidth, regionHeight);
+        subCtx.drawImage(img, x1, y1, regionWidth, regionHeight, 0, 0, regionWidth, regionHeight);
+
+        const blob = await new Promise(resolve => subCanvas.toBlob(resolve, file.type || "image/png"));
+        blob.name = file.name ? `${file.name}_part_${r}_${c}.png` : `qr_part_${r}_${c}.png`;
+        blob.lastModified = file.lastModified || Date.now();
+        extractedBlobs.push(blob);
+      }
+    }
+  }
+
+  return extractedBlobs.length > 0 ? extractedBlobs : [file];
+}
+
+/**
+ * Scan multiple QR codes from a single file by slicing it first
+ */
+async function readMultipleQRsFromFile(file, scanMultiple) {
+  if (!scanMultiple) {
+    const res = await readQRFromFile(file);
+    return res ? [res] : [];
+  }
+
+  const subFiles = await sliceImageByQuietZones(file);
+  const results = [];
+  
+  for (const subFile of subFiles) {
+    const res = await readQRFromFile(subFile);
+    if (res) {
+      results.push(res);
+    }
+  }
+
+  return results;
+}
+
+/**
  * Batch process multiple files with progress tracking
  */
-async function batchProcessQRFiles(files, onProgress = null) {
+async function batchProcessQRFiles(files, options = {}, onProgress = null) {
   const results = new Array(files.length).fill(null);
   const total = files.length;
   let doneCount = 0;
@@ -702,8 +853,8 @@ async function batchProcessQRFiles(files, onProgress = null) {
       let error = null;
 
       try {
-        result = await readQRFromFile(file);
-        if (!result) {
+        result = await readMultipleQRsFromFile(file, options.scanMultipleQR);
+        if (!result || result.length === 0) {
           error = new Error("No QR code detected");
         }
       } catch (err) {
@@ -776,27 +927,31 @@ export async function imagesQRToText(uploadArea, options = {}) {
     }
 
     // Process files in batch
-    const batchResults = await batchProcessQRFiles(supportedFiles, onProgress);
+    const batchResults = await batchProcessQRFiles(supportedFiles, options, onProgress);
 
-    // Format results
-    const results = batchResults.map(({ file, result, error }) => {
-      const baseResult = {
-        file: file.name,
-        success: !!result,
-        text: result || null,
-        error: error ? error.message : null,
-      };
-
-      if (returnDetailedResults) {
-        return {
-          ...baseResult,
-          fileSize: file.size,
-          fileType: file.type,
-          lastModified: file.lastModified,
+    // Format results (sử dụng flatMap để trải phẳng mảng nếu 1 ảnh có nhiều result)
+    const results = batchResults.flatMap(({ file, result, error }) => {
+      // Nếu không tìm thấy QR nào hoặc bị lỗi
+      if (!result || result.length === 0) {
+        const baseResult = {
+          file: file.name,
+          success: false,
+          text: null,
+          error: error ? error.message : null,
         };
+        return returnDetailedResults ? { ...baseResult, fileSize: file.size, fileType: file.type, lastModified: file.lastModified } : [baseResult];
       }
 
-      return baseResult;
+      // Nếu tìm thấy 1 hoặc nhiều QR, tách ra thành các item độc lập
+      return result.map(text => {
+        const baseResult = {
+          file: file.name,
+          success: true,
+          text: text,
+          error: null,
+        };
+        return returnDetailedResults ? { ...baseResult, fileSize: file.size, fileType: file.type, lastModified: file.lastModified } : baseResult;
+      });
     });
 
     // Filter successful results if validation is enabled

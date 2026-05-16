@@ -82,6 +82,12 @@
             :label="$t('i18nCommon.qrCodeToText.hasHeaderInQR')"
             @change="updateConfigLayout"
           ></TDCheckbox>
+          <TDCheckbox
+            v-model="currentConfigLayout.scanMultipleQR"
+            :variant="$tdEnum.checkboxType.switch"
+            :label="$t('i18nCommon.qrCodeToText.scanMultipleQR')"
+            @change="updateConfigLayout"
+          ></TDCheckbox>
         </div>
       </template>
     </TDSubSidebar>
@@ -174,7 +180,9 @@ export default {
           "@/common/qrcode/TDQRCodeUtil.js"
         );
         try {
-          let rawResults = await imagesQRToText(me.$refs.uploadArea);
+          let rawResults = await imagesQRToText(me.$refs.uploadArea, {
+            scanMultipleQR: me.currentConfigLayout.scanMultipleQR
+          });
           if (rawResults && rawResults.length > 0) {
             let finalOutput = "";
             if (me.currentConfigLayout.hasHeaderInQR) {
@@ -275,6 +283,7 @@ export default {
           window.__env.textToQRConfig &&
           window.__env.textToQRConfig.isCompressText,
         hasHeaderInQR: true,
+        scanMultipleQR: true,
       },
       textOutput: null,
       isRemoveEmpty: false,

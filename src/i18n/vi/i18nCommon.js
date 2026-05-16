@@ -347,6 +347,7 @@ export default {
       compressText: "Nén dữ liệu",
       hasHeaderInQR: "Có header QR",
       uploadLabel: "Tải ảnh lên hoặc Ctrl + V ảnh vào đây",
+      scanMultipleQR: "1 ảnh nhiều QR",
     },
     oneTimePassword: {
       title: "Mật khẩu một lần theo thời gian (TOTP) và theo HMAC (HOTP)!",
