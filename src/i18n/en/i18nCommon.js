@@ -9,7 +9,7 @@ export default {
       showTabNumber: "Show tab number",
     },
     group: {
-      Encrypt: "Encypt tooling",
+      QRCode: "QR tooling",
       API: "API intergate",
       JSON: "JSON building",
       Image: "Image handle",
@@ -105,8 +105,6 @@ export default {
       CodeFormatter: "Code formatter",
       ImageFromBase64: "Image from Base64",
       ImageToBase64: "Image to Base64",
-      textToImageEncrypt: "Text to Image Encrypt",
-      imageToTextDecrypt: "Image to Text Decrypt",
       QRCodeFromText: "QRCode from text",
       QRCodeToText: "QRCode to text",
       DownloadVSCodeExtension: "VSCode Extension",
@@ -321,28 +319,6 @@ export default {
       copyHtml: "Copy HTML",
       fullscreenPreview: "Fullscreen Preview",
       popupTitle: "HTML Preview",
-    },
-    textToImageEncrypt: {
-      title: "Text to Image Encrypt (RGB) tool!",
-      input: {
-        placeholder: "Enter text to encrypt...",
-      },
-      buttons: {
-        generate: "Encrypt",
-        download: "Download",
-        example: "Example",
-      },
-      blockSize: "Pixel Size (px)",
-      compressText: "Compress text",
-    },
-    imageToTextDecrypt: {
-      title: "Image to Text Decrypt tool!",
-      convert: "Decrypt",
-      copy: "Copy",
-      result: "Result will appear here",
-      uploadLabel: "Upload image or Ctrl + V to paste image here",
-      blockSize: "Pixel Size (px)",
-      autoCropBackground: "Auto crop background",
     },
     textToQRCode: {
       totalQRGen: "Created {0} QR",

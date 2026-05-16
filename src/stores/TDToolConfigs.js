@@ -52,8 +52,8 @@ const sidebarConfig = [
   },
   {
     type: "group",
-    groupKey: "encrypt",
-    groupTitleKey: "i18nCommon.group.Encrypt",
+    groupKey: "qrcode",
+    groupTitleKey: "i18nCommon.group.QRCode",
     children: [
       {
         name: "textoqrcode",
@@ -70,16 +70,6 @@ const sidebarConfig = [
           titleKey: "i18nCommon.feature.QRCodeToText",
           helpKey: "i18nHelp.feature.QRCodeToText",
         },
-      },
-      {
-        name: "texttoimageencrypt",
-        component: () => import("@/views/tools/TDTextToImageEncrypt.vue"),
-        meta: { titleKey: "i18nCommon.feature.textToImageEncrypt" },
-      },
-      {
-        name: "imagetotextdecrypt",
-        component: () => import("@/views/tools/TDImageToTextDecrypt.vue"),
-        meta: { titleKey: "i18nCommon.feature.imageToTextDecrypt" },
       },
     ],
   },

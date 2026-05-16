@@ -9,7 +9,7 @@ export default {
       showTabNumber: "Đánh số thứ tự tab",
     },
     group: {
-      Encrypt: "Công cụ mã hóa",
+      QRCode: "Công cụ QR",
       API: "Tích hợp API",
       JSON: "Xử lý JSON",
       Image: "Xử lý ảnh",
@@ -105,8 +105,6 @@ export default {
       CodeFormatter: "Định dạng mã",
       ImageFromBase64: "Ảnh từ Base64",
       ImageToBase64: "Ảnh sang Base64",
-      textToImageEncrypt: "Mã hóa văn bản thành ảnh",
-      imageToTextDecrypt: "Giải mã ảnh thành văn bản",
       QRCodeFromText: "Mã QR từ văn bản",
       QRCodeToText: "Mã QR sang văn bản",
       DownloadVSCodeExtension: "Tiện ích VS Code",
@@ -319,28 +317,6 @@ export default {
       copyHtml: "Sao chép HTML",
       fullscreenPreview: "Xem trước toàn màn hình",
       popupTitle: "Xem trước HTML",
-    },
-    textToImageEncrypt: {
-      title: "Công cụ mã hóa văn bản thành ảnh (RGB)!",
-      input: {
-        placeholder: "Nhập văn bản cần mã hóa...",
-      },
-      buttons: {
-        generate: "Mã hóa",
-        download: "Tải ảnh",
-        example: "Ví dụ",
-      },
-      blockSize: "Kích thước Pixel (px)",
-      compressText: "Nén dữ liệu",
-    },
-    imageToTextDecrypt: {
-      title: "Công cụ giải mã ảnh thành văn bản!",
-      convert: "Giải mã",
-      copy: "Sao chép",
-      result: "Kết quả sẽ xuất hiện sau khi upload ảnh",
-      uploadLabel: "Tải ảnh lên hoặc Ctrl + V ảnh vào đây",
-      blockSize: "Kích thước Pixel (px)",
-      autoCropBackground: "Tự động cắt viền nền",
     },
     textToQRCode: {
       totalQRGen: "Đã tạo {0} mã QR",
