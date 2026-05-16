@@ -650,8 +650,8 @@ async function readQRFromFile(file) {
 
   // Define scanning methods in order of preference (QrScanner first for better performance)
   const scanMethods = [
-    { name: "jsQR", fn: readQRWithJsQR },
     { name: "QrScanner", fn: readQRWithQrScanner },
+    { name: "jsQR", fn: readQRWithJsQR },
     { name: "ZXing", fn: readQRWithZXing },
   ];
 
