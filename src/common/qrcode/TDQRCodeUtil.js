@@ -166,7 +166,7 @@ function applyAdaptiveBinarization(imageData) {
   const histogram = new Array(256).fill(0);
   for (let i = 0; i < length; i += 4) {
     const gray = Math.round(
-      0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]
+      0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2],
     );
     histogram[gray]++;
   }
@@ -213,7 +213,7 @@ function applyAdaptiveBinarization(imageData) {
   // Apply binarization
   for (let i = 0; i < length; i += 4) {
     const gray = Math.round(
-      0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]
+      0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2],
     );
     const binary = gray > threshold ? 255 : 0;
     data[i] = data[i + 1] = data[i + 2] = binary;
@@ -320,7 +320,7 @@ function tryRotations(canvas, ctx, originalImageData) {
         0,
         0,
         canvas.width,
-        canvas.height
+        canvas.height,
       );
       results.push({ rotation, imageData: rotatedImageData });
 
@@ -378,7 +378,7 @@ async function readQRWithJsQR(file) {
                   0,
                   0,
                   scale.width,
-                  scale.height
+                  scale.height,
                 );
 
                 // Try without preprocessing first
@@ -412,7 +412,7 @@ async function readQRWithJsQR(file) {
                       name: "contrast-invert",
                       preprocess: { enableContrastEnhancement: true },
                       options: { inversionAttempt: "onlyInvert" },
-                    }
+                    },
                   );
                 }
 
@@ -430,7 +430,7 @@ async function readQRWithJsQR(file) {
                         enableContrastEnhancement: true,
                       },
                       options: { inversionAttempt: "attemptBoth" },
-                    }
+                    },
                   );
                 }
 
@@ -445,7 +445,7 @@ async function readQRWithJsQR(file) {
                       name: "binary-invert",
                       preprocess: { enableBinarization: true },
                       options: { inversionAttempt: "onlyInvert" },
-                    }
+                    },
                   );
                 }
 
@@ -461,14 +461,14 @@ async function readQRWithJsQR(file) {
                       processedImageData = preprocessImage(
                         canvas,
                         ctx,
-                        attempt.preprocess
+                        attempt.preprocess,
                       );
                     } else {
                       processedImageData = ctx.getImageData(
                         0,
                         0,
                         scale.width,
-                        scale.height
+                        scale.height,
                       );
                     }
 
@@ -477,7 +477,7 @@ async function readQRWithJsQR(file) {
                       processedImageData.data,
                       processedImageData.width,
                       processedImageData.height,
-                      attempt.options
+                      attempt.options,
                     );
                     if (code && code.data) {
                       resolve(code.data);
@@ -489,7 +489,7 @@ async function readQRWithJsQR(file) {
                       const rotations = tryRotations(
                         canvas,
                         ctx,
-                        processedImageData
+                        processedImageData,
                       );
                       for (const rotation of rotations) {
                         if (rotation.rotation === 0) continue; // Already tried
@@ -498,7 +498,7 @@ async function readQRWithJsQR(file) {
                           rotation.imageData.data,
                           rotation.imageData.width,
                           rotation.imageData.height,
-                          attempt.options
+                          attempt.options,
                         );
                         if (rotatedCode && rotatedCode.data) {
                           resolve(rotatedCode.data);
@@ -588,9 +588,8 @@ async function readQRWithQrScanner(file) {
  */
 async function readQRWithZXing(file) {
   try {
-    const { BrowserQRCodeReader, BrowserMultiFormatReader } = await import(
-      "@zxing/library"
-    );
+    const { BrowserQRCodeReader, BrowserMultiFormatReader } =
+      await import("@zxing/library");
 
     const readers = [new BrowserQRCodeReader(), new BrowserMultiFormatReader()];
 
@@ -671,7 +670,7 @@ async function readQRFromFile(file) {
       } catch (error) {
         console.warn(
           `${method.name} attempt ${attempt + 1} error:`,
-          error.message
+          error.message,
         );
 
         if (attempt < maxRetries) {
@@ -687,38 +686,50 @@ async function readQRFromFile(file) {
  * Batch process multiple files with progress tracking
  */
 async function batchProcessQRFiles(files, onProgress = null) {
-  const results = [];
+  const results = new Array(files.length).fill(null);
   const total = files.length;
+  let doneCount = 0;
 
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    let result = null;
-    let error = null;
+  const BATCH_SIZE = Math.min(4, navigator.hardwareConcurrency || 4);
 
-    try {
-      result = await readQRFromFile(file);
+  for (let i = 0; i < files.length; i += BATCH_SIZE) {
+    const batch = files.slice(i, i + BATCH_SIZE);
 
-      if (!result) {
-        error = new Error("No QR code detected");
+    // Xử lý song song các file trong batch
+    const batchPromises = batch.map(async (file, localIndex) => {
+      const globalIndex = i + localIndex;
+      let result = null;
+      let error = null;
+
+      try {
+        result = await readQRFromFile(file);
+        if (!result) {
+          error = new Error("No QR code detected");
+        }
+      } catch (err) {
+        error = err;
+        console.error(`Error processing ${file.name}:`, err);
       }
-    } catch (err) {
-      error = err;
-      console.error(`Error processing ${file.name}:`, err);
-    }
 
-    results.push({ file, result, error });
+      results[globalIndex] = { file, result, error };
+      doneCount++;
 
-    // Call progress callback if provided
-    if (onProgress && typeof onProgress === "function") {
-      onProgress({
-        current: i + 1,
-        total,
-        file,
-        result,
-        error,
-        progress: ((i + 1) / total) * 100,
-      });
-    }
+      if (onProgress && typeof onProgress === "function") {
+        onProgress({
+          current: doneCount,
+          total,
+          file,
+          result,
+          error,
+          progress: (doneCount / total) * 100,
+        });
+      }
+    });
+
+    await Promise.all(batchPromises);
+
+    // Yield control cho browser sau mỗi batch
+    await new Promise((resolve) => setTimeout(resolve, 0));
   }
 
   return results;
@@ -736,7 +747,7 @@ export async function imagesQRToText(uploadArea, options = {}) {
 
   if (!uploadArea || typeof uploadArea.getFileSelected !== "function") {
     console.warn(
-      "uploadArea không hợp lệ hoặc không có method getFileSelected"
+      "uploadArea không hợp lệ hoặc không có method getFileSelected",
     );
     return [];
   }
@@ -752,7 +763,7 @@ export async function imagesQRToText(uploadArea, options = {}) {
     const supportedFiles = allFiles.filter((file) => {
       if (!isValidImageFormat(file)) {
         console.warn(
-          `Skipping unsupported file format: ${file.name} (${file.type})`
+          `Skipping unsupported file format: ${file.name} (${file.type})`,
         );
         return false;
       }
