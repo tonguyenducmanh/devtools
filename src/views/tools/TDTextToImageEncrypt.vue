@@ -54,13 +54,9 @@
         class="output-section"
         v-if="imageSrc"
       >
-        <div
-          class="image-preview"
-          v-tooltip="$t('i18nCommon.copy')"
-          @click="copyImage(imageSrc)"
-        >
-          <img :src="imageSrc" />
-        </div>
+         <div class="image-preview" v-tooltip="$t('i18nCommon.copy')" @click="copyImage(imageSrc)">
+            <img :src="imageSrc" />
+         </div>
       </TDFullTabWrapper>
     </div>
     <TDSubSidebar
@@ -81,19 +77,7 @@
       <template v-slot:main>
         <div
           class="flex flex-col td-sub-sidebar"
-          v-show="
-            currentConfigLayout.currentSidebarOption ==
-            $tdEnum.ToolSidebarOption.Help
-          "
-        >
-          <TDTextToImageEncryptHelp />
-        </div>
-        <div
-          class="flex flex-col td-sub-sidebar"
-          v-show="
-            currentConfigLayout.currentSidebarOption ==
-            $tdEnum.ToolSidebarOption.Setting
-          "
+          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
         >
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
@@ -114,18 +98,6 @@
                 :noMargin="true"
               />
             </div>
-            <div class="flex input-config-item">
-              <span class="title-input-config">{{
-                $t("i18nCommon.textToQRCode.exampleWordCount")
-              }}</span>
-              <TDInput
-                v-model="currentConfigLayout.exampleWordCount"
-                :inputType="'number'"
-                class="value-input-config"
-                :placeHolder="'10'"
-                :noMargin="true"
-              />
-            </div>
           </div>
         </div>
       </template>
@@ -138,21 +110,19 @@ import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDMockTextGenerate from "@/common/mock/TDMockTextGenerate.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDFullTabWrapper from "@/components/TDFullTabWrapper.vue";
-import TDTextToImageEncryptHelp from "@/views/helps/TDTextToImageEncryptHelp.vue";
 
 export default {
   extends: TDToolBase,
   name: "TDTextToImageEncrypt",
-  components: { TDSubSidebar, TDFullTabWrapper, TDTextToImageEncryptHelp },
+  components: { TDSubSidebar, TDFullTabWrapper },
   data() {
     return {
-      keyCacheLayout: this.$tdEnum.cacheConfig.TextToImageEncryptConfigLayout,
+      keyCacheLayout: "TextToImageEncryptConfigLayout",
       currentConfigLayout: {
         currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
         isShowSidebar: true,
         isCompressText: true,
         blockSize: 4,
-        exampleWordCount: 10,
       },
       firstSectionSize: 30,
       secondSectionSize: 70,
@@ -164,11 +134,6 @@ export default {
   computed: {
     sidebarOptions() {
       let options = [];
-      options.push({
-        value: this.$tdEnum.ToolSidebarOption.Help,
-        label: this.$t("i18nCommon.sidebarOption.help"),
-        icon: "td-help-icon",
-      });
       options.push({
         value: this.$tdEnum.ToolSidebarOption.Setting,
         label: this.$t("i18nCommon.sidebarOption.setting"),
@@ -197,9 +162,7 @@ export default {
     async applyMock() {
       let me = this;
       let dataMock = {
-        textInput: TDMockTextGenerate.generateLoremWords(
-          me.currentConfigLayout.exampleWordCount || 10,
-        ),
+        textInput: TDMockTextGenerate.generateLoremWords(200),
       };
       this.$tdUtility.applyMock(this, dataMock);
     },
@@ -212,13 +175,8 @@ export default {
       try {
         let dataBytes;
         if (me.currentConfigLayout.isCompressText) {
-          let base64Compressed = await TDCompress.compressText(
-            text,
-            me.$tdEnum.compressType.gzip,
-          );
-          dataBytes = new Uint8Array(
-            me.$tdUtility.base64ToArrayBuffer(base64Compressed),
-          );
+          let base64Compressed = await TDCompress.compressText(text, me.$tdEnum.compressType.gzip);
+          dataBytes = new Uint8Array(me.$tdUtility.base64ToArrayBuffer(base64Compressed));
         } else {
           dataBytes = new TextEncoder().encode(text);
         }
@@ -288,12 +246,9 @@ export default {
         u8arr[n] = bstr.charCodeAt(n);
       }
       let blob = new Blob([u8arr], { type: mime });
-      this.$tdUtility.createDownloadFileFromBlob(
-        blob,
-        "td-encrypted-image.png",
-      );
-    },
-  },
+      this.$tdUtility.createDownloadFileFromBlob(blob, "td-encrypted-image.png");
+    }
+  }
 };
 </script>
 <style scoped lang="scss">

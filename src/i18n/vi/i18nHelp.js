@@ -48,10 +48,6 @@ export default {
         "Xử lý hàng loạt đoạn văn bản tương tự nhau theo mẫu có sẵn",
       BilingualWeb:
         "Công cụ dịch song ngữ cho trang web tĩnh và động. Yêu cầu tải và chạy Agent.",
-      TextToImageEncrypt:
-        "Mã hóa văn bản thành hình ảnh chứa các khối màu lượng tử 4-bit chống nhiễu.",
-      ImageToTextDecrypt:
-        "Giải mã hình ảnh mã màu để lấy lại văn bản gốc kể cả khi ảnh bị screenshot hay thay đổi màu sắc nhẹ.",
     },
     oneTimePassword: {
       purpose: {
@@ -436,33 +432,6 @@ export default {
         tags: "Block Tags - Các thẻ HTML sẽ được quét để dịch (VD: P, H1, LI).",
         classes: "Lọc theo Class - Chỉ định cụ thể tên các class muốn dịch, ngăn cách bởi dấu chấm phẩy (;).",
         ids: "Lọc theo ID - Chỉ định cụ thể tên các ID muốn dịch, ngăn cách bởi dấu chấm phẩy (;).",
-      },
-    },
-    TextToImageEncrypt: {
-      purpose: {
-        title: "Mã hóa văn bản thành ảnh là gì?",
-        content: "Công cụ chuyển đổi nội dung văn bản thành các pixel màu trên ảnh (chuẩn lượng tử 4-bit/channel) giúp bạn có thể lưu trữ và chia sẻ dữ liệu dưới dạng hình ảnh, chống chịu được sự biến đổi màu do screenshot.",
-      },
-      howToUse: {
-        title: "Cách sử dụng",
-        input: "Nhập đoạn text cần mã hóa.",
-        generate: "Nhấn biểu tượng Gửi để tạo ảnh.",
-        copyDownload: "Nhấn nút Download để tải ảnh gốc chuẩn xác nhất.",
-      },
-    },
-    ImageToTextDecrypt: {
-      purpose: {
-        title: "Giải mã ảnh thành văn bản là gì?",
-        content: "Công cụ giúp bạn khôi phục lại dữ liệu văn bản từ bức ảnh được mã hóa bởi công cụ Mã hóa văn bản thành ảnh.",
-      },
-      howToUse: {
-        title: "Cách sử dụng",
-        upload: "Tải ảnh lên hoặc copy (Ctrl+V) ảnh dán trực tiếp vào ô trống.",
-        convert: "Hệ thống tự động giải mã. Bạn có thể nhấn biểu tượng Gửi để giải mã thủ công.",
-      },
-      features: {
-        title: "Tính năng nổi bật",
-        autoDetect: "Thuật toán tự động tìm chữ ký khối màu hồng, quét và xác định tỷ lệ phóng to/thu nhỏ của ảnh để giải mã chính xác mà không cần cấu hình.",
       },
     },
   },
