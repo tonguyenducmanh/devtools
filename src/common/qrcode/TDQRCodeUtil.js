@@ -690,7 +690,7 @@ async function batchProcessQRFiles(files, onProgress = null) {
   const total = files.length;
   let doneCount = 0;
 
-  const BATCH_SIZE = Math.min(4, navigator.hardwareConcurrency || 4);
+  const BATCH_SIZE = Math.max(4, navigator.hardwareConcurrency - 1 || 4);
 
   for (let i = 0; i < files.length; i += BATCH_SIZE) {
     const batch = files.slice(i, i + BATCH_SIZE);
