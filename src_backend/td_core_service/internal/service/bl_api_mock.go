@@ -62,7 +62,7 @@ func RestartMockServer() {
 	registerDefaultRouteOnMux(app)
 
 	// gán 1 số route theo thiết lập từ phía client
-	mocks, err := database.GetAllMockAPIsForAutoStart()
+	mocks, err := (&database.TDDLBase[model.TDAPIMockItem]{}).GetAll()
 	if err != nil {
 		td_common.LogInfo(fmt.Sprintf("Lỗi query mock APIs: %v", err))
 	} else {

@@ -2,7 +2,7 @@ package model
 
 // model quản lý item api testing
 type TDAPITestingItem struct {
-	ID          string `json:"id"`
+	TDBaseModel
 	RequestName string `json:"request_name"`
 	GroupID     string `json:"group_id"`
 	Method      string `json:"method"`
@@ -11,10 +11,18 @@ type TDAPITestingItem struct {
 	BodyText    string `json:"body_text"`
 }
 
+func (m TDAPITestingItem) TableName() string {
+	return "td_api_testing"
+}
+
 // model quản lý nhóm của api testing
 type TDAPITestingGroup struct {
-	ID   string `json:"id"`
+	TDBaseModel
 	Name string `json:"name"`
+}
+
+func (g TDAPITestingGroup) TableName() string {
+	return "td_api_testing_group"
 }
 
 // model import batch

@@ -2,7 +2,7 @@ package model
 
 // param api mock muốn tạo
 type TDAPIMockItem struct {
-	ID          string `json:"id"`
+	TDBaseModel
 	RequestName string `json:"request_name"`
 	GroupID     string `json:"group_id"`
 	Method      string `json:"method"`
@@ -11,8 +11,16 @@ type TDAPIMockItem struct {
 	ResponeText string `json:"response_text"`
 }
 
+func (m TDAPIMockItem) TableName() string {
+	return "td_api_mock"
+}
+
 // model quản lý nhóm của api mock
 type TDAPIMockGroup struct {
-	ID   string `json:"id"`
+	TDBaseModel
 	Name string `json:"name"`
+}
+
+func (g TDAPIMockGroup) TableName() string {
+	return "td_api_mock_group"
 }

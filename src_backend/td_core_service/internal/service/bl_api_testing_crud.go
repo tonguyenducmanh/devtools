@@ -11,173 +11,29 @@ import (
 	"time"
 )
 
-// Lấy tất cả API testing
-func GetAllTestingAPIs(w http.ResponseWriter, r *http.Request) {
-	tests, err := database.GetAllTestingAPIs()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+// GetTestingAPIController trả về controller quản lý API testing
+func GetTestingAPIController() *TDBLBase[model.TDAPITestingItem] {
+	return &TDBLBase[model.TDAPITestingItem]{
+		PathPrefix: "api_testing",
+		Repo:       database.TDDLBase[model.TDAPITestingItem]{},
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    tests,
-	})
 }
 
-// Tạo API testing mới
-func CreateTestingAPI(w http.ResponseWriter, r *http.Request) {
-	var test model.TDAPITestingItem
-	if err := json.NewDecoder(r.Body).Decode(&test); err != nil {
-		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
-		return
-	}
-
-	// Tạo ID nếu chưa có
-	if test.ID == "" {
-		test.ID = fmt.Sprintf("test_%d", time.Now().UnixNano())
-	}
-
-	err := database.CreateTestingAPI(&test)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    test,
-	})
+func beforeDeleteTestingGroup(id string, r *http.Request) error {
+	// Xóa các bảng liên quan trước ở tầng DL
+	return database.DeleteTestingItemsByGroupID(id)
 }
 
-// Cập nhật API testing
-func UpdateTestingAPI(w http.ResponseWriter, r *http.Request) {
-	var test model.TDAPITestingItem
-	if err := json.NewDecoder(r.Body).Decode(&test); err != nil {
-		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
-		return
+// GetTestingGroupController trả về controller quản lý nhóm API testing
+func GetTestingGroupController() *TDBLBase[model.TDAPITestingGroup] {
+	return &TDBLBase[model.TDAPITestingGroup]{
+		PathPrefix:   "api_testing_group",
+		Repo:         database.TDDLBase[model.TDAPITestingGroup]{},
+		BeforeDelete: beforeDeleteTestingGroup,
 	}
-
-	rowsAffected, err := database.UpdateTestingAPI(&test)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    rowsAffected > 0,
-	})
 }
 
-// Xóa API testing
-func DeleteTestingAPI(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
-	if id == "" {
-		http.Error(w, "ID không hợp lệ", http.StatusBadRequest)
-		return
-	}
-
-	rowsAffected, err := database.DeleteTestingAPI(id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    rowsAffected > 0,
-	})
-}
-
-// Lấy tất cả nhóm API testing
-func GetAllTestingGroups(w http.ResponseWriter, r *http.Request) {
-	groups, err := database.GetAllTestingGroups()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    groups,
-	})
-}
-
-// Tạo nhóm API testing mới
-func CreateTestingGroup(w http.ResponseWriter, r *http.Request) {
-	var group model.TDAPITestingGroup
-	if err := json.NewDecoder(r.Body).Decode(&group); err != nil {
-		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
-		return
-	}
-
-	// Tạo ID nếu chưa có
-	if group.ID == "" {
-		group.ID = fmt.Sprintf("group_%d", time.Now().UnixNano())
-	}
-
-	err := database.CreateTestingGroup(&group)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    group,
-	})
-}
-
-// Cập nhật nhóm API testing
-func UpdateTestingGroup(w http.ResponseWriter, r *http.Request) {
-	var group model.TDAPITestingGroup
-	if err := json.NewDecoder(r.Body).Decode(&group); err != nil {
-		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
-		return
-	}
-
-	rowsAffected, err := database.UpdateTestingGroup(&group)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    rowsAffected > 0,
-	})
-}
-
-// Xóa nhóm API testing
-func DeleteTestingGroup(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
-	if id == "" {
-		http.Error(w, "ID không hợp lệ", http.StatusBadRequest)
-		return
-	}
-
-	err := database.DeleteTestingGroup(id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    true,
-	})
-}
-
-// Import batch API testing
+// Import batch API testing (giữ nguyên vì logic phức tạp nhiều bảng)
 func BatchImportTestingData(w http.ResponseWriter, r *http.Request) {
 	var batch model.TDAPITestingImportBatch
 	if err := json.NewDecoder(r.Body).Decode(&batch); err != nil {

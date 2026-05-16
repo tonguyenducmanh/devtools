@@ -170,6 +170,27 @@ class TDBaseAPI {
     const url = this.getURLRequest(endpoint);
     return await this.request(url, "OPTIONS", {}, headers, signal);
   }
+
+  /**
+   * Generic CRUD methods
+   */
+  async getAll(endpoint = "get_all", param = {}, headers = {}, signal = null) {
+    return await this.get(endpoint, param, headers, signal);
+  }
+
+  async create(data, endpoint = "create", headers = {}, signal = null) {
+    return await this.post(endpoint, data, headers, signal);
+  }
+
+  async update(data, endpoint = "update", headers = {}, signal = null) {
+    return await this.put(endpoint, data, headers, signal);
+  }
+
+  async deleteById(id, endpoint = "delete_by_id", headers = {}, signal = null) {
+    // Nếu có endpoint mặc định, chúng ta tự parse params
+    const finalEndpoint = endpoint.includes("?") ? `${endpoint}&id=${id}` : `${endpoint}?id=${id}`;
+    return await this.delete(finalEndpoint, headers, signal);
+  }
 }
 
 export default TDBaseAPI;

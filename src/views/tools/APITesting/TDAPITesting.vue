@@ -869,7 +869,7 @@ export default {
       }
       if (me.newCollectionName) {
         try {
-          let response = await me.agentAPI.createTestingGroup({
+          let response = await me.agentAPI.testingGroup.create({
             name: me.newCollectionName,
           });
           if (response && response.success && response.data?.success) {
@@ -899,8 +899,8 @@ export default {
       me.isLoadingData = true;
       try {
         let [groupsParams, testsParams] = await Promise.all([
-          me.agentAPI.getAllTestingGroups(),
-          me.agentAPI.getAllTestingAPIs(),
+          me.agentAPI.testingGroup.getAll(),
+          me.agentAPI.testingItem.getAll(),
         ]);
 
         let groups = groupsParams?.data?.data || [];
@@ -979,7 +979,7 @@ export default {
               body_text: me.bodyText,
             };
             try {
-              let response = await me.agentAPI.updateTestingAPI(testData);
+              let response = await me.agentAPI.testingItem.update(testData);
               if (response && response.success && response.data?.success) {
                 me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
                 await me.loadAllTestingData();
@@ -1013,7 +1013,7 @@ export default {
       };
 
       try {
-        let response = await me.agentAPI.createTestingAPI(testData);
+        let response = await me.agentAPI.testingItem.create(testData);
         if (response && response.success && response.data?.success) {
           me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
           me.currentRequestId = response.data.data.id;
@@ -1027,7 +1027,7 @@ export default {
       let me = this;
       if (request && request.requestId) {
         try {
-          let response = await me.agentAPI.deleteTestingAPI(request.requestId);
+          let response = await me.agentAPI.testingItem.deleteById(request.requestId);
           if (response && response.success && response.data?.success) {
             me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
             await me.loadAllTestingData(); // Reload to reflect changes
@@ -1064,7 +1064,7 @@ export default {
         if (collection.temp_name && collection.temp_name !== collection.name) {
           // Call API update
           try {
-            let response = await me.agentAPI.updateTestingGroup({
+            let response = await me.agentAPI.testingGroup.update({
               id: collection.collection_id,
               name: collection.temp_name,
             });
@@ -1082,7 +1082,7 @@ export default {
       let me = this;
       if (collectionId) {
         try {
-          let response = await me.agentAPI.deleteTestingGroup(collectionId);
+          let response = await me.agentAPI.testingGroup.deleteById(collectionId);
           if (response && response.success && response.data?.success) {
             me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
             await me.loadAllTestingData();

@@ -7,5 +7,5 @@ import (
 
 // Inject các router chung
 func InjectCommonRouter(app *http.ServeMux) {
-	app.HandleFunc("GET /", service.HeathCheck)
+	app.HandleFunc("GET /{$}", service.HeathCheck)
 }

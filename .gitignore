@@ -534,3 +534,5 @@ __debug*
 
 
 .sisyphus/
+
+config.json

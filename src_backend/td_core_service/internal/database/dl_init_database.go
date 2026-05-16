@@ -48,7 +48,7 @@ func InitDatabase() {
 		body_text TEXT,
 		response_text TEXT,
 		created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-		modififed_date DATETIME DEFAULT CURRENT_TIMESTAMP
+		modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
 	`
 	_, err = db.Exec(sqlStmt)
@@ -62,7 +62,8 @@ func InitDatabase() {
 	CREATE TABLE IF NOT EXISTS td_api_mock_group (
 		id TEXT PRIMARY KEY NOT NULL,
 		name TEXT NOT NULL,
-		created_date DATETIME DEFAULT CURRENT_TIMESTAMP
+		created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+		modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
 	`
 	_, err = db.Exec(sqlStmtGroup)
@@ -82,7 +83,7 @@ func InitDatabase() {
 		headers_text TEXT,
 		body_text TEXT,
 		created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-		modififed_date DATETIME DEFAULT CURRENT_TIMESTAMP
+		modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
 	`
 	_, err = db.Exec(sqlStmtTesting)
@@ -114,7 +115,8 @@ func InitDatabase() {
 	CREATE TABLE IF NOT EXISTS td_api_testing_group (
 		id TEXT PRIMARY KEY NOT NULL,
 		name TEXT NOT NULL,
-		created_date DATETIME DEFAULT CURRENT_TIMESTAMP
+		created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+		modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
 	`
 	_, err = db.Exec(sqlStmtTestingGroup)
