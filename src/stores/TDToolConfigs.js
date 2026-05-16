@@ -74,12 +74,18 @@ const sidebarConfig = [
       {
         name: "texttoimageencrypt",
         component: () => import("@/views/tools/TDTextToImageEncrypt.vue"),
-        meta: { titleKey: "i18nCommon.feature.textToImageEncrypt" },
+        meta: {
+          titleKey: "i18nCommon.feature.textToImageEncrypt",
+          helpKey: "i18nHelp.feature.TextToImageEncrypt",
+        },
       },
       {
         name: "imagetotextdecrypt",
         component: () => import("@/views/tools/TDImageToTextDecrypt.vue"),
-        meta: { titleKey: "i18nCommon.feature.imageToTextDecrypt" },
+        meta: {
+          titleKey: "i18nCommon.feature.imageToTextDecrypt",
+          helpKey: "i18nHelp.feature.ImageToTextDecrypt",
+        },
       },
     ],
   },

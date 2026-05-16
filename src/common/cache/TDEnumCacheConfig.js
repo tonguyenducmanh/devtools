@@ -41,4 +41,6 @@ export const EnumCacheConfig = {
   BilingualWebConfigLayout: 45,
   BilingualWebHistory: 46,
   CopyTextHistory: 47,
+  TextToImageEncryptConfigLayout: 48,
+  ImageToTextDecryptConfigLayout: 49,
 };

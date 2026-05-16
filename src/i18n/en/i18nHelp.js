@@ -47,6 +47,10 @@ export default {
         "Batch process similar text blocks using a predefined template",
       BilingualWeb:
         "Bilingual website translation tool. Requires Agent to function.",
+      TextToImageEncrypt:
+        "Encode text into an image containing noise-resistant 4-bit quantum color blocks.",
+      ImageToTextDecrypt:
+        "Decode a color-coded image to retrieve the original text even if the image is screenshotted or slightly color-shifted.",
     },
     oneTimePassword: {
       purpose: {
@@ -431,6 +435,33 @@ export default {
         tags: "Block Tags - HTML tags that will be scanned for translation (e.g., P, H1, LI).",
         classes: "Filter by Class - Specify class names to translate, separated by semicolons (;).",
         ids: "Filter by ID - Specify ID names to translate, separated by semicolons (;).",
+      },
+    },
+    TextToImageEncrypt: {
+      purpose: {
+        title: "What is Text to Image Encrypt?",
+        content: "A tool to convert text content into color pixels on an image (4-bit quantum standard) allowing you to store and share data as an image, resilient to color distortion caused by screenshots.",
+      },
+      howToUse: {
+        title: "How to Use",
+        input: "Enter the text to encode.",
+        generate: "Click the Send icon to generate the image.",
+        copyDownload: "Click Download to save the most accurate original image.",
+      },
+    },
+    ImageToTextDecrypt: {
+      purpose: {
+        title: "What is Image to Text Decrypt?",
+        content: "A tool to help you recover text data from an image encoded by the Text to Image Encrypt tool.",
+      },
+      howToUse: {
+        title: "How to Use",
+        upload: "Upload the image or copy (Ctrl+V) and paste it directly into the empty area.",
+        convert: "The system decodes automatically. You can also click the Send icon to decode manually.",
+      },
+      features: {
+        title: "Key Features",
+        autoDetect: "Automatically finds the pink signature block, scans and determines the image's scale ratio for accurate decoding without any configuration.",
       },
     },
   },

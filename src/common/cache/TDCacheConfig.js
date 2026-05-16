@@ -250,4 +250,16 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử copy văn bản vào clip board",
   },
+  TextToImageEncryptConfigLayout: {
+    KeyFormat: "TextToImageEncryptConfigLayout",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool Text To Image Encrypt",
+  },
+  ImageToTextDecryptConfigLayout: {
+    KeyFormat: "ImageToTextDecryptConfigLayout",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool Image To Text Decrypt",
+  },
 };

@@ -55,7 +55,19 @@
       <template v-slot:main>
         <div
           class="flex flex-col td-sub-sidebar"
-          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.Help
+          "
+        >
+          <TDImageToTextDecryptHelp />
+        </div>
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.Setting
+          "
         >
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
@@ -86,15 +98,17 @@
 import TDCompress from "@/common/compress/TDCompress.js";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDImageToTextDecryptHelp from "@/views/helps/TDImageToTextDecryptHelp.vue";
 
 export default {
   extends: TDToolBase,
   name: "TDImageToTextDecrypt",
-  components: { TDSubSidebar },
+  components: { TDSubSidebar, TDImageToTextDecryptHelp },
   data() {
     return {
       isLoading: false,
-      keyCacheLayout: "ImageToTextDecryptConfigLayout",
+      isFullTab: false,
+      keyCacheLayout: this.$tdEnum.cacheConfig.ImageToTextDecryptConfigLayout,
       currentConfigLayout: {
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.ToolSidebarOption.Setting,
@@ -107,6 +121,11 @@ export default {
   computed: {
     sidebarOptions() {
       let options = [];
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Help,
+        label: this.$t("i18nCommon.sidebarOption.help"),
+        icon: "td-help-icon",
+      });
       options.push({
         value: this.$tdEnum.ToolSidebarOption.Setting,
         label: this.$t("i18nCommon.sidebarOption.setting"),
@@ -129,7 +148,10 @@ export default {
       for (let item of items) {
         if (item.type.includes("image")) {
           const blob = item.getAsFile();
-          if (me.$refs.uploadArea && typeof me.$refs.uploadArea.setFileSelected === "function") {
+          if (
+            me.$refs.uploadArea &&
+            typeof me.$refs.uploadArea.setFileSelected === "function"
+          ) {
             me.$refs.uploadArea.setFileSelected(blob);
             me.convertImage();
           }
@@ -139,10 +161,13 @@ export default {
     },
     async convertImage() {
       let me = this;
-      if (me.$refs.uploadArea && typeof me.$refs.uploadArea.getFileSelected === "function") {
+      if (
+        me.$refs.uploadArea &&
+        typeof me.$refs.uploadArea.getFileSelected === "function"
+      ) {
         let files = me.$refs.uploadArea.getFileSelected();
         if (!files || files.length === 0) return;
-        
+
         let file = files[0];
         me.isLoading = true;
 
@@ -168,18 +193,26 @@ export default {
           const data = imageData.data;
 
           const matchColor = (index, r, g, b, tol = 15) => {
-            return Math.abs(data[index] - r) <= tol &&
-                   Math.abs(data[index+1] - g) <= tol &&
-                   Math.abs(data[index+2] - b) <= tol;
+            return (
+              Math.abs(data[index] - r) <= tol &&
+              Math.abs(data[index + 1] - g) <= tol &&
+              Math.abs(data[index + 2] - b) <= tol
+            );
           };
 
           let found = false;
-          let startX = 0, startY = 0;
+          let startX = 0,
+            startY = 0;
           let effectiveBlockSize = 0;
 
           // Signature is Hot Pink (255, 0, 128)
           const isSignature = (idx) => {
-            return data[idx] >= 200 && data[idx+1] <= 50 && data[idx+2] >= 80 && data[idx+2] <= 180;
+            return (
+              data[idx] >= 200 &&
+              data[idx + 1] <= 50 &&
+              data[idx + 2] >= 80 &&
+              data[idx + 2] <= 180
+            );
           };
 
           for (let y = 0; y < canvas.height && !found; y++) {
@@ -189,15 +222,17 @@ export default {
                 let bw = 0;
                 for (let tx = x; tx < canvas.width; tx++) {
                   let tidx = (y * canvas.width + tx) * 4;
-                  if (isSignature(tidx)) bw++; else break;
+                  if (isSignature(tidx)) bw++;
+                  else break;
                 }
-                
+
                 let bh = 0;
                 for (let ty = y; ty < canvas.height; ty++) {
                   let tidx = (ty * canvas.width + x) * 4;
-                  if (isSignature(tidx)) bh++; else break;
+                  if (isSignature(tidx)) bh++;
+                  else break;
                 }
-                
+
                 let ebs = Math.round((bw + bh) / 2);
                 if (ebs >= 1) {
                   // Verify with Pixel 1 (Version=1 -> RGB=0, 17, 255)
@@ -205,7 +240,8 @@ export default {
                   let cy = Math.floor(y + ebs * 0.5);
                   if (cx < canvas.width && cy < canvas.height) {
                     let cidx = (cy * canvas.width + cx) * 4;
-                    let pr = data[cidx], pg = data[cidx+1];
+                    let pr = data[cidx],
+                      pg = data[cidx + 1];
                     let high = Math.round(pr / 17);
                     let low = Math.round(pg / 17);
                     if (high === 0 && low === 1) {
@@ -221,43 +257,59 @@ export default {
           }
 
           if (!found) {
-            throw new Error("Không tìm thấy khối màu hồng Signature góc trên cùng bên trái. Vui lòng thử lại!");
+            throw new Error(
+              "Không tìm thấy khối màu hồng Signature góc trên cùng bên trái. Vui lòng thử lại!",
+            );
           }
 
           const getByteAtPixel = (col, row) => {
-            let px = Math.floor(startX + col * effectiveBlockSize + effectiveBlockSize / 2);
-            let py = Math.floor(startY + row * effectiveBlockSize + effectiveBlockSize / 2);
+            let px = Math.floor(
+              startX + col * effectiveBlockSize + effectiveBlockSize / 2,
+            );
+            let py = Math.floor(
+              startY + row * effectiveBlockSize + effectiveBlockSize / 2,
+            );
             if (px >= canvas.width) px = canvas.width - 1;
             if (py >= canvas.height) py = canvas.height - 1;
             let index = (py * canvas.width + px) * 4;
-            
-            let pr = data[index], pg = data[index+1];
+
+            let pr = data[index],
+              pg = data[index + 1];
             let high = Math.round(pr / 17);
             let low = Math.round(pg / 17);
-            if (high < 0) high = 0; if (high > 15) high = 15;
-            if (low < 0) low = 0; if (low > 15) low = 15;
+            if (high < 0) high = 0;
+            if (high > 15) high = 15;
+            if (low < 0) low = 0;
+            if (low > 15) low = 15;
             return (high << 4) | low;
           };
 
           let version = getByteAtPixel(1, 0);
           let isCompress = getByteAtPixel(2, 0);
-          let dataLen = (getByteAtPixel(3, 0) << 24) | (getByteAtPixel(4, 0) << 16) | (getByteAtPixel(5, 0) << 8) | getByteAtPixel(6, 0);
-          dataLen = dataLen >>> 0; 
+          let dataLen =
+            (getByteAtPixel(3, 0) << 24) |
+            (getByteAtPixel(4, 0) << 16) |
+            (getByteAtPixel(5, 0) << 8) |
+            getByteAtPixel(6, 0);
+          dataLen = dataLen >>> 0;
 
           let totalPixels = 7 + dataLen;
           let gridWidth = Math.max(8, Math.ceil(Math.sqrt(totalPixels)));
 
           let dataBytes = new Uint8Array(dataLen);
           for (let i = 0; i < dataLen; i++) {
-             let pIdx = i + 7;
-             let c = pIdx % gridWidth;
-             let r = Math.floor(pIdx / gridWidth);
-             dataBytes[i] = getByteAtPixel(c, r);
+            let pIdx = i + 7;
+            let c = pIdx % gridWidth;
+            let r = Math.floor(pIdx / gridWidth);
+            dataBytes[i] = getByteAtPixel(c, r);
           }
 
           if (isCompress === 1) {
             let base64Str = me.$tdUtility.arrayBufferToBase64(dataBytes.buffer);
-            me.textOutput = await TDCompress.decompressText(base64Str, me.$tdEnum.compressType.gzip);
+            me.textOutput = await TDCompress.decompressText(
+              base64Str,
+              me.$tdEnum.compressType.gzip,
+            );
           } else {
             me.textOutput = new TextDecoder().decode(dataBytes);
           }
@@ -265,7 +317,9 @@ export default {
           me.$tdToast.success(me.$t("i18nCommon.toastMessage.converted"));
         } catch (error) {
           console.error("Error in convertImage:", error);
-          me.$tdToast.error(error.message || me.$t("i18nCommon.toastMessage.error"));
+          me.$tdToast.error(
+            error.message || me.$t("i18nCommon.toastMessage.error"),
+          );
         } finally {
           me.isLoading = false;
         }
@@ -275,7 +329,7 @@ export default {
       let me = this;
       me.$tdUtility.copyToClipboard(me.textOutput);
     },
-  }
+  },
 };
 </script>
 <style scoped>
