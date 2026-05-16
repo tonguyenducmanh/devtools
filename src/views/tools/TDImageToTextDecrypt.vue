@@ -192,73 +192,42 @@ export default {
           let effectiveBlockSize = 0;
 
           // Signature is Hot Pink (255, 0, 128)
-          // Wide tolerance to handle VM screenshot DPI scaling & JPEG compression
           const isSignature = (idx) => {
             return (
-              data[idx] >= 140 &&
-              data[idx + 1] <= 110 &&
-              data[idx + 2] >= 30 &&
-              data[idx + 2] <= 220 &&
-              data[idx] > data[idx + 1] + 50
+              data[idx] >= 200 &&
+              data[idx + 1] <= 50 &&
+              data[idx + 2] >= 80 &&
+              data[idx + 2] <= 180
             );
-          };
-
-          // Estimate run length using median of multiple scan lines for robustness
-          const estimateRunLength = (sx, sy, isHorizontal) => {
-            let samples = [];
-            for (let s = 0; s < 6; s++) {
-              let runLen = 0;
-              if (isHorizontal) {
-                let scanY = sy + s;
-                if (scanY >= canvas.height) break;
-                for (let tx = sx; tx < canvas.width; tx++) {
-                  if (isSignature((scanY * canvas.width + tx) * 4)) runLen++;
-                  else break;
-                }
-              } else {
-                let scanX = sx + s;
-                if (scanX >= canvas.width) break;
-                for (let ty = sy; ty < canvas.height; ty++) {
-                  if (isSignature((ty * canvas.width + scanX) * 4)) runLen++;
-                  else break;
-                }
-              }
-              if (runLen > 0) samples.push(runLen);
-            }
-            if (samples.length === 0) return 0;
-            samples.sort((a, b) => a - b);
-            return samples[Math.floor(samples.length / 2)];
           };
 
           for (let y = 0; y < canvas.height && !found; y++) {
             for (let x = 0; x < canvas.width && !found; x++) {
               let idx = (y * canvas.width + x) * 4;
               if (isSignature(idx)) {
-                // Use multi-line median for robust block size under DPI scaling
-                let bw = estimateRunLength(x, y, true);
-                let bh = estimateRunLength(x, y, false);
+                let bw = 0;
+                for (let tx = x; tx < canvas.width; tx++) {
+                  let tidx = (y * canvas.width + tx) * 4;
+                  if (isSignature(tidx)) bw++;
+                  else break;
+                }
+
+                let bh = 0;
+                for (let ty = y; ty < canvas.height; ty++) {
+                  let tidx = (ty * canvas.width + x) * 4;
+                  if (isSignature(tidx)) bh++;
+                  else break;
+                }
 
                 let ebs = Math.round((bw + bh) / 2);
                 if (ebs >= 1) {
-                  // Verify pixel 1 (Version=1 → R=0, G=17): sample area with median
+                  // Verify with Pixel 1 (Version=1 -> RGB=0, 17, 255)
                   let cx = Math.floor(x + ebs * 1.5);
                   let cy = Math.floor(y + ebs * 0.5);
                   if (cx < canvas.width && cy < canvas.height) {
-                    let sr = Math.max(1, Math.floor(ebs / 4));
-                    let rVals = [], gVals = [];
-                    for (let dy = -sr; dy <= sr; dy++) {
-                      for (let dx = -sr; dx <= sr; dx++) {
-                        let spx = Math.min(Math.max(cx + dx, 0), canvas.width - 1);
-                        let spy = Math.min(Math.max(cy + dy, 0), canvas.height - 1);
-                        let pidx = (spy * canvas.width + spx) * 4;
-                        rVals.push(data[pidx]);
-                        gVals.push(data[pidx + 1]);
-                      }
-                    }
-                    rVals.sort((a, b) => a - b);
-                    gVals.sort((a, b) => a - b);
-                    let pr = rVals[Math.floor(rVals.length / 2)];
-                    let pg = gVals[Math.floor(gVals.length / 2)];
+                    let cidx = (cy * canvas.width + cx) * 4;
+                    let pr = data[cidx],
+                      pg = data[cidx + 1];
                     let high = Math.round(pr / 17);
                     let low = Math.round(pg / 17);
                     if (high === 0 && low === 1) {
@@ -280,31 +249,18 @@ export default {
           }
 
           const getByteAtPixel = (col, row) => {
-            let cx = Math.floor(
+            let px = Math.floor(
               startX + col * effectiveBlockSize + effectiveBlockSize / 2,
             );
-            let cy = Math.floor(
+            let py = Math.floor(
               startY + row * effectiveBlockSize + effectiveBlockSize / 2,
             );
-            if (cx >= canvas.width) cx = canvas.width - 1;
-            if (cy >= canvas.height) cy = canvas.height - 1;
+            if (px >= canvas.width) px = canvas.width - 1;
+            if (py >= canvas.height) py = canvas.height - 1;
+            let index = (py * canvas.width + px) * 4;
 
-            // Multi-point median sampling: robust against JPEG compression & bilinear scaling
-            const sr = Math.max(1, Math.floor(effectiveBlockSize / 4));
-            let rVals = [], gVals = [];
-            for (let dy = -sr; dy <= sr; dy++) {
-              for (let dx = -sr; dx <= sr; dx++) {
-                let spx = Math.min(Math.max(cx + dx, 0), canvas.width - 1);
-                let spy = Math.min(Math.max(cy + dy, 0), canvas.height - 1);
-                let index = (spy * canvas.width + spx) * 4;
-                rVals.push(data[index]);
-                gVals.push(data[index + 1]);
-              }
-            }
-            rVals.sort((a, b) => a - b);
-            gVals.sort((a, b) => a - b);
-            let pr = rVals[Math.floor(rVals.length / 2)];
-            let pg = gVals[Math.floor(gVals.length / 2)];
+            let pr = data[index],
+              pg = data[index + 1];
             let high = Math.round(pr / 17);
             let low = Math.round(pg / 17);
             if (high < 0) high = 0;
