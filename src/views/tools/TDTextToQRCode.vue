@@ -30,6 +30,14 @@
               iconClass="td-example-icon"
               v-tooltip="$t('i18nCommon.textToQRCode.buttons.example')"
             ></TDButton>
+            <TDButton
+              v-if="qrCodeItems && qrCodeItems.length > 0"
+              :noMargin="true"
+              @click="toggleFullTab"
+              :type="$tdEnum.buttonType.secondary"
+              iconClass="td-full-screen-icon"
+              v-tooltip="$t('i18nCommon.remoteDesktop.fullTab')"
+            ></TDButton>
           </div>
         </div>
         <div class="flex group-footer-input">
@@ -49,26 +57,33 @@
         @resize="handleResize"
         :minSize="15"
       />
-      <div class="qrcode-box" :style="secondSectionResizeStyle">
-        <TDVirtualScroll
-          :items="qrCodeItems"
-          :itemHeight="currentConfigLayout.QRSizeInPixel"
-          :itemWidth="currentConfigLayout.QRSizeInPixel"
-          :gap="10"
-          :bufferSize="0"
-        >
-          <template #default="{ item, index }">
-            <div
-              class="qr-container"
-              :style="QRImageStyle"
-              v-tooltip="$t('i18nCommon.copy')"
-              @click="copyQRCode(item.src, index)"
-            >
-              <img :src="item.src" />
-            </div>
-          </template>
-        </TDVirtualScroll>
-      </div>
+      <TDFullTabWrapper
+        v-model="isFullTab"
+        :hidePin="true"
+        :style="!isFullTab ? secondSectionResizeStyle : {}"
+        class="qrcode-wrapper"
+      >
+        <div class="qrcode-box">
+          <TDVirtualScroll
+            :items="qrCodeItems"
+            :itemHeight="currentConfigLayout.QRSizeInPixel"
+            :itemWidth="currentConfigLayout.QRSizeInPixel"
+            :gap="10"
+            :bufferSize="0"
+          >
+            <template #default="{ item, index }">
+              <div
+                class="qr-container"
+                :style="QRImageStyle"
+                v-tooltip="$t('i18nCommon.copy')"
+                @click="copyQRCode(item.src, index)"
+              >
+                <img :src="item.src" />
+              </div>
+            </template>
+          </TDVirtualScroll>
+        </div>
+      </TDFullTabWrapper>
     </div>
     <TDSubSidebar
       v-model="currentConfigLayout.isShowSidebar"
@@ -165,10 +180,11 @@ import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDMockTextGenerate from "@/common/mock/TDMockTextGenerate.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDTextToQRCodeHelp from "@/views/helps/TDTextToQRCodeHelp.vue";
+import TDFullTabWrapper from "@/components/TDFullTabWrapper.vue";
 export default {
   extends: TDToolBase,
   name: "TDTextToQRCode",
-  components: { TDSubSidebar, TDTextToQRCodeHelp },
+  components: { TDSubSidebar, TDTextToQRCodeHelp, TDFullTabWrapper },
   created() {
     let me = this;
   },
@@ -187,6 +203,12 @@ export default {
     handleResize(sizes) {
       this.firstSectionSize = sizes.leftSize;
       this.secondSectionSize = sizes.rightSize;
+    },
+    toggleFullTab() {
+      this.isFullTab = !this.isFullTab;
+      if (!this.isFullTab && document.fullscreenElement) {
+        document.exitFullscreen();
+      }
     },
     async applyMock() {
       let me = this;
@@ -434,6 +456,7 @@ export default {
       secondSectionSize: 70,
       textGenQR: null,
       qrCodeItems: [],
+      isFullTab: false,
     };
   },
 };
@@ -481,8 +504,13 @@ export default {
   cursor: pointer;
 }
 
+.qrcode-wrapper {
+  background: var(--bg-main-color);
+}
+
 .qrcode-box {
   width: 100%;
+  height: 100%;
   display: flex;
   flex-wrap: wrap; /* cho phép xuống hàng */
   gap: var(--padding);

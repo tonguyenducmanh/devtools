@@ -2,91 +2,31 @@
   <div class="flex container">
     <div class="main-tool">
       <div class="rdp-container">
-        <div
-          ref="canvasContainer"
-          class="rdp-canvas-container"
-          :class="{ 'rdp-canvas-container-full-tab': isFullTab }"
+        <TDFullTabWrapper
+          v-model="isFullTab"
+          :alwaysShowToolbar="true"
+          fullScreenBgColor="#000"
+          class="rdp-wrapper"
         >
-          <TDDynamicBackgroundEffect
-            :class="{ 'td-dynamic-effect-canvas': isHideEffectBackground }"
-          />
-
-          <canvas
-            ref="rdpCanvas"
-            class="rdp-canvas"
-            :class="{
-              'rdp-canvas-cursor-none':
-                currentConfigLayout.enableServerPointer && isConnected,
-            }"
-            :width="canvasWidth"
-            :height="canvasHeight"
-            tabindex="0"
-            @keydown="onCanvasKeydown"
-            @keyup="onCanvasKeyup"
-            @mousemove="onCanvasMousemove"
-            @mousedown="onCanvasMousedown"
-            @mouseup="onCanvasMouseup"
-            @wheel.prevent="onCanvasWheel"
-            @contextmenu.prevent="onCanvasContextmenu"
-          />
-          <div
-            class="fullscreen-toolbar"
-            :class="{ 'toolbar-pinned': isToolbarPinned }"
-          >
-            <template v-if="isToolbarPinned">
-              <div
-                v-tooltip="$t('i18nCommon.remoteDesktop.unpin')"
-                class="flex toolbar-btn"
-                @click="unpinToolbar"
-              >
-                <span class="td-icon td-unpin-icon"></span>
-              </div>
-            </template>
-            <template v-else>
-              <div
-                v-tooltip="$t('i18nCommon.remoteDesktop.pin')"
-                class="flex toolbar-btn"
-                @click="pinToolbar"
-              >
-                <span class="td-icon td-pin-icon"></span>
-              </div>
-            </template>
-            <div class="flex td-rdp-utility-area">
-              <div
-                v-tooltip="$t('i18nCommon.remoteDesktop.screenshot')"
-                class="flex toolbar-btn"
-                @click="takeScreenshot"
-              >
-                <span class="td-icon td-camera-icon"></span>
-              </div>
-              <div
-                v-tooltip="$t('i18nCommon.remoteDesktop.ctrlAltDel')"
-                class="flex toolbar-btn"
-                @click="sendCtrlAltDel"
-                :class="{ 'toolbar-btn-disabled': !isConnected }"
-              >
-                <span class="td-icon td-command-code-icon"></span>
-              </div>
-              <template v-if="isFullTab">
-                <div
-                  v-tooltip="$t('i18nCommon.remoteDesktop.closeFullTab')"
-                  class="flex toolbar-btn"
-                  @click="toggleFullTab"
-                >
-                  <span class="td-icon td-exit-full-screen-icon"></span>
-                </div>
-              </template>
-              <template v-else>
-                <div
-                  v-tooltip="$t('i18nCommon.remoteDesktop.fullTab')"
-                  class="flex toolbar-btn"
-                  @click="toggleFullTab"
-                >
-                  <span class="td-icon td-full-screen-icon"></span>
-                </div>
-              </template>
+          <template #toolbar-left>
+            <div
+              v-tooltip="$t('i18nCommon.remoteDesktop.screenshot')"
+              class="flex toolbar-btn"
+              @click="takeScreenshot"
+            >
+              <span class="td-icon td-camera-icon"></span>
             </div>
-            <div class="">
+            <div
+              v-tooltip="$t('i18nCommon.remoteDesktop.ctrlAltDel')"
+              class="flex toolbar-btn"
+              @click="sendCtrlAltDel"
+              :class="{ 'toolbar-btn-disabled': !isConnected }"
+            >
+              <span class="td-icon td-command-code-icon"></span>
+            </div>
+          </template>
+          <template #toolbar-right>
+            <div class="flex" style="margin-left: 16px;">
               <div
                 v-if="!isConnected && !isConnecting"
                 v-tooltip="$t('i18nCommon.remoteDesktop.connect')"
@@ -104,8 +44,33 @@
                 <span class="td-icon td-disconnect-icon"></span>
               </div>
             </div>
+          </template>
+
+          <div class="rdp-canvas-container">
+            <TDDynamicBackgroundEffect
+              :class="{ 'td-dynamic-effect-canvas': isHideEffectBackground }"
+            />
+
+            <canvas
+              ref="rdpCanvas"
+              class="rdp-canvas"
+              :class="{
+                'rdp-canvas-cursor-none':
+                  currentConfigLayout.enableServerPointer && isConnected,
+              }"
+              :width="canvasWidth"
+              :height="canvasHeight"
+              tabindex="0"
+              @keydown="onCanvasKeydown"
+              @keyup="onCanvasKeyup"
+              @mousemove="onCanvasMousemove"
+              @mousedown="onCanvasMousedown"
+              @mouseup="onCanvasMouseup"
+              @wheel.prevent="onCanvasWheel"
+              @contextmenu.prevent="onCanvasContextmenu"
+            />
           </div>
-        </div>
+        </TDFullTabWrapper>
 
         <!-- Log panel -->
         <div
@@ -311,6 +276,7 @@ import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDRemoteDesktopRDPHelp from "@/views/helps/TDRemoteDesktopRDPHelp.vue";
 import TDServerRDPAPI from "@/common/api/request/AgentAPI/TDServerRDPAPI.js";
 import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";
+import TDFullTabWrapper from "@/components/TDFullTabWrapper.vue";
 
 export default {
   name: "TDRemoteDesktop",
@@ -319,6 +285,7 @@ export default {
     TDSubSidebar,
     TDRemoteDesktopRDPHelp,
     TDDynamicBackgroundEffect,
+    TDFullTabWrapper,
   },
 
   data() {
@@ -340,7 +307,6 @@ export default {
       isConnected: false,
       isConnecting: false,
       isFullTab: false,
-      isToolbarPinned: true,
       session: null,
       wasmInitialized: false,
       canvasWidth: 1920,
@@ -742,13 +708,6 @@ export default {
       this.isConnected = false;
       this.isConnecting = false;
     },
-    pinToolbar() {
-      this.isToolbarPinned = true;
-    },
-
-    unpinToolbar() {
-      this.isToolbarPinned = false;
-    },
 
     toggleFullTab() {
       this.isFullTab = !this.isFullTab;
@@ -1077,8 +1036,17 @@ export default {
   overflow: hidden;
 }
 
+.rdp-wrapper {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
 .rdp-canvas-container {
   flex: 1;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1086,77 +1054,13 @@ export default {
   position: relative;
 }
 
-.rdp-canvas-container-full-tab {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1000;
-  background-color: #000;
-}
+
 
 .rdp-canvas-cursor-none {
   cursor: none;
 }
 
-.fullscreen-toolbar {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 4px;
-  background-color: var(--bg-layer-color);
-  border-radius: 0 0 var(--border-radius) var(--border-radius);
-  padding: 4px;
-  transition: all 0.3s ease-in-out;
-  z-index: 1001;
-  clip-path: inset(0 0 80% 0);
-  opacity: 0.6;
-  transform: translateX(-50%) translateY(-2px);
 
-  &:hover {
-    clip-path: inset(0 0 0 0);
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-  }
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: -10px;
-    z-index: -1;
-  }
-
-  &.toolbar-pinned {
-    clip-path: inset(0 0 0 0);
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  .toolbar-btn {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--border-radius);
-    &:hover {
-      background-color: var(--bg-main-color);
-      border: 1px solid var(--border-color);
-    }
-  }
-  .td-rdp-utility-area {
-    margin-right: 20px;
-    gap: var(--padding);
-    cursor: unset;
-  }
-}
 
 .rdp-canvas {
   display: block;
