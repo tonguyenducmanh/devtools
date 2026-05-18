@@ -1,4 +1,13 @@
--- query danh sách lệnh đang chạy
+-- query danh sách lệnh đang chạy của 1 db cụ thể
+select 
+  query, 
+    state 
+from 
+  pg_catalog.pg_stat_activity 
+where 
+  datname = 'your_db_name' and pid <> pg_backend_pid() limit 50;
+  
+-- query danh sách lệnh đang chạy khác idle
 SELECT
     pid,
     usename AS username,
