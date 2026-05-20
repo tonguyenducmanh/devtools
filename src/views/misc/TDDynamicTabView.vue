@@ -501,7 +501,6 @@ export default {
 
   &.td-tab-active {
     color: var(--text-color);
-    font-weight: 600;
     background-color: var(--bg-main-color);
     border-bottom: 2px solid var(--border-hard-color);
     .td-tab-close {
@@ -570,6 +569,7 @@ export default {
 /* ── Tab label ── */
 .td-tab-number {
   color: var(--border-hard-color);
+  font-size: var(--font-size-small);
 }
 
 .td-tab-label {
