@@ -66,6 +66,7 @@
                 <div class="td-connection-actions mt-medium">
                   <TDButton
                     :noMargin="true"
+                    :readOnly="!sessionName"
                     @click="createSession"
                     :label="$t('i18nCommon.feature.terminal.createSession')"
                   />
@@ -170,7 +171,7 @@ export default {
       selectedShell: "",
       activeSessions: [],
       activeSessionId: null,
-      sessionName: null,
+      sessionName: "session 1",
       themes: {
         dark: {
           background: "#1e1e1e",
