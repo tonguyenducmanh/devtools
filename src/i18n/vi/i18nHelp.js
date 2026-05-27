@@ -434,5 +434,23 @@ export default {
         ids: "Lọc theo ID - Chỉ định cụ thể tên các ID muốn dịch, ngăn cách bởi dấu chấm phẩy (;).",
       },
     },
+    terminal: {
+      purpose: {
+        title: "Terminal là gì?",
+        content: "Công cụ giả lập Terminal trên web, kết nối tới shell của máy bạn thông qua Agent. Cho phép bạn chạy các lệnh và tương tác với hệ thống trực tiếp từ trình duyệt.",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        selectShell: "Chọn môi trường shell (VD: bash, powershell, zsh) từ danh sách.",
+        createSession: "Bấm 'Tạo phiên mới' để bắt đầu một phiên làm việc mới với terminal.",
+        interact: "Bấm vào khu vực terminal và bắt đầu gõ lệnh của bạn.",
+      },
+      features: {
+        title: "Tính năng",
+        background: "Chạy ngầm - Các phiên làm việc được chạy ngầm. Bạn có thể đóng tab và quay lại sau mà không bị mất phiên làm việc.",
+        resize: "Tự động thay đổi kích thước - Terminal tự động điều chỉnh kích thước để vừa với cửa sổ trình duyệt.",
+        multiple: "Đa phiên làm việc - Bạn có thể mở nhiều phiên làm việc cùng lúc và dễ dàng chuyển đổi qua lại.",
+      },
+    },
   },
 };

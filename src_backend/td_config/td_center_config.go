@@ -15,7 +15,8 @@ type TDCenterConfig struct {
 	// endpoint của api có phân biệt hoa thường không
 	EndpointCaseSensitive bool `json:"endpoint_case_sensitive"`
 	// show địa chỉ ip server thay vì local host
-	ShowIPServer bool `json:"show_ip_server"`
+	ShowIPServer   bool           `json:"show_ip_server"`
+	TerminalConfig TerminalConfig `json:"terminal_config"`
 }
 
 type LogConfig struct {
@@ -37,6 +38,11 @@ type MockAPIConfig struct {
 	Port int `json:"port"`
 	// api mock không quan tâm tới body, chỉ cần trùng endpoint là được
 	EnableMockNotCareBody bool `json:"enable_mock_not_care_body"`
+}
+
+type TerminalConfig struct {
+	// dung lượng bộ nhớ tối đa tính bằng kb
+	MaxHistorySizeInKB int `json:"max_history_size_in_kb"`
 }
 
 // apply giá trị default
@@ -61,5 +67,8 @@ func DefaultConfig() TDCenterConfig {
 		DatabaseName:          "dev_tool.db",
 		EndpointCaseSensitive: false,
 		ShowIPServer:          false,
+		TerminalConfig: TerminalConfig{
+			MaxHistorySizeInKB: 10241024,
+		},
 	}
 }

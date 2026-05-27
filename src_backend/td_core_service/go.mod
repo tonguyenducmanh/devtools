@@ -5,6 +5,8 @@ go 1.25.6
 replace td_config => ../td_config
 
 require (
+	github.com/creack/pty v1.1.24
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
 	modernc.org/sqlite v1.44.3
 	td_config v0.0.0-00010101000000-000000000000
@@ -12,7 +14,6 @@ require (
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect

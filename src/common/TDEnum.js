@@ -115,6 +115,11 @@ class TDEnum {
     Template: 0,
     Setting: 1,
   };
+  TerminalSidebarOption = {
+    Help: 0,
+    Collection: 1,
+    Setting: 2,
+  };
 }
 
 export default new TDEnum();

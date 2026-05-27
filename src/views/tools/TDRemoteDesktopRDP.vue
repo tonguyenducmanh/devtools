@@ -26,7 +26,7 @@
             </div>
           </template>
           <template #toolbar-right>
-            <div class="flex" style="margin-left: 16px;">
+            <div class="flex" style="margin-left: 16px">
               <div
                 v-if="!isConnected && !isConnecting"
                 v-tooltip="$t('i18nCommon.remoteDesktop.connect')"
@@ -1054,13 +1054,9 @@ export default {
   position: relative;
 }
 
-
-
 .rdp-canvas-cursor-none {
   cursor: none;
 }
-
-
 
 .rdp-canvas {
   display: block;

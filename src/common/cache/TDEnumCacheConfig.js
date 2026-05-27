@@ -41,4 +41,5 @@ export const EnumCacheConfig = {
   BilingualWebConfigLayout: 45,
   BilingualWebHistory: 46,
   CopyTextHistory: 47,
+  TerminalConfigLayout: 48,
 };
