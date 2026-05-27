@@ -16,6 +16,7 @@ export default {
       Text: "Xử lý văn bản",
       ArtificialIntelligence: "Tích hợp AI",
       RemoteDesktop: "Máy tính từ xa",
+      Terminal: "Terminal",
       Database: "Cơ sở dữ liệu",
       DateAndTime: "Ngày và giờ",
     },
@@ -117,6 +118,15 @@ export default {
       remoteDesktopRDP: "Giao thức RDP",
       PostgreSQLTemplate: "Code mẫu PostgreSQL",
       BilingualWeb: "Web song ngữ",
+      terminal: {
+        title: "Terminal",
+        createSession: "Tạo phiên mới",
+        noSessionSelected: "Chọn một phiên từ thanh bên",
+        noActiveSessions: "Không có phiên hoạt động",
+        sessionsTitle: "Phiên làm việc",
+        sessionListTitle: "Danh sách phiên",
+        themeLabel: "Chủ đề"
+      },
       agentDownload: {
         title: "Tải Agent",
         redirecting: "Đang chuyển hướng...",

@@ -89,6 +89,12 @@ const sidebarConfig = [
   },
   {
     type: "route",
+    name: "TDTerminalVirtual",
+    component: () => import("@/views/tools/TDTerminalVirtual.vue"),
+    meta: { titleKey: "i18nCommon.feature.terminal.title" },
+  },
+  {
+    type: "route",
     name: "TDBlankText",
     component: () => import("@/views/tools/TDBlankText.vue"),
     meta: {

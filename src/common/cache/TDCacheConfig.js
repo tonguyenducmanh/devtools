@@ -250,4 +250,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử copy văn bản vào clip board",
   },
+  TerminalConfigLayout: {
+    KeyFormat: "TerminalConfigLayout",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool Terminal",
+  },
 };
