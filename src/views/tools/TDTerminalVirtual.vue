@@ -277,7 +277,7 @@ export default {
     },
     async fetchShells() {
       try {
-        const res = await TDTerminalAPI.getShells();
+        let res = await TDTerminalAPI.getShells();
         if (res && res.data) {
           this.availableShells = res.data;
           if (this.availableShells.length > 0) {
@@ -290,7 +290,7 @@ export default {
     },
     async fetchSessions() {
       try {
-        const res = await TDTerminalAPI.getSessions();
+        let res = await TDTerminalAPI.getSessions();
         if (res && res.data) {
           this.activeSessions = res.data;
         }
@@ -301,7 +301,7 @@ export default {
     async createSession() {
       if (!this.selectedShell) return;
       try {
-        const res = await TDTerminalAPI.createSession({
+        let res = await TDTerminalAPI.createSession({
           shell: this.selectedShell,
           name: this.sessionName,
         });
@@ -334,7 +334,7 @@ export default {
     },
     applyTheme() {
       if (this.terminal) {
-        const themeToApply =
+        let themeToApply =
           this.themes[this.selectedTheme] || this.themes.dark;
         this.terminal.options.theme = themeToApply;
       }
@@ -356,10 +356,10 @@ export default {
     initTerminal() {
       this.cleanupTerminal();
       this.$nextTick(() => {
-        const container = this.$refs.terminalContainer;
+        let container = this.$refs.terminalContainer;
         if (!container) return;
 
-        const themeToApply =
+        let themeToApply =
           this.themes[this.selectedTheme] || this.themes.dark;
 
         this.terminal = new Terminal({
@@ -382,7 +382,7 @@ export default {
         this.terminal.open(container);
         this.fitAddon.fit();
 
-        const agentUrl = TDTerminalAPI.getBaseUrl();
+        let agentUrl = TDTerminalAPI.getBaseUrl();
         if (!agentUrl) {
           this.$tdUtility.showErrorNotFoundAgentServer();
           return;
