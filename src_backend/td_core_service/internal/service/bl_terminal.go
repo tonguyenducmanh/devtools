@@ -14,7 +14,6 @@ import (
 	"td_core_service/td_common"
 
 	"github.com/creack/pty"
-	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
@@ -72,7 +71,7 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	id := uuid.New().String()
+	id := td_common.GenUUID()
 	session := &model.TerminalSession{
 		ID:      id,
 		Shell:   req.Shell,

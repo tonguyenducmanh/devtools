@@ -98,7 +98,7 @@
                 @click="selectSession(session)"
               >
                 <div class="td-connection-info">
-                  <span class="td-connection-name">{{ session.name }}</span>
+                  <span class="td-connection-name" v-tooltip="session.name">{{ session.name }}</span>
                   <span class="td-connection-host">{{
                     session.id.substring(0, 8)
                   }}</span>
@@ -519,7 +519,8 @@ export default {
 .td-connection-list-header {
   justify-content: space-between;
   align-items: center;
-  padding: var(--padding);
+  padding-bottom: var(--padding);
+  padding-right: var(--padding);
 }
 
 .td-connection-list-title {
