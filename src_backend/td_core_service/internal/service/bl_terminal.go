@@ -8,10 +8,12 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"slices"
 	"sync"
 	"td_config"
 	"td_core_service/internal/model"
 	"td_core_service/td_common"
+	"time"
 
 	"github.com/creack/pty"
 	"github.com/gorilla/websocket"
@@ -43,10 +45,17 @@ func GetAllTerminalShellsSupport(w http.ResponseWriter, r *http.Request) {
 func GetActiveSessions(w http.ResponseWriter, r *http.Request) {
 	sessionsMu.Lock()
 	defer sessionsMu.Unlock()
-	list := make([]model.TerminalSession, 0, len(sessions))
+
+	list := make([]*model.TerminalSession, 0, len(sessions))
 	for _, s := range sessions {
-		list = append(list, *s)
+		list = append(list, s) // Lưu trực tiếp con trỏ s, KHÔNG dùng dấu *
 	}
+
+	// Khi sắp xếp, hãy so sánh qua con trỏ
+	slices.SortFunc(list, func(a, b *model.TerminalSession) int {
+		return b.CreatedDateRaw.Compare(a.CreatedDateRaw)
+	})
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(list)
 }
@@ -72,14 +81,19 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := td_common.GenUUID()
+	current_time := time.Now()
 	session := &model.TerminalSession{
-		ID:      id,
-		Shell:   req.Shell,
-		Name:    req.Name,
-		Cmd:     c,
-		PTY:     ptmx,
-		Clients: make(map[*websocket.Conn]bool),
-		History: make([]byte, 0, maxHistorySize),
+		TDBaseModel: model.TDBaseModel{
+			ID:          id,
+			CreatedDate: current_time.Format("2006-01-02 15:04:05"),
+		},
+		CreatedDateRaw: current_time,
+		Shell:          req.Shell,
+		Name:           req.Name,
+		Cmd:            c,
+		PTY:            ptmx,
+		Clients:        make(map[*websocket.Conn]bool),
+		History:        make([]byte, 0, maxHistorySize),
 	}
 
 	sessionsMu.Lock()
