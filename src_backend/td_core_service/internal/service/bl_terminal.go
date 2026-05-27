@@ -18,7 +18,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var maxHistorySize = td_config.GetConfigGlobal().TerminalConfig.MaxHistorySizeInKB
+var maxHistorySize = td_config.GetConfigGlobal().TerminalConfig.MaxHistorySizeInKB * 1024
 
 var (
 	sessions   = make(map[string]*model.TerminalSession)
@@ -111,14 +111,19 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 				// Write to history
 				session.HistoryMu.Lock()
 				if len(session.History)+n > maxHistorySize {
-					// Shift history (simple approach)
-					keep := maxHistorySize - n
-					if keep > 0 {
-						session.History = append(session.History[len(session.History)-keep:], data...)
+					// Tổng sau khi append = len(History) + n > maxHistorySize
+					// → cần cắt bớt phần đầu history
+					keep := maxHistorySize - n // số byte muốn giữ từ history cũ
+					if keep <= 0 {
+						// data mới đã to hơn cả buffer → chỉ giữ phần cuối của data
+						session.History = data[n-maxHistorySize:]
 					} else {
-						// Data is bigger than max history
-						session.History = make([]byte, len(data))
-						copy(session.History, data)
+						// Giữ `keep` byte cuối của history cũ + data mới
+						start := len(session.History) - keep
+						if start < 0 {
+							start = 0
+						}
+						session.History = append(session.History[start:], data...)
 					}
 				} else {
 					session.History = append(session.History, data...)
