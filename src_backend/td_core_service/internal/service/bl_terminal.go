@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
 	"runtime"
 	"slices"
 	"sync"
@@ -15,7 +14,7 @@ import (
 	"td_core_service/td_common"
 	"time"
 
-	"github.com/creack/pty"
+	gopty "github.com/aymanbagabas/go-pty"
 	"github.com/gorilla/websocket"
 )
 
@@ -63,21 +62,32 @@ func GetActiveSessions(w http.ResponseWriter, r *http.Request) {
 // tạo 1 phiên terminal mới
 func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+
 	var req model.CreateTerminalRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	c := exec.Command(req.Shell)
-	c.Env = append(os.Environ(), "TERM=xterm-256color", "LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8")
 
-	// Start the command with a pty.
-	ptmx, err := pty.Start(c)
+	pty, err := gopty.New()
 	if err != nil {
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success": false,
-			"data":    err,
+			"data":    err.Error(),
 		})
+		return
+	}
+
+	c := pty.Command(req.Shell)
+	c.Env = append(os.Environ(), "TERM=xterm-256color", "LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8")
+
+	if err := c.Start(); err != nil {
+		pty.Close()
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"data":    err.Error(),
+		})
+		return
 	}
 
 	id := td_common.GenUUID()
@@ -91,7 +101,7 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 		Shell:          req.Shell,
 		Name:           req.Name,
 		Cmd:            c,
-		PTY:            ptmx,
+		PTY:            pty,
 		Clients:        make(map[*websocket.Conn]bool),
 		History:        make([]byte, 0, maxHistorySize),
 	}
@@ -107,7 +117,6 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 			sessionsMu.Lock()
 			delete(sessions, id)
 			sessionsMu.Unlock()
-			// Close all clients
 			session.ClientsMu.Lock()
 			for client := range session.Clients {
 				client.Close()
@@ -117,21 +126,16 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 
 		buf := make([]byte, 4096)
 		for {
-			n, err := ptmx.Read(buf)
+			n, err := session.PTY.Read(buf)
 			if n > 0 {
 				data := buf[:n]
 
-				// Write to history
 				session.HistoryMu.Lock()
 				if len(session.History)+n > maxHistorySize {
-					// Tổng sau khi append = len(History) + n > maxHistorySize
-					// → cần cắt bớt phần đầu history
-					keep := maxHistorySize - n // số byte muốn giữ từ history cũ
+					keep := maxHistorySize - n
 					if keep <= 0 {
-						// data mới đã to hơn cả buffer → chỉ giữ phần cuối của data
 						session.History = data[n-maxHistorySize:]
 					} else {
-						// Giữ `keep` byte cuối của history cũ + data mới
 						start := len(session.History) - keep
 						if start < 0 {
 							start = 0
@@ -143,7 +147,6 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 				}
 				session.HistoryMu.Unlock()
 
-				// Broadcast to all clients
 				session.ClientsMu.Lock()
 				for client := range session.Clients {
 					err := client.WriteMessage(websocket.BinaryMessage, data)
@@ -162,6 +165,7 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}()
+
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
 		"data":    session,
@@ -176,7 +180,9 @@ func KillTerminalSession(w http.ResponseWriter, r *http.Request) {
 			"success": false,
 			"data":    "Session ID is required",
 		})
+		return
 	}
+
 	sessionsMu.Lock()
 	session, exists := sessions[id]
 	sessionsMu.Unlock()
@@ -186,19 +192,17 @@ func KillTerminalSession(w http.ResponseWriter, r *http.Request) {
 			"success": false,
 			"data":    "session not found",
 		})
+		return
 	}
 
-	// This will trigger the defer in the read loop which cleans up the session
-	if session.Cmd.Process != nil {
-		err := session.Cmd.Process.Kill()
-		if err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"success": false,
-				"data":    err,
-			})
-		}
+	if err := session.PTY.Close(); err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"data":    err.Error(),
+		})
+		return
 	}
-	session.PTY.Close()
+
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
 		"data":    "kill session success",
@@ -229,19 +233,16 @@ func HandleTerminalWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 	defer ws.Close()
 
-	// Add client
 	session.ClientsMu.Lock()
 	session.Clients[ws] = true
 	session.ClientsMu.Unlock()
 
-	// Send history
 	session.HistoryMu.Lock()
 	if len(session.History) > 0 {
 		ws.WriteMessage(websocket.BinaryMessage, session.History)
 	}
 	session.HistoryMu.Unlock()
 
-	// Read from WS and write to PTY
 	for {
 		messageType, data, err := ws.ReadMessage()
 		if err != nil {
@@ -249,28 +250,22 @@ func HandleTerminalWebSocket(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if messageType == websocket.TextMessage {
-			// Check if it's a resize command
 			var msg struct {
 				Type string `json:"type"`
 				Rows uint16 `json:"rows"`
 				Cols uint16 `json:"cols"`
 			}
 			if err := json.Unmarshal(data, &msg); err == nil && msg.Type == "resize" {
-				pty.Setsize(session.PTY, &pty.Winsize{
-					Rows: msg.Rows,
-					Cols: msg.Cols,
-				})
+				session.PTY.Resize(int(msg.Cols), int(msg.Rows))
 				continue
 			}
 		}
 
-		// otherwise, it's raw input
 		if len(data) > 0 {
 			session.PTY.Write(data)
 		}
 	}
 
-	// Remove client
 	session.ClientsMu.Lock()
 	delete(session.Clients, ws)
 	session.ClientsMu.Unlock()

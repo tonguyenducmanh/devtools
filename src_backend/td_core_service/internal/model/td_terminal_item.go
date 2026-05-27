@@ -1,11 +1,10 @@
 package model
 
 import (
-	"os"
-	"os/exec"
 	"sync"
 	"time"
 
+	gopty "github.com/aymanbagabas/go-pty"
 	"github.com/gorilla/websocket"
 )
 
@@ -19,8 +18,8 @@ type TerminalSession struct {
 	CreatedDateRaw time.Time                `json:"-"`
 	Shell          string                   `json:"shell"`
 	Name           string                   `json:"name"`
-	Cmd            *exec.Cmd                `json:"-"`
-	PTY            *os.File                 `json:"-"`
+	Cmd            *gopty.Cmd               `json:"-"`
+	PTY            gopty.Pty                `json:"-"`
 	Clients        map[*websocket.Conn]bool `json:"-"`
 	ClientsMu      sync.Mutex               `json:"-"`
 	History        []byte                   `json:"-"`
