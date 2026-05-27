@@ -445,18 +445,15 @@ export default {
 }
 
 .main-tool {
-  flex: 1;
   height: 100%;
   width: 100%;
-  position: relative;
-  background: var(--bg-main-color);
 }
 
 .terminal-container {
   width: 100%;
   height: 100%;
-  padding: var(--padding);
-  box-sizing: border-box;
+  background: var(--bg-main-color);
+  overflow: hidden;
 }
 
 .no-session-msg {
