@@ -1207,7 +1207,8 @@ export default {
 .td-connection-list-header {
   justify-content: space-between;
   align-items: center;
-  padding: var(--padding);
+  padding-bottom: var(--padding);
+  padding-right: var(--padding);
 }
 
 .td-connection-list-title {

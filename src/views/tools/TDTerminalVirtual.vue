@@ -56,14 +56,14 @@
                   :width="100"
                   :usingStylePercent="true"
                 ></TDComboBox>
-                <div class="td-connection-actions mt-medium">
+                <div class="td-connection-actions">
                   <TDInput
                     :noMargin="true"
                     v-model="sessionName"
                     :placeHolder="$t('i18nCommon.feature.terminal.sessionName')"
                   />
                 </div>
-                <div class="td-connection-actions mt-medium">
+                <div class="td-connection-actions">
                   <TDButton
                     :noMargin="true"
                     :readOnly="!sessionName"
@@ -73,7 +73,7 @@
                 </div>
               </div>
             </div>
-            <div class="td-connection-list mt-medium">
+            <div class="td-connection-list">
               <div class="flex td-connection-list-header">
                 <span class="td-connection-list-title">{{
                   $t("i18nCommon.feature.terminal.sessionListTitle")
@@ -98,7 +98,9 @@
                 @click="selectSession(session)"
               >
                 <div class="td-connection-info">
-                  <span class="td-connection-name" v-tooltip="session.name">{{ session.name }}</span>
+                  <span class="td-connection-name" v-tooltip="session.name">{{
+                    session.name
+                  }}</span>
                   <span class="td-connection-host">{{
                     session.id.substring(0, 8)
                   }}</span>
