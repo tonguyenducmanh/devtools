@@ -57,7 +57,11 @@
                   :usingStylePercent="true"
                 ></TDComboBox>
                 <div class="td-connection-actions mt-medium">
-                  <TDInput :noMargin="true" v-model="sessionName" />
+                  <TDInput
+                    :noMargin="true"
+                    v-model="sessionName"
+                    :placeHolder="$t('i18nCommon.feature.terminal.sessionName')"
+                  />
                 </div>
                 <div class="td-connection-actions mt-medium">
                   <TDButton

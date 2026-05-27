@@ -119,13 +119,14 @@ export default {
       PostgreSQLTemplate: "Code mẫu PostgreSQL",
       BilingualWeb: "Web song ngữ",
       terminal: {
+        sessionName: "Tên phiên",
         title: "Terminal",
         createSession: "Tạo phiên mới",
         noSessionSelected: "Chọn một phiên từ thanh bên",
         noActiveSessions: "Không có phiên hoạt động",
         sessionsTitle: "Phiên làm việc",
         sessionListTitle: "Danh sách phiên",
-        themeLabel: "Chủ đề"
+        themeLabel: "Chủ đề",
       },
       agentDownload: {
         title: "Tải Agent",

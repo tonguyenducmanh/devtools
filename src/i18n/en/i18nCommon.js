@@ -119,13 +119,14 @@ export default {
       PostgreSQLTemplate: "PostgreSQL Template",
       BilingualWeb: "Bilingual Web",
       terminal: {
+        sessionName: "Session name",
         title: "Terminal",
         createSession: "New Session",
         noSessionSelected: "Select a session from the sidebar",
         noActiveSessions: "No active sessions",
         sessionsTitle: "Sessions",
         sessionListTitle: "Session List",
-        themeLabel: "Theme"
+        themeLabel: "Theme",
       },
       agentDownload: {
         title: "Download Agent",
