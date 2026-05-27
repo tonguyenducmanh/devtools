@@ -102,7 +102,7 @@
                     session.name
                   }}</span>
                   <span class="td-connection-host">{{
-                    session.id.substring(0, 8)
+                    session.created_date
                   }}</span>
                 </div>
                 <div
