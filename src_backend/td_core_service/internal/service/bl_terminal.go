@@ -110,9 +110,10 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 	sessions[id] = session
 	sessionsMu.Unlock()
 
-	// Read from PTY in a goroutine
+	// Read PTY output và broadcast tới tất cả WebSocket clients
 	go func() {
 		defer func() {
+			// Cleanup: đóng PTY, xoá session, ngắt tất cả clients
 			session.PTY.Close()
 			sessionsMu.Lock()
 			delete(sessions, id)
@@ -149,8 +150,7 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 
 				session.ClientsMu.Lock()
 				for client := range session.Clients {
-					err := client.WriteMessage(websocket.BinaryMessage, data)
-					if err != nil {
+					if err := client.WriteMessage(websocket.BinaryMessage, data); err != nil {
 						client.Close()
 						delete(session.Clients, client)
 					}
@@ -170,6 +170,23 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 		"success": true,
 		"data":    session,
 	})
+}
+
+// killSession dừng process và đóng PTY — dùng chung cho cả KillTerminalSession và cleanup.
+// Thứ tự quan trọng:
+//  1. Kill process trước → process thoát → PTY trả EOF → goroutine read tự thoát
+//  2. Close PTY sau → giải phóng handle
+func killSession(session *model.TerminalSession) error {
+	// Bước 1: kill process
+	// Cmd.Process là *os.Process trên Unix, trên Windows go-pty quản lý nội bộ.
+	// Gọi qua ExecCmd() để lấy process gốc.
+	if proc := session.Cmd.Process; proc != nil {
+		// Bỏ qua lỗi "process already finished"
+		_ = proc.Kill()
+	}
+
+	// Bước 2: đóng PTY handle — unblock goroutine Read nếu Kill chưa đủ
+	return session.PTY.Close()
 }
 
 // xóa 1 phiên terminal đang chạy
@@ -195,7 +212,7 @@ func KillTerminalSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := session.PTY.Close(); err != nil {
+	if err := killSession(session); err != nil {
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success": false,
 			"data":    err.Error(),
@@ -237,6 +254,7 @@ func HandleTerminalWebSocket(w http.ResponseWriter, r *http.Request) {
 	session.Clients[ws] = true
 	session.ClientsMu.Unlock()
 
+	// Gửi lại history cho client mới kết nối
 	session.HistoryMu.Lock()
 	if len(session.History) > 0 {
 		ws.WriteMessage(websocket.BinaryMessage, session.History)
