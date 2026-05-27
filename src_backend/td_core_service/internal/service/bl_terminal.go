@@ -76,6 +76,7 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 	session := &model.TerminalSession{
 		ID:      id,
 		Shell:   req.Shell,
+		Name:    req.Name,
 		Cmd:     c,
 		PTY:     ptmx,
 		Clients: make(map[*websocket.Conn]bool),
@@ -145,7 +146,7 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 	}()
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
-		"data":    id,
+		"data":    session,
 	})
 }
 

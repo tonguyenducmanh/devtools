@@ -57,6 +57,9 @@
                   :usingStylePercent="true"
                 ></TDComboBox>
                 <div class="td-connection-actions mt-medium">
+                  <TDInput :noMargin="true" v-model="sessionName" />
+                </div>
+                <div class="td-connection-actions mt-medium">
                   <TDButton
                     :noMargin="true"
                     @click="createSession"
@@ -87,12 +90,10 @@
                 :class="{
                   'td-connection-item-selected': activeSessionId === session.id,
                 }"
-                @click="selectSession(session.id)"
+                @click="selectSession(session)"
               >
                 <div class="td-connection-info">
-                  <span class="td-connection-name">{{
-                    getShellName(session.shell)
-                  }}</span>
+                  <span class="td-connection-name">{{ session.name }}</span>
                   <span class="td-connection-host">{{
                     session.id.substring(0, 8)
                   }}</span>
@@ -165,6 +166,7 @@ export default {
       selectedShell: "",
       activeSessions: [],
       activeSessionId: null,
+      sessionName: null,
       themes: {
         dark: {
           background: "#1e1e1e",
@@ -269,10 +271,6 @@ export default {
         }
       });
     },
-    getShellName(shellPath) {
-      const shell = this.availableShells.find((s) => s.path === shellPath);
-      return shell ? shell.name : shellPath;
-    },
     async fetchShells() {
       try {
         const res = await TDTerminalAPI.getShells();
@@ -299,7 +297,10 @@ export default {
     async createSession() {
       if (!this.selectedShell) return;
       try {
-        const res = await TDTerminalAPI.createSession(this.selectedShell);
+        const res = await TDTerminalAPI.createSession({
+          shell: this.selectedShell,
+          name: this.sessionName,
+        });
         if (res && res.data && res.data.data) {
           await this.fetchSessions();
           this.selectSession(res.data.data);
@@ -322,8 +323,9 @@ export default {
         this.$tdToast.error(this.$t("i18nCommon.toastMessage.error"));
       }
     },
-    selectSession(id) {
-      this.activeSessionId = id;
+    selectSession(session) {
+      this.activeSessionId = session.id;
+      this.sessionName = session.name;
       this.initTerminal();
     },
     applyTheme() {

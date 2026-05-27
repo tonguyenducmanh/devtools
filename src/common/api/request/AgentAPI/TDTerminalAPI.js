@@ -8,15 +8,15 @@ class TDTerminalAPI extends TDAgentAPI {
   async getShells() {
     return await this.get("shells");
   }
-  
+
   async getSessions() {
     return await this.get("sessions");
   }
-  
-  async createSession(shell) {
-    return await this.post("session", { shell });
+
+  async createSession(param) {
+    return await this.post("session", param);
   }
-  
+
   async killSession(id) {
     return await this.delete(`session/${id}`);
   }

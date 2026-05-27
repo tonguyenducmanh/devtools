@@ -10,11 +10,13 @@ import (
 
 type CreateTerminalRequest struct {
 	Shell string `json:"shell"`
+	Name  string `json:"name"`
 }
 
 type TerminalSession struct {
 	ID        string                   `json:"id"`
 	Shell     string                   `json:"shell"`
+	Name      string                   `json:"name"`
 	Cmd       *exec.Cmd                `json:"-"`
 	PTY       *os.File                 `json:"-"`
 	Clients   map[*websocket.Conn]bool `json:"-"`
