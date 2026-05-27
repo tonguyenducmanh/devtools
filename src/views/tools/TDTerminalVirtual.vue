@@ -263,6 +263,13 @@ export default {
     await this.fetchShells();
     await this.fetchSessions();
   },
+  watch: {
+    sessionName(oldVal, newVal) {
+      if (oldVal != newVal) {
+        this.reBuildTabTitle(this.sessionName);
+      }
+    },
+  },
   beforeUnmount() {
     this.cleanupTerminal();
   },
@@ -334,8 +341,7 @@ export default {
     },
     applyTheme() {
       if (this.terminal) {
-        let themeToApply =
-          this.themes[this.selectedTheme] || this.themes.dark;
+        let themeToApply = this.themes[this.selectedTheme] || this.themes.dark;
         this.terminal.options.theme = themeToApply;
       }
     },
@@ -359,8 +365,7 @@ export default {
         let container = this.$refs.terminalContainer;
         if (!container) return;
 
-        let themeToApply =
-          this.themes[this.selectedTheme] || this.themes.dark;
+        let themeToApply = this.themes[this.selectedTheme] || this.themes.dark;
 
         this.terminal = new Terminal({
           cursorBlink: true,
