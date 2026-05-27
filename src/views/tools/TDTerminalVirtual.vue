@@ -262,8 +262,6 @@ export default {
   },
   methods: {
     toggleSidebar() {
-      this.currentConfigLayout.isShowSidebar =
-        !this.currentConfigLayout.isShowSidebar;
       this.updateConfigLayout();
       this.$nextTick(() => {
         if (this.fitAddon && this.terminal) {
