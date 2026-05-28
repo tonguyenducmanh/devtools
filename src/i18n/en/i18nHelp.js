@@ -433,23 +433,5 @@ export default {
         ids: "Filter by ID - Specify ID names to translate, separated by semicolons (;).",
       },
     },
-    terminal: {
-      purpose: {
-        title: "What is Terminal?",
-        content: "A web-based terminal emulator that connects to your local machine's shell via the Agent. Allows you to run commands and interact with your system directly from the browser.",
-      },
-      howToUse: {
-        title: "How to Use",
-        selectShell: "Select a shell environment (e.g. bash, powershell, zsh) from the dropdown list.",
-        createSession: "Click 'New Session' to start a new terminal session.",
-        interact: "Click inside the terminal area and start typing your commands.",
-      },
-      features: {
-        title: "Features",
-        background: "Background Execution - Sessions run in the background. You can close the tab and return later without losing your session.",
-        resize: "Auto Resize - The terminal automatically resizes to fit your browser window.",
-        multiple: "Multiple Sessions - You can open multiple terminal sessions simultaneously and switch between them.",
-      },
-    },
   },
 };
