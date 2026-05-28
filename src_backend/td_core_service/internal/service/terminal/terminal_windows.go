@@ -8,9 +8,11 @@ import (
 	gopty "github.com/aymanbagabas/go-pty"
 )
 
-// Vì syscall.CREATE_NEW_PROCESS_GROUP trong Go đã mang giá trị 0x200 (Breakaway),
-// chúng ta tự định nghĩa hằng số mang giá trị 0x10 (Process Group thực tế của Windows)
-const WINDOWS_ACTUAL_NEW_PROCESS_GROUP = 0x00000010
+// Định nghĩa hằng số Windows chính xác
+const (
+	WINDOWS_ACTUAL_NEW_PROCESS_GROUP = 0x00000010
+	CREATE_NO_WINDOW                 = 0x08000000 // Ép buộc không tạo cửa sổ Console hiển thị
+)
 
 // Hàm bổ sung thuộc tính độc lập cho Windows
 func ConfigureSysProcAttr(c *gopty.Cmd) {
@@ -18,8 +20,12 @@ func ConfigureSysProcAttr(c *gopty.Cmd) {
 		c.SysProcAttr = &syscall.SysProcAttr{}
 	}
 
-	// Kết hợp cả hai bằng toán tử |=
-	// 1. syscall.CREATE_NEW_PROCESS_GROUP mang giá trị 0x200 (Windows hiểu là Breakaway khỏi Job)
-	// 2. WINDOWS_ACTUAL_NEW_PROCESS_GROUP mang giá trị 0x10 (Windows hiểu là Tạo Group riêng cho Terminal)
-	c.SysProcAttr.CreationFlags |= syscall.CREATE_NEW_PROCESS_GROUP | WINDOWS_ACTUAL_NEW_PROCESS_GROUP
+	// 1. Kết hợp các thuộc tính CreationFlags:
+	// - syscall.CREATE_NEW_PROCESS_GROUP (0x200): Breakaway khỏi Job mẹ để khi taskkill không chết lây app Go.
+	// - WINDOWS_ACTUAL_NEW_PROCESS_GROUP (0x10): Tạo Group riêng cho Terminal.
+	// - CREATE_NO_WINDOW (0x08000000): Chặn Windows tự động bật cửa sổ cmd/powershell mới lên màn hình.
+	c.SysProcAttr.CreationFlags |= syscall.CREATE_NEW_PROCESS_GROUP | WINDOWS_ACTUAL_NEW_PROCESS_GROUP | CREATE_NO_WINDOW
+
+	// 2. Ẩn cửa sổ ở mức độ Window GUI
+	c.SysProcAttr.HideWindow = true
 }
