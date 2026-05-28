@@ -12,7 +12,9 @@ import (
 	"sync"
 	"td_config"
 	"td_core_service/internal/model"
+	terminal "td_core_service/internal/service/terminal"
 	"td_core_service/td_common"
+
 	"time"
 
 	gopty "github.com/aymanbagabas/go-pty"
@@ -104,7 +106,7 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 
 	c := pty.Command(req.Shell)
 
-	// UTF-8 / Unicode trên Windows 
+	// UTF-8 / Unicode trên Windows
 	// Trên Windows, cmd/powershell mặc định dùng code page 437 hoặc 1252.
 	// Thêm biến môi trường và wrap bằng chcp 65001 để force UTF-8.
 	baseEnv := append(os.Environ(), "TERM=xterm-256color", "LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8")
@@ -122,6 +124,8 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 			// CMD: chạy chcp 65001 rồi mới vào interactive mode
 			c = pty.Command(req.Shell, "/k", "chcp 65001")
 		}
+
+		terminal.ConfigureSysProcAttr(c)
 	}
 	c.Env = baseEnv
 
@@ -216,7 +220,7 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-//killSession an toàn trên Windows
+// killSession an toàn trên Windows
 // Vấn đề gốc: trên Windows, go-pty tạo shell trong cùng Job Object với process
 // cha. Gọi proc.Kill() → TerminateProcess() sẽ lan sang toàn bộ job → kill app.
 //
