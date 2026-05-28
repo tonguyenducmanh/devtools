@@ -229,9 +229,7 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 func killSession(session *model.TerminalSession) error {
 	if proc := session.Cmd.Process; proc != nil {
 		if runtime.GOOS == "windows" {
-			// /F = force, /T = terminate child tree, /PID = target pid cụ thể
 			cmd := exec.Command("taskkill", "/F", "/T", "/PID", fmt.Sprintf("%d", proc.Pid))
-			// Bỏ qua lỗi nếu process đã thoát trước đó
 			_ = cmd.Run()
 		} else {
 			_ = proc.Kill()
