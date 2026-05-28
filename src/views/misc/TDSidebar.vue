@@ -26,11 +26,6 @@
           <div v-else class="td-sidebar-item td-sidebar-item--route">
             <div
               class="no-select td-item-content flex"
-              v-tooltip="
-                item.route.meta.helpKey
-                  ? $t(item.route.meta.helpKey)
-                  : undefined
-              "
               @click="onOpenRouteTab(item.route)"
             >
               <span>{{ $t(item.route.meta.titleKey) }}</span>
@@ -69,9 +64,6 @@
             <div
               class="td-sidebar-flyout-item"
               @click="onOpenGroupChildTab(hoveredItem, child)"
-              v-tooltip="
-                child.meta.helpKey ? $t(child.meta.helpKey) : undefined
-              "
             >
               {{ $t(child.meta.titleKey) }}
             </div>

@@ -24,7 +24,6 @@ const sidebarConfig = [
     component: () => import("@/views/tools/TDOneTimePassword.vue"),
     meta: {
       titleKey: "i18nCommon.feature.oneTimePassword",
-      helpKey: "i18nHelp.feature.oneTimePassword",
     },
   },
   {
@@ -37,7 +36,6 @@ const sidebarConfig = [
         component: () => import("@/views/tools/APITesting/TDAPITesting.vue"),
         meta: {
           titleKey: "i18nCommon.feature.APITesting",
-          helpKey: "i18nHelp.feature.APITesting",
         },
       },
       {
@@ -45,7 +43,6 @@ const sidebarConfig = [
         component: () => import("@/views/tools/TDAPIMocking.vue"),
         meta: {
           titleKey: "i18nCommon.feature.APIMocking",
-          helpKey: "i18nHelp.feature.APIMocking",
         },
       },
     ],
@@ -60,7 +57,6 @@ const sidebarConfig = [
         component: () => import("@/views/tools/TDTextToQRCode.vue"),
         meta: {
           titleKey: "i18nCommon.feature.QRCodeFromText",
-          helpKey: "i18nHelp.feature.QRCodeFromText",
         },
       },
       {
@@ -68,7 +64,6 @@ const sidebarConfig = [
         component: () => import("@/views/tools/TDQRCodeToText.vue"),
         meta: {
           titleKey: "i18nCommon.feature.QRCodeToText",
-          helpKey: "i18nHelp.feature.QRCodeToText",
         },
       },
     ],
@@ -188,7 +183,6 @@ const sidebarConfig = [
         component: () => import("@/views/tools/TDTextManipulation.vue"),
         meta: {
           titleKey: "i18nCommon.feature.textManipulation",
-          helpKey: "i18nHelp.feature.textManipulation",
         },
       },
       {
@@ -204,7 +198,6 @@ const sidebarConfig = [
     component: () => import("@/views/tools/TDBilingualWeb.vue"),
     meta: {
       titleKey: "i18nCommon.feature.BilingualWeb",
-      helpKey: "i18nHelp.feature.BilingualWeb",
     },
   },
   {
@@ -223,7 +216,6 @@ const sidebarConfig = [
         component: () => import("@/views/tools/TDCosinSimilarity.vue"),
         meta: {
           titleKey: "i18nCommon.feature.cosinSimilarity",
-          helpKey: "i18nHelp.feature.cosinSimilarity",
         },
       },
     ],
