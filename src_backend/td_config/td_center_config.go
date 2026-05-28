@@ -68,7 +68,7 @@ func DefaultConfig() TDCenterConfig {
 		EndpointCaseSensitive: false,
 		ShowIPServer:          false,
 		TerminalConfig: TerminalConfig{
-			MaxHistorySizeInKB: 10241024,
+			MaxHistorySizeInKB: 409600,
 		},
 	}
 }
