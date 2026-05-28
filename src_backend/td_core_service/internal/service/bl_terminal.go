@@ -6,8 +6,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
-	"runtime"
 	"slices"
 	"sync"
 	"td_config"
@@ -28,40 +26,9 @@ var (
 	sessionsMu sync.Mutex
 )
 
-// kiểm tra xem command có sẵn có trên hệ điều hành hiện tại không
-func isCommandAvailable(name string) bool {
-	_, err := exec.LookPath(name)
-	return err == nil
-}
-
 // lấy ra các loại terminal sẵn có ứng với từng hệ điều hành
 func GetAllTerminalShellsSupport(w http.ResponseWriter, r *http.Request) {
-	var shells []model.ShellOption
-
-	if runtime.GOOS == "windows" {
-		// Kiểm tra và thêm các shell trên Windows
-		if isCommandAvailable("powershell.exe") {
-			shells = append(shells, model.ShellOption{Name: "PowerShell", Path: "powershell.exe"})
-		}
-		if isCommandAvailable("cmd.exe") {
-			shells = append(shells, model.ShellOption{Name: "CMD", Path: "cmd.exe"})
-		}
-	} else {
-		// Danh sách các shell muốn hỗ trợ trên Linux/macOS
-		allLinuxShells := []model.ShellOption{
-			{Name: "Zsh", Path: "zsh"},
-			{Name: "Bash", Path: "bash"},
-			{Name: "Sh", Path: "sh"},
-		}
-
-		// Chỉ quét và thêm những shell thực sự có trên máy Ubuntu/Linux đó
-		for _, shell := range allLinuxShells {
-			if isCommandAvailable(shell.Path) {
-				shells = append(shells, shell)
-			}
-		}
-	}
-
+	var shells []model.ShellOption = terminal.AppendOSCommand()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(shells)
 }
@@ -106,27 +73,8 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 
 	c := pty.Command(req.Shell)
 
-	// UTF-8 / Unicode trên Windows
-	// Trên Windows, cmd/powershell mặc định dùng code page 437 hoặc 1252.
-	// Thêm biến môi trường và wrap bằng chcp 65001 để force UTF-8.
 	baseEnv := append(os.Environ(), "TERM=xterm-256color", "LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8")
-	if runtime.GOOS == "windows" {
-		// PYTHONUTF8, PYTHONIOENCODING phòng khi shell gọi python
-		baseEnv = append(baseEnv, "PYTHONUTF8=1", "PYTHONIOENCODING=utf-8")
-		// Với PowerShell: thêm args để set output encoding UTF-8 ngay khi khởi động
-		if req.Shell == "powershell.exe" || req.Shell == "pwsh.exe" {
-			c = pty.Command(req.Shell,
-				"-NoExit",
-				"-Command",
-				"[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; [Console]::InputEncoding=[System.Text.Encoding]::UTF8; chcp 65001 | Out-Null",
-			)
-		} else if req.Shell == "cmd.exe" {
-			// CMD: chạy chcp 65001 rồi mới vào interactive mode
-			c = pty.Command(req.Shell, "/k", "chcp 65001")
-		}
-
-		terminal.ConfigureSysProcAttr(c)
-	}
+	baseEnv, c = terminal.AppendOSEnv(baseEnv, req, c, pty)
 	c.Env = baseEnv
 
 	if err := c.Start(); err != nil {
@@ -220,20 +168,10 @@ func CreateTerminalSession(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// killSession an toàn trên Windows
-// Vấn đề gốc: trên Windows, go-pty tạo shell trong cùng Job Object với process
-// cha. Gọi proc.Kill() → TerminateProcess() sẽ lan sang toàn bộ job → kill app.
-//
-// Giải pháp: dùng `taskkill /F /T /PID <pid>` để kill shell và cây con của nó
-// mà KHÔNG ảnh hưởng process cha. Trên Unix giữ nguyên SIGKILL.
+// killSession
 func killSession(session *model.TerminalSession) error {
 	if proc := session.Cmd.Process; proc != nil {
-		if runtime.GOOS == "windows" {
-			cmd := exec.Command("taskkill", "/F", "/T", "/PID", fmt.Sprintf("%d", proc.Pid))
-			_ = cmd.Run()
-		} else {
-			_ = proc.Kill()
-		}
+		terminal.KillProcess(proc)
 	}
 
 	// Đóng PTY để unblock goroutine Read trong mọi trường hợp

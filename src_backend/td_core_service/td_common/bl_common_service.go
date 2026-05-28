@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os/exec"
 	"strings"
 	"td_config"
 )
@@ -85,4 +86,10 @@ func BuildHanlderAPICommon(app *http.ServeMux) http.HandlerFunc {
 		})
 	}
 	return handler
+}
+
+// kiểm tra xem command có sẵn có trên hệ điều hành hiện tại không
+func IsCommandAvailable(name string) bool {
+	_, err := exec.LookPath(name)
+	return err == nil
 }
