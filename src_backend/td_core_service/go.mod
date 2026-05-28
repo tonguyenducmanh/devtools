@@ -5,13 +5,13 @@ go 1.25.6
 replace td_config => ../td_config
 
 require (
+	github.com/aymanbagabas/go-pty v0.2.3
 	github.com/gorilla/websocket v1.5.3
 	modernc.org/sqlite v1.44.3
 	td_config v0.0.0-00010101000000-000000000000
 )
 
 require (
-	github.com/aymanbagabas/go-pty v0.2.3 // indirect
 	github.com/creack/pty v1.1.24 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
