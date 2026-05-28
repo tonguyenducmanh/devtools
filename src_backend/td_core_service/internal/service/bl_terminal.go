@@ -28,14 +28,31 @@ var (
 // lấy ra các loại terminal sẵn có ứng với từng hệ điều hành
 func GetAllTerminalShellsSupport(w http.ResponseWriter, r *http.Request) {
 	var shells []model.ShellOption
+
 	if runtime.GOOS == "windows" {
-		shells = append(shells, model.ShellOption{Name: "PowerShell", Path: "powershell.exe"})
-		shells = append(shells, model.ShellOption{Name: "CMD", Path: "cmd.exe"})
+		// Kiểm tra và thêm các shell trên Windows
+		if isCommandAvailable("powershell.exe") {
+			shells = append(shells, model.ShellOption{Name: "PowerShell", Path: "powershell.exe"})
+		}
+		if isCommandAvailable("cmd.exe") {
+			shells = append(shells, model.ShellOption{Name: "CMD", Path: "cmd.exe"})
+		}
 	} else {
-		shells = append(shells, model.ShellOption{Name: "Zsh", Path: "zsh"})
-		shells = append(shells, model.ShellOption{Name: "Bash", Path: "bash"})
-		shells = append(shells, model.ShellOption{Name: "Sh", Path: "sh"})
+		// Danh sách các shell muốn hỗ trợ trên Linux/macOS
+		allLinuxShells := []model.ShellOption{
+			{Name: "Zsh", Path: "zsh"},
+			{Name: "Bash", Path: "bash"},
+			{Name: "Sh", Path: "sh"},
+		}
+
+		// Chỉ quét và thêm những shell thực sự có trên máy Ubuntu/Linux đó
+		for _, shell := range allLinuxShells {
+			if isCommandAvailable(shell.Path) {
+				shells = append(shells, shell)
+			}
+		}
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(shells)
 }
