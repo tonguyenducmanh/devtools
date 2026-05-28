@@ -145,7 +145,6 @@ import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDButton from "@/components/TDButton.vue";
 import TDTerminalHelp from "@/views/helps/TDTerminalHelp.vue";
 import TDTerminalAPI from "@/common/api/request/AgentAPI/TDTerminalAPI.js";
-import TDCache from "@/common/cache/TDCache.js";
 import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";
 
 import { Terminal } from "@xterm/xterm";
@@ -341,6 +340,7 @@ export default {
       this.activeSessionId = session.id;
       this.sessionName = session.name;
       this.initTerminal();
+      this.reBuildTabTitle(this.sessionName);
     },
     applyTheme() {
       if (this.terminal) {
