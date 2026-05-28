@@ -1,8 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=dev-tool
-Comment=from tdmanh with luv
-Exec=/home/tdmanh1-ub/Exec/dev-tool-linux
-Terminal=true
-Categories=Utility;Development;
