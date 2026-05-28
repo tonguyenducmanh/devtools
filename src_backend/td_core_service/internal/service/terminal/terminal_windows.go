@@ -1,4 +1,5 @@
 //go:build windows
+
 // file này chỉ build trên hệ điều hành windows
 package terminal
 
@@ -28,16 +29,23 @@ func configureSysProcAttr(c *gopty.Cmd) {
 func AppendOSEnv(baseEnv []string, req model.CreateTerminalRequest, c *gopty.Cmd, pty gopty.Pty) ([]string, *gopty.Cmd) {
 	// PYTHONUTF8, PYTHONIOENCODING phòng khi shell gọi python
 	baseEnv = append(baseEnv, "PYTHONUTF8=1", "PYTHONIOENCODING=utf-8")
-	// Với PowerShell: thêm args để set output encoding UTF-8 ngay khi khởi động
-	if req.Shell == "powershell.exe" {
+
+	switch req.Shell {
+	case "powershell.exe":
+		// Với PowerShell: thêm args để set output encoding UTF-8 ngay khi khởi động
 		c = pty.Command(req.Shell,
 			"-NoExit",
 			"-Command",
 			"[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; [Console]::InputEncoding=[System.Text.Encoding]::UTF8; chcp 65001 | Out-Null",
 		)
-	} else if req.Shell == "cmd.exe" {
+
+	case "cmd.exe":
 		// CMD: chạy chcp 65001 rồi mới vào interactive mode
 		c = pty.Command(req.Shell, "/k", "chcp 65001")
+
+	default:
+		// Các shell khác: giữ nguyên cách khởi tạo mặc định
+		c = pty.Command(req.Shell)
 	}
 
 	configureSysProcAttr(c)
