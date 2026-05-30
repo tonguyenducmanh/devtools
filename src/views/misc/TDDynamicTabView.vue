@@ -32,7 +32,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
             @click="activateTab(tab.id)"
             @contextmenu.prevent="openContextMenu($event, tab)"
             @click.middle="closeTab(tab.id)"
-            v-tooltip="$t(tab.helpKey)"
+            v-tooltip="getTabTitle(tab)"
           >
             <div
               v-if="dragOverIndex === index && draggingId !== tab.id"
@@ -229,6 +229,7 @@ export default {
       // 3. Xử lý nếu payload là một object
       setTabTitle(payload.tabId, {
         title: formatTitle(payload.title),
+        titleFull: payload.title,
         append: !!payload.append,
       });
     }
@@ -239,6 +240,10 @@ export default {
       const { title, append } = tab.customTitle;
       if (append) return `${i18nData.global.t(tab.titleKey)} (${title})`;
       return title;
+    }
+
+    function getTabTitle(tab) {
+      return tab.customTitle?.titleFull;
     }
 
     // Drag state
@@ -395,6 +400,7 @@ export default {
       closeTab,
       exitTabMode,
       getTabLabel,
+      getTabTitle,
       onTabTitleUpdate,
       openContextMenu,
       setTabRef,
