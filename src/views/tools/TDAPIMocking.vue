@@ -2,7 +2,7 @@
   <div class="flex td-mocking-container">
     <!-- phần thao tác chính của tool -->
     <div class="flex flex-col td-mockding-main">
-      <div class="flex td-mocking-header-first">
+      <div class="flex td-mocking-header">
         <div class="flex flex-one">
           <TDComboBox
             v-model="groupId"
@@ -41,11 +41,12 @@
           v-tooltip="$t('i18nCommon.APIMocking.addNew')"
         />
         <TDButton
-          :noMargin="true"
+          v-if="currentMockId"
+          @click="createNewMock"
           :type="$tdEnum.buttonType.secondary"
-          @click="importMock"
-          iconClass="td-import-icon"
-          v-tooltip="$t('i18nCommon.APIMocking.tooltipImportMock')"
+          :noMargin="true"
+          iconClass="td-new-file-icon"
+          v-tooltip="$t('i18nCommon.APIMocking.createNew')"
         ></TDButton>
         <TDButton
           v-if="currentMockId"
@@ -55,14 +56,46 @@
           iconClass="td-copy-icon"
           v-tooltip="$t('i18nCommon.APIMocking.copyCURL')"
         ></TDButton>
-        <!-- nút tạo mới và làm mới danh sách -->
+      </div>
+      <div class="flex td-mocking-header">
+        <div class="flex flex-one">
+          <!-- combo chọn method http -->
+          <TDComboBox
+            :width="120"
+            v-model="httpMethod"
+            :options="methodOptions"
+            :customStyle="customStyleComboMethodAPI"
+            :noMargin="true"
+            :borderRadiusPosition="[
+              $tdEnum.BorderRadiusPosition.TopLeft,
+              $tdEnum.BorderRadiusPosition.BottomLeft,
+            ]"
+          />
+          <!-- base url -->
+          <div
+            class="flex td-base-url"
+            @click="copyBaseURL"
+            v-tooltip="$t('i18nCommon.APIMocking.APIMockBaseURL')"
+          >
+            <span>{{ mockBaseUrl }}</span>
+          </div>
+          <!-- nhập url endpoint api -->
+          <TDInput
+            v-model="apiUrl"
+            :placeHolder="$t('i18nCommon.APIMocking.endpoint')"
+            :noMargin="true"
+            :borderRadiusPosition="[
+              $tdEnum.BorderRadiusPosition.TopRight,
+              $tdEnum.BorderRadiusPosition.BottomRight,
+            ]"
+          ></TDInput>
+        </div>
         <TDButton
-          v-if="currentMockId"
-          @click="createNewMock"
-          :type="$tdEnum.buttonType.secondary"
           :noMargin="true"
-          iconClass="td-new-file-icon"
-          v-tooltip="$t('i18nCommon.APIMocking.createNew')"
+          :type="$tdEnum.buttonType.secondary"
+          @click="importMock"
+          iconClass="td-import-icon"
+          v-tooltip="$t('i18nCommon.APIMocking.tooltipImportMock')"
         ></TDButton>
         <TDButton
           @click="restartMockServer"
@@ -71,38 +104,6 @@
           iconClass="td-reload-icon"
           v-tooltip="$t('i18nCommon.APIMocking.restartMock')"
         ></TDButton>
-      </div>
-      <div class="flex td-mocking-header">
-        <!-- combo chọn method http -->
-        <TDComboBox
-          :width="120"
-          v-model="httpMethod"
-          :options="methodOptions"
-          :customStyle="customStyleComboMethodAPI"
-          :noMargin="true"
-          :borderRadiusPosition="[
-            $tdEnum.BorderRadiusPosition.TopLeft,
-            $tdEnum.BorderRadiusPosition.BottomLeft,
-          ]"
-        />
-        <!-- base url -->
-        <div
-          class="flex td-base-url"
-          @click="copyBaseURL"
-          v-tooltip="$t('i18nCommon.APIMocking.APIMockBaseURL')"
-        >
-          <span>{{ mockBaseUrl }}</span>
-        </div>
-        <!-- nhập url endpoint api -->
-        <TDInput
-          v-model="apiUrl"
-          :placeHolder="$t('i18nCommon.APIMocking.endpoint')"
-          :noMargin="true"
-          :borderRadiusPosition="[
-            $tdEnum.BorderRadiusPosition.TopRight,
-            $tdEnum.BorderRadiusPosition.BottomRight,
-          ]"
-        ></TDInput>
       </div>
       <div
         class="flex td-mocking-content"
@@ -715,12 +716,9 @@ export default {
     width: 100%;
     height: 100%;
     gap: var(--padding);
-    .td-mocking-header-first {
-      width: 100%;
-      gap: var(--padding);
-    }
     .td-mocking-header {
       width: 100%;
+      gap: var(--padding);
     }
     .td-mocking-content {
       flex: 1;
