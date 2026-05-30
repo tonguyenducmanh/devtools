@@ -465,7 +465,7 @@ export default {
   flex-direction: row;
   align-items: flex-end;
   gap: 1px;
-  border-bottom: 2px solid var(--bg-layer-color);
+  margin-bottom: calc(var(--padding) / 2);
   flex-shrink: 0;
   overflow-x: auto;
   overflow-y: hidden;
@@ -487,7 +487,7 @@ export default {
   cursor: pointer;
   white-space: nowrap;
   color: var(--text-secondary-color);
-  border-radius: var(--border-radius) var(--border-radius) 0 0;
+  border-radius: var(--border-radius);
   transition:
     background-color 0.15s ease,
     color 0.15s ease,
@@ -508,7 +508,6 @@ export default {
   &.td-tab-active {
     color: var(--text-color);
     background-color: var(--bg-main-color);
-    border-bottom: 2px solid var(--border-hard-color);
     .td-tab-close {
       opacity: 0.5;
     }
