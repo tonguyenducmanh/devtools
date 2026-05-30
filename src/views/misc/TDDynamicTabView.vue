@@ -428,6 +428,7 @@ export default {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  background-color: var(--bg-layer-color);
 }
 
 /* ── Tabbar transition ── */
@@ -536,8 +537,8 @@ export default {
   height: 60%;
   width: 2px;
   border-radius: 2px;
-  background: var(--primary-color, #00c9a7);
-  box-shadow: 0 0 6px var(--primary-color, #00c9a7);
+  background: var(--text-primary-color);
+  box-shadow: 0 0 6px var(--text-primary-color);
   animation: td-indicator-pulse 0.6s ease infinite alternate;
   pointer-events: none;
 }
@@ -635,10 +636,12 @@ export default {
 .td-tab-content {
   box-sizing: border-box;
   flex: 1;
-  margin: var(--padding);
+  padding: var(--padding);
   min-height: 0;
   position: relative;
   overflow: hidden;
+  background-color: var(--bg-main-color);
+  border-radius: var(--border-radius);
 }
 
 .td-tab-pane {
