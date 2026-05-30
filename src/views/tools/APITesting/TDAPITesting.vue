@@ -55,15 +55,6 @@
         <template
           v-if="currentConfigLayout.currentAPIMode != $tdEnum.APIMode.ProMode"
         >
-          <!-- nút mở chế độ api import curl -->
-          <TDButton
-            @click="openFormImportCURL"
-            :type="$tdEnum.buttonType.secondary"
-            :noMargin="true"
-            :readOnly="isLoading"
-            iconClass="td-import-icon"
-            v-tooltip="$t('i18nCommon.apiTesting.CURL')"
-          ></TDButton>
           <TDButton
             @click="copyCURLFromNormalMode"
             :type="$tdEnum.buttonType.secondary"
@@ -127,6 +118,15 @@
               ></TDInput>
               <!-- phần upload hàng loạt request -->
               <div class="flex td-import-request-group">
+                <!-- nút mở chế độ api import curl -->
+                <TDButton
+                  @click="openFormImportCURL"
+                  :type="$tdEnum.buttonType.secondary"
+                  :noMargin="true"
+                  :readOnly="isLoading"
+                  iconClass="td-import-icon"
+                  v-tooltip="$t('i18nCommon.apiTesting.CURL')"
+                ></TDButton>
                 <!-- nút copy dữ liệu làm mock data -->
                 <TDButton
                   :noMargin="true"
