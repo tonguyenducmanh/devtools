@@ -508,6 +508,7 @@ export default {
       groupName: "Tên nhóm",
       createNew: "Tạo mới",
       restartMock: "Khởi động lại server mock",
+      restartedMock: "Đã khởi động lại server mock",
       refresh: "Làm mới",
       loadMockErr: "Lỗi tải danh sách mock APIs",
       requestNameAndApiUrlRequired:

@@ -511,6 +511,7 @@ export default {
       groupName: "Group name",
       createNew: "Create new",
       restartMock: "Restart mock server",
+      restartedMock: "Restarted mock server",
       refresh: "Refresh",
       loadMockErr: "Error loading mock APIs",
       requestNameAndApiUrlRequired:

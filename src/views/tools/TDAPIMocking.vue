@@ -588,7 +588,7 @@ export default {
       let me = this;
       try {
         await me.agentAPI.restartMockServerFromClient();
-        me.$tdToast.success(me.$t("i18nCommon.APIMocking.updateMockSuccess"));
+        me.$tdToast.success(me.$t("i18nCommon.APIMocking.restartedMock"));
       } catch (error) {
         me.$tdUtility.showErrorNotFoundAgentServer();
       }
