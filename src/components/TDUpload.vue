@@ -1,5 +1,26 @@
 <template>
+  <!-- Icon-only mode: dùng TDButton trigger input file ẩn -->
+  <div v-if="iconClass" class="td-upload-icon-wrap">
+    <TDButton
+      :iconClass="iconClass"
+      :readOnly="readOnly"
+      :type="$tdEnum.buttonType.secondary"
+      @click="triggerFileInput"
+      :noMargin="true"
+    />
+    <input
+      ref="fileInput"
+      type="file"
+      class="td-upload-input"
+      :disabled="readOnly"
+      @change="handleFileSelect"
+      :multiple="multiple"
+    />
+  </div>
+
+  <!-- Normal mode -->
   <div
+    v-else
     class="td-upload"
     :style="{
       'max-width': maxWidth,
@@ -36,10 +57,12 @@
 
 <script>
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
+import TDButton from "@/components/TDButton.vue";
 
 export default {
   name: "TDUpload",
   mixins: [TDStylePremitiveMixin],
+  components: { TDButton },
 
   props: {
     readOnly: {
@@ -66,6 +89,10 @@ export default {
       type: String,
       default: "100%",
     },
+    iconClass: {
+      type: String,
+      default: "",
+    },
   },
   data() {
     return {
@@ -85,6 +112,9 @@ export default {
     },
   },
   methods: {
+    triggerFileInput() {
+      this.$refs.fileInput.click();
+    },
     handleFileSelect(event) {
       let me = this;
       if (
@@ -127,6 +157,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+/* ── Normal upload mode ───────────────────────────────────── */
 .td-upload {
   display: flex;
   align-items: center;
@@ -152,7 +183,6 @@ export default {
   border-radius: var(--border-radius);
   background-color: var(--bg-layer-color);
 }
-
 .td-upload-btn-read-only {
   cursor: unset;
 }
@@ -162,7 +192,6 @@ export default {
 .td-upload-input {
   display: none;
 }
-
 .td-selected-group {
   flex: 1;
   flex-direction: column;
@@ -175,5 +204,10 @@ export default {
     width: 100%;
     white-space: nowrap;
   }
+}
+
+/* ── Icon-only mode ───────────────────────────────────────── */
+.td-upload-icon-wrap {
+  display: contents;
 }
 </style>

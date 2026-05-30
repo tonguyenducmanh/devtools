@@ -42,7 +42,7 @@ body[data-theme="dark"] {
   background-position: -280px 0px;
 }
 .td-reload-icon {
-  background-position: -305px 0px;
+  background-position: -307px 0px;
 }
 
 .td-github-icon {
@@ -154,4 +154,17 @@ body[data-theme="dark"] {
 
 .td-example-icon {
   background-position: -180px -41px;
+}
+
+.td-save-icon {
+  background-position: -205px -40px;
+}
+
+.td-upload-icon {
+  background-position: -230px -40px;
+}
+
+.td-postman-icon {
+  background-position: -255px -40px;
+  filter: unset !important;
 }

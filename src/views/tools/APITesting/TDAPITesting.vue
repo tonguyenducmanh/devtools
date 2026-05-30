@@ -72,14 +72,24 @@
             iconClass="td-export-icon"
             v-tooltip="$t('i18nCommon.apiTesting.copyCURLFromAPI')"
           ></TDButton>
-          <!-- nút copy dữ liệu làm mock data -->
+          <!-- nút thêm request mới -->
           <TDButton
-            :noMargin="true"
-            :readOnly="!responseText"
-            @click="copyMockData"
+            v-if="currentRequestId"
+            :readOnly="isLoadingData"
+            @click="createNewRequest"
             :type="$tdEnum.buttonType.secondary"
-            iconClass="td-copy-icon"
-            v-tooltip="$t('i18nCommon.apiTesting.copyMockData')"
+            :noMargin="true"
+            iconClass="td-new-file-icon"
+            v-tooltip="$t('i18nCommon.apiTesting.createNewRequest')"
+          ></TDButton>
+          <!-- nút lưu request -->
+          <TDButton
+            :readOnly="isLoadingData || !requestName"
+            @click="saveRequest"
+            :type="$tdEnum.buttonType.secondary"
+            :noMargin="true"
+            iconClass="td-save-icon"
+            v-tooltip="$t('i18nCommon.apiTesting.save')"
           ></TDButton>
         </template>
       </div>
@@ -115,6 +125,45 @@
                   $tdEnum.BorderRadiusPosition.BottomRight,
                 ]"
               ></TDInput>
+              <!-- phần upload hàng loạt request -->
+              <div class="flex td-import-request-group">
+                <!-- nút copy dữ liệu làm mock data -->
+                <TDButton
+                  :noMargin="true"
+                  :readOnly="!responseText"
+                  @click="copyMockData"
+                  :type="$tdEnum.buttonType.secondary"
+                  iconClass="td-copy-icon"
+                  v-tooltip="$t('i18nCommon.apiTesting.copyMockData')"
+                ></TDButton>
+                <TDUpload
+                  v-tooltip="{
+                    text: $t(
+                      'i18nCommon.apiTesting.importCollectionZipTooltip',
+                    ),
+                    maxWidth: '500px',
+                  }"
+                  iconClass="td-upload-icon"
+                  :accept="'.zip'"
+                  @change="importCollectionZip"
+                  ref="uploadArea"
+                  :isShowSelect="false"
+                />
+                <TDUpload
+                  v-tooltip="{
+                    text: $t(
+                      'i18nCommon.apiTesting.importCollectionPostmanTooltip',
+                    ),
+                    maxWidth: '500px',
+                  }"
+                  :accept="'.json'"
+                  iconClass="td-postman-icon"
+                  @change="importCollectionPostman"
+                  ref="uploadAreaPostman"
+                  :isShowSelect="false"
+                  :multiple="true"
+                />
+              </div>
             </div>
           </div>
           <!-- phần nội dung  -->
@@ -536,71 +585,6 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <!-- phần upload hàng loạt request -->
-            <div class="flex td-api-upload-collection-area">
-              <!-- phần upload request từ postman -->
-              <span>
-                <TDUpload
-                  v-tooltip="{
-                    text: $t(
-                      'i18nCommon.apiTesting.importCollectionPostmanTooltip',
-                    ),
-                    maxWidth: '500px',
-                  }"
-                  :label="$t('i18nCommon.apiTesting.importCollectionPostman')"
-                  :accept="'.json'"
-                  @change="importCollectionPostman"
-                  ref="uploadAreaPostman"
-                  :isShowSelect="false"
-                  :multiple="true"
-                />
-              </span>
-              <!-- phần upload request từ zip collection curl -->
-              <span>
-                <TDUpload
-                  v-tooltip="{
-                    text: $t(
-                      'i18nCommon.apiTesting.importCollectionZipTooltip',
-                    ),
-                    maxWidth: '500px',
-                  }"
-                  :label="$t('i18nCommon.apiTesting.importCollectionZip')"
-                  :accept="'.zip'"
-                  @change="importCollectionZip"
-                  ref="uploadArea"
-                  :isShowSelect="false"
-                  maxWidth="250px"
-                />
-              </span>
-            </div>
-            <!-- phần danh sách các nút khác ở chân sidebar -->
-            <div class="flex">
-              <!-- nút thêm request mới -->
-              <TDButton
-                :readOnly="isLoadingData"
-                @click="createNewRequest"
-                :type="$tdEnum.buttonType.secondary"
-                :noMargin="true"
-                :label="$t('i18nCommon.apiTesting.createNewRequest')"
-                :borderRadiusPosition="[
-                  $tdEnum.BorderRadiusPosition.TopLeft,
-                  $tdEnum.BorderRadiusPosition.BottomLeft,
-                ]"
-              ></TDButton>
-              <!-- nút lưu request -->
-              <TDButton
-                v-tooltip="$t('i18nCommon.apiTesting.NeedRequestName')"
-                :readOnly="isLoadingData || !requestName"
-                @click="saveRequest"
-                :type="$tdEnum.buttonType.secondary"
-                :noMargin="true"
-                :label="$t('i18nCommon.apiTesting.save')"
-                :borderRadiusPosition="[
-                  $tdEnum.BorderRadiusPosition.TopRight,
-                  $tdEnum.BorderRadiusPosition.BottomRight,
-                ]"
-              ></TDButton>
             </div>
           </template>
         </div>
@@ -1027,7 +1011,9 @@ export default {
       let me = this;
       if (request && request.requestId) {
         try {
-          let response = await me.agentAPI.testingItem.deleteById(request.requestId);
+          let response = await me.agentAPI.testingItem.deleteById(
+            request.requestId,
+          );
           if (response && response.success && response.data?.success) {
             me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
             await me.loadAllTestingData(); // Reload to reflect changes
@@ -1082,7 +1068,8 @@ export default {
       let me = this;
       if (collectionId) {
         try {
-          let response = await me.agentAPI.testingGroup.deleteById(collectionId);
+          let response =
+            await me.agentAPI.testingGroup.deleteById(collectionId);
           if (response && response.success && response.data?.success) {
             me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
             await me.loadAllTestingData();
@@ -1892,5 +1879,9 @@ body[data-theme="dark"] {
   .td-template-item:hover {
     background-color: var(--bg-layer-color);
   }
+}
+.td-import-request-group {
+  gap: var(--padding);
+  margin-left: var(--padding);
 }
 </style>

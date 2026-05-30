@@ -472,7 +472,7 @@ export default {
         "//requestCURL() là hàm cung cấp sẵn dùng để gọi api bằng CURL\n//nếu trong curl text có chứa ký tự \\ thì phải dùng \\\\ \n//nếu text có chứa ký tự ' thì thay bằng '\\\\'' \n",
       newCollectionName: "Tên collection mới",
       save: "Lưu request",
-      createNewRequest: "Tạo request",
+      createNewRequest: "Tạo request mới",
       beautify: "Làm đẹp",
       delete: "Xoá",
       add: "Thêm",

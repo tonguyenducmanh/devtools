@@ -30,14 +30,14 @@
           v-if="currentMockId"
           :noMargin="true"
           @click="saveRequest"
-          iconClass="td-send-icon"
+          iconClass="td-save-icon"
           v-tooltip="$t('i18nCommon.APIMocking.save')"
         />
         <TDButton
           v-else
           :noMargin="true"
           @click="saveRequest"
-          iconClass="td-send-icon"
+          iconClass="td-save-icon"
           v-tooltip="$t('i18nCommon.APIMocking.addNew')"
         />
         <TDButton
