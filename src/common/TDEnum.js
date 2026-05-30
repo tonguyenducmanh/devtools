@@ -68,7 +68,6 @@ class TDEnum {
    */
   APIMode = {
     Normal: 1,
-    CURL: 2,
     ProMode: 3,
   };
   /**

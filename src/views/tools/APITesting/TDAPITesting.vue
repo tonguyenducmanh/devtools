@@ -270,73 +270,6 @@
           </div>
         </div>
       </template>
-      <!-- phần api dạng curl -->
-      <template
-        v-else-if="currentConfigLayout.currentAPIMode == $tdEnum.APIMode.CURL"
-      >
-        <div class="td-api-content">
-          <div
-            class="flex td-api-input-area"
-            :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
-          >
-            <div
-              class="flex flex-col td-api-request"
-              :style="requestSectionSizeStyle"
-            >
-              <div class="flex td-api-request-title">
-                <div class="title-request">
-                  {{ $t("i18nCommon.apiTesting.CURLModeTitle") }}
-                </div>
-                <div
-                  class="flex loader-without-response"
-                  v-if="!currentConfigLayout.showReponse && isLoading"
-                >
-                  <div class="loader"></div>
-                </div>
-                <TDAPIResponseStatus
-                  v-if="currentConfigLayout.splitHorizontal && !isLoading"
-                  :statusCode="statusCode"
-                  :responseTime="responseTime"
-                />
-              </div>
-              <TDTextarea
-                :isLabelTop="true"
-                v-model="curlContent"
-                :wrapText="currentConfigLayout.wrapText"
-                :enableHighlight="currentConfigLayout.enableHighlight"
-                language="shell"
-                :placeHolder="$t('i18nCommon.apiTesting.contentCURLExecute')"
-                :label="$t('i18nCommon.apiTesting.contentCURLExecute')"
-              ></TDTextarea>
-            </div>
-            <!-- Resizer -->
-            <TDResizer
-              v-if="currentConfigLayout.showReponse"
-              :direction="
-                currentConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
-              "
-              @resize="handleResize"
-            />
-            <div
-              v-if="currentConfigLayout.showReponse"
-              class="flex flex-col td-api-response"
-              :style="responseSectionSizeStyle"
-            >
-              <TDAPIResponseStatus
-                class="flex td-api-response-title"
-                v-if="!currentConfigLayout.splitHorizontal"
-                :statusCode="statusCode"
-                :responseTime="responseTime"
-              />
-              <TDAPIResponse
-                :isLoading="isLoading"
-                :responseText="responseText"
-                :currentConfigLayout="currentConfigLayout"
-              />
-            </div>
-          </div>
-        </div>
-      </template>
       <!-- phần api promode, xử lý nhiều kịch bản bằng javascript -->
       <template
         v-else-if="
@@ -731,7 +664,6 @@ export default {
       ],
       APIModeOptions: [
         { value: this.$tdEnum.APIMode.Normal, label: "Normal" },
-        { value: this.$tdEnum.APIMode.CURL, label: "CURL" },
         { value: this.$tdEnum.APIMode.ProMode, label: "Pro Mode" },
       ],
       proModeSecranioCode:
@@ -1309,22 +1241,9 @@ export default {
       if (me.currentConfigLayout.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
         await me.handleSendRequestProMode();
       } else if (
-        me.currentConfigLayout.currentAPIMode == me.$tdEnum.APIMode.CURL
-      ) {
-        await me.handleSendRequestCURL();
-      } else if (
         me.currentConfigLayout.currentAPIMode == me.$tdEnum.APIMode.Normal
       ) {
         await me.handleSendRequest();
-      }
-    },
-    async handleSendRequestCURL() {
-      let me = this;
-      let parseCURLSuccess = me.importCURL(true);
-      if (parseCURLSuccess) {
-        await me.handleSendRequest();
-      } else {
-        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
     async handleSendRequest() {
