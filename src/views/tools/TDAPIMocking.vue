@@ -52,7 +52,24 @@
           @click="copyCURL"
           :type="$tdEnum.buttonType.secondary"
           :noMargin="true"
-          :label="$t('i18nCommon.APIMocking.copyCURL')"
+          iconClass="td-copy-icon"
+          v-tooltip="$t('i18nCommon.APIMocking.copyCURL')"
+        ></TDButton>
+        <!-- nút tạo mới và làm mới danh sách -->
+        <TDButton
+          v-if="currentMockId"
+          @click="createNewMock"
+          :type="$tdEnum.buttonType.secondary"
+          :noMargin="true"
+          iconClass="td-new-file-icon"
+          v-tooltip="$t('i18nCommon.APIMocking.createNew')"
+        ></TDButton>
+        <TDButton
+          @click="restartMockServer"
+          :type="$tdEnum.buttonType.secondary"
+          :noMargin="true"
+          iconClass="td-reload-icon"
+          v-tooltip="$t('i18nCommon.APIMocking.restartMock')"
         ></TDButton>
       </div>
       <div class="flex td-mocking-header">
@@ -249,21 +266,6 @@
                 </div>
               </div>
             </div>
-          </div>
-          <!-- nút tạo mới và làm mới danh sách -->
-          <div class="flex flex-col collection-group-footer">
-            <TDButton
-              @click="createNewMock"
-              :type="$tdEnum.buttonType.secondary"
-              :noMargin="true"
-              :label="$t('i18nCommon.APIMocking.createNew')"
-            ></TDButton>
-            <TDButton
-              @click="restartMockServer"
-              :type="$tdEnum.buttonType.secondary"
-              :noMargin="true"
-              :label="$t('i18nCommon.APIMocking.restartMock')"
-            ></TDButton>
           </div>
         </div>
         <!-- phần sidebar nếu đang tùy chọn thiết lập api -->
@@ -585,6 +587,7 @@ export default {
       let me = this;
       try {
         await me.agentAPI.restartMockServerFromClient();
+        me.$tdToast.success(me.$t("i18nCommon.APIMocking.updateMockSuccess"));
       } catch (error) {
         me.$tdUtility.showErrorNotFoundAgentServer();
       }
