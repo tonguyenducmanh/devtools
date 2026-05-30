@@ -7,7 +7,7 @@
         <!-- lựa chọn chế độ api và tên request-->
         <div class="flex flex-one">
           <TDComboBox
-            :width="120"
+            :width="100"
             v-model="currentConfigLayout.currentAPIMode"
             :options="APIModeOptions"
             :noMargin="true"
@@ -105,7 +105,7 @@
             <div class="flex flex-one">
               <!-- combo chọn method http -->
               <TDComboBox
-                :width="120"
+                :width="100"
                 v-model="httpMethod"
                 :options="methodOptions"
                 :customStyle="customStyleComboMethodAPI"
@@ -664,7 +664,7 @@ export default {
       ],
       APIModeOptions: [
         { value: this.$tdEnum.APIMode.Normal, label: "Normal" },
-        { value: this.$tdEnum.APIMode.ProMode, label: "Pro Mode" },
+        { value: this.$tdEnum.APIMode.ProMode, label: "Pro" },
       ],
       proModeSecranioCode:
         this.$t("i18nCommon.apiTesting.tutorialProModeCode") +
