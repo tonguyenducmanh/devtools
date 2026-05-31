@@ -225,12 +225,11 @@ export default {
     apiTesting: {
       purpose: {
         title: "What is API Testing?",
-        content: "A tool to call APIs bypass CORS, SSL. Supports 3 modes: Normal Mode, CURL Mode and Pro Mode (run JavaScript scripts).",
+        content: "A tool to call APIs bypass CORS, SSL. Supports 2 modes: Normal Mode and Pro Mode (run JavaScript scripts).",
       },
       modes: {
         title: "Modes",
         normal: "Normal Mode - Call single API with Header and Body configuration.",
-        curl: "CURL Mode - Paste CURL command directly to call API.",
         proMode: "Pro Mode - Write JavaScript scripts to call multiple APIs in a scenario.",
       },
       features: {

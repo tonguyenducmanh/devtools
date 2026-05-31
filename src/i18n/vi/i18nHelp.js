@@ -225,12 +225,11 @@ export default {
     apiTesting: {
       purpose: {
         title: "Test API là gì?",
-        content: "Công cụ gọi API bypass CORS, SSL. Hỗ trợ 3 chế độ: Normal Mode, CURL Mode và Pro Mode (chạy script JavaScript).",
+        content: "Công cụ gọi API bypass CORS, SSL. Hỗ trợ 2 chế độ: Normal Mode và Pro Mode (chạy script JavaScript).",
       },
       modes: {
         title: "Các chế độ",
         normal: "Normal Mode - Gọi API đơn lẻ với cấu hình Header và Body.",
-        curl: "CURL Mode - Dán trực tiếp câu lệnh CURL để gọi API.",
         proMode: "Pro Mode - Viết script JavaScript để gọi hàng loạt API theo kịch bản.",
       },
       features: {
