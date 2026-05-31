@@ -19,9 +19,6 @@
             {{ $t("i18nHelp.apiTesting.modes.normal") }}
           </div>
           <div class="section-item">
-            {{ $t("i18nHelp.apiTesting.modes.curl") }}
-          </div>
-          <div class="section-item">
             {{ $t("i18nHelp.apiTesting.modes.proMode") }}
           </div>
         </div>
