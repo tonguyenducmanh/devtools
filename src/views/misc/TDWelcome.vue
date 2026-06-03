@@ -3,7 +3,7 @@
     <div class="flex flex-col wrap-container">
       <div class="container">
         <TDDynamicBackgroundEffect />
-        <div class="main-line-title">Dev Tools</div>
+        <div class="main-line-title">{{ welcomeTitle }}</div>
         <p class="description">
           {{ displayText }}<span class="cursor">|</span>
         </p>
@@ -40,6 +40,15 @@ export default {
         isShowSidebar: false,
       },
     };
+  },
+  computed: {
+    /**
+     * lấy ra title để hiển thị ở màn welcome
+     */
+    welcomeTitle() {
+      let me = this;
+      return me.$tdUtility.getAuthorApp() ?? me.$tdUtility.defaultTitleApp();
+    },
   },
   created() {},
   methods: {

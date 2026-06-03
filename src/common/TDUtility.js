@@ -23,6 +23,14 @@ class TDUtility {
   }
 
   /**
+   * Lấy ra tên tác giả app mặc định
+   */
+  getAuthorApp() {
+    const appName = window.__env.author;
+    return `${appName}`;
+  }
+
+  /**
    * Xóa html trong string
    * @param {string} htmlString chuỗi html
    * @returns {string} chuỗi html đã xóa html
