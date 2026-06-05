@@ -396,6 +396,30 @@ export default {
         now.getSeconds().toString().padStart(2, "0");
       return timestamp;
     },
+    /**
+     * Hàm này được gọi khi tab được active hoặc khi component được mount (nếu đang active)
+     * Component con cần add event (ví dụ listener trên window/document) thì override lại
+     */
+    onTabEnter() {
+      let me = this;
+      document.addEventListener("keydown", me.handleKeydownEvent);
+    },
+
+    /**
+     * Hàm này được gọi khi tab bị inactive hoặc trước khi component bị unmount (nếu đang active)
+     * Component con cần remove event thì override lại
+     */
+    onTabLeave() {
+      let me = this;
+      document.removeEventListener("keydown", me.handleKeydownEvent);
+    },
+    handleKeydownEvent(event) {
+      let me = this;
+      // nếu ấn esc thì đóng full tab
+      if (event.key === "Escape" && me.isFullTab) {
+        me.toggleFullTab();
+      }
+    },
   },
   computed: {
     sidebarOptions() {
