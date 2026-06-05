@@ -49,12 +49,17 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
               {{ getTabLabel(tab) }}
             </span>
 
-            <button
-              class="td-tab-close"
-              @click.stop="closeTab(tab.id)"
-              v-tooltip="$t('i18nCommon.tabManager.closeTab')"
-            >
-              <span class="td-icon td-close-icon"></span>
+            <button class="flex td-tab-quick-btn">
+              <span
+                class="td-icon td-dupplicate-icon"
+                v-tooltip="$t('i18nCommon.tabManager.duplicateTab')"
+                @click.stop="duplicateTab(tab.id)"
+              ></span>
+              <span
+                class="td-icon td-close-icon"
+                v-tooltip="$t('i18nCommon.tabManager.closeTab')"
+                @click.stop="closeTab(tab.id)"
+              ></span>
             </button>
           </div>
 
@@ -207,11 +212,13 @@ export default {
 
       tdContextMenu.open(event, [
         {
+          icon: "td-dupplicate-icon",
           key: "duplicate",
           label: i18nData.global.t("i18nCommon.tabManager.duplicateTab"),
           action: () => duplicateTab(tab.id),
         },
         {
+          icon: "td-close-icon",
           key: "close",
           label: i18nData.global.t("i18nCommon.tabManager.closeTab"),
           action: () => closeTab(tab.id),
@@ -406,6 +413,7 @@ export default {
       isTabMode,
       activateTab,
       closeTab,
+      duplicateTab,
       exitTabMode,
       getTabLabel,
       getTabTitle,
@@ -620,7 +628,7 @@ export default {
   transform: translateX(-2px);
 }
 /* ── Close button ── */
-.td-tab-close {
+.td-tab-quick-btn {
   width: 0;
   overflow: hidden;
 
@@ -645,13 +653,24 @@ export default {
     transform 0.18s ease,
     background-color 0.15s ease;
 }
-.td-tab-item:hover .td-tab-close {
-  width: 16px;
-  opacity: 0.5;
+.td-tab-item:hover .td-tab-quick-btn {
+  width: 40px;
+  .td-icon {
+    opacity: 0.5;
+  }
   transform: translateX(0) scale(1);
 }
-.td-tab-close:hover {
+.td-tab-quick-btn:hover {
+  transform: scale(1.15);
   opacity: 1 !important;
+}
+
+.td-tab-quick-btn {
+  opacity: 1 !important;
+
+  .td-icon:hover {
+    opacity: 1 !important;
+  }
   transform: scale(1.15);
 }
 .td-tab-switch-enter-active,

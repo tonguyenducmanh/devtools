@@ -91,7 +91,7 @@ export default {
 .td-ctx-menu {
   position: fixed;
   z-index: 1001;
-  min-width: 200px;
+  min-width: 120px;
   background-color: var(--bg-main-color);
   border: 1px solid var(--bg-layer-color);
   border-radius: var(--border-radius);
