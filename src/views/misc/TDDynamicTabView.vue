@@ -473,7 +473,7 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: flex-end;
-  gap: 1px;
+  gap: var(--padding);
   margin-bottom: calc(var(--padding) / 2);
   flex-shrink: 0;
   overflow-x: auto;
@@ -612,6 +612,9 @@ export default {
 .td-tab-label {
   font-size: var(--font-size-medium-rare);
   transition: transform 0.2s ease;
+}
+.td-tab-item:hover {
+  background-color: var(--border-color);
 }
 .td-tab-item:hover .td-tab-label {
   transform: translateX(-2px);
