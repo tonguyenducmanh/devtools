@@ -34,21 +34,27 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
             @click.middle="closeTab(tab.id)"
             v-tooltip="getTabTitle(tab)"
           >
+            <div class="td-tab-bg"></div>
+
             <div
               v-if="dragOverIndex === index && draggingId !== tab.id"
               class="td-drop-indicator td-drop-indicator-before"
             ></div>
 
-            <span v-if="showTabNumber" class="td-tab-number"
-              >{{ index + 1 }}.
+            <span v-if="showTabNumber" class="td-tab-number">
+              {{ index + 1 }}.
             </span>
-            <span class="td-tab-label">{{ getTabLabel(tab) }}</span>
+
+            <span class="td-tab-label">
+              {{ getTabLabel(tab) }}
+            </span>
+
             <button
               class="td-tab-close"
               @click.stop="closeTab(tab.id)"
               v-tooltip="$t('i18nCommon.tabManager.closeTab')"
             >
-              <span class="td-icon td-close-icon"> </span>
+              <span class="td-icon td-close-icon"></span>
             </button>
           </div>
 
@@ -80,17 +86,19 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
     <div class="td-tab-content">
       <!-- Tab mode: render sẵn tất cả bằng v-show -->
       <template v-if="isTabMode">
-        <KeepAlive>
-          <component
-            v-if="activeTab"
-            :ref="setTabRef"
-            :is="activeTab.resolvedComponent"
-            :key="activeTab.id"
-            :tabId="activeTab.id"
-            class="td-tab-pane"
-            @updateTabTitle="(payload) => onTabTitleUpdate(payload)"
-          />
-        </KeepAlive>
+        <Transition name="td-tab-switch" mode="out-in">
+          <KeepAlive>
+            <component
+              v-if="activeTab"
+              :ref="setTabRef"
+              :is="activeTab.resolvedComponent"
+              :key="activeTab.id"
+              :tabId="activeTab.id"
+              class="td-tab-pane"
+              @updateTabTitle="(payload) => onTabTitleUpdate(payload)"
+            />
+          </KeepAlive>
+        </Transition>
       </template>
 
       <!-- zero tabs mode: show Welcome -->
@@ -480,37 +488,60 @@ export default {
 /* ── Tab item ── */
 .td-tab-item {
   position: relative;
+
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 5px;
   padding: var(--padding);
-  cursor: pointer;
-  white-space: nowrap;
-  color: var(--text-secondary-color);
-  border-radius: var(--border-radius);
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease,
-    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
-    opacity 0.15s ease,
-    box-shadow 0.15s ease;
-  user-select: none;
 
-  .td-tab-close {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  border-radius: var(--border-radius);
+
+  color: var(--text-secondary-color);
+
+  transition:
+    width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    padding-right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    color 0.2s ease,
+    transform 0.18s ease,
+    opacity 0.15s ease;
+
+  .td-tab-bg {
+    position: absolute;
+    inset: 0;
+
+    background: var(--bg-main-color);
+
+    border-radius: inherit;
+
     opacity: 0;
+    transform: scale(0.92);
+
+    transition:
+      opacity 0.22s ease,
+      transform 0.22s ease;
+
+    z-index: 0;
+  }
+
+  > *:not(.td-tab-bg) {
+    position: relative;
+    z-index: 1;
   }
 
   &:hover {
-    background-color: var(--bg-layer-color);
     color: var(--text-color);
   }
 
   &.td-tab-active {
     color: var(--text-color);
-    background-color: var(--bg-main-color);
-    .td-tab-close {
-      opacity: 0.5;
+
+    .td-tab-bg {
+      opacity: 1;
+      transform: scale(1);
     }
   }
 
@@ -580,37 +611,72 @@ export default {
 
 .td-tab-label {
   font-size: var(--font-size-medium-rare);
+  transition: transform 0.2s ease;
 }
-
+.td-tab-item:hover .td-tab-label {
+  transform: translateX(-2px);
+}
 /* ── Close button ── */
 .td-tab-close {
+  width: 0;
+  overflow: hidden;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
+
   height: 16px;
-  flex-shrink: 0;
+
   border: none;
   background: transparent;
-  color: inherit;
+
   cursor: pointer;
-  border-radius: 4px;
-  padding: 0;
+
   opacity: 0;
+
+  transform: translateX(8px) scale(0.8);
+
   transition:
-    opacity 0.15s ease,
+    width 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.18s ease,
+    transform 0.18s ease,
     background-color 0.15s ease;
-
-  &:hover {
-    opacity: 1 !important;
-  }
 }
-
-.td-tab-item:hover .td-tab-close,
-.td-tab-item.td-tab-active .td-tab-close {
+.td-tab-item:hover .td-tab-close {
+  width: 16px;
   opacity: 0.5;
+  transform: translateX(0) scale(1);
+}
+.td-tab-close:hover {
+  opacity: 1 !important;
+  transform: scale(1.15);
+}
+.td-tab-switch-enter-active,
+.td-tab-switch-leave-active {
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
 }
 
+.td-tab-switch-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.td-tab-switch-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.td-tab-switch-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.td-tab-switch-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
 /* ── Exit button ── */
 .td-tab-exit-btn {
   display: flex;
