@@ -682,7 +682,7 @@ export default {
 
 .td-tab-switch-enter-from {
   opacity: 0;
-  transform: translateY(6px);
+  transform: translateY(-6px);
 }
 
 .td-tab-switch-enter-to {
@@ -697,7 +697,7 @@ export default {
 
 .td-tab-switch-leave-to {
   opacity: 0;
-  transform: translateY(-6px);
+  transform: translateY(6px);
 }
 /* ── Exit button ── */
 .td-tab-exit-btn {
