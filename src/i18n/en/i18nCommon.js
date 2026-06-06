@@ -116,6 +116,7 @@ export default {
       APIMocking: "API mocking",
       remoteDesktop: "Remote Desktop Protocol",
       PostgreSQLTemplate: "PostgreSQL Template",
+      CSharpTemplate: "C# template",
       BilingualWeb: "Bilingual Web",
       agentDownload: {
         title: "Download Agent",
@@ -715,6 +716,12 @@ export default {
       noTemplateFound: "No template found",
       sqlCode: "SQL Code",
       template: "Template",
+    },
+    CSharpTemplate: {
+      TwoThreadUsingList: "List 2 thread",
+      TwoThreadUsingConcurrentQueue: "ConcurrentQueue 2 thread",
+      MaxThreadUsingTaskWhenAny: "Task.WhenAny n thread",
+      MaxThreadUsingSemaphoreSlim: "SemaphoreSlim n thread",
     },
     dateTime: {
       placeholder: "dd/mm/yyyy hh:mm:ss",

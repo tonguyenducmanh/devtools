@@ -130,8 +130,14 @@ const sidebarConfig = [
       {
         name: "postgresqltemplate",
         component: () =>
-          import("@/views/tools/PostgreSQLTemplate/TDPostgreSQLTemplate.vue"),
+          import("@/views/tools/codeTemplateTools/PostgreSQLTemplate/TDPostgreSQLTemplate.vue"),
         meta: { titleKey: "i18nCommon.feature.PostgreSQLTemplate" },
+      },
+      {
+        name: "csharptemplate",
+        component: () =>
+          import("@/views/tools/codeTemplateTools/CSharpTemplate/TDCSharpTemplate.vue"),
+        meta: { titleKey: "i18nCommon.feature.CSharpTemplate" },
       },
     ],
   },

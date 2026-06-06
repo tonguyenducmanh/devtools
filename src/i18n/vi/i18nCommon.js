@@ -116,6 +116,7 @@ export default {
       APIMocking: "API mocking",
       remoteDesktopRDP: "Giao thức RDP",
       PostgreSQLTemplate: "Code mẫu PostgreSQL",
+      CSharpTemplate: "Code mẫu C#",
       BilingualWeb: "Web song ngữ",
       agentDownload: {
         title: "Tải Agent",
@@ -712,6 +713,12 @@ export default {
       noTemplateFound: "Không tìm thấy template",
       sqlCode: "Mã SQL",
       template: "Template",
+    },
+    CSharpTemplate: {
+      TwoThreadUsingList: "List 2 thread",
+      TwoThreadUsingConcurrentQueue: "ConcurrentQueue 2 thread",
+      MaxThreadUsingTaskWhenAny: "Task WhenAny cho n thread",
+      MaxThreadUsingSemaphoreSlim: "SemaphoreSlim cho n thread",
     },
     dateTime: {
       placeholder: "dd/mm/yyyy hh:mm:ss",
