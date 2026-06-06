@@ -124,8 +124,8 @@ const sidebarConfig = [
   },
   {
     type: "group",
-    groupKey: "database",
-    groupTitleKey: "i18nCommon.group.Database",
+    groupKey: "sampecode",
+    groupTitleKey: "i18nCommon.group.SampleCode",
     children: [
       {
         name: "postgresqltemplate",

@@ -16,7 +16,7 @@ export default {
       Text: "Text transfrom",
       ArtificialIntelligence: "AI tooling",
       RemoteDesktop: "Remote Desktop",
-      Database: "Database",
+      SampleCode: "Sample code",
       DateAndTime: "Date time",
     },
     typeInput: "Type value",

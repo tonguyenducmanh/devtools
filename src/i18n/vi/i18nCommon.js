@@ -16,7 +16,7 @@ export default {
       Text: "Xử lý văn bản",
       ArtificialIntelligence: "Tích hợp AI",
       RemoteDesktop: "Máy tính từ xa",
-      Database: "Cơ sở dữ liệu",
+      SampleCode: "Code mẫu",
       DateAndTime: "Ngày và giờ",
     },
     typeInput: "Nhập giá trị",
