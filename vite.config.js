@@ -1,5 +1,5 @@
 import { fileURLToPath, URL } from "node:url";
-import { defineConfig, splitVendorChunkPlugin } from "vite";
+import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import fs from "fs";
 import path from "path";
@@ -7,10 +7,7 @@ import path from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/**
- * Hard code config tại đây
- */
-const BASE_URL = "/"; // ví dụ: "/static/" hoặc "https://cdn.example.com/"
+const BASE_URL = "/";
 const VERSION = "12.1.5";
 const HASH_LENGTH = 10;
 const OUT_DIR = "./dist";
@@ -28,7 +25,6 @@ function processFolder(folderPath) {
 
     const fileLower = file.toLowerCase();
 
-    // Bỏ qua các file không cần xử lý
     if (
       fileLower.includes("pjs.vendor-") ||
       (!fileLower.includes("index.html") &&
@@ -40,7 +36,6 @@ function processFolder(folderPath) {
 
     const oldContent = fs.readFileSync(filePath, "utf-8");
 
-    // Xử lý index.html
     if (fileLower.includes("index.html")) {
       const newContent = oldContent.replace(
         /(["'])([^"']+\.(js|css))\1/g,
@@ -51,7 +46,20 @@ function processFolder(folderPath) {
           return `${quote}${subPath}${quote}`;
         }
       );
+      fs.writeFileSync(filePath, newContent);
+      return;
+    }
 
+    if (fileLower.includes("pjs.ckeditor-")) {
+      const newContent = oldContent.replace(
+        /(["'])([^"']+\.(js))\1/g,
+        (match, quote, subPath) => {
+          if (subPath.includes("pjs.vendor-")) {
+            return `${quote}${subPath}?v=${VERSION}${quote}`;
+          }
+          return `${quote}${subPath}${quote}`;
+        }
+      );
       fs.writeFileSync(filePath, newContent);
       return;
     }
@@ -96,16 +104,13 @@ export default defineConfig({
 
   plugins: [
     vue(),
-    splitVendorChunkPlugin(),
     {
       name: "versioned-bundle",
       apply: "build",
       closeBundle() {
         console.log("CloseBundle Start Replace Version CDN", new Date().toLocaleTimeString());
-
         const distDir = path.resolve(__dirname, OUT_DIR);
         processFolder(distDir);
-
         console.log("CloseBundle End Replace Version CDN", new Date().toLocaleTimeString());
       },
     },
@@ -159,12 +164,15 @@ export default defineConfig({
         assetFileNames: `assets/pas.[name]-[hash:${HASH_LENGTH}].[ext]`.toLowerCase(),
 
         manualChunks(id) {
+          if (id.includes("node_modules")) {
+            return "pjs.vendor";
+          }
+
           if (!id.endsWith(".js") && !id.endsWith(".ts")) {
             return;
           }
 
           const lstChunksFiles = [
-			// todo: thêm vào sau này
           ];
 
           for (const chunk of lstChunksFiles) {
