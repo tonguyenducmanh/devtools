@@ -1,9 +1,11 @@
 import { fileURLToPath, URL } from "node:url";
-
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import packageJson from "./package.json";
 
-// https://vitejs.dev/config/
+// cấu hình phiên bản để đưa vào tên file khi build, giúp cache busting
+const APP_VERSION = packageJson.version;
+
 export default defineConfig({
   plugins: [vue()],
   resolve: {
@@ -15,11 +17,26 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        api: "modern-compiler", // or "modern"
+        api: "modern-compiler",
       },
     },
   },
   optimizeDeps: {
-    exclude: ['rdp_client']
-  }
+    exclude: ["rdp_client"],
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        entryFileNames: (chunkInfo) => {
+          return `assets/tjs-[name]-[hash]-${APP_VERSION}.js`;
+        },
+        chunkFileNames: (chunkInfo) => {
+          return `assets/tjs-[name]-[hash]-${APP_VERSION}.js`;
+        },
+        assetFileNames: (assetInfo) => {
+          return `assets/tas-[name]-[hash]-${APP_VERSION}[extname]`;
+        },
+      },
+    },
+  },
 });
