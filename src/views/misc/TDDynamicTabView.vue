@@ -113,11 +113,20 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
 </template>
 
 <script>
-import { computed, ref, inject, watch as vueWatch, nextTick } from "vue";
-import TDWelcome from "@/views/misc/TDWelcome.vue";
+import {
+  computed,
+  ref,
+  inject,
+  watch as vueWatch,
+  nextTick,
+  defineAsyncComponent,
+} from "vue";
 import { useTabManager } from "@/stores/TDTabManager.js";
 import i18nData from "@/i18n/i18nData.js";
-
+// 2. Thay bằng defineAsyncComponent để import động:
+const TDWelcome = defineAsyncComponent(
+  () => import("@/views/misc/TDWelcome.vue"),
+);
 export default {
   name: "TDDynamicTabView",
   components: { TDWelcome },
