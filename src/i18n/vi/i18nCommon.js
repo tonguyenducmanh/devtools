@@ -29,6 +29,11 @@ export default {
       showTooltip: "Hiển thị menu theo tool",
       hideTooltip: "Ẩn menu theo tool",
     },
+    shortKeyAction: {
+      search: "Tìm kiếm tính năng",
+      showCommandTextEditor: "Hiển thị lệnh text editor",
+      formatCodeTextEditor: "Định dạng code text editor",
+    },
     footerHelp:
       "Chọn vào số dòng để copy cả dòng, chọn vào 1 cell cụ thể để copy 1 cell",
     noDataAvailable: "Không có dữ liệu",

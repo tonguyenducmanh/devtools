@@ -29,6 +29,11 @@ export default {
       showTooltip: "Show menu tool",
       hideTooltip: "Hide menu tool",
     },
+    shortKeyAction: {
+      search: "Search feature",
+      showCommandTextEditor: "Show command text editor",
+      formatCodeTextEditor: "Format code in text editor",
+    },
     footerHelp:
       "Select the row number to copy the entire row, select a specific cell to copy a single cell.",
     noDataAvailable: "No data available",

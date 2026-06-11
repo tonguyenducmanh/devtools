@@ -1,7 +1,7 @@
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import tdUtility from "@/common/TDUtility.js";
 
-let controlKeyName = tdUtility.isMacOS() ? "Cmd" : "Ctrl";
+let isMacOS = tdUtility.isMacOS() ? "Cmd" : "Ctrl";
 
 class TDShortcutAction {
   constructor() {
@@ -79,8 +79,8 @@ class TDShortcutAction {
   initDefaultShortcuts() {
     this.register("search", {
       key: tdUtility.newGuid(),
-      presentKey: [controlKeyName, "p"],
-      labelKey: "i18nCommon.search.placeholder",
+      presentKey: [isMacOS ? "Cmd" : "Ctrl", "p"],
+      labelKey: "i18nCommon.shortKeyAction.search",
       action: (event) => {
         if (event && (event.metaKey || event.ctrlKey) && event.key === "p") {
           event.preventDefault();
@@ -89,6 +89,16 @@ class TDShortcutAction {
           });
         }
       },
+    });
+    this.register("showCommandTextEditor", {
+      key: tdUtility.newGuid(),
+      presentKey: ["F1"],
+      labelKey: "i18nCommon.shortKeyAction.showCommandTextEditor",
+    });
+    this.register("formatCodeTextEditor", {
+      key: tdUtility.newGuid(),
+      presentKey: ["Shift", isMacOS ? "Opiton" : "Alt", "f"],
+      labelKey: "i18nCommon.shortKeyAction.formatCodeTextEditor",
     });
   }
 }
