@@ -15,7 +15,9 @@
             {{ part }}
           </span>
         </span>
-        <span class="td-shortcut-label">{{ $t(shortcut.labelKey) }}</span>
+        <span class="text-nowrap td-shortcut-label">{{
+          $t(shortcut.labelKey)
+        }}</span>
       </div>
     </div>
     <div class="td-footer-actions">
@@ -68,16 +70,20 @@ export default {
   align-items: center;
   padding: 0 var(--padding);
   flex-shrink: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .td-footer-shortcuts {
   display: flex;
   align-items: center;
   gap: var(--padding);
+  flex-wrap: nowrap;
 }
 
 .td-shortcut-item {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 6px;
   padding: 4px 8px;
