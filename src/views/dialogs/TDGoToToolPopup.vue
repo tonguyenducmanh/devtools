@@ -66,7 +66,9 @@
 <script>
 import { getAllSearchableRoutes } from "@/stores/TDToolConfigs.js";
 import { useTabManager } from "@/stores/TDTabManager.js";
-
+import TDShortcutAction, {
+  TDShortcutActionEnum,
+} from "@/common/TDShortcutAction.js";
 export default {
   name: "TDGoToToolPopup",
 
@@ -124,10 +126,15 @@ export default {
 
   mounted() {
     this.$refs.searchInput?.focus();
+    TDShortcutAction.unregisterByEnum(TDShortcutActionEnum.Search);
+  },
+  beforeUnmount() {
+    TDShortcutAction.registerByEnum(TDShortcutActionEnum.Search);
   },
 
   methods: {
     handleClose() {
+      TDShortcutAction.registerByEnum(TDShortcutActionEnum.Search);
       this.$emit("close");
     },
 
@@ -165,7 +172,7 @@ export default {
         helpKey: route.meta.helpKey,
         groupKey: route.groupKey || "",
         toolKey: route.name,
-        component: route.component
+        component: route.component,
       });
       this.handleClose();
     },

@@ -3,6 +3,38 @@ import tdUtility from "@/common/TDUtility.js";
 
 let isMacOS = tdUtility.isMacOS() ? "Cmd" : "Ctrl";
 
+export const TDShortcutActionEnum = {
+  Search: "search",
+  ShowCommandTextEditor: "showCommandTextEditor",
+  FormatCodeTextEditor: "formatCodeTextEditor",
+};
+
+const ShortcutConfigMap = {
+  [TDShortcutActionEnum.Search]: {
+    key: tdUtility.newGuid(),
+    presentKey: [isMacOS, "p"],
+    labelKey: "i18nCommon.shortKeyAction.search",
+    action: (event) => {
+      if (event && (event.metaKey || event.ctrlKey) && event.key === "p") {
+        event.preventDefault();
+        TDDialogUtil.showPopup({
+          dialogType: TDDialogEnum.TDGoToToolPopup,
+        });
+      }
+    },
+  },
+  [TDShortcutActionEnum.ShowCommandTextEditor]: {
+    key: tdUtility.newGuid(),
+    presentKey: ["F1"],
+    labelKey: "i18nCommon.shortKeyAction.showCommandTextEditor",
+  },
+  [TDShortcutActionEnum.FormatCodeTextEditor]: {
+    key: tdUtility.newGuid(),
+    presentKey: ["Shift", isMacOS === "Cmd" ? "Option" : "Alt", "f"],
+    labelKey: "i18nCommon.shortKeyAction.formatCodeTextEditor",
+  },
+};
+
 class TDShortcutAction {
   constructor() {
     this.activeShortcuts = new Map();
@@ -25,6 +57,17 @@ class TDShortcutAction {
       this.updateListeners();
       this.notifyListeners();
     }
+  }
+
+  registerByEnum(enumKey) {
+    const config = ShortcutConfigMap[enumKey];
+    if (config) {
+      this.register(enumKey, config);
+    }
+  }
+
+  unregisterByEnum(enumKey) {
+    this.unregister(enumKey);
   }
 
   isActive(name) {
@@ -77,29 +120,13 @@ class TDShortcutAction {
   }
 
   initDefaultShortcuts() {
-    this.register("search", {
-      key: tdUtility.newGuid(),
-      presentKey: [isMacOS ? "Cmd" : "Ctrl", "p"],
-      labelKey: "i18nCommon.shortKeyAction.search",
-      action: (event) => {
-        if (event && (event.metaKey || event.ctrlKey) && event.key === "p") {
-          event.preventDefault();
-          TDDialogUtil.showPopup({
-            dialogType: TDDialogEnum.TDGoToToolPopup,
-          });
-        }
-      },
-    });
-    this.register("showCommandTextEditor", {
-      key: tdUtility.newGuid(),
-      presentKey: ["F1"],
-      labelKey: "i18nCommon.shortKeyAction.showCommandTextEditor",
-    });
-    this.register("formatCodeTextEditor", {
-      key: tdUtility.newGuid(),
-      presentKey: ["Shift", isMacOS ? "Opiton" : "Alt", "f"],
-      labelKey: "i18nCommon.shortKeyAction.formatCodeTextEditor",
-    });
+    for (const key in TDShortcutActionEnum) {
+      const actionKey = TDShortcutActionEnum[key];
+      const config = ShortcutConfigMap[actionKey];
+      if (config) {
+        this.register(actionKey, config);
+      }
+    }
   }
 }
 
