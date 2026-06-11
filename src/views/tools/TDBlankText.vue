@@ -6,15 +6,16 @@
         v-model="content"
         height="100%"
         width="100%"
-        :enableHighlight="enableHighlight"
-        :language="language"
-        :wrapText="wrapText"
+        :enableHighlight="currentConfigLayout.enableHighlight"
+        :language="currentConfigLayout.language"
+        :wrapText="currentConfigLayout.wrapText"
       ></TDTextarea>
     </div>
     <div class="flex tool-footer">
       <TDComboBox
         :width="200"
-        v-model="language"
+        v-model="currentConfigLayout.language"
+        @selected="updateConfigLayout"
         :options="methodOptions"
         :isDropTop="true"
         :noMargin="true"
@@ -34,7 +35,8 @@
       ></TDButton>
       <div>
         <TDCheckbox
-          v-model="wrapText"
+          v-model="currentConfigLayout.wrapText"
+          @change="updateConfigLayout"
           :label="$t('i18nCommon.wrapText')"
         ></TDCheckbox>
       </div>
@@ -48,10 +50,13 @@ export default {
   name: "TDBlankText",
   data() {
     return {
+      keyCacheLayout: this.$tdEnum.cacheConfig.BlankTextConfigLayout,
       content: "",
-      enableHighlight: true,
-      wrapText: true,
-      language: "plaintext",
+      currentConfigLayout: {
+        enableHighlight: true,
+        wrapText: true,
+        language: "json",
+      },
       methodOptions: [
         { value: "plaintext", label: "Plain Text" },
         { value: "javascript", label: "JavaScript" },
@@ -94,7 +99,7 @@ export default {
     handleDownload() {
       let me = this;
       if (me.content) {
-        const extension = me.getFileExtension(me.language);
+        const extension = me.getFileExtension(me.currentConfigLayout.language);
         const blob = new Blob([me.content], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
