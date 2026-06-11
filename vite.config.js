@@ -25,7 +25,7 @@ export default defineConfig({
     exclude: ["rdp_client"],
   },
   build: {
-    rollupOptions: {
+    rolldownOptions: {
       output: {
         entryFileNames: (chunkInfo) => {
           return `assets/tjs-[name]-[hash]-${APP_VERSION}.js`;
@@ -35,6 +35,18 @@ export default defineConfig({
         },
         assetFileNames: (assetInfo) => {
           return `assets/tas-[name]-[hash]-${APP_VERSION}[extname]`;
+        },
+        codeSplitting: {
+          minSize: 20000,
+          groups: [
+            {
+              name: "vendor",
+              test: /node_modules/,
+              minSize: 100000, // 100KB
+              maxSize: 250000, // 250KB
+              priority: 10,
+            },
+          ],
         },
       },
     },
