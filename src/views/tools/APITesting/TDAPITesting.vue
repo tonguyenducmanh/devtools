@@ -639,7 +639,7 @@ export default {
         showReponse: true,
         enableHighlight: true,
         wrapText: true,
-        splitHorizontal: true,
+        splitHorizontal: false,
         currentAPIMode: this.$tdEnum.APIMode.Normal,
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.APISidebarOption.Setting,

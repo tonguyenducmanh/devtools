@@ -13,7 +13,22 @@ class TDUtility {
     this.copyQueue = [];
     this.batchTimeout = null;
   }
-
+  isMacOS() {
+    let OS = this.getOS();
+    return OS === "mac";
+  }
+  /**
+   * trả về hệ điều hành đang dùng, mac/windows/linux
+   */
+  getOS() {
+    let OS = "windows";
+    if (navigator.userAgent.indexOf("Mac") !== -1) {
+      OS = "mac";
+    } else if (navigator.userAgent.indexOf("Linux") !== -1) {
+      OS = "linux";
+    }
+    return OS;
+  }
   /**
    * Lấy ra tiêu đề app mặc định
    */

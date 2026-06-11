@@ -349,7 +349,7 @@ export default {
       currentConfigLayout: {
         enableHighlight: true,
         wrapText: true,
-        splitHorizontal: true,
+        splitHorizontal: false,
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.APISidebarOption.Collection,
       },

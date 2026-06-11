@@ -5,11 +5,15 @@
         v-for="shortcut in activeShortcuts"
         :key="shortcut.key"
         class="td-shortcut-item"
-        @click="shortcut.action"
       >
         <span class="td-shortcut-keys">
-          <span v-if="shortcut.requireCtrl" class="td-shortcut-key">Ctrl</span>
-          <span class="td-shortcut-key">{{ shortcut.key.toUpperCase() }}</span>
+          <span
+            v-for="part in shortcut.presentKey"
+            :key="part"
+            class="td-shortcut-key"
+          >
+            {{ part }}
+          </span>
         </span>
         <span class="td-shortcut-label">{{ $t(shortcut.labelKey) }}</span>
       </div>
@@ -44,9 +48,8 @@ export default {
       const componentShortcuts = TDShortcutAction.getActiveShortcuts().map(
         (s) => ({
           key: s.key,
+          presentKey: s.presentKey,
           labelKey: s.labelKey,
-          tooltipKey: s.tooltipKey,
-          requireCtrl: s.requireCtrl,
           action: s.action,
         }),
       );
@@ -85,12 +88,7 @@ export default {
   gap: 6px;
   padding: 4px 8px;
   border-radius: var(--border-radius);
-  cursor: pointer;
   transition: background-color 0.15s ease;
-
-  &:hover {
-    background-color: var(--bg-layer-color);
-  }
 }
 
 .td-shortcut-keys {

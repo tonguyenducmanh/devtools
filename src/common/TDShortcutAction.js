@@ -1,4 +1,7 @@
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
+import tdUtility from "@/common/TDUtility.js";
+
+let controlKeyName = tdUtility.isMacOS() ? "Cmd" : "Ctrl";
 
 class TDShortcutAction {
   constructor() {
@@ -67,29 +70,24 @@ class TDShortcutAction {
 
   handleKeydown(event) {
     for (const [name, config] of this.activeShortcuts) {
-      const ctrlMatch = config.requireCtrl
-        ? event.metaKey || event.ctrlKey
-        : !event.ctrlKey && !event.metaKey && !event.shiftKey;
-
-      if (ctrlMatch && event.key === config.key) {
-        event.preventDefault();
-        if (config.action) {
-          config.action();
-        }
-        break;
+      if (config.action && typeof config.action === "function") {
+        config.action(event);
       }
     }
   }
 
   initDefaultShortcuts() {
     this.register("search", {
-      key: "p",
+      key: tdUtility.newGuid(),
+      presentKey: [controlKeyName, "p"],
       labelKey: "i18nCommon.search.placeholder",
-      requireCtrl: true,
-      action: () => {
-        TDDialogUtil.showPopup({
-          dialogType: TDDialogEnum.TDGoToToolPopup,
-        });
+      action: (event) => {
+        if (event && (event.metaKey || event.ctrlKey) && event.key === "p") {
+          event.preventDefault();
+          TDDialogUtil.showPopup({
+            dialogType: TDDialogEnum.TDGoToToolPopup,
+          });
+        }
       },
     });
   }
