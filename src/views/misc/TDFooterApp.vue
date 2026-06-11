@@ -45,14 +45,8 @@ export default {
   },
   methods: {
     updateActiveShortcuts() {
-      const componentShortcuts = TDShortcutAction.getActiveShortcuts().map(
-        (s) => ({
-          key: s.key,
-          presentKey: s.presentKey,
-          labelKey: s.labelKey,
-          action: s.action,
-        }),
-      );
+      // short theo thứ tự tăng dần của sortOrder
+      const componentShortcuts = TDShortcutAction.getActiveShortcuts();
       this.activeShortcuts = [...componentShortcuts];
     },
   },

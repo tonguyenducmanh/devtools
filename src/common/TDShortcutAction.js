@@ -11,6 +11,7 @@ export const TDShortcutActionEnum = {
 
 const ShortcutConfigMap = {
   [TDShortcutActionEnum.Search]: {
+    sortOrder: 1,
     key: tdUtility.newGuid(),
     presentKey: [isMacOS, "p"],
     labelKey: "i18nCommon.shortKeyAction.search",
@@ -24,11 +25,13 @@ const ShortcutConfigMap = {
     },
   },
   [TDShortcutActionEnum.ShowCommandTextEditor]: {
+    sortOrder: 2,
     key: tdUtility.newGuid(),
     presentKey: ["F1"],
     labelKey: "i18nCommon.shortKeyAction.showCommandTextEditor",
   },
   [TDShortcutActionEnum.FormatCodeTextEditor]: {
+    sortOrder: 3,
     key: tdUtility.newGuid(),
     presentKey: ["Shift", isMacOS === "Cmd" ? "Option" : "Alt", "f"],
     labelKey: "i18nCommon.shortKeyAction.formatCodeTextEditor",
@@ -75,7 +78,9 @@ class TDShortcutAction {
   }
 
   getActiveShortcuts() {
-    return Array.from(this.activeShortcuts.values());
+    return Array.from(this.activeShortcuts.values()).sort(
+      (x, y) => x.sortOrder - y.sortOrder,
+    );
   }
 
   onChange(callback) {
