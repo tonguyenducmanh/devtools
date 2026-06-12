@@ -17,6 +17,14 @@ class TDUtility {
     let OS = this.getOS();
     return OS === "mac";
   }
+  isLinux() {
+    let OS = this.getOS();
+    return OS === "linux";
+  }
+  isWindows() {
+    let OS = this.getOS();
+    return OS === "windows";
+  }
   /**
    * trả về hệ điều hành đang dùng, mac/windows/linux
    */

@@ -1,7 +1,10 @@
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import tdUtility from "@/common/TDUtility.js";
 
-let isMacOS = tdUtility.isMacOS() ? "Cmd" : "Ctrl";
+let isMacOS = tdUtility.isMacOS();
+let isLinux = tdUtility.isLinux();
+let isWindows = tdUtility.isWindows();
+
 let currentOS = tdUtility.getOS();
 
 export const TDShortcutActionEnum = {
@@ -14,7 +17,13 @@ const ShortcutConfigMap = {
   [TDShortcutActionEnum.Search]: {
     sortOrder: 1,
     key: tdUtility.newGuid(),
-    presentKey: [isMacOS, "p"],
+    presentKey: (() => {
+      if (isMacOS) {
+        return ["Cmd", "p"];
+      } else {
+        return ["Ctrl", "p"];
+      }
+    })(),
     labelKey: "i18nCommon.shortKeyAction.search",
     action: (event) => {
       if (event && (event.metaKey || event.ctrlKey) && event.key === "p") {
@@ -34,10 +43,16 @@ const ShortcutConfigMap = {
   [TDShortcutActionEnum.FormatCodeTextEditor]: {
     sortOrder: 3,
     key: tdUtility.newGuid(),
-    presentKey: 
-      currentOS == "linux" 
-      ? ["Ctrl", "Shift", "i"]
-      : ["Shift", isMacOS === "Cmd" ? "Option" : "Alt", "f"],
+    presentKey: (() => {
+      if (isLinux) {
+        return ["Ctrl", "Shift", "i"];
+      } else if (isMacOS) {
+        return ["Shift", "Option", "f"];
+      } else {
+        return ["Shift", "Alt", "f"];
+      }
+    })(),
+
     labelKey: "i18nCommon.shortKeyAction.formatCodeTextEditor",
   },
 };
