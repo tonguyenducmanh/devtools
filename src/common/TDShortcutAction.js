@@ -2,6 +2,7 @@ import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import tdUtility from "@/common/TDUtility.js";
 
 let isMacOS = tdUtility.isMacOS() ? "Cmd" : "Ctrl";
+let currentOS = tdUtility.getOS();
 
 export const TDShortcutActionEnum = {
   Search: "search",
@@ -33,7 +34,10 @@ const ShortcutConfigMap = {
   [TDShortcutActionEnum.FormatCodeTextEditor]: {
     sortOrder: 3,
     key: tdUtility.newGuid(),
-    presentKey: ["Shift", isMacOS === "Cmd" ? "Option" : "Alt", "f"],
+    presentKey: 
+      currentOS == "linux" 
+      ? ["Ctrl", "Shift", "i"]
+      : ["Shift", isMacOS === "Cmd" ? "Option" : "Alt", "f"],
     labelKey: "i18nCommon.shortKeyAction.formatCodeTextEditor",
   },
 };
