@@ -3,89 +3,86 @@
 </template>
 
 <script>
-const SNIPPETS = [
-  // Vue 3 Options API
-  "data() { return {}",
-  "methods: {",
-  "mounted() {",
-  "computed: {",
-  "watch: { val(",
-  'emits: ["update"]',
-  "components: {",
-  "props: { id: Number",
-  "beforeUnmount() {",
-  '$emit("change")',
-  "this.$router.push(",
-  "this.$store.commit(",
-  'v-model="form"',
-  'v-for="i in list"',
-  ':class="{ active"',
-  '@click.stop="fn"',
-  'v-if="isReady"',
-  '<slot name="hd">',
-
-  // JavaScript
-  "const res = await",
-  "Promise.all([",
-  "Array.from({",
-  ".filter(x => x)",
-  ".map(x => ({",
-  "Object.keys(obj)",
-  "try { await fn(",
-  "catch (err) {",
-  "JSON.parse(str)",
-  "export default {",
-  "import { ref } from",
-  "localStorage.set(",
-  "setTimeout(() => {",
-  "console.error(",
-  '?.split(".")',
-
-  // C#
-  "public async Task",
-  "await Task.WhenAll(",
-  "var result = new",
-  "string? name = null",
-  "List<T> items = []",
-  "record User(int Id",
-  "if (obj is null)",
-  "foreach (var x in",
-  "return Ok(data)",
-  '[HttpGet("{id}")]',
-  "services.AddScoped(",
-  "builder.Build()",
-  "Console.WriteLine(",
-  ".Select(x => x.Id)",
-  "throw new Exception(",
-
-  // Go
-  "func main() {",
-  "go func() {",
-  "defer wg.Done()",
-  "if err != nil {",
-  "var wg sync.WaitGroup",
-  "ch := make(chan",
-  "ctx, cancel :=",
-  "log.Fatal(err)",
-  "http.HandleFunc(",
-  "json.Unmarshal(",
-  "type User struct {",
-  "interface{}",
-  "select { case v :=",
-  ":= range items {",
-  "fmt.Println(",
-];
-
-const MAX_NODES = 14; // số snippet hiển thị cùng lúc tối đa
-const SPAWN_MS = 700; // ms giữa mỗi lần spawn snippet mới
-const FONT_SIZE = 11; // px
-const MIN_LIFE = 2.8; // giây
-const MAX_LIFE = 5.0;
-
 export default {
   name: "TDDynamicBackgroundEffect",
   data() {
     return {
+      // ── Config ──
+      snippets: [
+        // Vue 3 Options API
+        "data() { return {}",
+        "methods: {",
+        "mounted() {",
+        "computed: {",
+        "watch: { val(",
+        'emits: ["update"]',
+        "components: {",
+        "props: { id: Number",
+        "beforeUnmount() {",
+        '$emit("change")',
+        "this.$router.push(",
+        "this.$store.commit(",
+        'v-model="form"',
+        'v-for="i in list"',
+        ':class="{ active"',
+        '@click.stop="fn"',
+        'v-if="isReady"',
+        '<slot name="hd">',
+        // JavaScript
+        "const res = await",
+        "Promise.all([",
+        "Array.from({",
+        ".filter(x => x)",
+        ".map(x => ({",
+        "Object.keys(obj)",
+        "try { await fn(",
+        "catch (err) {",
+        "JSON.parse(str)",
+        "export default {",
+        "import { ref } from",
+        "localStorage.set(",
+        "setTimeout(() => {",
+        "console.error(",
+        '?.split(".")',
+        // C#
+        "public async Task",
+        "await Task.WhenAll(",
+        "var result = new",
+        "string? name = null",
+        "List<T> items = []",
+        "record User(int Id",
+        "if (obj is null)",
+        "foreach (var x in",
+        "return Ok(data)",
+        '[HttpGet("{id}")]',
+        "services.AddScoped(",
+        "builder.Build()",
+        "Console.WriteLine(",
+        ".Select(x => x.Id)",
+        "throw new Exception(",
+        // Go
+        "func main() {",
+        "go func() {",
+        "defer wg.Done()",
+        "if err != nil {",
+        "var wg sync.WaitGroup",
+        "ch := make(chan",
+        "ctx, cancel :=",
+        "log.Fatal(err)",
+        "http.HandleFunc(",
+        "json.Unmarshal(",
+        "type User struct {",
+        "interface{}",
+        "select { case v :=",
+        ":= range items {",
+        "fmt.Println(",
+      ],
+      maxNodes: 14, // số snippet hiển thị cùng lúc tối đa
+      spawnMs: 700, // ms giữa mỗi lần spawn snippet mới
+      fontSize: 11, // px
+      minLife: 2.8, // giây
+      maxLife: 5.0,
+      // ── Runtime ──
       canvas: null,
       ctx: null,
       animationId: null,
@@ -95,7 +92,7 @@ export default {
       displayWidth: 0,
       displayHeight: 0,
       nodes: [],
-      usedSlots: [], // lưới slot để tránh chồng chữ
+      usedSlots: [],
       slotCols: 0,
       slotRows: 0,
     };
@@ -139,11 +136,8 @@ export default {
       const w = parent ? parent.clientWidth : 300;
       const h = parent ? parent.clientHeight : 300;
       this.handleResize(w, h);
-
-      // seed vài snippet ban đầu
       for (let i = 0; i < 5; i++) this.spawnNode();
-
-      this.spawnTimer = setInterval(() => this.spawnNode(), SPAWN_MS);
+      this.spawnTimer = setInterval(() => this.spawnNode(), this.spawnMs);
       this.animate();
     },
 
@@ -161,7 +155,6 @@ export default {
       this.nodes = [];
     },
 
-    // Chia canvas thành lưới ô để snippet không chồng lên nhau
     buildSlots() {
       const cellW = 160;
       const cellH = 40;
@@ -184,21 +177,21 @@ export default {
       const cellH = this.displayHeight / this.slotRows;
       const col = slotIdx % this.slotCols;
       const row = Math.floor(slotIdx / this.slotCols);
-      // jitter nhẹ trong ô
       const x = col * cellW + Math.random() * (cellW * 0.5) + cellW * 0.1;
       const y = row * cellH + Math.random() * (cellH * 0.4) + cellH * 0.3;
       return { x, y };
     },
 
     spawnNode() {
-      if (this.nodes.length >= MAX_NODES) return;
+      if (this.nodes.length >= this.maxNodes) return;
       const slotIdx = this.getFreeSlot();
       if (slotIdx === null) return;
 
       this.usedSlots[slotIdx] = true;
       const { x, y } = this.slotToXY(slotIdx);
-      const text = SNIPPETS[Math.floor(Math.random() * SNIPPETS.length)];
-      const life = MIN_LIFE + Math.random() * (MAX_LIFE - MIN_LIFE);
+      const text =
+        this.snippets[Math.floor(Math.random() * this.snippets.length)];
+      const life = this.minLife + Math.random() * (this.maxLife - this.minLife);
 
       this.nodes.push({
         x,
@@ -207,9 +200,8 @@ export default {
         slotIdx,
         born: performance.now() / 1000,
         maxLife: life,
-        // Typewriter: bao nhiêu ký tự đang hiển thị
         typed: 0,
-        typeSpeed: text.length / (life * 0.35), // gõ xong trong 35% thời gian
+        typeSpeed: text.length / (life * 0.35),
       });
     },
 
@@ -226,7 +218,7 @@ export default {
       const rgb = this.getColor();
 
       ctx.clearRect(0, 0, W, H);
-      ctx.font = `${FONT_SIZE}px "Courier New", monospace`;
+      ctx.font = `${this.fontSize}px "Courier New", monospace`;
       ctx.textBaseline = "top";
 
       this.nodes = this.nodes.filter((n) => {
@@ -236,11 +228,9 @@ export default {
           return false;
         }
 
-        // Typewriter progress
         n.typed = Math.min(n.text.length, n.typed + n.typeSpeed * (1 / 60));
         const visibleText = n.text.slice(0, Math.floor(n.typed));
 
-        // Alpha: fade-in nhanh, giữ, fade-out
         const p = age / n.maxLife;
         let alpha;
         if (p < 0.12) alpha = p / 0.12;
@@ -251,12 +241,11 @@ export default {
         ctx.fillStyle = `rgba(${rgb},${alpha.toFixed(3)})`;
         ctx.fillText(visibleText, n.x, n.y);
 
-        // Con trỏ nhấp nháy khi đang gõ
         if (Math.floor(n.typed) < n.text.length) {
           const cursorAlpha = (Math.sin(now * 8) * 0.5 + 0.5) * alpha * 1.4;
           ctx.fillStyle = `rgba(${rgb},${Math.min(1, cursorAlpha).toFixed(3)})`;
           const cursorX = n.x + ctx.measureText(visibleText).width + 1;
-          ctx.fillRect(cursorX, n.y, 1, FONT_SIZE);
+          ctx.fillRect(cursorX, n.y, 1, this.fontSize);
         }
 
         return true;
