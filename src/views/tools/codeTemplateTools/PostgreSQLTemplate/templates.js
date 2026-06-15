@@ -56,4 +56,9 @@ export default [
     labelKey: "i18nCommon.postgreSQLTemplate.queryKillProcess",
     code: codeModules["./template/query_kill_process.sql"],
   },
+  {
+    key: "query_delete_history_by_trigger",
+    labelKey: "i18nCommon.postgreSQLTemplate.queryDeleteHistoryByTrigger",
+    code: codeModules["./template/query_delete_history_by_trigger.sql"],
+  },
 ];

@@ -47,7 +47,8 @@
             <div
               v-for="template in filteredTemplates"
               :key="template.key"
-              class="template-item"
+              class="text-nowrap template-item"
+              v-tooltip="$t(template.labelKey)"
               :class="{
                 'template-item-selected': selectedTemplateKey === template.key,
               }"
