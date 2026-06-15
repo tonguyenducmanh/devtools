@@ -7,6 +7,16 @@ const codeModules = import.meta.glob("./template/*.sql", {
 
 export default [
   {
+    key: "query_size_db",
+    labelKey: "i18nCommon.postgreSQLTemplate.querySizeDb",
+    code: codeModules["./template/query_size_db.sql"],
+  },
+  {
+    key: "query_size_table",
+    labelKey: "i18nCommon.postgreSQLTemplate.querySizeTable",
+    code: codeModules["./template/query_size_table.sql"],
+  },
+  {
     key: "func_generate_create_table",
     labelKey: "i18nCommon.postgreSQLTemplate.funcGenerateCreateTable",
     code: codeModules["./template/func_generate_create_table.sql"],
@@ -25,16 +35,6 @@ export default [
     key: "query_function_contain",
     labelKey: "i18nCommon.postgreSQLTemplate.queryFunctionContain",
     code: codeModules["./template/query_function_contain.sql"],
-  },
-  {
-    key: "query_size_db",
-    labelKey: "i18nCommon.postgreSQLTemplate.querySizeDb",
-    code: codeModules["./template/query_size_db.sql"],
-  },
-  {
-    key: "query_size_table",
-    labelKey: "i18nCommon.postgreSQLTemplate.querySizeTable",
-    code: codeModules["./template/query_size_table.sql"],
   },
   {
     key: "query_table_data_type",
