@@ -411,16 +411,20 @@
                   :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
                 />
               </div>
-              <div
-                class="td-icon td-plus-icon"
+              <TDButton
+                :noMargin="true"
                 @click="addNewCollection"
+                :type="$tdEnum.buttonType.secondary"
+                iconClass="td-plus-icon"
                 v-tooltip="$t('i18nCommon.apiTesting.add')"
-              ></div>
-              <div
+              />
+              <TDButton
+                :noMargin="true"
                 @click="loadAllTestingData"
-                class="td-icon td-reload-icon"
+                :type="$tdEnum.buttonType.secondary"
+                iconClass="td-reload-icon"
                 v-tooltip="$t('i18nCommon.APIMocking.refresh')"
-              ></div>
+              />
             </div>
             <!-- phần danh sách các request đã lưu theo thư mục -->
             <div class="td-collection">
