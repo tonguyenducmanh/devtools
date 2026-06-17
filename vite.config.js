@@ -2,34 +2,12 @@ import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import packageJson from "./package.json";
-import { VitePWA } from "vite-plugin-pwa";
 
 // cấu hình phiên bản để đưa vào tên file khi build, giúp cache busting
 const APP_VERSION = packageJson.version;
 
 export default defineConfig({
-  plugins: [
-    vue(),
-    VitePWA({
-      registerType: "autoUpdate",
-      workbox: {
-        globPatterns: ["**/*.{js,css,ico,png,svg,woff2,ttf,wasm}"], // bỏ html ra
-        runtimeCaching: [
-          {
-            urlPattern: /\/index\.html$/,
-            handler: "NetworkFirst", // thử network trước, fail mới dùng cache
-          },
-        ],
-        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB
-      },
-      manifest: {
-        name: "dev-tool",
-        short_name: "dev-tool",
-        theme_color: "#ffffff",
-        icons: [{ src: "favicon.ico", sizes: "64x64", type: "image/x-icon" }],
-      },
-    }),
-  ],
+  plugins: [vue()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
