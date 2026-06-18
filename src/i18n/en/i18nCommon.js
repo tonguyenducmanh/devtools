@@ -122,6 +122,7 @@ export default {
       remoteDesktop: "Remote Desktop Protocol",
       PostgreSQLTemplate: "PostgreSQL Template",
       CSharpTemplate: "C# template",
+      JavaScriptTemplate: "JavaScript template",
       BilingualWeb: "Bilingual Web",
       agentDownload: {
         title: "Download Agent",
@@ -728,6 +729,9 @@ export default {
       TwoThreadUsingConcurrentQueue: "ConcurrentQueue 2 thread",
       MaxThreadUsingTaskWhenAny: "Task.WhenAny n thread",
       MaxThreadUsingSemaphoreSlim: "SemaphoreSlim n thread",
+    },
+    JavaScriptTemplate: {
+      JSONFileHandle: "Handle file json",
     },
     dateTime: {
       placeholder: "dd/mm/yyyy hh:mm:ss",

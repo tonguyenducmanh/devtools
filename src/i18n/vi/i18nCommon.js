@@ -122,6 +122,7 @@ export default {
       remoteDesktopRDP: "Giao thức RDP",
       PostgreSQLTemplate: "Code mẫu PostgreSQL",
       CSharpTemplate: "Code mẫu C#",
+      JavaScriptTemplate: "Code mẫu JavaScript",
       BilingualWeb: "Web song ngữ",
       agentDownload: {
         title: "Tải Agent",
@@ -725,6 +726,9 @@ export default {
       TwoThreadUsingConcurrentQueue: "ConcurrentQueue 2 thread",
       MaxThreadUsingTaskWhenAny: "Task WhenAny cho n thread",
       MaxThreadUsingSemaphoreSlim: "SemaphoreSlim cho n thread",
+    },
+    JavaScriptTemplate: {
+      JSONFileHandle: "Xử lý file json",
     },
     dateTime: {
       placeholder: "dd/mm/yyyy hh:mm:ss",
