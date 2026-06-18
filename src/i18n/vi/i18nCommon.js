@@ -123,6 +123,7 @@ export default {
       PostgreSQLTemplate: "Code mẫu PostgreSQL",
       CSharpTemplate: "Code mẫu C#",
       JavaScriptTemplate: "Code mẫu JavaScript",
+      PowerShellTemplate: "Code mẫu PowerShell",
       BilingualWeb: "Web song ngữ",
       agentDownload: {
         title: "Tải Agent",
@@ -729,6 +730,9 @@ export default {
     },
     JavaScriptTemplate: {
       JSONFileHandle: "Xử lý file json",
+    },
+    PowerShellTemplate: {
+      PullCodeFromRepo: "pull code từ nhiều repo",
     },
     dateTime: {
       placeholder: "dd/mm/yyyy hh:mm:ss",

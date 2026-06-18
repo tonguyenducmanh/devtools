@@ -145,6 +145,12 @@ const sidebarConfig = [
           import("@/views/tools/codeTemplateTools/CSharpTemplate/TDCSharpTemplate.vue"),
         meta: { titleKey: "i18nCommon.feature.CSharpTemplate" },
       },
+      {
+        name: "powershelltemplate",
+        component: () =>
+          import("@/views/tools/codeTemplateTools/PowerShellTemplate/TDPowerShellTemplate.vue"),
+        meta: { titleKey: "i18nCommon.feature.PowerShellTemplate" },
+      },
     ],
   },
   {

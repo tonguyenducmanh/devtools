@@ -123,6 +123,7 @@ export default {
       PostgreSQLTemplate: "PostgreSQL Template",
       CSharpTemplate: "C# template",
       JavaScriptTemplate: "JavaScript template",
+      PowerShellTemplate: "PowerShell template",
       BilingualWeb: "Bilingual Web",
       agentDownload: {
         title: "Download Agent",
@@ -732,6 +733,9 @@ export default {
     },
     JavaScriptTemplate: {
       JSONFileHandle: "Handle file json",
+    },
+    PowerShellTemplate: {
+      PullCodeFromRepo: "pull code multi repo",
     },
     dateTime: {
       placeholder: "dd/mm/yyyy hh:mm:ss",
