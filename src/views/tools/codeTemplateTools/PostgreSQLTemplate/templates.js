@@ -47,9 +47,19 @@ export default [
     code: codeModules["./template/query_view_definition.sql"],
   },
   {
+    key: "get_all_index_definition",
+    labelKey: "i18nCommon.postgreSQLTemplate.getAllIndexDefinition",
+    code: codeModules["./template/get_all_index_definition.sql"],
+  },
+  {
     key: "query_running_queries",
     labelKey: "i18nCommon.postgreSQLTemplate.queryRunningQueries",
     code: codeModules["./template/query_running_queries.sql"],
+  },
+  {
+    key: "kill_all_session",
+    labelKey: "i18nCommon.postgreSQLTemplate.killAllSession",
+    code: codeModules["./template/kill_all_session.sql"],
   },
   {
     key: "query_kill_process",

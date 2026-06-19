@@ -128,16 +128,16 @@ const sidebarConfig = [
     groupTitleKey: "i18nCommon.group.SampleCode",
     children: [
       {
-        name: "javadcripttemplate",
-        component: () =>
-          import("@/views/tools/codeTemplateTools/JavaScriptTemplate/TDJavaScriptTemplate.vue"),
-        meta: { titleKey: "i18nCommon.feature.JavaScriptTemplate" },
-      },
-      {
         name: "postgresqltemplate",
         component: () =>
           import("@/views/tools/codeTemplateTools/PostgreSQLTemplate/TDPostgreSQLTemplate.vue"),
         meta: { titleKey: "i18nCommon.feature.PostgreSQLTemplate" },
+      },
+      {
+        name: "javadcripttemplate",
+        component: () =>
+          import("@/views/tools/codeTemplateTools/JavaScriptTemplate/TDJavaScriptTemplate.vue"),
+        meta: { titleKey: "i18nCommon.feature.JavaScriptTemplate" },
       },
       {
         name: "csharptemplate",

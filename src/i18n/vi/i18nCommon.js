@@ -721,6 +721,8 @@ export default {
       sqlCode: "Mã SQL",
       template: "Template",
       queryDeleteHistoryByTrigger: "Lịch sử xóa bằng trigger",
+      getAllIndexDefinition: "Danh sách index của bảng",
+      killAllSession: "Đóng toàn bộ session db",
     },
     CSharpTemplate: {
       TwoThreadUsingList: "List 2 thread",

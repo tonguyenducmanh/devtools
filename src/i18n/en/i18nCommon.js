@@ -724,6 +724,8 @@ export default {
       sqlCode: "SQL Code",
       template: "Template",
       queryDeleteHistoryByTrigger: "Query history delete trigger",
+      getAllIndexDefinition: "All index of table",
+      killAllSession: "Kill all session db",
     },
     CSharpTemplate: {
       TwoThreadUsingList: "List 2 thread",
