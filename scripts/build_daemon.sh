@@ -25,6 +25,7 @@ OUTPUT_DIR="$ROOT_DIR/out"
 
 OUTPUT_NAME="dev-tool"
 
+rm -rf "$OUTPUT_DIR"
 
 # Build Backend (Go daemon)
 echo "Đang build Go daemon..."

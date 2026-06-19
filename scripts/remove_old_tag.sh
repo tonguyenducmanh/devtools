@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 1. Danh sách các tag muốn GIỮ LẠI (ngăn cách bằng khoảng trắng)
-EXCLUDE_TAGS=("v9.1.4")
+EXCLUDE_TAGS=("v12.3.3")
 
 # Chuyển mảng thành định dạng regex để so khớp (ví dụ: ^(v1.0|v2.0|stable)$ )
 EXCLUDE_PATTERN=$(printf "|%s" "${EXCLUDE_TAGS[@]}")
