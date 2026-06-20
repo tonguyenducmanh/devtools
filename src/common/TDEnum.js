@@ -125,6 +125,9 @@ class TDEnum {
     Connection: 2,
     SQLSave: 3,
   };
+  PostreSQLConnectionImportType = {
+    NpgSQLDotNet: 0,
+  };
 }
 
 export default new TDEnum();

@@ -12,39 +12,81 @@
   >
     <div class="flex flex-col td-pg-connection-popup">
       <div class="flex connection-row">
-        <div>
-          <TDInput
-            v-model="form.connection_name"
-            :noMargin="true"
-            :label="$t('i18nCommon.postgreSQLQuery.connectionName')"
-            :placeHolder="'My PostgreSQL DB'"
-          />
-        </div>
         <TDComboBox
           v-model="connFields.sslmode"
-          label="SSL Mode"
+          v-tooltip="$t('i18nCommon.postgreSQLQuery.sslMode')"
           :noMargin="true"
           :options="sslModeOptions"
           :isEditable="false"
           @update:modelValue="buildConnectionString"
         />
+        <div class="flex-one">
+          <TDInput
+            v-model="form.connection_name"
+            :noMargin="true"
+            :placeHolder="$t('i18nCommon.postgreSQLQuery.connectionName')"
+          />
+        </div>
+      </div>
+      <div class="flex connection-row">
+        <div>
+          <TDComboBox
+            v-model="inputType"
+            v-tooltip="$t('i18nCommon.postgreSQLQuery.importType')"
+            :noMargin="true"
+            :options="inputTypeOptions"
+            :isEditable="false"
+          />
+        </div>
+        <div class="flex-one">
+          <TDInput
+            v-model="npgsqlInput"
+            :noMargin="true"
+            :placeHolder="
+              $t('i18nCommon.postgreSQLQuery.connectionStringPlaceHolder')
+            "
+          />
+        </div>
+        <TDButton
+          :noMargin="true"
+          @click="handleConvertNpgsql"
+          :readOnly="!npgsqlInput"
+          iconClass="td-send-icon"
+          v-tooltip="$t('i18nCommon.postgreSQLQuery.convert')"
+        />
+      </div>
+      <div class="flex connection-row">
+        <TDComboBox
+          v-model="form.group_id"
+          v-tooltip="$t('i18nCommon.postgreSQLQuery.groupName')"
+          :placeHolder="$t('i18nCommon.postgreSQLQuery.groupName')"
+          :options="groupOptions"
+          :isEditable="false"
+          :noMargin="true"
+        />
+        <div class="flex-one">
+          <TDInput
+            v-model="connFields.database"
+            :noMargin="true"
+            :placeHolder="'Database name (eg postgres)'"
+            @input="buildConnectionString"
+          />
+        </div>
       </div>
       <div class="flex connection-row">
         <div class="flex-one">
           <TDInput
             v-model="connFields.host"
-            :label="'Host'"
+            :placeHolder="'Host (eg localhost)'"
             :noMargin="true"
-            :placeHolder="'localhost'"
             @input="buildConnectionString"
           />
         </div>
         <div class="">
           <TDInput
             v-model="connFields.port"
-            :label="'Port'"
             :noMargin="true"
-            :placeHolder="'5432'"
+            :placeHolder="'Host (eg 5432)'"
             @input="buildConnectionString"
           />
         </div>
@@ -53,43 +95,22 @@
         <div class="flex-one">
           <TDInput
             v-model="connFields.username"
-            :label="'Username'"
             :noMargin="true"
-            :placeHolder="'postgres'"
+            :placeHolder="'Username (eg postgres)'"
             @input="buildConnectionString"
           />
         </div>
         <div class="">
           <TDInput
             v-model="connFields.password"
-            :label="'Password'"
             :noMargin="true"
-            :placeHolder="'••••••••'"
+            :placeHolder="'Password'"
             :inputType="'password'"
             @input="buildConnectionString"
           />
         </div>
       </div>
 
-      <div class="flex connection-row">
-        <div class="flex-one">
-          <TDInput
-            v-model="connFields.database"
-            :label="'Database'"
-            :noMargin="true"
-            :placeHolder="'postgres'"
-            @input="buildConnectionString"
-          />
-        </div>
-        <TDComboBox
-          v-model="form.group_id"
-          :label="$t('i18nCommon.postgreSQLQuery.groupName')"
-          :placeHolder="$t('i18nCommon.postgreSQLQuery.groupName')"
-          :options="groupOptions"
-          :isEditable="false"
-          :noMargin="true"
-        />
-      </div>
       <div class="flex connection-row">
         {{ $t("i18nCommon.postgreSQLQuery.connectionAddInfo") }}
       </div>
@@ -142,6 +163,16 @@ export default {
       showPassword: false,
       testResult: null,
 
+      // Điều khiển loại Input dữ liệu đầu vào
+      inputType: this.$tdEnum.PostreSQLConnectionImportType.NpgSQLDotNet,
+      npgsqlInput: "",
+      inputTypeOptions: [
+        {
+          value: this.$tdEnum.PostreSQLConnectionImportType.NpgSQLDotNet,
+          label: this.$t("i18nCommon.postgreSQLQuery.importNpgSQL"),
+        },
+      ],
+
       // Form chính
       form: {
         id: null,
@@ -153,8 +184,8 @@ export default {
 
       // Các field tách riêng để build connection string
       connFields: {
-        host: "localhost",
-        port: "5432",
+        host: "",
+        port: "",
         database: "",
         username: "",
         password: "",
@@ -171,6 +202,8 @@ export default {
       ],
 
       agentAPI: null,
+      dotnetInitialized: false,
+      _dotnetExports: null,
     };
   },
 
@@ -181,16 +214,76 @@ export default {
     },
   },
 
-  mounted() {
+  async mounted() {
     this.agentAPI = new TDServerPostgreSQLAPI();
+    // Tự động kích hoạt tải .NET WASM phục vụ việc convert
+    await this.initDotNetWasm();
   },
 
   methods: {
+    /**
+     * Khởi tạo .NET 10.0 WASM Runtime
+     */
+    async initDotNetWasm() {
+      if (this.dotnetInitialized) return;
+      try {
+        const { dotnet } = await import("@wasm/pkg/dotnet/dotnet.js");
+        const { getAssemblyExports } = await dotnet
+          .withDiagnosticTracing(false)
+          .create();
+
+        const exports = await getAssemblyExports("Tools.NetWrapper.dll");
+        this._dotnetExports = exports.TDTools.TDToolDotNetWrapper;
+        this.dotnetInitialized = true;
+      } catch (error) {
+        console.error("Failed to load C# WASM Wrapper:", error);
+      }
+    },
+
+    /**
+     * Gọi hàm C# WASM để convert Npgsql connection string sang Object
+     */
+    handleConvertNpgsql() {
+      if (!this.npgsqlInput.trim()) {
+        this.$tdToast.warning("Vui lòng nhập chuỗi connection string trước.");
+        return;
+      }
+      if (!this.dotnetInitialized || !this._dotnetExports) {
+        this.$tdToast.error("Hệ thống phân tích C# WASM chưa sẵn sàng.");
+        return;
+      }
+
+      try {
+        // Thực hiện lệnh convert từ C#
+        const jsonResult = this._dotnetExports.ConvertNpgSQLConnection(
+          this.npgsqlInput.trim(),
+        );
+        const parsedObj = JSON.parse(jsonResult);
+
+        // Đổ ngược dữ liệu đã phân tích vào các trường input trên Form
+        this.connFields.host = parsedObj.host || "localhost";
+        this.connFields.port = parsedObj.port ? String(parsedObj.port) : "5432";
+        this.connFields.username = parsedObj.user_name || "";
+        this.connFields.password = parsedObj.password || "";
+        this.connFields.database = parsedObj.database_name || "";
+
+        // Tái tạo lại chuỗi DSN chuẩn lưu vào form
+        this.buildConnectionString();
+        this.$tdToast.success("Chuyển đổi dữ liệu Npgsql thành công!");
+      } catch (e) {
+        console.error(e);
+        this.$tdToast.error("Chuỗi Npgsql không hợp lệ hoặc lỗi phân tích.");
+      }
+    },
+
     /**
      * Được gọi từ TDDialogUtil sau khi mount
      */
     show(param) {
       this.testResult = null;
+      this.npgsqlInput = "";
+      this.inputType = this.$tdEnum.PostreSQLConnectionImportType.NpgSQLDotNet;
+
       if (param && param.id) {
         // Edit mode: parse connection string ngược lại thành các fields
         this.isEditMode = true;

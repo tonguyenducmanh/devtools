@@ -763,6 +763,11 @@ export default {
       days: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
     },
     postgreSQLQuery: {
+      importNpgSQL: "NpgSql",
+      connectionStringPlaceHolder: "Connection string",
+      convert: "Chuyển đổi",
+      sslMode: "Loại SSL",
+      importType: "Loại nhập khẩu connection string",
       featureName: "PostgreSQL",
       runQuery: "Chạy truy vấn",
       formatCode: "Định dạng code",

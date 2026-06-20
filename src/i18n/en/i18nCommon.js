@@ -766,6 +766,11 @@ export default {
       days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     },
     postgreSQLQuery: {
+      importNpgSQL: "NpgSql",
+      connectionStringPlaceHolder: "Connection string",
+      convert: "Convert",
+      sslMode: "SSL mode",
+      importType: "Connection string import type",
       featureName: "PostgreSQL",
       runQuery: "Run query",
       formatCode: "Format code",
