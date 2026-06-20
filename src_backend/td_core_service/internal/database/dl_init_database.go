@@ -128,7 +128,7 @@ func InitDatabase() {
 		id TEXT PRIMARY KEY NOT NULL,
 		connection_name TEXT NOT NULL,
 		connection_string TEXT NOT NULL,
-		usernconnect_type INTERGER NOT NULL DEFAULT 0,
+		connect_type INTERGER NOT NULL DEFAULT 0,
 		created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 		modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
