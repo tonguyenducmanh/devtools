@@ -55,7 +55,12 @@
         </div>
         <!-- copy result -->
         <TDButton
-          v-if="queryResult && queryResult.is_select && queryResult.rows && queryResult.rows.length > 0"
+          v-if="
+            queryResult &&
+            queryResult.is_select &&
+            queryResult.rows &&
+            queryResult.rows.length > 0
+          "
           :noMargin="true"
           :type="$tdEnum.buttonType.secondary"
           @click="handleCopyResult"
@@ -84,10 +89,7 @@
       </div>
 
       <!-- Resizer -->
-      <TDResizer
-        :direction="'vertical'"
-        @resize="handleResize"
-      />
+      <TDResizer :direction="'vertical'" @resize="handleResize" />
 
       <!-- RESULT AREA -->
       <div class="td-pg-query-result" :style="resultSectionSizeStyle">
@@ -103,8 +105,14 @@
         </div>
 
         <!-- non-select result -->
-        <div class="td-pg-result-affected" v-else-if="queryResult && !queryResult.is_select">
-          <span>{{ $t('i18nCommon.postgreSQLQuery.rowsAffected') }}: {{ queryResult.rows_affected }}</span>
+        <div
+          class="td-pg-result-affected"
+          v-else-if="queryResult && !queryResult.is_select"
+        >
+          <span
+            >{{ $t("i18nCommon.postgreSQLQuery.rowsAffected") }}:
+            {{ queryResult.rows_affected }}</span
+          >
         </div>
 
         <!-- select result table -->
@@ -120,7 +128,7 @@
 
         <!-- empty state -->
         <div class="td-pg-result-empty" v-else>
-          <span>{{ $t('i18nCommon.noDataAvailable') }}</span>
+          <span>{{ $t("i18nCommon.noDataAvailable") }}</span>
         </div>
       </div>
     </div>
@@ -150,7 +158,10 @@
         <!-- TAB: Help -->
         <div
           class="td-sidebar-content"
-          v-show="currentConfigLayout.currentSidebarOption === $tdEnum.PostgreSQLQuerySidebarOption.Help"
+          v-show="
+            currentConfigLayout.currentSidebarOption ===
+            $tdEnum.PostgreSQLQuerySidebarOption.Help
+          "
         >
           <TDPostgreSQLQueryHelp />
         </div>
@@ -158,7 +169,10 @@
         <!-- TAB: Setting -->
         <div
           class="td-sidebar-content"
-          v-show="currentConfigLayout.currentSidebarOption === $tdEnum.PostgreSQLQuerySidebarOption.Setting"
+          v-show="
+            currentConfigLayout.currentSidebarOption ===
+            $tdEnum.PostgreSQLQuerySidebarOption.Setting
+          "
         >
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
@@ -177,7 +191,10 @@
         <!-- TAB: Connection -->
         <div
           class="flex flex-col td-sidebar-content"
-          v-show="currentConfigLayout.currentSidebarOption === $tdEnum.PostgreSQLQuerySidebarOption.Connection"
+          v-show="
+            currentConfigLayout.currentSidebarOption ===
+            $tdEnum.PostgreSQLQuerySidebarOption.Connection
+          "
         >
           <!-- header: add group + refresh -->
           <div class="flex td-header-collection">
@@ -220,7 +237,9 @@
                   class="flex td-collection-header"
                   @click="toggleGroup(group.id || '__ungrouped__')"
                 >
-                  <div class="flex text-nowrap-collection td-collection-header-left">
+                  <div
+                    class="flex text-nowrap-collection td-collection-header-left"
+                  >
                     <TDArrow
                       :openProp="openGroups[group.id || '__ungrouped__']"
                       :arrowOpenDirection="$tdEnum.Direction.bottom"
@@ -256,7 +275,11 @@
 
                 <!-- connections trong group -->
                 <div
-                  v-if="openGroups[group.id || '__ungrouped__'] && group.items && group.items.length > 0"
+                  v-if="
+                    openGroups[group.id || '__ungrouped__'] &&
+                    group.items &&
+                    group.items.length > 0
+                  "
                   class="flex flex-col td-collection-content"
                 >
                   <div
@@ -264,7 +287,8 @@
                     :key="ci"
                     class="flex td-collection-request-item"
                     :class="{
-                      'td-collection-request-item-selected': selectedConnectionId === conn.id,
+                      'td-collection-request-item-selected':
+                        selectedConnectionId === conn.id,
                     }"
                     @click="selectConnection(conn)"
                   >
@@ -281,7 +305,9 @@
                       ></div>
                       <div
                         class="td-icon td-close-icon"
-                        v-tooltip="$t('i18nCommon.postgreSQLQuery.deleteConnection')"
+                        v-tooltip="
+                          $t('i18nCommon.postgreSQLQuery.deleteConnection')
+                        "
                         @click.stop="deleteConnection(conn.id)"
                       ></div>
                     </span>
@@ -295,7 +321,10 @@
         <!-- TAB: SQL Save -->
         <div
           class="flex flex-col td-sidebar-content"
-          v-show="currentConfigLayout.currentSidebarOption === $tdEnum.PostgreSQLQuerySidebarOption.SQLSave"
+          v-show="
+            currentConfigLayout.currentSidebarOption ===
+            $tdEnum.PostgreSQLQuerySidebarOption.SQLSave
+          "
         >
           <!-- header: new query + refresh -->
           <div class="flex td-header-collection">
@@ -324,17 +353,18 @@
 
           <!-- danh sách saved queries -->
           <div class="td-collection">
-            <div class="td-collection-body">
+            <div class="td-collection-sql-body">
               <div
                 v-for="(q, qi) in allSavedQueries"
                 :key="qi"
-                class="flex td-collection-request-item"
+                class="flex td-collection-sql-item"
                 :class="{
-                  'td-collection-request-item-selected': currentSavedQueryId === q.id,
+                  'td-collection-sql-item-selected':
+                    currentSavedQueryId === q.id,
                 }"
                 @click="loadSavedQuery(q)"
               >
-                <span class="text-nowrap">
+                <span class="text-nowrap flex-one td-sql-text">
                   <div v-tooltip="q.query_name">{{ q.query_name }}</div>
                 </span>
                 <span>
@@ -346,7 +376,7 @@
                 </span>
               </div>
               <div v-if="!allSavedQueries.length" class="td-empty-hint">
-                {{ $t('i18nCommon.noDataAvailable') }}
+                {{ $t("i18nCommon.noDataAvailable") }}
               </div>
             </div>
           </div>
@@ -454,7 +484,7 @@ export default {
         {
           value: this.$tdEnum.PostgreSQLQuerySidebarOption.SQLSave,
           label: this.$t("i18nCommon.postgreSQLQuery.sidebarOption.sqlSave"),
-          icon: "td-save-icon",
+          icon: "td-database-icon",
         },
       ];
     },
@@ -519,7 +549,11 @@ export default {
       let me = this;
       me.isLoading = true;
       try {
-        await Promise.all([me.loadGroups(), me.loadConnections(), me.loadSavedQueries()]);
+        await Promise.all([
+          me.loadGroups(),
+          me.loadConnections(),
+          me.loadSavedQueries(),
+        ]);
       } catch (error) {
         console.error("Lỗi tải dữ liệu:", error);
         me.$tdUtility.showErrorNotFoundAgentServer();
@@ -676,10 +710,12 @@ export default {
         if (response?.data?.success) {
           me.queryResult = response.data.data;
         } else {
-          me.queryError = response?.data?.message ?? me.$t("i18nCommon.toastMessage.error");
+          me.queryError =
+            response?.data?.message ?? me.$t("i18nCommon.toastMessage.error");
         }
       } catch (error) {
-        me.queryError = error?.message ?? me.$t("i18nCommon.toastMessage.error");
+        me.queryError =
+          error?.message ?? me.$t("i18nCommon.toastMessage.error");
       } finally {
         me.isRunning = false;
       }
@@ -708,7 +744,9 @@ export default {
       let me = this;
       if (!me.queryResult?.rows?.length) return;
       try {
-        me.$tdUtility.copyToClipboard(JSON.stringify(me.queryResult.rows, null, 2));
+        me.$tdUtility.copyToClipboard(
+          JSON.stringify(me.queryResult.rows, null, 2),
+        );
         me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
       } catch {
         me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
@@ -729,7 +767,7 @@ export default {
         // Query 1: Lấy keywords
         let keywordResponse = await me.agentAPI.executeQuery(
           me.selectedConnectionId,
-          "SELECT word, catcode, catdesc FROM pg_get_keywords() ORDER BY word;"
+          "SELECT word, catcode, catdesc FROM pg_get_keywords() ORDER BY word;",
         );
 
         // Query 2: Lấy tables và columns
@@ -746,11 +784,15 @@ export default {
             ON t.table_name = c.table_name 
             AND t.table_schema = c.table_schema
           WHERE t.table_schema NOT IN ('pg_catalog', 'information_schema')
-          ORDER BY t.table_schema, t.table_name, c.ordinal_position;`
+          ORDER BY t.table_schema, t.table_name, c.ordinal_position;`,
         );
 
-        let keywordsResult = keywordResponse?.data?.success ? keywordResponse.data.data : null;
-        let tablesResult = tableResponse?.data?.success ? tableResponse.data.data : null;
+        let keywordsResult = keywordResponse?.data?.success
+          ? keywordResponse.data.data
+          : null;
+        let tablesResult = tableResponse?.data?.success
+          ? tableResponse.data.data
+          : null;
 
         let intellisenseData = {
           keywords: keywordsResult,
@@ -758,7 +800,9 @@ export default {
         };
 
         // Lưu vào IndexedDB theo connection id
-        await TDCache.set(cacheKey, intellisenseData, { id: me.selectedConnectionId });
+        await TDCache.set(cacheKey, intellisenseData, {
+          id: me.selectedConnectionId,
+        });
         // Áp dụng intellisense vào monaco
         await me.applyMonacoIntellisense(intellisenseData);
         me.$tdToast.success(
@@ -780,7 +824,9 @@ export default {
       if (!me.selectedConnectionId) return;
       try {
         const cacheKey = me.$tdEnum.cacheConfig.PostgreSQLQueryHistory;
-        let cached = await TDCache.get(cacheKey, { id: me.selectedConnectionId });
+        let cached = await TDCache.get(cacheKey, {
+          id: me.selectedConnectionId,
+        });
         if (cached) {
           await me.applyMonacoIntellisense(cached);
         }
@@ -815,8 +861,8 @@ export default {
 
         // Xây dựng bản đồ lookup
         const tableRows = data?.tables?.rows ?? [];
-        const columnsByTable = new Map(); 
-        const tablesBySchema = new Map(); 
+        const columnsByTable = new Map();
+        const tablesBySchema = new Map();
         const allSchemas = new Set();
         const allTables = new Set();
         const allColumns = [];
@@ -830,19 +876,21 @@ export default {
           allSchemas.add(schema);
           allTables.add(tbl);
 
-          if (!tablesBySchema.has(schema)) tablesBySchema.set(schema, new Set());
+          if (!tablesBySchema.has(schema))
+            tablesBySchema.set(schema, new Set());
           tablesBySchema.get(schema).add(tbl);
 
           if (!columnsByTable.has(tbl)) columnsByTable.set(tbl, []);
-          if (!columnsByTable.has(`${schema}.${tbl}`)) columnsByTable.set(`${schema}.${tbl}`, []);
-          
+          if (!columnsByTable.has(`${schema}.${tbl}`))
+            columnsByTable.set(`${schema}.${tbl}`, []);
+
           const colDef = {
             label: String(col),
             kind: monaco.languages.CompletionItemKind.Field,
             insertText: String(col),
             detail: `${tbl}.${col} (${dtype})`,
           };
-          
+
           columnsByTable.get(tbl).push(colDef);
           columnsByTable.get(`${schema}.${tbl}`).push(colDef);
           allColumns.push(colDef);
@@ -852,7 +900,7 @@ export default {
         const disposable = monaco.languages.registerCompletionItemProvider(
           "pgsql",
           {
-            triggerCharacters: ['.'],
+            triggerCharacters: ["."],
             provideCompletionItems(model, position) {
               const word = model.getWordUntilPosition(position);
               const range = {
@@ -863,13 +911,30 @@ export default {
               };
 
               const text = model.getValue();
-              const aliasMap = new Map(); 
-              
+              const aliasMap = new Map();
+
               // regex để parse alias từ FROM/JOIN
-              const regex = /(?:from|join)\s+([a-zA-Z0-9_]+)(?:\.([a-zA-Z0-9_]+))?(?:\s+as)?\s+([a-zA-Z0-9_]+)?/gi;
+              const regex =
+                /(?:from|join)\s+([a-zA-Z0-9_]+)(?:\.([a-zA-Z0-9_]+))?(?:\s+as)?\s+([a-zA-Z0-9_]+)?/gi;
               let match;
-              const sqlKeywords = ["where", "join", "on", "left", "right", "inner", "outer", "cross", "group", "order", "having", "limit", "select", "and", "or"];
-              
+              const sqlKeywords = [
+                "where",
+                "join",
+                "on",
+                "left",
+                "right",
+                "inner",
+                "outer",
+                "cross",
+                "group",
+                "order",
+                "having",
+                "limit",
+                "select",
+                "and",
+                "or",
+              ];
+
               while ((match = regex.exec(text)) !== null) {
                 let schemaOrTable = match[1];
                 let tableIfSchema = match[2];
@@ -886,7 +951,10 @@ export default {
                   table = schemaOrTable.toLowerCase();
                 }
 
-                if (aliasOrTable && !sqlKeywords.includes(aliasOrTable.toLowerCase())) {
+                if (
+                  aliasOrTable &&
+                  !sqlKeywords.includes(aliasOrTable.toLowerCase())
+                ) {
                   alias = aliasOrTable.toLowerCase();
                 } else {
                   alias = table;
@@ -896,44 +964,49 @@ export default {
 
               // Kiểm tra xem user có gõ dấu chấm không
               const lineContent = model.getLineContent(position.lineNumber);
-              const textBeforePointer = lineContent.substring(0, position.column - 1);
+              const textBeforePointer = lineContent.substring(
+                0,
+                position.column - 1,
+              );
               const dotMatch = textBeforePointer.match(/([a-zA-Z0-9_]+)\.$/);
 
               let suggestions = [];
 
               if (dotMatch) {
                 const prefix = dotMatch[1].toLowerCase();
-                
+
                 // 1. Prefix là alias -> gợi ý cột
                 if (aliasMap.has(prefix)) {
                   const mapped = aliasMap.get(prefix);
-                  let key = mapped.schema ? `${mapped.schema}.${mapped.table}` : mapped.table;
+                  let key = mapped.schema
+                    ? `${mapped.schema}.${mapped.table}`
+                    : mapped.table;
                   if (columnsByTable.has(key)) {
-                     suggestions.push(...columnsByTable.get(key));
+                    suggestions.push(...columnsByTable.get(key));
                   } else if (columnsByTable.has(mapped.table)) {
-                     suggestions.push(...columnsByTable.get(mapped.table));
+                    suggestions.push(...columnsByTable.get(mapped.table));
                   }
-                } 
+                }
                 // 2. Prefix là tên bảng -> gợi ý cột
                 else if (columnsByTable.has(prefix)) {
                   suggestions.push(...columnsByTable.get(prefix));
                 }
                 // 3. Prefix là tên schema -> gợi ý bảng
                 else if (tablesBySchema.has(prefix)) {
-                  tablesBySchema.get(prefix).forEach(tbl => {
+                  tablesBySchema.get(prefix).forEach((tbl) => {
                     suggestions.push({
                       label: tbl,
                       kind: monaco.languages.CompletionItemKind.Module,
                       insertText: tbl,
-                      detail: `Table (${prefix})`
+                      detail: `Table (${prefix})`,
                     });
                   });
                 }
               } else {
                 // Đang gõ chay (không có chấm)
                 suggestions.push(...keywordSuggestions);
-                
-                allSchemas.forEach(schema => {
+
+                allSchemas.forEach((schema) => {
                   suggestions.push({
                     label: schema,
                     kind: monaco.languages.CompletionItemKind.Folder,
@@ -942,7 +1015,7 @@ export default {
                   });
                 });
 
-                allTables.forEach(tbl => {
+                allTables.forEach((tbl) => {
                   suggestions.push({
                     label: tbl,
                     kind: monaco.languages.CompletionItemKind.Module,
@@ -953,15 +1026,20 @@ export default {
 
                 // Ưu tiên cột từ các bảng đã được parse trong FROM
                 if (aliasMap.size > 0) {
-                  aliasMap.forEach(mapped => {
-                     let key = mapped.schema ? `${mapped.schema}.${mapped.table}` : mapped.table;
-                     let cols = columnsByTable.get(key) || columnsByTable.get(mapped.table) || [];
-                     cols.forEach(c => {
-                       suggestions.push({
-                         ...c,
-                         sortText: "0" + c.label // sortText 0 giúp đưa lên đầu tiên
-                       });
-                     });
+                  aliasMap.forEach((mapped) => {
+                    let key = mapped.schema
+                      ? `${mapped.schema}.${mapped.table}`
+                      : mapped.table;
+                    let cols =
+                      columnsByTable.get(key) ||
+                      columnsByTable.get(mapped.table) ||
+                      [];
+                    cols.forEach((c) => {
+                      suggestions.push({
+                        ...c,
+                        sortText: "0" + c.label, // sortText 0 giúp đưa lên đầu tiên
+                      });
+                    });
                   });
                 } else if (word.word && word.word.length > 1) {
                   // Chỉ push all columns nếu user đang gõ (tránh làm lag)
@@ -971,11 +1049,13 @@ export default {
 
               // Deduplicate
               const uniqueMap = new Map();
-              suggestions.forEach(s => {
+              suggestions.forEach((s) => {
                 uniqueMap.set(s.label + s.kind, s);
               });
-              
-              const finalSuggestions = Array.from(uniqueMap.values()).map(s => ({ ...s, range }));
+
+              const finalSuggestions = Array.from(uniqueMap.values()).map(
+                (s) => ({ ...s, range }),
+              );
 
               return {
                 suggestions: finalSuggestions,
@@ -1132,7 +1212,6 @@ export default {
   font-size: var(--font-size-small);
 }
 
-// ─── Sidebar styles (mirroring TDAPIMocking) ──────────────────────────────────
 .response-loading {
   width: 100%;
   height: 100%;
@@ -1215,6 +1294,42 @@ export default {
           font-weight: 600;
         }
       }
+    }
+  }
+  .td-collection-sql-body {
+    margin-top: var(--padding);
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+
+    .td-collection-sql-item {
+      cursor: pointer;
+      height: 40px;
+      justify-content: space-between;
+      width: 100%;
+      padding: var(--padding);
+      border-radius: var(--border-radius);
+      align-items: center;
+
+      .td-connection-actions {
+        gap: 4px;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+    }
+
+    .td-collection-sql-item:hover {
+      background-color: var(--bg-layer-color);
+
+      .td-connection-actions {
+        opacity: 1;
+      }
+    }
+
+    .td-collection-sql-item-selected {
+      background-color: var(--bg-layer-color);
+      font-weight: 600;
     }
   }
 }
