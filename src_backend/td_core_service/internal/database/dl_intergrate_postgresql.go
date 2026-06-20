@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"td_core_service/internal/model"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -27,7 +28,17 @@ func DeletePostgreSQLConnectionsByGroupID(groupID string) error {
 func ExecutePostgreSQLQuery(connectionString string, sqlQuery string) (*model.TDQueryResult, error) {
 	ctx := context.Background()
 
-	conn, err := pgx.Connect(ctx, connectionString)
+	// 1. Parse connection string ra object config
+	config, err := pgx.ParseConfig(connectionString)
+	if err != nil {
+		return nil, fmt.Errorf("connection string không hợp lệ: %w", err)
+	}
+
+	// 2. ÉP BUỘC pgx sử dụng Simple Protocol để chạy được chuỗi nhiều câu lệnh
+	config.DefaultQueryExecMode = pgx.QueryExecModeSimpleProtocol
+
+	// 3. Kết nối bằng config mới
+	conn, err := pgx.ConnectConfig(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("không thể kết nối PostgreSQL: %w", err)
 	}
@@ -56,10 +67,18 @@ func ExecutePostgreSQLQuery(connectionString string, sqlQuery string) (*model.TD
 		}
 		rowMap := make(map[string]any, len(columns))
 		for i, col := range columns {
-			v := vals[i]
-			if b, ok := v.([]byte); ok {
-				rowMap[col] = string(b)
-			} else {
+			switch v := vals[i].(type) {
+			case []byte:
+				rowMap[col] = string(v)
+			case [16]byte: // uuid đơn
+				rowMap[col] = uuid.UUID(v).String()
+			case [][16]byte: // mảng uuid[]
+				ids := make([]string, len(v))
+				for j, b := range v {
+					ids[j] = uuid.UUID(b).String()
+				}
+				rowMap[col] = ids
+			default:
 				rowMap[col] = v
 			}
 		}
