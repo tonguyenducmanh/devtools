@@ -402,9 +402,6 @@ export default {
 
       // api
       agentAPI: null,
-
-      // monaco options
-      monacoOptions: {},
     };
   },
 
@@ -421,6 +418,28 @@ export default {
   },
 
   computed: {
+    monacoOptions() {
+      return {
+        onInit: (editor, monacoInstance) => {
+          // Đăng ký tổ hợp phím Ctrl + U (hoặc Cmd + U trên Mac) trực tiếp vào Monaco
+          editor.addCommand(
+            monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyU,
+            () => {
+              // 1. Lấy trực tiếp nội dung mới nhất đang nằm trong Monaco Editor
+              const currentText = editor.getValue();
+
+              // 2. Gán thẳng nội dung này vào biến sqlText của Vue (thay thế cho việc đợi sự kiện blur)
+              this.sqlText = currentText;
+
+              // 3. Sử dụng $nextTick để chắc chắn Vue đã nhận giá trị mới trước khi gọi hàm format
+              this.$nextTick(() => {
+                this.handleFormatSQL();
+              });
+            },
+          );
+        },
+      };
+    },
     sidebarOptions() {
       return [
         {
@@ -1111,12 +1130,6 @@ export default {
         key: me.$tdUtility.newGuid(),
         presentKey: ["Ctrl", "u"],
         labelKey: "i18nCommon.shortKeyAction.formatCodeTextEditor",
-        action: (event) => {
-          if (event && (event.metaKey || event.ctrlKey) && event.key === "u") {
-            event.preventDefault();
-            me.handleFormatSQL();
-          }
-        },
       };
       return configFormat;
     },
