@@ -18,7 +18,8 @@
               <!-- Selection Column -->
               <th
                 v-if="selectable"
-                class="td-table-cell td-table-cell-checkbox"
+                class="td-table-cell td-table-cell-checkbox td-table-cell-sticky-header"
+                :style="checkboxStickyStyle"
               >
                 <label class="td-table-checkbox-label">
                   <input
@@ -37,7 +38,11 @@
               </th>
 
               <!-- Index Column -->
-              <th v-if="showIndex" class="td-table-cell td-table-cell-index">
+              <th 
+                v-if="showIndex" 
+                class="td-table-cell td-table-cell-index td-table-cell-sticky-header"
+                :style="indexStickyStyle"
+              >
                 {{ indexLabel }}
               </th>
 
@@ -94,7 +99,8 @@
               <!-- Selection Column -->
               <td
                 v-if="selectable"
-                class="td-table-cell td-table-cell-checkbox"
+                class="td-table-cell td-table-cell-checkbox td-table-cell-sticky"
+                :style="checkboxStickyStyle"
               >
                 <label class="td-table-checkbox-label" @click.stop>
                   <input
@@ -115,7 +121,8 @@
               <!-- Index Column -->
               <td
                 v-if="showIndex"
-                class="td-table-cell td-table-cell-index"
+                class="td-table-cell td-table-cell-index td-table-cell-sticky"
+                :style="indexStickyStyle"
                 v-tooltip="$t('i18nCommon.copy')"
                 @click="copyRow(row)"
               >
@@ -377,6 +384,18 @@ export default {
   },
 
   computed: {
+    checkboxStickyStyle() {
+      return {
+        position: 'sticky',
+        left: '0px',
+      };
+    },
+    indexStickyStyle() {
+      return {
+        position: 'sticky',
+        left: this.selectable ? '48px' : '0px',
+      };
+    },
     footerHelpText() {
       let me = this;
       if (me.usingFooterHelp) {
@@ -769,10 +788,11 @@ export default {
     .td-table-header {
       background-color: var(--bg-layer-color);
 
-      &.td-table-header-sticky {
+      &.td-table-header-sticky th {
         position: sticky;
         top: 0;
         z-index: 1;
+        background-color: var(--bg-layer-color); /* Ensure background is solid */
       }
 
       tr {
@@ -828,18 +848,40 @@ export default {
       }
 
       &-checkbox {
-        width: 40px;
+        width: 48px;
+        min-width: 48px;
+        max-width: 48px;
+        box-sizing: border-box;
         text-align: center;
-        padding: var(--padding);
+        padding: 0 var(--padding);
       }
 
       &-index {
-        width: 30px;
-        min-width: 30px;
-        max-width: 30px;
+        width: 40px;
+        min-width: 40px;
+        max-width: 40px;
+        box-sizing: border-box;
         text-align: center;
+        padding: 0 var(--padding);
         color: var(--text-secondary-color);
         font-weight: 500;
+      }
+
+      &-sticky {
+        background-color: var(--bg-main-color);
+        box-shadow: 1px 0 0 0 var(--border-color);
+        z-index: 1;
+      }
+      
+      tr:hover > &-sticky {
+        background-color: var(--bg-layer-color);
+      }
+
+      &-sticky-header {
+        background-color: var(--bg-layer-color);
+        box-shadow: 1px 0 0 0 var(--border-color);
+        z-index: 3 !important; /* Higher than normal sticky header */
+        top: 0;
       }
 
       &-actions {
