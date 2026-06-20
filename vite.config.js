@@ -11,19 +11,11 @@ export default defineConfig({
     vue(),
     viteStaticCopy({
       targets: [
-        // Cấu hình copy folder dotnet sang dist/dotnet-assets khi build
+        // Cấu hình copy folder dotnet sang dist/assets-wasm khi build
         {
           src: "src_wasm/pkg/dotnet/*",
-          dest: `dotnet-assets-${APP_VERSION}`,
+          dest: `assets-wasm`,
           rename: { stripBase: true },
-        },
-        // Sửa dist/cfg/config.js và đổi chữ __APP_VERSION__ thành version thật:
-        {
-          src: "public/cfg/config.js",
-          dest: "cfg",
-          rename: { stripBase: true },
-          transform: (contents) =>
-            contents.replace("__APP_VERSION__", APP_VERSION),
         },
       ],
     }),

@@ -235,8 +235,7 @@ export default {
         } else {
           // Môi trường PROD: Giấu đường dẫn trong một biến chuỗi
           // Việc này khiến Vite hoàn toàn bỏ qua không quét file này lúc dev nữa
-          const version = window.__env.appVersion;
-          const prodPath = `/dotnet-assets-${version}/dotnet.js`;
+          const prodPath = `/assets-wasm/dotnet.js`;
           const { dotnet } = await import(/* @vite-ignore */ prodPath);
           dotnetModule = dotnet;
         }
