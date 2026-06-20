@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
+    <RunAOTCompilation>true</RunAOTCompilation>
     <WasmOptLevel>2</WasmOptLevel>
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
     <TrimMode>full</TrimMode>
