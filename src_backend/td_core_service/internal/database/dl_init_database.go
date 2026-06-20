@@ -1,33 +1,10 @@
 package database
 
 import (
-	"database/sql"
 	"log"
-	"os"
-	"path/filepath"
-	"td_config"
 
 	_ "modernc.org/sqlite"
 )
-
-func executableDir() string {
-	exe, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	return filepath.Dir(exe)
-}
-func dbPath() string {
-	dir := executableDir()
-	return filepath.Join(dir, td_config.GetConfigGlobal().DatabaseName)
-}
-
-// Lấy ra thông tin kết nối
-func GetConnectionDB() (*sql.DB, error) {
-	// 1. Mở kết nối (Tên driver là "sqlite")
-	db, err := sql.Open("sqlite", dbPath())
-	return db, err
-}
 
 // Khởi tạo database nếu chưa có
 func InitDatabase() {

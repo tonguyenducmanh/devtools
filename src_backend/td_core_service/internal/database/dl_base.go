@@ -3,8 +3,11 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
+	"td_config"
 	"td_core_service/td_common"
 )
 
@@ -32,10 +35,10 @@ type TDDLBase[T TDModelBase] struct{}
 
 // tdColumnInfo chứa thông tin 1 field đã được parse từ struct tag
 type tdColumnInfo struct {
-	fieldIndex []int  // vị trí field trong struct (slice để hỗ trợ embedded struct)
-	dbColumn   string // tên cột trong DB (lấy từ tag `json:"..."`)
-	isPrimaryKey       bool   // có phải khóa chính không
-	isAutoSet  bool   // tự động sinh bởi DB, không tự insert/update
+	fieldIndex   []int  // vị trí field trong struct (slice để hỗ trợ embedded struct)
+	dbColumn     string // tên cột trong DB (lấy từ tag `json:"..."`)
+	isPrimaryKey bool   // có phải khóa chính không
+	isAutoSet    bool   // tự động sinh bởi DB, không tự insert/update
 }
 
 // parseColumns dùng reflection để đọc tất cả field của struct T, kể cả field từ embedded struct
@@ -66,10 +69,10 @@ func parseColumns[T TDModelBase]() []tdColumnInfo {
 		isAutoSet := colName == "created_date" || colName == "modified_date"
 
 		cols = append(cols, tdColumnInfo{
-			fieldIndex: field.Index, // slice path, hỗ trợ embedded struct
-			dbColumn:   colName,
-			isPrimaryKey:       colName == pkName,
-			isAutoSet:  isAutoSet,
+			fieldIndex:   field.Index, // slice path, hỗ trợ embedded struct
+			dbColumn:     colName,
+			isPrimaryKey: colName == pkName,
+			isAutoSet:    isAutoSet,
 		})
 	}
 	return cols
@@ -190,9 +193,29 @@ func extractUpdateValues[T TDModelBase](item *T, cols []tdColumnInfo) []any {
 	return vals
 }
 
+func dbPath() string {
+	dir := executableDir()
+	return filepath.Join(dir, td_config.GetConfigGlobal().DatabaseName)
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Public API — các method của TDDLBase[T]
 // ─────────────────────────────────────────────────────────────────────────────
+
+func executableDir() string {
+	exe, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	return filepath.Dir(exe)
+}
+
+// Lấy ra thông tin kết nối
+func GetConnectionDB() (*sql.DB, error) {
+	// 1. Mở kết nối (Tên driver là "sqlite")
+	db, err := sql.Open("sqlite", dbPath())
+	return db, err
+}
 
 func (r *TDDLBase[T]) GetAll() ([]T, error) {
 	db, err := GetConnectionDB()
