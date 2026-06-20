@@ -413,5 +413,32 @@ export default {
         ids: "Lọc theo ID - Chỉ định cụ thể tên các ID muốn dịch, ngăn cách bởi dấu chấm phẩy (;).",
       },
     },
+    postgreSQLQuery: {
+      purpose: {
+        title: "Mô tả tính năng",
+        content: "PostgreSQL Query là công cụ cho phép bạn kết nối trực tiếp vào cơ sở dữ liệu PostgreSQL và thực thi các câu lệnh SQL ngay trong ứng dụng. Kết quả trả về dưới dạng bảng trực quan, dễ đọc.",
+      },
+      howToUse: {
+        title: "Hướng dẫn sử dụng",
+        step1: "1. Mở tab Kết nối ở thanh bên phải để thêm nhóm và cấu hình kết nối PostgreSQL.",
+        step2: "2. Chọn kết nối muốn dùng từ combobox ở header.",
+        step3: "3. Nhập câu lệnh SQL vào ô soạn thảo (hỗ trợ gợi ý intellisense).",
+        step4: "4. Nhấn nút 'Chạy truy vấn' hoặc Ctrl+Enter để thực thi.",
+        step5: "5. Kết quả hiển thị bên dưới dưới dạng bảng có thể cuộn và sắp xếp.",
+      },
+      features: {
+        title: "Các tính năng nổi bật",
+        intellisense: "Gợi ý SQL thông minh: Keywords, tên bảng, tên cột được load tự động từ PostgreSQL server.",
+        savedScripts: "Lưu script: Lưu các câu query thường dùng vào mục 'Script đã lưu' để tái sử dụng.",
+        formatCode: "Định dạng code: Tự động định dạng câu SQL cho dễ đọc.",
+        multipleConnections: "Nhiều kết nối: Quản lý nhiều kết nối và phân nhóm dễ dàng.",
+      },
+      connectionString: {
+        title: "Cấu hình chuỗi kết nối",
+        format: "postgresql://user:password@host:port/dbname",
+        example: "Ví dụ: postgresql://postgres:mypassword@localhost:5432/mydb",
+        sslNote: "Thêm ?sslmode=disable nếu không dùng SSL.",
+      },
+    },
   },
 };

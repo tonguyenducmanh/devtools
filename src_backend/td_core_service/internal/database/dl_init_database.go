@@ -79,7 +79,7 @@ func InitDatabase() {
 		headers_text TEXT,
 		body_text TEXT,
 		response_text TEXT,
-		status_code INTERGER,
+		status_code INTEGER,
 		created_date DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
 	`
@@ -127,8 +127,9 @@ func InitDatabase() {
 	CREATE TABLE IF NOT EXISTS td_postgresql_connection (
 		id TEXT PRIMARY KEY NOT NULL,
 		connection_name TEXT NOT NULL,
+		group_id TEXT,
 		connection_string TEXT NOT NULL,
-		connect_type INTERGER NOT NULL DEFAULT 0,
+		connect_type INTEGER NOT NULL DEFAULT 0,
 		created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 		modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
@@ -151,6 +152,23 @@ func InitDatabase() {
 	_, err = db.Exec(sqlStmtPostgreSQLGroupConnection)
 	if err != nil {
 		td_common.LogError(fmt.Sprintf("%q: %s\n", err, sqlStmtPostgreSQLGroupConnection))
+		return
+	}
+
+	// 9. Tạo bảng lưu SQL query
+	sqlStmtSavedQuery := `
+	CREATE TABLE IF NOT EXISTS td_postgresql_saved_query (
+		id TEXT PRIMARY KEY NOT NULL,
+		query_name TEXT NOT NULL,
+		connection_id TEXT,
+		query_text TEXT,
+		created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+		modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+	`
+	_, err = db.Exec(sqlStmtSavedQuery)
+	if err != nil {
+		td_common.LogError(fmt.Sprintf("%q: %s\n", err, sqlStmtSavedQuery))
 		return
 	}
 }

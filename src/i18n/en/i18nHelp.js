@@ -413,5 +413,32 @@ export default {
         ids: "Filter by ID - Specify ID names to translate, separated by semicolons (;).",
       },
     },
+    postgreSQLQuery: {
+      purpose: {
+        title: "Feature Overview",
+        content: "PostgreSQL Query is a tool that lets you connect directly to a PostgreSQL database and execute SQL statements right inside the application. Results are displayed as a clean, readable table.",
+      },
+      howToUse: {
+        title: "How to use",
+        step1: "1. Open the Connections tab in the right sidebar to add groups and configure PostgreSQL connections.",
+        step2: "2. Select the connection you want to use from the combobox in the header.",
+        step3: "3. Type your SQL query in the editor (supports intellisense suggestions).",
+        step4: "4. Click 'Run query' or press Ctrl+Enter to execute.",
+        step5: "5. Results are displayed below as a scrollable, sortable table.",
+      },
+      features: {
+        title: "Key Features",
+        intellisense: "Smart SQL suggestions: Keywords, table names, and column names are automatically loaded from the PostgreSQL server.",
+        savedScripts: "Save scripts: Save frequently used queries under 'Saved scripts' for reuse.",
+        formatCode: "Format code: Automatically format your SQL for readability.",
+        multipleConnections: "Multiple connections: Easily manage multiple connections organized into groups.",
+      },
+      connectionString: {
+        title: "Connection String Format",
+        format: "postgresql://user:password@host:port/dbname",
+        example: "Example: postgresql://postgres:mypassword@localhost:5432/mydb",
+        sslNote: "Append ?sslmode=disable if not using SSL.",
+      },
+    },
   },
 };

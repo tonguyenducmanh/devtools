@@ -70,6 +70,18 @@ const sidebarConfig = [
   },
   {
     type: "group",
+    groupKey: "database",
+    groupTitleKey: "i18nCommon.group.Database",
+    children: [
+      {
+        name: "TDPostgreSQLQuery",
+        component: () => import("@/views/tools/TDPostgreSQLQuery.vue"),
+        meta: { titleKey: "i18nCommon.postgreSQLQuery.featureName" },
+      },
+    ],
+  },
+  {
+    type: "group",
     groupKey: "remotedesktop",
     groupTitleKey: "i18nCommon.group.RemoteDesktop",
     children: [

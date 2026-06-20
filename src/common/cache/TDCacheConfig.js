@@ -256,4 +256,16 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool blank text",
   },
+  PostgreSQLQueryConfigLayout: {
+    KeyFormat: "PostgreSQLQueryConfigLayout",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool PostgreSQL Query",
+  },
+  PostgreSQLQueryHistory: {
+    KeyFormat: "PostgreSQLQueryHistory_{id}",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "cache intellisense PostgreSQL theo connection id",
+  },
 };
