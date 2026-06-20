@@ -763,7 +763,7 @@ export default {
       days: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
     },
     postgreSQLQuery: {
-      featureName: "PostgreSQL Query",
+      featureName: "PostgreSQL",
       runQuery: "Chạy truy vấn",
       formatCode: "Định dạng code",
       loadIntellisense: "Load gợi ý syntax, table",

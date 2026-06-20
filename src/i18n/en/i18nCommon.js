@@ -766,7 +766,7 @@ export default {
       days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     },
     postgreSQLQuery: {
-      featureName: "PostgreSQL Query",
+      featureName: "PostgreSQL",
       runQuery: "Run query",
       formatCode: "Format code",
       loadIntellisense: "Load intellisense syntax, table",
