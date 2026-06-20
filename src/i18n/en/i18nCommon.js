@@ -769,7 +769,7 @@ export default {
       featureName: "PostgreSQL Query",
       runQuery: "Run query",
       formatCode: "Format code",
-      loadIntellisense: "Load intellisense",
+      loadIntellisense: "Load intellisense syntax, table",
       connectionName: "Connection name",
       connectionString: "Connection string",
       groupName: "Group name",

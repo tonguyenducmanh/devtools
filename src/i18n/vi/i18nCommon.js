@@ -766,7 +766,7 @@ export default {
       featureName: "PostgreSQL Query",
       runQuery: "Chạy truy vấn",
       formatCode: "Định dạng code",
-      loadIntellisense: "Load gợi ý",
+      loadIntellisense: "Load gợi ý syntax, table",
       connectionName: "Tên kết nối",
       connectionString: "Chuỗi kết nối",
       groupName: "Tên nhóm",
