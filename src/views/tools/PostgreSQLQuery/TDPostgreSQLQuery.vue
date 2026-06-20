@@ -31,18 +31,6 @@
           <TDButton
             :noMargin="true"
             :type="$tdEnum.buttonType.secondary"
-            @click="handleLoadIntellisense"
-            :readOnly="!selectedConnectionId || isLoadingIntellisense"
-            iconClass="td-example-icon"
-            v-tooltip="
-              isLoadingIntellisense
-                ? $t('i18nCommon.postgreSQLQuery.intellisenseLoading')
-                : $t('i18nCommon.postgreSQLQuery.loadIntellisense')
-            "
-          />
-          <TDButton
-            :noMargin="true"
-            :type="$tdEnum.buttonType.secondary"
             @click="handleFormatSQL"
             iconClass="td-format-icon"
             v-tooltip="$t('i18nCommon.postgreSQLQuery.formatCode')"
@@ -69,6 +57,18 @@
             @click="handleCopyResult"
             iconClass="td-copy-icon"
             v-tooltip="$t('i18nCommon.copy')"
+          />
+          <TDButton
+            :noMargin="true"
+            :type="$tdEnum.buttonType.secondary"
+            @click="handleLoadIntellisense"
+            :readOnly="!selectedConnectionId || isLoadingIntellisense"
+            iconClass="td-example-icon"
+            v-tooltip="
+              isLoadingIntellisense
+                ? $t('i18nCommon.postgreSQLQuery.intellisenseLoading')
+                : $t('i18nCommon.postgreSQLQuery.loadIntellisense')
+            "
           />
         </div>
       </div>
