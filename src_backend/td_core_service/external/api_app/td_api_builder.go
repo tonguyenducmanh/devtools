@@ -50,4 +50,5 @@ func addRoute(app *http.ServeMux) {
 	router.InjectAppDataMiner(app)
 	router.InjectRDPRouter(app)
 	router.InjectRDPConnectionRouter(app)
+	router.InjectPostgreSQLRouter(app)
 }

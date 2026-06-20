@@ -8,15 +8,18 @@ export default {
       },
       quickStart: {
         title: "Quick Start",
-        selectTool: "Select a tool from the sidebar menu on the left to get started.",
-        searchTool: "Press Ctrl + P (or Cmd + P on Mac) to open the search box, type the tool name you need and press Enter to open it quickly.",
+        selectTool:
+          "Select a tool from the sidebar menu on the left to get started.",
+        searchTool:
+          "Press Ctrl + P (or Cmd + P on Mac) to open the search box, type the tool name you need and press Enter to open it quickly.",
         note: "Tip: Use ↑↓ to navigate between search results.",
       },
       multiTab: {
         title: "Working with Multiple Tabs",
         description:
           "The application supports opening multiple tools simultaneously as tabs. This allows you to avoid opening multiple browser windows to use different features at the same time.",
-        rightClick: "Right-click on a tab name to open the context menu with the following options:",
+        rightClick:
+          "Right-click on a tab name to open the context menu with the following options:",
         duplicateTab: "Duplicate tab - Create a copy of the current tab",
         closeTab: "Close tab - Close the selected tab",
         closeAllTabs: "Close all - Close all open tabs",
@@ -24,25 +27,33 @@ export default {
       },
       agent: {
         title: "The tools in this app are divided into 2 types:",
-        webOnly: "Web-based - No additional installation required, works directly in the browser.",
-        needAgent: "Requires Agent - Need to download and run the Agent app (desktop application) as backend, helping to bypass browser limitations such as CORS, SSL, fake headers,...",
-        downloadAgent: "To download the Agent, click on the Help menu in the top header and select \"Download Agent\".",
+        webOnly:
+          "Web-based - No additional installation required, works directly in the browser.",
+        needAgent:
+          "Requires Agent - Need to download and run the Agent app (desktop application) as backend, helping to bypass browser limitations such as CORS, SSL, fake headers,...",
+        downloadAgent:
+          'To download the Agent, click on the Help menu in the top header and select "Download Agent".',
       },
     },
     oneTimePassword: {
       purpose: {
         title: "What is OTP Tool?",
-        content: "A tool to generate 6-character OTP (One-Time Password) codes that automatically refresh every 30 seconds. Supports importing accounts from Google Authenticator via QR code, URL, or manual entry.",
+        content:
+          "A tool to generate 6-character OTP (One-Time Password) codes that automatically refresh every 30 seconds. Supports importing accounts from Google Authenticator via QR code, URL, or manual entry.",
       },
       importData: {
         title: "Import Data",
-        scanQR: "Scan QR Code - Upload an image file containing the QR code from Google Authenticator to automatically import accounts.",
-        pasteURL: "Paste URL - Paste the otpauth-migration:// link from Google Authenticator to import accounts.",
-        manual: "Manual Entry - Fill in issuer, name, and secret to add a new account.",
+        scanQR:
+          "Scan QR Code - Upload an image file containing the QR code from Google Authenticator to automatically import accounts.",
+        pasteURL:
+          "Paste URL - Paste the otpauth-migration:// link from Google Authenticator to import accounts.",
+        manual:
+          "Manual Entry - Fill in issuer, name, and secret to add a new account.",
       },
       security: {
         title: "Security",
-        description: "OTP data is encrypted and stored locally on your device. You need to enter a password (user-created) to encrypt browser cache data and open saved accounts.",
+        description:
+          "OTP data is encrypted and stored locally on your device. You need to enter a password (user-created) to encrypt browser cache data and open saved accounts.",
       },
       quickUse: {
         title: "Quick Use",
@@ -54,7 +65,8 @@ export default {
     compareCode: {
       purpose: {
         title: "What is Code Compare?",
-        content: "A tool to compare code and view diffs between two code snippets with syntax highlighting for multiple programming languages.",
+        content:
+          "A tool to compare code and view diffs between two code snippets with syntax highlighting for multiple programming languages.",
       },
       supportedFormats: {
         title: "Supported Formats",
@@ -63,13 +75,15 @@ export default {
       features: {
         title: "Features",
         highlight: "Syntax highlighting based on selected language.",
-        wrapText: "Support wrap text to view long code without horizontal scrolling.",
+        wrapText:
+          "Support wrap text to view long code without horizontal scrolling.",
       },
     },
     colorPicker: {
       purpose: {
         title: "What is Color Picker?",
-        content: "A tool that allows you to upload an image, click anywhere on the image to extract color codes (HEX, RGB, HSL) at that point.",
+        content:
+          "A tool that allows you to upload an image, click anywhere on the image to extract color codes (HEX, RGB, HSL) at that point.",
       },
       howToUse: {
         title: "How to Use",
@@ -79,14 +93,16 @@ export default {
       },
       features: {
         title: "Features",
-        magnifier: "Magnifying glass zooms the area around the mouse cursor for more accurate color selection.",
+        magnifier:
+          "Magnifying glass zooms the area around the mouse cursor for more accurate color selection.",
         palette: "Automatically extract main color palette from the image.",
       },
     },
     imageToBase64: {
       purpose: {
         title: "What is Image to Base64?",
-        content: "A tool to convert image files to Base64 strings, commonly used to embed images directly in HTML/CSS or transmit via API.",
+        content:
+          "A tool to convert image files to Base64 strings, commonly used to embed images directly in HTML/CSS or transmit via API.",
       },
       howToUse: {
         title: "How to Use",
@@ -96,13 +112,15 @@ export default {
       },
       note: {
         title: "Note",
-        content: "Base64 strings can be very long, especially for large images.",
+        content:
+          "Base64 strings can be very long, especially for large images.",
       },
     },
     base64ToImage: {
       purpose: {
         title: "What is Base64 to Image?",
-        content: "A tool to convert Base64 strings back to image files, supporting image download.",
+        content:
+          "A tool to convert Base64 strings back to image files, supporting image download.",
       },
       howToUse: {
         title: "How to Use",
@@ -112,13 +130,15 @@ export default {
       },
       note: {
         title: "Note",
-        content: "The Base64 string must have the prefix data:image/...;base64,",
+        content:
+          "The Base64 string must have the prefix data:image/...;base64,",
       },
     },
     codeFormatter: {
       purpose: {
         title: "What is Code Formatter?",
-        content: "A tool to automatically format SQL code, supporting PostgreSQL and MySQL with various formatting options.",
+        content:
+          "A tool to automatically format SQL code, supporting PostgreSQL and MySQL with various formatting options.",
       },
       howToUse: {
         title: "How to Use",
@@ -134,11 +154,13 @@ export default {
     textCompress: {
       purpose: {
         title: "What is Text Compress?",
-        content: "A tool to compress and decompress text using popular compression algorithms like Gzip, Deflate.",
+        content:
+          "A tool to compress and decompress text using popular compression algorithms like Gzip, Deflate.",
       },
       howToUse: {
         title: "How to Use",
-        compress: "Paste text to compress, select algorithm and press Compress.",
+        compress:
+          "Paste text to compress, select algorithm and press Compress.",
         decompress: "Paste compressed text and press Decompress to decompress.",
       },
       algorithms: {
@@ -151,12 +173,15 @@ export default {
     textManipulation: {
       purpose: {
         title: "What is Text Manipulation?",
-        content: "A tool to batch process text using predefined templates, allowing transformation with given expressions.",
+        content:
+          "A tool to batch process text using predefined templates, allowing transformation with given expressions.",
       },
       howToUse: {
         title: "How to Use",
-        input: "Enter list of text to process (one item per line), set column and row separators.",
-        expression: "Enter processing expression, use $0, $1, $2... to refer to corresponding columns.",
+        input:
+          "Enter list of text to process (one item per line), set column and row separators.",
+        expression:
+          "Enter processing expression, use $0, $1, $2... to refer to corresponding columns.",
         execute: "Press Manipulate to process and view results.",
       },
       expressions: {
@@ -171,7 +196,8 @@ export default {
     textGenerator: {
       purpose: {
         title: "What is Text Generator?",
-        content: "A tool to quickly generate sample text (Lorem Ipsum) for use in development and testing.",
+        content:
+          "A tool to quickly generate sample text (Lorem Ipsum) for use in development and testing.",
       },
       howToUse: {
         title: "How to Use",
@@ -188,7 +214,8 @@ export default {
     cosinSimilarity: {
       purpose: {
         title: "What is Cosine Similarity?",
-        content: "A tool to calculate cosine similarity between two n-dimensional vectors, commonly used in ML and NLP.",
+        content:
+          "A tool to calculate cosine similarity between two n-dimensional vectors, commonly used in ML and NLP.",
       },
       howToUse: {
         title: "How to Use",
@@ -205,17 +232,20 @@ export default {
     apiMocking: {
       purpose: {
         title: "What is API Mocking?",
-        content: "A tool to create mock APIs to fake data in environments where it's not possible to call external APIs. Data is stored on the backend (Agent).",
+        content:
+          "A tool to create mock APIs to fake data in environments where it's not possible to call external APIs. Data is stored on the backend (Agent).",
       },
       howToUse: {
         title: "How to Use",
-        createMock: "Select HTTP method, enter endpoint and configure request/response.",
+        createMock:
+          "Select HTTP method, enter endpoint and configure request/response.",
         configure: "Use the right panel to manage created mock APIs.",
         saveMock: "Press Save to save mock API, then copy CURL to call it.",
       },
       collection: {
         title: "Collection Management",
-        description: "Organize mock APIs into groups for easy management. You can create new groups, delete groups and mock APIs.",
+        description:
+          "Organize mock APIs into groups for easy management. You can create new groups, delete groups and mock APIs.",
       },
       requirement: {
         title: "Requirements",
@@ -225,12 +255,15 @@ export default {
     apiTesting: {
       purpose: {
         title: "What is API Testing?",
-        content: "A tool to call APIs bypass CORS, SSL. Supports 2 modes: Normal Mode and Pro Mode (run JavaScript scripts).",
+        content:
+          "A tool to call APIs bypass CORS, SSL. Supports 2 modes: Normal Mode and Pro Mode (run JavaScript scripts).",
       },
       modes: {
         title: "Modes",
-        normal: "Normal Mode - Call single API with Header and Body configuration.",
-        proMode: "Pro Mode - Write JavaScript scripts to call multiple APIs in a scenario.",
+        normal:
+          "Normal Mode - Call single API with Header and Body configuration.",
+        proMode:
+          "Pro Mode - Write JavaScript scripts to call multiple APIs in a scenario.",
       },
       features: {
         title: "Features",
@@ -246,42 +279,52 @@ export default {
     qrCodeToText: {
       purpose: {
         title: "What is QR Code Reader?",
-        content: "A tool to read multiple QR codes and automatically combine them into a text. Supports decoding compressed data from the QR generation tool.",
+        content:
+          "A tool to read multiple QR codes and automatically combine them into a text. Supports decoding compressed data from the QR generation tool.",
       },
       howToUse: {
         title: "How to Use",
-        upload: "Upload image files containing QR codes to read (supports multiple images).",
+        upload:
+          "Upload image files containing QR codes to read (supports multiple images).",
         scan: "Click Convert to scan and merge content from QR codes.",
         copy: "Click Copy to copy the result.",
       },
       features: {
         title: "Features",
-        compress: "Automatically decompress data if text was compressed before.",
-        header: "Support sorting QR fragments by header (creation date and sequence number).",
+        compress:
+          "Automatically decompress data if text was compressed before.",
+        header:
+          "Support sorting QR fragments by header (creation date and sequence number).",
       },
     },
     textToQRCode: {
       purpose: {
         title: "What is QR Code Generator?",
-        content: "A tool to generate multiple QR codes from text. Supports marking QR codes by creation date and sequence, encoding content for increased accuracy.",
+        content:
+          "A tool to generate multiple QR codes from text. Supports marking QR codes by creation date and sequence, encoding content for increased accuracy.",
       },
       howToUse: {
         title: "How to Use",
         input: "Enter the text to generate QR codes.",
         generate: "Click Generate to create QR codes.",
-        copyDownload: "Click on a QR code to copy, click Download All to download all.",
+        copyDownload:
+          "Click on a QR code to copy, click Download All to download all.",
       },
       features: {
         title: "Features",
-        compress: "Compress data before generating QR to reduce number of codes.",
-        header: "Add header (timestamp + sequence) to each QR code to support merging when reading.",
-        batch: "Automatically split text into multiple QR codes if content is too long.",
+        compress:
+          "Compress data before generating QR to reduce number of codes.",
+        header:
+          "Add header (timestamp + sequence) to each QR code to support merging when reading.",
+        batch:
+          "Automatically split text into multiple QR codes if content is too long.",
       },
     },
     ocr: {
       purpose: {
         title: "What is OCR?",
-        content: "Optical Character Recognition tool to extract text from images. Supports Vietnamese and English.",
+        content:
+          "Optical Character Recognition tool to extract text from images. Supports Vietnamese and English.",
       },
       howToUse: {
         title: "How to Use",
@@ -294,41 +337,49 @@ export default {
         language: "Supports multiple languages: Vietnamese, English.",
         psm: "Customize page segmentation mode (PSM).",
         whitelist: "Only recognize characters in the allowed list.",
-        preprocessing: "Image preprocessing to improve accuracy (grayscale, contrast enhancement, denoising).",
+        preprocessing:
+          "Image preprocessing to improve accuracy (grayscale, contrast enhancement, denoising).",
       },
     },
     jsonToPostgreSQL: {
       purpose: {
         title: "What is JSON to PostgreSQL?",
-        content: "A tool to convert JSON data into PostgreSQL SQL statements (INSERT, CREATE TABLE, DELETE).",
+        content:
+          "A tool to convert JSON data into PostgreSQL SQL statements (INSERT, CREATE TABLE, DELETE).",
       },
       howToUse: {
         title: "How to Use",
         input: "Paste JSON directly or upload a JSON file.",
-        configure: "Configure table name, schema, primary key and other options.",
+        configure:
+          "Configure table name, schema, primary key and other options.",
         convert: "Click Convert to generate SQL script.",
       },
       features: {
         title: "Features",
-        createTable: "Auto-generate CREATE TABLE script with appropriate data types.",
-        deleteScript: "Generate DELETE script to remove old data before INSERT.",
+        createTable:
+          "Auto-generate CREATE TABLE script with appropriate data types.",
+        deleteScript:
+          "Generate DELETE script to remove old data before INSERT.",
         fileUpload: "Support uploading JSON file to process.",
       },
     },
     jsonToOneLineString: {
       purpose: {
         title: "What is JSON to String?",
-        content: "A tool to convert JSON to a single-line string in the syntax of various programming languages.",
+        content:
+          "A tool to convert JSON to a single-line string in the syntax of various programming languages.",
       },
       howToUse: {
         title: "How to Use",
         input: "Paste JSON or JS object into the input field.",
-        selectLanguage: "Select output language (JavaScript, C#, Go, Python, Java, Raw).",
+        selectLanguage:
+          "Select output language (JavaScript, C#, Go, Python, Java, Raw).",
         convert: "Click Convert to transform.",
       },
       features: {
         title: "Features",
-        languages: "Supports multiple languages: JavaScript, C#, Go, Python, Java, Raw.",
+        languages:
+          "Supports multiple languages: JavaScript, C#, Go, Python, Java, Raw.",
         escapeUnicode: "Option to escape Unicode characters to \\uXXXX.",
       },
     },
@@ -353,7 +404,8 @@ export default {
     jsonToModel: {
       purpose: {
         title: "What is JSON to Model?",
-        content: "A tool to convert JSON to model class for multiple programming languages.",
+        content:
+          "A tool to convert JSON to model class for multiple programming languages.",
       },
       howToUse: {
         title: "How to Use",
@@ -365,20 +417,24 @@ export default {
         title: "Features",
         languages: "Supports multiple languages: C#,Go.",
         namespace: "Customize namespace/class name.",
-        options: "Many options: PascalCase, nullable, JsonProperty, record type...",
+        options:
+          "Many options: PascalCase, nullable, JsonProperty, record type...",
       },
     },
     remoteDesktop: {
       purpose: {
         title: "What is Remote Desktop RDP?",
-        content: "A tool to connect to remote computers via RDP (Remote Desktop Protocol). Uses IronRDP WebAssembly to connect directly from the browser.",
+        content:
+          "A tool to connect to remote computers via RDP (Remote Desktop Protocol). Uses IronRDP WebAssembly to connect directly from the browser.",
       },
       howToUse: {
         title: "How to Use",
-        inputHost: "Enter the host address and port of the computer to connect to (e.g. 192.168.1.1:3389).",
+        inputHost:
+          "Enter the host address and port of the computer to connect to (e.g. 192.168.1.1:3389).",
         inputCredentials: "Enter username and password for authentication.",
         connect: "Click Connect button to start the remote session.",
-        fullscreen: "Click fullscreen button to enlarge the display, press ESC to exit.",
+        fullscreen:
+          "Click fullscreen button to enlarge the display, press ESC to exit.",
       },
       features: {
         title: "Features",
@@ -397,20 +453,53 @@ export default {
     bilingualWeb: {
       purpose: {
         title: "What is Bilingual Web?",
-        content: "A tool that displays an actual website with 100% original layout, while translating the visible text into bilingual form without breaking the HTML/CSS structure.",
+        content:
+          "A tool that displays an actual website with 100% original layout, while translating the visible text into bilingual form without breaking the HTML/CSS structure.",
       },
       howToUse: {
         title: "How to use",
         input: "Enter the website URL to translate.",
-        fetch: "Click 'Fetch & Translate' to embed the website and automatically find text to translate.",
+        fetch:
+          "Click 'Fetch & Translate' to embed the website and automatically find text to translate.",
         wait: "The system will automatically call the Agent to translate and inject the results directly below each original text.",
       },
       options: {
         title: "Configuration Options",
-        delay: "Delay time - Wait time for dynamic websites (React, etc.) to finish loading UI before scanning for text.",
+        delay:
+          "Delay time - Wait time for dynamic websites (React, etc.) to finish loading UI before scanning for text.",
         tags: "Block Tags - HTML tags that will be scanned for translation (e.g., P, H1, LI).",
-        classes: "Filter by Class - Specify class names to translate, separated by semicolons (;).",
+        classes:
+          "Filter by Class - Specify class names to translate, separated by semicolons (;).",
         ids: "Filter by ID - Specify ID names to translate, separated by semicolons (;).",
+      },
+    },
+    postgreSQLQuery: {
+      purpose: {
+        title: "PostgreSQL Query",
+        content: "Supports connecting to and querying PostgreSQL data.",
+      },
+      howToUse: {
+        title: "How to Use",
+        step1:
+          "1. Open the Connections tab in the right sidebar to add groups and configure PostgreSQL connections.",
+        step2:
+          "2. Select the desired connection from the combobox in the header.",
+        step3:
+          "3. Enter the SQL statement into the editor (intellisense suggestions are supported).",
+        step4: "4. Press the 'Run Query' button or Ctrl+Enter to execute.",
+        step5:
+          "5. The results are displayed below as a scrollable and sortable table.",
+      },
+      features: {
+        title: "Features",
+        intellisense:
+          "Intellisense SQL suggestions: Keywords, table names, and column names are automatically loaded from the PostgreSQL server.",
+        savedScripts:
+          "Save script: Save frequently used queries to the 'Saved Scripts' section for reuse.",
+        formatCode:
+          "Code Formatting: Automatically format the SQL statement for easy reading.",
+        multipleConnections:
+          "Multiple Connections: Manage multiple connections and group them easily.",
       },
     },
   },

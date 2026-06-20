@@ -119,6 +119,12 @@ class TDEnum {
     Collection: 1,
     Setting: 2,
   };
+  PostgreSQLQuerySidebarOption = {
+    Help: 0,
+    Setting: 1,
+    Connection: 2,
+    SQLSave: 3,
+  };
 }
 
 export default new TDEnum();

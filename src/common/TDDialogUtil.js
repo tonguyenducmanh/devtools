@@ -8,6 +8,7 @@ export const TDDialogEnum = {
   TDGoToToolPopup: 2,
   TDAPIImportCURLPopup: 3,
   TDAPIMokingImportPopup: 4,
+  TDPostgreSQLConnectionPopup: 5,
 };
 
 /**
@@ -23,6 +24,8 @@ const DialogComponentMap = {
     import("@/views/dialogs/TDAPIImportCURLPopup.vue"),
   [TDDialogEnum.TDAPIMokingImportPopup]: () =>
     import("@/views/dialogs/TDAPIMokingImportPopup.vue"),
+  [TDDialogEnum.TDPostgreSQLConnectionPopup]: () =>
+    import("@/views/dialogs/TDPostgreSQLConnectionPopup.vue"),
 };
 
 class TDDialogUtil {
@@ -82,13 +85,17 @@ class TDDialogUtil {
       Object.assign(app._context, this.globalAppContext);
     }
 
-    app.mount(container);
-    const instance = app._component.methods;
-    if (instance?.show && param !== undefined) {
-      instance.show(param);
+    const vm = app.mount(container);
+    // Gọi hàm show trên component instance (vm) thay vì object methods
+    if (typeof vm.show === 'function' && param !== undefined) {
+      vm.show(param);
+    } else if (app._component.methods?.show && param !== undefined) {
+      // Dành cho trường hợp fallback nếu chưa expose (Vue 3 script setup)
+      app._component.methods.show.call(vm, param);
     } else {
       throw new Error(`DialogType "${dialogType}" chưa triển khai hàm show`);
     }
+
     this.activeDialogs.set(dialogId, {
       app,
       container,

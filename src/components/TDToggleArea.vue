@@ -175,11 +175,13 @@ export default {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   outline: none;
   transition: all 0.2s ease;
+  opacity: 0.4;
 }
 
 .td-toggle-button:hover {
   border-color: var(--btn-color);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  opacity: 1;
 }
 
 /* ===== EDGE: LEFT ===== */

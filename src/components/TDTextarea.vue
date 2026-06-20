@@ -135,6 +135,10 @@ export default {
       type: String,
       default: "javascript",
     },
+    monacoOptions: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -229,6 +233,10 @@ export default {
           configObject.wrappingIndent = "none";
         }
         me.editor = monaco.editor.create(me.$refs.textareaWrap, configObject);
+        // Lắng nghe sự kiện phím tắt từ cấu hình cha truyền xuống
+        if (me.monacoOptions && typeof me.monacoOptions.onInit === "function") {
+          me.monacoOptions.onInit(me.editor, monaco);
+        }
         me.editor.onDidBlurEditorWidget((e) => {
           me.debounceUpdateValToEditor();
         });

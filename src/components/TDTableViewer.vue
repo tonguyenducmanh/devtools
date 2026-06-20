@@ -6,7 +6,7 @@
       'td-table-viewer-hoverable': hoverable,
     }"
   >
-    <div class="td-table-container" :style="containerStyle">
+    <div class="td-table-container" :style="containerStyle" ref="tableContainer" @scroll="handleScroll">
       <div class="td-table-wrapper" ref="tableWrapper">
         <table class="td-table">
           <!-- Header -->
@@ -18,7 +18,8 @@
               <!-- Selection Column -->
               <th
                 v-if="selectable"
-                class="td-table-cell td-table-cell-checkbox"
+                class="td-table-cell td-table-cell-checkbox td-table-cell-sticky-header"
+                :style="checkboxStickyStyle"
               >
                 <label class="td-table-checkbox-label">
                   <input
@@ -37,7 +38,11 @@
               </th>
 
               <!-- Index Column -->
-              <th v-if="showIndex" class="td-table-cell td-table-cell-index">
+              <th 
+                v-if="showIndex" 
+                class="td-table-cell td-table-cell-index td-table-cell-sticky-header"
+                :style="indexStickyStyle"
+              >
                 {{ indexLabel }}
               </th>
 
@@ -79,9 +84,14 @@
 
           <!-- Body -->
           <tbody class="td-table-body">
+            <!-- Top spacer for virtual scroll -->
+            <tr v-if="virtualScroll && paddingTop > 0" :style="{ height: paddingTop + 'px' }">
+              <td :colspan="totalColumns" style="padding: 0; border: none;"></td>
+            </tr>
+
             <tr
-              v-for="(row, rowIndex) in processedData"
-              :key="`row-${rowIndex}`"
+              v-for="{row, index: rowIndex} in visibleData"
+              :key="row[rowKey] || `row-${rowIndex}`"
               class="td-table-row"
               :class="{ 'td-table-row-selected': isRowSelected(row) }"
               @click="handleRowClick(row, rowIndex)"
@@ -89,7 +99,8 @@
               <!-- Selection Column -->
               <td
                 v-if="selectable"
-                class="td-table-cell td-table-cell-checkbox"
+                class="td-table-cell td-table-cell-checkbox td-table-cell-sticky"
+                :style="checkboxStickyStyle"
               >
                 <label class="td-table-checkbox-label" @click.stop>
                   <input
@@ -110,7 +121,8 @@
               <!-- Index Column -->
               <td
                 v-if="showIndex"
-                class="td-table-cell td-table-cell-index"
+                class="td-table-cell td-table-cell-index td-table-cell-sticky"
+                :style="indexStickyStyle"
                 v-tooltip="$t('i18nCommon.copy')"
                 @click="copyRow(row)"
               >
@@ -155,6 +167,11 @@
                   </div>
                 </slot>
               </td>
+            </tr>
+
+            <!-- Bottom spacer for virtual scroll -->
+            <tr v-if="virtualScroll && paddingBottom > 0" :style="{ height: paddingBottom + 'px' }">
+              <td :colspan="totalColumns" style="padding: 0; border: none;"></td>
             </tr>
 
             <!-- Empty State -->
@@ -339,6 +356,20 @@ export default {
       type: Boolean,
       default: true,
     },
+
+    // Virtual Scroll
+    virtualScroll: {
+      type: Boolean,
+      default: true,
+    },
+    rowHeight: {
+      type: Number,
+      default: 45,
+    },
+    bufferSize: {
+      type: Number,
+      default: 5,
+    },
   },
 
   data() {
@@ -347,10 +378,24 @@ export default {
       sortColumn: this.defaultSortColumn,
       sortDirection: this.defaultSortDirection,
       columnWidthCache: {}, // Cache calculated widths
+      scrollTop: 0,
+      containerHeight: 400,
     };
   },
 
   computed: {
+    checkboxStickyStyle() {
+      return {
+        position: 'sticky',
+        left: '0px',
+      };
+    },
+    indexStickyStyle() {
+      return {
+        position: 'sticky',
+        left: this.selectable ? '48px' : '0px',
+      };
+    },
     footerHelpText() {
       let me = this;
       if (me.usingFooterHelp) {
@@ -437,6 +482,46 @@ export default {
 
       return tableData;
     },
+
+    // Virtual Scroll computed properties
+    totalRows() {
+      return this.processedData.length;
+    },
+    visibleData() {
+      if (!this.virtualScroll) {
+        return this.processedData.map((row, index) => ({ row, index }));
+      }
+      const start = this.startRowWithBuffer;
+      const end = this.endRowWithBuffer;
+      return this.processedData.slice(start, end).map((row, i) => ({
+        row,
+        index: start + i
+      }));
+    },
+    startRow() {
+      return Math.max(0, Math.floor(this.scrollTop / this.rowHeight));
+    },
+    endRow() {
+      return Math.min(
+        this.totalRows - 1,
+        Math.ceil((this.scrollTop + this.containerHeight) / this.rowHeight)
+      );
+    },
+    startRowWithBuffer() {
+      return Math.max(0, this.startRow - this.bufferSize);
+    },
+    endRowWithBuffer() {
+      return Math.min(this.totalRows, this.endRow + this.bufferSize + 1);
+    },
+    paddingTop() {
+      if (!this.virtualScroll) return 0;
+      return this.startRowWithBuffer * this.rowHeight;
+    },
+    paddingBottom() {
+      if (!this.virtualScroll) return 0;
+      const remainingRows = this.totalRows - this.endRowWithBuffer;
+      return Math.max(0, remainingRows * this.rowHeight);
+    }
   },
 
   watch: {
@@ -455,7 +540,35 @@ export default {
     },
   },
 
+  mounted() {
+    if (this.virtualScroll) {
+      this.updateContainerSize();
+      this.resizeObserver = new ResizeObserver(() => {
+        this.updateContainerSize();
+      });
+      if (this.$refs.tableContainer) {
+        this.resizeObserver.observe(this.$refs.tableContainer);
+      }
+    }
+  },
+
+  beforeUnmount() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+  },
+
   methods: {
+    handleScroll(event) {
+      if (this.virtualScroll) {
+        this.scrollTop = event.target.scrollTop;
+      }
+    },
+    updateContainerSize() {
+      if (this.$refs.tableContainer) {
+        this.containerHeight = this.$refs.tableContainer.clientHeight;
+      }
+    },
     formatLabel(key) {
       return key.trim();
     },
@@ -675,10 +788,11 @@ export default {
     .td-table-header {
       background-color: var(--bg-layer-color);
 
-      &.td-table-header-sticky {
+      &.td-table-header-sticky th {
         position: sticky;
         top: 0;
         z-index: 1;
+        background-color: var(--bg-layer-color); /* Ensure background is solid */
       }
 
       tr {
@@ -734,18 +848,40 @@ export default {
       }
 
       &-checkbox {
-        width: 40px;
+        width: 48px;
+        min-width: 48px;
+        max-width: 48px;
+        box-sizing: border-box;
         text-align: center;
-        padding: var(--padding);
+        padding: 0 var(--padding);
       }
 
       &-index {
-        width: 30px;
-        min-width: 30px;
-        max-width: 30px;
+        width: 40px;
+        min-width: 40px;
+        max-width: 40px;
+        box-sizing: border-box;
         text-align: center;
+        padding: 0 var(--padding);
         color: var(--text-secondary-color);
         font-weight: 500;
+      }
+
+      &-sticky {
+        background-color: var(--bg-main-color);
+        box-shadow: 1px 0 0 0 var(--border-color);
+        z-index: 1;
+      }
+      
+      tr:hover > &-sticky {
+        background-color: var(--bg-layer-color);
+      }
+
+      &-sticky-header {
+        background-color: var(--bg-layer-color);
+        box-shadow: 1px 0 0 0 var(--border-color);
+        z-index: 3 !important; /* Higher than normal sticky header */
+        top: 0;
       }
 
       &-actions {

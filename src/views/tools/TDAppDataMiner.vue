@@ -30,11 +30,13 @@
                 :isCapitalizeText="false"
                 @selected="showDataByTable"
               ></TDComboBox>
-              <div
+              <TDButton
                 @click="loadAllTestingData"
-                class="td-icon td-reload-icon"
+                :noMargin="true"
+                :type="$tdEnum.buttonType.secondary"
+                iconClass="td-reload-icon"
                 v-tooltip="$t('i18nCommon.AppDataMiner.refreshTableData')"
-              ></div>
+              ></TDButton>
             </div>
           </div>
         </template>
@@ -263,7 +265,8 @@ export default {
         width: 200px;
       }
       .td-table-select-combo {
-        width: 300px;
+        width: 350px;
+        margin-right: var(--padding);
       }
       .td-data-btn {
         flex: 1;
