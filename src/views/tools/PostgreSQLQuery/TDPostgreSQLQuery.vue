@@ -1249,10 +1249,20 @@ export default {
   gap: var(--padding);
 }
 
+/* Container chứa các button */
 .td-query-btn-group {
-  gap: var(--padding);
-  justify-content: flex-start;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--padding);
+  /* Cố định chiều rộng (nếu cần) và cho phép scroll dọc khi thiếu chiều cao */
+  overflow-y: auto;
+  overflow-x: hidden; /* Ẩn scroll ngang ngoài ý muốn */
+
+  /* Đảm bảo container không bị ép co nhỏ lại quá mức trong layout lớn */
+  flex-shrink: 0;
 }
 
 .td-pg-query-editor {

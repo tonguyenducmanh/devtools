@@ -72,6 +72,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .td-button {
+  flex-shrink: 0;
   outline: none;
   display: flex;
   flex-direction: column;
