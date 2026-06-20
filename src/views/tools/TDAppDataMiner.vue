@@ -31,7 +31,7 @@
                 @selected="showDataByTable"
               ></TDComboBox>
               <TDButton
-                @click="loadAllTestingData"
+                @click="reloadTable"
                 :noMargin="true"
                 :type="$tdEnum.buttonType.secondary"
                 iconClass="td-reload-icon"

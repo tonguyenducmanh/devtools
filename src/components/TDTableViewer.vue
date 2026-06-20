@@ -6,7 +6,12 @@
       'td-table-viewer-hoverable': hoverable,
     }"
   >
-    <div class="td-table-container" :style="containerStyle" ref="tableContainer" @scroll="handleScroll">
+    <div
+      class="td-table-container"
+      :style="containerStyle"
+      ref="tableContainer"
+      @scroll="handleScroll"
+    >
       <div class="td-table-wrapper" ref="tableWrapper">
         <table class="td-table">
           <!-- Header -->
@@ -38,8 +43,8 @@
               </th>
 
               <!-- Index Column -->
-              <th 
-                v-if="showIndex" 
+              <th
+                v-if="showIndex"
                 class="td-table-cell td-table-cell-index td-table-cell-sticky-header"
                 :style="indexStickyStyle"
               >
@@ -85,12 +90,15 @@
           <!-- Body -->
           <tbody class="td-table-body">
             <!-- Top spacer for virtual scroll -->
-            <tr v-if="virtualScroll && paddingTop > 0" :style="{ height: paddingTop + 'px' }">
-              <td :colspan="totalColumns" style="padding: 0; border: none;"></td>
+            <tr
+              v-if="virtualScroll && paddingTop > 0"
+              :style="{ height: paddingTop + 'px' }"
+            >
+              <td :colspan="totalColumns" style="padding: 0; border: none"></td>
             </tr>
 
             <tr
-              v-for="{row, index: rowIndex} in visibleData"
+              v-for="{ row, index: rowIndex } in visibleData"
               :key="row[rowKey] || `row-${rowIndex}`"
               class="td-table-row"
               :class="{ 'td-table-row-selected': isRowSelected(row) }"
@@ -126,7 +134,9 @@
                 v-tooltip="$t('i18nCommon.copy')"
                 @click="copyRow(row)"
               >
-                {{ rowIndex + 1 }}
+                <div>
+                  {{ rowIndex + 1 }}
+                </div>
               </td>
 
               <!-- Data Columns -->
@@ -170,8 +180,11 @@
             </tr>
 
             <!-- Bottom spacer for virtual scroll -->
-            <tr v-if="virtualScroll && paddingBottom > 0" :style="{ height: paddingBottom + 'px' }">
-              <td :colspan="totalColumns" style="padding: 0; border: none;"></td>
+            <tr
+              v-if="virtualScroll && paddingBottom > 0"
+              :style="{ height: paddingBottom + 'px' }"
+            >
+              <td :colspan="totalColumns" style="padding: 0; border: none"></td>
             </tr>
 
             <!-- Empty State -->
@@ -386,14 +399,14 @@ export default {
   computed: {
     checkboxStickyStyle() {
       return {
-        position: 'sticky',
-        left: '0px',
+        position: "sticky",
+        left: "0px",
       };
     },
     indexStickyStyle() {
       return {
-        position: 'sticky',
-        left: this.selectable ? '48px' : '0px',
+        position: "sticky",
+        left: this.selectable ? "48px" : "0px",
       };
     },
     footerHelpText() {
@@ -495,7 +508,7 @@ export default {
       const end = this.endRowWithBuffer;
       return this.processedData.slice(start, end).map((row, i) => ({
         row,
-        index: start + i
+        index: start + i,
       }));
     },
     startRow() {
@@ -504,7 +517,7 @@ export default {
     endRow() {
       return Math.min(
         this.totalRows - 1,
-        Math.ceil((this.scrollTop + this.containerHeight) / this.rowHeight)
+        Math.ceil((this.scrollTop + this.containerHeight) / this.rowHeight),
       );
     },
     startRowWithBuffer() {
@@ -521,7 +534,7 @@ export default {
       if (!this.virtualScroll) return 0;
       const remainingRows = this.totalRows - this.endRowWithBuffer;
       return Math.max(0, remainingRows * this.rowHeight);
-    }
+    },
   },
 
   watch: {
@@ -792,7 +805,9 @@ export default {
         position: sticky;
         top: 0;
         z-index: 1;
-        background-color: var(--bg-layer-color); /* Ensure background is solid */
+        background-color: var(
+          --bg-layer-color
+        ); /* Ensure background is solid */
       }
 
       tr {
@@ -865,6 +880,10 @@ export default {
         padding: 0 var(--padding);
         color: var(--text-secondary-color);
         font-weight: 500;
+        /* Thêm các thuộc tính dưới đây */
+        display: table-cell; /* Giữ nguyên đặc tính ô của table */
+        text-align: center; /* Căn giữa ngang */
+        vertical-align: middle; /* Sửa thành middle để căn giữa dọc */
       }
 
       &-sticky {
@@ -872,7 +891,7 @@ export default {
         box-shadow: 1px 0 0 0 var(--border-color);
         z-index: 1;
       }
-      
+
       tr:hover > &-sticky {
         background-color: var(--bg-layer-color);
       }

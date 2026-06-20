@@ -2,11 +2,13 @@ package database
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"td_core_service/internal/model"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 // file này hướng tới việc gọi nối vào postgressl ở server khác
@@ -24,8 +26,20 @@ func DeletePostgreSQLConnectionsByGroupID(groupID string) error {
 	return err
 }
 
-// Thực hiện query theo yêu cầu của User
-func ExecutePostgreSQLQuery(connectionString string, sqlQuery string) (*model.TDQueryResult, error) {
+// rawStatementResult lưu kết quả thô của 1 statement, CHƯA resolve tên bảng.
+// Việc resolve OID -> tên bảng phải làm SAU khi MultiResultReader đã đóng hoàn toàn,
+// vì không được gửi query khác trên cùng 1 connection trong lúc nó còn đang đọc dở.
+type rawStatementResult struct {
+	columns   []string
+	tableOIDs []uint32
+	rows      []map[string]any
+	cmdTag    pgconn.CommandTag
+}
+
+// Thực hiện 1 hoặc nhiều câu lệnh SQL cách nhau bởi dấu ";" theo yêu cầu của User.
+// Mỗi statement trả về 1 result set riêng
+// Dùng Simple Query Protocol ở tầng pgconn (đọc nhiều result set trong 1 round-trip duy nhất).
+func ExecutePostgreSQLQuery(connectionString string, sqlQuery string) (*model.TDMultiQueryResult, error) {
 	ctx := context.Background()
 
 	// 1. Parse connection string ra object config
@@ -44,66 +58,125 @@ func ExecutePostgreSQLQuery(connectionString string, sqlQuery string) (*model.TD
 	}
 	defer conn.Close(ctx)
 
-	// Dùng conn.Query cho TẤT CẢ mọi thứ
-	rows, err := conn.Query(ctx, sqlQuery)
-	if err != nil {
-		return nil, fmt.Errorf("lỗi thực thi query: %w", err)
-	}
-	defer rows.Close()
+	// 4. Gửi cả script lên server trong 1 lần, đọc lần lượt từng result set
+	pgConn := conn.PgConn()
+	mrr := pgConn.Exec(ctx, sqlQuery)
 
-	// 1. Lấy thông tin cột trước
-	fieldDescs := rows.FieldDescriptions()
-	columns := make([]string, len(fieldDescs))
-	for i, fd := range fieldDescs {
-		columns[i] = string(fd.Name)
-	}
+	var rawResults []rawStatementResult
+	oidSet := make(map[uint32]struct{})
 
-	// 2. Đọc dữ liệu nếu có
-	var resultRows []map[string]any
-	for rows.Next() {
-		vals, err := rows.Values()
-		if err != nil {
-			return nil, fmt.Errorf("lỗi đọc row: %w", err)
-		}
-		rowMap := make(map[string]any, len(columns))
-		for i, col := range columns {
-			switch v := vals[i].(type) {
-			case []byte:
-				rowMap[col] = string(v)
-			case [16]byte: // uuid đơn
-				rowMap[col] = uuid.UUID(v).String()
-			case [][16]byte: // mảng uuid[]
-				ids := make([]string, len(v))
-				for j, b := range v {
-					ids[j] = uuid.UUID(b).String()
-				}
-				rowMap[col] = ids
-			default:
-				rowMap[col] = v
+	for mrr.NextResult() {
+		rr := mrr.ResultReader()
+
+		fieldDescs := rr.FieldDescriptions()
+		columns := make([]string, len(fieldDescs))
+		tableOIDs := make([]uint32, len(fieldDescs))
+		dataTypeOIDs := make([]uint32, len(fieldDescs))
+		for i, fd := range fieldDescs {
+			columns[i] = string(fd.Name)
+			tableOIDs[i] = fd.TableOID
+			dataTypeOIDs[i] = fd.DataTypeOID
+			if fd.TableOID != 0 {
+				oidSet[fd.TableOID] = struct{}{}
 			}
 		}
-		resultRows = append(resultRows, rowMap)
+
+		var resultRows []map[string]any
+		for rr.NextRow() {
+			values := rr.Values() // [][]byte - dạng TEXT thô (Simple Protocol luôn trả text format)
+			rowMap := make(map[string]any, len(columns))
+			for i, col := range columns {
+				rowMap[col] = decodeTextValue(values[i], dataTypeOIDs[i])
+			}
+			resultRows = append(resultRows, rowMap)
+		}
+
+		cmdTag, closeErr := rr.Close()
+		rawResults = append(rawResults, rawStatementResult{
+			columns:   columns,
+			tableOIDs: tableOIDs,
+			rows:      resultRows,
+			cmdTag:    cmdTag,
+		})
+
+		if closeErr != nil {
+			// PostgreSQL dừng các statement còn lại của script khi 1 câu lỗi
+			// (cả script chạy chung 1 implicit transaction).
+			// Vẫn trả về các statement đã chạy thành công trước đó kèm lỗi.
+			mrr.Close()
+			result := buildMultiResult(ctx, conn, rawResults, oidSet)
+			return result, fmt.Errorf("lỗi thực thi statement thứ %d: %w", len(rawResults), closeErr)
+		}
 	}
 
-	if rows.Err() != nil {
-		return nil, fmt.Errorf("lỗi sau khi đọc rows: %w", rows.Err())
+	if err := mrr.Close(); err != nil {
+		result := buildMultiResult(ctx, conn, rawResults, oidSet)
+		return result, fmt.Errorf("lỗi sau khi đọc kết quả: %w", err)
 	}
 
-	// Lấy chính xác RowsAffected từ CommandTag của câu lệnh
-	cmdTag := rows.CommandTag()
-	rowsAffected := cmdTag.RowsAffected()
+	return buildMultiResult(ctx, conn, rawResults, oidSet), nil
+}
 
-	// Nếu là câu lệnh SELECT thì RowsAffected từ CommandTag thường bằng 0 hoặc tùy driver,
-	// ta sẽ lấy số lượng row đọc được làm RowsAffected nếu đó là câu lệnh SELECT thực sự.
-	isSelect := len(columns) > 0
-	if isSelect {
-		rowsAffected = int64(len(resultRows))
+// decodeTextValue chuyển 1 giá trị text thô Postgres trả về sang kiểu Go phù hợp để encode JSON.
+//   - NULL                -> nil
+//   - json / jsonb         -> json.RawMessage (giữ nguyên cấu trúc lồng nhau thay vì chuỗi escape)
+//   - còn lại (uuid, số,
+//     ngày giờ, mảng,...)  -> giữ nguyên dạng text Postgres trả về (không bị lỗi [16]byte như trước)
+func decodeTextValue(raw []byte, dataTypeOID uint32) any {
+	if raw == nil {
+		return nil
+	}
+	switch dataTypeOID {
+	case pgtype.JSONOID, pgtype.JSONBOID:
+		return json.RawMessage(raw)
+	default:
+		return string(raw)
+	}
+}
+
+// buildMultiResult resolve tên bảng (1 lần cho mỗi OID xuất hiện trong toàn bộ script)
+// rồi gói các rawStatementResult thành model.TDMultiQueryResult.
+func buildMultiResult(ctx context.Context, conn *pgx.Conn, rawResults []rawStatementResult, oidSet map[uint32]struct{}) *model.TDMultiQueryResult {
+	oidToName := resolveTableNames(ctx, conn, oidSet)
+
+	results := make([]*model.TDQueryResult, 0, len(rawResults))
+	for _, rr := range rawResults {
+		tableNames := make([]string, len(rr.tableOIDs))
+		for i, oid := range rr.tableOIDs {
+			tableNames[i] = oidToName[oid] // "" nếu oid = 0 hoặc không tra được
+		}
+
+		isSelect := len(rr.columns) > 0
+		rowsAffected := rr.cmdTag.RowsAffected()
+		if isSelect {
+			rowsAffected = int64(len(rr.rows))
+		}
+
+		results = append(results, &model.TDQueryResult{
+			Columns:      rr.columns,
+			TableNames:   tableNames,
+			Rows:         rr.rows,
+			RowsAffected: rowsAffected,
+			IsSelect:     isSelect,
+		})
 	}
 
-	return &model.TDQueryResult{
-		Columns:      columns,
-		Rows:         resultRows,
-		RowsAffected: rowsAffected, // Trả về số dòng chuẩn xác cho cả INSERT/UPDATE lẫn SELECT
-		IsSelect:     isSelect,
-	}, nil
+	return &model.TDMultiQueryResult{Results: results}
+}
+
+// resolveTableNames tra tên bảng cho từng OID xuất hiện trong script.
+// CHỈ được gọi sau khi MultiResultReader đã Close() hoàn toàn (không được xen query
+// khác vào giữa lúc đang đọc multi-result trên cùng 1 connection).
+func resolveTableNames(ctx context.Context, conn *pgx.Conn, oidSet map[uint32]struct{}) map[uint32]string {
+	oidToName := make(map[uint32]string, len(oidSet))
+	for oid := range oidSet {
+		var name string
+		// ép kiểu sang int64 khi bind tham số rồi cast lại oid trong SQL để tránh
+		// vấn đề pgx không có sẵn codec mặc định cho kiểu Go uint32
+		err := conn.QueryRow(ctx, "SELECT relname FROM pg_class WHERE oid = $1::oid", int64(oid)).Scan(&name)
+		if err == nil {
+			oidToName[oid] = name
+		}
+	}
+	return oidToName
 }

@@ -39,26 +39,12 @@
             :noMargin="true"
             @click="handleDownloadReponse"
             :type="$tdEnum.buttonType.secondary"
-            :readOnly="
-              !(
-                queryResult &&
-                queryResult.is_select &&
-                queryResult.rows &&
-                queryResult.rows.length > 0
-              )
-            "
+            :readOnly="!canExportActiveResult"
             iconClass="td-download-icon"
             v-tooltip="$t('i18nCommon.apiTesting.downloadReponse')"
-          ></TDButton>
+          />
           <TDButton
-            :readOnly="
-              !(
-                queryResult &&
-                queryResult.is_select &&
-                queryResult.rows &&
-                queryResult.rows.length > 0
-              )
-            "
+            :readOnly="!canExportActiveResult"
             :noMargin="true"
             :type="$tdEnum.buttonType.secondary"
             @click="handleCopyResult"
@@ -93,35 +79,73 @@
         <div class="flex td-pg-result-loading" v-if="isRunning">
           <div class="loader"></div>
         </div>
-        <div class="td-pg-result-error" v-else-if="queryError">
-          <span>{{ queryError }}</span>
-        </div>
-        <div
-          class="td-pg-result-affected"
-          v-else-if="queryResult && !queryResult.is_select"
-        >
-          <span
-            >{{ $t("i18nCommon.postgreSQLQuery.rowsAffected") }}:
-            {{ queryResult.rows_affected }}</span
+
+        <template v-else>
+          <div class="td-pg-result-error" v-if="queryError">
+            {{ queryError }}
+          </div>
+          <div
+            class="td-pg-result-empty"
+            v-if="!hasQueryResults && !queryError"
           >
-        </div>
-        <TDTableViewer
-          v-else-if="queryResult && queryResult.is_select"
-          :tableData="queryResult.rows || []"
-          :columns="tableColumns"
-          :noMargin="true"
-          :stickyHeader="true"
-          :showIndex="true"
-          :usingFooterHelp="true"
-          :showFooter="true"
-          maxHeight="100%"
-        />
-        <div class="td-pg-result-empty" v-else>
-          <TDDynamicBackgroundEffect />
-          <span>{{ $t("i18nCommon.noDataAvailable") }}</span>
-        </div>
+            <TDDynamicBackgroundEffect />
+            <span>{{ $t("i18nCommon.noDataAvailable") }}</span>
+          </div>
+          <div
+            v-else-if="hasQueryResults"
+            class="flex flex-col td-pg-result-body"
+          >
+            <div class="flex flex-col flex-one td-pg-result-content">
+              <div class="td-pg-result-table">
+                <KeepAlive>
+                  <TDTableViewer
+                    v-if="activeQueryResult && activeQueryResult.is_select"
+                    :key="activeResultCacheKey"
+                    :tableData="activeQueryResult.rows"
+                    :columns="activeTableColumns"
+                    :noMargin="true"
+                    :stickyHeader="true"
+                    :showIndex="true"
+                    :usingFooterHelp="true"
+                    :showFooter="!hasMultipleResultStatement"
+                    maxHeight="100%"
+                  />
+                </KeepAlive>
+              </div>
+              <div
+                v-if="activeQueryResult && !activeQueryResult.is_select"
+                class="flex td-pg-result-affected"
+              >
+                <TDDynamicBackgroundEffect />
+                <span>
+                  {{ $t("i18nCommon.postgreSQLQuery.rowsAffected") }}:
+                  {{ activeQueryResult.rows_affected || 0 }}
+                </span>
+              </div>
+            </div>
+            <div
+              class="flex td-pg-result-tabs-wrap"
+              v-if="hasMultipleResultStatement"
+            >
+              <div class="flex td-pg-result-tabs">
+                <div
+                  v-for="(result, index) in queryResults"
+                  :key="getResultTabKey(result, index)"
+                  class="text-nowrap td-pg-result-tab-item"
+                  :class="{
+                    'td-pg-result-tab-item-active': activeResultIndex === index,
+                  }"
+                  @click="activateResultTab(index)"
+                >
+                  {{ getResultTabLabel(result, index) }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
       </div>
     </div>
+
     <TDSubSidebar
       ref="subSidebar"
       v-model="currentConfigLayout.isShowSidebar"
@@ -413,7 +437,9 @@ export default {
       sqlText: "",
 
       // result
-      queryResult: null,
+      queryResult: null, // giữ lại tương thích code cũ
+      queryResults: [], // mới: danh sách result theo từng statement
+      activeResultIndex: 0,
       queryError: null,
       isRunning: false,
       isLoading: false,
@@ -440,6 +466,13 @@ export default {
   },
 
   computed: {
+    /**
+     * kiểm tra xem có phải có nhiều reuslt trả về không
+     */
+    hasMultipleResultStatement() {
+      let me = this;
+      return me.queryResults && me.queryResults.length > 1;
+    },
     monacoOptions() {
       return {
         onInit: (editor, monacoInstance) => {
@@ -522,16 +555,69 @@ export default {
     },
 
     /**
-     * Columns cho TDTableViewer từ kết quả query
+     * Có result hay không
+     */
+    hasQueryResults() {
+      return Array.isArray(this.queryResults) && this.queryResults.length > 0;
+    },
+
+    /**
+     * Result đang active
+     */
+    activeQueryResult() {
+      if (!this.hasQueryResults) return null;
+      return this.queryResults[this.activeResultIndex] ?? null;
+    },
+
+    /**
+     * Giữ tương thích với code cũ nào còn đọc queryResult
+     */
+    currentQueryResultCompat() {
+      return this.activeQueryResult || this.queryResult || null;
+    },
+
+    /**
+     * Columns cho TDTableViewer từ result active
+     * Có title theo table_names nếu backend có trả về
+     */
+    activeTableColumns() {
+      let result = this.activeQueryResult;
+      if (!result?.columns?.length) return null;
+
+      return result.columns.map((col, index) => {
+        const tableName = result.table_names?.[index] || "";
+        return {
+          key: col,
+          label: col,
+          sortable: true,
+          autoWidth: true,
+          title: tableName ? `${tableName}.${col}` : col,
+        };
+      });
+    },
+
+    /**
+     * fallback tương thích code cũ
      */
     tableColumns() {
-      if (!this.queryResult?.columns?.length) return null;
-      return this.queryResult.columns.map((col) => ({
-        key: col,
-        label: col,
-        sortable: true,
-        autoWidth: true,
-      }));
+      return this.activeTableColumns;
+    },
+
+    /**
+     * export/copy chỉ cho phép với SELECT đang active
+     */
+    canExportActiveResult() {
+      return !!(
+        this.activeQueryResult &&
+        this.activeQueryResult.is_select &&
+        this.activeQueryResult.rows &&
+        this.activeQueryResult.rows.length > 0
+      );
+    },
+
+    activeResultCacheKey() {
+      if (!this.activeQueryResult) return "pg-result-empty";
+      return `pg-result-${this.activeResultIndex}-${this.activeQueryResult.is_select ? "select" : "command"}`;
     },
   },
 
@@ -541,7 +627,71 @@ export default {
       this.resultSectionSize = sizes.rightSize;
     },
 
-    // ─── Load data ────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────
+    // Multi result helpers
+    // ─────────────────────────────────────────────────────────
+
+    normalizeSingleResult(result) {
+      if (!result) return null;
+      return {
+        columns: Array.isArray(result.columns) ? result.columns : [],
+        table_names: Array.isArray(result.table_names)
+          ? result.table_names
+          : [],
+        rows: Array.isArray(result.rows) ? result.rows : [],
+        rows_affected: Number(result.rows_affected || 0),
+        is_select: !!result.is_select,
+      };
+    },
+
+    normalizeMultiQueryResult(payload) {
+      // backend mới: { results: [...] }
+      if (payload && Array.isArray(payload.results)) {
+        return payload.results
+          .map((item) => this.normalizeSingleResult(item))
+          .filter(Boolean);
+      }
+
+      // backend cũ: trả thẳng 1 result
+      if (payload && typeof payload === "object") {
+        const one = this.normalizeSingleResult(payload);
+        return one ? [one] : [];
+      }
+
+      return [];
+    },
+
+    activateResultTab(index) {
+      if (index < 0 || index >= this.queryResults.length) return;
+      this.activeResultIndex = index;
+      this.queryResult = this.queryResults[index] || null; // tương thích code cũ
+    },
+
+    getResultTabKey(result, index) {
+      return `${index}-${result?.is_select ? "select" : "command"}-${result?.rows_affected ?? 0}`;
+    },
+
+    getResultTabLabel(result, index) {
+      if (!result) return `Result ${index + 1}`;
+
+      if (result.is_select) {
+        const firstTable = result.table_names?.find((x) => !!x);
+        if (firstTable)
+          return `${index + 1} ${firstTable} ${result.rows_affected} ${this.$t("i18nCommon.record")}`;
+        return `${index + 1} SELECT`;
+      }
+
+      return `${index + 1} COMMAND`;
+    },
+
+    resetQueryResults() {
+      this.queryResult = null;
+      this.queryResults = [];
+      this.activeResultIndex = 0;
+      this.queryError = null;
+    },
+
+    // ─── Load data ───────────────────────────────────────────
 
     async loadAllData() {
       let me = this;
@@ -638,8 +788,7 @@ export default {
           );
           if (me.selectedConnectionId === id) {
             me.selectedConnectionId = "";
-            me.queryResult = null;
-            me.queryError = null;
+            me.resetQueryResults();
           }
           await me.loadConnections();
         }
@@ -697,21 +846,28 @@ export default {
       if (!me.sqlText?.trim()) return;
 
       me.isRunning = true;
-      me.queryResult = null;
-      me.queryError = null;
+      me.resetQueryResults();
 
       try {
-        let response = await me.agentAPI.executeQuery(
+        const response = await me.agentAPI.executeQuery(
           me.selectedConnectionId,
           me.sqlText,
         );
-        if (response?.data?.success) {
-          me.queryResult = response.data.data;
-        } else {
+
+        const normalizedResults = me.normalizeMultiQueryResult(
+          response?.data?.data,
+        );
+
+        me.queryResults = normalizedResults;
+        me.activeResultIndex = normalizedResults.length > 0 ? 0 : 0;
+        me.queryResult = normalizedResults[0] || null;
+
+        if (!response?.data?.success) {
           me.queryError =
             response?.data?.message ?? me.$t("i18nCommon.toastMessage.error");
         }
       } catch (error) {
+        me.resetQueryResults();
         me.queryError =
           error?.message ?? me.$t("i18nCommon.toastMessage.error");
       } finally {
@@ -738,7 +894,7 @@ export default {
           indent: "  ",
           uppercase: true,
         });
-      } catch (error) {
+      } catch {
         me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
@@ -746,9 +902,9 @@ export default {
     // ─── Copy result ───────────────────────────────────────────────────────────
 
     buildResultForCopy() {
-      let me = this;
-      if (!me.queryResult?.rows?.length) return;
-      return JSON.stringify(me.queryResult.rows, null, 2);
+      const result = this.activeQueryResult;
+      if (!result?.is_select || !result?.rows?.length) return "";
+      return JSON.stringify(result.rows, null, 2);
     },
 
     handleCopyResult() {
@@ -806,11 +962,13 @@ export default {
         );
 
         let totalRows = 0;
-        if (
-          countResponse?.data?.success &&
-          countResponse.data.data?.rows?.length > 0
-        ) {
-          totalRows = parseInt(countResponse.data.data.rows[0].total || 0, 10);
+        const countResult =
+          countResponse?.data?.data?.results?.[0] ||
+          countResponse?.data?.data ||
+          null;
+
+        if (countResponse?.data?.success && countResult?.rows?.length > 0) {
+          totalRows = parseInt(countResult.rows[0].total || 0, 10);
         }
 
         // Chạy vòng lặp FOR gối đầu để kéo dữ liệu về thông qua SQL Paging
@@ -826,8 +984,13 @@ export default {
             pagingQuery,
           );
 
-          if (pagingResponse?.data?.success && pagingResponse.data.data?.rows) {
-            allTableRows.push(...pagingResponse.data.data.rows);
+          const pagingResult =
+            pagingResponse?.data?.data?.results?.[0] ||
+            pagingResponse?.data?.data ||
+            null;
+
+          if (pagingResponse?.data?.success && pagingResult?.rows) {
+            allTableRows.push(...pagingResult.rows);
           } else {
             console.error(
               `Gặp lỗi khi tải dữ liệu tại vị trí dòng (offset): ${offset}`,
@@ -847,10 +1010,14 @@ export default {
           ],
           rows: allTableRows,
         };
-        // ─────────────────────────────────────────────────────────────────────
+
+        let keywordResult =
+          keywordResponse?.data?.data?.results?.[0] ||
+          keywordResponse?.data?.data ||
+          null;
 
         let keywordsResult = keywordResponse?.data?.success
-          ? keywordResponse.data.data
+          ? keywordResult
           : null;
 
         let intellisenseData = {
@@ -871,7 +1038,6 @@ export default {
         console.error("Load intellisense error:", error);
         me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       } finally {
-        me.isRunningIntellisense = false; // Đảm bảo hạ cờ hiệu loading trong mọi trường hợp
         me.isLoadingIntellisense = false;
       }
     },
@@ -1276,6 +1442,53 @@ export default {
   width: 100%;
   display: flex;
   flex-direction: column;
+  .td-pg-result-body {
+    width: 100%;
+    height: 100%;
+    gap: var(--padding);
+    .td-pg-result-tabs-wrap {
+      width: 100%;
+      .td-pg-result-tabs {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        align-items: center;
+        justify-content: flex-start;
+        gap: var(--padding);
+        background-color: var(--bg-layer-color);
+        border-radius: var(--border-radius);
+        padding: calc(var(--padding) / 2);
+
+        .td-pg-result-tab-item {
+          flex-shrink: 0;
+          font-size: var(--font-size-small);
+          color: var(--text-secondary-color);
+          border-radius: var(--border-radius-component);
+          padding: calc(var(--padding) / 2);
+          cursor: pointer;
+          background: var(--bg-layer-color);
+        }
+        .td-pg-result-tab-item:hover {
+          background: var(--border-color);
+        }
+        .td-pg-result-tab-item-active {
+          background: var(--bg-main-color);
+        }
+        .td-pg-result-tab-item-active:hover {
+          background: var(--bg-main-color);
+        }
+      }
+    }
+
+    .td-pg-result-content {
+      width: 100%;
+      min-height: 0;
+      .td-pg-result-table {
+        height: 100%;
+        width: 100%;
+      }
+    }
+  }
 }
 
 .td-pg-result-loading {
@@ -1300,6 +1513,9 @@ export default {
 }
 
 .td-pg-result-affected {
+  width: 100%;
+  height: 100%;
+  position: relative;
   padding: var(--padding);
   color: var(--text-secondary-color);
   font-size: var(--font-size-small);

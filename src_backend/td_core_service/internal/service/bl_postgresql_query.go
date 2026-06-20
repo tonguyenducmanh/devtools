@@ -9,7 +9,9 @@ import (
 	"td_core_service/internal/model"
 )
 
-// ExecutePostgreSQLQueryHandler nhận connection_id + sql, tìm connection string từ SQLite, thực thi query
+// ExecutePostgreSQLQueryHandler nhận connection_id + sql, tìm connection string từ SQLite,
+// thực thi script (có thể gồm nhiều câu lệnh cách nhau bởi ";"), trả về danh sách kết quả -
+// mỗi statement tương ứng 1 result set
 func ExecutePostgreSQLQueryHandler(w http.ResponseWriter, r *http.Request) {
 	var req model.TDPostgeSQLRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -35,9 +37,7 @@ func ExecutePostgreSQLQueryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var result *model.TDQueryResult
-
-	result, err = database.ExecutePostgreSQLQuery(conn.ConnectionString, req.SQL)
+	result, err := database.ExecutePostgreSQLQuery(conn.ConnectionString, req.SQL)
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -45,7 +45,7 @@ func ExecutePostgreSQLQueryHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success": false,
 			"message": err.Error(),
-			"data":    nil,
+			"data":    result,
 		})
 		return
 	}
