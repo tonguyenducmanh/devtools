@@ -7,11 +7,11 @@ export default {
       }
     };
 
-    document.addEventListener("click", el.__clickOutsideHandler__);
+    document.addEventListener("click", el.__clickOutsideHandler__, true);
   },
 
   unmounted(el) {
-    document.removeEventListener("click", el.__clickOutsideHandler__);
+    document.removeEventListener("click", el.__clickOutsideHandler__, true);
     delete el.__clickOutsideHandler__;
   },
 };

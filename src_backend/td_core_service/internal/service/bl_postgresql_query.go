@@ -10,15 +10,9 @@ import (
 	"td_core_service/internal/model"
 )
 
-// request body cho execute query
-type executeQueryRequest struct {
-	ConnectionID string `json:"connection_id"`
-	SQL          string `json:"sql"`
-}
-
 // ExecutePostgreSQLQueryHandler nhận connection_id + sql, tìm connection string từ SQLite, thực thi query
 func ExecutePostgreSQLQueryHandler(w http.ResponseWriter, r *http.Request) {
-	var req executeQueryRequest
+	var req model.TDPostgeSQLRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
 		return

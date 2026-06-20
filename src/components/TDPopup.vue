@@ -1,7 +1,7 @@
 <template>
   <teleport to="body">
-    <div v-if="visible" class="td-popup-overlay" @click="onOverlayClick">
-      <div class="td-popup-container" :style="{ width }" @click.stop>
+    <div v-if="visible" class="td-popup-overlay" @click.self="onOverlayClick">
+      <div class="td-popup-container" :style="{ width }">
         <div v-if="showHeader" class="td-popup-header">
           <div class="td-popup-title">{{ title }}</div>
           <button

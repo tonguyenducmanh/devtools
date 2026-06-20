@@ -8,7 +8,8 @@ type TDQueryResult struct {
 	IsSelect     bool             `json:"is_select"`
 }
 
-// request body cho test connection tới 1 db PostgreSQL
-type TDTestPostgeSQLRequest struct {
-	ConnectionString string `json:"connection_string"`
+// request body cho connection tới 1 db PostgreSQL
+type TDPostgeSQLRequest struct {
+	ConnectionID string `json:"connection_id"`
+	SQL          string `json:"sql"`
 }
