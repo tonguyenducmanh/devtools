@@ -117,6 +117,7 @@
           maxHeight="100%"
         />
         <div class="td-pg-result-empty" v-else>
+          <TDDynamicBackgroundEffect />
           <span>{{ $t("i18nCommon.noDataAvailable") }}</span>
         </div>
       </div>
@@ -367,12 +368,18 @@ import TDShortcutAction, {
   TDShortcutActionEnum,
 } from "@/common/TDShortcutAction.js";
 import TDDatabaseConnectionMixin from "@/mixins/TDDatabaseConnectionMixin.js";
+import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";
 
 export default {
   extends: TDToolBase,
   name: "TDPostgreSQLQuery",
   mixins: [TDDatabaseConnectionMixin],
-  components: { TDSubSidebar, TDArrow, TDPostgreSQLQueryHelp },
+  components: {
+    TDSubSidebar,
+    TDArrow,
+    TDPostgreSQLQueryHelp,
+    TDDynamicBackgroundEffect,
+  },
 
   data() {
     return {
@@ -1295,6 +1302,7 @@ export default {
   justify-content: center;
   color: var(--text-secondary-color);
   font-size: var(--font-size-small);
+  position: relative;
 }
 
 .response-loading {
