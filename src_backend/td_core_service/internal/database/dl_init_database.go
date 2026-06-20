@@ -1,7 +1,9 @@
 package database
 
 import (
+	"fmt"
 	"log"
+	"td_core_service/td_common"
 
 	_ "modernc.org/sqlite"
 )
@@ -30,7 +32,7 @@ func InitDatabase() {
 	`
 	_, err = db.Exec(sqlStmt)
 	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmt)
+		td_common.LogError(fmt.Sprintf("%q: %s\n", err, sqlStmt))
 		return
 	}
 
@@ -45,7 +47,7 @@ func InitDatabase() {
 	`
 	_, err = db.Exec(sqlStmtGroup)
 	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmtGroup)
+		td_common.LogError(fmt.Sprintf("%q: %s\n", err, sqlStmtGroup))
 		return
 	}
 
@@ -65,7 +67,7 @@ func InitDatabase() {
 	`
 	_, err = db.Exec(sqlStmtTesting)
 	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmtTesting)
+		td_common.LogError(fmt.Sprintf("%q: %s\n", err, sqlStmtTesting))
 		return
 	}
 
@@ -83,7 +85,7 @@ func InitDatabase() {
 	`
 	_, err = db.Exec(sqlStmtTestingLog)
 	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmtTestingLog)
+		td_common.LogError(fmt.Sprintf("%q: %s\n", err, sqlStmtTestingLog))
 		return
 	}
 
@@ -98,7 +100,7 @@ func InitDatabase() {
 	`
 	_, err = db.Exec(sqlStmtTestingGroup)
 	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmtTestingGroup)
+		td_common.LogError(fmt.Sprintf("%q: %s\n", err, sqlStmtTestingGroup))
 		return
 	}
 
@@ -116,7 +118,39 @@ func InitDatabase() {
 	`
 	_, err = db.Exec(sqlStmtRDPConnection)
 	if err != nil {
-		log.Printf("%q: %s\n", err, sqlStmtRDPConnection)
+		td_common.LogError(fmt.Sprintf("%q: %s\n", err, sqlStmtRDPConnection))
+		return
+	}
+
+	// 7. Tạo bảng PostgreSQL connections
+	sqlStmtPostgreSQLConnection := `
+	CREATE TABLE IF NOT EXISTS td_postgresql_connection (
+		id TEXT PRIMARY KEY NOT NULL,
+		connection_name TEXT NOT NULL,
+		connection_string TEXT NOT NULL,
+		usernconnect_type INTERGER NOT NULL DEFAULT 0,
+		created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+		modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+	`
+	_, err = db.Exec(sqlStmtPostgreSQLConnection)
+	if err != nil {
+		td_common.LogError(fmt.Sprintf("%q: %s\n", err, sqlStmtPostgreSQLConnection))
+		return
+	}
+
+	// 8. Tạo bảng nhóm kết nối postgresql
+	sqlStmtPostgreSQLGroupConnection := `
+	CREATE TABLE IF NOT EXISTS td_postgresql_connection_group (
+		id TEXT PRIMARY KEY NOT NULL,
+		name TEXT NOT NULL,
+		created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+		modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+	`
+	_, err = db.Exec(sqlStmtPostgreSQLGroupConnection)
+	if err != nil {
+		td_common.LogError(fmt.Sprintf("%q: %s\n", err, sqlStmtPostgreSQLGroupConnection))
 		return
 	}
 }
