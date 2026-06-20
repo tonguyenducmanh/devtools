@@ -804,6 +804,8 @@ export default {
       saveQueryErr: "Error saving query",
       deleteQuerySuccess: "Query deleted successfully",
       deleteQueryErr: "Error deleting query",
+      connectionAddInfo:
+        "Typing all info you get from your database connection",
       sidebarOption: {
         help: "Help",
         setting: "Settings",

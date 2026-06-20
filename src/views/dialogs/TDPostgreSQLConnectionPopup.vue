@@ -3,7 +3,7 @@
     :visible="true"
     :showHeader="true"
     @close="handleClose"
-    width="1000px"
+    width="700px"
     :title="
       isEditMode
         ? $t('i18nCommon.postgreSQLQuery.editConnection')
@@ -11,64 +11,59 @@
     "
   >
     <div class="flex flex-col td-pg-connection-popup">
-      <!-- Connection Name -->
-      <TDInput
-        v-model="form.connection_name"
-        :label="$t('i18nCommon.postgreSQLQuery.connectionName')"
-        :placeHolder="'My PostgreSQL DB'"
-      />
-
-      <!-- Group -->
-      <TDComboBox
-        v-model="form.group_id"
-        :label="$t('i18nCommon.postgreSQLQuery.groupName')"
-        :placeHolder="$t('i18nCommon.postgreSQLQuery.groupName')"
-        :options="groupOptions"
-        :isEditable="false"
-      />
-
-      <!-- Host + Port trên cùng hàng -->
-      <div class="flex td-pg-row">
+      <div class="flex connection-row">
+        <div>
+          <TDInput
+            v-model="form.connection_name"
+            :noMargin="true"
+            :label="$t('i18nCommon.postgreSQLQuery.connectionName')"
+            :placeHolder="'My PostgreSQL DB'"
+          />
+        </div>
+        <TDComboBox
+          v-model="connFields.sslmode"
+          label="SSL Mode"
+          :noMargin="true"
+          :options="sslModeOptions"
+          :isEditable="false"
+          @update:modelValue="buildConnectionString"
+        />
+      </div>
+      <div class="flex connection-row">
         <div class="flex-one">
           <TDInput
             v-model="connFields.host"
             :label="'Host'"
+            :noMargin="true"
             :placeHolder="'localhost'"
             @input="buildConnectionString"
           />
         </div>
-        <div class="td-pg-port">
+        <div class="">
           <TDInput
             v-model="connFields.port"
             :label="'Port'"
+            :noMargin="true"
             :placeHolder="'5432'"
             @input="buildConnectionString"
           />
         </div>
       </div>
-
-      <!-- Database -->
-      <TDInput
-        v-model="connFields.database"
-        :label="'Database'"
-        :placeHolder="'postgres'"
-        @input="buildConnectionString"
-      />
-
-      <!-- Username + Password trên cùng hàng -->
-      <div class="flex td-pg-row">
+      <div class="flex connection-row">
         <div class="flex-one">
           <TDInput
             v-model="connFields.username"
             :label="'Username'"
+            :noMargin="true"
             :placeHolder="'postgres'"
             @input="buildConnectionString"
           />
         </div>
-        <div class="flex-one">
+        <div class="">
           <TDInput
             v-model="connFields.password"
             :label="'Password'"
+            :noMargin="true"
             :placeHolder="'••••••••'"
             :inputType="'password'"
             @input="buildConnectionString"
@@ -76,53 +71,38 @@
         </div>
       </div>
 
-      <!-- SSL Mode -->
-      <TDComboBox
-        v-model="connFields.sslmode"
-        label="SSL Mode"
-        :options="sslModeOptions"
-        :isEditable="false"
-        @update:modelValue="buildConnectionString"
-      />
-
-      <!-- Connection string preview (readonly) -->
-      <div class="td-pg-preview">
-        <div class="td-pg-preview-label">Connection string</div>
-        <div class="td-pg-preview-box">
-          <span class="td-pg-preview-text">{{
-            form.connection_string || "—"
-          }}</span>
-          <div
-            v-if="form.connection_string"
-            class="td-icon td-copy-icon td-pg-copy-btn"
-            v-tooltip="$t('i18nCommon.copy')"
-            @click="handleCopy"
-          ></div>
+      <div class="flex connection-row">
+        <div class="flex-one">
+          <TDInput
+            v-model="connFields.database"
+            :label="'Database'"
+            :noMargin="true"
+            :placeHolder="'postgres'"
+            @input="buildConnectionString"
+          />
         </div>
+        <TDComboBox
+          v-model="form.group_id"
+          :label="$t('i18nCommon.postgreSQLQuery.groupName')"
+          :placeHolder="$t('i18nCommon.postgreSQLQuery.groupName')"
+          :options="groupOptions"
+          :isEditable="false"
+          :noMargin="true"
+        />
       </div>
-
-      <!-- Test connection result -->
-      <div
-        v-if="testResult !== null"
-        class="td-pg-test-result"
-        :class="testResult.success ? 'td-pg-test-ok' : 'td-pg-test-err'"
-      >
-        <div
-          class="td-icon"
-          :class="testResult.success ? 'td-check-icon' : 'td-warning-icon'"
-        ></div>
-        <span>{{ testResult.message }}</span>
+      <div class="flex connection-row">
+        {{ $t("i18nCommon.postgreSQLQuery.connectionAddInfo") }}
       </div>
-
       <!-- Action buttons -->
       <div class="flex td-popup-actions">
         <TDButton
+          :noMargin="true"
           @click="handleTestConnection"
           :type="$tdEnum.buttonType.secondary"
           :label="$t('i18nCommon.apiTesting.testConnection')"
-          iconClass="td-play-icon"
         />
         <TDButton
+          :noMargin="true"
           @click="handleSave"
           :label="
             isEditMode
@@ -131,6 +111,7 @@
           "
         />
         <TDButton
+          :noMargin="true"
           @click="handleClose"
           :type="$tdEnum.buttonType.secondary"
           :label="$t('i18nCommon.apiTesting.cancel')"
@@ -284,7 +265,10 @@ export default {
       };
 
       try {
-        if (connStr.startsWith("postgresql://") || connStr.startsWith("postgres://")) {
+        if (
+          connStr.startsWith("postgresql://") ||
+          connStr.startsWith("postgres://")
+        ) {
           // Parse URI format (tương thích ngược nếu người dùng đã lưu bằng URI format trước đây)
           const url = new URL(connStr);
           this.connFields.host = url.hostname || "localhost";
@@ -292,7 +276,8 @@ export default {
           this.connFields.database = url.pathname?.replace(/^\//, "") || "";
           this.connFields.username = decodeURIComponent(url.username || "");
           this.connFields.password = decodeURIComponent(url.password || "");
-          this.connFields.sslmode = url.searchParams.get("sslmode") || "disable";
+          this.connFields.sslmode =
+            url.searchParams.get("sslmode") || "disable";
         } else {
           // Parse DSN format
           const parts = connStr.match(/(?:[^\s']+|'[^']*')+/g);
@@ -340,18 +325,29 @@ export default {
         me.$tdToast.warning("Chưa có chuỗi kết nối để test.");
         return;
       }
-      
+
       me.testResult = null;
       try {
-        let response = await me.agentAPI.testConnection(me.form.connection_string);
+        let response = await me.agentAPI.testConnection(
+          me.form.connection_string,
+        );
         if (response?.data?.success) {
-          me.testResult = { success: true, message: response.data.message || "Kết nối thành công" };
+          me.testResult = {
+            success: true,
+            message: response.data.message || "Kết nối thành công",
+          };
           me.$tdToast.success("Kết nối thành công");
         } else {
-          me.testResult = { success: false, message: response?.data?.message || "Kết nối thất bại" };
+          me.testResult = {
+            success: false,
+            message: response?.data?.message || "Kết nối thất bại",
+          };
         }
       } catch (error) {
-        me.testResult = { success: false, message: error?.message || "Đã có lỗi xảy ra" };
+        me.testResult = {
+          success: false,
+          message: error?.message || "Đã có lỗi xảy ra",
+        };
       }
     },
 
@@ -411,68 +407,14 @@ export default {
 <style scoped lang="scss">
 .td-pg-connection-popup {
   gap: var(--padding);
-  padding-bottom: var(--padding);
+  margin: calc(var(--padding) * 2) var(--padding);
 }
-
-.td-pg-row {
+.connection-row {
   gap: var(--padding);
-  align-items: flex-end;
-
-  .td-pg-port {
-    width: 100px;
-    flex-shrink: 0;
-  }
-
-  .flex-one {
-    flex: 1;
-    min-width: 0;
-  }
-}
-
-/* Preview box */
-.td-pg-preview {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.td-pg-preview-label {
-  font-size: var(--font-size-small);
-  color: var(--text-secondary-color);
-  font-weight: 500;
-}
-
-.td-pg-preview-box {
-  display: flex;
+  width: 100%;
   align-items: center;
-  gap: var(--padding);
-  padding: 8px var(--padding);
-  background-color: var(--bg-thirt-color);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  min-height: 36px;
-
-  .td-pg-preview-text {
-    flex: 1;
-    font-family: monospace;
-    font-size: var(--font-size-small);
-    word-break: break-all;
-    color: var(--primary-color);
-    opacity: 0.85;
-  }
-
-  .td-pg-copy-btn {
-    flex-shrink: 0;
-    cursor: pointer;
-    opacity: 0.6;
-    transition: opacity 0.15s;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
+  justify-content: flex-start;
 }
-
 /* Test result */
 .td-pg-test-result {
   display: flex;
@@ -495,8 +437,7 @@ export default {
 
 /* Actions */
 .td-popup-actions {
+  margin-top: 30px;
   gap: var(--padding);
-  justify-content: flex-end;
-  margin-top: var(--padding);
 }
 </style>

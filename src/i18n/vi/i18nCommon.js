@@ -801,6 +801,7 @@ export default {
       saveQueryErr: "Lỗi lưu query",
       deleteQuerySuccess: "Xóa query thành công",
       deleteQueryErr: "Lỗi xóa query",
+      connectionAddInfo: "Nhập toàn bộ thông tin lấy được từ database",
       sidebarOption: {
         help: "Trợ giúp",
         setting: "Cài đặt",
