@@ -155,7 +155,11 @@
                   :value="getCellValue(row, column.key)"
                   :rowIndex="rowIndex"
                 >
-                  <div class="td-table-cell-content">
+                  <div
+                    class="td-table-cell-content"
+                    :class="{ 'td-table-cell-content-clamped': virtualScroll }"
+                    :style="getCellContentStyle()"
+                  >
                     {{ formatCellValue(row, column) }}
                   </div>
                 </slot>
@@ -256,13 +260,13 @@ export default {
       // Example: [{
       //   key: 'name',
       //   label: 'Name',
-      //   width: '200px', // Fixed width
+      //   width: '200px',
       //   minWidth: '100px',
       //   maxWidth: '400px',
       //   align: 'left',
       //   sortable: true,
       //   formatter: (val) => val,
-      //   autoWidth: true, // Auto calculate width based on content (default: false)
+      //   autoWidth: true,
       // }]
     },
 
@@ -315,7 +319,7 @@ export default {
     },
     charWidthPx: {
       type: Number,
-      default: 10, // Average character width in pixels (can adjust based on font)
+      default: 10, // Average character width in pixels
     },
     minColumnWidth: {
       type: Number,
@@ -344,6 +348,7 @@ export default {
       type: String,
       default: "",
     },
+
     // Actions
     actions: {
       type: Array,
@@ -383,6 +388,12 @@ export default {
       type: Number,
       default: 5,
     },
+
+    // Khi virtual scroll bật thì cell text chỉ hiển thị tối đa N dòng
+    virtualScrollLineClamp: {
+      type: Number,
+      default: 2,
+    },
   },
 
   data() {
@@ -420,6 +431,7 @@ export default {
       }
       return null;
     },
+
     // Auto-generate columns from data if not provided
     computedColumns() {
       if (this.columns && this.columns.length > 0) {
@@ -577,11 +589,13 @@ export default {
         this.scrollTop = event.target.scrollTop;
       }
     },
+
     updateContainerSize() {
       if (this.$refs.tableContainer) {
         this.containerHeight = this.$refs.tableContainer.clientHeight;
       }
     },
+
     formatLabel(key) {
       return key.trim();
     },
@@ -596,6 +610,15 @@ export default {
         return column.formatter(value, row);
       }
       return !value || value == "" ? this.emptyCellText : value;
+    },
+
+    getCellContentStyle() {
+      if (!this.virtualScroll) return {};
+
+      return {
+        WebkitLineClamp: String(this.virtualScrollLineClamp),
+        lineClamp: String(this.virtualScrollLineClamp),
+      };
     },
 
     /**
@@ -750,10 +773,12 @@ export default {
       this.$emit("update:modelValue", this.selectedRows);
       this.$emit("selection-change", this.selectedRows);
     },
+
     handleDataSelected(row, column) {
       let data = this.formatCellValue(row, column);
       this.$tdUtility.copyToClipboard(data, true, this.enableLogCopyData);
     },
+
     copyRow(row) {
       this.$tdUtility.copyToClipboard(
         JSON.stringify(row),
@@ -788,6 +813,7 @@ export default {
     border-radius: var(--border-radius-component);
     background-color: var(--bg-main-color);
   }
+
   .td-table-wrapper {
     min-width: 100%;
     width: fit-content;
@@ -805,9 +831,7 @@ export default {
         position: sticky;
         top: 0;
         z-index: 1;
-        background-color: var(
-          --bg-layer-color
-        ); /* Ensure background is solid */
+        background-color: var(--bg-layer-color);
       }
 
       tr {
@@ -842,15 +866,20 @@ export default {
         }
       }
 
-      // Cell content wrapper for truncation
       &-content {
         word-wrap: break-word;
         word-break: break-word;
         overflow-wrap: break-word;
         line-height: 1.5;
+
+        &.td-table-cell-content-clamped {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
 
-      // Truncated cells
       &-truncated {
         .td-table-cell-content {
           display: -webkit-box;
@@ -880,10 +909,9 @@ export default {
         padding: 0 var(--padding);
         color: var(--text-secondary-color);
         font-weight: 500;
-        /* Thêm các thuộc tính dưới đây */
-        display: table-cell; /* Giữ nguyên đặc tính ô của table */
-        text-align: center; /* Căn giữa ngang */
-        vertical-align: middle; /* Sửa thành middle để căn giữa dọc */
+        display: table-cell;
+        text-align: center;
+        vertical-align: middle;
       }
 
       &-sticky {
@@ -899,7 +927,7 @@ export default {
       &-sticky-header {
         background-color: var(--bg-layer-color);
         box-shadow: 1px 0 0 0 var(--border-color);
-        z-index: 3 !important; /* Higher than normal sticky header */
+        z-index: 3 !important;
         top: 0;
       }
 
@@ -926,10 +954,12 @@ export default {
         color: var(--text-secondary-color);
       }
     }
+
     .td-table-cell:hover {
       background-color: var(--bg-layer-color);
       cursor: pointer;
     }
+
     .td-table-body {
       .td-table-row {
         border-bottom: 1px solid var(--border-color);
@@ -1099,6 +1129,7 @@ export default {
     }
   }
 }
+
 .td-table-cell:not(:last-child) {
   border-right: 1px solid var(--border-color);
 }
