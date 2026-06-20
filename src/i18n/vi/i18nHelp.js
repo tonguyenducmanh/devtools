@@ -9,14 +9,16 @@ export default {
       quickStart: {
         title: "Bắt đầu nhanh",
         selectTool: "Chọn công cụ từ thanh menu bên trái để bắt đầu sử dụng.",
-        searchTool: "Nhấn Ctrl + P (hoặc Cmd + P trên Mac) để mở hộp tìm kiếm, gõ tên công cụ bạn cần và nhấn Enter để mở nhanh.",
+        searchTool:
+          "Nhấn Ctrl + P (hoặc Cmd + P trên Mac) để mở hộp tìm kiếm, gõ tên công cụ bạn cần và nhấn Enter để mở nhanh.",
         note: "Mẹo: Sử dụng ↑↓ để di chuyển giữa các kết quả tìm kiếm.",
       },
       multiTab: {
         title: "Làm việc với nhiều tab",
         description:
           "Ứng dụng hỗ trợ mở nhiều công cụ cùng lúc dưới dạng tab. Điều này giúp bạn không cần mở nhiều cửa sổ trình duyệt để sử dụng đồng thời các tính năng khác nhau.",
-        rightClick: "Nhấn chuột phải vào tên tab để mở menu ngữ cảnh với các tùy chọn:",
+        rightClick:
+          "Nhấn chuột phải vào tên tab để mở menu ngữ cảnh với các tùy chọn:",
         duplicateTab: "Nhân bản tab - Tạo bản sao của tab hiện tại",
         closeTab: "Đóng tab - Đóng tab đang chọn",
         closeAllTabs: "Đóng tất cả - Đóng toàn bộ các tab đang mở",
@@ -24,25 +26,33 @@ export default {
       },
       agent: {
         title: "Các công cụ trong app được chia làm 2 loại:",
-        webOnly: "Chạy trên web - Không cần cài đặt thêm, hoạt động trực tiếp trên trình duyệt.",
-        needAgent: "Cần Agent - Cần tải và chạy app Agent (ứng dụng desktop) để làm backend, giúp vượt qua các giới hạn của trình duyệt như CORS, SSL, fake header,...",
-        downloadAgent: "Để tải Agent, bấm vào menu Trợ giúp ở thanh header phía trên và chọn \"Tải Agent\".",
+        webOnly:
+          "Chạy trên web - Không cần cài đặt thêm, hoạt động trực tiếp trên trình duyệt.",
+        needAgent:
+          "Cần Agent - Cần tải và chạy app Agent (ứng dụng desktop) để làm backend, giúp vượt qua các giới hạn của trình duyệt như CORS, SSL, fake header,...",
+        downloadAgent:
+          'Để tải Agent, bấm vào menu Trợ giúp ở thanh header phía trên và chọn "Tải Agent".',
       },
     },
     oneTimePassword: {
       purpose: {
         title: "Công cụ OTP là gì?",
-        content: "Công cụ giúp tạo mã OTP (One-Time Password) 6 ký tự, tự động thay đổi mỗi 30 giây. Hỗ trợ import tài khoản từ Google Authenticator thông qua QR code, URL hoặc nhập thủ công.",
+        content:
+          "Công cụ giúp tạo mã OTP (One-Time Password) 6 ký tự, tự động thay đổi mỗi 30 giây. Hỗ trợ import tài khoản từ Google Authenticator thông qua QR code, URL hoặc nhập thủ công.",
       },
       importData: {
         title: "Nhập dữ liệu",
-        scanQR: "Quét QR Code - Upload file ảnh chứa mã QR từ Google Authenticator để tự động nhập tài khoản.",
-        pasteURL: "Dán URL - Dán link otpauth-migration:// từ Google Authenticator để import tài khoản.",
-        manual: "Nhập thủ công - Điền thông tin issuer, name và secret để thêm tài khoản mới.",
+        scanQR:
+          "Quét QR Code - Upload file ảnh chứa mã QR từ Google Authenticator để tự động nhập tài khoản.",
+        pasteURL:
+          "Dán URL - Dán link otpauth-migration:// từ Google Authenticator để import tài khoản.",
+        manual:
+          "Nhập thủ công - Điền thông tin issuer, name và secret để thêm tài khoản mới.",
       },
       security: {
         title: "Bảo mật",
-        description: "Dữ liệu OTP được mã hóa và lưu trữ cục bộ trên thiết bị của bạn. Bạn cần nhập mật khẩu (mật khẩu do bạn tự tạo) để mã hóa dữ liệu cache phía trình duyệt và mở tài khoản đã lưu.",
+        description:
+          "Dữ liệu OTP được mã hóa và lưu trữ cục bộ trên thiết bị của bạn. Bạn cần nhập mật khẩu (mật khẩu do bạn tự tạo) để mã hóa dữ liệu cache phía trình duyệt và mở tài khoản đã lưu.",
       },
       quickUse: {
         title: "Sử dụng nhanh",
@@ -54,7 +64,8 @@ export default {
     compareCode: {
       purpose: {
         title: "So sánh code là gì?",
-        content: "Công cụ so sánh code hỗ trợ xem diff giữa 2 đoạn code với tính năng highlight cú pháp cho nhiều ngôn ngữ lập trình khác nhau.",
+        content:
+          "Công cụ so sánh code hỗ trợ xem diff giữa 2 đoạn code với tính năng highlight cú pháp cho nhiều ngôn ngữ lập trình khác nhau.",
       },
       supportedFormats: {
         title: "Định dạng được hỗ trợ",
@@ -69,7 +80,8 @@ export default {
     colorPicker: {
       purpose: {
         title: "Trích xuất màu từ ảnh là gì?",
-        content: "Công cụ cho phép upload ảnh, click vào vị trí bất kỳ trên ảnh để lấy mã màu (HEX, RGB, HSL) tại điểm đó.",
+        content:
+          "Công cụ cho phép upload ảnh, click vào vị trí bất kỳ trên ảnh để lấy mã màu (HEX, RGB, HSL) tại điểm đó.",
       },
       howToUse: {
         title: "Cách sử dụng",
@@ -79,14 +91,16 @@ export default {
       },
       features: {
         title: "Tính năng",
-        magnifier: "Kính lúp phóng đại vùng xung quanh con trỏ chuột để chọn màu chính xác hơn.",
+        magnifier:
+          "Kính lúp phóng đại vùng xung quanh con trỏ chuột để chọn màu chính xác hơn.",
         palette: "Tự động trích xuất bảng màu chính từ ảnh.",
       },
     },
     imageToBase64: {
       purpose: {
         title: "Chuyển ảnh sang Base64 là gì?",
-        content: "Công cụ chuyển đổi file ảnh thành chuỗi Base64, thường dùng để nhúng ảnh trực tiếp vào HTML/CSS hoặc truyền qua API.",
+        content:
+          "Công cụ chuyển đổi file ảnh thành chuỗi Base64, thường dùng để nhúng ảnh trực tiếp vào HTML/CSS hoặc truyền qua API.",
       },
       howToUse: {
         title: "Cách sử dụng",
@@ -96,13 +110,15 @@ export default {
       },
       note: {
         title: "Lưu ý",
-        content: "Chuỗi Base64 có thể rất dài, đặc biệt với ảnh có kích thước lớn.",
+        content:
+          "Chuỗi Base64 có thể rất dài, đặc biệt với ảnh có kích thước lớn.",
       },
     },
     base64ToImage: {
       purpose: {
         title: "Chuyển Base64 sang ảnh là gì?",
-        content: "Công cụ chuyển đổi chuỗi Base64 thành file ảnh, hỗ trợ tải ảnh về máy.",
+        content:
+          "Công cụ chuyển đổi chuỗi Base64 thành file ảnh, hỗ trợ tải ảnh về máy.",
       },
       howToUse: {
         title: "Cách sử dụng",
@@ -118,7 +134,8 @@ export default {
     codeFormatter: {
       purpose: {
         title: "Định dạng code SQL là gì?",
-        content: "Công cụ format code SQL tự động, hỗ trợ PostgreSQL và MySQL với nhiều tùy chọn định dạng.",
+        content:
+          "Công cụ format code SQL tự động, hỗ trợ PostgreSQL và MySQL với nhiều tùy chọn định dạng.",
       },
       howToUse: {
         title: "Cách sử dụng",
@@ -134,7 +151,8 @@ export default {
     textCompress: {
       purpose: {
         title: "Nén/Giải nén text là gì?",
-        content: "Công cụ nén và giải nén văn bản sử dụng các thuật toán nén phổ biến như Gzip, Deflate.",
+        content:
+          "Công cụ nén và giải nén văn bản sử dụng các thuật toán nén phổ biến như Gzip, Deflate.",
       },
       howToUse: {
         title: "Cách sử dụng",
@@ -151,12 +169,15 @@ export default {
     textManipulation: {
       purpose: {
         title: "Xử lý text hàng loạt là gì?",
-        content: "Công cụ xử lý hàng loạt văn bản theo mẫu có sẵn, cho phép biến đổi text với các biểu thức cho trước.",
+        content:
+          "Công cụ xử lý hàng loạt văn bản theo mẫu có sẵn, cho phép biến đổi text với các biểu thức cho trước.",
       },
       howToUse: {
         title: "Cách sử dụng",
-        input: "Nhập danh sách text cần xử lý (mỗi dòng 1 item), đặt separator cho cột và dòng.",
-        expression: "Nhập biểu thức xử lý, dùng $0, $1, $2... để refer đến cột tương ứng.",
+        input:
+          "Nhập danh sách text cần xử lý (mỗi dòng 1 item), đặt separator cho cột và dòng.",
+        expression:
+          "Nhập biểu thức xử lý, dùng $0, $1, $2... để refer đến cột tương ứng.",
         execute: "Nhấn Xử lý để xử lý và xem kết quả.",
       },
       expressions: {
@@ -171,7 +192,8 @@ export default {
     textGenerator: {
       purpose: {
         title: "Tạo text mẫu là gì?",
-        content: "Công cụ tạo nhanh các đoạn text mẫu (Lorem Ipsum) để sử dụng trong quá trình phát triển và testing.",
+        content:
+          "Công cụ tạo nhanh các đoạn text mẫu (Lorem Ipsum) để sử dụng trong quá trình phát triển và testing.",
       },
       howToUse: {
         title: "Cách sử dụng",
@@ -188,7 +210,8 @@ export default {
     cosinSimilarity: {
       purpose: {
         title: "Tính độ tương đồng Cosine là gì?",
-        content: "Công cụ tính toán độ tương đồng cosine giữa 2 vector n chiều, thường dùng trong ML và NLP.",
+        content:
+          "Công cụ tính toán độ tương đồng cosine giữa 2 vector n chiều, thường dùng trong ML và NLP.",
       },
       howToUse: {
         title: "Cách sử dụng",
@@ -205,17 +228,20 @@ export default {
     apiMocking: {
       purpose: {
         title: "Mock API là gì?",
-        content: "Công cụ tạo mock API giúp fake data ở những môi trường không thể call ra API bên ngoài internet. Dữ liệu được lưu trữ phía backend (Agent).",
+        content:
+          "Công cụ tạo mock API giúp fake data ở những môi trường không thể call ra API bên ngoài internet. Dữ liệu được lưu trữ phía backend (Agent).",
       },
       howToUse: {
         title: "Cách sử dụng",
-        createMock: "Chọn HTTP method, nhập endpoint và cấu hình request/response.",
+        createMock:
+          "Chọn HTTP method, nhập endpoint và cấu hình request/response.",
         configure: "Sử dụng panel bên phải để quản lý các mock API đã tạo.",
         saveMock: "Nhấn Save để lưu mock API, sau đó có thể copy CURL để gọi.",
       },
       collection: {
         title: "Quản lý Collection",
-        description: "Tổ chức các mock API theo nhóm (group) để dễ quản lý. Có thể tạo nhóm mới, xóa nhóm và xóa mock API.",
+        description:
+          "Tổ chức các mock API theo nhóm (group) để dễ quản lý. Có thể tạo nhóm mới, xóa nhóm và xóa mock API.",
       },
       requirement: {
         title: "Yêu cầu",
@@ -225,12 +251,14 @@ export default {
     apiTesting: {
       purpose: {
         title: "Test API là gì?",
-        content: "Công cụ gọi API bypass CORS, SSL. Hỗ trợ 2 chế độ: Normal Mode và Pro Mode (chạy script JavaScript).",
+        content:
+          "Công cụ gọi API bypass CORS, SSL. Hỗ trợ 2 chế độ: Normal Mode và Pro Mode (chạy script JavaScript).",
       },
       modes: {
         title: "Các chế độ",
         normal: "Normal Mode - Gọi API đơn lẻ với cấu hình Header và Body.",
-        proMode: "Pro Mode - Viết script JavaScript để gọi hàng loạt API theo kịch bản.",
+        proMode:
+          "Pro Mode - Viết script JavaScript để gọi hàng loạt API theo kịch bản.",
       },
       features: {
         title: "Tính năng",
@@ -246,7 +274,8 @@ export default {
     qrCodeToText: {
       purpose: {
         title: "Đọc QR Code là gì?",
-        content: "Công cụ đọc hàng loạt mã QR và tự động nối lại thành đoạn văn bản. Hỗ trợ giải mã dữ liệu đã được nén từ tool tạo mã QR.",
+        content:
+          "Công cụ đọc hàng loạt mã QR và tự động nối lại thành đoạn văn bản. Hỗ trợ giải mã dữ liệu đã được nén từ tool tạo mã QR.",
       },
       howToUse: {
         title: "Cách sử dụng",
@@ -257,31 +286,36 @@ export default {
       features: {
         title: "Tính năng",
         compress: "Tự động giải nén dữ liệu nếu text được nén trước đó.",
-        header: "Hỗ trợ sắp xếp các mảnh QR theo header (ngày tạo và số thứ tự).",
+        header:
+          "Hỗ trợ sắp xếp các mảnh QR theo header (ngày tạo và số thứ tự).",
       },
     },
     textToQRCode: {
       purpose: {
         title: "Tạo QR Code là gì?",
-        content: "Công cụ tạo hàng loạt mã QR từ đoạn văn bản. Hỗ trợ đánh dấu mã QR theo ngày tạo và số thứ tự, mã hóa nội dung để tăng độ chính xác.",
+        content:
+          "Công cụ tạo hàng loạt mã QR từ đoạn văn bản. Hỗ trợ đánh dấu mã QR theo ngày tạo và số thứ tự, mã hóa nội dung để tăng độ chính xác.",
       },
       howToUse: {
         title: "Cách sử dụng",
         input: "Nhập đoạn text cần tạo mã QR.",
         generate: "Nhấn Generate để tạo các mã QR.",
-        copyDownload: "Click vào mã QR để copy, nhấn Download All để tải tất cả.",
+        copyDownload:
+          "Click vào mã QR để copy, nhấn Download All để tải tất cả.",
       },
       features: {
         title: "Tính năng",
         compress: "Nén dữ liệu trước khi tạo QR để giảm số lượng mã.",
-        header: "Thêm header (timestamp + thứ tự) vào mỗi mã QR để hỗ trợ ghép nối khi đọc.",
+        header:
+          "Thêm header (timestamp + thứ tự) vào mỗi mã QR để hỗ trợ ghép nối khi đọc.",
         batch: "Tự động chia text thành nhiều mã QR nếu nội dung quá dài.",
       },
     },
     ocr: {
       purpose: {
         title: "OCR là gì?",
-        content: "Công cụ nhận dạng ký tự quang học (OCR) giúp trích xuất text từ ảnh. Hỗ trợ tiếng Việt và tiếng Anh.",
+        content:
+          "Công cụ nhận dạng ký tự quang học (OCR) giúp trích xuất text từ ảnh. Hỗ trợ tiếng Việt và tiếng Anh.",
       },
       howToUse: {
         title: "Cách sử dụng",
@@ -294,23 +328,27 @@ export default {
         language: "Hỗ trợ nhiều ngôn ngữ: Tiếng Việt, Tiếng Anh.",
         psm: "Tùy chỉnh chế độ phân đoạn trang (PSM).",
         whitelist: "Chỉ nhận dạng các ký tự trong danh sách cho phép.",
-        preprocessing: "Tiền xử lý ảnh để tăng độ chính xác (grayscale, tăng contrast, khử nhiễu).",
+        preprocessing:
+          "Tiền xử lý ảnh để tăng độ chính xác (grayscale, tăng contrast, khử nhiễu).",
       },
     },
     jsonToPostgreSQL: {
       purpose: {
         title: "JSON to PostgreSQL là gì?",
-        content: "Công cụ chuyển đổi dữ liệu JSON thành câu lệnh SQL (INSERT, CREATE TABLE, DELETE) cho PostgreSQL.",
+        content:
+          "Công cụ chuyển đổi dữ liệu JSON thành câu lệnh SQL (INSERT, CREATE TABLE, DELETE) cho PostgreSQL.",
       },
       howToUse: {
         title: "Cách sử dụng",
         input: "Dán JSON trực tiếp hoặc upload file JSON.",
-        configure: "Cấu hình tên bảng, schema, primary key và các tùy chọn khác.",
+        configure:
+          "Cấu hình tên bảng, schema, primary key và các tùy chọn khác.",
         convert: "Nhấn Convert để tạo script SQL.",
       },
       features: {
         title: "Tính năng",
-        createTable: "Tự động tạo script CREATE TABLE với kiểu dữ liệu phù hợp.",
+        createTable:
+          "Tự động tạo script CREATE TABLE với kiểu dữ liệu phù hợp.",
         deleteScript: "Tạo script DELETE để xóa dữ liệu cũ trước khi INSERT.",
         fileUpload: "Hỗ trợ upload file JSON để xử lý.",
       },
@@ -318,17 +356,20 @@ export default {
     jsonToOneLineString: {
       purpose: {
         title: "JSON to String là gì?",
-        content: "Công cụ chuyển đổi JSON thành chuỗi string một dòng theo cú pháp của nhiều ngôn ngữ lập trình khác nhau.",
+        content:
+          "Công cụ chuyển đổi JSON thành chuỗi string một dòng theo cú pháp của nhiều ngôn ngữ lập trình khác nhau.",
       },
       howToUse: {
         title: "Cách sử dụng",
         input: "Dán JSON hoặc JS object vào ô input.",
-        selectLanguage: "Chọn ngôn ngữ đầu ra (JavaScript, C#, Go, Python, Java, Raw).",
+        selectLanguage:
+          "Chọn ngôn ngữ đầu ra (JavaScript, C#, Go, Python, Java, Raw).",
         convert: "Nhấn Convert để chuyển đổi.",
       },
       features: {
         title: "Tính năng",
-        languages: "Hỗ trợ nhiều ngôn ngữ: JavaScript, C#, Go, Python, Java, Raw.",
+        languages:
+          "Hỗ trợ nhiều ngôn ngữ: JavaScript, C#, Go, Python, Java, Raw.",
         escapeUnicode: "Tùy chọn escape các ký tự Unicode thành \\uXXXX.",
       },
     },
@@ -353,7 +394,8 @@ export default {
     jsonToModel: {
       purpose: {
         title: "JSON to Model là gì?",
-        content: "Công cụ chuyển đổi JSON thành class model cho nhiều ngôn ngữ lập trình.",
+        content:
+          "Công cụ chuyển đổi JSON thành class model cho nhiều ngôn ngữ lập trình.",
       },
       howToUse: {
         title: "Cách sử dụng",
@@ -365,20 +407,24 @@ export default {
         title: "Tính năng",
         languages: "Hỗ trợ nhiều ngôn ngữ: C#,Go.",
         namespace: "Tùy chỉnh namespace/class name.",
-        options: "Nhiều tùy chọn: PascalCase, nullable, JsonProperty, record type...",
+        options:
+          "Nhiều tùy chọn: PascalCase, nullable, JsonProperty, record type...",
       },
     },
     remoteDesktop: {
       purpose: {
         title: "Máy tính từ xa RDP là gì?",
-        content: "Công cụ kết nối máy tính từ xa qua giao thức RDP (Remote Desktop Protocol). Sử dụng IronRDP WebAssembly để kết nối trực tiếp từ trình duyệt.",
+        content:
+          "Công cụ kết nối máy tính từ xa qua giao thức RDP (Remote Desktop Protocol). Sử dụng IronRDP WebAssembly để kết nối trực tiếp từ trình duyệt.",
       },
       howToUse: {
         title: "Cách sử dụng",
-        inputHost: "Nhập địa chỉ host và port của máy muốn kết nối (vd: 192.168.1.1:3389).",
+        inputHost:
+          "Nhập địa chỉ host và port của máy muốn kết nối (vd: 192.168.1.1:3389).",
         inputCredentials: "Nhập tên người dùng và mật khẩu để xác thực.",
         connect: "Nhấn nút Kết nối để bắt đầu phiên làm việc từ xa.",
-        fullscreen: "Nhấn nút fullscreen để phóng to màn hình, nhấn ESC để thoát.",
+        fullscreen:
+          "Nhấn nút fullscreen để phóng to màn hình, nhấn ESC để thoát.",
       },
       features: {
         title: "Tính năng",
@@ -397,47 +443,51 @@ export default {
     bilingualWeb: {
       purpose: {
         title: "Dịch trang web song ngữ là gì?",
-        content: "Công cụ cho phép hiển thị một trang web thực tế 100% giao diện gốc, đồng thời dịch các đoạn văn bản hiển thị trên trang thành song ngữ mà không làm hỏng cấu trúc HTML/CSS.",
+        content:
+          "Công cụ cho phép hiển thị một trang web thực tế 100% giao diện gốc, đồng thời dịch các đoạn văn bản hiển thị trên trang thành song ngữ mà không làm hỏng cấu trúc HTML/CSS.",
       },
       howToUse: {
         title: "Cách sử dụng",
         input: "Nhập URL trang web cần dịch.",
-        fetch: "Nhấn 'Tải & Dịch' để hệ thống nhúng trang web và tự động tìm văn bản để dịch.",
+        fetch:
+          "Nhấn 'Tải & Dịch' để hệ thống nhúng trang web và tự động tìm văn bản để dịch.",
         wait: "Hệ thống sẽ tự động gọi Agent để dịch và chèn kết quả trực tiếp xuống phía dưới mỗi văn bản gốc.",
       },
       options: {
         title: "Tuỳ chọn cấu hình",
-        delay: "Thời gian delay - Thời gian chờ trang web động (React, v.v) tải xong giao diện trước khi bắt đầu quét text.",
+        delay:
+          "Thời gian delay - Thời gian chờ trang web động (React, v.v) tải xong giao diện trước khi bắt đầu quét text.",
         tags: "Block Tags - Các thẻ HTML sẽ được quét để dịch (VD: P, H1, LI).",
-        classes: "Lọc theo Class - Chỉ định cụ thể tên các class muốn dịch, ngăn cách bởi dấu chấm phẩy (;).",
+        classes:
+          "Lọc theo Class - Chỉ định cụ thể tên các class muốn dịch, ngăn cách bởi dấu chấm phẩy (;).",
         ids: "Lọc theo ID - Chỉ định cụ thể tên các ID muốn dịch, ngăn cách bởi dấu chấm phẩy (;).",
       },
     },
     postgreSQLQuery: {
       purpose: {
-        title: "Mô tả tính năng",
-        content: "PostgreSQL Query là công cụ cho phép bạn kết nối trực tiếp vào cơ sở dữ liệu PostgreSQL và thực thi các câu lệnh SQL ngay trong ứng dụng. Kết quả trả về dưới dạng bảng trực quan, dễ đọc.",
+        title: "PostgreSQL Query",
+        content: "Hỗ trợ kết nối và truy vấn dữ liệu PostgreSQL.",
       },
       howToUse: {
         title: "Hướng dẫn sử dụng",
-        step1: "1. Mở tab Kết nối ở thanh bên phải để thêm nhóm và cấu hình kết nối PostgreSQL.",
+        step1:
+          "1. Mở tab Kết nối ở thanh bên phải để thêm nhóm và cấu hình kết nối PostgreSQL.",
         step2: "2. Chọn kết nối muốn dùng từ combobox ở header.",
-        step3: "3. Nhập câu lệnh SQL vào ô soạn thảo (hỗ trợ gợi ý intellisense).",
+        step3:
+          "3. Nhập câu lệnh SQL vào ô soạn thảo (hỗ trợ gợi ý intellisense).",
         step4: "4. Nhấn nút 'Chạy truy vấn' hoặc Ctrl+Enter để thực thi.",
-        step5: "5. Kết quả hiển thị bên dưới dưới dạng bảng có thể cuộn và sắp xếp.",
+        step5:
+          "5. Kết quả hiển thị bên dưới dưới dạng bảng có thể cuộn và sắp xếp.",
       },
       features: {
-        title: "Các tính năng nổi bật",
-        intellisense: "Gợi ý SQL thông minh: Keywords, tên bảng, tên cột được load tự động từ PostgreSQL server.",
-        savedScripts: "Lưu script: Lưu các câu query thường dùng vào mục 'Script đã lưu' để tái sử dụng.",
+        title: "Các tính năng",
+        intellisense:
+          "Gợi ý SQL thông minh: Keywords, tên bảng, tên cột được load tự động từ PostgreSQL server.",
+        savedScripts:
+          "Lưu script: Lưu các câu query thường dùng vào mục 'Script đã lưu' để tái sử dụng.",
         formatCode: "Định dạng code: Tự động định dạng câu SQL cho dễ đọc.",
-        multipleConnections: "Nhiều kết nối: Quản lý nhiều kết nối và phân nhóm dễ dàng.",
-      },
-      connectionString: {
-        title: "Cấu hình chuỗi kết nối",
-        format: "postgresql://user:password@host:port/dbname",
-        example: "Ví dụ: postgresql://postgres:mypassword@localhost:5432/mydb",
-        sslNote: "Thêm ?sslmode=disable nếu không dùng SSL.",
+        multipleConnections:
+          "Nhiều kết nối: Quản lý nhiều kết nối và phân nhóm dễ dàng.",
       },
     },
   },

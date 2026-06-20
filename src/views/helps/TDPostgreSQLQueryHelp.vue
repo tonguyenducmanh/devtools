@@ -52,21 +52,6 @@
           </div>
         </div>
       </div>
-
-      <div class="help-section">
-        <h3 class="section-subtitle">
-          {{ $t("i18nHelp.postgreSQLQuery.connectionString.title") }}
-        </h3>
-        <code class="section-code">{{
-          $t("i18nHelp.postgreSQLQuery.connectionString.format")
-        }}</code>
-        <p class="section-text">
-          {{ $t("i18nHelp.postgreSQLQuery.connectionString.example") }}
-        </p>
-        <p class="section-note">
-          {{ $t("i18nHelp.postgreSQLQuery.connectionString.sslNote") }}
-        </p>
-      </div>
     </div>
   </div>
 </template>
