@@ -97,6 +97,8 @@
           :noMargin="true"
           :stickyHeader="true"
           :showIndex="true"
+          :usingFooterHelp="true"
+          :showFooter="true"
           maxHeight="100%"
         />
         <div class="td-pg-result-empty" v-else>
@@ -682,7 +684,7 @@ export default {
       if (!this.selectedConnectionId) return;
       await this.testDatabaseConnection(
         this.agentAPI,
-        this.selectedConnectionId
+        this.selectedConnectionId,
       );
     },
 
