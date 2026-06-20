@@ -97,18 +97,18 @@
       <div class="flex td-popup-actions">
         <TDButton
           :noMargin="true"
-          @click="handleTestConnection"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.postgreSQLQuery.saveAndTestConnection')"
-        />
-        <TDButton
-          :noMargin="true"
           @click="handleSave"
           :label="
             isEditMode
               ? $t('i18nCommon.edit')
               : $t('i18nCommon.postgreSQLQuery.addConnection')
           "
+        />
+        <TDButton
+          :noMargin="true"
+          @click="handleTestConnection"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.postgreSQLQuery.saveAndTestConnection')"
         />
         <TDButton
           :noMargin="true"
@@ -322,7 +322,7 @@ export default {
 
     async handleTestConnection() {
       let me = this;
-      
+
       if (!me.form.connection_name) {
         me.$tdToast.warning(
           me.$t("i18nCommon.postgreSQLQuery.connectionName") +
@@ -332,7 +332,9 @@ export default {
         return;
       }
       if (!me.connFields.host || !me.connFields.database) {
-        me.$tdToast.warning(me.$t("i18nCommon.postgreSQLQuery.hostAndDbRequired"));
+        me.$tdToast.warning(
+          me.$t("i18nCommon.postgreSQLQuery.hostAndDbRequired"),
+        );
         return;
       }
 
@@ -369,10 +371,7 @@ export default {
         return;
       }
 
-      me.testResult = await me.testDatabaseConnection(
-        me.agentAPI,
-        me.form.id
-      );
+      me.testResult = await me.testDatabaseConnection(me.agentAPI, me.form.id);
     },
 
     async handleSave() {
@@ -388,7 +387,9 @@ export default {
         return;
       }
       if (!me.connFields.host || !me.connFields.database) {
-        me.$tdToast.warning(me.$t("i18nCommon.postgreSQLQuery.hostAndDbRequired"));
+        me.$tdToast.warning(
+          me.$t("i18nCommon.postgreSQLQuery.hostAndDbRequired"),
+        );
         return;
       }
 
