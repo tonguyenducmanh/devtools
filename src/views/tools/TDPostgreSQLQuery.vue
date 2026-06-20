@@ -48,6 +48,14 @@
             v-tooltip="$t('i18nCommon.postgreSQLQuery.formatCode')"
           />
           <TDButton
+            :noMargin="true"
+            :type="$tdEnum.buttonType.secondary"
+            @click="handleTestConnection"
+            :readOnly="!selectedConnectionId || isRunning"
+            iconClass="td-test-icon"
+            v-tooltip="$t('i18nCommon.apiTesting.testConnection')"
+          />
+          <TDButton
             :readOnly="
               !(
                 queryResult &&
