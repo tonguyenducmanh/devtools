@@ -95,6 +95,24 @@
             v-else-if="hasQueryResults"
             class="flex flex-col td-pg-result-body"
           >
+            <div
+              class="flex td-pg-result-tabs-wrap"
+              v-if="hasMultipleResultStatement"
+            >
+              <div class="flex td-pg-result-tabs">
+                <div
+                  v-for="(result, index) in queryResults"
+                  :key="getResultTabKey(result, index)"
+                  class="text-nowrap td-pg-result-tab-item"
+                  :class="{
+                    'td-pg-result-tab-item-active': activeResultIndex === index,
+                  }"
+                  @click="activateResultTab(index)"
+                >
+                  {{ getResultTabLabel(result, index) }}
+                </div>
+              </div>
+            </div>
             <div class="flex flex-col flex-one td-pg-result-content">
               <div class="td-pg-result-table">
                 <KeepAlive>
@@ -121,24 +139,6 @@
                   {{ $t("i18nCommon.postgreSQLQuery.rowsAffected") }}:
                   {{ activeQueryResult.rows_affected || 0 }}
                 </span>
-              </div>
-            </div>
-            <div
-              class="flex td-pg-result-tabs-wrap"
-              v-if="hasMultipleResultStatement"
-            >
-              <div class="flex td-pg-result-tabs">
-                <div
-                  v-for="(result, index) in queryResults"
-                  :key="getResultTabKey(result, index)"
-                  class="text-nowrap td-pg-result-tab-item"
-                  :class="{
-                    'td-pg-result-tab-item-active': activeResultIndex === index,
-                  }"
-                  @click="activateResultTab(index)"
-                >
-                  {{ getResultTabLabel(result, index) }}
-                </div>
               </div>
             </div>
           </div>
