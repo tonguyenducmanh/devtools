@@ -672,16 +672,27 @@ export default {
     },
 
     getResultTabLabel(result, index) {
-      if (!result) return `Result ${index + 1}`;
-
-      if (result.is_select) {
-        const firstTable = result.table_names?.find((x) => !!x);
-        if (firstTable)
-          return `${index + 1} ${firstTable} ${result.rows_affected} ${this.$t("i18nCommon.record")}`;
-        return `${index + 1} SELECT`;
-      }
-
-      return `${index + 1} COMMAND`;
+      let labelTab = null;
+      try {
+        if (!result) {
+          `${index + 1} result`;
+        }
+        let rowEffect = result.rows_affected ?? result.rows?.length ?? 0;
+        let tableName = null;
+        if (result.is_select) {
+          tableName = result.table_names?.find((x) => !!x);
+          if (tableName) labelTab = `${index + 1} ${tableName}`;
+          else {
+            labelTab = `${index + 1} select`;
+          }
+        } else {
+          labelTab = `${index + 1} command`;
+        }
+        if (rowEffect) {
+          labelTab = `${labelTab} ${rowEffect} ${this.$t("i18nCommon.record")}`;
+        }
+      } catch (error) {}
+      return labelTab;
     },
 
     resetQueryResults() {
