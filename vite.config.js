@@ -24,18 +24,13 @@ function copyDotnetWasmPlugin() {
       const sourceDir = path.resolve(rootDir, "src_wasm/pkg/dotnet");
 
       // nơi copy vào dist
-      const targetDir = path.resolve(rootDir, "dist/dotnet");
+      const targetDir = path.resolve(rootDir, "dist/assets/");
 
       if (!fs.existsSync(sourceDir)) {
         console.warn(`[copy-dotnet-wasm] Không tìm thấy thư mục: ${sourceDir}`);
         return;
       }
 
-      // xoá bản cũ nếu có để tránh file cũ bị sót lại
-      fs.rmSync(targetDir, { recursive: true, force: true });
-
-      // tạo thư mục đích và copy toàn bộ nội dung
-      fs.mkdirSync(targetDir, { recursive: true });
       fs.cpSync(sourceDir, targetDir, { recursive: true });
 
       console.log(
