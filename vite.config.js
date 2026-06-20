@@ -9,40 +9,9 @@ import packageJson from "./package.json";
 // cấu hình phiên bản để đưa vào tên file khi build, giúp cache busting
 const APP_VERSION = packageJson.version;
 
-/**
- * Copy toàn bộ .NET WASM output vào dist sau khi vite build xong
- * Source: src_wasm/pkg/dotnet
- * Target: dist/dotnet
- */
-function copyDotnetWasmPlugin() {
-  return {
-    name: "copy-dotnet-wasm",
-    writeBundle() {
-      const rootDir = process.cwd();
-
-      // folder .NET wasm đã build sẵn
-      const sourceDir = path.resolve(rootDir, "src_wasm/pkg/dotnet");
-
-      // nơi copy vào dist
-      const targetDir = path.resolve(rootDir, "dist/assets/");
-
-      if (!fs.existsSync(sourceDir)) {
-        console.warn(`[copy-dotnet-wasm] Không tìm thấy thư mục: ${sourceDir}`);
-        return;
-      }
-
-      fs.cpSync(sourceDir, targetDir, { recursive: true });
-
-      console.log(
-        `[copy-dotnet-wasm] Copied .NET WASM: ${sourceDir} -> ${targetDir}`,
-      );
-    },
-  };
-}
-
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), copyDotnetWasmPlugin()],
+  plugins: [vue()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
