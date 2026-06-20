@@ -6,7 +6,7 @@
       'td-table-viewer-hoverable': hoverable,
     }"
   >
-    <div class="td-table-container" :style="containerStyle">
+    <div class="td-table-container" :style="containerStyle" ref="tableContainer" @scroll="handleScroll">
       <div class="td-table-wrapper" ref="tableWrapper">
         <table class="td-table">
           <!-- Header -->
@@ -79,9 +79,14 @@
 
           <!-- Body -->
           <tbody class="td-table-body">
+            <!-- Top spacer for virtual scroll -->
+            <tr v-if="virtualScroll && paddingTop > 0" :style="{ height: paddingTop + 'px' }">
+              <td :colspan="totalColumns" style="padding: 0; border: none;"></td>
+            </tr>
+
             <tr
-              v-for="(row, rowIndex) in processedData"
-              :key="`row-${rowIndex}`"
+              v-for="{row, index: rowIndex} in visibleData"
+              :key="row[rowKey] || `row-${rowIndex}`"
               class="td-table-row"
               :class="{ 'td-table-row-selected': isRowSelected(row) }"
               @click="handleRowClick(row, rowIndex)"
@@ -155,6 +160,11 @@
                   </div>
                 </slot>
               </td>
+            </tr>
+
+            <!-- Bottom spacer for virtual scroll -->
+            <tr v-if="virtualScroll && paddingBottom > 0" :style="{ height: paddingBottom + 'px' }">
+              <td :colspan="totalColumns" style="padding: 0; border: none;"></td>
             </tr>
 
             <!-- Empty State -->
@@ -339,6 +349,20 @@ export default {
       type: Boolean,
       default: true,
     },
+
+    // Virtual Scroll
+    virtualScroll: {
+      type: Boolean,
+      default: true,
+    },
+    rowHeight: {
+      type: Number,
+      default: 45,
+    },
+    bufferSize: {
+      type: Number,
+      default: 5,
+    },
   },
 
   data() {
@@ -347,6 +371,8 @@ export default {
       sortColumn: this.defaultSortColumn,
       sortDirection: this.defaultSortDirection,
       columnWidthCache: {}, // Cache calculated widths
+      scrollTop: 0,
+      containerHeight: 400,
     };
   },
 
@@ -437,6 +463,46 @@ export default {
 
       return tableData;
     },
+
+    // Virtual Scroll computed properties
+    totalRows() {
+      return this.processedData.length;
+    },
+    visibleData() {
+      if (!this.virtualScroll) {
+        return this.processedData.map((row, index) => ({ row, index }));
+      }
+      const start = this.startRowWithBuffer;
+      const end = this.endRowWithBuffer;
+      return this.processedData.slice(start, end).map((row, i) => ({
+        row,
+        index: start + i
+      }));
+    },
+    startRow() {
+      return Math.max(0, Math.floor(this.scrollTop / this.rowHeight));
+    },
+    endRow() {
+      return Math.min(
+        this.totalRows - 1,
+        Math.ceil((this.scrollTop + this.containerHeight) / this.rowHeight)
+      );
+    },
+    startRowWithBuffer() {
+      return Math.max(0, this.startRow - this.bufferSize);
+    },
+    endRowWithBuffer() {
+      return Math.min(this.totalRows, this.endRow + this.bufferSize + 1);
+    },
+    paddingTop() {
+      if (!this.virtualScroll) return 0;
+      return this.startRowWithBuffer * this.rowHeight;
+    },
+    paddingBottom() {
+      if (!this.virtualScroll) return 0;
+      const remainingRows = this.totalRows - this.endRowWithBuffer;
+      return Math.max(0, remainingRows * this.rowHeight);
+    }
   },
 
   watch: {
@@ -455,7 +521,35 @@ export default {
     },
   },
 
+  mounted() {
+    if (this.virtualScroll) {
+      this.updateContainerSize();
+      this.resizeObserver = new ResizeObserver(() => {
+        this.updateContainerSize();
+      });
+      if (this.$refs.tableContainer) {
+        this.resizeObserver.observe(this.$refs.tableContainer);
+      }
+    }
+  },
+
+  beforeUnmount() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+  },
+
   methods: {
+    handleScroll(event) {
+      if (this.virtualScroll) {
+        this.scrollTop = event.target.scrollTop;
+      }
+    },
+    updateContainerSize() {
+      if (this.$refs.tableContainer) {
+        this.containerHeight = this.$refs.tableContainer.clientHeight;
+      }
+    },
     formatLabel(key) {
       return key.trim();
     },

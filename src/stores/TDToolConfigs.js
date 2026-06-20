@@ -75,8 +75,14 @@ const sidebarConfig = [
     children: [
       {
         name: "TDPostgreSQLQuery",
-        component: () => import("@/views/tools/PostgreSQLQuery/TDPostgreSQLQuery.vue"),
+        component: () =>
+          import("@/views/tools/PostgreSQLQuery/TDPostgreSQLQuery.vue"),
         meta: { titleKey: "i18nCommon.postgreSQLQuery.featureName" },
+      },
+      {
+        name: "TDAppDataMiner",
+        component: () => import("@/views/tools/TDAppDataMiner.vue"),
+        meta: { titleKey: "i18nCommon.feature.AppDataMiner" },
       },
     ],
   },
