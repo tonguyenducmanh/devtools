@@ -15,6 +15,7 @@ export default defineConfig({
         {
           src: "src_wasm/pkg/dotnet/*",
           dest: "dotnet-assets", // Sẽ nằm trong dist/dotnet-assets/
+          rename: { stripBase: true },
         },
       ],
     }),
