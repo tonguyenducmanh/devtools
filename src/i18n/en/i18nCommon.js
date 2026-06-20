@@ -804,6 +804,11 @@ export default {
       saveQueryErr: "Error saving query",
       deleteQuerySuccess: "Query deleted successfully",
       deleteQueryErr: "Error deleting query",
+      noConnectionString: "No connection string to test.",
+      connectionSuccess: "Connection successful",
+      connectionFail: "Connection failed",
+      saveAndTestConnection: "Save and test connection",
+      hostAndDbRequired: "Host and Database are required",
       connectionAddInfo:
         "Typing all info you get from your database connection",
       sidebarOption: {

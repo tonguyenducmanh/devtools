@@ -26,15 +26,6 @@ class TDServerPostgreSQLAPI extends TDAgentAPI {
     });
   }
 
-  /**
-   * Test chuỗi kết nối PostgreSQL trực tiếp
-   * @param {string} connectionString
-   */
-  async testConnection(connectionString) {
-    return await this.post("/postgresql/test_connection", {
-      connection_string: connectionString,
-    });
-  }
 }
 
 export default TDServerPostgreSQLAPI;

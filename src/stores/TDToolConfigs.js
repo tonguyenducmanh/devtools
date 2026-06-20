@@ -75,7 +75,7 @@ const sidebarConfig = [
     children: [
       {
         name: "TDPostgreSQLQuery",
-        component: () => import("@/views/tools/TDPostgreSQLQuery.vue"),
+        component: () => import("@/views/tools/PostgreSQLQuery/TDPostgreSQLQuery.vue"),
         meta: { titleKey: "i18nCommon.postgreSQLQuery.featureName" },
       },
     ],

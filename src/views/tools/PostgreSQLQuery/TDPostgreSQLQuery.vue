@@ -345,13 +345,16 @@ import TDPostgreSQLQueryHelp from "@/views/helps/TDPostgreSQLQueryHelp.vue";
 import TDServerPostgreSQLAPI from "@/common/api/request/AgentAPI/TDServerPostgreSQLAPI.js";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDCache from "@/common/cache/TDCache.js";
+import pgQueries from "./templates.js";
 import TDShortcutAction, {
   TDShortcutActionEnum,
 } from "@/common/TDShortcutAction.js";
+import TDDatabaseConnectionMixin from "@/mixins/TDDatabaseConnectionMixin.js";
 
 export default {
   extends: TDToolBase,
   name: "TDPostgreSQLQuery",
+  mixins: [TDDatabaseConnectionMixin],
   components: { TDSubSidebar, TDArrow, TDPostgreSQLQueryHelp },
 
   data() {
@@ -675,6 +678,14 @@ export default {
 
     // ─── Format SQL ────────────────────────────────────────────────────────────
 
+    async handleTestConnection() {
+      if (!this.selectedConnectionId) return;
+      await this.testDatabaseConnection(
+        this.agentAPI,
+        this.selectedConnectionId
+      );
+    },
+
     handleFormatSQL() {
       let me = this;
       if (!me.sqlText?.trim()) return;
@@ -718,24 +729,13 @@ export default {
         // Query 1: Lấy keywords
         let keywordResponse = await me.agentAPI.executeQuery(
           me.selectedConnectionId,
-          "SELECT word, catcode, catdesc FROM pg_get_keywords() ORDER BY word limit 1000;",
+          pgQueries.pg_get_keywords,
         );
 
         // Query 2: Lấy tables và columns
         let tableResponse = await me.agentAPI.executeQuery(
           me.selectedConnectionId,
-          `SELECT
-            t.table_schema,
-            t.table_name,
-            c.column_name,
-            c.data_type,
-            c.ordinal_position
-          FROM information_schema.tables t
-          JOIN information_schema.columns c
-            ON t.table_name = c.table_name
-            AND t.table_schema = c.table_schema
-          WHERE t.table_schema NOT IN ('pg_catalog', 'information_schema')
-          ORDER BY t.table_schema, t.table_name, c.ordinal_position limit 100000;`,
+          pgQueries.pg_get_tables,
         );
 
         let keywordsResult = keywordResponse?.data?.success

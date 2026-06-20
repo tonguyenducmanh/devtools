@@ -99,7 +99,7 @@
           :noMargin="true"
           @click="handleTestConnection"
           :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.apiTesting.testConnection')"
+          :label="$t('i18nCommon.postgreSQLQuery.saveAndTestConnection')"
         />
         <TDButton
           :noMargin="true"
@@ -123,9 +123,11 @@
 
 <script>
 import TDServerPostgreSQLAPI from "@/common/api/request/AgentAPI/TDServerPostgreSQLAPI.js";
+import TDDatabaseConnectionMixin from "@/mixins/TDDatabaseConnectionMixin.js";
 
 export default {
   name: "TDPostgreSQLConnectionPopup",
+  mixins: [TDDatabaseConnectionMixin],
 
   props: {
     ownerForm: {
@@ -320,35 +322,57 @@ export default {
 
     async handleTestConnection() {
       let me = this;
-      me.buildConnectionString();
-      if (!me.form.connection_string) {
-        me.$tdToast.warning("Chưa có chuỗi kết nối để test.");
+      
+      if (!me.form.connection_name) {
+        me.$tdToast.warning(
+          me.$t("i18nCommon.postgreSQLQuery.connectionName") +
+            " " +
+            me.$t("i18nCommon.toastMessage.required"),
+        );
+        return;
+      }
+      if (!me.connFields.host || !me.connFields.database) {
+        me.$tdToast.warning(me.$t("i18nCommon.postgreSQLQuery.hostAndDbRequired"));
         return;
       }
 
-      me.testResult = null;
+      me.buildConnectionString();
+
       try {
-        let response = await me.agentAPI.testConnection(
-          me.form.connection_string,
-        );
-        if (response?.data?.success) {
-          me.testResult = {
-            success: true,
-            message: response.data.message || "Kết nối thành công",
-          };
-          me.$tdToast.success("Kết nối thành công");
+        let response;
+        if (me.isEditMode && me.form.id) {
+          response = await me.agentAPI.connection.update(me.form);
         } else {
-          me.testResult = {
-            success: false,
-            message: response?.data?.message || "Kết nối thất bại",
-          };
+          let payload = { ...me.form };
+          delete payload.id;
+          response = await me.agentAPI.connection.create(payload);
+          if (response?.data?.success) {
+            me.form.id = response.data.data.id;
+            me.isEditMode = true;
+          }
         }
-      } catch (error) {
-        me.testResult = {
-          success: false,
-          message: error?.message || "Đã có lỗi xảy ra",
-        };
+
+        if (!response?.data?.success) {
+          me.$tdToast.error(
+            me.isEditMode
+              ? me.$t("i18nCommon.postgreSQLQuery.updateConnectionErr")
+              : me.$t("i18nCommon.postgreSQLQuery.createConnectionErr"),
+          );
+          return;
+        }
+      } catch {
+        me.$tdToast.error(
+          me.isEditMode
+            ? me.$t("i18nCommon.postgreSQLQuery.updateConnectionErr")
+            : me.$t("i18nCommon.postgreSQLQuery.createConnectionErr"),
+        );
+        return;
       }
+
+      me.testResult = await me.testDatabaseConnection(
+        me.agentAPI,
+        me.form.id
+      );
     },
 
     async handleSave() {
@@ -364,7 +388,7 @@ export default {
         return;
       }
       if (!me.connFields.host || !me.connFields.database) {
-        me.$tdToast.warning("Host và Database là bắt buộc");
+        me.$tdToast.warning(me.$t("i18nCommon.postgreSQLQuery.hostAndDbRequired"));
         return;
       }
 
@@ -414,25 +438,6 @@ export default {
   width: 100%;
   align-items: center;
   justify-content: flex-start;
-}
-/* Test result */
-.td-pg-test-result {
-  display: flex;
-  align-items: center;
-  gap: var(--padding);
-  padding: 8px var(--padding);
-  border-radius: var(--border-radius);
-  font-size: var(--font-size-small);
-}
-
-.td-pg-test-ok {
-  background-color: rgba(34, 197, 94, 0.12);
-  color: #22c55e;
-}
-
-.td-pg-test-err {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
 }
 
 /* Actions */

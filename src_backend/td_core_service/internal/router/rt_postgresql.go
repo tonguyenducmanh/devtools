@@ -15,7 +15,4 @@ func InjectPostgreSQLRouter(app *http.ServeMux) {
 
 	// Endpoint duy nhất để thực thi query (dùng cho cả query thường lẫn intellisense)
 	app.HandleFunc("POST /postgresql/execute_query", service.ExecutePostgreSQLQueryHandler)
-
-	// Endpoint để test connection string
-	app.HandleFunc("POST /postgresql/test_connection", service.TestPostgreSQLConnectionHandler)
 }

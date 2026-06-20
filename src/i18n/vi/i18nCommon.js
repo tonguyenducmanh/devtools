@@ -801,6 +801,11 @@ export default {
       saveQueryErr: "Lỗi lưu query",
       deleteQuerySuccess: "Xóa query thành công",
       deleteQueryErr: "Lỗi xóa query",
+      noConnectionString: "Chưa có chuỗi kết nối để test.",
+      connectionSuccess: "Kết nối thành công",
+      connectionFail: "Kết nối thất bại",
+      saveAndTestConnection: "Lưu và test kết nối",
+      hostAndDbRequired: "Host và Database là bắt buộc",
       connectionAddInfo: "Nhập toàn bộ thông tin lấy được từ database",
       sidebarOption: {
         help: "Trợ giúp",

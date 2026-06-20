@@ -75,34 +75,3 @@ func ExecutePostgreSQLQueryHandler(w http.ResponseWriter, r *http.Request) {
 		"data":    result,
 	})
 }
-
-// TestPostgreSQLConnectionHandler nhận connection_string từ client và thử kết nối
-func TestPostgreSQLConnectionHandler(w http.ResponseWriter, r *http.Request) {
-	var req model.TDTestPostgeSQLRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
-		return
-	}
-
-	if req.ConnectionString == "" {
-		http.Error(w, "connection_string là bắt buộc", http.StatusBadRequest)
-		return
-	}
-
-	// Thử thực thi câu query đơn giản SELECT 1
-	_, err := database.ExecutePostgreSQLQuery(req.ConnectionString, "SELECT 1 LIMIT 1;")
-
-	w.Header().Set("Content-Type", "application/json")
-	if err != nil {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"message": err.Error(),
-		})
-		return
-	}
-
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"message": "Kết nối thành công!",
-	})
-}
