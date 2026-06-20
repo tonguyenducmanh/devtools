@@ -786,23 +786,64 @@ export default {
         const cacheKey = me.$tdEnum.cacheConfig.PostgreSQLQueryHistory;
         await TDCache.remove(cacheKey, { id: me.selectedConnectionId });
 
-        // Query 1: Lấy keywords
+        // Lấy keywords
         let keywordResponse = await me.agentAPI.executeQuery(
           me.selectedConnectionId,
           pgQueries.pg_get_keywords,
         );
 
-        // Query 2: Lấy tables và columns
-        let tableResponse = await me.agentAPI.executeQuery(
+        // Gọi SQL đếm tổng số dòng
+        let countResponse = await me.agentAPI.executeQuery(
           me.selectedConnectionId,
-          pgQueries.pg_get_tables,
+          pgQueries.pg_get_tables_count,
         );
+
+        let totalRows = 0;
+        if (
+          countResponse?.data?.success &&
+          countResponse.data.data?.rows?.length > 0
+        ) {
+          totalRows = parseInt(countResponse.data.data.rows[0].total || 0, 10);
+        }
+
+        // Chạy vòng lặp FOR gối đầu để kéo dữ liệu về thông qua SQL Paging
+        let allTableRows = [];
+        const pageSize = 5000; // Số lượng dòng tải mỗi lần
+
+        for (let offset = 0; offset < totalRows; offset += pageSize) {
+          // Nối thêm điều kiện LIMIT OFFSET vào câu SQL Paging mẫu
+          let pagingQuery = `${pgQueries.pg_get_tables_paging} LIMIT ${pageSize} OFFSET ${offset};`;
+
+          let pagingResponse = await me.agentAPI.executeQuery(
+            me.selectedConnectionId,
+            pagingQuery,
+          );
+
+          if (pagingResponse?.data?.success && pagingResponse.data.data?.rows) {
+            allTableRows.push(...pagingResponse.data.data.rows);
+          } else {
+            console.error(
+              `Gặp lỗi khi tải dữ liệu tại vị trí dòng (offset): ${offset}`,
+            );
+            break;
+          }
+        }
+
+        // Đóng gói lại đúng cấu trúc ban đầu để cấp phát cho Monaco Editor
+        let tablesResult = {
+          columns: [
+            "table_schema",
+            "table_name",
+            "column_name",
+            "data_type",
+            "ordinal_position",
+          ],
+          rows: allTableRows,
+        };
+        // ─────────────────────────────────────────────────────────────────────
 
         let keywordsResult = keywordResponse?.data?.success
           ? keywordResponse.data.data
-          : null;
-        let tablesResult = tableResponse?.data?.success
-          ? tableResponse.data.data
           : null;
 
         let intellisenseData = {
@@ -810,12 +851,12 @@ export default {
           tables: tablesResult,
         };
 
-        // Lưu vào IndexedDB theo connection id
+        // Lưu vào IndexedDB và áp dụng Intellisense
         await TDCache.set(cacheKey, intellisenseData, {
           id: me.selectedConnectionId,
         });
-        // Áp dụng intellisense vào monaco
         await me.applyMonacoIntellisense(intellisenseData);
+
         me.$tdToast.success(
           me.$t("i18nCommon.postgreSQLQuery.intellisenseLoaded"),
         );
@@ -823,6 +864,7 @@ export default {
         console.error("Load intellisense error:", error);
         me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       } finally {
+        me.isRunningIntellisense = false; // Đảm bảo hạ cờ hiệu loading trong mọi trường hợp
         me.isLoadingIntellisense = false;
       }
     },

@@ -7,6 +7,7 @@ const codeModules = import.meta.glob("./template/*.sql", {
 
 export default {
   pg_get_keywords: codeModules["./template/pg_get_keywords.sql"],
-  pg_get_tables: codeModules["./template/pg_get_tables.sql"],
+  pg_get_tables_count: codeModules["./template/pg_get_tables_count.sql"],
+  pg_get_tables_paging: codeModules["./template/pg_get_tables_paging.sql"],
   pg_test_connection: codeModules["./template/pg_test_connection.sql"],
 };
