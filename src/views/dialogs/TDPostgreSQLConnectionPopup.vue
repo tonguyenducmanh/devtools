@@ -145,7 +145,6 @@
 <script>
 import TDServerPostgreSQLAPI from "@/common/api/request/AgentAPI/TDServerPostgreSQLAPI.js";
 import TDDatabaseConnectionMixin from "@/mixins/TDDatabaseConnectionMixin.js";
-
 export default {
   name: "TDPostgreSQLConnectionPopup",
   mixins: [TDDatabaseConnectionMixin],
@@ -236,7 +235,8 @@ export default {
         } else {
           // Môi trường PROD: Giấu đường dẫn trong một biến chuỗi
           // Việc này khiến Vite hoàn toàn bỏ qua không quét file này lúc dev nữa
-          const prodPath = "/dotnet-assets/dotnet.js";
+          const version = window.__env.appVersion;
+          const prodPath = `/dotnet-assets-${version}/dotnet.js`;
           const { dotnet } = await import(/* @vite-ignore */ prodPath);
           dotnetModule = dotnet;
         }

@@ -4,6 +4,7 @@
 (function (window) {
   window.__env = window.__env || {};
   window.__env.appName = "Dev Tools";
+  window.__env.appVersion = "__APP_VERSION__";
   window.__env.author = "Tô Mạnh";
   window.__env.footerQuote = "";
   window.__env.defaultValue = {

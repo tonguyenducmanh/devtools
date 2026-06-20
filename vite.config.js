@@ -9,13 +9,21 @@ const APP_VERSION = packageJson.version;
 export default defineConfig({
   plugins: [
     vue(),
-    // Cấu hình copy folder dotnet sang dist/dotnet-assets khi build
     viteStaticCopy({
       targets: [
+        // Cấu hình copy folder dotnet sang dist/dotnet-assets khi build
         {
           src: "src_wasm/pkg/dotnet/*",
-          dest: "dotnet-assets", // Sẽ nằm trong dist/dotnet-assets/
+          dest: `dotnet-assets-${APP_VERSION}`,
           rename: { stripBase: true },
+        },
+        // Sửa dist/cfg/config.js và đổi chữ __APP_VERSION__ thành version thật:
+        {
+          src: "public/cfg/config.js",
+          dest: "cfg",
+          rename: { stripBase: true },
+          transform: (contents) =>
+            contents.replace("__APP_VERSION__", APP_VERSION),
         },
       ],
     }),
