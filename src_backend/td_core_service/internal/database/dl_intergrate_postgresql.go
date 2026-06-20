@@ -23,7 +23,7 @@ func DeletePostgreSQLConnectionsByGroupID(groupID string) error {
 	return err
 }
 
-// ExecutePostgreSQLQuery kết nối và thực thi SQL trên PostgreSQL, trả về kết quả dạng JSON-serializable
+// Thực hiện query theo yêu cầu của User
 func ExecutePostgreSQLQuery(connectionString string, sqlQuery string) (*model.TDQueryResult, error) {
 	ctx := context.Background()
 
@@ -33,18 +33,21 @@ func ExecutePostgreSQLQuery(connectionString string, sqlQuery string) (*model.TD
 	}
 	defer conn.Close(ctx)
 
+	// Dùng conn.Query cho TẤT CẢ mọi thứ
 	rows, err := conn.Query(ctx, sqlQuery)
 	if err != nil {
 		return nil, fmt.Errorf("lỗi thực thi query: %w", err)
 	}
 	defer rows.Close()
 
+	// 1. Lấy thông tin cột trước
 	fieldDescs := rows.FieldDescriptions()
 	columns := make([]string, len(fieldDescs))
 	for i, fd := range fieldDescs {
 		columns[i] = string(fd.Name)
 	}
 
+	// 2. Đọc dữ liệu nếu có
 	var resultRows []map[string]any
 	for rows.Next() {
 		vals, err := rows.Values()
@@ -54,7 +57,6 @@ func ExecutePostgreSQLQuery(connectionString string, sqlQuery string) (*model.TD
 		rowMap := make(map[string]any, len(columns))
 		for i, col := range columns {
 			v := vals[i]
-			// Chuyển []byte thành string để JSON serializable
 			if b, ok := v.([]byte); ok {
 				rowMap[col] = string(b)
 			} else {
@@ -68,37 +70,21 @@ func ExecutePostgreSQLQuery(connectionString string, sqlQuery string) (*model.TD
 		return nil, fmt.Errorf("lỗi sau khi đọc rows: %w", rows.Err())
 	}
 
+	// Lấy chính xác RowsAffected từ CommandTag của câu lệnh
+	cmdTag := rows.CommandTag()
+	rowsAffected := cmdTag.RowsAffected()
+
+	// Nếu là câu lệnh SELECT thì RowsAffected từ CommandTag thường bằng 0 hoặc tùy driver,
+	// ta sẽ lấy số lượng row đọc được làm RowsAffected nếu đó là câu lệnh SELECT thực sự.
+	isSelect := len(columns) > 0
+	if isSelect {
+		rowsAffected = int64(len(resultRows))
+	}
+
 	return &model.TDQueryResult{
 		Columns:      columns,
 		Rows:         resultRows,
-		RowsAffected: int64(len(resultRows)),
-		IsSelect:     true,
+		RowsAffected: rowsAffected, // Trả về số dòng chuẩn xác cho cả INSERT/UPDATE lẫn SELECT
+		IsSelect:     isSelect,
 	}, nil
-}
-
-// ExecutePostgreSQLNonQuery thực thi câu lệnh không trả về rows (INSERT/UPDATE/DELETE/DDL)
-func ExecutePostgreSQLNonQuery(connectionString string, sqlQuery string) (*model.TDQueryResult, error) {
-	ctx := context.Background()
-	conn, err := pgx.Connect(ctx, connectionString)
-	if err != nil {
-		return nil, fmt.Errorf("không thể kết nối PostgreSQL: %w", err)
-	}
-	defer conn.Close(ctx)
-
-	cmdTag, err := conn.Exec(ctx, sqlQuery)
-	if err != nil {
-		return nil, fmt.Errorf("lỗi thực thi: %w", err)
-	}
-
-	return &model.TDQueryResult{
-		Columns:      []string{},
-		Rows:         []map[string]any{},
-		RowsAffected: cmdTag.RowsAffected(),
-		IsSelect:     false,
-	}, nil
-}
-
-// GetPostgreSQLKeywords lấy danh sách keywords từ PostgreSQL server
-func GetPostgreSQLKeywords(connectionString string) ([]map[string]any, error) {
-	return nil, nil // được gọi qua ExecutePostgreSQLQuery
 }
