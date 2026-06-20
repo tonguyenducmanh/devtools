@@ -5,7 +5,6 @@ package service
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
 	"td_core_service/internal/database"
 	"td_core_service/internal/model"
 )
@@ -36,21 +35,9 @@ func ExecutePostgreSQLQueryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Xác định câu lệnh SELECT hay non-query dựa vào từ khóa đầu tiên
-	sqlTrimmed := strings.TrimSpace(req.SQL)
-	upperSQL := strings.ToUpper(sqlTrimmed)
-
 	var result *model.TDQueryResult
 
-	if strings.HasPrefix(upperSQL, "SELECT") ||
-		strings.HasPrefix(upperSQL, "WITH") ||
-		strings.HasPrefix(upperSQL, "EXPLAIN") ||
-		strings.HasPrefix(upperSQL, "SHOW") ||
-		strings.HasPrefix(upperSQL, "TABLE") {
-		result, err = database.ExecutePostgreSQLQuery(conn.ConnectionString, req.SQL)
-	} else {
-		result, err = database.ExecutePostgreSQLNonQuery(conn.ConnectionString, req.SQL)
-	}
+	result, err = database.ExecutePostgreSQLQuery(conn.ConnectionString, req.SQL)
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
