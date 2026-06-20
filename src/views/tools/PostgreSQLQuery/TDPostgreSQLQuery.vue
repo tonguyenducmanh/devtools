@@ -37,12 +37,19 @@
           />
           <TDButton
             :noMargin="true"
+            @click="handleDownloadReponse"
             :type="$tdEnum.buttonType.secondary"
-            @click="handleTestConnection"
-            :readOnly="!selectedConnectionId || isRunning"
-            iconClass="td-test-icon"
-            v-tooltip="$t('i18nCommon.apiTesting.testConnection')"
-          />
+            :readOnly="
+              !(
+                queryResult &&
+                queryResult.is_select &&
+                queryResult.rows &&
+                queryResult.rows.length > 0
+              )
+            "
+            iconClass="td-download-icon"
+            v-tooltip="$t('i18nCommon.apiTesting.downloadReponse')"
+          ></TDButton>
           <TDButton
             :readOnly="
               !(
@@ -57,6 +64,14 @@
             @click="handleCopyResult"
             iconClass="td-copy-icon"
             v-tooltip="$t('i18nCommon.copy')"
+          />
+          <TDButton
+            :noMargin="true"
+            :type="$tdEnum.buttonType.secondary"
+            @click="handleTestConnection"
+            :readOnly="!selectedConnectionId || isRunning"
+            iconClass="td-test-icon"
+            v-tooltip="$t('i18nCommon.apiTesting.testConnection')"
           />
           <TDButton
             :noMargin="true"
@@ -723,16 +738,40 @@ export default {
 
     // ─── Copy result ───────────────────────────────────────────────────────────
 
-    handleCopyResult() {
+    buildResultForCopy() {
       let me = this;
       if (!me.queryResult?.rows?.length) return;
-      try {
-        me.$tdUtility.copyToClipboard(
-          JSON.stringify(me.queryResult.rows, null, 2),
+      return JSON.stringify(me.queryResult.rows, null, 2);
+    },
+
+    handleCopyResult() {
+      let me = this;
+      let queryResultText = me.buildResultForCopy();
+      if (queryResultText) {
+        try {
+          me.$tdUtility.copyToClipboard(queryResultText);
+          me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+        } catch {
+          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+        }
+      }
+    },
+
+    handleDownloadReponse() {
+      let me = this;
+      let queryResultText = me.buildResultForCopy();
+
+      if (queryResultText) {
+        let encoder = new TextEncoder();
+        let buffer = encoder.encode(queryResultText); // Uint8Array
+        let fileName = me.$tdUtility.createFileDownloadName("result_query", {
+          ext: ".txt",
+        });
+        me.$tdUtility.createDownloadFileFromBuffer(
+          buffer,
+          "text/plain;charset=utf-8",
+          fileName,
         );
-        me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-      } catch {
-        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
 
