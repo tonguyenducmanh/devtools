@@ -1,17 +1,24 @@
 import { fileURLToPath, URL } from "node:url";
-import fs from "node:fs";
-import path from "node:path";
-
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 import packageJson from "./package.json";
 
-// cấu hình phiên bản để đưa vào tên file khi build, giúp cache busting
 const APP_VERSION = packageJson.version;
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    // Cấu hình copy folder dotnet sang dist/dotnet-assets khi build
+    viteStaticCopy({
+      targets: [
+        {
+          src: "src_wasm/pkg/dotnet/*",
+          dest: "dotnet-assets", // Sẽ nằm trong dist/dotnet-assets/
+        },
+      ],
+    }),
+  ],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

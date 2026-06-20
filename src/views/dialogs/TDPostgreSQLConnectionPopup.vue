@@ -227,8 +227,21 @@ export default {
     async initDotNetWasm() {
       if (this.dotnetInitialized) return;
       try {
-        const { dotnet } = await import("@wasm/pkg/dotnet/dotnet.js");
-        const { getAssemblyExports } = await dotnet
+        let dotnetModule;
+
+        if (import.meta.env.DEV) {
+          // Môi trường DEV: Import thông qua alias đã cấu hình trong vite.config.js
+          const { dotnet } = await import("@wasm/pkg/dotnet/dotnet.js");
+          dotnetModule = dotnet;
+        } else {
+          // Môi trường PROD: Giấu đường dẫn trong một biến chuỗi
+          // Việc này khiến Vite hoàn toàn bỏ qua không quét file này lúc dev nữa
+          const prodPath = "/dotnet-assets/dotnet.js";
+          const { dotnet } = await import(/* @vite-ignore */ prodPath);
+          dotnetModule = dotnet;
+        }
+
+        const { getAssemblyExports } = await dotnetModule
           .withDiagnosticTracing(false)
           .create();
 
