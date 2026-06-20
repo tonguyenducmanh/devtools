@@ -403,6 +403,7 @@ export default {
       notFoundAgentServer: "Not found server agent",
       cannotCopy:
         "Unable to copy using browser API, please check if HTTP is insecure.",
+      required: " is required",
     },
     cosinSimilarity: {
       firstVector: "First Vector",
@@ -469,6 +470,7 @@ export default {
       proModeTitle: "Javascript code",
       CURLModeTitle: "CURL cmd",
       cancel: "Cancel",
+      testConnection: "Test connection",
       requestName: "Request name",
       collectionRename: "Enter new collecion name",
       requestCanceled: "Current request canceled",

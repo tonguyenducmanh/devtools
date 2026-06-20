@@ -401,6 +401,7 @@ export default {
       notFoundAgentServer: "Không tìm thấy server agent",
       cannotCopy:
         "Không thể copy được bằng api của trình duyệt, vui lòng kiểm tra xem có phải http insecure không",
+      required: " là bắt buộc",
     },
     cosinSimilarity: {
       firstVector: "Vector thứ nhất",
@@ -467,6 +468,7 @@ export default {
       proModeTitle: "Javascript code",
       CURLModeTitle: "CURL cmd",
       cancel: "Hủy",
+      testConnection: "Kiểm tra kết nối",
       requestName: "Tên request",
       collectionRename: "Nhập tên collecion mới",
       requestCanceled: "Đã hủy request hiện tại",
