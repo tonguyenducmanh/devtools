@@ -61,18 +61,3 @@ export default {
   name: "TDPostgreSQLQueryHelp",
 };
 </script>
-
-<style lang="scss">
-@use "@/styles/help.scss";
-.section-code {
-  display: block;
-  padding: var(--padding);
-  background-color: var(--bg-thirt-color);
-  border-radius: var(--border-radius);
-  font-family: monospace;
-  font-size: var(--font-size-small);
-  margin-bottom: var(--padding);
-  color: var(--primary-color);
-  word-break: break-all;
-}
-</style>

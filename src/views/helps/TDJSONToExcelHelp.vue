@@ -52,7 +52,3 @@ export default {
   name: "TDJSONToExcelHelp",
 };
 </script>
-
-<style lang="scss">
-@use "@/styles/help.scss";
-</style>

@@ -49,7 +49,3 @@ export default {
   name: "TDQRCodeToTextHelp",
 };
 </script>
-
-<style lang="scss">
-@use "@/styles/help.scss";
-</style>

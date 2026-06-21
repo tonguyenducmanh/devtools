@@ -53,7 +53,3 @@ export default {
   name: "TDAPIMockingHelp",
 };
 </script>
-
-<style lang="scss">
-@use "@/styles/help.scss";
-</style>

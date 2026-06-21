@@ -647,10 +647,6 @@ export default {
 };
 </script>
 
-<style lang="scss">
-/* No global styles needed for v-html anymore */
-</style>
-
 <style scoped lang="scss">
 .td-bilingual-container {
   width: 100%;

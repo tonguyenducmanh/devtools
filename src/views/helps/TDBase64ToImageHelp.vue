@@ -44,7 +44,3 @@ export default {
   name: "TDBase64ToImageHelp",
 };
 </script>
-
-<style lang="scss">
-@use "@/styles/help.scss";
-</style>

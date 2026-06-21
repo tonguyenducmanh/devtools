@@ -49,7 +49,3 @@ export default {
   name: "TDTextGeneratorHelp",
 };
 </script>
-
-<style lang="scss">
-@use "@/styles/help.scss";
-</style>

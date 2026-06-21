@@ -58,7 +58,3 @@ export default {
   name: "TDTextManipulationHelp",
 };
 </script>
-
-<style lang="scss">
-@use "@/styles/help.scss";
-</style>
