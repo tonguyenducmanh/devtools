@@ -68,7 +68,7 @@
           <TDInput
             v-model="connFields.database"
             :noMargin="true"
-            :placeHolder="'Database name (eg postgres)'"
+            :placeHolder="'Database name'"
             @input="buildConnectionString"
           />
         </div>
@@ -77,7 +77,7 @@
         <div class="flex-one">
           <TDInput
             v-model="connFields.host"
-            :placeHolder="'Host (eg localhost)'"
+            :placeHolder="'Host (localhost)'"
             :noMargin="true"
             @input="buildConnectionString"
           />
@@ -86,7 +86,7 @@
           <TDInput
             v-model="connFields.port"
             :noMargin="true"
-            :placeHolder="'Host (eg 5432)'"
+            :placeHolder="'Port (5432)'"
             @input="buildConnectionString"
           />
         </div>
@@ -96,7 +96,7 @@
           <TDInput
             v-model="connFields.username"
             :noMargin="true"
-            :placeHolder="'Username (eg postgres)'"
+            :placeHolder="'Username'"
             @input="buildConnectionString"
           />
         </div>
@@ -273,8 +273,8 @@ export default {
         const parsedObj = JSON.parse(jsonResult);
 
         // Đổ ngược dữ liệu đã phân tích vào các trường input trên Form
-        this.connFields.host = parsedObj.host || "localhost";
-        this.connFields.port = parsedObj.port ? String(parsedObj.port) : "5432";
+        this.connFields.host = parsedObj.host || "";
+        this.connFields.port = parsedObj.port ? String(parsedObj.port) : "";
         this.connFields.username = parsedObj.user_name || "";
         this.connFields.password = parsedObj.password || "";
         this.connFields.database = parsedObj.database_name || "";
@@ -363,8 +363,8 @@ export default {
     parseConnectionString(connStr) {
       if (!connStr) return;
       this.connFields = {
-        host: "localhost",
-        port: "5432",
+        host: "",
+        port: "",
         database: "",
         username: "",
         password: "",
