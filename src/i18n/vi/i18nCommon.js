@@ -779,7 +779,7 @@ export default {
       sslMode: "Loại SSL",
       importType: "Loại nhập khẩu connection string",
       featureName: "PostgreSQL",
-      runQuery: "Chạy truy vấn",
+      runQuery: "Chạy truy vấn SQL",
       formatCode: "Định dạng code",
       loadIntellisense: "Load gợi ý syntax, table",
       connectionName: "Tên kết nối",

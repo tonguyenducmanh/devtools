@@ -782,7 +782,7 @@ export default {
       sslMode: "SSL mode",
       importType: "Connection string import type",
       featureName: "PostgreSQL",
-      runQuery: "Run query",
+      runQuery: "Run SQL query",
       formatCode: "Format code",
       loadIntellisense: "Load intellisense syntax, table",
       connectionName: "Connection name",

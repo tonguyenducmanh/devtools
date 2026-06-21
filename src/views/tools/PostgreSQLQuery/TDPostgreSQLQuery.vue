@@ -1773,7 +1773,7 @@ export default {
         sortOrder: 4,
         key: me.$tdUtility.newGuid(),
         presentKey: isMacOS ? ["Option", "return"] : ["Alt", "enter"],
-        labelKey: "i18nCommon.shortKeyAction.executeSQLCode",
+        labelKey: "i18nCommon.postgreSQLQuery.runQuery",
       };
       return configKeyboard;
     },
