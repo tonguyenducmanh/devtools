@@ -323,15 +323,14 @@ export default {
     align-items: center;
     gap: var(--padding-small);
     font-size: var(--font-size-medium-rare);
-    color: var(--text-secondary-color);
-    background-color: var(--bg-layer-color);
+    color: white;
+    background-color: var(--btn-color);
     padding: var(--padding-medium);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-component);
   }
   .td-actions-editor:hover {
-    color: var(--text-color);
-    background-color: var(--bg-main-color);
+    background-color: var(--focus-color);
   }
   .textarea-wrapper {
     position: relative;
