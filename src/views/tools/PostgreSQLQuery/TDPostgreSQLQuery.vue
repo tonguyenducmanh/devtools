@@ -1758,18 +1758,17 @@ export default {
       let configKeyboard = {
         sortOrder: 3,
         key: me.$tdUtility.newGuid(),
-        presentKey: ["Ctrl", "u"],
+        presentKey: [me.$tdUtility.ctrlKey(), "u"],
         labelKey: "i18nCommon.shortKeyAction.formatCodeTextEditor",
       };
       return configKeyboard;
     },
     getConfigExecuteSQLCode() {
       let me = this;
-      let isMacOS = me.$tdUtility.isMacOS();
       let configKeyboard = {
         sortOrder: 4,
         key: me.$tdUtility.newGuid(),
-        presentKey: isMacOS ? ["Option", "return"] : ["Alt", "enter"],
+        presentKey: [me.$tdUtility.altKey(), me.$tdUtility.enterKey()],
         labelKey: "i18nCommon.postgreSQLQuery.runQuery",
       };
       return configKeyboard;

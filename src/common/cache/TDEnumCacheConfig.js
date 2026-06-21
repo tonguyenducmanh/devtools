@@ -44,4 +44,5 @@ export const EnumCacheConfig = {
   BlankTextConfigLayout: 48,
   PostgreSQLQueryConfigLayout: 49,
   PostgreSQLQueryHistory: 50,
+  PostgreSQLLastConnectionId: 51,
 };

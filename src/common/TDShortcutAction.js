@@ -18,11 +18,7 @@ const ShortcutConfigMap = {
     sortOrder: 1,
     key: tdUtility.newGuid(),
     presentKey: (() => {
-      if (isMacOS) {
-        return ["Cmd", "p"];
-      } else {
-        return ["Ctrl", "p"];
-      }
+      return [tdUtility.ctrlKey(), "p"];
     })(),
     labelKey: "i18nCommon.shortKeyAction.search",
     action: (event) => {

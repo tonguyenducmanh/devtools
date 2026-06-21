@@ -32,6 +32,27 @@ class TDUtility {
     let OS = this.getOS();
     return OS === "windows";
   }
+  ctrlKey() {
+    if (this.isMacOS()) {
+      return "Cmd";
+    } else {
+      return "Ctrl";
+    }
+  }
+  altKey() {
+    if (this.isMacOS()) {
+      return "Option";
+    } else {
+      return "Alt";
+    }
+  }
+  enterKey() {
+    if (this.isMacOS()) {
+      return "Return";
+    } else {
+      return "Enter";
+    }
+  }
   /**
    * trả về hệ điều hành đang dùng, mac/windows/linux
    */
