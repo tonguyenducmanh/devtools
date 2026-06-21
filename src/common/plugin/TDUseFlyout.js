@@ -17,7 +17,7 @@ import { ref } from "vue";
  *   <div
  *     v-for="(items, key) in menuConfig"
  *     :class="{ active: activeKeyFlyOut === key }"
- *     @mouseenter="open(key, $event)"
+ *     @mouseenter="openFlyout(key, $event)"
  *     @mouseleave="scheduleCloseFlyout()"
  *   >...</div>
  *
@@ -41,7 +41,7 @@ export function useFlyout({ hideDelay = 120 } = {}) {
   let hideTimer = null;
 
   /** Mở flyout cho `key`, lấy `event.currentTarget` làm anchor để định vị. */
-  function open(key, event) {
+  function openFlyout(key, event) {
     clearTimeout(hideTimer);
     anchorElFlyout.value = event?.currentTarget ?? null;
     activeKeyFlyOut.value = key;
@@ -61,22 +61,22 @@ export function useFlyout({ hideDelay = 120 } = {}) {
   }
 
   /** Đóng ngay lập tức, ví dụ sau khi user click chọn 1 item trong flyout. */
-  function close() {
+  function closeFlyout() {
     clearTimeout(hideTimer);
     activeKeyFlyOut.value = null;
   }
 
-  function isOpen(key) {
+  function isOpenFlyout(key) {
     return activeKeyFlyOut.value === key;
   }
 
   return {
     activeKeyFlyOut,
     anchorElFlyout,
-    open,
+    openFlyout,
     scheduleCloseFlyout,
     cancelCloseFlyOut,
-    close,
-    isOpen,
+    closeFlyout,
+    isOpenFlyout,
   };
 }

@@ -15,7 +15,7 @@
           :key="menuKey"
           class="td-menu-item"
           :class="{ 'td-menu-item--active': activeKeyFlyOut === menuKey }"
-          @mouseenter="open(menuKey, $event)"
+          @mouseenter="openFlyout(menuKey, $event)"
           @mouseleave="scheduleCloseFlyout()"
         >
           <span>{{ $t(`i18nCommon.${menuKey}.title`) }}</span>
@@ -28,7 +28,7 @@
       :show="!!activeKeyFlyOut"
       :anchorElFlyout="anchorElFlyout"
       placement="bottom"
-      panel-class="td-header-flyout"
+      panelClass="td-header-flyout"
       @mouseenter="cancelCloseFlyOut"
       @mouseleave="scheduleCloseFlyout()"
     >
@@ -59,20 +59,20 @@ export default {
     const {
       activeKeyFlyOut,
       anchorElFlyout,
-      open,
+      openFlyout,
       scheduleCloseFlyout,
       cancelCloseFlyOut,
-      close,
+      closeFlyout,
     } = useFlyout();
     return {
       openTab,
       exitTabMode,
       activeKeyFlyOut,
       anchorElFlyout,
-      open,
+      openFlyout,
       scheduleCloseFlyout,
       cancelCloseFlyOut,
-      close,
+      closeFlyout,
     };
   },
   data() {
@@ -148,19 +148,19 @@ export default {
     genUUIDFunc() {
       let me = this;
       me.$tdUtility.copyToClipboard(me.$tdUtility.newGuid());
-      this.close();
+      this.closeFlyout();
     },
     getCurrentDateFunc() {
       const now = new Date();
       const formatted = now.toISOString().split("T")[0];
       this.$tdUtility.copyToClipboard(formatted);
-      this.close();
+      this.closeFlyout();
     },
     getCurrentDateTimeFunc() {
       const now = new Date();
       const formatted = now.toISOString().slice(0, 19).replace("T", " ");
       this.$tdUtility.copyToClipboard(formatted);
-      this.close();
+      this.closeFlyout();
     },
     goToWelcome() {
       this.exitTabMode();
@@ -172,7 +172,7 @@ export default {
         path: "/TDUserSettings",
         component: () => import("@/views/misc/TDUserSettings.vue"),
       });
-      this.close();
+      this.closeFlyout();
     },
     appDataMinerFunc() {
       this.openTab({
@@ -181,16 +181,16 @@ export default {
         path: "/appdataminer",
         component: () => import("@/views/tools/TDAppDataMiner.vue"),
       });
-      this.close();
+      this.closeFlyout();
     },
     goToSourceFunc() {
       this.$tdUtility.goToSource();
-      this.close();
+      this.closeFlyout();
     },
     downloadAgentFunc() {
       const url = window.__env?.githubSource?.releasesUrl;
       window.open(url, "_blank");
-      this.close();
+      this.closeFlyout();
     },
     async pingAgentFunc() {
       try {
@@ -203,11 +203,11 @@ export default {
       } catch {
         this.$tdUtility.showErrorNotFoundAgentServer();
       }
-      this.close();
+      this.closeFlyout();
     },
     reloadAppFunc() {
       this.$tdUtility.reloadApp();
-      this.close();
+      this.closeFlyout();
     },
   },
 };

@@ -13,7 +13,7 @@
             :class="{
               'td-sidebar-item--active': activeKeyFlyOut === item.groupKey,
             }"
-            @mouseenter="open(item.groupKey, $event)"
+            @mouseenter="openFlyout(item.groupKey, $event)"
             @mouseleave="scheduleCloseFlyout()"
           >
             <div
@@ -53,7 +53,7 @@
       :show="!!activeKeyFlyOut"
       :anchorElFlyout="anchorElFlyout"
       placement="right"
-      panel-class="td-sidebar-group-flyout"
+      panelClass="td-sidebar-group-flyout"
       @mouseenter="cancelCloseFlyOut"
       @mouseleave="scheduleCloseFlyout()"
     >
@@ -90,19 +90,19 @@ export default {
     const {
       activeKeyFlyOut,
       anchorElFlyout,
-      open,
+      openFlyout,
       scheduleCloseFlyout,
       cancelCloseFlyOut,
-      close,
+      closeFlyout,
     } = useFlyout();
     return {
       openTab,
       activeKeyFlyOut,
       anchorElFlyout,
-      open,
+      openFlyout,
       scheduleCloseFlyout,
       cancelCloseFlyOut,
-      close,
+      closeFlyout,
     };
   },
 
@@ -165,7 +165,7 @@ export default {
         toolKey: child.name,
         component: child.component,
       });
-      this.close();
+      this.closeFlyout();
     }, 300),
 
     // Mở tab từ standalone route item
