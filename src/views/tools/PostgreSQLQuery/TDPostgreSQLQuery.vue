@@ -1764,4 +1764,7 @@ export default {
   font-size: var(--font-size-small);
   padding: var(--padding);
 }
+.td-collection-rename {
+  width: 100%;
+}
 </style>
