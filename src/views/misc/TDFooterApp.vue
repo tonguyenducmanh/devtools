@@ -38,8 +38,8 @@ export default {
   },
   computed: {
     currentTitle() {
-      const versionApp = window.__env?.footerQuote || "";
-      return versionApp;
+      let version = this.$tdUtility.getAppVersion();
+      return `v${version}`;
     },
   },
   mounted() {
