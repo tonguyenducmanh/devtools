@@ -146,11 +146,7 @@ export default {
         {
           value: "function",
           label: this.$t("i18nCommon.postgreSQLQuery.dbInspect.function"),
-        },
-        {
-          value: "trigger",
-          label: this.$t("i18nCommon.postgreSQLQuery.dbInspect.trigger"),
-        },
+        }
       ],
 
       agentAPI: null,
@@ -198,9 +194,7 @@ export default {
         case "function":
           queryTemplate = pgQueries.pg_inspect_search_function;
           break;
-        case "trigger":
-          queryTemplate = pgQueries.pg_inspect_search_trigger;
-          break;
+
         default:
           return "";
       }
@@ -228,9 +222,7 @@ export default {
         case "function":
           queryTemplate = pgQueries.pg_inspect_ddl_function;
           break;
-        case "trigger":
-          queryTemplate = pgQueries.pg_inspect_ddl_trigger;
-          break;
+
         default:
           return "";
       }

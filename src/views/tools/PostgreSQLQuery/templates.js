@@ -15,9 +15,7 @@ export default {
   pg_inspect_search_table: codeModules["./template/pg_inspect_search_table.sql"],
   pg_inspect_search_view: codeModules["./template/pg_inspect_search_view.sql"],
   pg_inspect_search_function: codeModules["./template/pg_inspect_search_function.sql"],
-  pg_inspect_search_trigger: codeModules["./template/pg_inspect_search_trigger.sql"],
   pg_inspect_ddl_table: codeModules["./template/pg_inspect_ddl_table.sql"],
   pg_inspect_ddl_view: codeModules["./template/pg_inspect_ddl_view.sql"],
   pg_inspect_ddl_function: codeModules["./template/pg_inspect_ddl_function.sql"],
-  pg_inspect_ddl_trigger: codeModules["./template/pg_inspect_ddl_trigger.sql"],
 };
