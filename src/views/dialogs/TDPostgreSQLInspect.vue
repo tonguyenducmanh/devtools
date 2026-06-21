@@ -87,7 +87,7 @@
               v-model="ddlContent"
               language="pgsql"
               :enableHighlight="true"
-              :wrapText="false"
+              :wrapText="true"
               :isLabelTop="false"
               :readOnly="true"
             />
@@ -262,6 +262,10 @@ export default {
 
         if (resp?.data?.success && result?.rows?.length > 0) {
           this.results = result.rows;
+          // Tự động chọn item đầu tiên khi có kết quả
+          this.$nextTick(() => {
+            this.selectItem(0);
+          });
         } else {
           this.searchError =
             resp?.data?.message ||
