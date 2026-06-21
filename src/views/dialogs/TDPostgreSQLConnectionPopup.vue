@@ -226,14 +226,14 @@ export default {
         this.$tdToast.warning("Vui lòng nhập chuỗi connection string trước.");
         return;
       }
-      if (!this.dotnetInitialized || !this._dotnetExports) {
+      if (!this.dotnetInitialized || !this.dotnetExports) {
         this.$tdToast.error("Hệ thống phân tích C# WASM chưa sẵn sàng.");
         return;
       }
 
       try {
         // Thực hiện lệnh convert từ C#
-        const jsonResult = this._dotnetExports.ConvertNpgSQLConnection(
+        const jsonResult = this.dotnetExports.ParseNpgSQLConnection(
           this.npgsqlInput.trim(),
         );
         const parsedObj = JSON.parse(jsonResult);

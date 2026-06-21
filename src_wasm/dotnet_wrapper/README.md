@@ -30,7 +30,7 @@ Sau khi build, import WASM module trong Vue component:
 khai báo trong data:
 
 dotnetInitialized: false,
-_dotnetExports: null,
+dotnetExports: null,
 
 trong mounted:
 
@@ -52,7 +52,7 @@ async initDotNetWasm() {
       .create();
 
     const exports = await getAssemblyExports("Tools.NetWrapper.dll");
-    this._dotnetExports = exports.TDTools.TDToolDotNetWrapper;
+    this.dotnetExports = exports.TDTools.TDToolDotNetWrapper;
     this.dotnetInitialized = true;
   } catch (error) {
     console.error("Failed to load C# WASM Wrapper:", error);
@@ -62,7 +62,7 @@ async initDotNetWasm() {
 ví dụ sử dụng
 
 // Thực hiện lệnh convert từ C#
-const jsonResult = this._dotnetExports.ConvertNpgSQLConnection(
+const jsonResult = this.dotnetExports.ParseNpgSQLConnection(
   this.textInput.trim(),
 );
 

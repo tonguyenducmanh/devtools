@@ -38,7 +38,7 @@ namespace TDTools
         /// <summary>
         /// port của kết nối
         /// </summary>
-        public int? port { get; set; }
+        public int port { get; set; }
 
         /// <summary>
         /// tên database
@@ -57,7 +57,7 @@ namespace TDTools
         /// </summary>
         /// <param name="source">connection string đã lưu bằng NpgSQL</param>
         [JSExport]
-        public static string ConvertNpgSQLConnection(string source)
+        public static string ParseNpgSQLConnection(string source)
         {
             string result = string.Empty;
 
@@ -78,9 +78,37 @@ namespace TDTools
                     database_name = npgParsedConnect.Database
                 };
 
-                // TRUYỀN TYPE AN TOÀN CHO TRIMMING/AOT Ở ĐÂY:
                 // Sử dụng AppJsonContext.Default.TDPosgreSQLCnonectionString đã được sinh code sẵn
                 result = JsonSerializer.Serialize(connectionConvert, TDToolPosgreSQlContextString.Default.TDPosgreSQLCnonectionString);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// đọc cấu hình connectionstring từ ngoài truyền vào rồi convert thành object NpgsqlConnectionStringBuilder
+        /// </summary>
+        /// <param name="source">connection string đã lưu bằng NpgSQL</param>
+        [JSExport]
+        public static string StringifyNpgSQLConnection(string source)
+        {
+            string result = string.Empty;
+
+            if (string.IsNullOrEmpty(source))
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+            TDPosgreSQLCnonectionString? parseConnect = JsonSerializer.Deserialize<TDPosgreSQLCnonectionString>(source, TDToolPosgreSQlContextString.Default.TDPosgreSQLCnonectionString);
+            if (parseConnect != null)
+            {
+                NpgsqlConnectionStringBuilder npgParsedConnect = new NpgsqlConnectionStringBuilder()
+                {
+                    Username = parseConnect.user_name,
+                    Password = parseConnect.password,
+                    Host = parseConnect.host,
+                    Port = parseConnect.port,
+                    Database = parseConnect.database_name
+                };
+                result = npgParsedConnect.ConnectionString;
             }
             return result;
         }

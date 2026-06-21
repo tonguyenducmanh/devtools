@@ -8,7 +8,7 @@ export default {
   data() {
     return {
       dotnetInitialized: false,
-      _dotnetExports: null,
+      dotnetExports: null,
     };
   },
   async mounted() {
@@ -41,10 +41,10 @@ export default {
           .create();
 
         const exports = await getAssemblyExports("Tools.NetWrapper.dll");
-        this._dotnetExports = exports.TDTools.TDToolDotNetWrapper;
+        this.dotnetExports = exports.TDTools.TDToolDotNetWrapper;
         // gắn vào global để tiện debug
         window.__tdAPI = window.__tdAPI ?? {};
-        window.__tdAPI._dotnetExports = this._dotnetExports;
+        window.__tdAPI.dotnetExports = this.dotnetExports;
         this.dotnetInitialized = true;
       } catch (error) {
         console.error("Failed to load C# WASM Wrapper:", error);
