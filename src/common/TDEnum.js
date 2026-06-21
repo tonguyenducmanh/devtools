@@ -127,6 +127,7 @@ class TDEnum {
   };
   PostreSQLConnectionImportType = {
     NpgSQLDotNet: 0,
+    PgxGo: 1,
   };
 }
 

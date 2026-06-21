@@ -764,6 +764,7 @@ export default {
     },
     postgreSQLQuery: {
       importNpgSQL: "NpgSql",
+      importPgxGo: "Pgx Go",
       connectionStringPlaceHolder: "Connection string",
       convert: "Chuyển đổi",
       sslMode: "Loại SSL",

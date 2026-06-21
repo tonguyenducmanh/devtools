@@ -40,7 +40,7 @@
         </div>
         <div class="flex-one">
           <TDInput
-            v-model="npgsqlInput"
+            v-model="connectionStringFromAnotherApp"
             :noMargin="true"
             :placeHolder="
               $t('i18nCommon.postgreSQLQuery.connectionStringPlaceHolder')
@@ -49,8 +49,8 @@
         </div>
         <TDButton
           :noMargin="true"
-          @click="handleConvertNpgsql"
-          :readOnly="!npgsqlInput"
+          @click="handleConvertConnectionStringFromAnotherApp"
+          :readOnly="!connectionStringFromAnotherApp"
           iconClass="td-send-icon"
           v-tooltip="$t('i18nCommon.postgreSQLQuery.convert')"
         />
@@ -163,11 +163,15 @@ export default {
 
       // Điều khiển loại Input dữ liệu đầu vào
       inputType: this.$tdEnum.PostreSQLConnectionImportType.NpgSQLDotNet,
-      npgsqlInput: "",
+      connectionStringFromAnotherApp: "",
       inputTypeOptions: [
         {
           value: this.$tdEnum.PostreSQLConnectionImportType.NpgSQLDotNet,
           label: this.$t("i18nCommon.postgreSQLQuery.importNpgSQL"),
+        },
+        {
+          value: this.$tdEnum.PostreSQLConnectionImportType.PgxGo,
+          label: this.$t("i18nCommon.postgreSQLQuery.importPgxGo"),
         },
       ],
 
@@ -218,8 +222,8 @@ export default {
     /**
      * Gọi hàm C# WASM để convert Npgsql connection string sang Object
      */
-    handleConvertNpgsql() {
-      if (!this.npgsqlInput.trim()) {
+    handleConvertConnectionStringFromAnotherApp() {
+      if (!this.connectionStringFromAnotherApp.trim()) {
         this.$tdToast.warning("Vui lòng nhập chuỗi connection string trước.");
         return;
       }
@@ -227,27 +231,36 @@ export default {
         this.$tdToast.error("Hệ thống phân tích C# WASM chưa sẵn sàng.");
         return;
       }
+      // convert NgSQL connect
+      if (
+        this.inputType ==
+        this.$tdEnum.PostreSQLConnectionImportType.NpgSQLDotNet
+      ) {
+        try {
+          // Thực hiện lệnh convert từ C#
+          const jsonResult = this.dotnetExports.ParseNpgSQLConnection(
+            this.connectionStringFromAnotherApp.trim(),
+          );
+          const parsedObj = JSON.parse(jsonResult);
 
-      try {
-        // Thực hiện lệnh convert từ C#
-        const jsonResult = this.dotnetExports.ParseNpgSQLConnection(
-          this.npgsqlInput.trim(),
-        );
-        const parsedObj = JSON.parse(jsonResult);
+          // Đổ ngược dữ liệu đã phân tích vào các trường input trên Form
+          this.connFields.host = parsedObj.host || "";
+          this.connFields.port = parsedObj.port ? String(parsedObj.port) : "";
+          this.connFields.username = parsedObj.user_name || "";
+          this.connFields.password = parsedObj.password || "";
+          this.connFields.database = parsedObj.database_name || "";
 
-        // Đổ ngược dữ liệu đã phân tích vào các trường input trên Form
-        this.connFields.host = parsedObj.host || "";
-        this.connFields.port = parsedObj.port ? String(parsedObj.port) : "";
-        this.connFields.username = parsedObj.user_name || "";
-        this.connFields.password = parsedObj.password || "";
-        this.connFields.database = parsedObj.database_name || "";
-
-        // Tái tạo lại chuỗi DSN chuẩn lưu vào form
-        this.buildConnectionString();
-        this.$tdToast.success("Chuyển đổi dữ liệu Npgsql thành công!");
-      } catch (e) {
-        console.error(e);
-        this.$tdToast.error("Chuỗi Npgsql không hợp lệ hoặc lỗi phân tích.");
+          // Tái tạo lại chuỗi DSN chuẩn lưu vào form
+          this.buildConnectionString();
+          this.$tdToast.success("Chuyển đổi dữ liệu Npgsql thành công!");
+        } catch (e) {
+          console.error(e);
+          this.$tdToast.error("Chuỗi Npgsql không hợp lệ hoặc lỗi phân tích.");
+        }
+      } else if (
+        this.inputType == this.$tdEnum.PostreSQLConnectionImportType.PgxGo
+      ) {
+        this.parseConnectionString(this.connectionStringFromAnotherApp);
       }
     },
 
@@ -256,7 +269,7 @@ export default {
      */
     show(param) {
       this.testResult = null;
-      this.npgsqlInput = "";
+      this.connectionStringFromAnotherApp = "";
       this.inputType = this.$tdEnum.PostreSQLConnectionImportType.NpgSQLDotNet;
 
       if (param && param.id) {
