@@ -13,6 +13,13 @@ class TDUtility {
     this.copyQueue = [];
     this.batchTimeout = null;
   }
+  /**
+   * lấy ra version hiện tại của app được cấu hình khi build
+   */
+  getAppVersion() {
+    const APP_VERSION = import.meta.env.PACKAGE_VERSION;
+    return APP_VERSION;
+  }
   isMacOS() {
     let OS = this.getOS();
     return OS === "mac";

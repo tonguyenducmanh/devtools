@@ -14,12 +14,16 @@ export default defineConfig({
         // Cấu hình copy folder dotnet sang dist/assets-wasm khi build
         {
           src: "src_wasm/pkg/dotnet/*",
-          dest: `assets-wasm`,
+          dest: `assets-wasm-${APP_VERSION}`,
           rename: { stripBase: true },
         },
       ],
     }),
   ],
+  define: {
+    // Định nghĩa một biến toàn cục chứa version
+    "import.meta.env.PACKAGE_VERSION": JSON.stringify(APP_VERSION),
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
