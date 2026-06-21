@@ -16,19 +16,19 @@ import { ref } from "vue";
  *
  *   <div
  *     v-for="(items, key) in menuConfig"
- *     :class="{ active: activeKey === key }"
+ *     :class="{ active: activeKeyFlyOut === key }"
  *     @mouseenter="open(key, $event)"
- *     @mouseleave="scheduleClose()"
+ *     @mouseleave="scheduleCloseFlyout()"
  *   >...</div>
  *
  *   <TDFlyoutPanel
- *     :show="!!activeKey"
- *     :anchor-el="anchorEl"
+ *     :show="!!activeKeyFlyOut"
+ *     :anchorElFlyout="anchorElFlyout"
  *     placement="bottom"
- *     @mouseenter="cancelClose"
- *     @mouseleave="scheduleClose"
+ *     @mouseenter="cancelCloseFlyOut"
+ *     @mouseleave="scheduleCloseFlyout"
  *   >
- *     ...nội dung menu con của menuConfig[activeKey]...
+ *     ...nội dung menu con của menuConfig[activeKeyFlyOut]...
  *   </TDFlyoutPanel>
  *
  * @param {Object} options
@@ -36,46 +36,46 @@ import { ref } from "vue";
  *   chuột "băng" từ trigger qua panel (panel nằm cách trigger vài px).
  */
 export function useFlyout({ hideDelay = 120 } = {}) {
-  const activeKey = ref(null);
-  const anchorEl = ref(null);
+  const activeKeyFlyOut = ref(null);
+  const anchorElFlyout = ref(null);
   let hideTimer = null;
 
   /** Mở flyout cho `key`, lấy `event.currentTarget` làm anchor để định vị. */
   function open(key, event) {
     clearTimeout(hideTimer);
-    anchorEl.value = event?.currentTarget ?? null;
-    activeKey.value = key;
+    anchorElFlyout.value = event?.currentTarget ?? null;
+    activeKeyFlyOut.value = key;
   }
 
-  /** Lên lịch đóng sau `delay`ms (có thể bị huỷ bởi cancelClose). */
-  function scheduleClose(delay = hideDelay) {
+  /** Lên lịch đóng sau `delay`ms (có thể bị huỷ bởi cancelCloseFlyOut). */
+  function scheduleCloseFlyout(delay = hideDelay) {
     clearTimeout(hideTimer);
     hideTimer = setTimeout(() => {
-      activeKey.value = null;
+      activeKeyFlyOut.value = null;
     }, delay);
   }
 
   /** Huỷ lịch đóng đang chờ (gọi khi chuột vào trigger hoặc vào panel). */
-  function cancelClose() {
+  function cancelCloseFlyOut() {
     clearTimeout(hideTimer);
   }
 
   /** Đóng ngay lập tức, ví dụ sau khi user click chọn 1 item trong flyout. */
   function close() {
     clearTimeout(hideTimer);
-    activeKey.value = null;
+    activeKeyFlyOut.value = null;
   }
 
   function isOpen(key) {
-    return activeKey.value === key;
+    return activeKeyFlyOut.value === key;
   }
 
   return {
-    activeKey,
-    anchorEl,
+    activeKeyFlyOut,
+    anchorElFlyout,
     open,
-    scheduleClose,
-    cancelClose,
+    scheduleCloseFlyout,
+    cancelCloseFlyOut,
     close,
     isOpen,
   };

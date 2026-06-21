@@ -22,13 +22,13 @@ const SIDES = ["top", "bottom", "left", "right"];
 export default {
   name: "TDFlyoutPanel",
   props: {
-    // Có hiển thị panel hay không (thường truyền `!!activeKey` từ useFlyout)
+    // Có hiển thị panel hay không (thường truyền `!!activeKeyFlyOut` từ useFlyout)
     show: {
       type: Boolean,
       default: false,
     },
-    // DOM element làm điểm neo để định vị (thường truyền `anchorEl` từ useFlyout)
-    anchorEl: {
+    // DOM element làm điểm neo để định vị (thường truyền `anchorElFlyout` từ useFlyout)
+    anchorElFlyout: {
       default: null,
     },
     // 'auto' sẽ tự chọn hướng còn nhiều chỗ trống nhất và đủ chỗ chứa panel
@@ -72,8 +72,8 @@ export default {
   watch: {
     // Trường hợp đổi sang anchor khác trong lúc panel ĐANG mở (vd: rê chuột
     // từ item này sang item kế bên mà không rời khỏi vùng menu) — `show`
-    // vẫn là true suốt nên phải lắng riêng anchorEl để định vị lại.
-    anchorEl(el) {
+    // vẫn là true suốt nên phải lắng riêng anchorElFlyout để định vị lại.
+    anchorElFlyout(el) {
       if (this.show && el) this._preparePosition();
     },
     show(val) {
@@ -103,7 +103,7 @@ export default {
     },
 
     position() {
-      const anchor = this.anchorEl;
+      const anchor = this.anchorElFlyout;
       const panel = this.$refs.panelEl;
       if (!anchor || !panel) return;
 

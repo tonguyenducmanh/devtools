@@ -10,9 +10,11 @@
           <div
             v-if="item.type === 'group'"
             class="td-sidebar-item"
-            :class="{ 'td-sidebar-item--active': activeKey === item.groupKey }"
+            :class="{
+              'td-sidebar-item--active': activeKeyFlyOut === item.groupKey,
+            }"
             @mouseenter="open(item.groupKey, $event)"
-            @mouseleave="scheduleClose()"
+            @mouseleave="scheduleCloseFlyout()"
           >
             <div
               class="flex no-select td-item-content"
@@ -48,12 +50,12 @@
 
     <!-- Flyout: mở sang phải (placement="right"), tự lật sang trái nếu sát mép phải màn hình -->
     <TDFlyoutPanel
-      :show="!!activeKey"
-      :anchor-el="anchorEl"
+      :show="!!activeKeyFlyOut"
+      :anchorElFlyout="anchorElFlyout"
       placement="right"
       panel-class="td-sidebar-group-flyout"
-      @mouseenter="cancelClose"
-      @mouseleave="scheduleClose()"
+      @mouseenter="cancelCloseFlyOut"
+      @mouseleave="scheduleCloseFlyout()"
     >
       <div
         v-for="child in activeChildren"
@@ -85,15 +87,21 @@ export default {
 
   setup() {
     const { openTab } = useTabManager();
-    const { activeKey, anchorEl, open, scheduleClose, cancelClose, close } =
-      useFlyout();
+    const {
+      activeKeyFlyOut,
+      anchorElFlyout,
+      open,
+      scheduleCloseFlyout,
+      cancelCloseFlyOut,
+      close,
+    } = useFlyout();
     return {
       openTab,
-      activeKey,
-      anchorEl,
+      activeKeyFlyOut,
+      anchorElFlyout,
       open,
-      scheduleClose,
-      cancelClose,
+      scheduleCloseFlyout,
+      cancelCloseFlyOut,
       close,
     };
   },
@@ -108,8 +116,9 @@ export default {
   computed: {
     activeItem() {
       return (
-        this.sidebarItems.find((item) => item.groupKey === this.activeKey) ??
-        null
+        this.sidebarItems.find(
+          (item) => item.groupKey === this.activeKeyFlyOut,
+        ) ?? null
       );
     },
     activeChildren() {

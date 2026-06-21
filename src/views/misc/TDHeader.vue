@@ -14,9 +14,9 @@
           v-for="(items, menuKey) in menuConfig"
           :key="menuKey"
           class="td-menu-item"
-          :class="{ 'td-menu-item--active': activeKey === menuKey }"
+          :class="{ 'td-menu-item--active': activeKeyFlyOut === menuKey }"
           @mouseenter="open(menuKey, $event)"
-          @mouseleave="scheduleClose()"
+          @mouseleave="scheduleCloseFlyout()"
         >
           <span>{{ $t(`i18nCommon.${menuKey}.title`) }}</span>
         </div>
@@ -25,12 +25,12 @@
 
     <!-- Flyout Menu: mở xuống dưới (placement="bottom") -->
     <TDFlyoutPanel
-      :show="!!activeKey"
-      :anchor-el="anchorEl"
+      :show="!!activeKeyFlyOut"
+      :anchorElFlyout="anchorElFlyout"
       placement="bottom"
       panel-class="td-header-flyout"
-      @mouseenter="cancelClose"
-      @mouseleave="scheduleClose()"
+      @mouseenter="cancelCloseFlyOut"
+      @mouseleave="scheduleCloseFlyout()"
     >
       <div
         v-for="item in currentMenuItems"
@@ -56,16 +56,22 @@ export default {
   components: { TDFlyoutPanel },
   setup() {
     const { openTab, exitTabMode } = useTabManager();
-    const { activeKey, anchorEl, open, scheduleClose, cancelClose, close } =
-      useFlyout();
+    const {
+      activeKeyFlyOut,
+      anchorElFlyout,
+      open,
+      scheduleCloseFlyout,
+      cancelCloseFlyOut,
+      close,
+    } = useFlyout();
     return {
       openTab,
       exitTabMode,
-      activeKey,
-      anchorEl,
+      activeKeyFlyOut,
+      anchorElFlyout,
       open,
-      scheduleClose,
-      cancelClose,
+      scheduleCloseFlyout,
+      cancelCloseFlyOut,
       close,
     };
   },
@@ -79,7 +85,7 @@ export default {
       return window.__env.appName;
     },
     currentMenuItems() {
-      return this.menuConfig[this.activeKey] ?? [];
+      return this.menuConfig[this.activeKeyFlyOut] ?? [];
     },
   },
   mounted() {
