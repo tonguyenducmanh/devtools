@@ -35,7 +35,8 @@ export default {
     shortKeyAction: {
       search: "Tìm kiếm tính năng",
       showCommandTextEditor: "Hiển thị lệnh text editor",
-      formatCodeTextEditor: "Định dạng code text editor",
+      formatCodeTextEditor: "Định dạng code",
+      executeSQLCode: "Run SQL code",
     },
     footerHelp:
       "Chọn vào số dòng để copy cả dòng, chọn vào 1 cell cụ thể để copy 1 cell",

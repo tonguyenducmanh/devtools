@@ -35,7 +35,8 @@ export default {
     shortKeyAction: {
       search: "Search feature",
       showCommandTextEditor: "Show command text editor",
-      formatCodeTextEditor: "Format code in text editor",
+      formatCodeTextEditor: "Format code",
+      executeSQLCode: "Run SQL code",
     },
     footerHelp:
       "Select the row number to copy the entire row, select a specific cell to copy a single cell.",

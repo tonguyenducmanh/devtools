@@ -596,22 +596,20 @@ export default {
       return me.queryResults && me.queryResults.length > 1;
     },
     monacoOptions() {
+      let me = this;
       return {
         onInit: (editor, monacoInstance) => {
           // Đăng ký tổ hợp phím Ctrl + U (hoặc Cmd + U trên Mac) trực tiếp vào Monaco
           editor.addCommand(
             monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyU,
             () => {
-              // 1. Lấy trực tiếp nội dung mới nhất đang nằm trong Monaco Editor
-              const currentText = editor.getValue();
-
-              // 2. Gán thẳng nội dung này vào biến sqlText của Vue (thay thế cho việc đợi sự kiện blur)
-              this.sqlText = currentText;
-
-              // 3. Sử dụng $nextTick để chắc chắn Vue đã nhận giá trị mới trước khi gọi hàm format
-              this.$nextTick(() => {
-                this.handleFormatSQL();
-              });
+              me.endEditFromEditor(editor, this.handleFormatSQL);
+            },
+          );
+          editor.addCommand(
+            monacoInstance.KeyMod.Alt | monacoInstance.KeyCode.Enter,
+            () => {
+              me.endEditFromEditor(editor, this.handleRunQuery);
             },
           );
         },
@@ -1740,6 +1738,10 @@ export default {
         "formatCodePostgreSQL",
         me.getConfigFormatCode(),
       );
+      TDShortcutAction.register(
+        "executePosgreSQLCode",
+        me.getConfigExecuteSQLCode(),
+      );
     },
 
     /**
@@ -1752,16 +1754,46 @@ export default {
         TDShortcutActionEnum.FormatCodeTextEditor,
       );
       TDShortcutAction.unregister("formatCodePostgreSQL");
+      TDShortcutAction.unregister("executePosgreSQLCode");
     },
     getConfigFormatCode() {
       let me = this;
-      let configFormat = {
+      let configKeyboard = {
         sortOrder: 3,
         key: me.$tdUtility.newGuid(),
         presentKey: ["Ctrl", "u"],
         labelKey: "i18nCommon.shortKeyAction.formatCodeTextEditor",
       };
-      return configFormat;
+      return configKeyboard;
+    },
+    getConfigExecuteSQLCode() {
+      let me = this;
+      let isMacOS = me.$tdUtility.isMacOS();
+      let configKeyboard = {
+        sortOrder: 4,
+        key: me.$tdUtility.newGuid(),
+        presentKey: isMacOS ? ["Option", "return"] : ["Alt", "enter"],
+        labelKey: "i18nCommon.shortKeyAction.executeSQLCode",
+      };
+      return configKeyboard;
+    },
+    /**
+     * kết thúc việc edit từ event bên trong editor
+     * @param editor
+     */
+    endEditFromEditor(editor, callback) {
+      let me = this;
+      // 1. Lấy trực tiếp nội dung mới nhất đang nằm trong Monaco Editor
+      let currentText = editor.getValue();
+
+      // 2. Gán thẳng nội dung này vào biến sqlText của Vue (thay thế cho việc đợi sự kiện blur)
+      me.sqlText = currentText;
+      // 3. Sử dụng $nextTick để chắc chắn Vue đã nhận giá trị mới trước khi gọi hàm format
+      this.$nextTick(() => {
+        if (callback && typeof callback == "function") {
+          callback();
+        }
+      });
     },
     /**
      * Mở danh sách code mẫu ra để xem
