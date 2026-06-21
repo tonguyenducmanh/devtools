@@ -768,6 +768,12 @@ export default {
       days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     },
     postgreSQLQuery: {
+      export: "Export",
+      codeComplete: "Code Completion",
+      help: "Help",
+      explore: "Explore",
+      edit: "Edit",
+      reloadDatabase: "Reload databases",
       importNpgSQL: "NpgSql",
       importPgxGo: "Pgx Go",
       connectionStringPlaceHolder: "Connection string",

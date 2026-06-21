@@ -1,6 +1,38 @@
 <template>
   <div class="flex td-pg-query-container">
     <div class="flex flex-col td-pg-query-main">
+      <div class="flex flex-start td-tool-header-menu-group">
+        <div
+          v-for="(items, menuKey) in menuConfig"
+          :key="menuKey"
+          class="td-menu-item"
+          :class="{ 'td-menu-item--active': activeKeyFlyOut === menuKey }"
+          @mouseenter="openFlyout(menuKey, $event)"
+          @mouseleave="scheduleCloseFlyout()"
+        >
+          <span>{{ $t(`i18nCommon.postgreSQLQuery.${menuKey}`) }}</span>
+        </div>
+        <TDFlyoutPanel
+          :show="!!activeKeyFlyOut"
+          :anchorElFlyout="anchorElFlyout"
+          placement="bottom"
+          panel-class="td-query-action-flyout"
+          @mouseenter="cancelCloseFlyOut"
+          @mouseleave="scheduleCloseFlyout()"
+        >
+          <div
+            v-for="action in currentMenuItems"
+            :key="action.key"
+            class="td-flyout-item"
+            :class="{ 'td-toolbar-btn-disabled': action.disabled }"
+            v-tooltip="action.tooltip"
+            @click="onActionClick(action)"
+          >
+            <span class="td-icon" :class="action.iconClass"></span>
+            <span>{{ action.label }}</span>
+          </div>
+        </TDFlyoutPanel>
+      </div>
       <div
         class="flex flex-one td-pg-query-editor"
         :style="editorSectionSizeStyle"
@@ -19,67 +51,13 @@
           :monacoOptions="monacoOptions"
           @keydown.ctrl.enter.prevent="handleRunQuery"
           @keydown.meta.enter.prevent="handleRunQuery"
-        />
-        <div class="flex flex-col td-query-btn-group">
-          <TDButton
-            :noMargin="true"
-            @click="handleRunQuery"
-            :readOnly="!selectedConnectionId || isRunning"
-            iconClass="td-send-icon"
-            v-tooltip="$t('i18nCommon.postgreSQLQuery.runQuery')"
-          />
-          <TDButton
-            :noMargin="true"
-            :type="$tdEnum.buttonType.secondary"
-            @click="handleFormatSQL"
-            iconClass="td-format-icon"
-            v-tooltip="$t('i18nCommon.postgreSQLQuery.formatCode')"
-          />
-          <TDButton
-            :noMargin="true"
-            @click="handleDownloadReponse"
-            :type="$tdEnum.buttonType.secondary"
-            :readOnly="!canExportActiveResult"
-            iconClass="td-download-icon"
-            v-tooltip="$t('i18nCommon.apiTesting.downloadReponse')"
-          />
-          <TDButton
-            :readOnly="!canExportActiveResult"
-            :noMargin="true"
-            :type="$tdEnum.buttonType.secondary"
-            @click="handleCopyResult"
-            iconClass="td-copy-icon"
-            v-tooltip="$t('i18nCommon.copy')"
-          />
-          <TDButton
-            :noMargin="true"
-            :type="$tdEnum.buttonType.secondary"
-            @click="handleTestConnection"
-            :readOnly="!selectedConnectionId || isRunning"
-            iconClass="td-test-icon"
-            v-tooltip="$t('i18nCommon.apiTesting.testConnection')"
-          />
-          <TDButton
-            :noMargin="true"
-            :type="$tdEnum.buttonType.secondary"
-            @click="handleLoadIntellisense"
-            :readOnly="!selectedConnectionId || isLoadingIntellisense"
-            iconClass="td-example-icon"
-            v-tooltip="
-              isLoadingIntellisense
-                ? $t('i18nCommon.postgreSQLQuery.intellisenseLoading')
-                : $t('i18nCommon.postgreSQLQuery.loadIntellisense')
-            "
-          />
-          <TDButton
-            :noMargin="true"
-            :type="$tdEnum.buttonType.secondary"
-            @click="handleOpenInspect"
-            :readOnly="!selectedConnectionId"
-            iconClass="td-search-icon"
-            v-tooltip="$t('i18nCommon.postgreSQLQuery.dbInspect.title')"
-          />
-        </div>
+        >
+          <template #actions>
+            <div class="flex send-btn" @click="handleRunQuery">
+              <span>{{ $t("i18nCommon.postgreSQLQuery.runQuery") }}</span>
+            </div>
+          </template>
+        </TDTextarea>
       </div>
 
       <TDResizer :direction="'vertical'" @resize="handleResize" />
@@ -432,6 +410,8 @@ import TDShortcutAction, {
 import TDDatabaseConnectionMixin from "@/mixins/TDDatabaseConnectionMixin.js";
 import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";
 import TDDotNetWasmMixin from "@/mixins/TDDotNetWasmMixin.js";
+import TDFlyoutPanel from "@/components/TDFlyoutPanel.vue";
+import { useFlyout } from "@/common/plugin/TDUseFlyout.js";
 
 export default {
   extends: TDToolBase,
@@ -442,6 +422,11 @@ export default {
     TDArrow,
     TDPostgreSQLQueryHelp,
     TDDynamicBackgroundEffect,
+    TDFlyoutPanel,
+  },
+
+  setup() {
+    return { ...useFlyout() };
   },
 
   data() {
@@ -497,6 +482,7 @@ export default {
   async mounted() {
     this.agentAPI = new TDServerPostgreSQLAPI();
     await this.loadAllData();
+    let me = this;
   },
 
   beforeUnmount() {
@@ -507,6 +493,115 @@ export default {
   },
 
   computed: {
+    menuConfig() {
+      let me = this;
+      return {
+        codeComplete: [
+          {
+            key: "loadIntellisense",
+            iconClass: "td-example-icon",
+            label: me.isLoadingIntellisense
+              ? me.$t("i18nCommon.postgreSQLQuery.intellisenseLoading")
+              : me.$t("i18nCommon.postgreSQLQuery.loadIntellisense"),
+            tooltip: me.isLoadingIntellisense
+              ? me.$t("i18nCommon.postgreSQLQuery.intellisenseLoading")
+              : me.$t("i18nCommon.postgreSQLQuery.loadIntellisense"),
+            disabled: !me.selectedConnectionId || me.isLoadingIntellisense,
+            run: me.handleLoadIntellisense,
+          },
+        ],
+        edit: [
+          {
+            key: "formatSQL",
+            iconClass: "td-format-icon",
+            label: me.$t("i18nCommon.postgreSQLQuery.formatCode"),
+            tooltip: me.$t("i18nCommon.postgreSQLQuery.formatCode"),
+            disabled: false,
+            run: me.handleFormatSQL,
+          },
+          {
+            key: "saveQuery",
+            iconClass: "td-save-icon",
+            label: me.$t("i18nCommon.postgreSQLQuery.saveQuery"),
+            tooltip: me.$t("i18nCommon.postgreSQLQuery.saveQuery"),
+            disabled: false,
+            run: me.saveCurrentQuery,
+          },
+          {
+            key: "addConnection",
+            iconClass: "td-plus-icon",
+            label: me.$t("i18nCommon.postgreSQLQuery.addConnection"),
+            tooltip: me.$t("i18nCommon.postgreSQLQuery.addConnection"),
+            disabled: false,
+            run: me.openAddConnectionPopup,
+          },
+        ],
+        export: [
+          {
+            key: "downloadResponse",
+            iconClass: "td-download-icon",
+            label: me.$t("i18nCommon.apiTesting.downloadReponse"),
+            tooltip: me.$t("i18nCommon.apiTesting.downloadReponse"),
+            disabled: !me.canExportActiveResult,
+            run: me.handleDownloadReponse,
+          },
+          {
+            key: "copyResult",
+            iconClass: "td-copy-icon",
+            label: me.$t("i18nCommon.copy"),
+            tooltip: me.$t("i18nCommon.copy"),
+            disabled: !me.canExportActiveResult,
+            run: me.handleCopyResult,
+          },
+        ],
+        explore: [
+          {
+            key: "runQuery",
+            iconClass: "td-send-icon",
+            label: me.$t("i18nCommon.postgreSQLQuery.runQuery"),
+            tooltip: me.$t("i18nCommon.postgreSQLQuery.runQuery"),
+            disabled: !me.selectedConnectionId || me.isRunning,
+            run: me.handleRunQuery,
+          },
+          {
+            key: "formatSQL",
+            iconClass: "td-format-icon",
+            label: me.$t("i18nCommon.postgreSQLQuery.formatCode"),
+            tooltip: me.$t("i18nCommon.postgreSQLQuery.formatCode"),
+            disabled: false,
+            run: me.handleFormatSQL,
+          },
+          {
+            key: "openInspect",
+            iconClass: "td-search-icon",
+            label: me.$t("i18nCommon.postgreSQLQuery.dbInspect.title"),
+            tooltip: me.$t("i18nCommon.postgreSQLQuery.dbInspect.title"),
+            disabled: !me.selectedConnectionId,
+            run: me.handleOpenInspect,
+          },
+        ],
+        help: [
+          {
+            key: "testConnection",
+            iconClass: "td-test-icon",
+            label: me.$t("i18nCommon.apiTesting.testConnection"),
+            tooltip: me.$t("i18nCommon.apiTesting.testConnection"),
+            disabled: !me.selectedConnectionId || me.isRunning,
+            run: me.handleTestConnection,
+          },
+          {
+            key: "reloadDatabase",
+            iconClass: "td-reload-icon",
+            label: me.$t("i18nCommon.postgreSQLQuery.reloadDatabase"),
+            tooltip: me.$t("i18nCommon.postgreSQLQuery.reloadDatabase"),
+            run: me.loadAllData,
+          },
+        ],
+      };
+    },
+    currentMenuItems() {
+      return this.menuConfig[this.activeKeyFlyOut] ?? [];
+    },
     /**
      * kiểm tra xem có phải có nhiều reuslt trả về không
      */
@@ -663,6 +758,16 @@ export default {
   },
 
   methods: {
+    /**
+     * Xử lý khi click 1 item trong flyout action: bỏ qua nếu đang disabled,
+     * chạy action tương ứng rồi đóng flyout lại.
+     */
+    onActionClick(action) {
+      if (action.disabled) return;
+      action.run();
+      this.closeFlyout();
+    },
+
     handleResize(sizes) {
       this.editorSectionSize = sizes.leftSize;
       this.resultSectionSize = sizes.rightSize;
@@ -997,7 +1102,6 @@ export default {
       if (queryResultText) {
         try {
           me.$tdUtility.copyToClipboard(queryResultText);
-          me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
         } catch {
           me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
         }
@@ -1701,22 +1805,11 @@ export default {
   gap: var(--padding);
 }
 
-.td-query-btn-group {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: var(--padding);
-  overflow-y: auto;
-  overflow-x: hidden;
-  flex-shrink: 0;
-}
-
 .td-pg-query-editor {
   min-height: 0;
   width: 100%;
   gap: var(--padding);
+  position: relative;
 }
 
 .td-pg-query-result {
@@ -1984,5 +2077,15 @@ export default {
 }
 .td-collection-rename {
   width: 100%;
+}
+
+.td-tool-header-menu-group {
+  width: 100%;
+  align-items: center;
+  justify-self: flex-start;
+}
+.send-btn {
+  cursor: pointer;
+  gap: var(--padding);
 }
 </style>

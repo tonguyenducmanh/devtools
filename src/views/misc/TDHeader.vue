@@ -244,24 +244,5 @@ export default {
     align-items: center;
     gap: var(--padding);
   }
-
-  .td-menu-item {
-    display: flex;
-    align-items: center;
-    padding: 4px 10px;
-    border-radius: var(--border-radius-component);
-    cursor: pointer;
-    font-size: var(--font-size-medium-rare);
-    color: var(--text-color);
-    transition: background-color 0.15s ease;
-
-    &:hover {
-      background-color: var(--bg-layer-color);
-    }
-
-    &--active {
-      background-color: var(--bg-layer-color);
-    }
-  }
 }
 </style>

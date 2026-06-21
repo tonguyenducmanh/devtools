@@ -765,6 +765,12 @@ export default {
       days: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
     },
     postgreSQLQuery: {
+      export: "Xuất khẩu",
+      codeComplete: "Code Completion",
+      help: "Trợ giúp",
+      explore: "Khám phá",
+      edit: "Sửa",
+      reloadDatabase: "Tải lại danh sách database",
       importNpgSQL: "NpgSql",
       importPgxGo: "Pgx Go",
       connectionStringPlaceHolder: "Connection string",
