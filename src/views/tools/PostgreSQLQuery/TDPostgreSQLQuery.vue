@@ -1361,16 +1361,10 @@ export default {
         });
 
         // ── Functions ─────────────────────────────────────────────────────────
-        /**
-         * Parse chuỗi arguments của pg_get_function_arguments thành mảng
-         * [{name, type}], ví dụ: "p_id uuid, p_name character varying"
-         */
         function parseFunctionArgs(argsStr) {
           if (!argsStr || !argsStr.trim()) return [];
           return argsStr.split(",").map((segment) => {
             const parts = segment.trim().split(/\s+/);
-            // format: [DEFAULT] [name] type ...  hoặc  type (anonymous)
-            // pg luôn đặt tên trước type khi có tên
             const name = parts.length >= 2 ? parts[0] : null;
             const type =
               parts.length >= 2 ? parts.slice(1).join(" ") : parts[0];
@@ -1378,12 +1372,6 @@ export default {
           });
         }
 
-        /**
-         * Tạo snippet text cho một function:
-        /**
-         * Build snippet chỉ chứa tên hàm + params (dùng khi prefix schema đã gõ rồi, ví dụ: td.|)
-         * Kết quả: fn_name(\n  p1 => ${1:'value'}::type\n)
-         */
         function buildFunctionCallSnippet(fnName, argsStr) {
           const args = parseFunctionArgs(argsStr);
           if (args.length === 0) {
@@ -1400,10 +1388,6 @@ export default {
           return `${fnName}(\n` + paramLines.join(",\n") + `\n)`;
         }
 
-        /**
-         * Build snippet kèm schema prefix (dùng khi user gõ chạy không có dấu chấm)
-         * Kết quả: schema.fn_name(\n  p1 => ${1:'value'}::type\n)
-         */
         function buildFunctionCallSnippetWithSchema(schema, fnName, argsStr) {
           const args = parseFunctionArgs(argsStr);
           if (args.length === 0) {
@@ -1421,9 +1405,7 @@ export default {
         }
 
         const functionRows = data?.functions?.rows ?? [];
-        // functionSuggestions: dùng khi gõ không có chấm (label = fn_name, snippet kèm schema)
         const functionSuggestions = [];
-        // functionsBySchema: dùng khi gõ schema. (chỉ chèn fn_name + params)
         const functionsBySchema = new Map();
 
         functionRows.forEach((row) => {
@@ -1439,28 +1421,28 @@ export default {
             `Returns: \`${returnType}\``,
           ].join("\n");
 
-          // Lưu vào map theo schema — snippet chỉ có fn_name(params) (schema đã gõ rồi)
+          const pureSnippet = buildFunctionCallSnippet(fnName, argsStr);
+          const fullSnippet = buildFunctionCallSnippetWithSchema(
+            schema,
+            fnName,
+            argsStr,
+          );
+
           if (!functionsBySchema.has(schema)) functionsBySchema.set(schema, []);
           functionsBySchema.get(schema).push({
             label: fnName,
             kind: monaco.languages.CompletionItemKind.Function,
-            insertText: buildFunctionCallSnippet(fnName, argsStr),
-            insertTextRules:
-              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            pureInsertText: pureSnippet,
+            fullInsertText: fullSnippet,
             detail: `fn ${schema}.${fnName}(${argsStr}) \u2192 ${returnType}`,
             documentation: { value: docValue, isTrusted: true },
             sortText: "0" + fnName,
           });
 
-          // Suggestion khi gõ chạy (không có dấu chấm) — label = fn_name, snippet kèm schema
           functionSuggestions.push({
             label: fnName,
             kind: monaco.languages.CompletionItemKind.Function,
-            insertText: buildFunctionCallSnippetWithSchema(
-              schema,
-              fnName,
-              argsStr,
-            ),
+            insertText: fullSnippet,
             insertTextRules:
               monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             detail: `fn ${schema}.${fnName}(${argsStr}) \u2192 ${returnType}`,
@@ -1476,7 +1458,9 @@ export default {
             triggerCharacters: ["."],
             provideCompletionItems(model, position) {
               const word = model.getWordUntilPosition(position);
-              const range = {
+
+              // Mặc định ban đầu
+              let range = {
                 startLineNumber: position.lineNumber,
                 endLineNumber: position.lineNumber,
                 startColumn: word.startColumn,
@@ -1486,7 +1470,6 @@ export default {
               const text = model.getValue();
               const aliasMap = new Map();
 
-              // regex để parse alias từ FROM/JOIN
               const regex =
                 /(?:from|join)\s+([a-zA-Z0-9_]+)(?:\.([a-zA-Z0-9_]+))?(?:\s+as)?\s+([a-zA-Z0-9_]+)?/gi;
               let match;
@@ -1535,18 +1518,30 @@ export default {
                 aliasMap.set(alias, { schema, table });
               }
 
-              // Kiểm tra xem user có gõ dấu chấm không
               const lineContent = model.getLineContent(position.lineNumber);
               const textBeforePointer = lineContent.substring(
                 0,
                 position.column - 1,
               );
-              const dotMatch = textBeforePointer.match(/([a-zA-Z0-9_]+)\.$/);
+
+              // Regex bóc tách chính xác tên_schema và cụm text đang gõ dở phía sau dấu chấm
+              const dotMatch = textBeforePointer.match(
+                /([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]*)$/,
+              );
 
               let suggestions = [];
 
               if (dotMatch) {
-                const prefix = dotMatch[1].toLowerCase();
+                const prefix = dotMatch[1].toLowerCase(); // Ví dụ: "td"
+                const typedWord = dotMatch[2]; // Phần chữ đã gõ sau dấu chấm, ví dụ: "fn_cre" hoặc rỗng ""
+
+                const totalOffset = prefix.length + 1 + typedWord.length;
+                range = {
+                  startLineNumber: position.lineNumber,
+                  endLineNumber: position.lineNumber,
+                  startColumn: position.column - totalOffset,
+                  endColumn: position.column,
+                };
 
                 // 1. Prefix là alias -> gợi ý cột
                 if (aliasMap.has(prefix)) {
@@ -1554,15 +1549,28 @@ export default {
                   let key = mapped.schema
                     ? `${mapped.schema}.${mapped.table}`
                     : mapped.table;
-                  if (columnsByTable.has(key)) {
-                    suggestions.push(...columnsByTable.get(key));
-                  } else if (columnsByTable.has(mapped.table)) {
-                    suggestions.push(...columnsByTable.get(mapped.table));
-                  }
+                  let cols =
+                    columnsByTable.get(key) ||
+                    columnsByTable.get(mapped.table) ||
+                    [];
+                  cols.forEach((c) => {
+                    suggestions.push({
+                      ...c,
+                      filterText: `${prefix}.${c.label}`, // Đặt filter khớp với text trên editor
+                      insertText: `${prefix}.${c.insertText}`,
+                    });
+                  });
                 }
                 // 2. Prefix là tên bảng -> gợi ý cột
                 else if (columnsByTable.has(prefix)) {
-                  suggestions.push(...columnsByTable.get(prefix));
+                  let cols = columnsByTable.get(prefix) || [];
+                  cols.forEach((c) => {
+                    suggestions.push({
+                      ...c,
+                      filterText: `${prefix}.${c.label}`,
+                      insertText: `${prefix}.${c.insertText}`,
+                    });
+                  });
                 }
                 // 3. Prefix là tên schema -> gợi ý bảng + functions
                 else if (
@@ -1574,13 +1582,23 @@ export default {
                     suggestions.push({
                       label: tbl,
                       kind: monaco.languages.CompletionItemKind.Module,
-                      insertText: tbl,
+                      filterText: `${prefix}.${tbl}`,
+                      insertText: `${prefix}.${tbl}`,
                       detail: `Table (${prefix})`,
                     });
                   });
-                  // Functions — snippet chỉ chèn fn_name(params) vì schema đã gõ rồi
+
+                  // Functions
                   (functionsBySchema.get(prefix) ?? []).forEach((fnItem) => {
-                    suggestions.push(fnItem);
+                    suggestions.push({
+                      ...fnItem,
+                      // QUAN TRỌNG: filterText phải bao gồm cả schema prefix để Monaco so khớp được chuỗi "td.fn_create_user"
+                      filterText: `${prefix}.${fnItem.label}`,
+                      insertText: fnItem.fullInsertText, // Thay thế trọn gói bằng snippet kèm schema
+                      insertTextRules:
+                        monaco.languages.CompletionItemInsertTextRule
+                          .InsertAsSnippet,
+                    });
                   });
                 }
               } else {
@@ -1605,10 +1623,8 @@ export default {
                   });
                 });
 
-                // Functions (với snippet)
                 suggestions.push(...functionSuggestions);
 
-                // Ưu tiên cột từ các bảng đã được parse trong FROM
                 if (aliasMap.size > 0) {
                   aliasMap.forEach((mapped) => {
                     let key = mapped.schema
@@ -1621,27 +1637,25 @@ export default {
                     cols.forEach((c) => {
                       suggestions.push({
                         ...c,
-                        sortText: "0" + c.label, // sortText 0 giúp đưa lên đầu tiên
+                        sortText: "0" + c.label,
                       });
                     });
                   });
                 } else if (word.word && word.word.length > 1) {
-                  // Chỉ push all columns nếu user đang gõ (tránh làm lag)
                   suggestions.push(...allColumns);
                 }
               }
 
-              // Deduplicate
+              // Khử trùng lặp danh sách gợi ý
               const uniqueMap = new Map();
               suggestions.forEach((s) => {
-                uniqueMap.set(s.label + s.kind, s);
+                uniqueMap.set(s.label + s.kind + s.insertText, s);
               });
 
               const finalSuggestions = Array.from(uniqueMap.values()).map(
                 (s) => ({
                   ...s,
                   range,
-                  // Giữ insertTextRules nếu có (snippet)
                   ...(s.insertTextRules != null
                     ? { insertTextRules: s.insertTextRules }
                     : {}),
@@ -1660,7 +1674,6 @@ export default {
         console.error("applyMonacoIntellisense error:", error);
       }
     },
-
     async saveCurrentQuery() {
       let me = this;
       if (!me.sqlText?.trim()) {
