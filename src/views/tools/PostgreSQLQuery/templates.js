@@ -10,4 +10,7 @@ export default {
   pg_get_tables_count: codeModules["./template/pg_get_tables_count.sql"],
   pg_get_tables_paging: codeModules["./template/pg_get_tables_paging.sql"],
   pg_test_connection: codeModules["./template/pg_test_connection.sql"],
+  pg_get_functions_count: codeModules["./template/pg_get_functions_count.sql"],
+  pg_get_functions_paging: codeModules["./template/pg_get_functions_paging.sql"],
 };
+

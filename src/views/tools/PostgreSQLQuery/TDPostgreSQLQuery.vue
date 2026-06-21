@@ -1087,9 +1087,68 @@ export default {
           ? keywordResult
           : null;
 
+        // Load functions (count → paging, giống như load bảng)
+        let allFunctionRows = [];
+        try {
+          let funcCountResponse = await me.agentAPI.executeQuery(
+            me.selectedConnectionId,
+            pgQueries.pg_get_functions_count,
+          );
+
+          let totalFuncRows = 0;
+          const funcCountResult =
+            funcCountResponse?.data?.data?.results?.[0] ||
+            funcCountResponse?.data?.data ||
+            null;
+
+          if (
+            funcCountResponse?.data?.success &&
+            funcCountResult?.rows?.length > 0
+          ) {
+            totalFuncRows = parseInt(funcCountResult.rows[0].total || 0, 10);
+          }
+
+          for (let offset = 0; offset < totalFuncRows; offset += pageSize) {
+            let funcPagingQuery = `${pgQueries.pg_get_functions_paging} LIMIT ${pageSize} OFFSET ${offset};`;
+
+            let funcPagingResponse = await me.agentAPI.executeQuery(
+              me.selectedConnectionId,
+              funcPagingQuery,
+            );
+
+            const funcPagingResult =
+              funcPagingResponse?.data?.data?.results?.[0] ||
+              funcPagingResponse?.data?.data ||
+              null;
+
+            if (funcPagingResponse?.data?.success && funcPagingResult?.rows) {
+              allFunctionRows.push(...funcPagingResult.rows);
+            } else {
+              console.error(
+                `Gặp lỗi khi tải functions tại vị trí dòng (offset): ${offset}`,
+              );
+              break;
+            }
+          }
+        } catch (e) {
+          console.warn("Load functions intellisense warning:", e);
+        }
+
+        // Đóng gói lại đúng cấu trúc để cấp phát cho Monaco Editor
+        let functionsResult = {
+          columns: [
+            "function_schema",
+            "function_name",
+            "function_arguments",
+            "return_type",
+          ],
+          rows: allFunctionRows,
+        };
+
         let intellisenseData = {
           keywords: keywordsResult,
           tables: tablesResult,
+          functions: functionsResult,
         };
 
         // Lưu vào IndexedDB và áp dụng Intellisense
@@ -1189,6 +1248,110 @@ export default {
           allColumns.push(colDef);
         });
 
+        // ── Functions ─────────────────────────────────────────────────────────
+        /**
+         * Parse chuỗi arguments của pg_get_function_arguments thành mảng
+         * [{name, type}], ví dụ: "p_id uuid, p_name character varying"
+         */
+        function parseFunctionArgs(argsStr) {
+          if (!argsStr || !argsStr.trim()) return [];
+          return argsStr.split(",").map((segment) => {
+            const parts = segment.trim().split(/\s+/);
+            // format: [DEFAULT] [name] type ...  hoặc  type (anonymous)
+            // pg luôn đặt tên trước type khi có tên
+            const name = parts.length >= 2 ? parts[0] : null;
+            const type = parts.length >= 2 ? parts.slice(1).join(" ") : parts[0];
+            return { name: name || null, type: type || "" };
+          });
+        }
+
+        /**
+         * Tạo snippet text cho một function:
+        /**
+         * Build snippet chỉ chứa tên hàm + params (dùng khi prefix schema đã gõ rồi, ví dụ: td.|)
+         * Kết quả: fn_name(\n  p1 => ${1:'value'}::type\n)
+         */
+        function buildFunctionCallSnippet(fnName, argsStr) {
+          const args = parseFunctionArgs(argsStr);
+          if (args.length === 0) {
+            return `${fnName}()`;
+          }
+          let tabStop = 1;
+          const paramLines = args.map((arg) => {
+            const ts = tabStop++;
+            if (arg.name) {
+              return `  ${arg.name} => \${${ts}:'value'}::${arg.type}`;
+            }
+            return `  \${${ts}:'value'}::${arg.type}`;
+          });
+          return `${fnName}(\n` + paramLines.join(",\n") + `\n)`;
+        }
+
+        /**
+         * Build snippet kèm schema prefix (dùng khi user gõ chạy không có dấu chấm)
+         * Kết quả: schema.fn_name(\n  p1 => ${1:'value'}::type\n)
+         */
+        function buildFunctionCallSnippetWithSchema(schema, fnName, argsStr) {
+          const args = parseFunctionArgs(argsStr);
+          if (args.length === 0) {
+            return `${schema}.${fnName}()`;
+          }
+          let tabStop = 1;
+          const paramLines = args.map((arg) => {
+            const ts = tabStop++;
+            if (arg.name) {
+              return `  ${arg.name} => \${${ts}:'value'}::${arg.type}`;
+            }
+            return `  \${${ts}:'value'}::${arg.type}`;
+          });
+          return `${schema}.${fnName}(\n` + paramLines.join(",\n") + `\n)`;
+        }
+
+        const functionRows = data?.functions?.rows ?? [];
+        // functionSuggestions: dùng khi gõ không có chấm (label = fn_name, snippet kèm schema)
+        const functionSuggestions = [];
+        // functionsBySchema: dùng khi gõ schema. (chỉ chèn fn_name + params)
+        const functionsBySchema = new Map();
+
+        functionRows.forEach((row) => {
+          const schema = row.function_schema;
+          const fnName = row.function_name;
+          const argsStr = row.function_arguments || "";
+          const returnType = row.return_type || "";
+
+          const docValue = [
+            `**${schema}.${fnName}**`,
+            ``,
+            `Arguments: \`${argsStr || "(none)"}\``,
+            `Returns: \`${returnType}\``,
+          ].join("\n");
+
+          // Lưu vào map theo schema — snippet chỉ có fn_name(params) (schema đã gõ rồi)
+          if (!functionsBySchema.has(schema)) functionsBySchema.set(schema, []);
+          functionsBySchema.get(schema).push({
+            label: fnName,
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: buildFunctionCallSnippet(fnName, argsStr),
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            detail: `fn ${schema}.${fnName}(${argsStr}) \u2192 ${returnType}`,
+            documentation: { value: docValue, isTrusted: true },
+            sortText: "0" + fnName,
+          });
+
+          // Suggestion khi gõ chạy (không có dấu chấm) — label = fn_name, snippet kèm schema
+          functionSuggestions.push({
+            label: fnName,
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: buildFunctionCallSnippetWithSchema(schema, fnName, argsStr),
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            detail: `fn ${schema}.${fnName}(${argsStr}) \u2192 ${returnType}`,
+            documentation: { value: docValue, isTrusted: true },
+            sortText: "1" + fnName,
+          });
+        });
+
         // Đăng ký completion provider
         const disposable = monaco.languages.registerCompletionItemProvider(
           "pgsql",
@@ -1284,15 +1447,20 @@ export default {
                 else if (columnsByTable.has(prefix)) {
                   suggestions.push(...columnsByTable.get(prefix));
                 }
-                // 3. Prefix là tên schema -> gợi ý bảng
-                else if (tablesBySchema.has(prefix)) {
-                  tablesBySchema.get(prefix).forEach((tbl) => {
+                // 3. Prefix là tên schema -> gợi ý bảng + functions
+                else if (tablesBySchema.has(prefix) || functionsBySchema.has(prefix)) {
+                  // Bảng
+                  (tablesBySchema.get(prefix) ?? new Set()).forEach((tbl) => {
                     suggestions.push({
                       label: tbl,
                       kind: monaco.languages.CompletionItemKind.Module,
                       insertText: tbl,
                       detail: `Table (${prefix})`,
                     });
+                  });
+                  // Functions — snippet chỉ chèn fn_name(params) vì schema đã gõ rồi
+                  (functionsBySchema.get(prefix) ?? []).forEach((fnItem) => {
+                    suggestions.push(fnItem);
                   });
                 }
               } else {
@@ -1316,6 +1484,9 @@ export default {
                     detail: "Table",
                   });
                 });
+
+                // Functions (với snippet)
+                suggestions.push(...functionSuggestions);
 
                 // Ưu tiên cột từ các bảng đã được parse trong FROM
                 if (aliasMap.size > 0) {
@@ -1347,7 +1518,14 @@ export default {
               });
 
               const finalSuggestions = Array.from(uniqueMap.values()).map(
-                (s) => ({ ...s, range }),
+                (s) => ({
+                  ...s,
+                  range,
+                  // Giữ insertTextRules nếu có (snippet)
+                  ...(s.insertTextRules != null
+                    ? { insertTextRules: s.insertTextRules }
+                    : {}),
+                }),
               );
 
               return {
