@@ -540,16 +540,16 @@ export default {
         ],
         export: [
           {
-            key: "downloadResponse",
-            label: me.$t("i18nCommon.postgreSQLQuery.downloadResult"),
-            disabled: !me.canExportActiveResult,
-            run: me.handleDownloadReponse,
-          },
-          {
             key: "copyResult",
             label: me.$t("i18nCommon.postgreSQLQuery.copyResult"),
             disabled: !me.canExportActiveResult,
             run: me.handleCopyResult,
+          },
+          {
+            key: "downloadResponse",
+            label: me.$t("i18nCommon.postgreSQLQuery.downloadResult"),
+            disabled: !me.canExportActiveResult,
+            run: me.handleDownloadReponse,
           },
         ],
         explore: [
