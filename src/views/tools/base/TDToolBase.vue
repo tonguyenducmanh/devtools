@@ -12,6 +12,9 @@ export default {
       default: null,
     },
   },
+  mounted() {
+    this.onTabEnter();
+  },
   beforeUnmount() {
     // mặc định file này unmount là remove hết event
     this.onTabLeave();
