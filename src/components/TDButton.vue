@@ -7,6 +7,7 @@
       'td-button-readonly': readOnly,
       'td-button-no-margin': noMargin,
       'td-button-icon': iconClass,
+      'td-button-small': isSmallButton,
     }"
     :disabled="readOnly"
     :style="borderRadiusStyle"
@@ -57,6 +58,10 @@ export default {
       type: String,
       default: "",
     },
+    isSmallButton: {
+      type: Boolean,
+      default: "",
+    },
   },
   data() {
     return {};
@@ -92,6 +97,9 @@ export default {
   word-break: keep-all; /* For wider browser support */
   white-space: nowrap; /* Ensure wrapping is enabled */
   border: 1px solid transparent;
+}
+.td-button-small {
+  height: 25px;
 }
 .td-button-no-margin {
   margin: unset;

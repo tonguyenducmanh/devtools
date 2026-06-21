@@ -46,9 +46,6 @@
         ref="textarea"
       />
     </div>
-    <div class="td-actions-editor" v-if="$slots.actions">
-      <slot name="actions"></slot>
-    </div>
   </div>
 </template>
 
@@ -313,24 +310,6 @@ export default {
   }
   .td-label-editor:hover {
     opacity: 0.5;
-  }
-  .td-actions-editor {
-    position: absolute;
-    bottom: var(--padding);
-    right: calc(var(--padding) * 4);
-    z-index: 5;
-    display: flex;
-    align-items: center;
-    gap: var(--padding-small);
-    font-size: var(--font-size-medium-rare);
-    color: white;
-    background-color: var(--btn-color);
-    padding: var(--padding-medium);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-component);
-  }
-  .td-actions-editor:hover {
-    background-color: var(--focus-color);
   }
   .textarea-wrapper {
     position: relative;

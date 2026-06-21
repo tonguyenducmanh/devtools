@@ -2,16 +2,25 @@
   <div class="flex td-pg-query-container">
     <div class="flex flex-col td-pg-query-main">
       <div class="flex flex-start td-tool-header-menu-group">
-        <div
-          v-for="(items, menuKey) in menuConfig"
-          :key="menuKey"
-          class="td-menu-item"
-          :class="{ 'td-menu-item--active': activeKeyFlyOut === menuKey }"
-          @mouseenter="openFlyout(menuKey, $event)"
-          @mouseleave="scheduleCloseFlyout()"
-        >
-          <span>{{ $t(`i18nCommon.postgreSQLQuery.${menuKey}`) }}</span>
+        <div class="flex flex-one td-header-menu-group">
+          <div
+            v-for="(items, menuKey) in menuConfig"
+            :key="menuKey"
+            class="td-menu-item"
+            :class="{ 'td-menu-item--active': activeKeyFlyOut === menuKey }"
+            @mouseenter="openFlyout(menuKey, $event)"
+            @mouseleave="scheduleCloseFlyout()"
+          >
+            <span>{{ $t(`i18nCommon.postgreSQLQuery.${menuKey}`) }}</span>
+          </div>
         </div>
+        <TDButton
+          :noMargin="true"
+          @click="handleRunQuery"
+          iconClass="td-send-icon"
+          isSmallButton
+          v-tooltip="$t('i18nCommon.postgreSQLQuery.runQuery')"
+        ></TDButton>
         <TDFlyoutPanel
           :show="!!activeKeyFlyOut"
           :anchorElFlyout="anchorElFlyout"
@@ -51,11 +60,6 @@
           @keydown.ctrl.enter.prevent="handleRunQuery"
           @keydown.meta.enter.prevent="handleRunQuery"
         >
-          <template #actions>
-            <div class="flex send-btn" @click="handleRunQuery">
-              <span>{{ $t("i18nCommon.postgreSQLQuery.runQuery") }}</span>
-            </div>
-          </template>
         </TDTextarea>
       </div>
 
@@ -2079,10 +2083,9 @@ export default {
 .td-tool-header-menu-group {
   width: 100%;
   align-items: center;
-  justify-self: flex-start;
-}
-.send-btn {
-  cursor: pointer;
-  gap: var(--padding);
+  justify-content: space-between;
+  .td-header-menu-group {
+    justify-content: flex-start;
+  }
 }
 </style>
