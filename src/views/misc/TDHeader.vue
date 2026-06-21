@@ -22,7 +22,7 @@
         </div>
       </div>
     </div>
-
+    <div class="td-version-app">{{ currentVersionApp }}</div>
     <!-- Flyout Menu -->
     <Teleport to="body">
       <Transition name="td-flyout">
@@ -72,6 +72,10 @@ export default {
     },
     currentMenuItems() {
       return this.menuConfig[this.hoveredMenu] ?? [];
+    },
+    currentVersionApp() {
+      let version = this.$tdUtility.getAppVersion();
+      return `v${version}`;
     },
   },
   mounted() {
@@ -250,6 +254,10 @@ export default {
       font-weight: 700;
       cursor: pointer;
     }
+  }
+  .td-version-app {
+    font-size: 14px;
+    color: var(--text-color);
   }
 
   .td-header-menu {

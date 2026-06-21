@@ -1,3 +1,7 @@
+/**
+ * File mixin cho tất cả các tính năng cần sử dụng dotnet thì chọc hết vào đây
+ * để làm việc khởi tạo dotnet tùy vào từng môi trường chạy
+ */
 import tdUtility from "@/common/TDUtility.js";
 
 export default {
@@ -12,7 +16,7 @@ export default {
   },
   methods: {
     /**
-     * Khởi tạo .NET 10.0 WASM Runtime
+     * Khởi tạo .NET WASM Runtime
      */
     async initDotNetWasm() {
       if (this.dotnetInitialized) return;
@@ -38,6 +42,9 @@ export default {
 
         const exports = await getAssemblyExports("Tools.NetWrapper.dll");
         this._dotnetExports = exports.TDTools.TDToolDotNetWrapper;
+        // gắn vào global để tiện debug
+        window.__tdAPI = window.__tdAPI ?? {};
+        window.__tdAPI._dotnetExports = this._dotnetExports;
         this.dotnetInitialized = true;
       } catch (error) {
         console.error("Failed to load C# WASM Wrapper:", error);
