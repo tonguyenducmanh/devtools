@@ -393,11 +393,12 @@ import TDShortcutAction, {
 } from "@/common/TDShortcutAction.js";
 import TDDatabaseConnectionMixin from "@/mixins/TDDatabaseConnectionMixin.js";
 import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";
+import TDDotNetWasmMixin from "@/mixins/TDDotNetWasmMixin.js";
 
 export default {
   extends: TDToolBase,
   name: "TDPostgreSQLQuery",
-  mixins: [TDDatabaseConnectionMixin],
+  mixins: [TDDatabaseConnectionMixin, TDDotNetWasmMixin],
   components: {
     TDSubSidebar,
     TDArrow,
