@@ -71,6 +71,14 @@
                 : $t('i18nCommon.postgreSQLQuery.loadIntellisense')
             "
           />
+          <TDButton
+            :noMargin="true"
+            :type="$tdEnum.buttonType.secondary"
+            @click="handleOpenInspect"
+            :readOnly="!selectedConnectionId"
+            iconClass="td-search-icon"
+            v-tooltip="$t('i18nCommon.postgreSQLQuery.dbInspect.title')"
+          />
         </div>
       </div>
 
@@ -1588,6 +1596,21 @@ export default {
       } catch {
         me.$tdToast.error(me.$t("i18nCommon.postgreSQLQuery.saveQueryErr"));
       }
+    },
+
+    async handleOpenInspect() {
+      let me = this;
+      if (!me.selectedConnectionId) {
+        me.$tdToast.warning(
+          me.$t("i18nCommon.postgreSQLQuery.noConnectionSelected"),
+        );
+        return;
+      }
+      await TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDPostgreSQLInspect,
+        ownerForm: me,
+        param: { connectionId: me.selectedConnectionId },
+      });
     },
 
     loadSavedQuery(query) {

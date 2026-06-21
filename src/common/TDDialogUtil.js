@@ -9,6 +9,7 @@ export const TDDialogEnum = {
   TDAPIImportCURLPopup: 3,
   TDAPIMokingImportPopup: 4,
   TDPostgreSQLConnectionPopup: 5,
+  TDPostgreSQLInspect: 6,
 };
 
 /**
@@ -26,6 +27,8 @@ const DialogComponentMap = {
     import("@/views/dialogs/TDAPIMokingImportPopup.vue"),
   [TDDialogEnum.TDPostgreSQLConnectionPopup]: () =>
     import("@/views/dialogs/TDPostgreSQLConnectionPopup.vue"),
+  [TDDialogEnum.TDPostgreSQLInspect]: () =>
+    import("@/views/dialogs/TDPostgreSQLInspect.vue"),
 };
 
 class TDDialogUtil {

@@ -12,5 +12,12 @@ export default {
   pg_test_connection: codeModules["./template/pg_test_connection.sql"],
   pg_get_functions_count: codeModules["./template/pg_get_functions_count.sql"],
   pg_get_functions_paging: codeModules["./template/pg_get_functions_paging.sql"],
+  pg_inspect_search_table: codeModules["./template/pg_inspect_search_table.sql"],
+  pg_inspect_search_view: codeModules["./template/pg_inspect_search_view.sql"],
+  pg_inspect_search_function: codeModules["./template/pg_inspect_search_function.sql"],
+  pg_inspect_search_trigger: codeModules["./template/pg_inspect_search_trigger.sql"],
+  pg_inspect_ddl_table: codeModules["./template/pg_inspect_ddl_table.sql"],
+  pg_inspect_ddl_view: codeModules["./template/pg_inspect_ddl_view.sql"],
+  pg_inspect_ddl_function: codeModules["./template/pg_inspect_ddl_function.sql"],
+  pg_inspect_ddl_trigger: codeModules["./template/pg_inspect_ddl_trigger.sql"],
 };
-
