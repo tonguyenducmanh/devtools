@@ -412,6 +412,7 @@ import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vu
 import TDDotNetWasmMixin from "@/mixins/TDDotNetWasmMixin.js";
 import TDFlyoutPanel from "@/components/TDFlyoutPanel.vue";
 import { useFlyout } from "@/common/plugin/TDUseFlyout.js";
+import { useTabManager } from "@/stores/TDTabManager.js";
 
 export default {
   extends: TDToolBase,
@@ -426,7 +427,8 @@ export default {
   },
 
   setup() {
-    return { ...useFlyout() };
+    const { openTab } = useTabManager();
+    return { openTab, ...useFlyout() };
   },
 
   data() {
@@ -564,14 +566,6 @@ export default {
             run: me.handleRunQuery,
           },
           {
-            key: "formatSQL",
-            iconClass: "td-format-icon",
-            label: me.$t("i18nCommon.postgreSQLQuery.formatCode"),
-            tooltip: me.$t("i18nCommon.postgreSQLQuery.formatCode"),
-            disabled: false,
-            run: me.handleFormatSQL,
-          },
-          {
             key: "openInspect",
             iconClass: "td-search-icon",
             label: me.$t("i18nCommon.postgreSQLQuery.dbInspect.title"),
@@ -595,6 +589,13 @@ export default {
             label: me.$t("i18nCommon.postgreSQLQuery.reloadDatabase"),
             tooltip: me.$t("i18nCommon.postgreSQLQuery.reloadDatabase"),
             run: me.loadAllData,
+          },
+          {
+            key: "templatePostgresSQL",
+            iconClass: "td-book-icon",
+            label: me.$t("i18nCommon.feature.PostgreSQLTemplate"),
+            tooltip: me.$t("i18nCommon.feature.PostgreSQLTemplate"),
+            run: me.openCodePostgresqlTemplate,
           },
         ],
       };
@@ -1776,6 +1777,17 @@ export default {
         labelKey: "i18nCommon.shortKeyAction.formatCodeTextEditor",
       };
       return configFormat;
+    },
+    /**
+     * Mở danh sách code mẫu ra để xem
+     */
+    openCodePostgresqlTemplate() {
+      this.openTab({
+        titleKey: "i18nCommon.feature.PostgreSQLTemplate",
+        groupPath: "",
+        component: () =>
+          import("@/views/tools/codeTemplateTools/PostgreSQLTemplate/TDPostgreSQLTemplate.vue"),
+      });
     },
   },
 
