@@ -241,7 +241,20 @@
                 class="flex flex-col no-select td-collection-item"
                 :key="index"
               >
+                <!-- phần sửa nhanh tên thư mục request nếu đang ở chế độ edit -->
+                <div v-if="group.is_renaming" class="td-collection-rename">
+                  <TDInput
+                    v-model="group.temp_name"
+                    :noMargin="true"
+                    :placeHolder="$t('i18nCommon.apiTesting.collectionRename')"
+                    :ref="group.temp_name"
+                    @keyup.enter="saveNewCollectionName(group)"
+                    @clickOutSide="saveNewCollectionName(group)"
+                  >
+                  </TDInput>
+                </div>
                 <div
+                  v-else
                   class="flex td-collection-header"
                   @click="toggleGroup(group.id || '__ungrouped__')"
                 >
@@ -258,6 +271,11 @@
                     </div>
                   </div>
                   <div class="flex td-collection-edit-btn" v-if="group.id">
+                    <div
+                      class="td-icon td-edit-icon"
+                      v-tooltip="$t('i18nCommon.edit')"
+                      @click.stop="enableRenameCollection(group)"
+                    ></div>
                     <div
                       v-tooltip="$t('i18nCommon.postgreSQLQuery.addConnection')"
                       class="td-icon td-plus-icon"
@@ -647,7 +665,51 @@ export default {
         is_select: !!result.is_select,
       };
     },
-
+    enableRenameCollection(collectionFromView) {
+      let me = this;
+      // collectionFromView là bản sao tạm do computed groupedConnections tạo ra,
+      // phải tìm đúng object gốc trong allGroups thì set mới reactive/persist được
+      let collection = me.allGroups.find((g) => g.id === collectionFromView.id);
+      if (collection) {
+        collection.is_renaming = true;
+        collection.temp_name = collection.name;
+        this.$nextTick(() => {
+          if (me.$refs && me.$refs[collection.temp_name]) {
+            let refs = me.$refs[collection.temp_name];
+            if (refs) {
+              if (Array.isArray(refs)) {
+                refs[0].focus();
+              } else {
+                refs.focus();
+              }
+            }
+          }
+        });
+      }
+    },
+    async saveNewCollectionName(collectionFromView) {
+      let me = this;
+      let collection = me.allGroups.find((g) => g.id === collectionFromView.id);
+      if (collection) {
+        delete collection.is_renaming;
+        if (
+          collection.temp_name &&
+          collectionFromView.temp_name !== collection.name
+        ) {
+          try {
+            let response = await me.agentAPI.connectionGroup.update({
+              id: collection.id,
+              name: collectionFromView.temp_name,
+            });
+            if (response && response.success && response.data?.success) {
+              await me.loadAllData();
+            }
+          } catch (e) {
+            me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+          }
+        }
+      }
+    },
     normalizeMultiQueryResult(payload) {
       if (payload && Array.isArray(payload.results)) {
         return payload.results
@@ -728,6 +790,7 @@ export default {
         me.allGroups.splice(0, me.allGroups.length, ...data);
         // Tự mở tất cả groups
         data.forEach((g) => {
+          g.is_renaming = false;
           if (!(g.id in me.openGroups)) me.openGroups[g.id] = true;
         });
         if (!("__ungrouped__" in me.openGroups)) {
