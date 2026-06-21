@@ -1,0 +1,565 @@
+// file này tách ra chỉ để dễ đọc code, không nhúng vào file nào khác ngoài tool src/views/tools/PostgreSQLQuery/TDPostgreSQLQuery.vue
+import TDCache from "@/common/cache/TDCache.js";
+import pgQueries from "./templates.js";
+
+export default {
+  methods: {
+    async handleLoadIntellisense() {
+      let me = this;
+      if (!me.selectedConnectionId) return;
+      me.isLoadingIntellisense = true;
+      try {
+        // Xóa cache cũ
+        const cacheKey = me.$tdEnum.cacheConfig.PostgreSQLQueryHistory;
+        await TDCache.remove(cacheKey, { id: me.selectedConnectionId });
+
+        // Lấy keywords
+        let keywordResponse = await me.agentAPI.executeQuery(
+          me.selectedConnectionId,
+          pgQueries.pg_get_keywords,
+        );
+
+        // Gọi SQL đếm tổng số dòng
+        let countResponse = await me.agentAPI.executeQuery(
+          me.selectedConnectionId,
+          pgQueries.pg_get_tables_count,
+        );
+
+        let totalRows = 0;
+        const countResult =
+          countResponse?.data?.data?.results?.[0] ||
+          countResponse?.data?.data ||
+          null;
+
+        if (countResponse?.data?.success && countResult?.rows?.length > 0) {
+          totalRows = parseInt(countResult.rows[0].total || 0, 10);
+        }
+
+        // Chạy vòng lặp FOR gối đầu để kéo dữ liệu về thông qua SQL Paging
+        let allTableRows = [];
+        const pageSize = 5000; // Số lượng dòng tải mỗi lần
+
+        for (let offset = 0; offset < totalRows; offset += pageSize) {
+          // Nối thêm điều kiện LIMIT OFFSET vào câu SQL Paging mẫu
+          let pagingQuery = `${pgQueries.pg_get_tables_paging} LIMIT ${pageSize} OFFSET ${offset};`;
+
+          let pagingResponse = await me.agentAPI.executeQuery(
+            me.selectedConnectionId,
+            pagingQuery,
+          );
+
+          const pagingResult =
+            pagingResponse?.data?.data?.results?.[0] ||
+            pagingResponse?.data?.data ||
+            null;
+
+          if (pagingResponse?.data?.success && pagingResult?.rows) {
+            allTableRows.push(...pagingResult.rows);
+          } else {
+            console.error(
+              `Gặp lỗi khi tải dữ liệu tại vị trí dòng (offset): ${offset}`,
+            );
+            break;
+          }
+        }
+
+        // Đóng gói lại đúng cấu trúc ban đầu để cấp phát cho Monaco Editor
+        let tablesResult = {
+          columns: [
+            "table_schema",
+            "table_name",
+            "column_name",
+            "data_type",
+            "ordinal_position",
+          ],
+          rows: allTableRows,
+        };
+
+        let keywordResult =
+          keywordResponse?.data?.data?.results?.[0] ||
+          keywordResponse?.data?.data ||
+          null;
+
+        let keywordsResult = keywordResponse?.data?.success
+          ? keywordResult
+          : null;
+
+        // Load functions (count → paging) — chỉ thực hiện khi bật tùy chọn
+        let allFunctionRows = [];
+        if (me.currentConfigLayout.loadFunctionIntellisense) {
+          try {
+            let funcCountResponse = await me.agentAPI.executeQuery(
+              me.selectedConnectionId,
+              pgQueries.pg_get_functions_count,
+            );
+
+            let totalFuncRows = 0;
+            const funcCountResult =
+              funcCountResponse?.data?.data?.results?.[0] ||
+              funcCountResponse?.data?.data ||
+              null;
+
+            if (
+              funcCountResponse?.data?.success &&
+              funcCountResult?.rows?.length > 0
+            ) {
+              totalFuncRows = parseInt(funcCountResult.rows[0].total || 0, 10);
+            }
+
+            for (let offset = 0; offset < totalFuncRows; offset += pageSize) {
+              let funcPagingQuery = `${pgQueries.pg_get_functions_paging} LIMIT ${pageSize} OFFSET ${offset};`;
+
+              let funcPagingResponse = await me.agentAPI.executeQuery(
+                me.selectedConnectionId,
+                funcPagingQuery,
+              );
+
+              const funcPagingResult =
+                funcPagingResponse?.data?.data?.results?.[0] ||
+                funcPagingResponse?.data?.data ||
+                null;
+
+              if (funcPagingResponse?.data?.success && funcPagingResult?.rows) {
+                allFunctionRows.push(...funcPagingResult.rows);
+              } else {
+                console.error(
+                  `Gặp lỗi khi tải functions tại vị trí dòng (offset): ${offset}`,
+                );
+                break;
+              }
+            }
+          } catch (e) {
+            console.warn("Load functions intellisense warning:", e);
+          }
+        }
+
+        // Đóng gói lại đúng cấu trúc để cấp phát cho Monaco Editor
+        let functionsResult = {
+          columns: [
+            "function_schema",
+            "function_name",
+            "function_arguments",
+            "return_type",
+          ],
+          rows: allFunctionRows,
+        };
+
+        let intellisenseData = {
+          keywords: keywordsResult,
+          tables: tablesResult,
+          functions: functionsResult,
+        };
+
+        // Lưu vào IndexedDB và áp dụng Intellisense
+        await TDCache.set(cacheKey, intellisenseData, {
+          id: me.selectedConnectionId,
+        });
+        await me.applyMonacoIntellisense(intellisenseData);
+
+        me.$tdToast.success(
+          me.$t("i18nCommon.postgreSQLQuery.intellisenseLoaded"),
+        );
+      } catch (error) {
+        console.error("Load intellisense error:", error);
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+      } finally {
+        me.isLoadingIntellisense = false;
+      }
+    },
+
+    /**
+     * Tải intellisense từ cache (nếu có) và áp dụng vào Monaco
+     */
+    async loadCachedIntellisense() {
+      let me = this;
+      if (!me.selectedConnectionId) return;
+      try {
+        const cacheKey = me.$tdEnum.cacheConfig.PostgreSQLQueryHistory;
+        let cached = await TDCache.get(cacheKey, {
+          id: me.selectedConnectionId,
+        });
+        if (cached) {
+          await me.applyMonacoIntellisense(cached);
+        }
+      } catch {}
+    },
+
+    /**
+     * Áp dụng completion providers vào Monaco Editor cho pgsql (DBeaver-like)
+     */
+    async applyMonacoIntellisense(data) {
+      let me = this;
+      try {
+        // Cleanup providers cũ
+        if (me.intellisenseDisposable) {
+          me.intellisenseDisposable.forEach((d) => d?.dispose?.());
+        }
+
+        // Lazy-load monaco
+        const monaco = await import("monaco-editor");
+
+        // Keywords
+        const keywords = data?.keywords?.rows ?? [];
+        const keywordSuggestions = [];
+        keywords.forEach((row) => {
+          keywordSuggestions.push({
+            label: String(row.word ?? "").toUpperCase(),
+            kind: monaco.languages.CompletionItemKind.Keyword,
+            insertText: String(row.word ?? "").toUpperCase(),
+            detail: row.catdesc ?? "PostgreSQL keyword",
+          });
+        });
+
+        // Xây dựng bản đồ lookup
+        const tableRows = data?.tables?.rows ?? [];
+        const columnsByTable = new Map();
+        const tablesBySchema = new Map();
+        const allSchemas = new Set();
+        const allTables = new Set();
+        const allColumns = [];
+
+        tableRows.forEach((row) => {
+          const tbl = row.table_name;
+          const schema = row.table_schema;
+          const col = row.column_name;
+          const dtype = row.data_type;
+
+          allSchemas.add(schema);
+          allTables.add(tbl);
+
+          if (!tablesBySchema.has(schema))
+            tablesBySchema.set(schema, new Set());
+          tablesBySchema.get(schema).add(tbl);
+
+          if (!columnsByTable.has(tbl)) columnsByTable.set(tbl, []);
+          if (!columnsByTable.has(`${schema}.${tbl}`))
+            columnsByTable.set(`${schema}.${tbl}`, []);
+
+          const colDef = {
+            label: String(col),
+            kind: monaco.languages.CompletionItemKind.Field,
+            insertText: String(col),
+            detail: `${tbl}.${col} (${dtype})`,
+          };
+
+          columnsByTable.get(tbl).push(colDef);
+          columnsByTable.get(`${schema}.${tbl}`).push(colDef);
+          allColumns.push(colDef);
+        });
+
+        // ── Functions ─────────────────────────────────────────────────────────
+        function parseFunctionArgs(argsStr) {
+          if (!argsStr || !argsStr.trim()) return [];
+          return argsStr.split(",").map((segment) => {
+            const parts = segment.trim().split(/\s+/);
+            const name = parts.length >= 2 ? parts[0] : null;
+            const type =
+              parts.length >= 2 ? parts.slice(1).join(" ") : parts[0];
+            return { name: name || null, type: type || "" };
+          });
+        }
+
+        function buildFunctionCallSnippet(fnName, argsStr) {
+          const args = parseFunctionArgs(argsStr);
+          if (args.length === 0) {
+            return `${fnName}()`;
+          }
+          let tabStop = 1;
+          const paramLines = args.map((arg) => {
+            const ts = tabStop++;
+            if (arg.name) {
+              return `  ${arg.name} => \${${ts}:'value'}::${arg.type}`;
+            }
+            return `  \${${ts}:'value'}::${arg.type}`;
+          });
+          return `${fnName}(\n` + paramLines.join(",\n") + `\n)`;
+        }
+
+        function buildFunctionCallSnippetWithSchema(schema, fnName, argsStr) {
+          const args = parseFunctionArgs(argsStr);
+          if (args.length === 0) {
+            return `${schema}.${fnName}()`;
+          }
+          let tabStop = 1;
+          const paramLines = args.map((arg) => {
+            const ts = tabStop++;
+            if (arg.name) {
+              return `  ${arg.name} => \${${ts}:'value'}::${arg.type}`;
+            }
+            return `  \${${ts}:'value'}::${arg.type}`;
+          });
+          return `${schema}.${fnName}(\n` + paramLines.join(",\n") + `\n)`;
+        }
+
+        const functionRows = data?.functions?.rows ?? [];
+        const functionSuggestions = [];
+        const functionsBySchema = new Map();
+
+        functionRows.forEach((row) => {
+          const schema = row.function_schema;
+          const fnName = row.function_name;
+          const argsStr = row.function_arguments || "";
+          const returnType = row.return_type || "";
+
+          const docValue = [
+            `**${schema}.${fnName}**`,
+            ``,
+            `Arguments: \`${argsStr || "(none)"}\``,
+            `Returns: \`${returnType}\``,
+          ].join("\n");
+
+          const pureSnippet = buildFunctionCallSnippet(fnName, argsStr);
+          const fullSnippet = buildFunctionCallSnippetWithSchema(
+            schema,
+            fnName,
+            argsStr,
+          );
+
+          if (!functionsBySchema.has(schema)) functionsBySchema.set(schema, []);
+          functionsBySchema.get(schema).push({
+            label: fnName,
+            kind: monaco.languages.CompletionItemKind.Function,
+            pureInsertText: pureSnippet,
+            fullInsertText: fullSnippet,
+            detail: `fn ${schema}.${fnName}(${argsStr}) \u2192 ${returnType}`,
+            documentation: { value: docValue, isTrusted: true },
+            sortText: "0" + fnName,
+          });
+
+          functionSuggestions.push({
+            label: fnName,
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: fullSnippet,
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            detail: `fn ${schema}.${fnName}(${argsStr}) \u2192 ${returnType}`,
+            documentation: { value: docValue, isTrusted: true },
+            sortText: "1" + fnName,
+          });
+        });
+
+        // Đăng ký completion provider
+        const disposable = monaco.languages.registerCompletionItemProvider(
+          "pgsql",
+          {
+            triggerCharacters: ["."],
+            provideCompletionItems(model, position) {
+              const word = model.getWordUntilPosition(position);
+
+              // Mặc định ban đầu
+              let range = {
+                startLineNumber: position.lineNumber,
+                endLineNumber: position.lineNumber,
+                startColumn: word.startColumn,
+                endColumn: word.endColumn,
+              };
+
+              const text = model.getValue();
+              const aliasMap = new Map();
+
+              const regex =
+                /(?:from|join)\s+([a-zA-Z0-9_]+)(?:\.([a-zA-Z0-9_]+))?(?:\s+as)?\s+([a-zA-Z0-9_]+)?/gi;
+              let match;
+              const sqlKeywords = [
+                "where",
+                "join",
+                "on",
+                "left",
+                "right",
+                "inner",
+                "outer",
+                "cross",
+                "group",
+                "order",
+                "having",
+                "limit",
+                "select",
+                "and",
+                "or",
+              ];
+
+              while ((match = regex.exec(text)) !== null) {
+                let schemaOrTable = match[1];
+                let tableIfSchema = match[2];
+                let aliasOrTable = match[3];
+
+                let schema = "";
+                let table = "";
+                let alias = "";
+
+                if (tableIfSchema) {
+                  schema = schemaOrTable.toLowerCase();
+                  table = tableIfSchema.toLowerCase();
+                } else {
+                  table = schemaOrTable.toLowerCase();
+                }
+
+                if (
+                  aliasOrTable &&
+                  !sqlKeywords.includes(aliasOrTable.toLowerCase())
+                ) {
+                  alias = aliasOrTable.toLowerCase();
+                } else {
+                  alias = table;
+                }
+                aliasMap.set(alias, { schema, table });
+              }
+
+              const lineContent = model.getLineContent(position.lineNumber);
+              const textBeforePointer = lineContent.substring(
+                0,
+                position.column - 1,
+              );
+
+              // Regex bóc tách chính xác tên_schema và cụm text đang gõ dở phía sau dấu chấm
+              const dotMatch = textBeforePointer.match(
+                /([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]*)$/,
+              );
+
+              let suggestions = [];
+
+              if (dotMatch) {
+                const prefix = dotMatch[1].toLowerCase(); // Ví dụ: "td"
+                const typedWord = dotMatch[2]; // Phần chữ đã gõ sau dấu chấm, ví dụ: "fn_cre" hoặc rỗng ""
+
+                const totalOffset = prefix.length + 1 + typedWord.length;
+                range = {
+                  startLineNumber: position.lineNumber,
+                  endLineNumber: position.lineNumber,
+                  startColumn: position.column - totalOffset,
+                  endColumn: position.column,
+                };
+
+                // 1. Prefix là alias -> gợi ý cột
+                if (aliasMap.has(prefix)) {
+                  const mapped = aliasMap.get(prefix);
+                  let key = mapped.schema
+                    ? `${mapped.schema}.${mapped.table}`
+                    : mapped.table;
+                  let cols =
+                    columnsByTable.get(key) ||
+                    columnsByTable.get(mapped.table) ||
+                    [];
+                  cols.forEach((c) => {
+                    suggestions.push({
+                      ...c,
+                      filterText: `${prefix}.${c.label}`, // Đặt filter khớp với text trên editor
+                      insertText: `${prefix}.${c.insertText}`,
+                    });
+                  });
+                }
+                // 2. Prefix là tên bảng -> gợi ý cột
+                else if (columnsByTable.has(prefix)) {
+                  let cols = columnsByTable.get(prefix) || [];
+                  cols.forEach((c) => {
+                    suggestions.push({
+                      ...c,
+                      filterText: `${prefix}.${c.label}`,
+                      insertText: `${prefix}.${c.insertText}`,
+                    });
+                  });
+                }
+                // 3. Prefix là tên schema -> gợi ý bảng + functions
+                else if (
+                  tablesBySchema.has(prefix) ||
+                  functionsBySchema.has(prefix)
+                ) {
+                  // Bảng
+                  (tablesBySchema.get(prefix) ?? new Set()).forEach((tbl) => {
+                    suggestions.push({
+                      label: tbl,
+                      kind: monaco.languages.CompletionItemKind.Module,
+                      filterText: `${prefix}.${tbl}`,
+                      insertText: `${prefix}.${tbl}`,
+                      detail: `Table (${prefix})`,
+                    });
+                  });
+
+                  // Functions
+                  (functionsBySchema.get(prefix) ?? []).forEach((fnItem) => {
+                    suggestions.push({
+                      ...fnItem,
+                      // QUAN TRỌNG: filterText phải bao gồm cả schema prefix để Monaco so khớp được chuỗi "td.fn_create_user"
+                      filterText: `${prefix}.${fnItem.label}`,
+                      insertText: fnItem.fullInsertText, // Thay thế trọn gói bằng snippet kèm schema
+                      insertTextRules:
+                        monaco.languages.CompletionItemInsertTextRule
+                          .InsertAsSnippet,
+                    });
+                  });
+                }
+              } else {
+                // Đang gõ chay (không có chấm)
+                suggestions.push(...keywordSuggestions);
+
+                allSchemas.forEach((schema) => {
+                  suggestions.push({
+                    label: schema,
+                    kind: monaco.languages.CompletionItemKind.Folder,
+                    insertText: schema,
+                    detail: "Schema",
+                  });
+                });
+
+                allTables.forEach((tbl) => {
+                  suggestions.push({
+                    label: tbl,
+                    kind: monaco.languages.CompletionItemKind.Module,
+                    insertText: tbl,
+                    detail: "Table",
+                  });
+                });
+
+                suggestions.push(...functionSuggestions);
+
+                if (aliasMap.size > 0) {
+                  aliasMap.forEach((mapped) => {
+                    let key = mapped.schema
+                      ? `${mapped.schema}.${mapped.table}`
+                      : mapped.table;
+                    let cols =
+                      columnsByTable.get(key) ||
+                      columnsByTable.get(mapped.table) ||
+                      [];
+                    cols.forEach((c) => {
+                      suggestions.push({
+                        ...c,
+                        sortText: "0" + c.label,
+                      });
+                    });
+                  });
+                } else if (word.word && word.word.length > 1) {
+                  suggestions.push(...allColumns);
+                }
+              }
+
+              // Khử trùng lặp danh sách gợi ý
+              const uniqueMap = new Map();
+              suggestions.forEach((s) => {
+                uniqueMap.set(s.label + s.kind + s.insertText, s);
+              });
+
+              const finalSuggestions = Array.from(uniqueMap.values()).map(
+                (s) => ({
+                  ...s,
+                  range,
+                  ...(s.insertTextRules != null
+                    ? { insertTextRules: s.insertTextRules }
+                    : {}),
+                }),
+              );
+
+              return {
+                suggestions: finalSuggestions,
+              };
+            },
+          },
+        );
+
+        me.intellisenseDisposable = [disposable];
+      } catch (error) {
+        console.error("applyMonacoIntellisense error:", error);
+      }
+    },
+  },
+};
