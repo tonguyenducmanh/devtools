@@ -783,7 +783,7 @@ export default {
       downloadResult: "Tải về kết quả query",
       copyResult: "Sao chép kết quả query",
       formatCode: "Định dạng code",
-      loadIntellisense: "Load gợi ý syntax, table",
+      loadIntellisense: "Load gợi ý code database hiện tại",
       connectionName: "Tên kết nối",
       connectionString: "Chuỗi kết nối",
       groupName: "Tên nhóm",

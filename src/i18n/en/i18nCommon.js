@@ -786,7 +786,7 @@ export default {
       downloadResult: "Download result query",
       copyResult: "Copy result query",
       formatCode: "Format code",
-      loadIntellisense: "Load intellisense syntax, table",
+      loadIntellisense: "Load intellisense curent databse",
       connectionName: "Connection name",
       connectionString: "Connection string",
       groupName: "Group name",
