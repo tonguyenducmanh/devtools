@@ -522,7 +522,7 @@ export default {
           },
           {
             key: "genUUID",
-            iconClass: "td-save-icon",
+            iconClass: "td-random-icon",
             label: me.$t("i18nCommon.help.genUUID"),
             disabled: false,
             run: me.genUUIDFunc,
