@@ -14,54 +14,63 @@
           v-for="(items, menuKey) in menuConfig"
           :key="menuKey"
           class="td-menu-item"
-          :class="{ 'td-menu-item--active': hoveredMenu === menuKey }"
-          @mouseenter="onMenuMouseEnter(menuKey, $event)"
-          @mouseleave="onMenuMouseLeave"
+          :class="{ 'td-menu-item--active': activeKey === menuKey }"
+          @mouseenter="open(menuKey, $event)"
+          @mouseleave="scheduleClose()"
         >
           <span>{{ $t(`i18nCommon.${menuKey}.title`) }}</span>
         </div>
       </div>
     </div>
-    <!-- Flyout Menu -->
-    <Teleport to="body">
-      <Transition name="td-flyout-down">
-        <div
-          v-if="hoveredMenu"
-          class="td-header-flyout"
-          :style="flyoutStyle"
-          @mouseenter="onFlyoutMouseEnter"
-          @mouseleave="onFlyoutMouseLeave"
-        >
-          <div
-            v-for="item in currentMenuItems"
-            :key="item.key"
-            class="td-flyout-item"
-            v-tooltip="item.tooltip"
-            @click="item.action"
-          >
-            {{ $t(item.labelKey) }}
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
+
+    <!-- Flyout Menu: mở xuống dưới (placement="bottom") -->
+    <TDFlyoutPanel
+      :show="!!activeKey"
+      :anchor-el="anchorEl"
+      placement="bottom"
+      panel-class="td-header-flyout"
+      @mouseenter="cancelClose"
+      @mouseleave="scheduleClose()"
+    >
+      <div
+        v-for="item in currentMenuItems"
+        :key="item.key"
+        class="td-flyout-item"
+        v-tooltip="item.tooltip"
+        @click="item.action"
+      >
+        {{ $t(item.labelKey) }}
+      </div>
+    </TDFlyoutPanel>
   </div>
 </template>
 
 <script>
 import { useTabManager } from "@/stores/TDTabManager.js";
 import TDAgentAPI from "@/common/api/request/AgentAPI/TDAgentAPI.js";
+import TDFlyoutPanel from "@/components/TDFlyoutPanel.vue";
+import { useFlyout } from "@/common/plugin/TDUseFlyout.js";
 
 export default {
   name: "TDHeader",
+  components: { TDFlyoutPanel },
   setup() {
     const { openTab, exitTabMode } = useTabManager();
-    return { openTab, exitTabMode };
+    const { activeKey, anchorEl, open, scheduleClose, cancelClose, close } =
+      useFlyout();
+    return {
+      openTab,
+      exitTabMode,
+      activeKey,
+      anchorEl,
+      open,
+      scheduleClose,
+      cancelClose,
+      close,
+    };
   },
   data() {
     return {
-      hoveredMenu: null,
-      flyoutStyle: {},
-      _leaveTimer: null,
       menuConfig: {},
     };
   },
@@ -70,7 +79,7 @@ export default {
       return window.__env.appName;
     },
     currentMenuItems() {
-      return this.menuConfig[this.hoveredMenu] ?? [];
+      return this.menuConfig[this.activeKey] ?? [];
     },
   },
   mounted() {
@@ -133,19 +142,19 @@ export default {
     genUUIDFunc() {
       let me = this;
       me.$tdUtility.copyToClipboard(me.$tdUtility.newGuid());
-      this.hoveredMenu = null;
+      this.close();
     },
     getCurrentDateFunc() {
       const now = new Date();
       const formatted = now.toISOString().split("T")[0];
       this.$tdUtility.copyToClipboard(formatted);
-      this.hoveredMenu = null;
+      this.close();
     },
     getCurrentDateTimeFunc() {
       const now = new Date();
       const formatted = now.toISOString().slice(0, 19).replace("T", " ");
       this.$tdUtility.copyToClipboard(formatted);
-      this.hoveredMenu = null;
+      this.close();
     },
     goToWelcome() {
       this.exitTabMode();
@@ -157,7 +166,7 @@ export default {
         path: "/TDUserSettings",
         component: () => import("@/views/misc/TDUserSettings.vue"),
       });
-      this.hoveredMenu = null;
+      this.close();
     },
     appDataMinerFunc() {
       this.openTab({
@@ -166,16 +175,16 @@ export default {
         path: "/appdataminer",
         component: () => import("@/views/tools/TDAppDataMiner.vue"),
       });
-      this.hoveredMenu = null;
+      this.close();
     },
     goToSourceFunc() {
       this.$tdUtility.goToSource();
-      this.hoveredMenu = null;
+      this.close();
     },
     downloadAgentFunc() {
       const url = window.__env?.githubSource?.releasesUrl;
       window.open(url, "_blank");
-      this.hoveredMenu = null;
+      this.close();
     },
     async pingAgentFunc() {
       try {
@@ -188,38 +197,11 @@ export default {
       } catch {
         this.$tdUtility.showErrorNotFoundAgentServer();
       }
-      this.hoveredMenu = null;
+      this.close();
     },
     reloadAppFunc() {
       this.$tdUtility.reloadApp();
-      this.hoveredMenu = null;
-    },
-    showFlyout(menu, event) {
-      clearTimeout(this._leaveTimer);
-      const rect = event.currentTarget.getBoundingClientRect();
-      this.flyoutStyle = {
-        position: "fixed",
-        top: `${rect.bottom + 4}px`,
-        left: `${rect.left}px`,
-        zIndex: 1000,
-      };
-      this.hoveredMenu = menu;
-    },
-    onMenuMouseEnter(menuKey, event) {
-      this.showFlyout(menuKey, event);
-    },
-    onMenuMouseLeave() {
-      this._leaveTimer = setTimeout(() => {
-        this.hoveredMenu = null;
-      }, 120);
-    },
-    onFlyoutMouseEnter() {
-      clearTimeout(this._leaveTimer);
-    },
-    onFlyoutMouseLeave() {
-      this._leaveTimer = setTimeout(() => {
-        this.hoveredMenu = null;
-      }, 120);
+      this.close();
     },
   },
 };

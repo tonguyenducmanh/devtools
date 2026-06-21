@@ -10,9 +10,9 @@
           <div
             v-if="item.type === 'group'"
             class="td-sidebar-item"
-            :class="{ 'td-sidebar-item--active': hoveredItem === item }"
-            @mouseenter="onGroupMouseEnter($event, item)"
-            @mouseleave="onGroupMouseLeave"
+            :class="{ 'td-sidebar-item--active': activeKey === item.groupKey }"
+            @mouseenter="open(item.groupKey, $event)"
+            @mouseleave="scheduleClose()"
           >
             <div
               class="flex no-select td-item-content"
@@ -46,57 +46,75 @@
       @toggle="toggleSidebar"
     />
 
-    <!-- Flyout -->
-    <Teleport to="body">
-      <Transition name="td-flyout-right">
+    <!-- Flyout: mở sang phải (placement="right"), tự lật sang trái nếu sát mép phải màn hình -->
+    <TDFlyoutPanel
+      :show="!!activeKey"
+      :anchor-el="anchorEl"
+      placement="right"
+      panel-class="td-sidebar-group-flyout"
+      @mouseenter="cancelClose"
+      @mouseleave="scheduleClose()"
+    >
+      <div
+        v-for="child in activeChildren"
+        :key="child.name"
+        class="no-select td-sidebar-flyout-row"
+      >
         <div
-          v-if="hoveredItem"
-          class="td-sidebar-group-flyout"
-          :style="flyoutStyle"
-          @mouseenter="onFlyoutMouseEnter"
-          @mouseleave="onFlyoutMouseLeave"
+          class="td-sidebar-flyout-item"
+          @click="onOpenGroupChildTab(activeItem, child)"
         >
-          <div
-            v-for="child in hoveredItem.children"
-            :key="child.name"
-            class="no-select td-sidebar-flyout-row"
-          >
-            <div
-              class="td-sidebar-flyout-item"
-              @click="onOpenGroupChildTab(hoveredItem, child)"
-            >
-              {{ $t(child.meta.titleKey) }}
-            </div>
-          </div>
+          {{ $t(child.meta.titleKey) }}
         </div>
-      </Transition>
-    </Teleport>
+      </div>
+    </TDFlyoutPanel>
   </div>
 </template>
 
 <script>
 import { getSidebarItems } from "@/stores/TDToolConfigs.js";
 import TDToggleArea from "@/components/TDToggleArea.vue";
+import TDFlyoutPanel from "@/components/TDFlyoutPanel.vue";
 import { useTabManager } from "@/stores/TDTabManager.js";
+import { useFlyout } from "@/common/plugin/TDUseFlyout.js";
 import _ from "@/common/TDCommonFunction.js";
 
 export default {
   name: "TDSidebar",
-  components: { TDToggleArea },
+  components: { TDToggleArea, TDFlyoutPanel },
 
   setup() {
     const { openTab } = useTabManager();
-    return { openTab };
+    const { activeKey, anchorEl, open, scheduleClose, cancelClose, close } =
+      useFlyout();
+    return {
+      openTab,
+      activeKey,
+      anchorEl,
+      open,
+      scheduleClose,
+      cancelClose,
+      close,
+    };
   },
 
   data() {
     return {
       sidebarItems: getSidebarItems(),
       showSideBar: true,
-      hoveredItem: null,
-      flyoutStyle: {},
-      _leaveTimer: null,
     };
+  },
+
+  computed: {
+    activeItem() {
+      return (
+        this.sidebarItems.find((item) => item.groupKey === this.activeKey) ??
+        null
+      );
+    },
+    activeChildren() {
+      return this.activeItem?.children ?? [];
+    },
   },
 
   created() {
@@ -113,44 +131,6 @@ export default {
       let me = this;
       me.showSideBar = !me.showSideBar;
       await me.$tdUtility.saveUserSettings("showSideBar", me.showSideBar);
-    },
-
-    onGroupMouseEnter(event, item) {
-      clearTimeout(this._leaveTimer);
-      const ITEM_HEIGHT = 42;
-      const FLYOUT_PADDING = 12;
-      const childCount = item.children?.length ?? 0;
-      const rect = event.currentTarget.getBoundingClientRect();
-      const flyoutHeight = childCount * ITEM_HEIGHT + FLYOUT_PADDING;
-      const vh = window.innerHeight;
-
-      let top = rect.top;
-      if (top + flyoutHeight > vh - 8) top = vh - flyoutHeight - 8;
-      if (top < 8) top = 8;
-
-      this.flyoutStyle = {
-        position: "fixed",
-        top: `${top}px`,
-        left: `${rect.right + 4}px`,
-        zIndex: 10,
-      };
-      this.hoveredItem = item;
-    },
-
-    onGroupMouseLeave() {
-      this._leaveTimer = setTimeout(() => {
-        this.hoveredItem = null;
-      }, 120);
-    },
-
-    onFlyoutMouseEnter() {
-      clearTimeout(this._leaveTimer);
-    },
-
-    onFlyoutMouseLeave() {
-      this._leaveTimer = setTimeout(() => {
-        this.hoveredItem = null;
-      }, 120);
     },
 
     // Mở tất từ group
@@ -176,7 +156,7 @@ export default {
         toolKey: child.name,
         component: child.component,
       });
-      this.hoveredItem = null;
+      this.close();
     }, 300),
 
     // Mở tab từ standalone route item
