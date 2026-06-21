@@ -34,7 +34,8 @@ export default {
     },
     shortKeyAction: {
       search: "Search feature",
-      showCommandTextEditor: "Show command text editor",
+      showCommandTextEditor: "Show command",
+      showIntelliSense: "Show intelliSense",
       formatCodeTextEditor: "Format code",
       executeSQLCode: "Run SQL code",
     },

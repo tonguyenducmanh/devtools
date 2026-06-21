@@ -11,6 +11,7 @@ export const TDShortcutActionEnum = {
   Search: "search",
   ShowCommandTextEditor: "showCommandTextEditor",
   FormatCodeTextEditor: "formatCodeTextEditor",
+  ShowIntelliSense: "ShowIntelliSense",
 };
 
 const ShortcutConfigMap = {
@@ -30,14 +31,26 @@ const ShortcutConfigMap = {
       }
     },
   },
-  [TDShortcutActionEnum.ShowCommandTextEditor]: {
+  [TDShortcutActionEnum.ShowIntelliSense]: {
     sortOrder: 2,
+    key: tdUtility.newGuid(),
+    presentKey: (() => {
+      if (isMacOS) {
+        return ["Option", "Esc"];
+      } else {
+        return ["Ctrl", "Space"];
+      }
+    })(),
+    labelKey: "i18nCommon.shortKeyAction.showIntelliSense",
+  },
+  [TDShortcutActionEnum.ShowCommandTextEditor]: {
+    sortOrder: 3,
     key: tdUtility.newGuid(),
     presentKey: ["F1"],
     labelKey: "i18nCommon.shortKeyAction.showCommandTextEditor",
   },
   [TDShortcutActionEnum.FormatCodeTextEditor]: {
-    sortOrder: 3,
+    sortOrder: 4,
     key: tdUtility.newGuid(),
     presentKey: (() => {
       if (isLinux) {

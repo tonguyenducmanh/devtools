@@ -34,7 +34,8 @@ export default {
     },
     shortKeyAction: {
       search: "Tìm kiếm tính năng",
-      showCommandTextEditor: "Hiển thị lệnh text editor",
+      showCommandTextEditor: "Hiển thị lệnh",
+      showIntelliSense: "Hiển thị intelliSense",
       formatCodeTextEditor: "Định dạng code",
       executeSQLCode: "Run SQL code",
     },

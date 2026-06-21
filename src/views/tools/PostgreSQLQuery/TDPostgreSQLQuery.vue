@@ -1223,7 +1223,7 @@ export default {
     getConfigFormatCode() {
       let me = this;
       let configKeyboard = {
-        sortOrder: 3,
+        sortOrder: 4,
         key: me.$tdUtility.newGuid(),
         presentKey: [me.$tdUtility.ctrlKey(), "u"],
         labelKey: "i18nCommon.shortKeyAction.formatCodeTextEditor",
@@ -1233,7 +1233,7 @@ export default {
     getConfigExecuteSQLCode() {
       let me = this;
       let configKeyboard = {
-        sortOrder: 4,
+        sortOrder: 5,
         key: me.$tdUtility.newGuid(),
         presentKey: [me.$tdUtility.altKey(), me.$tdUtility.enterKey()],
         labelKey: "i18nCommon.postgreSQLQuery.runQuery",
