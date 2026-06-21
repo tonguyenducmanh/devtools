@@ -727,11 +727,3 @@ export default {
   padding: var(--padding);
 }
 </style>
-
-<style lang="scss">
-.td-toolbar-btn-disabled {
-  opacity: 0.3 !important;
-  pointer-events: none !important;
-  cursor: default !important;
-}
-</style>
