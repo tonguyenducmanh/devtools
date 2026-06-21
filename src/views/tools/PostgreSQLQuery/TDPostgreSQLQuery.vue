@@ -485,9 +485,10 @@ export default {
   },
 
   async mounted() {
-    this.agentAPI = new TDServerPostgreSQLAPI();
-    await this.loadAllData();
     let me = this;
+    me.agentAPI = new TDServerPostgreSQLAPI();
+    await me.loadAllData();
+    me.loadLastDatabaseConnect();
   },
 
   beforeUnmount() {
@@ -540,13 +541,13 @@ export default {
         export: [
           {
             key: "downloadResponse",
-            label: me.$t("i18nCommon.apiTesting.downloadReponse"),
+            label: me.$t("i18nCommon.postgreSQLQuery.downloadResult"),
             disabled: !me.canExportActiveResult,
             run: me.handleDownloadReponse,
           },
           {
             key: "copyResult",
-            label: me.$t("i18nCommon.copy"),
+            label: me.$t("i18nCommon.postgreSQLQuery.copyResult"),
             disabled: !me.canExportActiveResult,
             run: me.handleCopyResult,
           },
@@ -926,7 +927,13 @@ export default {
     },
 
     selectConnection(conn) {
-      this.selectedConnectionId = conn.id;
+      let me = this;
+      me.selectedConnectionId = conn.id;
+      // gán lại cache
+      me.$tdCache.set(
+        me.$tdEnum.cacheConfig.PostgreSQLLastConnectionId,
+        conn.id,
+      );
     },
 
     openAddConnectionPopup(groupId) {
@@ -1805,6 +1812,25 @@ export default {
     genUUIDFunc() {
       let me = this;
       me.$tdUtility.copyToClipboard(me.$tdUtility.newGuid());
+    },
+    async loadLastDatabaseConnect() {
+      let me = this;
+      let oldSelectedConnection = await me.$tdCache.get(
+        me.$tdEnum.cacheConfig.PostgreSQLLastConnectionId,
+      );
+      if (
+        oldSelectedConnection &&
+        me.allConnections &&
+        Array.isArray(me.allConnections) &&
+        me.allConnections.length > 0
+      ) {
+        let oldConnection = me.allConnections.find(
+          (x) => x.id == oldSelectedConnection,
+        );
+        if (oldConnection) {
+          me.selectConnection(oldConnection);
+        }
+      }
     },
   },
 
