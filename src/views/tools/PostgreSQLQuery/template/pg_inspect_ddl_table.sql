@@ -15,6 +15,20 @@ WITH
         E',\n'
         ORDER BY
           c.ordinal_position
+      ) || COALESCE(
+        (
+          SELECT
+            E',\n  CONSTRAINT ' || quote_ident(con.conname) || ' ' || pg_get_constraintdef(con.oid)
+          FROM
+            pg_constraint con
+            JOIN pg_class cl ON con.conrelid = cl.oid
+            JOIN pg_namespace ns ON cl.relnamespace = ns.oid
+          WHERE
+            ns.nspname = t.table_schema
+            AND cl.relname = t.table_name
+            AND con.contype = 'p'
+        ),
+        ''
       ) || E'\n);' AS def
     FROM
       information_schema.tables t
@@ -42,7 +56,7 @@ WITH
     WHERE
       n.nspname = '{schema}'
       AND c.relname = '{name}'
-      AND con.contype IN ('p', 'f', 'u', 'c')
+      AND con.contype IN ('f', 'u', 'c')
   ),
   index_def AS (
     SELECT
@@ -99,4 +113,5 @@ SELECT
     ),
     ''
   ) AS ddl
-LIMIT 1;
+LIMIT
+  1;
