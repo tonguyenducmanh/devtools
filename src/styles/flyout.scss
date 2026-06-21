@@ -1,16 +1,16 @@
 /* Không scoped — dùng Teleport nên cần global */
-.td-flyout-enter-active {
+.td-flyout-down-enter-active {
   transition:
     opacity 0.15s ease,
     transform 0.15s ease;
 }
-.td-flyout-leave-active {
+.td-flyout-down-leave-active {
   transition:
     opacity 0.1s ease,
     transform 0.1s ease;
 }
-.td-flyout-enter-from,
-.td-flyout-leave-to {
+.td-flyout-down-enter-from,
+.td-flyout-down-leave-to {
   opacity: 0;
   transform: translateY(-4px);
 }
@@ -38,18 +38,18 @@
   }
 }
 
-.td-flyout-enter-active {
+.td-flyout-right-enter-active {
   transition:
     opacity 0.15s ease,
     transform 0.15s ease;
 }
-.td-flyout-leave-active {
+.td-flyout-right-leave-active {
   transition:
     opacity 0.1s ease,
     transform 0.1s ease;
 }
-.td-flyout-enter-from,
-.td-flyout-leave-to {
+.td-flyout-right-enter-from,
+.td-flyout-right-leave-to {
   opacity: 0;
   transform: translateX(-6px);
 }

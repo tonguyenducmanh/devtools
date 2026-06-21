@@ -24,7 +24,7 @@
     </div>
     <!-- Flyout Menu -->
     <Teleport to="body">
-      <Transition name="td-flyout">
+      <Transition name="td-flyout-down">
         <div
           v-if="hoveredMenu"
           class="td-header-flyout"

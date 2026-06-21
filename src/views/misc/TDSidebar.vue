@@ -48,7 +48,7 @@
 
     <!-- Flyout -->
     <Teleport to="body">
-      <Transition name="td-flyout">
+      <Transition name="td-flyout-right">
         <div
           v-if="hoveredItem"
           class="td-sidebar-group-flyout"
