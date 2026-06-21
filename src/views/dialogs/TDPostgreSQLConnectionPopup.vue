@@ -111,9 +111,6 @@
         </div>
       </div>
 
-      <div class="flex connection-row">
-        {{ $t("i18nCommon.postgreSQLQuery.connectionAddInfo") }}
-      </div>
       <!-- Action buttons -->
       <div class="flex td-popup-actions">
         <TDButton
@@ -514,7 +511,7 @@ export default {
 
 /* Actions */
 .td-popup-actions {
-  margin-top: 30px;
+  margin-top: 10px;
   gap: var(--padding);
 }
 </style>
