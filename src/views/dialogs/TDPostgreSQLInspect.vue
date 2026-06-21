@@ -213,8 +213,9 @@ export default {
 
     /** Build SQL lấy DDL theo loại và item */
     buildDDLSQL(item) {
-      const schema = item.schema_name.replace(/'/g, "''");
-      const name = item.object_name.replace(/'/g, "''");
+      const schema = item.schema_name?.replace(/'/g, "''");
+      const name = item.object_name?.replace(/'/g, "''");
+      const oid = item.object_oid || 0;
 
       let queryTemplate = "";
       switch (this.searchType) {
@@ -236,7 +237,8 @@ export default {
 
       return queryTemplate
         .replace(/{schema}/g, schema)
-        .replace(/{name}/g, name);
+        .replace(/{name}/g, name)
+        .replace(/{oid}/g, oid);
     },
 
     async handleSearch() {
