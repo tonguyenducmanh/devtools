@@ -781,6 +781,7 @@ export default {
       queryName: "Tên query",
       sqlContent: "Nội dung script SQL",
       autoSaveQueryAfterExec: "Tự động lưu query",
+      loadFunctionIntellisense: "Load gợi ý cả function",
       addGroup: "Thêm nhóm",
       editConnection: "Sửa kết nối",
       addConnection: "Thêm kết nối",

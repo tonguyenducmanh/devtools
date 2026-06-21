@@ -200,6 +200,12 @@
             :label="$t('i18nCommon.postgreSQLQuery.autoSaveQueryAfterExec')"
             @change="updateConfigLayout"
           />
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="currentConfigLayout.loadFunctionIntellisense"
+            :label="$t('i18nCommon.postgreSQLQuery.loadFunctionIntellisense')"
+            @change="updateConfigLayout"
+          />
         </div>
         <div
           class="flex flex-col td-sidebar-content"
@@ -442,6 +448,7 @@ export default {
         currentSidebarOption:
           this.$tdEnum.PostgreSQLQuerySidebarOption.Connection,
         autoSaveQueryAfterExec: true,
+        loadFunctionIntellisense: false,
       },
 
       editorSectionSize: 50,
@@ -1087,51 +1094,53 @@ export default {
           ? keywordResult
           : null;
 
-        // Load functions (count → paging, giống như load bảng)
+        // Load functions (count → paging) — chỉ thực hiện khi bật tùy chọn
         let allFunctionRows = [];
-        try {
-          let funcCountResponse = await me.agentAPI.executeQuery(
-            me.selectedConnectionId,
-            pgQueries.pg_get_functions_count,
-          );
-
-          let totalFuncRows = 0;
-          const funcCountResult =
-            funcCountResponse?.data?.data?.results?.[0] ||
-            funcCountResponse?.data?.data ||
-            null;
-
-          if (
-            funcCountResponse?.data?.success &&
-            funcCountResult?.rows?.length > 0
-          ) {
-            totalFuncRows = parseInt(funcCountResult.rows[0].total || 0, 10);
-          }
-
-          for (let offset = 0; offset < totalFuncRows; offset += pageSize) {
-            let funcPagingQuery = `${pgQueries.pg_get_functions_paging} LIMIT ${pageSize} OFFSET ${offset};`;
-
-            let funcPagingResponse = await me.agentAPI.executeQuery(
+        if (me.currentConfigLayout.loadFunctionIntellisense) {
+          try {
+            let funcCountResponse = await me.agentAPI.executeQuery(
               me.selectedConnectionId,
-              funcPagingQuery,
+              pgQueries.pg_get_functions_count,
             );
 
-            const funcPagingResult =
-              funcPagingResponse?.data?.data?.results?.[0] ||
-              funcPagingResponse?.data?.data ||
+            let totalFuncRows = 0;
+            const funcCountResult =
+              funcCountResponse?.data?.data?.results?.[0] ||
+              funcCountResponse?.data?.data ||
               null;
 
-            if (funcPagingResponse?.data?.success && funcPagingResult?.rows) {
-              allFunctionRows.push(...funcPagingResult.rows);
-            } else {
-              console.error(
-                `Gặp lỗi khi tải functions tại vị trí dòng (offset): ${offset}`,
-              );
-              break;
+            if (
+              funcCountResponse?.data?.success &&
+              funcCountResult?.rows?.length > 0
+            ) {
+              totalFuncRows = parseInt(funcCountResult.rows[0].total || 0, 10);
             }
+
+            for (let offset = 0; offset < totalFuncRows; offset += pageSize) {
+              let funcPagingQuery = `${pgQueries.pg_get_functions_paging} LIMIT ${pageSize} OFFSET ${offset};`;
+
+              let funcPagingResponse = await me.agentAPI.executeQuery(
+                me.selectedConnectionId,
+                funcPagingQuery,
+              );
+
+              const funcPagingResult =
+                funcPagingResponse?.data?.data?.results?.[0] ||
+                funcPagingResponse?.data?.data ||
+                null;
+
+              if (funcPagingResponse?.data?.success && funcPagingResult?.rows) {
+                allFunctionRows.push(...funcPagingResult.rows);
+              } else {
+                console.error(
+                  `Gặp lỗi khi tải functions tại vị trí dòng (offset): ${offset}`,
+                );
+                break;
+              }
+            }
+          } catch (e) {
+            console.warn("Load functions intellisense warning:", e);
           }
-        } catch (e) {
-          console.warn("Load functions intellisense warning:", e);
         }
 
         // Đóng gói lại đúng cấu trúc để cấp phát cho Monaco Editor
@@ -1260,7 +1269,8 @@ export default {
             // format: [DEFAULT] [name] type ...  hoặc  type (anonymous)
             // pg luôn đặt tên trước type khi có tên
             const name = parts.length >= 2 ? parts[0] : null;
-            const type = parts.length >= 2 ? parts.slice(1).join(" ") : parts[0];
+            const type =
+              parts.length >= 2 ? parts.slice(1).join(" ") : parts[0];
             return { name: name || null, type: type || "" };
           });
         }
@@ -1343,7 +1353,11 @@ export default {
           functionSuggestions.push({
             label: fnName,
             kind: monaco.languages.CompletionItemKind.Function,
-            insertText: buildFunctionCallSnippetWithSchema(schema, fnName, argsStr),
+            insertText: buildFunctionCallSnippetWithSchema(
+              schema,
+              fnName,
+              argsStr,
+            ),
             insertTextRules:
               monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             detail: `fn ${schema}.${fnName}(${argsStr}) \u2192 ${returnType}`,
@@ -1448,7 +1462,10 @@ export default {
                   suggestions.push(...columnsByTable.get(prefix));
                 }
                 // 3. Prefix là tên schema -> gợi ý bảng + functions
-                else if (tablesBySchema.has(prefix) || functionsBySchema.has(prefix)) {
+                else if (
+                  tablesBySchema.has(prefix) ||
+                  functionsBySchema.has(prefix)
+                ) {
                   // Bảng
                   (tablesBySchema.get(prefix) ?? new Set()).forEach((tbl) => {
                     suggestions.push({

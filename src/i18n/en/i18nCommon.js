@@ -784,6 +784,7 @@ export default {
       queryName: "Query name",
       sqlContent: "SQL script",
       autoSaveQueryAfterExec: "Auto save query",
+      loadFunctionIntellisense: "Load function intellisense",
       addGroup: "Add group",
       editConnection: "Edit connection",
       addConnection: "Add connection",
