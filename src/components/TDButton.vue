@@ -60,7 +60,7 @@ export default {
     },
     isSmallButton: {
       type: Boolean,
-      default: "",
+      default: false,
     },
   },
   data() {

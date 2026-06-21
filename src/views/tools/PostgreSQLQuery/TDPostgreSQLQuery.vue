@@ -18,7 +18,7 @@
           :noMargin="true"
           @click="handleRunQuery"
           iconClass="td-send-icon"
-          isSmallButton
+          :isSmallButton="true"
           v-tooltip="$t('i18nCommon.postgreSQLQuery.runQuery')"
         ></TDButton>
         <TDFlyoutPanel
