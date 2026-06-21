@@ -244,7 +244,7 @@ const sidebarConfig = [
   },
   {
     type: "group",
-    groupKey: "qrcode",
+    groupKey: "ai",
     groupTitleKey: "i18nCommon.group.ArtificialIntelligence",
     children: [
       {
