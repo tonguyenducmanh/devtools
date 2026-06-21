@@ -1674,9 +1674,6 @@ export default {
           query_text: me.sqlText,
         });
         if (response?.data?.success) {
-          me.$tdToast.success(
-            me.$t("i18nCommon.postgreSQLQuery.saveQuerySuccess"),
-          );
           me.currentSavedQueryId = response.data.data?.id;
           me.newQueryName = "";
           await me.loadSavedQueries();
