@@ -777,6 +777,8 @@ export default {
       connectionString: "Chuỗi kết nối",
       groupName: "Tên nhóm",
       queryName: "Tên query",
+      sqlContent: "Nội dung script SQL",
+      autoSaveQueryAfterExec:"Tự động lưu query",
       addGroup: "Thêm nhóm",
       editConnection: "Sửa kết nối",
       addConnection: "Thêm kết nối",

@@ -780,6 +780,8 @@ export default {
       connectionString: "Connection string",
       groupName: "Group name",
       queryName: "Query name",
+      sqlContent: "SQL script",
+      autoSaveQueryAfterExec: "Auto save query",
       addGroup: "Add group",
       editConnection: "Edit connection",
       addConnection: "Add connection",

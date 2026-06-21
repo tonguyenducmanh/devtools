@@ -194,6 +194,12 @@
             :label="$t('i18nCommon.APIMocking.wrapText')"
             @change="updateConfigLayout"
           />
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="currentConfigLayout.autoSaveQueryAfterExec"
+            :label="$t('i18nCommon.postgreSQLQuery.autoSaveQueryAfterExec')"
+            @change="updateConfigLayout"
+          />
         </div>
         <div
           class="flex flex-col td-sidebar-content"
@@ -417,6 +423,7 @@ export default {
         splitHorizontal: true,
         currentSidebarOption:
           this.$tdEnum.PostgreSQLQuerySidebarOption.Connection,
+        autoSaveQueryAfterExec: true,
       },
 
       editorSectionSize: 50,
@@ -871,6 +878,10 @@ export default {
           error?.message ?? me.$t("i18nCommon.toastMessage.error");
       } finally {
         me.isRunning = false;
+        // lưu lại luôn câu lệnh vừa chạy của user
+        if (me.currentConfigLayout.autoSaveQueryAfterExec) {
+          me.saveCurrentQuery();
+        }
       }
     },
 
@@ -1291,17 +1302,20 @@ export default {
 
     async saveCurrentQuery() {
       let me = this;
-      if (!me.newQueryName || !me.sqlText?.trim()) {
+      if (!me.sqlText?.trim()) {
         me.$tdToast.warning(
-          me.$t("i18nCommon.postgreSQLQuery.queryName") +
+          me.$t("i18nCommon.postgreSQLQuery.sqlContent") +
             " " +
             me.$t("i18nCommon.toastMessage.required"),
         );
         return;
       }
+      // không ép user phải nhập tên mới cho cất
+      let queryName = me.newQueryName || me.sqlText;
+      queryName = (queryName || "").substring(0, 100);
       try {
         let response = await me.agentAPI.savedQuery.create({
-          query_name: me.newQueryName,
+          query_name: queryName,
           connection_id: me.selectedConnectionId ?? "",
           query_text: me.sqlText,
         });
