@@ -1,1 +1,4 @@
-SELECT 1 LIMIT 1;
+SELECT
+  1
+LIMIT
+  1;
