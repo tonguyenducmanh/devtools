@@ -28,7 +28,6 @@
             v-tooltip="action.tooltip"
             @click="onActionClick(action)"
           >
-            <span class="td-icon" :class="action.iconClass"></span>
             <span>{{ action.label }}</span>
           </div>
         </TDFlyoutPanel>
@@ -501,11 +500,7 @@ export default {
         codeComplete: [
           {
             key: "loadIntellisense",
-            iconClass: "td-example-icon",
             label: me.isLoadingIntellisense
-              ? me.$t("i18nCommon.postgreSQLQuery.intellisenseLoading")
-              : me.$t("i18nCommon.postgreSQLQuery.loadIntellisense"),
-            tooltip: me.isLoadingIntellisense
               ? me.$t("i18nCommon.postgreSQLQuery.intellisenseLoading")
               : me.$t("i18nCommon.postgreSQLQuery.loadIntellisense"),
             disabled: !me.selectedConnectionId || me.isLoadingIntellisense,
@@ -515,28 +510,24 @@ export default {
         edit: [
           {
             key: "formatSQL",
-            iconClass: "td-format-icon",
             label: me.$t("i18nCommon.postgreSQLQuery.formatCode"),
             disabled: false,
             run: me.handleFormatSQL,
           },
           {
             key: "genUUID",
-            iconClass: "td-random-icon",
             label: me.$t("i18nCommon.help.genUUID"),
             disabled: false,
             run: me.genUUIDFunc,
           },
           {
             key: "saveQuery",
-            iconClass: "td-save-icon",
             label: me.$t("i18nCommon.postgreSQLQuery.saveQuery"),
             disabled: false,
             run: me.saveCurrentQuery,
           },
           {
             key: "addConnection",
-            iconClass: "td-plus-icon",
             label: me.$t("i18nCommon.postgreSQLQuery.addConnection"),
             disabled: false,
             run: me.openAddConnectionPopup,
@@ -545,14 +536,12 @@ export default {
         export: [
           {
             key: "downloadResponse",
-            iconClass: "td-download-icon",
             label: me.$t("i18nCommon.apiTesting.downloadReponse"),
             disabled: !me.canExportActiveResult,
             run: me.handleDownloadReponse,
           },
           {
             key: "copyResult",
-            iconClass: "td-copy-icon",
             label: me.$t("i18nCommon.copy"),
             disabled: !me.canExportActiveResult,
             run: me.handleCopyResult,
@@ -561,14 +550,12 @@ export default {
         explore: [
           {
             key: "runQuery",
-            iconClass: "td-send-icon",
             label: me.$t("i18nCommon.postgreSQLQuery.runQuery"),
             disabled: !me.selectedConnectionId || me.isRunning,
             run: me.handleRunQuery,
           },
           {
             key: "openInspect",
-            iconClass: "td-search-icon",
             label: me.$t("i18nCommon.postgreSQLQuery.dbInspect.title"),
             disabled: !me.selectedConnectionId,
             run: me.handleOpenInspect,
@@ -577,20 +564,17 @@ export default {
         help: [
           {
             key: "testConnection",
-            iconClass: "td-test-icon",
             label: me.$t("i18nCommon.apiTesting.testConnection"),
             disabled: !me.selectedConnectionId || me.isRunning,
             run: me.handleTestConnection,
           },
           {
             key: "reloadDatabase",
-            iconClass: "td-reload-icon",
             label: me.$t("i18nCommon.postgreSQLQuery.reloadDatabase"),
             run: me.loadAllData,
           },
           {
             key: "templatePostgresSQL",
-            iconClass: "td-book-icon",
             label: me.$t("i18nCommon.feature.PostgreSQLTemplate"),
             run: me.openCodePostgresqlTemplate,
           },
