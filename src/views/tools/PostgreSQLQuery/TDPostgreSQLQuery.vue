@@ -628,10 +628,6 @@ export default {
       this.resultSectionSize = sizes.rightSize;
     },
 
-    // ─────────────────────────────────────────────────────────
-    // Multi result helpers
-    // ─────────────────────────────────────────────────────────
-
     normalizeSingleResult(result) {
       if (!result) return null;
       return {
@@ -646,14 +642,11 @@ export default {
     },
 
     normalizeMultiQueryResult(payload) {
-      // backend mới: { results: [...] }
       if (payload && Array.isArray(payload.results)) {
         return payload.results
           .map((item) => this.normalizeSingleResult(item))
           .filter(Boolean);
       }
-
-      // backend cũ: trả thẳng 1 result
       if (payload && typeof payload === "object") {
         const one = this.normalizeSingleResult(payload);
         return one ? [one] : [];
@@ -702,8 +695,6 @@ export default {
       this.activeResultIndex = 0;
       this.queryError = null;
     },
-
-    // ─── Load data ───────────────────────────────────────────
 
     async loadAllData() {
       let me = this;
@@ -755,8 +746,6 @@ export default {
         me.allSavedQueries.splice(0, me.allSavedQueries.length, ...data);
       }
     },
-
-    // ─── Connection management ─────────────────────────────────────────────────
 
     toggleGroup(groupKey) {
       this.openGroups[groupKey] = !this.openGroups[groupKey];
@@ -845,8 +834,6 @@ export default {
       }
     },
 
-    // ─── SQL Execution ─────────────────────────────────────────────────────────
-
     async handleRunQuery() {
       let me = this;
       if (!me.selectedConnectionId) {
@@ -887,8 +874,6 @@ export default {
       }
     },
 
-    // ─── Format SQL ────────────────────────────────────────────────────────────
-
     async handleTestConnection() {
       if (!this.selectedConnectionId) return;
       await this.testDatabaseConnection(
@@ -910,8 +895,6 @@ export default {
         me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
-
-    // ─── Copy result ───────────────────────────────────────────────────────────
 
     buildResultForCopy() {
       const result = this.activeQueryResult;
@@ -949,8 +932,6 @@ export default {
         );
       }
     },
-
-    // ─── Intellisense ──────────────────────────────────────────────────────────
 
     async handleLoadIntellisense() {
       let me = this;
@@ -1308,8 +1289,6 @@ export default {
       }
     },
 
-    // ─── Saved queries ─────────────────────────────────────────────────────────
-
     async saveCurrentQuery() {
       let me = this;
       if (!me.newQueryName || !me.sqlText?.trim()) {
@@ -1427,7 +1406,6 @@ export default {
   gap: var(--padding);
 }
 
-/* Container chứa các button */
 .td-query-btn-group {
   height: 100%;
   display: flex;
@@ -1435,11 +1413,8 @@ export default {
   align-items: center;
   justify-content: flex-start;
   gap: var(--padding);
-  /* Cố định chiều rộng (nếu cần) và cho phép scroll dọc khi thiếu chiều cao */
   overflow-y: auto;
-  overflow-x: hidden; /* Ẩn scroll ngang ngoài ý muốn */
-
-  /* Đảm bảo container không bị ép co nhỏ lại quá mức trong layout lớn */
+  overflow-x: hidden;
   flex-shrink: 0;
 }
 
