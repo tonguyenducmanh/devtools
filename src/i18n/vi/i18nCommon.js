@@ -26,6 +26,8 @@ export default {
     selectedRecord: "Đã chọn",
     record: "Bản ghi",
     copy: "Sao chép",
+    clickTocopyRow: "Click để sao chép dòng {0}",
+    clickTocopyCell: "Click để sao chép ô này",
     subSidebar: {
       showTooltip: "Hiển thị menu theo tool",
       hideTooltip: "Ẩn menu theo tool",
@@ -778,7 +780,7 @@ export default {
       groupName: "Tên nhóm",
       queryName: "Tên query",
       sqlContent: "Nội dung script SQL",
-      autoSaveQueryAfterExec:"Tự động lưu query",
+      autoSaveQueryAfterExec: "Tự động lưu query",
       addGroup: "Thêm nhóm",
       editConnection: "Sửa kết nối",
       addConnection: "Thêm kết nối",

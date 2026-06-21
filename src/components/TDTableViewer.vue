@@ -131,7 +131,7 @@
                 v-if="showIndex"
                 class="td-table-cell td-table-cell-index td-table-cell-sticky"
                 :style="indexStickyStyle"
-                v-tooltip="$t('i18nCommon.copy')"
+                v-tooltip="$t('i18nCommon.clickTocopyRow').format(rowIndex + 1)"
                 @click="copyRow(row)"
               >
                 <div>
@@ -147,6 +147,7 @@
                 :class="[getColumnClass(column)]"
                 :style="getColumnStyle(column)"
                 @click="handleDataSelected(row, column)"
+                v-tooltip="$t('i18nCommon.clickTocopyCell')"
               >
                 <slot
                   :name="`cell-${column.key}`"

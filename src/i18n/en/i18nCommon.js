@@ -26,6 +26,8 @@ export default {
     selectedRecord: "Selected",
     record: "Records",
     copy: "Copy",
+    clickTocopyRow: "Click to copy row {0}",
+    clickTocopyCell: "Click to copy this cell",
     subSidebar: {
       showTooltip: "Show menu tool",
       hideTooltip: "Hide menu tool",
