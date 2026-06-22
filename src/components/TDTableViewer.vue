@@ -626,6 +626,9 @@ export default {
       if (value === false) {
         return "false";
       }
+      if (typeof value === "object") {
+        return JSON.stringify(value);
+      }
       return value === "" ? this.emptyCellText : value;
     },
 
@@ -813,6 +816,9 @@ export default {
 
     handleDataSelected(row, column) {
       let data = this.formatCellValue(row, column);
+      if (data !== null && typeof data === "object") {
+        data = JSON.stringify(data);
+      }
       this.$tdUtility.copyToClipboard(data, true, this.enableLogCopyData);
     },
 
