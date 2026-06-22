@@ -53,6 +53,9 @@
           <div class="section-item">
             {{ $t("i18nHelp.postgreSQLQuery.features.objectInspect") }}
           </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.postgreSQLQuery.features.listDatabases") }}
+          </div>
         </div>
       </div>
     </div>

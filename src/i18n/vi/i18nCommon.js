@@ -878,6 +878,13 @@ export default {
         inspectHint: "Chuột phải → Xem DDL",
         noObjectSelected: "Không tìm thấy tên object tại vị trí con trỏ",
       },
+      dbList: {
+        title: "Danh sách Database",
+        searchPlaceholder: "Lọc database...",
+        loadError: "Không thể tải danh sách database",
+        loadErrorFallback: "Lỗi tải danh sách database",
+        clickToAdd: "Nhấn để thêm database này làm kết nối",
+      },
     },
   },
 };

@@ -11,6 +11,7 @@ export const TDDialogEnum = {
   TDPostgreSQLConnectionPopup: 5,
   TDPostgreSQLInspect: 6,
   TDQuickPreview: 7,
+  TDPostgreSQLDatabaseList: 8,
 };
 
 /**
@@ -32,6 +33,8 @@ const DialogComponentMap = {
     import("@/views/dialogs/TDPostgreSQLInspect.vue"),
   [TDDialogEnum.TDQuickPreview]: () =>
     import("@/views/dialogs/TDQuickPreview.vue"),
+  [TDDialogEnum.TDPostgreSQLDatabaseList]: () =>
+    import("@/views/dialogs/TDPostgreSQLDatabaseList.vue"),
 };
 
 class TDDialogUtil {

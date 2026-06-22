@@ -882,6 +882,13 @@ export default {
         inspectHint: "Right-click → Inspect DDL",
         noObjectSelected: "No object name found at cursor",
       },
+      dbList: {
+        title: "Database List",
+        searchPlaceholder: "Filter databases...",
+        loadError: "Could not load database list",
+        loadErrorFallback: "Error loading databases",
+        clickToAdd: "Click to add this database as a connection",
+      },
     },
   },
 };

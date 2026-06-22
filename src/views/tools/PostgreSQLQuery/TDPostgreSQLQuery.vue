@@ -621,6 +621,12 @@ export default {
             disabled: !me.selectedConnectionId,
             run: me.handleOpenInspect,
           },
+          {
+            key: "openDatabaseList",
+            label: me.$t("i18nCommon.postgreSQLQuery.dbList.title"),
+            disabled: !me.selectedConnectionId,
+            run: me.handleOpenDatabaseList,
+          },
         ],
         help: [
           {
@@ -1362,6 +1368,21 @@ export default {
       }
       await TDDialogUtil.showPopup({
         dialogType: TDDialogEnum.TDPostgreSQLInspect,
+        ownerForm: me,
+        param: { connectionId: me.selectedConnectionId },
+      });
+    },
+
+    async handleOpenDatabaseList() {
+      let me = this;
+      if (!me.selectedConnectionId) {
+        me.$tdToast.warning(
+          me.$t("i18nCommon.postgreSQLQuery.noConnectionSelected"),
+        );
+        return;
+      }
+      await TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDPostgreSQLDatabaseList,
         ownerForm: me,
         param: { connectionId: me.selectedConnectionId },
       });

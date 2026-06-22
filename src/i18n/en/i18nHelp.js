@@ -502,6 +502,8 @@ export default {
           "Multiple Connections: Manage multiple connections and group them easily.",
         objectInspect:
           "Object Inspection: Hover over a table/view/function name in the editor to see its type; right-click and select 'Inspect Object DDL' to view the full DDL in the DB Inspect dialog.",
+        listDatabases:
+          "List Databases: Use the 'Database List' action in the Explore menu to list all databases on the same server. Click a database to add it as a new connection with auto-filled host/port/credentials.",
       },
     },
   },

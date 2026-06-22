@@ -20,4 +20,5 @@ export default {
   pg_inspect_ddl_function: codeModules["./template/pg_inspect_ddl_function.sql"],
   pg_inspect_ddl_function_by_name: codeModules["./template/pg_inspect_ddl_function_by_name.sql"],
   pg_inspect_list_schemas: codeModules["./template/pg_inspect_list_schemas.sql"],
+  pg_inspect_list_databases: codeModules["./template/pg_inspect_list_databases.sql"],
 };

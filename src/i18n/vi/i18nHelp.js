@@ -490,6 +490,8 @@ export default {
           "Nhiều kết nối: Quản lý nhiều kết nối và phân nhóm dễ dàng.",
         objectInspect:
           "Tra cứu Object: Di chuột vào tên table/view/function trong editor để xem loại; chuột phải và chọn 'Xem DDL Object' để xem DDL đầy đủ trong hộp thoại DB Inspect.",
+        listDatabases:
+          "Danh sách Database: Dùng menu 'Danh sách Database' trong nhóm Explore để xem tất cả database trên cùng server. Click vào database để thêm kết nối mới với thông tin host/port được điền sẵn.",
       },
     },
   },

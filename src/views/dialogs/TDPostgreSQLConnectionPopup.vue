@@ -291,19 +291,27 @@ export default {
         this.isEditMode = false;
         this.form = {
           id: null,
-          connection_name: "",
+          connection_name: param?.connection_name ?? "",
           group_id: param?.group_id ?? "",
           connection_string: "",
           connect_type: 0,
         };
-        this.connFields = {
-          host: "localhost",
-          port: "5432",
-          database: "",
-          username: "",
-          password: "",
-          sslmode: "disable",
-        };
+        // Cho phép pre-fill connFields từ param (vd: từ tính năng list databases)
+        if (param?.connFields) {
+          this.connFields = { ...this.connFields, ...param.connFields };
+        } else {
+          this.connFields = {
+            host: "localhost",
+            port: "5432",
+            database: "",
+            username: "",
+            password: "",
+            sslmode: "disable",
+          };
+        }
+        if (param?.connFields) {
+          this.buildConnectionString();
+        }
       }
     },
 
