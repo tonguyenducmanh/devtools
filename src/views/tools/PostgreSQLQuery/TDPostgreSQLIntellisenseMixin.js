@@ -68,6 +68,7 @@ export default {
           columns: [
             "table_schema",
             "table_name",
+            "table_type",
             "column_name",
             "data_type",
             "ordinal_position",
@@ -140,6 +141,7 @@ export default {
             "function_name",
             "function_arguments",
             "return_type",
+            "function_oid",
           ],
           rows: allFunctionRows,
         };
@@ -247,6 +249,28 @@ export default {
           allColumns.push(colDef);
         });
 
+        // ── Build inspect lookup ──────────────────────────────────────────────
+        me._inspectLookup = { tables: new Map(), views: new Map(), functions: new Map() };
+
+        tableRows.forEach((row) => {
+          const tbl = String(row.table_name).toLowerCase();
+          const schema = String(row.table_schema).toLowerCase();
+          const type = String(row.table_type || "").toUpperCase();
+          const key = `${schema}.${tbl}`;
+
+          if (type === "VIEW") {
+            if (!me._inspectLookup.views.has(key))
+              me._inspectLookup.views.set(key, { schema, name: tbl });
+            if (!me._inspectLookup.views.has(tbl))
+              me._inspectLookup.views.set(tbl, { schema, name: tbl });
+          } else {
+            if (!me._inspectLookup.tables.has(key))
+              me._inspectLookup.tables.set(key, { schema, name: tbl });
+            if (!me._inspectLookup.tables.has(tbl))
+              me._inspectLookup.tables.set(tbl, { schema, name: tbl });
+          }
+        });
+
         // ── Functions ─────────────────────────────────────────────────────────
         function parseFunctionArgs(argsStr) {
           if (!argsStr || !argsStr.trim()) return [];
@@ -336,6 +360,24 @@ export default {
             documentation: { value: docValue, isTrusted: true },
             sortText: "1" + fnName,
           });
+        });
+
+        // Add functions to inspect lookup
+        functionRows.forEach((row) => {
+          const schema = String(row.function_schema).toLowerCase();
+          const fnName = String(row.function_name).toLowerCase();
+          const key = `${schema}.${fnName}`;
+          const entry = {
+            schema,
+            name: fnName,
+            args: row.function_arguments || "",
+            returnType: row.return_type || "",
+            oid: row.function_oid || null,
+          };
+          if (!me._inspectLookup.functions.has(key))
+            me._inspectLookup.functions.set(key, entry);
+          if (!me._inspectLookup.functions.has(fnName))
+            me._inspectLookup.functions.set(fnName, entry);
         });
 
         // Đăng ký completion provider
@@ -557,8 +599,131 @@ export default {
         );
 
         me.intellisenseDisposable = [disposable];
+
+        // ── Register hover provider ────────────────────────────────────────────
+        function findInspectObject(word) {
+          if (!me._inspectLookup) return null;
+          const w = word.toLowerCase();
+          // Check tables
+          let entry = me._inspectLookup.tables.get(w);
+          if (entry) return { ...entry, type: "table" };
+          // Check views
+          entry = me._inspectLookup.views.get(w);
+          if (entry) return { ...entry, type: "view" };
+          // Check functions
+          entry = me._inspectLookup.functions.get(w);
+          if (entry) return { ...entry, type: "function" };
+          return null;
+        }
+
+        const hoverDisposable = monaco.languages.registerHoverProvider("pgsql", {
+          provideHover: async (model, position) => {
+            if (!me.selectedConnectionId || !me._inspectLookup) return null;
+
+            // Lấy full word tại vị trí hover (vd: "sample_data")
+            const word = model.getWordAtPosition(position);
+            if (!word) return null;
+            const objectName = word.word.toLowerCase();
+
+            // Kiểm tra phía trước word có schema prefix không (vd: "tm.")
+            const lineContent = model.getLineContent(position.lineNumber);
+            const textBeforeWord = lineContent.substring(
+              0,
+              word.startColumn - 1,
+            );
+            const dotMatch = textBeforeWord.match(
+              /([a-zA-Z0-9_]+)\.$/,
+            );
+
+            if (dotMatch) {
+              const schemaName = dotMatch[1].toLowerCase();
+              const key = `${schemaName}.${objectName}`;
+              const obj = findInspectObject(key);
+              if (!obj) return null;
+              return buildHoverContent(obj, objectName);
+            }
+
+            // Bare word, không có schema prefix
+            const obj = findInspectObject(objectName);
+            if (!obj) return null;
+            return buildHoverContent(obj, objectName);
+          },
+        });
+        me.intellisenseDisposable.push(hoverDisposable);
+
+        // Helper build nội dung hover
+        function buildHoverContent(obj, name) {
+          const typeLabel =
+            obj.type === "table"
+              ? "TABLE"
+              : obj.type === "view"
+                ? "VIEW"
+                : "FUNCTION";
+          const fullName = `${obj.schema}.${obj.name}`;
+          let detail = "";
+          if (obj.type === "function") {
+            detail = `Arguments: ${obj.args}\nReturns: ${obj.returnType}`;
+          }
+
+          const contents = [
+            { value: `**${typeLabel}** \`${fullName}\``, isTrusted: true },
+          ];
+          if (detail) {
+            contents.push({ value: `\n${detail}`, isTrusted: true });
+          }
+          contents.push({
+            value: `\n\n_Right-click \u2192 Inspect DDL_`,
+            isTrusted: true,
+          });
+
+          return { contents };
+        }
       } catch (error) {
         console.error("applyMonacoIntellisense error:", error);
+      }
+    },
+
+    /**
+     * Fetch DDL của object từ database
+     */
+    async fetchObjectDDL(schema, name, type) {
+      if (!this.selectedConnectionId) return "-- No connection selected";
+      try {
+        let template = "";
+        switch (type) {
+          case "table":
+            template = pgQueries.pg_inspect_ddl_table
+              .replace("{schema}", schema)
+              .replace("{name}", name);
+            break;
+          case "view":
+            template = pgQueries.pg_inspect_ddl_view
+              .replace("{schema}", schema)
+              .replace("{name}", name);
+            break;
+          case "function":
+            template = pgQueries.pg_inspect_ddl_function_by_name
+              .replace("{schema}", schema)
+              .replace("{name}", name);
+            break;
+        }
+        if (!template) return "-- Unknown object type";
+
+        const resp = await this.agentAPI.executeQuery(
+          this.selectedConnectionId,
+          template,
+        );
+        const result =
+          resp?.data?.data?.results?.[0] || resp?.data?.data || null;
+
+        if (resp?.data?.success && result?.rows?.length > 0) {
+          const firstRow = result.rows[0];
+          const firstKey = Object.keys(firstRow)[0];
+          return firstRow[firstKey] ?? "-- No DDL returned";
+        }
+        return `-- Object "${schema}.${name}" not found`;
+      } catch (e) {
+        return `-- Error: ${e.message || "Unknown"}`;
       }
     },
   },

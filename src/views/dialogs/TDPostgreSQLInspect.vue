@@ -171,6 +171,18 @@ export default {
       this.ddlContent = "";
       this.activeIndex = -1;
       this.searchError = "";
+
+      // Hỗ trợ pre-fill từ context menu inspect
+      if (param?.preSearchType) {
+        this.searchType = param.preSearchType;
+      }
+      if (param?.preSearchSchema) {
+        this.searchSchema = param.preSearchSchema;
+      }
+      if (param?.preSearchValue) {
+        this.searchValue = param.preSearchValue;
+      }
+
       await this.loadSchemas();
       await this.handleSearch();
     },

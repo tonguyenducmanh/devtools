@@ -874,6 +874,8 @@ export default {
         function: "Function",
         trigger: "Trigger",
         allSchemas: "Tất cả schema",
+        inspectObject: "Xem DDL Object",
+        noObjectSelected: "Không tìm thấy tên object tại vị trí con trỏ",
       },
     },
   },

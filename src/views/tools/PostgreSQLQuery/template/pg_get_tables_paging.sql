@@ -1,6 +1,7 @@
 SELECT
   t.table_schema,
   t.table_name,
+  t.table_type,
   c.column_name,
   c.data_type,
   c.ordinal_position

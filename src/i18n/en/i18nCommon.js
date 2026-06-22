@@ -878,6 +878,8 @@ export default {
         function: "Function",
         trigger: "Trigger",
         allSchemas: "All schemas",
+        inspectObject: "Inspect Object DDL",
+        noObjectSelected: "No object name found at cursor",
       },
     },
   },

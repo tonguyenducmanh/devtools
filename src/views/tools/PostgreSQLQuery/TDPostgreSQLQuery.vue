@@ -669,6 +669,84 @@ export default {
               me.endEditFromEditor(editor, this.handleRunQuery);
             },
           );
+
+          // Context menu: Inspect object DDL
+          editor.addAction({
+            id: "inspect-pg-object",
+            label: me.$t("i18nCommon.postgreSQLQuery.dbInspect.inspectObject"),
+            contextMenuGroupId: "navigation",
+            contextMenuOrder: 2,
+            run: async (ed) => {
+              const position = ed.getPosition();
+              const model = ed.getModel();
+              if (!position || !model) return;
+
+              // Lấy full word tại vị trí con trỏ (vd: "sample_data")
+              const word = model.getWordAtPosition(position);
+              if (!word) {
+                me.$tdToast.warning(
+                  me.$t("i18nCommon.postgreSQLQuery.dbInspect.noObjectSelected"),
+                );
+                return;
+              }
+              let objectName = word.word;
+              let schemaName = "";
+
+              // Kiểm tra phía trước word có schema prefix không (vd: "tm.")
+              const lineContent = model.getLineContent(position.lineNumber);
+              const textBeforeWord = lineContent.substring(
+                0,
+                word.startColumn - 1,
+              );
+              const dotMatch = textBeforeWord.match(
+                /([a-zA-Z0-9_]+)\.$/,
+              );
+              if (dotMatch) {
+                schemaName = dotMatch[1];
+              }
+
+              if (!objectName) {
+                me.$tdToast.warning(
+                  me.$t("i18nCommon.postgreSQLQuery.dbInspect.noObjectSelected"),
+                );
+                return;
+              }
+
+              // Phân giải object type từ inspect lookup
+              let searchType = "";
+              let resolvedSchema = schemaName;
+
+              if (me._inspectLookup) {
+                const w = objectName.toLowerCase();
+                const s = schemaName.toLowerCase();
+                const key = s ? `${s}.${w}` : w;
+
+                if (me._inspectLookup.tables.has(key)) {
+                  searchType = "table";
+                  if (!resolvedSchema)
+                    resolvedSchema =
+                      me._inspectLookup.tables.get(key).schema;
+                } else if (me._inspectLookup.views.has(key)) {
+                  searchType = "view";
+                  if (!resolvedSchema)
+                    resolvedSchema =
+                      me._inspectLookup.views.get(key).schema;
+                } else if (me._inspectLookup.functions.has(key)) {
+                  searchType = "function";
+                  if (!resolvedSchema)
+                    resolvedSchema =
+                      me._inspectLookup.functions.get(key).schema;
+                }
+              }
+
+              // Fallback: nếu không xác định được type, mở dialog với search text
+              me.handleOpenInspectWithSearch(
+                searchType || "table",
+                objectName,
+                resolvedSchema || "",
+              );
+            },
+          });
         },
       };
     },
@@ -1275,6 +1353,26 @@ export default {
         dialogType: TDDialogEnum.TDPostgreSQLInspect,
         ownerForm: me,
         param: { connectionId: me.selectedConnectionId },
+      });
+    },
+
+    async handleOpenInspectWithSearch(searchType, searchValue, searchSchema) {
+      let me = this;
+      if (!me.selectedConnectionId) {
+        me.$tdToast.warning(
+          me.$t("i18nCommon.postgreSQLQuery.noConnectionSelected"),
+        );
+        return;
+      }
+      await TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDPostgreSQLInspect,
+        ownerForm: me,
+        param: {
+          connectionId: me.selectedConnectionId,
+          preSearchType: searchType,
+          preSearchValue: searchValue,
+          preSearchSchema: searchSchema,
+        },
       });
     },
 
