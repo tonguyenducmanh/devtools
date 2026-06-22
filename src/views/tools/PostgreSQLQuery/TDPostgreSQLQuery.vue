@@ -114,7 +114,7 @@
                     :stickyHeader="true"
                     :showIndex="true"
                     :usingFooterHelp="true"
-                    :showFooter="!hasMultipleResultStatement"
+                    :showFooter="true"
                     maxHeight="100%"
                   />
                 </KeepAlive>
@@ -901,19 +901,14 @@ export default {
         if (!result) {
           `${index + 1} result`;
         }
-        let rowEffect = result.rows_affected ?? result.rows?.length ?? 0;
-        let tableName = null;
         if (result.is_select) {
-          tableName = result.table_names?.find((x) => !!x);
+          let tableName = result.table_names?.find((x) => !!x);
           if (tableName) labelTab = `${index + 1} ${tableName}`;
           else {
             labelTab = `${index + 1} select`;
           }
         } else {
           labelTab = `${index + 1} command`;
-        }
-        if (rowEffect) {
-          labelTab = `${labelTab} ${rowEffect} ${this.$t("i18nCommon.record")}`;
         }
       } catch (error) {}
       return labelTab;

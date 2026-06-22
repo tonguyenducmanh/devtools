@@ -29,6 +29,7 @@ export default {
     clickTocopyRow: "Click to copy row {0}",
     clickTocopyCell: "Click to copy this cell",
     viewFullData: "View full data",
+    rowData: "Row data",
     subSidebar: {
       showTooltip: "Show menu tool",
       hideTooltip: "Hide menu tool",
@@ -40,9 +41,9 @@ export default {
       formatCodeTextEditor: "Format code",
       executeSQLCode: "Run SQL code",
     },
-    footerHelp: "Right-click to copy · Click row # to copy row · Drag to scroll",
+    footerHelp: "Right-click a row or cell for more options · Drag to scroll",
     footerHelpDesc:
-      "Right-click a row number to copy the row, right-click a cell to copy its value. Click and drag in the table to scroll quickly.",
+      "Right-click a row number to copy or view the full row, right-click a cell to copy its value or view the full data. Click and drag in the table to scroll quickly.",
     noDataAvailable: "No data available",
     sidebarOption: {
       help: "Help",

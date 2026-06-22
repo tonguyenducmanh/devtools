@@ -818,6 +818,11 @@ export default {
           label: this.$t("i18nCommon.copy"),
           action: () => this.copyRow(row),
         },
+        {
+          key: "viewFullRow",
+          label: this.$t("i18nCommon.viewFullData"),
+          action: () => this.onRowPreview(row),
+        },
       ]);
     },
 
@@ -835,6 +840,15 @@ export default {
         true,
         this.enableLogCopyData,
       );
+    },
+
+    onRowPreview(row) {
+      TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDQuickPreview,
+        ownerForm: this,
+        props: {},
+        param: { value: row, label: this.$t("i18nCommon.rowData") },
+      });
     },
 
     onCellPreview(row, column) {

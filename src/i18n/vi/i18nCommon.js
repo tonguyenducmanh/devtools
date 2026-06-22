@@ -29,6 +29,7 @@ export default {
     clickTocopyRow: "Click để sao chép dòng {0}",
     clickTocopyCell: "Click để sao chép ô này",
     viewFullData: "Xem toàn bộ dữ liệu",
+    rowData: "Dữ liệu dòng",
     subSidebar: {
       showTooltip: "Hiển thị menu theo tool",
       hideTooltip: "Ẩn menu theo tool",
@@ -40,9 +41,9 @@ export default {
       formatCodeTextEditor: "Định dạng code",
       executeSQLCode: "Run SQL code",
     },
-    footerHelp: "Chuột phải để copy · Click số dòng copy cả dòng · Kéo thả để di chuyển nhanh",
+    footerHelp: "Chuột phải vào dòng hoặc ô để xem thêm tùy chọn · Kéo thả để di chuyển nhanh",
     footerHelpDesc:
-      "Chuột phải vào số dòng để copy cả dòng, chuột phải vào ô để copy giá trị ô. Kéo thả chuột trái trong bảng để di chuyển nhanh.",
+      "Chuột phải vào số dòng để copy hoặc xem toàn bộ dòng, chuột phải vào ô để copy giá trị hoặc xem toàn bộ dữ liệu. Kéo thả chuột trái trong bảng để di chuyển nhanh.",
     noDataAvailable: "Không có dữ liệu",
     sidebarOption: {
       help: "Trợ giúp",
