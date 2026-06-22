@@ -1731,6 +1731,11 @@ export default {
   justify-content: space-between;
   .td-header-menu-group {
     justify-content: flex-start;
+    overflow-x: auto;
+
+    .td-menu-item {
+      flex-shrink: 0;
+    }
   }
 }
 .td-query-config {
