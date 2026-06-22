@@ -14,6 +14,7 @@
           :noMargin="true"
           :options="searchTypeOptions"
           :isEditable="false"
+          @selected="handleSearch"
         />
         <div class="flex-one">
           <TDInput
@@ -159,12 +160,13 @@ export default {
 
   methods: {
     /** Gọi từ TDDialogUtil sau khi mount */
-    show(param) {
+    async show(param) {
       this.connectionId = param?.connectionId ?? "";
       this.results = [];
       this.ddlContent = "";
       this.activeIndex = -1;
       this.searchError = "";
+      await this.handleSearch();
     },
 
     handleClose(payload) {
