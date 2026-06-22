@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"td_core_service/internal/database"
 	"td_core_service/internal/model"
 
@@ -14,6 +15,8 @@ import (
 
 // DefaultQueryLimit là fallback nếu frontend không gửi default_limit.
 const DefaultQueryLimit = 1000
+
+var defaultTypeMap = pgtype.NewMap()
 
 // file này hướng tới việc gọi nối vào postgressl ở server khác
 // coding sẽ là truyền từ UI vào
@@ -44,7 +47,13 @@ type rawStatementResult struct {
 // Mỗi statement trả về 1 result set riêng
 // Dùng Simple Query Protocol ở tầng pgconn (đọc nhiều result set trong 1 round-trip duy nhất).
 // defaultLimit: 0 = không giới hạn, > 0 = hard cap.
-func ExecutePostgreSQLQuery(connectionString string, sqlQuery string, defaultLimit int, unlimited bool) (*model.TDMultiQueryResult, error) {
+func ExecutePostgreSQLQuery(connectionString string, sqlQuery string, defaultLimit int, unlimited bool) (result *model.TDMultiQueryResult, err error) {
+	defer func() {
+		if rec := recover(); rec != nil {
+			err = fmt.Errorf("internal error: %v", rec)
+		}
+	}()
+
 	ctx := context.Background()
 
 	// 1. Parse connection string ra object config
@@ -133,9 +142,10 @@ func ExecutePostgreSQLQuery(connectionString string, sqlQuery string, defaultLim
 
 // decodeTextValue chuyển 1 giá trị text thô Postgres trả về sang kiểu Go phù hợp để encode JSON.
 //   - NULL                -> nil
-//   - json / jsonb         -> json.RawMessage (giữ nguyên cấu trúc lồng nhau thay vì chuỗi escape)
-//   - còn lại (uuid, số,
-//     ngày giờ, mảng,...)  -> giữ nguyên dạng text Postgres trả về (không bị lỗi [16]byte như trước)
+//   - json / jsonb         -> json.RawMessage (giữ nguyên cấu trúc lồng nhau)
+//   - bool                 -> bool
+//   - các array type       -> slice (dùng pgtype.Map.Scan để decode)
+//   - còn lại              -> string
 func decodeTextValue(raw []byte, dataTypeOID uint32) any {
 	if raw == nil {
 		return nil
@@ -146,8 +156,36 @@ func decodeTextValue(raw []byte, dataTypeOID uint32) any {
 	case pgtype.BoolOID:
 		// Simple protocol trả boolean dạng 't'/'f', cần đổi thành bool để JSON encode đúng true/false
 		return len(raw) > 0 && raw[0] == 't'
-	default:
+	case pgtype.UUIDOID:
 		return string(raw)
+	default:
+		// Dùng pgtype.Map.Scan cho array/composite (raw bắt đầu bằng '{')
+		if len(raw) > 0 && raw[0] == '{' {
+			var decoded any
+			if err := defaultTypeMap.Scan(dataTypeOID, pgtype.TextFormatCode, raw, &decoded); err == nil {
+				if reflect.TypeOf(decoded).Kind() == reflect.Slice {
+					return sanitizePgValue(decoded)
+				}
+			}
+		}
+		return string(raw)
+	}
+}
+
+// sanitizePgValue đệ quy chuyển các kiểu Go không JSON-friendly sang dạng string.
+// Ví dụ: [16]byte (UUID) -> uuid string
+func sanitizePgValue(v any) any {
+	switch val := v.(type) {
+	case [16]byte:
+		return fmt.Sprintf("%x-%x-%x-%x-%x",
+			val[0:4], val[4:6], val[6:8], val[8:10], val[10:16])
+	case []any:
+		for i, item := range val {
+			val[i] = sanitizePgValue(item)
+		}
+		return val
+	default:
+		return v
 	}
 }
 
