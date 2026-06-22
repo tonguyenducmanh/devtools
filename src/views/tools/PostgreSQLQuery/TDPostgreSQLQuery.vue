@@ -553,6 +553,12 @@ export default {
             disabled: !me.selectedConnectionId || me.isLoadingIntellisense,
             run: me.handleLoadIntellisense,
           },
+          {
+            key: "cloneIntellisense",
+            label: me.$t("i18nCommon.postgreSQLQuery.cloneIntellisense"),
+            disabled: !me.selectedConnectionId,
+            run: me.handleCloneIntellisense,
+          },
         ],
         edit: [
           {
@@ -1383,6 +1389,21 @@ export default {
       }
       await TDDialogUtil.showPopup({
         dialogType: TDDialogEnum.TDPostgreSQLDatabaseList,
+        ownerForm: me,
+        param: { connectionId: me.selectedConnectionId },
+      });
+    },
+
+    async handleCloneIntellisense() {
+      let me = this;
+      if (!me.selectedConnectionId) {
+        me.$tdToast.warning(
+          me.$t("i18nCommon.postgreSQLQuery.noConnectionSelected"),
+        );
+        return;
+      }
+      await TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDPostgreSQLCloneCachePopup,
         ownerForm: me,
         param: { connectionId: me.selectedConnectionId },
       });
