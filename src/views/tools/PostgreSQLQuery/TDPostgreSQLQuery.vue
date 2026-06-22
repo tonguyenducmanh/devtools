@@ -554,6 +554,12 @@ export default {
             run: me.handleLoadIntellisense,
           },
           {
+            key: "loadCachedIntellisense",
+            label: me.$t("i18nCommon.postgreSQLQuery.loadCachedIntellisense"),
+            disabled: !me.selectedConnectionId,
+            run: me.loadCachedIntellisense,
+          },
+          {
             key: "cloneIntellisense",
             label: me.$t("i18nCommon.postgreSQLQuery.cloneIntellisense"),
             disabled: !me.selectedConnectionId,
