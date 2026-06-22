@@ -239,6 +239,8 @@
 </template>
 
 <script>
+import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
+
 export default {
   name: "TDTableViewer",
 
@@ -801,6 +803,11 @@ export default {
           label: this.$t("i18nCommon.copy"),
           action: () => this.handleDataSelected(row, column),
         },
+        {
+          key: "viewFullData",
+          label: this.$t("i18nCommon.viewFullData"),
+          action: () => this.onCellPreview(row, column),
+        },
       ]);
     },
 
@@ -828,6 +835,17 @@ export default {
         true,
         this.enableLogCopyData,
       );
+    },
+
+    onCellPreview(row, column) {
+      const value = this.getCellValue(row, column.key);
+      const label = column.label || column.key;
+      TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDQuickPreview,
+        ownerForm: this,
+        props: {},
+        param: { value, label },
+      });
     },
 
     onDragStart(e) {

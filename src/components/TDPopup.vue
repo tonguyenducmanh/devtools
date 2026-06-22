@@ -4,13 +4,16 @@
       <div class="td-popup-container" :style="{ width }">
         <div v-if="showHeader" class="td-popup-header">
           <div class="td-popup-title">{{ title }}</div>
-          <button
-            v-if="showCloseHeaderIcon"
-            class="td-popup-close"
-            @click="emitClose"
-          >
-            <div class="td-icon td-close-icon"></div>
-          </button>
+          <div class="td-popup-header-extra">
+            <slot name="header" />
+            <button
+              v-if="showCloseHeaderIcon"
+              class="td-popup-close"
+              @click="emitClose"
+            >
+              <div class="td-icon td-close-icon"></div>
+            </button>
+          </div>
         </div>
 
         <div class="td-popup-body" :style="{ maxHeight }">
@@ -94,6 +97,13 @@ export default {
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: var(--padding);
+}
+.td-popup-header-extra {
+  display: flex;
+  align-items: center;
+  gap: var(--padding);
 }
 
 .td-popup-body {

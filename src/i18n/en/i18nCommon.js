@@ -28,6 +28,7 @@ export default {
     copy: "Copy",
     clickTocopyRow: "Click to copy row {0}",
     clickTocopyCell: "Click to copy this cell",
+    viewFullData: "View full data",
     subSidebar: {
       showTooltip: "Show menu tool",
       hideTooltip: "Hide menu tool",

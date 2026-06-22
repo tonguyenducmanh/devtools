@@ -28,6 +28,7 @@ export default {
     copy: "Sao chép",
     clickTocopyRow: "Click để sao chép dòng {0}",
     clickTocopyCell: "Click để sao chép ô này",
+    viewFullData: "Xem toàn bộ dữ liệu",
     subSidebar: {
       showTooltip: "Hiển thị menu theo tool",
       hideTooltip: "Ẩn menu theo tool",
