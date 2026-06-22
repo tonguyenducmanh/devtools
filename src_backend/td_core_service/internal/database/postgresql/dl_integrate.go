@@ -1,9 +1,10 @@
-package database
+package postgresql
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"td_core_service/internal/database"
 	"td_core_service/internal/model"
 
 	"github.com/jackc/pgx/v5"
@@ -17,7 +18,7 @@ import (
 
 // Xóa toàn bộ connection thuộc 1 group (dùng khi xóa group)
 func DeletePostgreSQLConnectionsByGroupID(groupID string) error {
-	db, err := GetConnectionDB()
+	db, err := database.GetConnectionDB()
 	if err != nil {
 		return err
 	}

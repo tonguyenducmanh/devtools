@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"td_config"
 	"td_core_service/internal/database"
+	"td_core_service/internal/database/postgresql"
 	"td_core_service/internal/middleware"
 	"td_core_service/internal/router"
 	"td_core_service/internal/service"
@@ -13,6 +14,8 @@ import (
 // build dữ liệu database
 func InitDatabase() {
 	database.InitDatabase()
+	// Khởi tạo buffer ghi saved query bất đồng bộ
+	postgresql.InitPostgreSQLSavedQueryBuffer()
 }
 
 // khởi chạy api app

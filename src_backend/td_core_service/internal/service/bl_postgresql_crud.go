@@ -5,14 +5,16 @@ package service
 import (
 	"net/http"
 	"td_core_service/internal/database"
+	"td_core_service/internal/database/postgresql"
 	"td_core_service/internal/model"
 )
 
 // --- Hooks cho PostgreSQL Connection Group ---
 
 func beforeDeletePostgreSQLGroup(id string, r *http.Request) error {
-	// Xóa tất cả connection thuộc group trước khi xóa group
-	return database.DeletePostgreSQLConnectionsByGroupID(id)
+	// Xoá tất cả connection thuộc group trước khi xóa group
+	postgresql.InvalidateAllPostgreSQLConnectionCache()
+	return postgresql.DeletePostgreSQLConnectionsByGroupID(id)
 }
 
 // GetPostgreSQLConnectionGroupController trả về controller quản lý nhóm connection
@@ -24,18 +26,44 @@ func GetPostgreSQLConnectionGroupController() *TDBLBase[model.TDPostgreSQLConnec
 	}
 }
 
+// --- Hooks cho PostgreSQL Connection ---
+
+func afterInsertConnection(conn *model.TDPostgreSQLConnection, r *http.Request) {
+	postgresql.InvalidatePostgreSQLConnectionCache(conn.ID)
+}
+
+func afterUpdateConnection(conn *model.TDPostgreSQLConnection, r *http.Request) {
+	postgresql.InvalidatePostgreSQLConnectionCache(conn.ID)
+}
+
+func beforeDeleteConnection(id string, r *http.Request) error {
+	postgresql.InvalidatePostgreSQLConnectionCache(id)
+	return nil
+}
+
 // GetPostgreSQLConnectionController trả về controller quản lý connection
 func GetPostgreSQLConnectionController() *TDBLBase[model.TDPostgreSQLConnection] {
 	return &TDBLBase[model.TDPostgreSQLConnection]{
-		PathPrefix: "postgresql_connection",
-		Repo:       database.TDDLBase[model.TDPostgreSQLConnection]{},
+		PathPrefix:  "postgresql_connection",
+		Repo:        database.TDDLBase[model.TDPostgreSQLConnection]{},
+		AfterInsert: afterInsertConnection,
+		AfterUpdate: afterUpdateConnection,
+		BeforeDelete: beforeDeleteConnection,
 	}
+}
+
+// --- Custom Create cho PostgreSQL Saved Query (ghi bất đồng bộ qua buffer) ---
+
+func savedQueryCustomCreate(req *model.TDPostgreSQLSavedQuery, r *http.Request) error {
+	postgresql.PushPostgreSQLSavedQuery(req)
+	return nil
 }
 
 // GetPostgreSQLSavedQueryController trả về controller quản lý saved query
 func GetPostgreSQLSavedQueryController() *TDBLBase[model.TDPostgreSQLSavedQuery] {
 	return &TDBLBase[model.TDPostgreSQLSavedQuery]{
-		PathPrefix: "postgresql_saved_query",
-		Repo:       database.TDDLBase[model.TDPostgreSQLSavedQuery]{},
+		PathPrefix:   "postgresql_saved_query",
+		Repo:         database.TDDLBase[model.TDPostgreSQLSavedQuery]{},
+		CustomCreate: savedQueryCustomCreate,
 	}
 }

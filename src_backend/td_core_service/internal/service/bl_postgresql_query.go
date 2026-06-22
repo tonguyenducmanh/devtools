@@ -5,11 +5,11 @@ package service
 import (
 	"encoding/json"
 	"net/http"
-	"td_core_service/internal/database"
+	"td_core_service/internal/database/postgresql"
 	"td_core_service/internal/model"
 )
 
-// ExecutePostgreSQLQueryHandler nhận connection_id + sql, tìm connection string từ SQLite,
+// ExecutePostgreSQLQueryHandler nhận connection_id + sql, tìm connection string từ cache,
 // thực thi script (có thể gồm nhiều câu lệnh cách nhau bởi ";"), trả về danh sách kết quả -
 // mỗi statement tương ứng 1 result set
 func ExecutePostgreSQLQueryHandler(w http.ResponseWriter, r *http.Request) {
@@ -24,10 +24,9 @@ func ExecutePostgreSQLQueryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Lấy connection từ SQLite
-	repo := database.TDDLBase[model.TDPostgreSQLConnection]{}
-	conn, err := repo.GetByID(req.ConnectionID)
-	if err != nil || conn == nil {
+	// Lấy connection từ cache (tránh đọc SQLite mỗi lần)
+	conn, err := postgresql.GetCachedPostgreSQLConnection(req.ConnectionID)
+	if err != nil {
 		http.Error(w, "Không tìm thấy connection", http.StatusNotFound)
 		return
 	}
@@ -37,7 +36,7 @@ func ExecutePostgreSQLQueryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := database.ExecutePostgreSQLQuery(conn.ConnectionString, req.SQL)
+	result, err := postgresql.ExecutePostgreSQLQuery(conn.ConnectionString, req.SQL)
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")

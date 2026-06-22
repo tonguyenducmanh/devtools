@@ -16,6 +16,11 @@ func InitDatabase() {
 		log.Fatal(err)
 	}
 	defer db.Close()
+
+	// Bật WAL mode + busy timeout để tránh SQLITE_BUSY khi đọc/ghi đồng thời
+	_, _ = db.Exec("PRAGMA journal_mode=WAL")
+	_, _ = db.Exec("PRAGMA busy_timeout=5000")
+
 	// 2. Tạo bảng
 	sqlStmt := `
 	CREATE TABLE IF NOT EXISTS td_api_mock (

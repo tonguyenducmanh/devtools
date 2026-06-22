@@ -23,6 +23,9 @@ type TDBLBase[T database.TDModelBase] struct {
 
 	// Override toàn bộ thao tác xoá (ví dụ: cần xóa nhiều bảng trong transaction)
 	CustomDelete func(id string, r *http.Request) error
+
+	// Override toàn bộ thao tác tạo (ví dụ: ghi bất đồng bộ)
+	CustomCreate func(req *T, r *http.Request) error
 }
 
 func (c *TDBLBase[T]) RegisterRoutes(app *http.ServeMux) {
@@ -61,10 +64,17 @@ func (c *TDBLBase[T]) Create(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err := c.Repo.Insert(&req)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Lỗi lưu dữ liệu: %v", err), http.StatusInternalServerError)
-		return
+	if c.CustomCreate != nil {
+		if err := c.CustomCreate(&req, r); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		err := c.Repo.Insert(&req)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Lỗi lưu dữ liệu: %v", err), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	if c.AfterInsert != nil {

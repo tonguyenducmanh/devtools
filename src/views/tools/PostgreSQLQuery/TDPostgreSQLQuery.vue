@@ -461,6 +461,8 @@ export default {
         autoSaveQueryAfterExec: true,
         loadFunctionIntellisense: false,
       },
+      lastAutoSavedQueryText: "",
+      lastAutoSavedConnectionId: "",
 
       editorSectionSize: 50,
       resultSectionSize: 50,
@@ -1081,9 +1083,16 @@ export default {
           error?.message ?? me.$t("i18nCommon.toastMessage.error");
       } finally {
         me.isRunning = false;
-        // lưu lại luôn câu lệnh vừa chạy của user
+        // lưu lại luôn câu lệnh vừa chạy của user (bỏ qua nếu trùng với lần auto-save trước)
         if (me.currentConfigLayout.autoSaveQueryAfterExec) {
-          me.saveCurrentQuery();
+          if (
+            me.sqlText !== me.lastAutoSavedQueryText ||
+            me.selectedConnectionId !== me.lastAutoSavedConnectionId
+          ) {
+            me.lastAutoSavedQueryText = me.sqlText;
+            me.lastAutoSavedConnectionId = me.selectedConnectionId;
+            me.saveCurrentQuery();
+          }
         }
       }
     },
