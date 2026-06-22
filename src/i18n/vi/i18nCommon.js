@@ -795,6 +795,7 @@ export default {
       loadFunctionIntellisense: "Load gợi ý cả function",
       defaultQueryLimit: "Số dòng tối đa",
       resultLimit: "Giới hạn kết quả",
+      resultLimitDesc: "Server trả về toàn bộ dòng khi tắt. Nếu bật mà để trống số, server dùng mặc định 1000.",
       defaultQueryLimitDesc: "Số dòng tối đa trả về khi bật 'Giới hạn kết quả'.",
       addGroup: "Thêm nhóm",
       editConnection: "Sửa kết nối",

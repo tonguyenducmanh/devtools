@@ -798,6 +798,7 @@ export default {
       loadFunctionIntellisense: "Load function intellisense",
       defaultQueryLimit: "Max rows",
       resultLimit: "Limit results",
+      resultLimitDesc: "Unchecked = unlimited rows. Checked with empty field = server defaults to 1000.",
       defaultQueryLimitDesc: "Max rows returned when 'Limit results' is enabled.",
       addGroup: "Add group",
       editConnection: "Edit connection",

@@ -199,6 +199,7 @@
             :variant="$tdEnum.checkboxType.switch"
             v-model="currentConfigLayout.limitResults"
             :label="$t('i18nCommon.postgreSQLQuery.resultLimit')"
+            v-tooltip="$t('i18nCommon.postgreSQLQuery.resultLimitDesc')"
             @change="updateConfigLayout"
           />
           <div
@@ -482,7 +483,7 @@ export default {
         currentSidebarOption:
           this.$tdEnum.PostgreSQLQuerySidebarOption.Connection,
         autoSaveQueryAfterExec: true,
-        loadFunctionIntellisense: false,
+        loadFunctionIntellisense: true,
         defaultQueryLimit: 1000,
         limitResults: true,
         limitResultsBackup: 1000,
