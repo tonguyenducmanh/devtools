@@ -1470,6 +1470,10 @@ export default {
         "executePosgreSQLCode",
         me.getConfigExecuteSQLCode(),
       );
+      // Reload intellisense cho tab này khi được active lại
+      if (me.selectedConnectionId) {
+        me.loadCachedIntellisense();
+      }
     },
 
     /**
@@ -1483,6 +1487,11 @@ export default {
       );
       TDShortcutAction.unregister("formatCodePostgreSQL");
       TDShortcutAction.unregister("executePosgreSQLCode");
+      // Dispose intellisense providers để tab kia không bị ảnh hưởng
+      if (me.intellisenseDisposable) {
+        me.intellisenseDisposable.forEach((d) => d?.dispose?.());
+        me.intellisenseDisposable = [];
+      }
     },
     getConfigFormatCode() {
       let me = this;
