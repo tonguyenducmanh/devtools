@@ -610,7 +610,13 @@ export default {
       if (column.formatter && typeof column.formatter === "function") {
         return column.formatter(value, row);
       }
-      return !value || value == "" ? this.emptyCellText : value;
+      if (value === null || value === undefined) {
+        return "null";
+      }
+      if (value === false) {
+        return "false";
+      }
+      return value === "" ? this.emptyCellText : value;
     },
 
     getCellContentStyle() {

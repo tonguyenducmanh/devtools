@@ -129,6 +129,9 @@ func decodeTextValue(raw []byte, dataTypeOID uint32) any {
 	switch dataTypeOID {
 	case pgtype.JSONOID, pgtype.JSONBOID:
 		return json.RawMessage(raw)
+	case pgtype.BoolOID:
+		// Simple protocol trả boolean dạng 't'/'f', cần đổi thành bool để JSON encode đúng true/false
+		return len(raw) > 0 && raw[0] == 't'
 	default:
 		return string(raw)
 	}
