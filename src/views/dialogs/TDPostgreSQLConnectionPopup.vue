@@ -337,59 +337,20 @@ export default {
     },
 
     /**
-     * Parse connection string thành các fields khi edit
+     * Parse connection string thành các fields khi edit, dùng chung logic từ mixin
      */
     parseConnectionString(connStr) {
       if (!connStr) return;
+      // Dùng method từ TDDatabaseConnectionMixin để parse
+      let fields = this.parseConnectionStringToFields(connStr);
       this.connFields = {
-        host: "",
-        port: "",
-        database: "",
-        username: "",
-        password: "",
-        sslmode: "disable",
+        host: fields.host,
+        port: fields.port,
+        database: fields.database,
+        username: fields.username,
+        password: fields.password,
+        sslmode: fields.sslmode,
       };
-
-      try {
-        if (
-          connStr.startsWith("postgresql://") ||
-          connStr.startsWith("postgres://")
-        ) {
-          // Parse URI format (tương thích ngược nếu người dùng đã lưu bằng URI format trước đây)
-          const url = new URL(connStr);
-          this.connFields.host = url.hostname || "localhost";
-          this.connFields.port = url.port || "5432";
-          this.connFields.database = url.pathname?.replace(/^\//, "") || "";
-          this.connFields.username = decodeURIComponent(url.username || "");
-          this.connFields.password = decodeURIComponent(url.password || "");
-          this.connFields.sslmode =
-            url.searchParams.get("sslmode") || "disable";
-        } else {
-          // Parse DSN format
-          const parts = connStr.match(/(?:[^\s']+|'[^']*')+/g);
-          if (parts) {
-            parts.forEach((p) => {
-              const eqIdx = p.indexOf("=");
-              if (eqIdx > -1) {
-                const key = p.substring(0, eqIdx).trim();
-                let val = p.substring(eqIdx + 1).trim();
-                // Bỏ nháy đơn nếu có
-                if (val.startsWith("'") && val.endsWith("'")) {
-                  val = val.substring(1, val.length - 1).replace(/\\'/g, "'");
-                }
-                if (key === "host") this.connFields.host = val;
-                if (key === "port") this.connFields.port = val;
-                if (key === "dbname") this.connFields.database = val;
-                if (key === "user") this.connFields.username = val;
-                if (key === "password") this.connFields.password = val;
-                if (key === "sslmode") this.connFields.sslmode = val;
-              }
-            });
-          }
-        }
-      } catch (e) {
-        console.warn("Parse connection string failed:", e);
-      }
     },
 
     handleCopy() {

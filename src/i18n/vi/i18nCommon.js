@@ -844,6 +844,7 @@ export default {
       dotNetWasmNotReady:
         "Hệ thống phân tích C# WASM chưa sẵn sàng.",
       copyConnectionStringSuccess: "Đã sao chép connection string!",
+      copyDSNConnectionString: "Sao chép connection string DSN/URI",
       sidebarOption: {
         help: "Trợ giúp",
         setting: "Cài đặt",

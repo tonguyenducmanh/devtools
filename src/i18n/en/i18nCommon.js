@@ -848,6 +848,7 @@ export default {
       dotNetWasmNotReady:
         "C# WASM analysis system is not ready.",
       copyConnectionStringSuccess: "Connection string copied!",
+      copyDSNConnectionString: "Copy connection string DSN/URI",
       sidebarOption: {
         help: "Help",
         setting: "Settings",

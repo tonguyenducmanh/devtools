@@ -572,6 +572,14 @@ export default {
             disabled: !me.selectedConnectionId,
             run: me.handleCopyNpgSQLConnectionString,
           },
+          {
+            key: "copyDSNConnectionString",
+            label: me.$t(
+              "i18nCommon.postgreSQLQuery.copyDSNConnectionString",
+            ),
+            disabled: !me.selectedConnectionId,
+            run: me.handleCopyDSNConnectionString,
+          },
         ],
         explore: [
           {
@@ -1079,10 +1087,15 @@ export default {
         }
       }
     },
+    /**
+     * Sao chép connection string dạng NpgSQL từ kết nối đang chọn vào clipboard
+     * Parse connection string đã lưu -> gọi C# WASM để build chuẩn Npgsql -> copy
+     */
     handleCopyNpgSQLConnectionString() {
       let me = this;
       if (!me.checkInitDotNetWasm()) return;
 
+      // Tìm kết nối đang được chọn
       let conn = me.allConnections.find(
         (c) => c.id === me.selectedConnectionId,
       );
@@ -1094,66 +1107,46 @@ export default {
       }
 
       try {
-        let connStr = conn.connection_string;
+        // Parse connection string gốc (DSN hoặc URI) ra các trường riêng lẻ
+        let parsed = me.parseConnectionStringToFields(
+          conn.connection_string,
+        );
+        // Map fields sang format mà C# StringifyNpgSQLConnection yêu cầu
         let fields = {
-          host: "",
-          port: 5432,
-          user_name: "",
-          password: "",
-          database_name: "",
+          host: parsed.host,
+          port: parseInt(parsed.port) || 5432,
+          user_name: parsed.username,
+          password: parsed.password,
+          database_name: parsed.database,
         };
 
-        if (
-          connStr.startsWith("postgresql://") ||
-          connStr.startsWith("postgres://")
-        ) {
-          const url = new URL(connStr);
-          fields.host = url.hostname || "";
-          fields.port = parseInt(url.port) || 5432;
-          fields.database_name =
-            url.pathname?.replace(/^\//, "") || "";
-          fields.user_name =
-            decodeURIComponent(url.username || "");
-          fields.password =
-            decodeURIComponent(url.password || "");
-        } else {
-          const parts =
-            connStr.match(/(?:[^\s']+|'[^']*')+/g) || [];
-          parts.forEach((p) => {
-            const eqIdx = p.indexOf("=");
-            if (eqIdx > -1) {
-              const key = p.substring(0, eqIdx).trim();
-              let val = p.substring(eqIdx + 1).trim();
-              if (
-                val.startsWith("'") &&
-                val.endsWith("'")
-              ) {
-                val = val
-                  .substring(1, val.length - 1)
-                  .replace(/\\'/g, "'");
-              }
-              if (key === "host") fields.host = val;
-              if (key === "port")
-                fields.port = parseInt(val) || 5432;
-              if (key === "user")
-                fields.user_name = val;
-              if (key === "password")
-                fields.password = val;
-              if (key === "dbname")
-                fields.database_name = val;
-            }
-          });
-        }
-
+        // Gọi C# WASM để build Npgsql connection string chuẩn
         const jsonStr = JSON.stringify(fields);
         const npgSqlConnStr =
           me.dotnetExports.StringifyNpgSQLConnection(jsonStr);
 
+        // Copy vào clipboard
         me.$tdUtility.copyToClipboard(npgSqlConnStr);
       } catch (e) {
         console.error(e);
         me.$tdToast.error(
           me.$t("i18nCommon.toastMessage.error"),
+        );
+      }
+    },
+    /**
+     * Sao chép connection string dạng DSN/URI gốc từ kết nối đang chọn vào clipboard
+     */
+    handleCopyDSNConnectionString() {
+      let me = this;
+      let conn = me.allConnections.find(
+        (c) => c.id === me.selectedConnectionId,
+      );
+      if (conn?.connection_string) {
+        me.$tdUtility.copyToClipboard(conn.connection_string);
+      } else {
+        me.$tdToast.warning(
+          me.$t("i18nCommon.postgreSQLQuery.noConnectionString"),
         );
       }
     },
