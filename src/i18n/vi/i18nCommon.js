@@ -39,8 +39,9 @@ export default {
       formatCodeTextEditor: "Định dạng code",
       executeSQLCode: "Run SQL code",
     },
-    footerHelp:
-      "Chọn vào số dòng để copy cả dòng, chọn vào 1 cell cụ thể để copy 1 cell",
+    footerHelp: "Chuột phải để copy · Click số dòng copy cả dòng · Kéo thả để di chuyển nhanh",
+    footerHelpDesc:
+      "Chuột phải vào số dòng để copy cả dòng, chuột phải vào ô để copy giá trị ô. Kéo thả chuột trái trong bảng để di chuyển nhanh.",
     noDataAvailable: "Không có dữ liệu",
     sidebarOption: {
       help: "Trợ giúp",

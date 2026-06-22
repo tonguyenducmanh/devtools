@@ -39,8 +39,9 @@ export default {
       formatCodeTextEditor: "Format code",
       executeSQLCode: "Run SQL code",
     },
-    footerHelp:
-      "Select the row number to copy the entire row, select a specific cell to copy a single cell.",
+    footerHelp: "Right-click to copy · Click row # to copy row · Drag to scroll",
+    footerHelpDesc:
+      "Right-click a row number to copy the row, right-click a cell to copy its value. Click and drag in the table to scroll quickly.",
     noDataAvailable: "No data available",
     sidebarOption: {
       help: "Help",

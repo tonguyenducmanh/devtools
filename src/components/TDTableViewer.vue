@@ -8,9 +8,11 @@
   >
     <div
       class="td-table-container"
+      :class="{ 'td-table-grabbing': _isDragging }"
       :style="containerStyle"
       ref="tableContainer"
       @scroll="handleScroll"
+      @mousedown="onDragStart"
     >
       <div class="td-table-wrapper" ref="tableWrapper">
         <table class="td-table">
@@ -131,8 +133,8 @@
                 v-if="showIndex"
                 class="td-table-cell td-table-cell-index td-table-cell-sticky"
                 :style="indexStickyStyle"
-                v-tooltip="$t('i18nCommon.clickTocopyRow').format(rowIndex + 1)"
                 @click="copyRow(row)"
+                @contextmenu.prevent="onIndexContextMenu(row, $event)"
               >
                 <div>
                   {{ rowIndex + 1 }}
@@ -146,8 +148,7 @@
                 class="td-table-cell"
                 :class="[getColumnClass(column)]"
                 :style="getColumnStyle(column)"
-                @click="handleDataSelected(row, column)"
-                v-tooltip="$t('i18nCommon.clickTocopyCell')"
+                @contextmenu.prevent="onCellContextMenu(row, column, $event)"
               >
                 <slot
                   :name="`cell-${column.key}`"
@@ -228,7 +229,7 @@
               {{ processedData.length }} {{ $t("i18nCommon.record") }}
             </span>
           </span>
-          <span v-if="usingFooterHelp">
+          <span v-if="usingFooterHelp" v-tooltip="$t('i18nCommon.footerHelpDesc')">
             {{ footerHelpText }}
           </span>
         </slot>
@@ -405,6 +406,13 @@ export default {
       columnWidthCache: {}, // Cache calculated widths
       scrollTop: 0,
       containerHeight: 400,
+
+      // drag-to-scroll
+      _isDragging: false,
+      _dragStartX: 0,
+      _dragStartY: 0,
+      _scrollStartLeft: 0,
+      _scrollStartTop: 0,
     };
   },
 
@@ -582,6 +590,8 @@ export default {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
+    document.removeEventListener("mousemove", this.onDragMove);
+    document.removeEventListener("mouseup", this.onDragEnd);
   },
 
   methods: {
@@ -781,6 +791,26 @@ export default {
       this.$emit("selection-change", this.selectedRows);
     },
 
+    onCellContextMenu(row, column, event) {
+      this.$tdContextMenu.open(event, [
+        {
+          key: "copyCell",
+          label: this.$t("i18nCommon.copy"),
+          action: () => this.handleDataSelected(row, column),
+        },
+      ]);
+    },
+
+    onIndexContextMenu(row, event) {
+      this.$tdContextMenu.open(event, [
+        {
+          key: "copyRow",
+          label: this.$t("i18nCommon.copy"),
+          action: () => this.copyRow(row),
+        },
+      ]);
+    },
+
     handleDataSelected(row, column) {
       let data = this.formatCellValue(row, column);
       this.$tdUtility.copyToClipboard(data, true, this.enableLogCopyData);
@@ -792,6 +822,43 @@ export default {
         true,
         this.enableLogCopyData,
       );
+    },
+
+    onDragStart(e) {
+      const el = this.$refs.tableContainer;
+      if (!el || el.scrollWidth <= el.clientWidth && el.scrollHeight <= el.clientHeight) return;
+      if (e.shiftKey || e.ctrlKey || e.metaKey || e.button !== 0) return;
+
+      // Không kéo từ sticky cells (index, checkbox)
+      const target = e.target.closest?.(".td-table-cell-sticky") || e.target.closest?.(".td-table-cell-checkbox");
+      if (target) return;
+
+      this._isDragging = true;
+      this._dragStartX = e.clientX;
+      this._dragStartY = e.clientY;
+      this._scrollStartLeft = el.scrollLeft;
+      this._scrollStartTop = el.scrollTop;
+
+      document.addEventListener("mousemove", this.onDragMove);
+      document.addEventListener("mouseup", this.onDragEnd);
+    },
+
+    onDragMove(e) {
+      if (!this._isDragging) return;
+      const el = this.$refs.tableContainer;
+      if (!el) return;
+
+      const dx = e.clientX - this._dragStartX;
+      const dy = e.clientY - this._dragStartY;
+      el.scrollLeft = this._scrollStartLeft - dx;
+      el.scrollTop = this._scrollStartTop - dy;
+    },
+
+    onDragEnd() {
+      if (!this._isDragging) return;
+      this._isDragging = false;
+      document.removeEventListener("mousemove", this.onDragMove);
+      document.removeEventListener("mouseup", this.onDragEnd);
     },
   },
 };
@@ -819,6 +886,11 @@ export default {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-component);
     background-color: var(--bg-main-color);
+
+    &.td-table-grabbing {
+      cursor: grabbing;
+      user-select: none;
+    }
   }
 
   .td-table-wrapper {
