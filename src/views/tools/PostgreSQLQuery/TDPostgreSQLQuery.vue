@@ -485,10 +485,10 @@ export default {
         loadFunctionIntellisense: false,
         defaultQueryLimit: 1000,
         limitResults: true,
+        limitResultsBackup: 1000,
       },
       lastAutoSavedQueryText: "",
       lastAutoSavedConnectionId: "",
-      _limitBackup: 1000,
 
       editorSectionSize: 50,
       resultSectionSize: 50,
@@ -1422,9 +1422,13 @@ export default {
     },
     "currentConfigLayout.limitResults"(enabled) {
       if (enabled) {
-        this.currentConfigLayout.defaultQueryLimit = this._limitBackup;
+        this.currentConfigLayout.defaultQueryLimit =
+          this.currentConfigLayout.limitResultsBackup || 1000;
       } else {
-        this._limitBackup = this.currentConfigLayout.defaultQueryLimit;
+        if (this.currentConfigLayout.defaultQueryLimit > 0) {
+          this.currentConfigLayout.limitResultsBackup =
+            this.currentConfigLayout.defaultQueryLimit;
+        }
         this.currentConfigLayout.defaultQueryLimit = 0;
       }
       this.updateConfigLayout();

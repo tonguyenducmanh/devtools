@@ -798,7 +798,7 @@ export default {
       loadFunctionIntellisense: "Load function intellisense",
       defaultQueryLimit: "Max rows",
       resultLimit: "Limit results",
-      defaultQueryLimitDesc: "Max rows per query. Enable 'Unlimited' to read all.",
+      defaultQueryLimitDesc: "Max rows returned when 'Limit results' is enabled.",
       addGroup: "Add group",
       editConnection: "Edit connection",
       addConnection: "Add connection",
