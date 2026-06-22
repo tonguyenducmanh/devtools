@@ -7,7 +7,7 @@ WITH
           ELSE ''
         END || CASE
           WHEN c.is_nullable = 'NO' THEN ' NOT NULL'
-          ELSE ''
+          ELSE ' NULL'
         END || CASE
           WHEN c.column_default IS NOT NULL THEN ' DEFAULT ' || c.column_default
           ELSE ''
