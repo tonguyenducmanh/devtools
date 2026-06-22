@@ -210,19 +210,11 @@ func executableDir() string {
 	return filepath.Dir(exe)
 }
 
-// Lấy ra thông tin kết nối
-func GetConnectionDB() (*sql.DB, error) {
-	// 1. Mở kết nối (Tên driver là "sqlite")
-	db, err := sql.Open("sqlite", dbPath())
-	return db, err
-}
-
 func (r *TDDLBase[T]) GetAll() ([]T, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
 
 	cols := parseColumns[T]()
 	sql := buildSelectAll[T](cols)
@@ -248,7 +240,6 @@ func (r *TDDLBase[T]) GetByID(id any) (*T, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
 
 	cols := parseColumns[T]()
 	sql := buildSelectByPK[T](cols)
@@ -273,7 +264,6 @@ func (r *TDDLBase[T]) Insert(item *T) error {
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 
 	cols := parseColumns[T]()
 
@@ -303,7 +293,6 @@ func (r *TDDLBase[T]) InsertBatch(items []T) error {
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 
 	cols := parseColumns[T]()
 	sql := buildInsert[T](cols)
@@ -348,7 +337,6 @@ func (r *TDDLBase[T]) InsertOrIgnoreBatch(items []T) error {
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 
 	cols := parseColumns[T]()
 	rawSQL := strings.Replace(buildInsert[T](cols), "INSERT INTO", "INSERT OR IGNORE INTO", 1)
@@ -389,7 +377,6 @@ func (r *TDDLBase[T]) Update(item *T) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	defer db.Close()
 
 	cols := parseColumns[T]()
 	sql := buildUpdate[T](cols)
@@ -410,7 +397,6 @@ func (r *TDDLBase[T]) UpdateBatch(items []T) error {
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 
 	cols := parseColumns[T]()
 	rawSQL := buildUpdate[T](cols)
@@ -442,7 +428,6 @@ func (r *TDDLBase[T]) Delete(id any) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	defer db.Close()
 
 	sql := buildDelete[T]()
 	result, err := db.Exec(sql, id)
@@ -461,7 +446,6 @@ func (r *TDDLBase[T]) DeleteBatch(ids []any) error {
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 
 	rawSQL := buildDelete[T]()
 
@@ -491,7 +475,6 @@ func (r *TDDLBase[T]) QueryRaw(query string, args ...any) ([]map[string]any, err
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
 
 	rows, err := db.Query(query, args...)
 	if err != nil {
@@ -532,7 +515,6 @@ func (r *TDDLBase[T]) ExecRaw(query string, args ...any) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	defer db.Close()
 
 	result, err := db.Exec(query, args...)
 	if err != nil {
