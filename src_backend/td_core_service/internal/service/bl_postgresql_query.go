@@ -36,7 +36,7 @@ func ExecutePostgreSQLQueryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := postgresql.ExecutePostgreSQLQuery(conn.ConnectionString, req.SQL)
+	result, err := postgresql.ExecutePostgreSQLQuery(conn.ConnectionString, req.SQL, req.DefaultLimit, req.Unlimited)
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")

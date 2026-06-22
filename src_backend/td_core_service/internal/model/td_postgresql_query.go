@@ -19,4 +19,6 @@ type TDMultiQueryResult struct {
 type TDPostgeSQLRequest struct {
 	ConnectionID string `json:"connection_id"`
 	SQL          string `json:"sql"`
+	DefaultLimit int    `json:"default_limit"`
+	Unlimited    bool   `json:"unlimited"`
 }

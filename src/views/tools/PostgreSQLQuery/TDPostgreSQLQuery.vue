@@ -195,6 +195,31 @@
             :label="$t('i18nCommon.postgreSQLQuery.loadFunctionIntellisense')"
             @change="updateConfigLayout"
           />
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="currentConfigLayout.limitResults"
+            :label="$t('i18nCommon.postgreSQLQuery.resultLimit')"
+            @change="updateConfigLayout"
+          />
+          <div
+            class="td-query-config"
+            v-show="currentConfigLayout.limitResults"
+          >
+            <TDInput
+              :noMargin="true"
+              inputType="number"
+              :modelValue="currentConfigLayout.defaultQueryLimit"
+              :label="$t('i18nCommon.postgreSQLQuery.defaultQueryLimit')"
+              :isLabelTop="false"
+              v-tooltip="$t('i18nCommon.postgreSQLQuery.defaultQueryLimitDesc')"
+              @update:modelValue="
+                (v) => {
+                  currentConfigLayout.defaultQueryLimit = Number(v);
+                  updateConfigLayout();
+                }
+              "
+            />
+          </div>
         </div>
         <div
           class="flex flex-col td-sidebar-content"
@@ -263,13 +288,11 @@
                     />
                     <div
                       v-tooltip="
-                        group.name ||
-                        $t('i18nCommon.postgreSQLQuery.ungrouped')
+                        group.name || $t('i18nCommon.postgreSQLQuery.ungrouped')
                       "
                     >
                       {{
-                        group.name ||
-                        $t("i18nCommon.postgreSQLQuery.ungrouped")
+                        group.name || $t("i18nCommon.postgreSQLQuery.ungrouped")
                       }}
                     </div>
                   </div>
@@ -460,9 +483,12 @@ export default {
           this.$tdEnum.PostgreSQLQuerySidebarOption.Connection,
         autoSaveQueryAfterExec: true,
         loadFunctionIntellisense: false,
+        defaultQueryLimit: 1000,
+        limitResults: true,
       },
       lastAutoSavedQueryText: "",
       lastAutoSavedConnectionId: "",
+      _limitBackup: 1000,
 
       editorSectionSize: 50,
       resultSectionSize: 50,
@@ -576,9 +602,7 @@ export default {
           },
           {
             key: "copyDSNConnectionString",
-            label: me.$t(
-              "i18nCommon.postgreSQLQuery.copyDSNConnectionString",
-            ),
+            label: me.$t("i18nCommon.postgreSQLQuery.copyDSNConnectionString"),
             disabled: !me.selectedConnectionId,
             run: me.handleCopyDSNConnectionString,
           },
@@ -1063,6 +1087,8 @@ export default {
         const response = await me.agentAPI.executeQuery(
           me.selectedConnectionId,
           me.sqlText,
+          me.currentConfigLayout.defaultQueryLimit,
+          !me.currentConfigLayout.limitResults,
         );
 
         const normalizedResults = me.normalizeMultiQueryResult(
@@ -1117,9 +1143,7 @@ export default {
 
       try {
         // Parse connection string gốc (DSN hoặc URI) ra các trường riêng lẻ
-        let parsed = me.parseConnectionStringToFields(
-          conn.connection_string,
-        );
+        let parsed = me.parseConnectionStringToFields(conn.connection_string);
         // Map fields sang format mà C# StringifyNpgSQLConnection yêu cầu
         let fields = {
           host: parsed.host,
@@ -1138,9 +1162,7 @@ export default {
         me.$tdUtility.copyToClipboard(npgSqlConnStr);
       } catch (e) {
         console.error(e);
-        me.$tdToast.error(
-          me.$t("i18nCommon.toastMessage.error"),
-        );
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
     /**
@@ -1397,6 +1419,15 @@ export default {
       }
       let conn = this.allConnections.find((c) => c.id === newId);
       this.reBuildTabTitle(conn ? conn.connection_name : null);
+    },
+    "currentConfigLayout.limitResults"(enabled) {
+      if (enabled) {
+        this.currentConfigLayout.defaultQueryLimit = this._limitBackup;
+      } else {
+        this._limitBackup = this.currentConfigLayout.defaultQueryLimit;
+        this.currentConfigLayout.defaultQueryLimit = 0;
+      }
+      this.updateConfigLayout();
     },
   },
 };
@@ -1696,5 +1727,8 @@ export default {
   .td-header-menu-group {
     justify-content: flex-start;
   }
+}
+.td-query-config {
+  padding: var(--padding);
 }
 </style>

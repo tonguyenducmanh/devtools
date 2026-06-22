@@ -12,6 +12,9 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+// DefaultQueryLimit là fallback nếu frontend không gửi default_limit.
+const DefaultQueryLimit = 1000
+
 // file này hướng tới việc gọi nối vào postgressl ở server khác
 // coding sẽ là truyền từ UI vào
 // chỉ có các config kết nối thì vẫn lưu ở sqlite của backend app
@@ -40,7 +43,8 @@ type rawStatementResult struct {
 // Thực hiện 1 hoặc nhiều câu lệnh SQL cách nhau bởi dấu ";" theo yêu cầu của User.
 // Mỗi statement trả về 1 result set riêng
 // Dùng Simple Query Protocol ở tầng pgconn (đọc nhiều result set trong 1 round-trip duy nhất).
-func ExecutePostgreSQLQuery(connectionString string, sqlQuery string) (*model.TDMultiQueryResult, error) {
+// defaultLimit: 0 = không giới hạn, > 0 = hard cap.
+func ExecutePostgreSQLQuery(connectionString string, sqlQuery string, defaultLimit int, unlimited bool) (*model.TDMultiQueryResult, error) {
 	ctx := context.Background()
 
 	// 1. Parse connection string ra object config
@@ -58,6 +62,12 @@ func ExecutePostgreSQLQuery(connectionString string, sqlQuery string) (*model.TD
 		return nil, fmt.Errorf("không thể kết nối PostgreSQL: %w", err)
 	}
 	defer conn.Close(ctx)
+
+	if unlimited {
+		defaultLimit = 0
+	} else if defaultLimit <= 0 {
+		defaultLimit = DefaultQueryLimit
+	}
 
 	// 4. Gửi cả script lên server trong 1 lần, đọc lần lượt từng result set
 	pgConn := conn.PgConn()
@@ -90,6 +100,9 @@ func ExecutePostgreSQLQuery(connectionString string, sqlQuery string) (*model.TD
 				rowMap[col] = decodeTextValue(values[i], dataTypeOIDs[i])
 			}
 			resultRows = append(resultRows, rowMap)
+			if !unlimited && len(fieldDescs) > 0 && len(resultRows) >= defaultLimit {
+				break
+			}
 		}
 
 		cmdTag, closeErr := rr.Close()

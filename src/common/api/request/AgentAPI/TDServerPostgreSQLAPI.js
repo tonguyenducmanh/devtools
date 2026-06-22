@@ -18,11 +18,15 @@ class TDServerPostgreSQLAPI extends TDAgentAPI {
    * Thực thi câu lệnh SQL trên PostgreSQL
    * @param {string} connectionId - ID của connection đã lưu
    * @param {string} sql - câu lệnh SQL cần thực thi
+   * @param {number} defaultLimit - giới hạn dòng mặc định
+   * @param {boolean} unlimited - không giới hạn dòng
    */
-  async executeQuery(connectionId, sql) {
+  async executeQuery(connectionId, sql, defaultLimit = 1000, unlimited = false) {
     return await this.post("/postgresql/execute_query", {
       connection_id: connectionId,
       sql: sql,
+      default_limit: defaultLimit,
+      unlimited: unlimited,
     });
   }
 
