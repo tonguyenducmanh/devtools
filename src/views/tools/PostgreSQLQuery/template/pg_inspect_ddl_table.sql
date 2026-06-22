@@ -1,20 +1,16 @@
 WITH
   table_def AS (
     SELECT
-      'CREATE TABLE IF NOT EXISTS ' || quote_ident(t.table_schema) || '.' || quote_ident(t.table_name) || ' (' || E'\n' || string_agg(
-        '  ' || quote_ident(c.column_name) || ' ' || c.data_type || CASE
-          WHEN c.character_maximum_length IS NOT NULL THEN '(' || c.character_maximum_length || ')'
-          ELSE ''
-        END || CASE
-          WHEN c.is_nullable = 'NO' THEN ' NOT NULL'
+      'CREATE TABLE IF NOT EXISTS ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' (' || E'\n' || string_agg(
+        '  ' || quote_ident(a.attname) || ' ' || pg_catalog.format_type(a.atttypid, a.atttypmod) || CASE
+          WHEN a.attnotnull THEN ' NOT NULL'
           ELSE ' NULL'
-        END || CASE
-          WHEN c.column_default IS NOT NULL THEN ' DEFAULT ' || c.column_default
-          ELSE ''
-        END,
+        END || COALESCE(
+          ' DEFAULT ' || pg_get_expr(ad.adbin, ad.adrelid),
+          ''
+        ),
         E',\n'
-        ORDER BY
-          c.ordinal_position
+        ORDER BY a.attnum
       ) || COALESCE(
         (
           SELECT
@@ -24,22 +20,25 @@ WITH
             JOIN pg_class cl ON con.conrelid = cl.oid
             JOIN pg_namespace ns ON cl.relnamespace = ns.oid
           WHERE
-            ns.nspname = t.table_schema
-            AND cl.relname = t.table_name
+            ns.nspname = n.nspname
+            AND cl.relname = c.relname
             AND con.contype = 'p'
         ),
         ''
       ) || E'\n);' AS def
     FROM
-      information_schema.tables t
-      JOIN information_schema.columns c ON c.table_schema = t.table_schema
-      AND c.table_name = t.table_name
+      pg_class c
+      JOIN pg_namespace n ON c.relnamespace = n.oid
+      JOIN pg_attribute a ON a.attrelid = c.oid
+      LEFT JOIN pg_attrdef ad ON ad.adrelid = a.attrelid AND ad.adnum = a.attnum
     WHERE
-      t.table_schema = '{schema}'
-      AND t.table_name = '{name}'
+      n.nspname = '{schema}'
+      AND c.relname = '{name}'
+      AND a.attnum > 0
+      AND NOT a.attisdropped
     GROUP BY
-      t.table_schema,
-      t.table_name
+      n.nspname,
+      c.relname
   ),
   constraint_def AS (
     SELECT
