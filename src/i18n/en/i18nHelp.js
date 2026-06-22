@@ -500,6 +500,8 @@ export default {
           "Code Formatting: Automatically format the SQL statement for easy reading.",
         multipleConnections:
           "Multiple Connections: Manage multiple connections and group them easily.",
+        objectInspect:
+          "Object Inspection: Hover over a table/view/function name in the editor to see its type; right-click and select 'Inspect Object DDL' to view the full DDL in the DB Inspect dialog.",
       },
     },
   },

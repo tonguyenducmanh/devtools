@@ -488,6 +488,8 @@ export default {
         formatCode: "Định dạng code: Tự động định dạng câu SQL cho dễ đọc.",
         multipleConnections:
           "Nhiều kết nối: Quản lý nhiều kết nối và phân nhóm dễ dàng.",
+        objectInspect:
+          "Tra cứu Object: Di chuột vào tên table/view/function trong editor để xem loại; chuột phải và chọn 'Xem DDL Object' để xem DDL đầy đủ trong hộp thoại DB Inspect.",
       },
     },
   },

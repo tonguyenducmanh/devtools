@@ -50,6 +50,9 @@
           <div class="section-item">
             {{ $t("i18nHelp.postgreSQLQuery.features.multipleConnections") }}
           </div>
+          <div class="section-item">
+            {{ $t("i18nHelp.postgreSQLQuery.features.objectInspect") }}
+          </div>
         </div>
       </div>
     </div>
