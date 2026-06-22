@@ -154,18 +154,20 @@ func decodeTextValue(raw []byte, dataTypeOID uint32) any {
 	case pgtype.JSONOID, pgtype.JSONBOID:
 		return json.RawMessage(raw)
 	case pgtype.BoolOID:
-		// Simple protocol trả boolean dạng 't'/'f', cần đổi thành bool để JSON encode đúng true/false
-		return len(raw) > 0 && raw[0] == 't'
+		var b bool
+		if err := defaultTypeMap.Scan(dataTypeOID, pgtype.TextFormatCode, raw, &b); err == nil {
+			return b
+		}
+		return false
 	case pgtype.UUIDOID:
 		return string(raw)
 	default:
-		// Dùng pgtype.Map.Scan cho array/composite (raw bắt đầu bằng '{')
-		if len(raw) > 0 && raw[0] == '{' {
-			var decoded any
-			if err := defaultTypeMap.Scan(dataTypeOID, pgtype.TextFormatCode, raw, &decoded); err == nil {
-				if reflect.TypeOf(decoded).Kind() == reflect.Slice {
-					return sanitizePgValue(decoded)
-				}
+		// Thử decode bằng pgtype — nếu ra slice (array/composite) thì dùng,
+		// còn lại fallback về string giữ nguyên text thô
+		var decoded any
+		if err := defaultTypeMap.Scan(dataTypeOID, pgtype.TextFormatCode, raw, &decoded); err == nil {
+			if reflect.TypeOf(decoded).Kind() == reflect.Slice {
+				return sanitizePgValue(decoded)
 			}
 		}
 		return string(raw)
@@ -177,8 +179,7 @@ func decodeTextValue(raw []byte, dataTypeOID uint32) any {
 func sanitizePgValue(v any) any {
 	switch val := v.(type) {
 	case [16]byte:
-		return fmt.Sprintf("%x-%x-%x-%x-%x",
-			val[0:4], val[4:6], val[6:8], val[8:10], val[10:16])
+		return pgtype.UUID{Bytes: val, Valid: true}.String()
 	case []any:
 		for i, item := range val {
 			val[i] = sanitizePgValue(item)
