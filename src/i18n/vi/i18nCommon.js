@@ -767,6 +767,7 @@ export default {
       days: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
     },
     postgreSQLQuery: {
+      copyNpgSQLConnectionString: "Sao chép connection string NpgSQL",
       export: "Xuất khẩu",
       codeComplete: "Code Completion",
       help: "Trợ giúp",
@@ -828,6 +829,21 @@ export default {
       saveAndTestConnection: "Lưu và test kết nối",
       hostAndDbRequired: "Host và Database là bắt buộc",
       connectionAddInfo: "Nhập toàn bộ thông tin lấy được từ database",
+      databaseName: "Tên database",
+      hostPlaceholder: "Host (localhost)",
+      portPlaceholder: "Port (5432)",
+      usernamePlaceholder: "Tên người dùng",
+      passwordPlaceholder: "Mật khẩu",
+      sqlEditorPlaceholder: "SELECT * FROM table_name LIMIT 100;",
+      sqlEditorLabel: "SQL Query",
+      ungrouped: "Chưa phân nhóm",
+      convertConnectionStringRequired:
+        "Vui lòng nhập chuỗi connection string trước.",
+      convertNpgsqlSuccess: "Chuyển đổi dữ liệu Npgsql thành công!",
+      convertNpgsqlError: "Chuỗi Npgsql không hợp lệ hoặc lỗi phân tích.",
+      dotNetWasmNotReady:
+        "Hệ thống phân tích C# WASM chưa sẵn sàng.",
+      copyConnectionStringSuccess: "Đã sao chép connection string!",
       sidebarOption: {
         help: "Trợ giúp",
         setting: "Cài đặt",

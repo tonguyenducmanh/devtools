@@ -51,8 +51,8 @@
           language="pgsql"
           :enableHighlight="currentConfigLayout.enableHighlight"
           :wrapText="currentConfigLayout.wrapText"
-          :placeHolder="'SELECT * FROM table_name LIMIT 100;'"
-          :label="'SQL Query'"
+          :placeHolder="$t('i18nCommon.postgreSQLQuery.sqlEditorPlaceholder')"
+          :label="$t('i18nCommon.postgreSQLQuery.sqlEditorLabel')"
           :isLabelTop="true"
           height="100%"
           width="100%"
@@ -261,8 +261,16 @@
                       :arrowOpenDirection="$tdEnum.Direction.bottom"
                       :arrowDirection="$tdEnum.Direction.right"
                     />
-                    <div v-tooltip="group.name || 'Ungrouped'">
-                      {{ group.name || "Ungrouped" }}
+                    <div
+                      v-tooltip="
+                        group.name ||
+                        $t('i18nCommon.postgreSQLQuery.ungrouped')
+                      "
+                    >
+                      {{
+                        group.name ||
+                        $t("i18nCommon.postgreSQLQuery.ungrouped")
+                      }}
                     </div>
                   </div>
                   <div class="flex td-collection-edit-btn" v-if="group.id">
@@ -555,6 +563,14 @@ export default {
             label: me.$t("i18nCommon.postgreSQLQuery.downloadResult"),
             disabled: !me.canExportActiveResult,
             run: me.handleDownloadReponse,
+          },
+          {
+            key: "copyNpgSQLConnectionString",
+            label: me.$t(
+              "i18nCommon.postgreSQLQuery.copyNpgSQLConnectionString",
+            ),
+            disabled: !me.selectedConnectionId,
+            run: me.handleCopyNpgSQLConnectionString,
           },
         ],
         explore: [
@@ -1063,7 +1079,84 @@ export default {
         }
       }
     },
+    handleCopyNpgSQLConnectionString() {
+      let me = this;
+      if (!me.checkInitDotNetWasm()) return;
 
+      let conn = me.allConnections.find(
+        (c) => c.id === me.selectedConnectionId,
+      );
+      if (!conn?.connection_string) {
+        me.$tdToast.warning(
+          me.$t("i18nCommon.postgreSQLQuery.noConnectionString"),
+        );
+        return;
+      }
+
+      try {
+        let connStr = conn.connection_string;
+        let fields = {
+          host: "",
+          port: 5432,
+          user_name: "",
+          password: "",
+          database_name: "",
+        };
+
+        if (
+          connStr.startsWith("postgresql://") ||
+          connStr.startsWith("postgres://")
+        ) {
+          const url = new URL(connStr);
+          fields.host = url.hostname || "";
+          fields.port = parseInt(url.port) || 5432;
+          fields.database_name =
+            url.pathname?.replace(/^\//, "") || "";
+          fields.user_name =
+            decodeURIComponent(url.username || "");
+          fields.password =
+            decodeURIComponent(url.password || "");
+        } else {
+          const parts =
+            connStr.match(/(?:[^\s']+|'[^']*')+/g) || [];
+          parts.forEach((p) => {
+            const eqIdx = p.indexOf("=");
+            if (eqIdx > -1) {
+              const key = p.substring(0, eqIdx).trim();
+              let val = p.substring(eqIdx + 1).trim();
+              if (
+                val.startsWith("'") &&
+                val.endsWith("'")
+              ) {
+                val = val
+                  .substring(1, val.length - 1)
+                  .replace(/\\'/g, "'");
+              }
+              if (key === "host") fields.host = val;
+              if (key === "port")
+                fields.port = parseInt(val) || 5432;
+              if (key === "user")
+                fields.user_name = val;
+              if (key === "password")
+                fields.password = val;
+              if (key === "dbname")
+                fields.database_name = val;
+            }
+          });
+        }
+
+        const jsonStr = JSON.stringify(fields);
+        const npgSqlConnStr =
+          me.dotnetExports.StringifyNpgSQLConnection(jsonStr);
+
+        me.$tdUtility.copyToClipboard(npgSqlConnStr);
+      } catch (e) {
+        console.error(e);
+        me.$tdToast.error(
+          me.$t("i18nCommon.toastMessage.error"),
+        );
+      }
+    },
     async handleTestConnection() {
       if (!this.selectedConnectionId) return;
       await this.testDatabaseConnection(

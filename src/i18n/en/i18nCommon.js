@@ -770,6 +770,7 @@ export default {
       days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     },
     postgreSQLQuery: {
+      copyNpgSQLConnectionString: "Copy connection string NpgSQL",
       export: "Export",
       codeComplete: "Code Completion",
       help: "Help",
@@ -832,6 +833,21 @@ export default {
       hostAndDbRequired: "Host and Database are required",
       connectionAddInfo:
         "Typing all info you get from your database connection",
+      databaseName: "Database name",
+      hostPlaceholder: "Host (localhost)",
+      portPlaceholder: "Port (5432)",
+      usernamePlaceholder: "Username",
+      passwordPlaceholder: "Password",
+      sqlEditorPlaceholder: "SELECT * FROM table_name LIMIT 100;",
+      sqlEditorLabel: "SQL Query",
+      ungrouped: "Ungrouped",
+      convertConnectionStringRequired:
+        "Please enter a connection string.",
+      convertNpgsqlSuccess: "Data conversion successful!",
+      convertNpgsqlError: "Invalid Npgsql string or parsing error.",
+      dotNetWasmNotReady:
+        "C# WASM analysis system is not ready.",
+      copyConnectionStringSuccess: "Connection string copied!",
       sidebarOption: {
         help: "Help",
         setting: "Settings",

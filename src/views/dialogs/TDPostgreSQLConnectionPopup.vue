@@ -68,7 +68,7 @@
           <TDInput
             v-model="connFields.database"
             :noMargin="true"
-            :placeHolder="'Database name'"
+            :placeHolder="$t('i18nCommon.postgreSQLQuery.databaseName')"
             @input="buildConnectionString"
           />
         </div>
@@ -77,7 +77,7 @@
         <div class="flex-one">
           <TDInput
             v-model="connFields.host"
-            :placeHolder="'Host (localhost)'"
+            :placeHolder="$t('i18nCommon.postgreSQLQuery.hostPlaceholder')"
             :noMargin="true"
             @input="buildConnectionString"
           />
@@ -86,7 +86,7 @@
           <TDInput
             v-model="connFields.port"
             :noMargin="true"
-            :placeHolder="'Port (5432)'"
+            :placeHolder="$t('i18nCommon.postgreSQLQuery.portPlaceholder')"
             @input="buildConnectionString"
           />
         </div>
@@ -96,7 +96,7 @@
           <TDInput
             v-model="connFields.username"
             :noMargin="true"
-            :placeHolder="'Username'"
+            :placeHolder="$t('i18nCommon.postgreSQLQuery.usernamePlaceholder')"
             @input="buildConnectionString"
           />
         </div>
@@ -104,7 +104,7 @@
           <TDInput
             v-model="connFields.password"
             :noMargin="true"
-            :placeHolder="'Password'"
+            :placeHolder="$t('i18nCommon.postgreSQLQuery.passwordPlaceholder')"
             :inputType="'password'"
             @input="buildConnectionString"
           />
@@ -224,17 +224,16 @@ export default {
      */
     handleConvertConnectionStringFromAnotherApp() {
       if (!this.connectionStringFromAnotherApp.trim()) {
-        this.$tdToast.warning("Vui lòng nhập chuỗi connection string trước.");
-        return;
-      }
-      if (!this.dotnetInitialized || !this.dotnetExports) {
-        this.$tdToast.error("Hệ thống phân tích C# WASM chưa sẵn sàng.");
+        this.$tdToast.warning(
+          this.$t("i18nCommon.postgreSQLQuery.convertConnectionStringRequired"),
+        );
         return;
       }
       // convert NgSQL connect
       if (
+        this.checkInitDotNetWasm() &&
         this.inputType ==
-        this.$tdEnum.PostreSQLConnectionImportType.NpgSQLDotNet
+          this.$tdEnum.PostreSQLConnectionImportType.NpgSQLDotNet
       ) {
         try {
           // Thực hiện lệnh convert từ C#
@@ -252,10 +251,14 @@ export default {
 
           // Tái tạo lại chuỗi DSN chuẩn lưu vào form
           this.buildConnectionString();
-          this.$tdToast.success("Chuyển đổi dữ liệu Npgsql thành công!");
+          this.$tdToast.success(
+            this.$t("i18nCommon.postgreSQLQuery.convertNpgsqlSuccess"),
+          );
         } catch (e) {
           console.error(e);
-          this.$tdToast.error("Chuỗi Npgsql không hợp lệ hoặc lỗi phân tích.");
+          this.$tdToast.error(
+            this.$t("i18nCommon.postgreSQLQuery.convertNpgsqlError"),
+          );
         }
       } else if (
         this.inputType == this.$tdEnum.PostreSQLConnectionImportType.PgxGo
@@ -393,7 +396,6 @@ export default {
       let me = this;
       if (me.form.connection_string) {
         me.$tdUtility.copyToClipboard(me.form.connection_string);
-        me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
       }
     },
 

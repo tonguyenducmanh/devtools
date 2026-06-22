@@ -15,6 +15,16 @@ export default {
     await this.initDotNetWasm();
   },
   methods: {
+    checkInitDotNetWasm() {
+      let result = true;
+      if (!this.dotnetInitialized || !this.dotnetExports) {
+        this.$tdToast.error(
+          this.$t("i18nCommon.postgreSQLQuery.dotNetWasmNotReady"),
+        );
+        result = false;
+      }
+      return result;
+    },
     /**
      * Khởi tạo .NET WASM Runtime
      */
