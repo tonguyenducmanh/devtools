@@ -16,15 +16,18 @@
           :isEditable="false"
           @selected="handleSearch"
         />
-        <div class="flex-one">
-          <TDInput
-            v-model="searchSchema"
-            :noMargin="true"
-            :placeHolder="
-              $t('i18nCommon.postgreSQLQuery.dbInspect.schemaPlaceholder')
-            "
-          />
-        </div>
+        <TDComboBox
+          v-model="searchSchema"
+          :noMargin="true"
+          :width="200"
+          :options="schemaOptions"
+          :isEditable="false"
+          :isCapitalizeText="false"
+          :placeHolder="
+            $t('i18nCommon.postgreSQLQuery.dbInspect.schemaPlaceholder')
+          "
+          @selected="handleSearch"
+        />
         <div class="flex-one">
           <TDInput
             v-model="searchValue"
@@ -127,6 +130,8 @@ export default {
       searchSchema: "",
       searchValue: "",
       limitCount: 20,
+      isLoadingSchemas: false,
+      schemaOptions: [],
       // state
       isSearching: false,
       isLoadingDDL: false,
@@ -147,7 +152,7 @@ export default {
         {
           value: "function",
           label: this.$t("i18nCommon.postgreSQLQuery.dbInspect.function"),
-        }
+        },
       ],
 
       agentAPI: null,
@@ -166,6 +171,7 @@ export default {
       this.ddlContent = "";
       this.activeIndex = -1;
       this.searchError = "";
+      await this.loadSchemas();
       await this.handleSearch();
     },
 
@@ -173,13 +179,46 @@ export default {
       this.$emit("close", payload);
     },
 
+    /** Load danh sách schema từ PostgreSQL để đổ vào combo */
+    async loadSchemas() {
+      if (!this.connectionId) return;
+      this.isLoadingSchemas = true;
+      try {
+        const resp = await this.agentAPI.executeQuery(
+          this.connectionId,
+          pgQueries.pg_inspect_list_schemas,
+        );
+        const result =
+          resp?.data?.data?.results?.[0] || resp?.data?.data || null;
+        const rows = result?.rows ?? [];
+        // array_agg trả về text dạng {elem1,elem2,...}
+        const raw = rows?.[0]?.schema_names;
+        const schemaNames =
+          typeof raw === "string"
+            ? raw.slice(1, -1).split(",").filter(Boolean)
+            : [];
+        this.schemaOptions = [
+          {
+            value: "",
+            label: this.$t("i18nCommon.postgreSQLQuery.dbInspect.allSchemas"),
+          },
+          ...schemaNames.map((name) => ({
+            value: name,
+            label: name,
+          })),
+        ];
+      } catch {
+        this.schemaOptions = [];
+      } finally {
+        this.isLoadingSchemas = false;
+      }
+    },
+
     /** Build SQL tìm kiếm theo loại */
     buildSearchSQL() {
       const schema = this.searchSchema?.trim();
       const rawValue = this.searchValue?.trim();
-      const value = rawValue
-        ? `%${rawValue.replace(/'/g, "''")}%`
-        : "%";
+      const value = rawValue ? `%${rawValue.replace(/'/g, "''")}%` : "%";
       const limit = Math.min(
         Math.max(parseInt(this.limitCount, 10) || 20, 1),
         100,

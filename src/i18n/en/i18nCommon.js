@@ -870,6 +870,7 @@ export default {
         view: "View",
         function: "Function",
         trigger: "Trigger",
+        allSchemas: "All schemas",
       },
     },
   },

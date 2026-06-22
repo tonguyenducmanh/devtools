@@ -866,6 +866,7 @@ export default {
         view: "View",
         function: "Function",
         trigger: "Trigger",
+        allSchemas: "Tất cả schema",
       },
     },
   },
