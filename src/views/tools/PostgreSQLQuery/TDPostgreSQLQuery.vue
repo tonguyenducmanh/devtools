@@ -670,12 +670,23 @@ export default {
             },
           );
 
+          // Context menu: Format SQL
+          editor.addAction({
+            id: "format-pg-sql",
+            label: me.$t("i18nCommon.postgreSQLQuery.formatCode"),
+            contextMenuGroupId: "navigation",
+            contextMenuOrder: 1.1,
+            run: () => {
+              me.endEditFromEditor(editor, me.handleFormatSQL);
+            },
+          });
+
           // Context menu: Inspect object DDL
           editor.addAction({
             id: "inspect-pg-object",
             label: me.$t("i18nCommon.postgreSQLQuery.dbInspect.inspectObject"),
             contextMenuGroupId: "navigation",
-            contextMenuOrder: 2,
+            contextMenuOrder: 1.2,
             run: async (ed) => {
               const position = ed.getPosition();
               const model = ed.getModel();
