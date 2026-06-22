@@ -43,7 +43,7 @@ export default {
     return {
       previewLabel: "",
       previewValue: "",
-      previewLanguage: "json",
+      previewLanguage: "plaintext",
       langOptions: [
         "json", "sql", "pgsql", "mysql", "xml", "html", "css", "scss",
         "yaml", "markdown", "javascript", "typescript", "plaintext",
@@ -55,42 +55,26 @@ export default {
   methods: {
     show({ value, label }) {
       this.previewLabel = label || "";
-      let v = value;
-      if (v !== null && v !== undefined && typeof v === "object") {
-        v = JSON.stringify(v, null, 2);
+      let str;
+      if (value !== null && value !== undefined && typeof value === "object") {
+        str = JSON.stringify(value, null, 2);
+      } else {
+        str = value != null ? String(value) : "";
       }
-      this.previewValue = v != null ? String(v) : "";
-      this.previewLanguage = this.detectLang(label);
+      this.previewValue = str;
+      this.previewLanguage = this.detectLang(str);
     },
     handleClose() {
       this.onClose?.();
     },
-    detectLang(label) {
-      const text = (label || "").toLowerCase();
-      if (/json|jsonb/.test(text)) return "json";
-      if (/xml/.test(text)) return "xml";
-      if (/html/.test(text)) return "html";
-      if (/css/.test(text)) return /scss/.test(text) ? "scss" : "css";
-      if (/yaml|yml/.test(text)) return "yaml";
-      if (/sql|query/.test(text)) return /mysql/.test(text) ? "mysql" : /pgsql|postgres/.test(text) ? "pgsql" : "sql";
-      if (/md|markdown/.test(text)) return "markdown";
-      if (/js|javascript|script/.test(text)) return "javascript";
-      if (/ts|typescript/.test(text)) return "typescript";
-      if (/php/.test(text)) return "php";
-      if (/py|python/.test(text)) return "python";
-      if (/rb|ruby/.test(text)) return "ruby";
-      if (/go|golang/.test(text)) return "go";
-      if (/java/.test(text)) return "java";
-      if (/cs|csharp|c#/.test(text)) return "csharp";
-      if (/sh|bash|shell|zsh/.test(text)) return "shell";
-      if (/ps1|powershell/.test(text)) return "powershell";
-      if (/docker|dockerfile/.test(text)) return "dockerfile";
-      if (/ini/.test(text)) return "ini";
-      if (/bat|batch/.test(text)) return "bat";
-      if (/rs|rust/.test(text)) return "rust";
-      if (/kt|kotlin/.test(text)) return "kotlin";
-      if (/swift/.test(text)) return "swift";
-      return "json";
+    detectLang(str) {
+      if (!str) return "plaintext";
+      try {
+        JSON.parse(str);
+        return "json";
+      } catch {
+        return "plaintext";
+      }
     },
   },
 };
