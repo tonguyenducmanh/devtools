@@ -174,7 +174,10 @@ export default {
     /** Build SQL tìm kiếm theo loại */
     buildSearchSQL() {
       const schema = this.searchSchema?.trim();
-      const value = this.searchValue?.trim() || "%";
+      const rawValue = this.searchValue?.trim();
+      const value = rawValue
+        ? `%${rawValue.replace(/'/g, "''")}%`
+        : "%";
       const limit = Math.min(
         Math.max(parseInt(this.limitCount, 10) || 20, 1),
         100,
@@ -201,7 +204,7 @@ export default {
 
       return queryTemplate
         .replace(/{schemaFilter}/g, schemaFilter)
-        .replace(/{value}/g, value.replace(/'/g, "''"))
+        .replace(/{value}/g, value)
         .replace(/{limit}/g, limit);
     },
 
