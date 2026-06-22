@@ -879,6 +879,7 @@ export default {
         trigger: "Trigger",
         allSchemas: "All schemas",
         inspectObject: "Inspect Object DDL",
+        inspectHint: "Right-click → Inspect DDL",
         noObjectSelected: "No object name found at cursor",
       },
     },

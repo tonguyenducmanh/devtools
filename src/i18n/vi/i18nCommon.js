@@ -875,6 +875,7 @@ export default {
         trigger: "Trigger",
         allSchemas: "Tất cả schema",
         inspectObject: "Xem DDL Object",
+        inspectHint: "Chuột phải → Xem DDL",
         noObjectSelected: "Không tìm thấy tên object tại vị trí con trỏ",
       },
     },

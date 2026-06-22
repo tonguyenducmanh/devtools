@@ -672,7 +672,7 @@ export default {
             contents.push({ value: `\n${detail}`, isTrusted: true });
           }
           contents.push({
-            value: `\n\n_Right-click \u2192 Inspect DDL_`,
+            value: `\n\n_${me.$t("i18nCommon.postgreSQLQuery.dbInspect.inspectHint")}_`,
             isTrusted: true,
           });
 
