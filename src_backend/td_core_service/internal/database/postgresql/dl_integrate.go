@@ -142,7 +142,7 @@ func ExecutePostgreSQLQuery(connectionString string, sqlQuery string, defaultLim
 
 // decodeTextValue chuyển 1 giá trị text thô Postgres trả về sang kiểu Go phù hợp để encode JSON.
 //   - NULL                -> nil
-//   - json / jsonb         -> json.RawMessage (giữ nguyên cấu trúc lồng nhau)
+//   - json / jsonb         -> json.RawMessage nếu hợp lệ, fallback string nếu không
 //   - bool                 -> bool
 //   - các array type       -> slice (dùng pgtype.Map.Scan để decode)
 //   - còn lại              -> string
@@ -152,7 +152,16 @@ func decodeTextValue(raw []byte, dataTypeOID uint32) any {
 	}
 	switch dataTypeOID {
 	case pgtype.JSONOID, pgtype.JSONBOID:
-		return json.RawMessage(raw)
+		// Validate trước khi wrap thành RawMessage.
+		// Nếu raw không phải JSON hợp lệ (ví dụ bị corrupt hoặc có ký tự thừa)
+		// thì json.Encoder sẽ trả về MarshalerError khi encode -> fallback về string.
+		if json.Valid(raw) {
+			// Copy để tránh slice bị GC hoặc overwrite bởi pgx buffer
+			dst := make([]byte, len(raw))
+			copy(dst, raw)
+			return json.RawMessage(dst)
+		}
+		return string(raw)
 	case pgtype.BoolOID:
 		var b bool
 		if err := defaultTypeMap.Scan(dataTypeOID, pgtype.TextFormatCode, raw, &b); err == nil {
@@ -175,7 +184,7 @@ func decodeTextValue(raw []byte, dataTypeOID uint32) any {
 }
 
 // sanitizePgValue đệ quy chuyển các kiểu Go không JSON-friendly sang dạng string.
-// Ví dụ: [16]byte (UUID) -> uuid string
+// Ví dụ: [16]byte (UUID) -> uuid string, json.RawMessage không hợp lệ -> string
 func sanitizePgValue(v any) any {
 	switch val := v.(type) {
 	case [16]byte:
@@ -185,6 +194,12 @@ func sanitizePgValue(v any) any {
 			val[i] = sanitizePgValue(item)
 		}
 		return val
+	case json.RawMessage:
+		// Guard phòng trường hợp RawMessage lọt vào qua array/composite
+		if json.Valid(val) {
+			return val
+		}
+		return string(val)
 	default:
 		return v
 	}
