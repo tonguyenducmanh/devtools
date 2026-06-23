@@ -3,7 +3,7 @@
     :visible="true"
     :showHeader="true"
     @close="handleClose"
-    width="1000px"
+    isFullPopup
     :title="$t('i18nCommon.postgreSQLQuery.dbInspect.title')"
   >
     <div class="flex flex-col td-pg-inspect-popup">
@@ -374,8 +374,9 @@ export default {
 <style scoped lang="scss">
 .td-pg-inspect-popup {
   gap: var(--padding);
+  width: 100%;
+  height: 100%;
   margin: var(--padding);
-  height: 600px;
 }
 
 .td-inspect-search-bar {

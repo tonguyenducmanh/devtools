@@ -1,6 +1,6 @@
 <template>
   <TDPopup :visible="true" :showHeader="false" @close="handleClose">
-    <div class="td-search-modal">
+    <div class="flex flex-col td-search-modal">
       <div class="td-search-input-container">
         <div class="td-icon td-search-icon"></div>
         <input
@@ -25,7 +25,7 @@
         >
         </TDButton>
       </div>
-      <div class="td-search-results" v-else>
+      <div class="flex-one td-search-results" v-else>
         <div class="td-search-section">
           <div
             v-for="(collection, index) in filteredCollection"
@@ -121,8 +121,7 @@ export default {
 <style scoped lang="scss">
 .td-search-modal {
   width: 100%;
-  max-width: 600px;
-  height: 50vh;
+  height: 100%;
   background-color: var(--bg-main-color);
   border: 1px solid var(--border-color);
   border-radius: calc(var(--border-radius) * 1.5);
@@ -133,6 +132,7 @@ export default {
     display: flex;
     align-items: center;
     padding: 16px;
+    width: 100%;
     border-bottom: 1px solid var(--border-color);
     .td-search-icon {
       margin-right: var(--padding);
@@ -167,7 +167,7 @@ export default {
   }
 
   .td-search-results {
-    max-height: 400px;
+    width: 100%;
     overflow: auto;
 
     .td-search-section {

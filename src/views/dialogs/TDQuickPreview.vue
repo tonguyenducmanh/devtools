@@ -2,7 +2,7 @@
   <TDPopup
     :visible="true"
     :showHeader="true"
-    width="80vw"
+    isFullPopup
     :title="previewLabel"
     @close="handleClose"
   >
@@ -45,11 +45,34 @@ export default {
       previewValue: "",
       previewLanguage: "plaintext",
       langOptions: [
-        "json", "sql", "pgsql", "mysql", "xml", "html", "css", "scss",
-        "yaml", "markdown", "javascript", "typescript", "plaintext",
-        "php", "python", "ruby", "go", "java", "csharp", "shell",
-        "powershell", "dockerfile", "ini", "bat", "rust", "kotlin", "swift",
-      ].map(l => ({ value: l, label: l })),
+        "json",
+        "sql",
+        "pgsql",
+        "mysql",
+        "xml",
+        "html",
+        "css",
+        "scss",
+        "yaml",
+        "markdown",
+        "javascript",
+        "typescript",
+        "plaintext",
+        "php",
+        "python",
+        "ruby",
+        "go",
+        "java",
+        "csharp",
+        "shell",
+        "powershell",
+        "dockerfile",
+        "ini",
+        "bat",
+        "rust",
+        "kotlin",
+        "swift",
+      ].map((l) => ({ value: l, label: l })),
     };
   },
   methods: {
@@ -82,6 +105,7 @@ export default {
 
 <style scoped>
 .td-preview-editor {
-  height: 70vh;
+  width: 100%;
+  height: 100%;
 }
 </style>

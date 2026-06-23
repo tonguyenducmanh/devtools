@@ -3,7 +3,6 @@
     :visible="true"
     :showHeader="true"
     @close="handleClose"
-    width="480px"
     :title="$t('i18nCommon.postgreSQLQuery.cloneIntellisenseTitle')"
   >
     <div class="flex flex-col td-pg-clone-popup">

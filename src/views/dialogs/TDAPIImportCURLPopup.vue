@@ -1,10 +1,5 @@
 <template>
-  <TDPopup
-    :visible="true"
-    :showHeader="false"
-    @close="handleClose"
-    width="800px"
-  >
+  <TDPopup :visible="true" :showHeader="false" @close="handleClose">
     <div class="flex flex-col td-api-import-curl">
       <TDTextarea
         :isLabelTop="true"

@@ -1,7 +1,11 @@
 <template>
   <teleport to="body">
     <div v-if="visible" class="td-popup-overlay" @click.self="onOverlayClick">
-      <div class="td-popup-container" :style="{ width }">
+      <div
+        class="flex flex-col td-popup-container"
+        :style="computeStyle"
+        :class="{ 'td-popup-full-screen': isFullPopup }"
+      >
         <div v-if="showHeader" class="td-popup-header">
           <div class="td-popup-title">{{ title }}</div>
           <div class="td-popup-header-extra">
@@ -16,7 +20,7 @@
           </div>
         </div>
 
-        <div class="td-popup-body" :style="{ maxHeight }">
+        <div class="flex-one td-popup-body">
           <slot />
         </div>
       </div>
@@ -39,11 +43,15 @@ export default {
     },
     width: {
       type: String,
-      default: "600px",
+      default: "800px",
     },
-    maxHeight: {
+    height: {
       type: String,
-      default: "80vh",
+      default: "500px",
+    },
+    isFullPopup: {
+      type: Boolean,
+      default: false,
     },
     showHeader: {
       type: Boolean,
@@ -59,6 +67,16 @@ export default {
     },
   },
   emits: ["close"],
+  computed: {
+    computeStyle() {
+      let styleBuild = {};
+      if (!this.isFullPopup) {
+        styleBuild.width = this.width;
+        styleBuild.height = this.height;
+      }
+      return styleBuild;
+    },
+  },
   methods: {
     emitClose() {
       this.$emit("close");
@@ -92,6 +110,11 @@ export default {
   flex-direction: column;
 }
 
+.td-popup-full-screen {
+  width: 90vw;
+  height: 95vh;
+}
+
 .td-popup-header {
   padding: calc(var(--padding) * 2);
   border-bottom: 1px solid var(--border-color);
@@ -99,6 +122,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   gap: var(--padding);
+  width: 100%;
 }
 .td-popup-header-extra {
   display: flex;
@@ -108,6 +132,7 @@ export default {
 
 .td-popup-body {
   overflow-y: auto;
+  width: 100%;
 }
 
 .td-popup-close {

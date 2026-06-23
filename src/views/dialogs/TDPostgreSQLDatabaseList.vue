@@ -3,7 +3,6 @@
     :visible="true"
     :showHeader="true"
     @close="handleClose"
-    width="480px"
     :title="$t('i18nCommon.postgreSQLQuery.dbList.title')"
   >
     <div class="flex flex-col td-pg-dblist-popup">

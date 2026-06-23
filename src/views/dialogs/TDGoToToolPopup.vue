@@ -1,6 +1,6 @@
 <template>
   <TDPopup :visible="true" :showHeader="false" @close="handleClose">
-    <div class="td-search-modal" @click.stop>
+    <div class="flex flex-col td-search-modal" @click.stop>
       <div class="td-search-input-container">
         <div class="td-icon td-search-icon"></div>
         <input
@@ -16,7 +16,7 @@
         </button>
       </div>
 
-      <div class="td-search-results" v-if="filteredRoutes.length > 0">
+      <div class="flex-one td-search-results" v-if="filteredRoutes.length > 0">
         <div class="td-search-section">
           <div
             v-for="(route, index) in filteredRoutes"
@@ -47,14 +47,14 @@
 
       <div
         v-else-if="searchQuery && filteredRoutes.length === 0"
-        class="td-search-empty"
+        class="flex-one td-search-empty"
       >
         <div class="td-search-empty-text">
           {{ $t("i18nCommon.search.noResults") }}
         </div>
       </div>
 
-      <div v-else class="td-search-help">
+      <div v-else class="flex-one td-search-help">
         <div class="td-search-help-text">
           {{ $t("i18nCommon.search.help") }}
         </div>
@@ -183,8 +183,7 @@ export default {
 <style scoped lang="scss">
 .td-search-modal {
   width: 100%;
-  max-width: 600px;
-  height: 50vh;
+  height: 100%;
   background-color: var(--bg-main-color);
   border: 1px solid var(--border-color);
   border-radius: calc(var(--border-radius) * 1.5);
@@ -195,6 +194,7 @@ export default {
     display: flex;
     align-items: center;
     padding: 16px;
+    width: 100%;
     border-bottom: 1px solid var(--border-color);
 
     .td-search-icon {
@@ -231,7 +231,7 @@ export default {
   }
 
   .td-search-results {
-    max-height: 400px;
+    width: 100%;
     overflow: auto;
 
     .td-search-section {
