@@ -7,8 +7,14 @@
 import TDCodeMoveEffect from "./backgroundEffect/TDCodeMoveEffect.vue";
 import TDParticleShapeEffect from "./backgroundEffect/TDParticleShapeEffect.vue";
 import TDGridLinesEffect from "./backgroundEffect/TDGridLinesEffect.vue";
+import TDPixelTunnelEffect from "./backgroundEffect/TDPixelTunnelEffect.vue";
 
-const effects = [TDCodeMoveEffect, TDGridLinesEffect, TDParticleShapeEffect];
+const effects = [
+  TDCodeMoveEffect,
+  TDGridLinesEffect,
+  TDPixelTunnelEffect,
+  TDParticleShapeEffect,
+];
 
 export default {
   name: "TDDynamicBackgroundEffect",
