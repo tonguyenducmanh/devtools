@@ -13,16 +13,25 @@ export default {
         const cacheKey = me.$tdEnum.cacheConfig.PostgreSQLQueryHistory;
         await TDCache.remove(cacheKey, { id: me.selectedConnectionId });
 
+        // Số lượng dòng tải mỗi lần
+        let defaultQueryLimit = 5000;
+        // có limit kết quả ở backend không, đặt thế này để tương thích với executeQuery trong TDPosgreSQLQuery
+        let limitResults = false;
+
         // Lấy keywords
         let keywordResponse = await me.agentAPI.executeQuery(
           me.selectedConnectionId,
           pgQueries.pg_get_keywords,
+          defaultQueryLimit,
+          !limitResults,
         );
 
         // Gọi SQL đếm tổng số dòng
         let countResponse = await me.agentAPI.executeQuery(
           me.selectedConnectionId,
           pgQueries.pg_get_tables_count,
+          defaultQueryLimit,
+          !limitResults,
         );
 
         let totalRows = 0;
@@ -37,15 +46,16 @@ export default {
 
         // Chạy vòng lặp FOR gối đầu để kéo dữ liệu về thông qua SQL Paging
         let allTableRows = [];
-        const pageSize = 5000; // Số lượng dòng tải mỗi lần
 
-        for (let offset = 0; offset < totalRows; offset += pageSize) {
+        for (let offset = 0; offset < totalRows; offset += defaultQueryLimit) {
           // Nối thêm điều kiện LIMIT OFFSET vào câu SQL Paging mẫu
-          let pagingQuery = `${pgQueries.pg_get_tables_paging} LIMIT ${pageSize} OFFSET ${offset};`;
+          let pagingQuery = `${pgQueries.pg_get_tables_paging} LIMIT ${defaultQueryLimit} OFFSET ${offset};`;
 
           let pagingResponse = await me.agentAPI.executeQuery(
             me.selectedConnectionId,
             pagingQuery,
+            defaultQueryLimit,
+            !limitResults,
           );
 
           const pagingResult =
@@ -92,6 +102,8 @@ export default {
             let funcCountResponse = await me.agentAPI.executeQuery(
               me.selectedConnectionId,
               pgQueries.pg_get_functions_count,
+              defaultQueryLimit,
+              !limitResults,
             );
 
             let totalFuncRows = 0;
@@ -107,12 +119,18 @@ export default {
               totalFuncRows = parseInt(funcCountResult.rows[0].total || 0, 10);
             }
 
-            for (let offset = 0; offset < totalFuncRows; offset += pageSize) {
-              let funcPagingQuery = `${pgQueries.pg_get_functions_paging} LIMIT ${pageSize} OFFSET ${offset};`;
+            for (
+              let offset = 0;
+              offset < totalFuncRows;
+              offset += defaultQueryLimit
+            ) {
+              let funcPagingQuery = `${pgQueries.pg_get_functions_paging} LIMIT ${defaultQueryLimit} OFFSET ${offset};`;
 
               let funcPagingResponse = await me.agentAPI.executeQuery(
                 me.selectedConnectionId,
                 funcPagingQuery,
+                defaultQueryLimit,
+                !limitResults,
               );
 
               const funcPagingResult =
@@ -250,7 +268,11 @@ export default {
         });
 
         // ── Build inspect lookup ──────────────────────────────────────────────
-        me._inspectLookup = { tables: new Map(), views: new Map(), functions: new Map() };
+        me._inspectLookup = {
+          tables: new Map(),
+          views: new Map(),
+          functions: new Map(),
+        };
 
         tableRows.forEach((row) => {
           const tbl = String(row.table_name).toLowerCase();
@@ -616,39 +638,40 @@ export default {
           return null;
         }
 
-        const hoverDisposable = monaco.languages.registerHoverProvider("pgsql", {
-          provideHover: async (model, position) => {
-            if (!me.selectedConnectionId || !me._inspectLookup) return null;
+        const hoverDisposable = monaco.languages.registerHoverProvider(
+          "pgsql",
+          {
+            provideHover: async (model, position) => {
+              if (!me.selectedConnectionId || !me._inspectLookup) return null;
 
-            // Lấy full word tại vị trí hover (vd: "sample_data")
-            const word = model.getWordAtPosition(position);
-            if (!word) return null;
-            const objectName = word.word.toLowerCase();
+              // Lấy full word tại vị trí hover (vd: "sample_data")
+              const word = model.getWordAtPosition(position);
+              if (!word) return null;
+              const objectName = word.word.toLowerCase();
 
-            // Kiểm tra phía trước word có schema prefix không (vd: "tm.")
-            const lineContent = model.getLineContent(position.lineNumber);
-            const textBeforeWord = lineContent.substring(
-              0,
-              word.startColumn - 1,
-            );
-            const dotMatch = textBeforeWord.match(
-              /([a-zA-Z0-9_]+)\.$/,
-            );
+              // Kiểm tra phía trước word có schema prefix không (vd: "tm.")
+              const lineContent = model.getLineContent(position.lineNumber);
+              const textBeforeWord = lineContent.substring(
+                0,
+                word.startColumn - 1,
+              );
+              const dotMatch = textBeforeWord.match(/([a-zA-Z0-9_]+)\.$/);
 
-            if (dotMatch) {
-              const schemaName = dotMatch[1].toLowerCase();
-              const key = `${schemaName}.${objectName}`;
-              const obj = findInspectObject(key);
+              if (dotMatch) {
+                const schemaName = dotMatch[1].toLowerCase();
+                const key = `${schemaName}.${objectName}`;
+                const obj = findInspectObject(key);
+                if (!obj) return null;
+                return buildHoverContent(obj, objectName);
+              }
+
+              // Bare word, không có schema prefix
+              const obj = findInspectObject(objectName);
               if (!obj) return null;
               return buildHoverContent(obj, objectName);
-            }
-
-            // Bare word, không có schema prefix
-            const obj = findInspectObject(objectName);
-            if (!obj) return null;
-            return buildHoverContent(obj, objectName);
+            },
           },
-        });
+        );
         me.intellisenseDisposable.push(hoverDisposable);
 
         // Helper build nội dung hover
