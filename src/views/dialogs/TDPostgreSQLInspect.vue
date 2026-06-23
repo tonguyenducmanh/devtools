@@ -422,7 +422,7 @@ export default {
   width: 100%;
   position: relative;
   border-radius: var(--border-radius);
-  gap: var(--padding);
+  gap: calc(var(--padding) / 2);
   overflow: hidden; /* Cắt phần nội dung bị tràn */
   min-height: 0; /* Bắt buộc để flex child không bị phình to theo nội dung bên trong */
 
