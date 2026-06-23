@@ -25,14 +25,6 @@
           @click="handleSearch"
           :readOnly="isSearching"
         />
-        <TDButton
-          :noMargin="true"
-          iconClass="td-reload-icon"
-          :type="$tdEnum.buttonType.secondary"
-          v-tooltip="$t('i18nCommon.postgreSQLQuery.refreshData')"
-          @click="handleSearch"
-          :readOnly="isSearching"
-        />
         <span class="td-dblist-current">{{ currentConnLabel }}</span>
       </div>
       <div v-if="isSearching" class="flex td-dblist-loading">
@@ -135,8 +127,7 @@ export default {
           if (q) {
             rows = rows.filter(
               (r) =>
-                r.database_name &&
-                r.database_name.toLowerCase().includes(q),
+                r.database_name && r.database_name.toLowerCase().includes(q),
             );
           }
           this.databases = rows;
@@ -170,10 +161,9 @@ export default {
         return;
       }
 
-      const fields =
-        this.ownerForm.parseConnectionStringToFields(
-          currentConn.connection_string,
-        );
+      const fields = this.ownerForm.parseConnectionStringToFields(
+        currentConn.connection_string,
+      );
 
       TDDialogUtil.showPopup({
         dialogType: TDDialogEnum.TDPostgreSQLConnectionPopup,
@@ -253,6 +243,7 @@ export default {
   align-items: stretch;
   justify-content: flex-start;
   gap: 4px;
+  max-height: 400px;
 }
 
 .td-dblist-item {
