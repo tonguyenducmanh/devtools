@@ -198,10 +198,6 @@ func dbPath() string {
 	return filepath.Join(dir, td_config.GetConfigGlobal().DatabaseName)
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Public API — các method của TDDLBase[T]
-// ─────────────────────────────────────────────────────────────────────────────
-
 func executableDir() string {
 	exe, err := os.Executable()
 	if err != nil {
@@ -210,6 +206,26 @@ func executableDir() string {
 	return filepath.Dir(exe)
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// withTx — helper chạy fn trong 1 transaction, tự rollback nếu có lỗi
+// ─────────────────────────────────────────────────────────────────────────────
+
+func withTx(db *sql.DB, fn func(*sql.Tx) error) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	if err := fn(tx); err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+	return tx.Commit()
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Public API — các method của TDDLBase[T]
+// ─────────────────────────────────────────────────────────────────────────────
+
 func (r *TDDLBase[T]) GetAll() ([]T, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -217,8 +233,9 @@ func (r *TDDLBase[T]) GetAll() ([]T, error) {
 	}
 
 	cols := parseColumns[T]()
-	sql := buildSelectAll[T](cols)
-	rows, err := db.Query(sql)
+	// FIX: đổi tên biến từ `sql` thành `query` để tránh shadow package "database/sql"
+	query := buildSelectAll[T](cols)
+	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -232,6 +249,10 @@ func (r *TDDLBase[T]) GetAll() ([]T, error) {
 		}
 		results = append(results, item)
 	}
+	// FIX: kiểm tra lỗi sau vòng lặp (rows.Err() có thể chứa lỗi network/IO)
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return results, nil
 }
 
@@ -242,8 +263,8 @@ func (r *TDDLBase[T]) GetByID(id any) (*T, error) {
 	}
 
 	cols := parseColumns[T]()
-	sql := buildSelectByPK[T](cols)
-	rows, err := db.Query(sql, id)
+	query := buildSelectByPK[T](cols)
+	rows, err := db.Query(query, id)
 	if err != nil {
 		return nil, err
 	}
@@ -267,7 +288,7 @@ func (r *TDDLBase[T]) Insert(item *T) error {
 
 	cols := parseColumns[T]()
 
-	// Auto-generate UUID if PK is string and empty
+	// Auto-generate UUID nếu PK là string và rỗng
 	v := reflect.ValueOf(item).Elem()
 	for _, c := range cols {
 		if c.isPrimaryKey {
@@ -279,8 +300,8 @@ func (r *TDDLBase[T]) Insert(item *T) error {
 	}
 
 	vals := extractValues(item, cols)
-	sql := buildInsert[T](cols)
-	_, err = db.Exec(sql, vals...)
+	query := buildInsert[T](cols)
+	_, err = db.Exec(query, vals...)
 	return err
 }
 
@@ -295,37 +316,32 @@ func (r *TDDLBase[T]) InsertBatch(items []T) error {
 	}
 
 	cols := parseColumns[T]()
-	sql := buildInsert[T](cols)
+	query := buildInsert[T](cols)
 
-	tx, err := db.Begin()
-	if err != nil {
-		return err
-	}
-
-	stmt, err := tx.Prepare(sql)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	defer stmt.Close()
-
-	for i := range items {
-		v := reflect.ValueOf(&items[i]).Elem()
-		for _, c := range cols {
-			if c.isPrimaryKey {
-				field := v.FieldByIndex(c.fieldIndex)
-				if field.Kind() == reflect.String && field.String() == "" {
-					field.SetString(td_common.GenUUID())
-				}
-			}
-		}
-		vals := extractValues(&items[i], cols)
-		if _, err = stmt.Exec(vals...); err != nil {
-			tx.Rollback()
+	return withTx(db, func(tx *sql.Tx) error {
+		stmt, err := tx.Prepare(query)
+		if err != nil {
 			return err
 		}
-	}
-	return tx.Commit()
+		defer stmt.Close()
+
+		for i := range items {
+			v := reflect.ValueOf(&items[i]).Elem()
+			for _, c := range cols {
+				if c.isPrimaryKey {
+					field := v.FieldByIndex(c.fieldIndex)
+					if field.Kind() == reflect.String && field.String() == "" {
+						field.SetString(td_common.GenUUID())
+					}
+				}
+			}
+			vals := extractValues(&items[i], cols)
+			if _, err = stmt.Exec(vals...); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 func (r *TDDLBase[T]) InsertOrIgnoreBatch(items []T) error {
@@ -339,37 +355,32 @@ func (r *TDDLBase[T]) InsertOrIgnoreBatch(items []T) error {
 	}
 
 	cols := parseColumns[T]()
-	rawSQL := strings.Replace(buildInsert[T](cols), "INSERT INTO", "INSERT OR IGNORE INTO", 1)
+	query := strings.Replace(buildInsert[T](cols), "INSERT INTO", "INSERT OR IGNORE INTO", 1)
 
-	tx, err := db.Begin()
-	if err != nil {
-		return err
-	}
-
-	stmt, err := tx.Prepare(rawSQL)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	defer stmt.Close()
-
-	for i := range items {
-		v := reflect.ValueOf(&items[i]).Elem()
-		for _, c := range cols {
-			if c.isPrimaryKey {
-				field := v.FieldByIndex(c.fieldIndex)
-				if field.Kind() == reflect.String && field.String() == "" {
-					field.SetString(td_common.GenUUID())
-				}
-			}
-		}
-		vals := extractValues(&items[i], cols)
-		if _, err = stmt.Exec(vals...); err != nil {
-			tx.Rollback()
+	return withTx(db, func(tx *sql.Tx) error {
+		stmt, err := tx.Prepare(query)
+		if err != nil {
 			return err
 		}
-	}
-	return tx.Commit()
+		defer stmt.Close()
+
+		for i := range items {
+			v := reflect.ValueOf(&items[i]).Elem()
+			for _, c := range cols {
+				if c.isPrimaryKey {
+					field := v.FieldByIndex(c.fieldIndex)
+					if field.Kind() == reflect.String && field.String() == "" {
+						field.SetString(td_common.GenUUID())
+					}
+				}
+			}
+			vals := extractValues(&items[i], cols)
+			if _, err = stmt.Exec(vals...); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 func (r *TDDLBase[T]) Update(item *T) (int64, error) {
@@ -379,9 +390,9 @@ func (r *TDDLBase[T]) Update(item *T) (int64, error) {
 	}
 
 	cols := parseColumns[T]()
-	sql := buildUpdate[T](cols)
+	query := buildUpdate[T](cols)
 	vals := extractUpdateValues(item, cols)
-	result, err := db.Exec(sql, vals...)
+	result, err := db.Exec(query, vals...)
 	if err != nil {
 		return 0, err
 	}
@@ -399,28 +410,23 @@ func (r *TDDLBase[T]) UpdateBatch(items []T) error {
 	}
 
 	cols := parseColumns[T]()
-	rawSQL := buildUpdate[T](cols)
+	query := buildUpdate[T](cols)
 
-	tx, err := db.Begin()
-	if err != nil {
-		return err
-	}
-
-	stmt, err := tx.Prepare(rawSQL)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	defer stmt.Close()
-
-	for i := range items {
-		vals := extractUpdateValues(&items[i], cols)
-		if _, err = stmt.Exec(vals...); err != nil {
-			tx.Rollback()
+	return withTx(db, func(tx *sql.Tx) error {
+		stmt, err := tx.Prepare(query)
+		if err != nil {
 			return err
 		}
-	}
-	return tx.Commit()
+		defer stmt.Close()
+
+		for i := range items {
+			vals := extractUpdateValues(&items[i], cols)
+			if _, err = stmt.Exec(vals...); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 func (r *TDDLBase[T]) Delete(id any) (int64, error) {
@@ -429,8 +435,8 @@ func (r *TDDLBase[T]) Delete(id any) (int64, error) {
 		return 0, err
 	}
 
-	sql := buildDelete[T]()
-	result, err := db.Exec(sql, id)
+	query := buildDelete[T]()
+	result, err := db.Exec(query, id)
 	if err != nil {
 		return 0, err
 	}
@@ -447,27 +453,22 @@ func (r *TDDLBase[T]) DeleteBatch(ids []any) error {
 		return err
 	}
 
-	rawSQL := buildDelete[T]()
+	query := buildDelete[T]()
 
-	tx, err := db.Begin()
-	if err != nil {
-		return err
-	}
-
-	stmt, err := tx.Prepare(rawSQL)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-	defer stmt.Close()
-
-	for _, id := range ids {
-		if _, err = stmt.Exec(id); err != nil {
-			tx.Rollback()
+	return withTx(db, func(tx *sql.Tx) error {
+		stmt, err := tx.Prepare(query)
+		if err != nil {
 			return err
 		}
-	}
-	return tx.Commit()
+		defer stmt.Close()
+
+		for _, id := range ids {
+			if _, err = stmt.Exec(id); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 func (r *TDDLBase[T]) QueryRaw(query string, args ...any) ([]map[string]any, error) {
@@ -506,6 +507,9 @@ func (r *TDDLBase[T]) QueryRaw(query string, args ...any) ([]map[string]any, err
 			}
 		}
 		results = append(results, rowMap)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return results, nil
 }
