@@ -61,7 +61,10 @@
           <div class="loader"></div>
         </div>
         <template v-else-if="results && results.length > 0">
-          <div class="flex flex-col td-inspect-list">
+          <div
+            class="flex flex-col td-inspect-list"
+            :style="requestSectionSizeStyle"
+          >
             <div v-if="!results.length" class="flex td-inspect-empty">
               {{
                 searchError ||
@@ -82,7 +85,12 @@
               </span>
             </div>
           </div>
-          <div class="flex flex-col flex-one td-inspect-preview">
+          <!-- Resizer -->
+          <TDResizer :direction="'horizontal'" @resize="handleResize" />
+          <div
+            class="flex flex-col flex-one td-inspect-preview"
+            :style="responseSectionSizeStyle"
+          >
             <div v-if="isLoadingDDL" class="flex td-inspect-loading">
               <div class="loader"></div>
             </div>
@@ -123,6 +131,8 @@ export default {
   },
   data() {
     return {
+      requestSectionSize: 20,
+      responseSectionSize: 80,
       // connection
       connectionId: "",
       // search
@@ -162,8 +172,29 @@ export default {
   mounted() {
     this.agentAPI = new TDServerPostgreSQLAPI();
   },
-
+  computed: {
+    /**
+     * Tính toán style động cho request area
+     */
+    requestSectionSizeStyle() {
+      let me = this;
+      let style = { width: `${me.requestSectionSize}%` };
+      return style;
+    },
+    /**
+     * Tính toán style động cho response area
+     */
+    responseSectionSizeStyle() {
+      let me = this;
+      let style = { width: `${me.responseSectionSize}%` };
+      return style;
+    },
+  },
   methods: {
+    handleResize(sizes) {
+      this.requestSectionSize = sizes.leftSize;
+      this.responseSectionSize = sizes.rightSize;
+    },
     /** Gọi từ TDDialogUtil sau khi mount */
     async show(param) {
       this.connectionId = param?.connectionId ?? "";
