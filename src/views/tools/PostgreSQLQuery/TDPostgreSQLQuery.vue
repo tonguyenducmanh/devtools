@@ -674,26 +674,34 @@ export default {
       let me = this;
       return {
         onInit: (editor, monacoInstance) => {
+          editor.addAction({
+            id: "execute-pg-sql",
+            label: me.$t("i18nCommon.postgreSQLQuery.runQuery"),
+            contextMenuGroupId: "navigation",
+            contextMenuOrder: 1.1,
+            keybindings: [
+              monacoInstance.KeyMod.Alt | monacoInstance.KeyCode.Enter,
+            ],
+            run: () => {
+              me.endEditFromEditor(editor, me.handleRunQuery);
+            },
+          });
+          // bỏ add command, add hẳn action để vừa ctrl + u vừa format bằng chuột phải được
+          // editor.addCommand(
+          //   monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyU,
+          //   () => {
+          //     me.endEditFromEditor(editor, this.handleFormatSQL);
+          //   },
+          // );
           // Đăng ký tổ hợp phím Ctrl + U (hoặc Cmd + U trên Mac) trực tiếp vào Monaco
-          editor.addCommand(
-            monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyU,
-            () => {
-              me.endEditFromEditor(editor, this.handleFormatSQL);
-            },
-          );
-          editor.addCommand(
-            monacoInstance.KeyMod.Alt | monacoInstance.KeyCode.Enter,
-            () => {
-              me.endEditFromEditor(editor, this.handleRunQuery);
-            },
-          );
-
-          // Context menu: Format SQL
           editor.addAction({
             id: "format-pg-sql",
             label: me.$t("i18nCommon.postgreSQLQuery.formatCode"),
             contextMenuGroupId: "navigation",
-            contextMenuOrder: 1.1,
+            contextMenuOrder: 1.2,
+            keybindings: [
+              monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyU,
+            ],
             run: () => {
               me.endEditFromEditor(editor, me.handleFormatSQL);
             },
@@ -704,7 +712,10 @@ export default {
             id: "inspect-pg-object",
             label: me.$t("i18nCommon.postgreSQLQuery.dbInspect.inspectObject"),
             contextMenuGroupId: "navigation",
-            contextMenuOrder: 1.2,
+            contextMenuOrder: 1.3,
+            keybindings: [
+              monacoInstance.KeyCode.F12, // F12 để inspect tương tự như f12 ở code bình thường
+            ],
             run: async (ed) => {
               const position = ed.getPosition();
               const model = ed.getModel();
@@ -714,7 +725,9 @@ export default {
               const word = model.getWordAtPosition(position);
               if (!word) {
                 me.$tdToast.warning(
-                  me.$t("i18nCommon.postgreSQLQuery.dbInspect.noObjectSelected"),
+                  me.$t(
+                    "i18nCommon.postgreSQLQuery.dbInspect.noObjectSelected",
+                  ),
                 );
                 return;
               }
@@ -727,16 +740,16 @@ export default {
                 0,
                 word.startColumn - 1,
               );
-              const dotMatch = textBeforeWord.match(
-                /([a-zA-Z0-9_]+)\.$/,
-              );
+              const dotMatch = textBeforeWord.match(/([a-zA-Z0-9_]+)\.$/);
               if (dotMatch) {
                 schemaName = dotMatch[1];
               }
 
               if (!objectName) {
                 me.$tdToast.warning(
-                  me.$t("i18nCommon.postgreSQLQuery.dbInspect.noObjectSelected"),
+                  me.$t(
+                    "i18nCommon.postgreSQLQuery.dbInspect.noObjectSelected",
+                  ),
                 );
                 return;
               }
@@ -753,13 +766,11 @@ export default {
                 if (me._inspectLookup.tables.has(key)) {
                   searchType = "table";
                   if (!resolvedSchema)
-                    resolvedSchema =
-                      me._inspectLookup.tables.get(key).schema;
+                    resolvedSchema = me._inspectLookup.tables.get(key).schema;
                 } else if (me._inspectLookup.views.has(key)) {
                   searchType = "view";
                   if (!resolvedSchema)
-                    resolvedSchema =
-                      me._inspectLookup.views.get(key).schema;
+                    resolvedSchema = me._inspectLookup.views.get(key).schema;
                 } else if (me._inspectLookup.functions.has(key)) {
                   searchType = "function";
                   if (!resolvedSchema)
@@ -1476,6 +1487,7 @@ export default {
         "executePosgreSQLCode",
         me.getConfigExecuteSQLCode(),
       );
+      TDShortcutAction.register("dllInspect", me.getConfigDLLInspect());
       // Reload intellisense cho tab này khi được active lại
       if (me.selectedConnectionId) {
         me.loadCachedIntellisense();
@@ -1493,6 +1505,7 @@ export default {
       );
       TDShortcutAction.unregister("formatCodePostgreSQL");
       TDShortcutAction.unregister("executePosgreSQLCode");
+      TDShortcutAction.unregister("dllInspect");
       // Dispose intellisense providers để tab kia không bị ảnh hưởng
       if (me.intellisenseDisposable) {
         me.intellisenseDisposable.forEach((d) => d?.dispose?.());
@@ -1516,6 +1529,16 @@ export default {
         key: me.$tdUtility.newGuid(),
         presentKey: [me.$tdUtility.altKey(), me.$tdUtility.enterKey()],
         labelKey: "i18nCommon.postgreSQLQuery.runQuery",
+      };
+      return configKeyboard;
+    },
+    getConfigDLLInspect() {
+      let me = this;
+      let configKeyboard = {
+        sortOrder: 6,
+        key: me.$tdUtility.newGuid(),
+        presentKey: ["F12"],
+        labelKey: "i18nCommon.postgreSQLQuery.dbInspect.inspectObject",
       };
       return configKeyboard;
     },
