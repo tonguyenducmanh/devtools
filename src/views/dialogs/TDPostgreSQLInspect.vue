@@ -376,7 +376,7 @@ export default {
   gap: var(--padding);
   width: 100%;
   height: 100%;
-  margin: var(--padding);
+  padding: var(--padding);
 }
 
 .td-inspect-search-bar {
