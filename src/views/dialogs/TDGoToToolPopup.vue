@@ -160,9 +160,6 @@ export default {
             this.selectRoute(this.filteredRoutes[this.selectedIndex]);
           }
           break;
-        case "Escape":
-          this.handleClose();
-          break;
       }
     },
 

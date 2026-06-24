@@ -50,6 +50,24 @@ class TDDialogUtil {
     this.activeDialogs = new Map();
     this.dialogCounter = 0;
     this.globalAppContext = null;
+    this._boundKeydown = this._onKeydown.bind(this);
+  }
+
+  _onKeydown(event) {
+    if (event.key === "Escape" && this.activeDialogs.size > 0) {
+      const lastId = Array.from(this.activeDialogs.keys()).pop();
+      if (lastId) {
+        this.closeById(lastId);
+      }
+    }
+  }
+
+  _updateKeydownListener() {
+    if (this.activeDialogs.size > 0) {
+      window.addEventListener("keydown", this._boundKeydown);
+    } else {
+      window.removeEventListener("keydown", this._boundKeydown);
+    }
   }
 
   setAppContext(context) {
@@ -113,6 +131,8 @@ class TDDialogUtil {
       container,
     });
 
+    this._updateKeydownListener();
+
     return dialogId;
   }
 
@@ -127,6 +147,9 @@ class TDDialogUtil {
     dialog.container.remove();
 
     this.activeDialogs.delete(dialogId);
+
+    this._updateKeydownListener();
+
     return true;
   }
 
