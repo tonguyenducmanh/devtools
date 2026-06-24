@@ -52,6 +52,7 @@
 <script>
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
 import * as monaco from "monaco-editor";
+import { getPgsqlThemeRules } from "@/components/monarch/pgsqlLanguage.js";
 import _ from "@/common/TDCommonFunction.js";
 
 export default {
@@ -207,9 +208,9 @@ export default {
         monaco.editor.defineTheme(myThemeName, {
           base: isDarkTheme ? "vs-dark" : "vs",
           inherit: true,
-          rules: [],
+          rules: me.language === "pgsql" ? getPgsqlThemeRules(isDarkTheme) : [],
           colors: {
-            "editor.background": isDarkTheme ? "#252525" : "#f6f6f7", // background chính
+            "editor.background": isDarkTheme ? "#252525" : "#f6f6f7",
           },
         });
         monaco.editor.setTheme(myThemeName);
@@ -226,6 +227,7 @@ export default {
             'ui-monospace, "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
           readOnly: me.readOnly,
           automaticLayout: true,
+          "semanticHighlighting.enabled": true,
         };
         if (me.wrapText) {
           configObject.wordWrap = "on";

@@ -1,8 +1,12 @@
 // file này tách ra chỉ để dễ đọc code, không nhúng vào file nào khác ngoài tool src/views/tools/PostgreSQLQuery/TDPostgreSQLQuery.vue
 import TDCache from "@/common/cache/TDCache.js";
 import pgQueries from "./templates.js";
+import { registerPgsqlLanguage, updatePgsqlIntellisenseData } from "@/components/monarch/pgsqlLanguage.js";
 
 export default {
+  created() {
+    registerPgsqlLanguage();
+  },
   methods: {
     /**
      * Tải toàn bộ dữ liệu intellisense (keywords, tables, functions) từ database
@@ -250,6 +254,10 @@ export default {
             .map((k) => String(k.word).toLowerCase())
             .filter(Boolean),
         );
+
+        // Đăng ký language + Monarch + semantic provider + cập nhật dữ liệu
+        registerPgsqlLanguage();
+        updatePgsqlIntellisenseData(data);
 
         // ── Xây dựng lookup map cho bảng/view/cột ──────────────────────────────
         const tableRows = data?.tables?.rows ?? [];
