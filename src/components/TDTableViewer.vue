@@ -254,7 +254,10 @@
               <td class="td-record-cell td-record-cell-label">
                 {{ col.label || col.key }}
               </td>
-              <td class="td-record-cell td-record-cell-value">
+              <td
+                class="td-record-cell td-record-cell-value"
+                @contextmenu.prevent="onRecordCellContextMenu(col, $event)"
+              >
                 {{ formatCellValue(currentRecord, col) }}
               </td>
             </tr>
@@ -485,9 +488,7 @@ export default {
     },
     currentRecordIndex() {
       if (!this.currentRecord) return -1;
-      return this.processedData.findIndex(
-        (r) => r[this.rowKey] === this.currentRecord[this.rowKey],
-      );
+      return this.processedData.indexOf(this.currentRecord);
     },
     checkboxStickyStyle() {
       return {
@@ -965,6 +966,21 @@ export default {
           }
         });
       }
+    },
+
+    onRecordCellContextMenu(column, event) {
+      this.$tdContextMenu.open(event, [
+        {
+          key: "copyCell",
+          label: this.$t("i18nCommon.copy"),
+          action: () => this.handleDataSelected(this.currentRecord, column),
+        },
+        {
+          key: "backToTable",
+          label: this.$t("i18nCommon.backToTable"),
+          action: () => this.switchToTableView(),
+        },
+      ]);
     },
 
     onDragStart(e) {

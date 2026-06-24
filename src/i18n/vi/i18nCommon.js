@@ -28,7 +28,7 @@ export default {
     copy: "Sao chép",
     clickTocopyRow: "Click để sao chép dòng {0}",
     clickTocopyCell: "Click để sao chép ô này",
-    viewFullData: "Xem toàn bộ dữ liệu",
+    viewFullData: "Xem theo object JSON",
     viewRecord: "Xem theo bản ghi",
     backToTable: "Quay lại bảng",
     rowData: "Dữ liệu dòng",
