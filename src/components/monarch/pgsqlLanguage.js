@@ -277,6 +277,7 @@ const semanticLegend = {
 function _extractAliases(text, outMap) {
   const clauseRe = /(?:from|join)\s+/gi;
   const tableAliasRe = /^(?:\w+\.)?(\w+)(?:\s+as)?\s+(\w+)$/i;
+  const funcAliasRe = /^(?:\w+\.)?(\w+)\([^)]*\)\s+(?:as\s+)?(\w+)$/i;
   const clauseEndRe = /\b(?:where|group\s+by|order\s+by|having|limit|offset|returning|union|intersect|except)\b/i;
   let clauseMatch;
 
@@ -284,11 +285,21 @@ function _extractAliases(text, outMap) {
     const after = clauseMatch.index + clauseMatch[0].length;
     const endRest = text.slice(after).search(clauseEndRe);
     const end = endRest === -1 ? text.length : after + endRest;
-    const block = text.slice(after, end);
-    const parts = block.split(",");
-    for (const part of parts) {
-      const trimmed = part.trim();
-      const m = trimmed.match(tableAliasRe);
+    let block = text.slice(after, end);
+    // Strip ON/USING conditions to avoid false matches like "p.project_id = e.project_id"
+    block = block.replace(/\s+ON\s+.+$/is, "");
+    block = block.replace(/\s+USING\s*\([^)]*\)/ig, "");
+    // Split by comma or newline to get individual table/alias references
+    const fragments = block.split(/[,\n]+/);
+    for (const fragment of fragments) {
+      const trimmed = fragment.trim().replace(/^(?:inner|cross|left|right|full|natural|outer)?\s*(?:from|join)\s+/i, "");
+      if (!trimmed) continue;
+      let m = trimmed.match(tableAliasRe);
+      if (m) {
+        outMap.set(m[2].toLowerCase(), m[1].toLowerCase());
+        continue;
+      }
+      m = trimmed.match(funcAliasRe);
       if (m) {
         outMap.set(m[2].toLowerCase(), m[1].toLowerCase());
       }
