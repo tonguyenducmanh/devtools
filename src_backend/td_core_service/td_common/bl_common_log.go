@@ -6,15 +6,24 @@ import (
 	"strings"
 	"td_config"
 	"time"
+
+	"github.com/charmbracelet/lipgloss"
 )
 
-// Định nghĩa mã màu ANSI
-const (
-	colorReset  = "\033[0m"
-	colorInfo   = "\033[32m" // Xanh lá
-	colorDebug  = "\033[36m" // Xanh dương lam (Cyan)
-	colorError  = "\033[31m" // Đỏ
-	colorExcept = "\033[35m" // Tím (Magenta)
+var (
+	// Style thời gian gọn gàng (màu xám xanh thanh lịch)
+	styleTime = lipgloss.NewStyle().Foreground(lipgloss.Color("#6272A4"))
+
+	// Base tag cho level log
+	baseTag = lipgloss.NewStyle().Bold(true).Padding(0, 1).Foreground(lipgloss.Color("#FFFFFF"))
+
+	// Cố định chiều rộng tag là 7 ký tự để thẳng hàng tuyệt đối
+	styleInfo   = baseTag.Width(7).Background(lipgloss.Color("#50FA7B")).Foreground(lipgloss.Color("#282A36"))
+	styleDebug  = baseTag.Width(7).Background(lipgloss.Color("#8BE9FD")).Foreground(lipgloss.Color("#282A36"))
+	styleError  = baseTag.Width(7).Background(lipgloss.Color("#FF5555"))
+	styleExcept = baseTag.Width(7).Background(lipgloss.Color("#BD93F9"))
+
+	styleMessage = lipgloss.NewStyle().Foreground(lipgloss.Color("#F8F8F2"))
 )
 
 func logData(message string, level string) {
@@ -22,32 +31,37 @@ func logData(message string, level string) {
 		return
 	}
 
-	t := time.Now()
-	sub_fix := "\n"
-	if !strings.HasSuffix(message, sub_fix) {
-		message += sub_fix
+	// Làm sạch tin nhắn, loại bỏ khoảng trắng thừa ở đầu/cuối
+	message = strings.TrimSpace(message)
+	if message == "" {
+		return
 	}
 
-	if td_config.GetConfigGlobal().LogConfig.LogConsole {
-		levelLogName := "Log " + level
+	t := time.Now()
 
-		// Chọn màu dựa trên level
-		var colorCode string
+	if td_config.GetConfigGlobal().LogConfig.LogConsole {
+		levelLogName := strings.ToUpper(level)
+
+		var styledLevel string
 		switch level {
 		case "info":
-			colorCode = colorInfo
+			styledLevel = styleInfo.Render(levelLogName)
 		case "debug":
-			colorCode = colorDebug
+			styledLevel = styleDebug.Render(levelLogName)
 		case "error":
-			colorCode = colorError
+			styledLevel = styleError.Render(levelLogName)
 		case "exception":
-			colorCode = colorExcept
+			styledLevel = styleExcept.Render(levelLogName)
 		default:
-			colorCode = colorReset
+			styledLevel = baseTag.Width(7).Background(lipgloss.Color("#44475A")).Render(levelLogName)
 		}
 
-		// Định dạng: Thêm mã màu vào trước và reset màu ở cuối dòng
-		fmt.Printf("%s[%s] %s: %s%s", colorCode, t.Format("02/01/2006 15:04:05"), levelLogName, message, colorReset)
+		// Đổi ở đây: Hiển thị đầy đủ Ngày/Tháng/Năm Giờ:Phút:Giây.Mili-giây
+		formattedTime := styleTime.Render(fmt.Sprintf("[%s]", t.Format("02/01/2006 15:04:05.000")))
+		styledMessage := styleMessage.Render(message)
+
+		// Xuất ra màn hình thẳng hàng tăm tắp
+		fmt.Printf("%s  %s  %s\n", formattedTime, styledLevel, styledMessage)
 	}
 }
 
