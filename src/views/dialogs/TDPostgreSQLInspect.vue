@@ -227,19 +227,13 @@ export default {
       if (!this.connectionId) return;
       this.isLoadingSchemas = true;
       try {
-        const resp = await this.agentAPI.executeQuery(
+        let resp = await this.agentAPI.executeQuery(
           this.connectionId,
           pgQueries.pg_inspect_list_schemas,
         );
-        const result =
-          resp?.data?.data?.results?.[0] || resp?.data?.data || null;
-        const rows = result?.rows ?? [];
-        // array_agg trả về text dạng {elem1,elem2,...}
-        const raw = rows?.[0]?.schema_names;
-        const schemaNames =
-          typeof raw === "string"
-            ? raw.slice(1, -1).split(",").filter(Boolean)
-            : [];
+        let result = resp?.data?.data?.results?.[0] || resp?.data?.data || null;
+        let rows = result?.rows ?? [];
+        let schemaNames = rows?.[0]?.schema_names;
         this.schemaOptions = [
           {
             value: "",
@@ -259,14 +253,14 @@ export default {
 
     /** Build SQL tìm kiếm theo loại */
     buildSearchSQL() {
-      const schema = this.searchSchema?.trim();
-      const rawValue = this.searchValue?.trim();
-      const value = rawValue ? `%${rawValue.replace(/'/g, "''")}%` : "%";
-      const limit = Math.min(
+      let schema = this.searchSchema?.trim();
+      let rawValue = this.searchValue?.trim();
+      let value = rawValue ? `%${rawValue.replace(/'/g, "''")}%` : "%";
+      let limit = Math.min(
         Math.max(parseInt(this.limitCount, 10) || 20, 1),
         100,
       );
-      const schemaFilter = schema
+      let schemaFilter = schema
         ? `AND n.nspname = '${schema.replace(/'/g, "''")}'`
         : `AND n.nspname NOT IN ('pg_catalog','information_schema','pg_toast')`;
 
@@ -294,9 +288,9 @@ export default {
 
     /** Build SQL lấy DDL theo loại và item */
     buildDDLSQL(item) {
-      const schema = item.schema_name?.replace(/'/g, "''");
-      const name = item.object_name?.replace(/'/g, "''");
-      const oid = item.object_oid || 0;
+      let schema = item.schema_name?.replace(/'/g, "''");
+      let name = item.object_name?.replace(/'/g, "''");
+      let oid = item.object_oid || 0;
 
       let queryTemplate = "";
       switch (this.searchType) {
@@ -327,7 +321,7 @@ export default {
         );
         return;
       }
-      const sql = this.buildSearchSQL();
+      let sql = this.buildSearchSQL();
       if (!sql) return;
 
       this.isSearching = true;
@@ -337,9 +331,8 @@ export default {
       this.searchError = "";
 
       try {
-        const resp = await this.agentAPI.executeQuery(this.connectionId, sql);
-        const result =
-          resp?.data?.data?.results?.[0] || resp?.data?.data || null;
+        let resp = await this.agentAPI.executeQuery(this.connectionId, sql);
+        let result = resp?.data?.data?.results?.[0] || resp?.data?.data || null;
 
         if (resp?.data?.success && result?.rows?.length > 0) {
           this.results = result.rows;
@@ -363,24 +356,23 @@ export default {
 
     async selectItem(idx) {
       this.activeIndex = idx;
-      const item = this.results[idx];
+      let item = this.results[idx];
       if (!item) return;
 
-      const sql = this.buildDDLSQL(item);
+      let sql = this.buildDDLSQL(item);
       if (!sql) return;
 
       this.isLoadingDDL = true;
       this.ddlContent = "";
 
       try {
-        const resp = await this.agentAPI.executeQuery(this.connectionId, sql);
-        const result =
-          resp?.data?.data?.results?.[0] || resp?.data?.data || null;
+        let resp = await this.agentAPI.executeQuery(this.connectionId, sql);
+        let result = resp?.data?.data?.results?.[0] || resp?.data?.data || null;
 
         if (resp?.data?.success && result?.rows?.length > 0) {
           // lấy giá trị cột đầu tiên của dòng đầu tiên
-          const firstRow = result.rows[0];
-          const firstKey = Object.keys(firstRow)[0];
+          let firstRow = result.rows[0];
+          let firstKey = Object.keys(firstRow)[0];
           this.ddlContent = firstRow[firstKey] ?? "";
         } else {
           this.ddlContent =
