@@ -230,6 +230,12 @@ export default {
           });
         });
 
+        me._pgKeywordSet = new Set(
+          keywords
+            .map((k) => String(k.word).toLowerCase())
+            .filter(Boolean),
+        );
+
         // Xây dựng bản đồ lookup
         const tableRows = data?.tables?.rows ?? [];
         const columnsByTable = new Map();
@@ -530,22 +536,24 @@ export default {
                 ) {
                   // Bảng
                   (tablesBySchema.get(prefix) ?? new Set()).forEach((tbl) => {
+                    const alias = me._generateUniqueAlias(tbl, text, me._pgKeywordSet);
                     suggestions.push({
                       label: tbl,
                       kind: monaco.languages.CompletionItemKind.Module,
                       filterText: `${prefix}.${tbl}`,
-                      insertText: `${prefix}.${tbl}`,
+                      insertText: alias ? `${prefix}.${tbl} ${alias}` : `${prefix}.${tbl}`,
                       detail: `Table (${prefix})`,
                     });
                   });
 
                   // Functions
                   (functionsBySchema.get(prefix) ?? []).forEach((fnItem) => {
+                    const alias = me._generateUniqueAlias(fnItem.label, text, me._pgKeywordSet);
                     suggestions.push({
                       ...fnItem,
                       // QUAN TRỌNG: filterText phải bao gồm cả schema prefix để Monaco so khớp được chuỗi "td.fn_create_user"
                       filterText: `${prefix}.${fnItem.label}`,
-                      insertText: fnItem.fullInsertText, // Thay thế trọn gói bằng snippet kèm schema
+                      insertText: alias ? `${fnItem.fullInsertText} ${alias}` : fnItem.fullInsertText,
                       insertTextRules:
                         monaco.languages.CompletionItemInsertTextRule
                           .InsertAsSnippet,
@@ -566,18 +574,33 @@ export default {
                 });
 
                 allTables.forEach((tbl) => {
+                  const alias = me._generateUniqueAlias(tbl, text, me._pgKeywordSet);
                   suggestions.push({
                     label: tbl,
                     kind: monaco.languages.CompletionItemKind.Module,
-                    insertText: tbl,
+                    insertText: alias ? `${tbl} ${alias}` : tbl,
                     detail: "Table",
                   });
                 });
 
-                suggestions.push(...functionSuggestions);
+                suggestions.push(
+                  ...functionSuggestions.map((fnItem) => {
+                    const alias = me._generateUniqueAlias(fnItem.label, text, me._pgKeywordSet);
+                    return alias ? { ...fnItem, insertText: `${fnItem.insertText} ${alias}` } : fnItem;
+                  }),
+                );
 
                 if (aliasMap.size > 0) {
-                  aliasMap.forEach((mapped) => {
+                  aliasMap.forEach((mapped, alias) => {
+                    suggestions.push({
+                      label: alias,
+                      kind: monaco.languages.CompletionItemKind.Variable,
+                      insertText: alias,
+                      sortText: "0" + alias,
+                      detail: mapped.schema
+                        ? `${mapped.schema}.${mapped.table}`
+                        : mapped.table,
+                    });
                     let key = mapped.schema
                       ? `${mapped.schema}.${mapped.table}`
                       : mapped.table;
@@ -588,7 +611,7 @@ export default {
                     cols.forEach((c) => {
                       suggestions.push({
                         ...c,
-                        sortText: "0" + c.label,
+                        sortText: "1" + c.label,
                       });
                     });
                   });
@@ -748,6 +771,41 @@ export default {
       } catch (e) {
         return `-- Error: ${e.message || "Unknown"}`;
       }
+    },
+
+    _generateUniqueAlias(objectName, sqlText, keywordSet) {
+      if (!objectName) return null;
+
+      const parts = objectName.split(".");
+      const name = parts[parts.length - 1];
+
+      const words = name.split("_").filter((w) => w.length > 0);
+      if (words.length === 0) return null;
+
+      let alias = words.map((w) => w[0]).join("").toLowerCase();
+      if (!alias) return null;
+
+      const used = new Set();
+      const re = /(?:from|join)\s+([a-zA-Z0-9_]+)(?:\.([a-zA-Z0-9_]+))?(?:\s+as)?\s+([a-zA-Z0-9_]+)?/gi;
+      let m;
+      while ((m = re.exec(sqlText)) !== null) {
+        if (m[1]) used.add(m[1].toLowerCase());
+        if (m[2]) used.add(m[2].toLowerCase());
+        if (m[3]) used.add(m[3].toLowerCase());
+      }
+
+      let finalAlias = alias;
+      let counter = 1;
+      while (
+        used.has(finalAlias) ||
+        (keywordSet && keywordSet.has(finalAlias))
+      ) {
+        counter++;
+        finalAlias = alias + counter;
+        if (counter > 1000) return alias;
+      }
+
+      return finalAlias;
     },
   },
 };
