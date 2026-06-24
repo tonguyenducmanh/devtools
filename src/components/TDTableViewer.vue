@@ -6,205 +6,256 @@
       'td-table-viewer-hoverable': hoverable,
     }"
   >
-    <div
-      class="td-table-container"
-      :class="{ 'td-table-grabbing': _isDragging }"
-      :style="containerStyle"
-      ref="tableContainer"
-      @scroll="handleScroll"
-      @mousedown="onDragStart"
-    >
-      <div class="td-table-wrapper" ref="tableWrapper">
-        <table class="td-table">
-          <!-- Header -->
-          <thead
-            class="td-table-header"
-            :class="{ 'td-table-header-sticky': stickyHeader }"
-          >
-            <tr>
-              <!-- Selection Column -->
-              <th
-                v-if="selectable"
-                class="td-table-cell td-table-cell-checkbox td-table-cell-sticky-header"
-                :style="checkboxStickyStyle"
-              >
-                <label class="td-table-checkbox-label">
-                  <input
-                    type="checkbox"
-                    :checked="isAllSelected"
-                    @change="toggleSelectAll"
-                    class="td-table-checkbox"
-                  />
-                  <span class="td-checkbox-custom">
-                    <span
-                      v-if="isAllSelected"
-                      class="td-checkbox-active"
-                    ></span>
-                  </span>
-                </label>
-              </th>
-
-              <!-- Index Column -->
-              <th
-                v-if="showIndex"
-                class="td-table-cell td-table-cell-index td-table-cell-sticky-header"
-                :style="indexStickyStyle"
-              >
-                {{ indexLabel }}
-              </th>
-
-              <!-- Data Columns -->
-              <th
-                v-for="(column, index) in computedColumns"
-                :key="`header-${index}`"
-                class="td-table-cell td-table-cell-header"
-                :class="getColumnClass(column)"
-                :style="getColumnStyle(column)"
-                @click="handleHeaderClick(column)"
-              >
-                <div class="td-table-header-content">
-                  <span>{{ column.label || column.key }}</span>
-                  <span v-if="column.sortable" class="td-table-sort-icon">
-                    <span
-                      v-if="
-                        sortColumn === column.key && sortDirection === 'asc'
-                      "
-                      >▲</span
-                    >
-                    <span
-                      v-else-if="
-                        sortColumn === column.key && sortDirection === 'desc'
-                      "
-                      >▼</span
-                    >
-                    <span v-else class="td-table-sort-icon-inactive">⬍</span>
-                  </span>
-                </div>
-              </th>
-
-              <!-- Actions Column -->
-              <th v-if="hasActions" class="td-table-cell td-table-cell-actions">
-                {{ actionsLabel }}
-              </th>
-            </tr>
-          </thead>
-
-          <!-- Body -->
-          <tbody class="td-table-body">
-            <!-- Top spacer for virtual scroll -->
-            <tr
-              v-if="virtualScroll && paddingTop > 0"
-              :style="{ height: paddingTop + 'px' }"
+    <!-- Table View -->
+    <template v-if="viewMode === 'table'">
+      <div
+        class="td-table-container"
+        :class="{ 'td-table-grabbing': _isDragging }"
+        :style="containerStyle"
+        ref="tableContainer"
+        @scroll="handleScroll"
+        @mousedown="onDragStart"
+      >
+        <div class="td-table-wrapper" ref="tableWrapper">
+          <table class="td-table">
+            <!-- Header -->
+            <thead
+              class="td-table-header"
+              :class="{ 'td-table-header-sticky': stickyHeader }"
             >
-              <td :colspan="totalColumns" style="padding: 0; border: none"></td>
-            </tr>
-
-            <tr
-              v-for="{ row, index: rowIndex } in visibleData"
-              :key="row[rowKey] || `row-${rowIndex}`"
-              class="td-table-row"
-              :class="{ 'td-table-row-selected': isRowSelected(row) }"
-              @click="handleRowClick(row, rowIndex)"
-            >
-              <!-- Selection Column -->
-              <td
-                v-if="selectable"
-                class="td-table-cell td-table-cell-checkbox td-table-cell-sticky"
-                :style="checkboxStickyStyle"
-              >
-                <label class="td-table-checkbox-label" @click.stop>
-                  <input
-                    type="checkbox"
-                    :checked="isRowSelected(row)"
-                    @change="toggleRowSelection(row)"
-                    class="td-table-checkbox"
-                  />
-                  <span class="td-checkbox-custom">
-                    <span
-                      v-if="isRowSelected(row)"
-                      class="td-checkbox-active"
-                    ></span>
-                  </span>
-                </label>
-              </td>
-
-              <!-- Index Column -->
-              <td
-                v-if="showIndex"
-                class="td-table-cell td-table-cell-index td-table-cell-sticky"
-                :style="indexStickyStyle"
-                @click="copyRow(row)"
-                @contextmenu.prevent="onIndexContextMenu(row, $event)"
-              >
-                <div>
-                  {{ rowIndex + 1 }}
-                </div>
-              </td>
-
-              <!-- Data Columns -->
-              <td
-                v-for="(column, colIndex) in computedColumns"
-                :key="`cell-${rowIndex}-${colIndex}`"
-                class="td-table-cell"
-                :class="[getColumnClass(column)]"
-                :style="getColumnStyle(column)"
-                @contextmenu.prevent="onCellContextMenu(row, column, $event)"
-              >
-                <slot
-                  :name="`cell-${column.key}`"
-                  :row="row"
-                  :column="column"
-                  :value="getCellValue(row, column.key)"
-                  :rowIndex="rowIndex"
+              <tr>
+                <!-- Selection Column -->
+                <th
+                  v-if="selectable"
+                  class="td-table-cell td-table-cell-checkbox td-table-cell-sticky-header"
+                  :style="checkboxStickyStyle"
                 >
-                  <div
-                    class="td-table-cell-content"
-                    :class="{ 'td-table-cell-content-clamped': virtualScroll }"
-                    :style="getCellContentStyle()"
-                  >
-                    {{ formatCellValue(row, column) }}
+                  <label class="td-table-checkbox-label">
+                    <input
+                      type="checkbox"
+                      :checked="isAllSelected"
+                      @change="toggleSelectAll"
+                      class="td-table-checkbox"
+                    />
+                    <span class="td-checkbox-custom">
+                      <span
+                        v-if="isAllSelected"
+                        class="td-checkbox-active"
+                      ></span>
+                    </span>
+                  </label>
+                </th>
+
+                <!-- Index Column -->
+                <th
+                  v-if="showIndex"
+                  class="td-table-cell td-table-cell-index td-table-cell-sticky-header"
+                  :style="indexStickyStyle"
+                >
+                  {{ indexLabel }}
+                </th>
+
+                <!-- Data Columns -->
+                <th
+                  v-for="(column, index) in computedColumns"
+                  :key="`header-${index}`"
+                  class="td-table-cell td-table-cell-header"
+                  :class="getColumnClass(column)"
+                  :style="getColumnStyle(column)"
+                  @click="handleHeaderClick(column)"
+                >
+                  <div class="td-table-header-content">
+                    <span>{{ column.label || column.key }}</span>
+                    <span v-if="column.sortable" class="td-table-sort-icon">
+                      <span
+                        v-if="
+                          sortColumn === column.key && sortDirection === 'asc'
+                        "
+                        >▲</span
+                      >
+                      <span
+                        v-else-if="
+                          sortColumn === column.key && sortDirection === 'desc'
+                        "
+                        >▼</span
+                      >
+                      <span v-else class="td-table-sort-icon-inactive">⬍</span>
+                    </span>
                   </div>
-                </slot>
-              </td>
+                </th>
 
-              <!-- Actions Column -->
-              <td v-if="hasActions" class="td-table-cell td-table-cell-actions">
-                <slot name="actions" :row="row" :rowIndex="rowIndex">
-                  <div class="td-table-actions">
-                    <button
-                      v-for="(action, actionIndex) in actions"
-                      :key="`action-${actionIndex}`"
-                      @click.stop="handleAction(action, row, rowIndex)"
-                      class="td-table-action-button"
-                      :class="action.class"
-                    >
-                      {{ action.label }}
-                    </button>
-                  </div>
-                </slot>
-              </td>
-            </tr>
+                <!-- Actions Column -->
+                <th
+                  v-if="hasActions"
+                  class="td-table-cell td-table-cell-actions"
+                >
+                  {{ actionsLabel }}
+                </th>
+              </tr>
+            </thead>
 
-            <!-- Bottom spacer for virtual scroll -->
-            <tr
-              v-if="virtualScroll && paddingBottom > 0"
-              :style="{ height: paddingBottom + 'px' }"
-            >
-              <td :colspan="totalColumns" style="padding: 0; border: none"></td>
-            </tr>
-
-            <!-- Empty State -->
-            <tr
-              v-if="!processedData || processedData.length === 0"
-              class="td-table-row-empty"
-            >
-              <td
-                :colspan="totalColumns"
-                class="td-table-cell td-table-cell-empty"
+            <!-- Body -->
+            <tbody class="td-table-body">
+              <!-- Top spacer for virtual scroll -->
+              <tr
+                v-if="virtualScroll && paddingTop > 0"
+                :style="{ height: paddingTop + 'px' }"
               >
-                <slot name="empty">
-                  {{ emptyText || $t("i18nCommon.noDataAvailable") }}
-                </slot>
+                <td
+                  :colspan="totalColumns"
+                  style="padding: 0; border: none"
+                ></td>
+              </tr>
+
+              <tr
+                v-for="{ row, index: rowIndex } in visibleData"
+                :key="row[rowKey] || `row-${rowIndex}`"
+                class="td-table-row"
+                :class="{ 'td-table-row-selected': isRowSelected(row) }"
+                @click="handleRowClick(row, rowIndex)"
+              >
+                <!-- Selection Column -->
+                <td
+                  v-if="selectable"
+                  class="td-table-cell td-table-cell-checkbox td-table-cell-sticky"
+                  :style="checkboxStickyStyle"
+                >
+                  <label class="td-table-checkbox-label" @click.stop>
+                    <input
+                      type="checkbox"
+                      :checked="isRowSelected(row)"
+                      @change="toggleRowSelection(row)"
+                      class="td-table-checkbox"
+                    />
+                    <span class="td-checkbox-custom">
+                      <span
+                        v-if="isRowSelected(row)"
+                        class="td-checkbox-active"
+                      ></span>
+                    </span>
+                  </label>
+                </td>
+
+                <!-- Index Column -->
+                <td
+                  v-if="showIndex"
+                  class="td-table-cell td-table-cell-index td-table-cell-sticky"
+                  :style="indexStickyStyle"
+                  @click="copyRow(row)"
+                  @contextmenu.prevent="onIndexContextMenu(row, $event)"
+                >
+                  <div>
+                    {{ rowIndex + 1 }}
+                  </div>
+                </td>
+
+                <!-- Data Columns -->
+                <td
+                  v-for="(column, colIndex) in computedColumns"
+                  :key="`cell-${rowIndex}-${colIndex}`"
+                  class="td-table-cell"
+                  :class="[getColumnClass(column)]"
+                  :style="getColumnStyle(column)"
+                  @contextmenu.prevent="onCellContextMenu(row, column, $event)"
+                >
+                  <slot
+                    :name="`cell-${column.key}`"
+                    :row="row"
+                    :column="column"
+                    :value="getCellValue(row, column.key)"
+                    :rowIndex="rowIndex"
+                  >
+                    <div
+                      class="td-table-cell-content"
+                      :class="{
+                        'td-table-cell-content-clamped': virtualScroll,
+                      }"
+                      :style="getCellContentStyle()"
+                    >
+                      {{ formatCellValue(row, column) }}
+                    </div>
+                  </slot>
+                </td>
+
+                <!-- Actions Column -->
+                <td
+                  v-if="hasActions"
+                  class="td-table-cell td-table-cell-actions"
+                >
+                  <slot name="actions" :row="row" :rowIndex="rowIndex">
+                    <div class="td-table-actions">
+                      <button
+                        v-for="(action, actionIndex) in actions"
+                        :key="`action-${actionIndex}`"
+                        @click.stop="handleAction(action, row, rowIndex)"
+                        class="td-table-action-button"
+                        :class="action.class"
+                      >
+                        {{ action.label }}
+                      </button>
+                    </div>
+                  </slot>
+                </td>
+              </tr>
+
+              <!-- Bottom spacer for virtual scroll -->
+              <tr
+                v-if="virtualScroll && paddingBottom > 0"
+                :style="{ height: paddingBottom + 'px' }"
+              >
+                <td
+                  :colspan="totalColumns"
+                  style="padding: 0; border: none"
+                ></td>
+              </tr>
+
+              <!-- Empty State -->
+              <tr
+                v-if="!processedData || processedData.length === 0"
+                class="td-table-row-empty"
+              >
+                <td
+                  :colspan="totalColumns"
+                  class="td-table-cell td-table-cell-empty"
+                >
+                  <slot name="empty">
+                    {{ emptyText || $t("i18nCommon.noDataAvailable") }}
+                  </slot>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </template>
+
+    <!-- Record View -->
+    <div v-else class="td-record-container" :style="containerStyle">
+      <div class="td-record-header">
+        <div class="td-record-back-btn" @click="switchToTableView">
+          <TDArrow
+            :arrowDirection="tdEnum.Direction.left"
+            :openProp="false"
+            v-tooltip="$t('i18nCommon.backToTable')"
+          />
+        </div>
+        <span class="td-record-title"
+          >{{ $t("i18nCommon.viewRecord") }} #{{ currentRecordIndex + 1 }}</span
+        >
+      </div>
+      <div class="td-record-body">
+        <table class="td-record-table">
+          <tbody>
+            <tr
+              v-for="col in computedColumns"
+              :key="col.key"
+              class="td-record-row"
+            >
+              <td class="td-record-cell td-record-cell-label">
+                {{ col.label || col.key }}
+              </td>
+              <td class="td-record-cell td-record-cell-value">
+                {{ formatCellValue(currentRecord, col) }}
               </td>
             </tr>
           </tbody>
@@ -229,7 +280,10 @@
               {{ processedData.length }} {{ $t("i18nCommon.record") }}
             </span>
           </span>
-          <span v-if="usingFooterHelp" v-tooltip="$t('i18nCommon.footerHelpDesc')">
+          <span
+            v-if="usingFooterHelp"
+            v-tooltip="$t('i18nCommon.footerHelpDesc')"
+          >
             {{ footerHelpText }}
           </span>
         </slot>
@@ -240,9 +294,12 @@
 
 <script>
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
+import tdEnum from "@/common/TDEnum.js";
+import TDArrow from "@/components/TDArrow.vue";
 
 export default {
   name: "TDTableViewer",
+  components: { TDArrow },
 
   props: {
     // Data
@@ -415,10 +472,23 @@ export default {
       _dragStartY: 0,
       _scrollStartLeft: 0,
       _scrollStartTop: 0,
+
+      // record view mode
+      viewMode: "table",
+      currentRecord: null,
     };
   },
 
   computed: {
+    tdEnum() {
+      return tdEnum;
+    },
+    currentRecordIndex() {
+      if (!this.currentRecord) return -1;
+      return this.processedData.findIndex(
+        (r) => r[this.rowKey] === this.currentRecord[this.rowKey],
+      );
+    },
     checkboxStickyStyle() {
       return {
         position: "sticky",
@@ -808,6 +878,11 @@ export default {
           label: this.$t("i18nCommon.viewFullData"),
           action: () => this.onCellPreview(row, column),
         },
+        {
+          key: "viewRecord",
+          label: this.$t("i18nCommon.viewRecord"),
+          action: () => this.onRecordView(row),
+        },
       ]);
     },
 
@@ -822,6 +897,11 @@ export default {
           key: "viewFullRow",
           label: this.$t("i18nCommon.viewFullData"),
           action: () => this.onRowPreview(row),
+        },
+        {
+          key: "viewRecord",
+          label: this.$t("i18nCommon.viewRecord"),
+          action: () => this.onRecordView(row),
         },
       ]);
     },
@@ -862,13 +942,44 @@ export default {
       });
     },
 
+    onRecordView(row) {
+      this.currentRecord = row;
+      this.viewMode = "record";
+    },
+
+    switchToTableView() {
+      this.viewMode = "table";
+      this.currentRecord = null;
+      this.scrollTop = 0;
+      if (this.virtualScroll) {
+        this.$nextTick(() => {
+          this.updateContainerSize();
+          if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+          }
+          this.resizeObserver = new ResizeObserver(() => {
+            this.updateContainerSize();
+          });
+          if (this.$refs.tableContainer) {
+            this.resizeObserver.observe(this.$refs.tableContainer);
+          }
+        });
+      }
+    },
+
     onDragStart(e) {
       const el = this.$refs.tableContainer;
-      if (!el || el.scrollWidth <= el.clientWidth && el.scrollHeight <= el.clientHeight) return;
+      if (
+        !el ||
+        (el.scrollWidth <= el.clientWidth && el.scrollHeight <= el.clientHeight)
+      )
+        return;
       if (e.shiftKey || e.ctrlKey || e.metaKey || e.button !== 0) return;
 
       // Không kéo từ sticky cells (index, checkbox)
-      const target = e.target.closest?.(".td-table-cell-sticky") || e.target.closest?.(".td-table-cell-checkbox");
+      const target =
+        e.target.closest?.(".td-table-cell-sticky") ||
+        e.target.closest?.(".td-table-cell-checkbox");
       if (target) return;
 
       this._isDragging = true;
@@ -1228,6 +1339,79 @@ export default {
 // No margin
 .td-table-viewer-no-margin {
   margin: 0;
+}
+
+// Record View
+.td-record-container {
+  position: relative;
+  overflow: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-component);
+  background-color: var(--bg-main-color);
+
+  .td-record-header {
+    display: flex;
+    align-items: center;
+    gap: var(--padding);
+    padding: var(--padding) calc(var(--padding) * 1.5);
+    text-align: left;
+    color: var(--text-primary-color);
+    vertical-align: top;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-layer-color);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+
+    .td-record-back-btn {
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .td-record-title {
+      font-size: var(--font-size-medium-rare);
+      font-weight: 600;
+      color: var(--text-primary-color);
+    }
+  }
+
+  .td-record-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    .td-record-row {
+      border-bottom: 1px solid var(--border-color);
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    .td-record-cell {
+      padding: var(--padding-medium) var(--padding-x-medium);
+      vertical-align: top;
+      line-height: 1.5;
+      word-wrap: break-word;
+      word-break: break-word;
+      overflow-wrap: break-word;
+
+      &-label {
+        width: 30%;
+        min-width: 150px;
+        font-weight: 500;
+        font-size: var(--font-size-medium-rare);
+        color: var(--text-secondary-color);
+        background-color: var(--bg-layer-color);
+        border-right: 1px solid var(--border-color);
+      }
+
+      &-value {
+        font-size: var(--font-size-medium);
+        color: var(--text-primary-color);
+        font-family: var(--main-font);
+      }
+    }
+  }
 }
 
 // Responsive

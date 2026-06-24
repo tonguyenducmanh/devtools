@@ -29,6 +29,8 @@ export default {
     clickTocopyRow: "Click để sao chép dòng {0}",
     clickTocopyCell: "Click để sao chép ô này",
     viewFullData: "Xem toàn bộ dữ liệu",
+    viewRecord: "Xem theo bản ghi",
+    backToTable: "Quay lại bảng",
     rowData: "Dữ liệu dòng",
     subSidebar: {
       showTooltip: "Hiển thị menu theo tool",
