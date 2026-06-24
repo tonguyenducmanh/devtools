@@ -78,7 +78,6 @@
             v-if="!hasQueryResults && !queryError"
           >
             <TDDynamicBackgroundEffect />
-            <span>{{ $t("i18nCommon.noDataAvailable") }}</span>
           </div>
           <div
             v-else-if="hasQueryResults"
