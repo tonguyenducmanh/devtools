@@ -452,6 +452,9 @@ import { useTabManager } from "@/stores/TDTabManager.js";
 export default {
   extends: TDToolBase,
   name: "TDPostgreSQLQuery",
+  /**
+   * Mixin xử lý kết nối database, dotnet wasm, và intellisense
+   */
   mixins: [
     TDDatabaseConnectionMixin,
     TDDotNetWasmMixin,
@@ -472,59 +475,74 @@ export default {
 
   data() {
     return {
+      /**
+       * Key dùng để cache layout config vào IndexedDB
+       */
       keyCacheLayout: this.$tdEnum.cacheConfig.PostgreSQLQueryConfigLayout,
+      /**
+       * Cấu hình layout mặc định của tool
+       */
       currentConfigLayout: {
-        isShowSidebar: true,
-        enableHighlight: true,
-        wrapText: false,
+        isShowSidebar: true,               // Hiển thị sidebar
+        enableHighlight: true,             // Bật highlight cú pháp
+        wrapText: false,                    // Không wrap text
         showReponse: true,
         splitHorizontal: true,
         currentSidebarOption:
           this.$tdEnum.PostgreSQLQuerySidebarOption.Connection,
-        autoSaveQueryAfterExec: true,
-        loadFunctionIntellisense: true,
-        defaultQueryLimit: 1000,
-        limitResults: true,
+        autoSaveQueryAfterExec: true,      // Tự động lưu query sau khi chạy
+        loadFunctionIntellisense: true,    // Tải intellisense cho function
+        defaultQueryLimit: 1000,           // Giới hạn số dòng mặc định
+        limitResults: true,                // Bật giới hạn kết quả
         limitResultsBackup: 1000,
       },
+      /**
+       * Lưu text query lần auto-save gần nhất để tránh save trùng
+       */
       lastAutoSavedQueryText: "",
       lastAutoSavedConnectionId: "",
 
+      /**
+       * Kích thước editor/result (chia theo %)
+       */
       editorSectionSize: 50,
       resultSectionSize: 50,
 
-      // connection
+      // ── Connection ───────────────────────────────────────────────────
       selectedConnectionId: "",
-      allGroups: [],
-      allConnections: [],
-      openGroups: {},
-      newGroupName: "",
+      allGroups: [],          // Danh sách nhóm connection
+      allConnections: [],     // Danh sách tất cả connection
+      openGroups: {},         // Trạng thái đóng/mở của từng nhóm
+      newGroupName: "",       // Tên nhóm mới khi tạo
 
-      // saved queries
+      // ── Saved Queries ────────────────────────────────────────────────
       allSavedQueries: [],
       newQueryName: "",
       currentSavedQueryId: null,
 
-      // editor
+      // ── Editor ───────────────────────────────────────────────────────
       sqlText: "",
 
-      // result
-      queryResult: null, // giữ lại tương thích code cũ
-      queryResults: [], // mới: danh sách result theo từng statement
-      activeResultIndex: 0,
-      queryError: null,
-      isRunning: false,
-      isLoading: false,
-      isLoadingIntellisense: false,
+      // ── Results ──────────────────────────────────────────────────────
+      queryResult: null,      // Tương thích code cũ
+      queryResults: [],       // Danh sách result theo từng statement
+      activeResultIndex: 0,   // Index của result tab đang active
+      queryError: null,       // Lỗi query (nếu có)
+      isRunning: false,       // Đang chạy query
+      isLoading: false,       // Đang tải connections
+      isLoadingIntellisense: false, // Đang tải intellisense data
 
-      // intellisense
+      // ── Intellisense ─────────────────────────────────────────────────
       intellisenseDisposable: null,
 
-      // api
+      // ── API ──────────────────────────────────────────────────────────
       agentAPI: null,
     };
   },
 
+  /**
+   * Khởi tạo tool: tạo API instance, load connections/saved queries, khôi phục connection cuối
+   */
   async mounted() {
     let me = this;
     me.agentAPI = new TDServerPostgreSQLAPI();
@@ -532,17 +550,23 @@ export default {
     me.loadLastDatabaseConnect();
   },
 
+  /**
+   * Dọn dẹp intellisense provider khi component bị huỷ
+   */
   beforeUnmount() {
-    // Cleanup monaco intellisense provider
     if (this.intellisenseDisposable) {
       this.intellisenseDisposable.forEach((d) => d?.dispose?.());
     }
   },
 
   computed: {
+    /**
+     * Cấu hình menu flyout ở header tool, phân loại theo nhóm chức năng
+     */
     menuConfig() {
       let me = this;
       return {
+        // Nhóm Code Complete: load/cache/clone intellisense data
         codeComplete: [
           {
             key: "loadIntellisense",
@@ -565,6 +589,7 @@ export default {
             run: me.handleCloneIntellisense,
           },
         ],
+        // Nhóm Edit: format SQL, gen UUID, lưu query, thêm connection
         edit: [
           {
             key: "formatSQL",
@@ -591,6 +616,7 @@ export default {
             run: me.openAddConnectionPopup,
           },
         ],
+        // Nhóm Export: copy/download kết quả, copy connection string
         export: [
           {
             key: "copyResult",
@@ -619,6 +645,7 @@ export default {
             run: me.handleCopyDSNConnectionString,
           },
         ],
+        // Nhóm Explore: chạy query, inspect object, xem danh sách database
         explore: [
           {
             key: "runQuery",
@@ -639,6 +666,7 @@ export default {
             run: me.handleOpenDatabaseList,
           },
         ],
+        // Nhóm Help: test connection, reload, xem template
         help: [
           {
             key: "testConnection",
@@ -659,20 +687,27 @@ export default {
         ],
       };
     },
+    /**
+     * Lấy danh sách menu items của flyout đang mở
+     */
     currentMenuItems() {
       return this.menuConfig[this.activeKeyFlyOut] ?? [];
     },
     /**
-     * kiểm tra xem có phải có nhiều reuslt trả về không
+     * Kiểm tra xem có nhiều hơn 1 result tab không (khi query nhiều statement)
      */
     hasMultipleResultStatement() {
       let me = this;
       return me.queryResults && me.queryResults.length > 1;
     },
+    /**
+     * Cấu hình Monaco Editor: actions, keybindings, context menu
+     */
     monacoOptions() {
       let me = this;
       return {
         onInit: (editor, monacoInstance) => {
+          // Action: chạy query (Alt+Enter hoặc Ctrl+Enter)
           editor.addAction({
             id: "execute-pg-sql",
             label: me.$t("i18nCommon.postgreSQLQuery.runQuery"),
@@ -685,14 +720,8 @@ export default {
               me.endEditFromEditor(editor, me.handleRunQuery);
             },
           });
-          // bỏ add command, add hẳn action để vừa ctrl + u vừa format bằng chuột phải được
-          // editor.addCommand(
-          //   monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyU,
-          //   () => {
-          //     me.endEditFromEditor(editor, this.handleFormatSQL);
-          //   },
-          // );
-          // Đăng ký tổ hợp phím Ctrl + U (hoặc Cmd + U trên Mac) trực tiếp vào Monaco
+
+          // Action: format SQL (Ctrl+U / Cmd+U)
           editor.addAction({
             id: "format-pg-sql",
             label: me.$t("i18nCommon.postgreSQLQuery.formatCode"),
@@ -706,21 +735,21 @@ export default {
             },
           });
 
-          // Context menu: Inspect object DDL
+          // Action: Inspect object DDL (F12) - xem định nghĩa table/view/function
           editor.addAction({
             id: "inspect-pg-object",
             label: me.$t("i18nCommon.postgreSQLQuery.dbInspect.inspectObject"),
             contextMenuGroupId: "navigation",
             contextMenuOrder: 1.3,
             keybindings: [
-              monacoInstance.KeyCode.F12, // F12 để inspect tương tự như f12 ở code bình thường
+              monacoInstance.KeyCode.F12,
             ],
             run: async (ed) => {
               const position = ed.getPosition();
               const model = ed.getModel();
               if (!position || !model) return;
 
-              // Lấy full word tại vị trí con trỏ (vd: "sample_data")
+              // Lấy từ tại vị trí con trỏ (vd: "sample_data" hoặc "account_object")
               const word = model.getWordAtPosition(position);
               if (!word) {
                 me.$tdToast.warning(
@@ -733,7 +762,7 @@ export default {
               let objectName = word.word;
               let schemaName = "";
 
-              // Kiểm tra phía trước word có schema prefix không (vd: "tm.")
+              // Kiểm tra phía trước word có schema prefix không (vd: "sme.")
               const lineContent = model.getLineContent(position.lineNumber);
               const textBeforeWord = lineContent.substring(
                 0,
@@ -753,7 +782,7 @@ export default {
                 return;
               }
 
-              // Phân giải object type từ inspect lookup
+              // Tra cứu loại object (table/view/function) từ inspectLookup đã build sẵn
               let searchType = "";
               let resolvedSchema = schemaName;
 
@@ -778,7 +807,7 @@ export default {
                 }
               }
 
-              // Fallback: nếu không xác định được type, mở dialog với search text
+              // Mở dialog inspect object (fallback "table" nếu không xác định được type)
               me.handleOpenInspectWithSearch(
                 searchType || "table",
                 objectName,
@@ -789,6 +818,9 @@ export default {
         },
       };
     },
+    /**
+     * Các tab trong sidebar: Help, Setting, Connection, SQL Save
+     */
     sidebarOptions() {
       return [
         {
@@ -814,6 +846,9 @@ export default {
       ];
     },
 
+    /**
+     * Danh sách connection dạng dropdown option
+     */
     connectionOptions() {
       return this.allConnections.map((c) => ({
         value: c.id,
@@ -821,19 +856,25 @@ export default {
       }));
     },
 
+    /**
+     * Style cho vùng kết quả (chiều cao theo %)
+     */
     resultSectionSizeStyle() {
       return { height: `${this.resultSectionSize}%` };
     },
+    /**
+     * Style cho vùng editor (chiều cao theo %)
+     */
     editorSectionSizeStyle() {
       return { height: `${this.editorSectionSize}%` };
     },
 
     /**
-     * Nhóm connections theo group
+     * Nhóm connections theo group, thêm nhóm "ungrouped" cho connection không có group
      */
     groupedConnections() {
       let groups = this.allGroups.map((g) => ({ ...g, items: [] }));
-      groups.push({ id: "", name: "", items: [] }); // ungrouped
+      groups.push({ id: "", name: "", items: [] });
 
       this.allConnections.forEach((conn) => {
         let group = groups.find((g) => g.id === conn.group_id);
@@ -849,14 +890,14 @@ export default {
     },
 
     /**
-     * Có result hay không
+     * Kiểm tra có kết quả query hay không
      */
     hasQueryResults() {
       return Array.isArray(this.queryResults) && this.queryResults.length > 0;
     },
 
     /**
-     * Result đang active
+     * Lấy result đang active (theo tab index)
      */
     activeQueryResult() {
       if (!this.hasQueryResults) return null;
@@ -864,15 +905,14 @@ export default {
     },
 
     /**
-     * Giữ tương thích với code cũ nào còn đọc queryResult
+     * Tương thích ngược: một số code cũ đọc queryResult
      */
     currentQueryResultCompat() {
       return this.activeQueryResult || this.queryResult || null;
     },
 
     /**
-     * Columns cho TDTableViewer từ result active
-     * Có title theo table_names nếu backend có trả về
+     * Tạo cấu hình columns cho TDTableViewer từ result active
      */
     activeTableColumns() {
       let result = this.activeQueryResult;
@@ -891,14 +931,14 @@ export default {
     },
 
     /**
-     * fallback tương thích code cũ
+     * Fallback tương thích code cũ
      */
     tableColumns() {
       return this.activeTableColumns;
     },
 
     /**
-     * export/copy chỉ cho phép với SELECT đang active
+     * Chỉ cho phép export/copy khi result là SELECT và có dữ liệu
      */
     canExportActiveResult() {
       return !!(
@@ -909,6 +949,9 @@ export default {
       );
     },
 
+    /**
+     * Key cho KeepAlive cache của TDTableViewer, change khi đổi tab kết quả
+     */
     activeResultCacheKey() {
       if (!this.activeQueryResult) return "pg-result-empty";
       return `pg-result-${this.activeResultIndex}-${this.activeQueryResult.is_select ? "select" : "command"}`;
@@ -917,8 +960,7 @@ export default {
 
   methods: {
     /**
-     * Xử lý khi click 1 item trong flyout action: bỏ qua nếu đang disabled,
-     * chạy action tương ứng rồi đóng flyout lại.
+     * Khi click item trong flyout: bỏ qua nếu disabled, chạy action rồi đóng flyout
      */
     onActionClick(action) {
       if (action.disabled) return;
@@ -926,11 +968,17 @@ export default {
       this.closeFlyout();
     },
 
+    /**
+     * Xử lý kéo thay đổi kích thước editor/result
+     */
     handleResize(sizes) {
       this.editorSectionSize = sizes.leftSize;
       this.resultSectionSize = sizes.rightSize;
     },
 
+    /**
+     * Chuẩn hoá cấu trúc result từ backend về format đồng nhất
+     */
     normalizeSingleResult(result) {
       if (!result) return null;
       return {
@@ -943,10 +991,12 @@ export default {
         is_select: !!result.is_select,
       };
     },
+
+    /**
+     * Kích hoạt chế độ rename collection (tìm object gốc trong allGroups để reactive)
+     */
     enableRenameCollection(collectionFromView) {
       let me = this;
-      // collectionFromView là bản sao tạm do computed groupedConnections tạo ra,
-      // phải tìm đúng object gốc trong allGroups thì set mới reactive/persist được
       let collection = me.allGroups.find((g) => g.id === collectionFromView.id);
       if (collection) {
         collection.is_renaming = true;
@@ -965,6 +1015,10 @@ export default {
         });
       }
     },
+
+    /**
+     * Lưu tên mới của collection sau khi rename
+     */
     async saveNewCollectionName(collectionFromView) {
       let me = this;
       let collection = me.allGroups.find((g) => g.id === collectionFromView.id);
@@ -988,6 +1042,10 @@ export default {
         }
       }
     },
+
+    /**
+     * Chuẩn hoá kết quả query (hỗ trợ cả single và multi-statement)
+     */
     normalizeMultiQueryResult(payload) {
       if (payload && Array.isArray(payload.results)) {
         return payload.results
@@ -998,20 +1056,28 @@ export default {
         const one = this.normalizeSingleResult(payload);
         return one ? [one] : [];
       }
-
       return [];
     },
 
+    /**
+     * Chuyển đổi tab kết quả
+     */
     activateResultTab(index) {
       if (index < 0 || index >= this.queryResults.length) return;
       this.activeResultIndex = index;
-      this.queryResult = this.queryResults[index] || null; // tương thích code cũ
+      this.queryResult = this.queryResults[index] || null;
     },
 
+    /**
+     * Key cho tab kết quả (dùng trong v-for)
+     */
     getResultTabKey(result, index) {
       return `${index}-${result?.is_select ? "select" : "command"}-${result?.rows_affected ?? 0}`;
     },
 
+    /**
+     * Label hiển thị trên tab kết quả (ưu tiên tên bảng nếu có)
+     */
     getResultTabLabel(result, index) {
       let labelTab = null;
       try {
@@ -1031,6 +1097,9 @@ export default {
       return labelTab;
     },
 
+    /**
+     * Reset toàn bộ kết quả query
+     */
     resetQueryResults() {
       this.queryResult = null;
       this.queryResults = [];
@@ -1038,6 +1107,9 @@ export default {
       this.queryError = null;
     },
 
+    /**
+     * Tải đồng thời groups, connections, và saved queries từ API
+     */
     async loadAllData() {
       let me = this;
       me.isLoading = true;
@@ -1055,13 +1127,15 @@ export default {
       }
     },
 
+    /**
+     * Tải danh sách groups connection, tự động mở rộng tất cả
+     */
     async loadGroups() {
       let me = this;
       let response = await me.agentAPI.connectionGroup.getAll();
       let data = response?.data?.data ?? [];
       if (Array.isArray(data)) {
         me.allGroups.splice(0, me.allGroups.length, ...data);
-        // Tự mở tất cả groups
         data.forEach((g) => {
           g.is_renaming = false;
           if (!(g.id in me.openGroups)) me.openGroups[g.id] = true;
@@ -1072,6 +1146,9 @@ export default {
       }
     },
 
+    /**
+     * Tải danh sách tất cả connections
+     */
     async loadConnections() {
       let me = this;
       let response = await me.agentAPI.connection.getAll();
@@ -1081,6 +1158,9 @@ export default {
       }
     },
 
+    /**
+     * Tải danh sách saved queries
+     */
     async loadSavedQueries() {
       let me = this;
       let response = await me.agentAPI.savedQuery.getAll();
@@ -1090,20 +1170,28 @@ export default {
       }
     },
 
+    /**
+     * Bật/tắt trạng thái mở rộng của group
+     */
     toggleGroup(groupKey) {
       this.openGroups[groupKey] = !this.openGroups[groupKey];
     },
 
+    /**
+     * Chọn connection và lưu vào cache
+     */
     selectConnection(conn) {
       let me = this;
       me.selectedConnectionId = conn.id;
-      // gán lại cache
       me.$tdCache.set(
         me.$tdEnum.cacheConfig.PostgreSQLLastConnectionId,
         conn.id,
       );
     },
 
+    /**
+     * Mở popup thêm connection mới (có thể gán vào group)
+     */
     openAddConnectionPopup(groupId) {
       let me = this;
       TDDialogUtil.showPopup({
@@ -1116,6 +1204,9 @@ export default {
       });
     },
 
+    /**
+     * Mở popup sửa connection
+     */
     openEditConnectionPopup(conn) {
       let me = this;
       TDDialogUtil.showPopup({
@@ -1128,6 +1219,9 @@ export default {
       });
     },
 
+    /**
+     * Xoá connection, nếu là connection đang chọn thì reset
+     */
     async deleteConnection(id) {
       let me = this;
       try {
@@ -1149,6 +1243,9 @@ export default {
       }
     },
 
+    /**
+     * Tạo nhóm connection mới
+     */
     async addNewGroup() {
       let me = this;
       if (!me.newGroupName) return;
@@ -1168,6 +1265,9 @@ export default {
       }
     },
 
+    /**
+     * Xoá nhóm connection (kèm các connection trong nhóm)
+     */
     async deleteGroup(id) {
       let me = this;
       try {
@@ -1183,6 +1283,9 @@ export default {
       }
     },
 
+    /**
+     * Chạy câu query SQL: gọi API, xử lý kết quả, tự động save nếu bật option
+     */
     async handleRunQuery() {
       let me = this;
       if (!me.selectedConnectionId) {
@@ -1222,7 +1325,7 @@ export default {
           error?.message ?? me.$t("i18nCommon.toastMessage.error");
       } finally {
         me.isRunning = false;
-        // lưu lại luôn câu lệnh vừa chạy của user (bỏ qua nếu trùng với lần auto-save trước)
+        // Tự động lưu query sau khi chạy (nếu bật setting)
         if (me.currentConfigLayout.autoSaveQueryAfterExec) {
           if (
             me.sqlText !== me.lastAutoSavedQueryText ||
@@ -1236,14 +1339,12 @@ export default {
       }
     },
     /**
-     * Sao chép connection string dạng NpgSQL từ kết nối đang chọn vào clipboard
-     * Parse connection string đã lưu -> gọi C# WASM để build chuẩn Npgsql -> copy
+     * Parse connection string gốc -> gọi C# WASM build Npgsql connection string -> copy clipboard
      */
     handleCopyNpgSQLConnectionString() {
       let me = this;
       if (!me.checkInitDotNetWasm()) return;
 
-      // Tìm kết nối đang được chọn
       let conn = me.allConnections.find(
         (c) => c.id === me.selectedConnectionId,
       );
@@ -1255,9 +1356,8 @@ export default {
       }
 
       try {
-        // Parse connection string gốc (DSN hoặc URI) ra các trường riêng lẻ
+        // Parse DSN/URI thành các trường riêng lẻ
         let parsed = me.parseConnectionStringToFields(conn.connection_string);
-        // Map fields sang format mà C# StringifyNpgSQLConnection yêu cầu
         let fields = {
           host: parsed.host,
           port: parseInt(parsed.port) || 5432,
@@ -1266,20 +1366,20 @@ export default {
           database_name: parsed.database,
         };
 
-        // Gọi C# WASM để build Npgsql connection string chuẩn
+        // Stringify qua C# WASM để đảm bảo format Npgsql chuẩn
         const jsonStr = JSON.stringify(fields);
         const npgSqlConnStr =
           me.dotnetExports.StringifyNpgSQLConnection(jsonStr);
 
-        // Copy vào clipboard
         me.$tdUtility.copyToClipboard(npgSqlConnStr);
       } catch (e) {
         console.error(e);
         me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
+
     /**
-     * Sao chép connection string dạng DSN/URI gốc từ kết nối đang chọn vào clipboard
+     * Copy trực tiếp connection string DSN/URI gốc vào clipboard
      */
     handleCopyDSNConnectionString() {
       let me = this;
@@ -1294,6 +1394,10 @@ export default {
         );
       }
     },
+
+    /**
+     * Kiểm tra kết nối database (gọi qua mixin TDDatabaseConnectionMixin)
+     */
     async handleTestConnection() {
       if (!this.selectedConnectionId) return;
       await this.testDatabaseConnection(
@@ -1302,6 +1406,9 @@ export default {
       );
     },
 
+    /**
+     * Format SQL: dùng sql-formatter, Postgresql dialect, uppercase keywords
+     */
     handleFormatSQL() {
       let me = this;
       if (!me.sqlText?.trim()) return;
@@ -1316,12 +1423,18 @@ export default {
       }
     },
 
+    /**
+     * Build nội dung JSON để copy/download từ result đang active
+     */
     buildResultForCopy() {
       const result = this.activeQueryResult;
       if (!result?.is_select || !result?.rows?.length) return "";
       return JSON.stringify(result.rows, null, 2);
     },
 
+    /**
+     * Copy kết quả query dạng JSON vào clipboard
+     */
     handleCopyResult() {
       let me = this;
       let queryResultText = me.buildResultForCopy();
@@ -1334,13 +1447,16 @@ export default {
       }
     },
 
+    /**
+     * Download kết quả query dạng file .txt
+     */
     handleDownloadReponse() {
       let me = this;
       let queryResultText = me.buildResultForCopy();
 
       if (queryResultText) {
         let encoder = new TextEncoder();
-        let buffer = encoder.encode(queryResultText); // Uint8Array
+        let buffer = encoder.encode(queryResultText);
         let fileName = me.$tdUtility.createFileDownloadName("result_query", {
           ext: ".txt",
         });
@@ -1351,6 +1467,10 @@ export default {
         );
       }
     },
+
+    /**
+     * Lưu query hiện tại (tên mặc định là nội dung query nếu user không nhập)
+     */
     async saveCurrentQuery() {
       let me = this;
       if (!me.sqlText?.trim()) {
@@ -1361,7 +1481,6 @@ export default {
         );
         return;
       }
-      // không ép user phải nhập tên mới cho cất
       let queryName = me.newQueryName || me.sqlText;
       queryName = (queryName || "").substring(0, 100);
       try {
@@ -1380,6 +1499,9 @@ export default {
       }
     },
 
+    /**
+     * Mở dialog inspect object (table/view/function)
+     */
     async handleOpenInspect() {
       let me = this;
       if (!me.selectedConnectionId) {
@@ -1395,6 +1517,9 @@ export default {
       });
     },
 
+    /**
+     * Mở dialog danh sách database
+     */
     async handleOpenDatabaseList() {
       let me = this;
       if (!me.selectedConnectionId) {
@@ -1410,6 +1535,9 @@ export default {
       });
     },
 
+    /**
+     * Mở dialog clone intellisense từ connection khác
+     */
     async handleCloneIntellisense() {
       let me = this;
       if (!me.selectedConnectionId) {
@@ -1425,6 +1553,9 @@ export default {
       });
     },
 
+    /**
+     * Mở dialog inspect với search text và schema có sẵn (dùng từ F12)
+     */
     async handleOpenInspectWithSearch(searchType, searchValue, searchSchema) {
       let me = this;
       if (!me.selectedConnectionId) {
@@ -1445,6 +1576,9 @@ export default {
       });
     },
 
+    /**
+     * Load nội dung saved query vào editor
+     */
     loadSavedQuery(query) {
       let me = this;
       me.currentSavedQueryId = query.id;
@@ -1454,6 +1588,9 @@ export default {
       }
     },
 
+    /**
+     * Xoá saved query
+     */
     async deleteSavedQuery(id) {
       let me = this;
       try {
@@ -1469,9 +1606,9 @@ export default {
         me.$tdToast.error(me.$t("i18nCommon.postgreSQLQuery.deleteQueryErr"));
       }
     },
+
     /**
-     * Hàm này được gọi khi tab được active hoặc khi component được mount (nếu đang active)
-     * Component con cần add event (ví dụ listener trên window/document) thì override lại
+     * Khi tab được active: đăng ký shortcut, load intellisense từ cache
      */
     onTabEnter() {
       let me = this;
@@ -1487,15 +1624,13 @@ export default {
         me.getConfigExecuteSQLCode(),
       );
       TDShortcutAction.register("dllInspect", me.getConfigDLLInspect());
-      // Reload intellisense cho tab này khi được active lại
       if (me.selectedConnectionId) {
         me.loadCachedIntellisense();
       }
     },
 
     /**
-     * Hàm này được gọi khi tab bị inactive hoặc trước khi component bị unmount (nếu đang active)
-     * Component con cần remove event thì override lại
+     * Khi tab bị inactive: restore shortcut gốc, dispose intellisense providers
      */
     onTabLeave() {
       let me = this;
@@ -1505,12 +1640,15 @@ export default {
       TDShortcutAction.unregister("formatCodePostgreSQL");
       TDShortcutAction.unregister("executePosgreSQLCode");
       TDShortcutAction.unregister("dllInspect");
-      // Dispose intellisense providers để tab kia không bị ảnh hưởng
       if (me.intellisenseDisposable) {
         me.intellisenseDisposable.forEach((d) => d?.dispose?.());
         me.intellisenseDisposable = [];
       }
     },
+
+    /**
+     * Cấu hình shortcut format code (Ctrl+U / Cmd+U)
+     */
     getConfigFormatCode() {
       let me = this;
       let configKeyboard = {
@@ -1521,6 +1659,10 @@ export default {
       };
       return configKeyboard;
     },
+
+    /**
+     * Cấu hình shortcut chạy query (Alt+Enter)
+     */
     getConfigExecuteSQLCode() {
       let me = this;
       let configKeyboard = {
@@ -1531,6 +1673,10 @@ export default {
       };
       return configKeyboard;
     },
+
+    /**
+     * Cấu hình shortcut inspect object (F12)
+     */
     getConfigDLLInspect() {
       let me = this;
       let configKeyboard = {
@@ -1541,9 +1687,9 @@ export default {
       };
       return configKeyboard;
     },
+
     /**
-     * kết thúc việc edit từ event bên trong editor
-     * @param editor
+     * Kết thúc edit trong Monaco: cập nhật sqlText, gọi callback (vd: format/run)
      */
     endEditFromEditor(editor, callback) {
       let me = this;
@@ -1559,8 +1705,9 @@ export default {
         }
       });
     },
+
     /**
-     * Mở danh sách code mẫu ra để xem
+     * Mở tab xem template PostgreSQL
      */
     openCodePostgresqlTemplate() {
       this.openTab({
@@ -1570,10 +1717,18 @@ export default {
           import("@/views/tools/codeTemplateTools/PostgreSQLTemplate/TDPostgreSQLTemplate.vue"),
       });
     },
+
+    /**
+     * Gen UUID và copy vào clipboard
+     */
     genUUIDFunc() {
       let me = this;
       me.$tdUtility.copyToClipboard(me.$tdUtility.newGuid());
     },
+
+    /**
+     * Khôi phục connection đã chọn lần trước từ cache
+     */
     async loadLastDatabaseConnect() {
       let me = this;
       let oldSelectedConnection = await me.$tdCache.get(
@@ -1596,7 +1751,9 @@ export default {
   },
 
   watch: {
-    // Khi đổi connection thì load intellisense từ cache
+    /**
+     * Khi đổi connection: load intellisense từ cache, cập nhật tab title
+     */
     async selectedConnectionId(newId) {
       if (newId) {
         await this.loadCachedIntellisense();
@@ -1604,6 +1761,10 @@ export default {
       let conn = this.allConnections.find((c) => c.id === newId);
       this.reBuildTabTitle(conn ? conn.connection_name : null);
     },
+
+    /**
+     * Khi bật/tắt limitResults: backup limit hiện tại, reset về 0 nếu tắt
+     */
     "currentConfigLayout.limitResults"(enabled) {
       if (enabled) {
         this.currentConfigLayout.defaultQueryLimit =

@@ -4,21 +4,26 @@ import pgQueries from "./templates.js";
 
 export default {
   methods: {
+    /**
+     * Tải toàn bộ dữ liệu intellisense (keywords, tables, functions) từ database
+     * bằng cách gọi các câu SQL mẫu trong templates.js, phân trang để tránh quá tải.
+     * Kết quả được lưu vào IndexedDB cache và áp dụng lên Monaco Editor.
+     */
     async handleLoadIntellisense() {
       let me = this;
+      // Bỏ qua nếu chưa chọn connection
       if (!me.selectedConnectionId) return;
       me.isLoadingIntellisense = true;
       try {
-        // Xóa cache cũ
+        // Xoá cache cũ của connection này để tránh dữ liệu rác
         const cacheKey = me.$tdEnum.cacheConfig.PostgreSQLQueryHistory;
         await TDCache.remove(cacheKey, { id: me.selectedConnectionId });
 
-        // Số lượng dòng tải mỗi lần
+        // Mỗi lần gọi SQL chỉ lấy 5000 dòng, tránh timeout
         let defaultQueryLimit = 5000;
-        // có limit kết quả ở backend không, đặt thế này để tương thích với executeQuery trong TDPosgreSQLQuery
         let limitResults = false;
 
-        // Lấy keywords
+        // Bước 1: Lấy danh sách keyword PostgreSQL từ hệ thống (pg_catalog.pg_get_keywords)
         let keywordResponse = await me.agentAPI.executeQuery(
           me.selectedConnectionId,
           pgQueries.pg_get_keywords,
@@ -26,7 +31,7 @@ export default {
           !limitResults,
         );
 
-        // Gọi SQL đếm tổng số dòng
+        // Bước 2: Đếm tổng số bảng/view để biết số trang cần tải
         let countResponse = await me.agentAPI.executeQuery(
           me.selectedConnectionId,
           pgQueries.pg_get_tables_count,
@@ -44,11 +49,11 @@ export default {
           totalRows = parseInt(countResult.rows[0].total || 0, 10);
         }
 
-        // Chạy vòng lặp FOR gối đầu để kéo dữ liệu về thông qua SQL Paging
+        // Bước 3: Tải dữ liệu bảng/view theo từng trang (LIMIT/OFFSET)
         let allTableRows = [];
 
         for (let offset = 0; offset < totalRows; offset += defaultQueryLimit) {
-          // Nối thêm điều kiện LIMIT OFFSET vào câu SQL Paging mẫu
+          // Ghép LIMIT/OFFSET vào câu SQL mẫu
           let pagingQuery = `${pgQueries.pg_get_tables_paging} LIMIT ${defaultQueryLimit} OFFSET ${offset};`;
 
           let pagingResponse = await me.agentAPI.executeQuery(
@@ -63,6 +68,7 @@ export default {
             pagingResponse?.data?.data ||
             null;
 
+          // Nếu lỗi ở trang nào thì dừng luôn để tránh treo
           if (pagingResponse?.data?.success && pagingResult?.rows) {
             allTableRows.push(...pagingResult.rows);
           } else {
@@ -73,7 +79,7 @@ export default {
           }
         }
 
-        // Đóng gói lại đúng cấu trúc ban đầu để cấp phát cho Monaco Editor
+        // Đóng gói kết quả bảng/view đúng cấu trúc để Monaco xử lý
         let tablesResult = {
           columns: [
             "table_schema",
@@ -86,6 +92,7 @@ export default {
           rows: allTableRows,
         };
 
+        // Trích xuất kết quả keywords từ response
         let keywordResult =
           keywordResponse?.data?.data?.results?.[0] ||
           keywordResponse?.data?.data ||
@@ -95,10 +102,11 @@ export default {
           ? keywordResult
           : null;
 
-        // Load functions (count → paging) — chỉ thực hiện khi bật tùy chọn
+        // Bước 4: Tải functions (chỉ khi user bật tuỳ chọn trong sidebar)
         let allFunctionRows = [];
         if (me.currentConfigLayout.loadFunctionIntellisense) {
           try {
+            // Đếm tổng số function để phân trang
             let funcCountResponse = await me.agentAPI.executeQuery(
               me.selectedConnectionId,
               pgQueries.pg_get_functions_count,
@@ -119,6 +127,7 @@ export default {
               totalFuncRows = parseInt(funcCountResult.rows[0].total || 0, 10);
             }
 
+            // Tải từng trang function
             for (
               let offset = 0;
               offset < totalFuncRows;
@@ -152,7 +161,7 @@ export default {
           }
         }
 
-        // Đóng gói lại đúng cấu trúc để cấp phát cho Monaco Editor
+        // Đóng gói kết quả functions
         let functionsResult = {
           columns: [
             "function_schema",
@@ -164,13 +173,14 @@ export default {
           rows: allFunctionRows,
         };
 
+        // Gom tất cả dữ liệu intellisense lại
         let intellisenseData = {
           keywords: keywordsResult,
           tables: tablesResult,
           functions: functionsResult,
         };
 
-        // Lưu vào IndexedDB và áp dụng Intellisense
+        // Lưu vào IndexedDB để lần sau load nhanh hơn, rồi áp dụng lên Monaco
         await TDCache.set(cacheKey, intellisenseData, {
           id: me.selectedConnectionId,
         });
@@ -188,7 +198,9 @@ export default {
     },
 
     /**
-     * Tải intellisense từ cache (nếu có) và áp dụng vào Monaco
+     * Tải intellisense từ IndexedDB cache của connection hiện tại
+     * (nếu đã từng load trước đó) và áp dụng lên Monaco.
+     * Giúp khởi động nhanh, không cần query database lại.
      */
     async loadCachedIntellisense() {
       let me = this;
@@ -205,20 +217,22 @@ export default {
     },
 
     /**
-     * Áp dụng completion providers vào Monaco Editor cho pgsql (DBeaver-like)
+     * Đăng ký completion provider và hover provider cho Monaco Editor
+     * để gợi ý keyword, bảng, cột, function, alias khi user gõ SQL.
+     * Dữ liệu gợi ý được xây dựng từ tham số data đã load trước đó.
      */
     async applyMonacoIntellisense(data) {
       let me = this;
       try {
-        // Cleanup providers cũ
+        // Xoá các provider cũ trước khi đăng ký mới, tránh chồng chéo
         if (me.intellisenseDisposable) {
           me.intellisenseDisposable.forEach((d) => d?.dispose?.());
         }
 
-        // Lazy-load monaco
+        // Lazy-load Monaco Editor (chỉ import khi cần)
         const monaco = await import("monaco-editor");
 
-        // Keywords
+        // ── Xây dựng danh sách keyword PostgreSQL ──────────────────────────────
         const keywords = data?.keywords?.rows ?? [];
         const keywordSuggestions = [];
         keywords.forEach((row) => {
@@ -230,19 +244,20 @@ export default {
           });
         });
 
+        // Lưu set keyword để kiểm tra xung đột khi tạo alias tự động
         me._pgKeywordSet = new Set(
           keywords
             .map((k) => String(k.word).toLowerCase())
             .filter(Boolean),
         );
 
-        // Xây dựng bản đồ lookup
+        // ── Xây dựng lookup map cho bảng/view/cột ──────────────────────────────
         const tableRows = data?.tables?.rows ?? [];
-        const columnsByTable = new Map();
-        const tablesBySchema = new Map();
-        const allSchemas = new Set();
-        const allTables = new Set();
-        const allColumns = [];
+        const columnsByTable = new Map();   // table_name -> column list, schema.table -> column list
+        const tablesBySchema = new Map();   // schema -> Set<table_name>
+        const allSchemas = new Set();       // tất cả schema
+        const allTables = new Set();        // tất cả tên bảng (không kèm schema)
+        const allColumns = [];              // tất cả cột (dùng khi không có alias)
 
         tableRows.forEach((row) => {
           const tbl = row.table_name;
@@ -253,10 +268,12 @@ export default {
           allSchemas.add(schema);
           allTables.add(tbl);
 
+          // Nhóm bảng theo schema
           if (!tablesBySchema.has(schema))
             tablesBySchema.set(schema, new Set());
           tablesBySchema.get(schema).add(tbl);
 
+          // Map cột theo tên bảng và theo schema.table
           if (!columnsByTable.has(tbl)) columnsByTable.set(tbl, []);
           if (!columnsByTable.has(`${schema}.${tbl}`))
             columnsByTable.set(`${schema}.${tbl}`, []);
@@ -273,13 +290,14 @@ export default {
           allColumns.push(colDef);
         });
 
-        // ── Build inspect lookup ──────────────────────────────────────────────
+        // ── Build inspect lookup (dùng cho hover và F12 inspect) ───────────────
         me._inspectLookup = {
-          tables: new Map(),
-          views: new Map(),
-          functions: new Map(),
+          tables: new Map(),    // key: table_name hoặc schema.table -> { schema, name }
+          views: new Map(),     // key: view_name hoặc schema.view -> { schema, name }
+          functions: new Map(), // key: function_name hoặc schema.func -> { schema, name, args, ... }
         };
 
+        // Phân loại bảng (table_type = 'VIEW' -> view, còn lại -> table)
         tableRows.forEach((row) => {
           const tbl = String(row.table_name).toLowerCase();
           const schema = String(row.table_schema).toLowerCase();
@@ -299,7 +317,9 @@ export default {
           }
         });
 
-        // ── Functions ─────────────────────────────────────────────────────────
+        // ── Xử lý function arguments và tạo snippet ────────────────────────────
+
+        // Parse chuỗi arguments "name type, name type" thành mảng {name, type}
         function parseFunctionArgs(argsStr) {
           if (!argsStr || !argsStr.trim()) return [];
           return argsStr.split(",").map((segment) => {
@@ -311,6 +331,7 @@ export default {
           });
         }
 
+        // Tạo snippet function call không kèm schema, có tabstop cho từng param
         function buildFunctionCallSnippet(fnName, argsStr) {
           const args = parseFunctionArgs(argsStr);
           if (args.length === 0) {
@@ -327,6 +348,7 @@ export default {
           return `${fnName}(\n` + paramLines.join(",\n") + `\n)`;
         }
 
+        // Tạo snippet function call kèm schema prefix
         function buildFunctionCallSnippetWithSchema(schema, fnName, argsStr) {
           const args = parseFunctionArgs(argsStr);
           if (args.length === 0) {
@@ -343,9 +365,10 @@ export default {
           return `${schema}.${fnName}(\n` + paramLines.join(",\n") + `\n)`;
         }
 
+        // ── Xây dựng function suggestions ──────────────────────────────────────
         const functionRows = data?.functions?.rows ?? [];
-        const functionSuggestions = [];
-        const functionsBySchema = new Map();
+        const functionSuggestions = [];      // dùng cho context không có dấu chấm
+        const functionsBySchema = new Map(); // schema -> function items, dùng cho context có dấu chấm
 
         functionRows.forEach((row) => {
           const schema = row.function_schema;
@@ -353,6 +376,7 @@ export default {
           const argsStr = row.function_arguments || "";
           const returnType = row.return_type || "";
 
+          // Nội dung documentation hiển thị khi hover
           const docValue = [
             `**${schema}.${fnName}**`,
             ``,
@@ -367,6 +391,7 @@ export default {
             argsStr,
           );
 
+          // Item dùng cho context schema prefix (vd: "sme."), ưu tiên sort cao hơn
           if (!functionsBySchema.has(schema)) functionsBySchema.set(schema, []);
           functionsBySchema.get(schema).push({
             label: fnName,
@@ -378,6 +403,7 @@ export default {
             sortText: "0" + fnName,
           });
 
+          // Item dùng cho context không có dấu chấm
           functionSuggestions.push({
             label: fnName,
             kind: monaco.languages.CompletionItemKind.Function,
@@ -390,7 +416,7 @@ export default {
           });
         });
 
-        // Add functions to inspect lookup
+        // Thêm functions vào inspect lookup (cả key có schema và không schema)
         functionRows.forEach((row) => {
           const schema = String(row.function_schema).toLowerCase();
           const fnName = String(row.function_name).toLowerCase();
@@ -408,7 +434,12 @@ export default {
             me._inspectLookup.functions.set(fnName, entry);
         });
 
-        // Đăng ký completion provider
+        // ═══════════════════════════════════════════════════════════════════════
+        //  ĐĂNG KÝ COMPLETION PROVIDER
+        // ═══════════════════════════════════════════════════════════════════════
+        // Provider này xử lý 2 tình huống:
+        //   1. Có dấu chấm (vd: "sme.", "ao.") -> gợi ý cột/bảng/function theo prefix
+        //   2. Không có dấu chấm -> gợi ý keyword, schema, table, function, alias
         const disposable = monaco.languages.registerCompletionItemProvider(
           "pgsql",
           {
@@ -416,7 +447,7 @@ export default {
             provideCompletionItems(model, position) {
               const word = model.getWordUntilPosition(position);
 
-              // Mặc định ban đầu
+              // Range mặc định: thay thế từ vị trí con trỏ đến cuối từ hiện tại
               let range = {
                 startLineNumber: position.lineNumber,
                 endLineNumber: position.lineNumber,
@@ -424,9 +455,12 @@ export default {
                 endColumn: word.endColumn,
               };
 
+              // Đọc toàn bộ nội dung SQL hiện tại để phân tích alias và ngữ cảnh
               const text = model.getValue();
               const aliasMap = new Map();
 
+              // Regex phát hiện alias từ các mệnh đề FROM/JOIN
+              // Ví dụ: "FROM sme.account_object ao" -> alias "ao" trỏ đến sme.account_object
               const regex =
                 /(?:from|join)\s+([a-zA-Z0-9_]+)(?:\.([a-zA-Z0-9_]+))?(?:\s+as)?\s+([a-zA-Z0-9_]+)?/gi;
               let match;
@@ -448,6 +482,7 @@ export default {
                 "or",
               ];
 
+              // Duyệt tất cả các alias trong câu SQL và build aliasMap
               while ((match = regex.exec(text)) !== null) {
                 let schemaOrTable = match[1];
                 let tableIfSchema = match[2];
@@ -457,6 +492,7 @@ export default {
                 let table = "";
                 let alias = "";
 
+                // Nếu có dạng "schema.table alias" thì match[1]=schema, match[2]=table
                 if (tableIfSchema) {
                   schema = schemaOrTable.toLowerCase();
                   table = tableIfSchema.toLowerCase();
@@ -464,6 +500,7 @@ export default {
                   table = schemaOrTable.toLowerCase();
                 }
 
+                // Nếu match[3] là một từ khoá SQL thì coi như không có alias, lấy tên bảng làm alias
                 if (
                   aliasOrTable &&
                   !sqlKeywords.includes(aliasOrTable.toLowerCase())
@@ -475,23 +512,28 @@ export default {
                 aliasMap.set(alias, { schema, table });
               }
 
+              // Lấy dòng hiện tại và text trước con trỏ để xác định context
               const lineContent = model.getLineContent(position.lineNumber);
               const textBeforePointer = lineContent.substring(
                 0,
                 position.column - 1,
               );
 
-              // Regex bóc tách chính xác tên_schema và cụm text đang gõ dở phía sau dấu chấm
+              // Kiểm tra xem có dấu chấm trước con trỏ không (vd: "sme.|" hoặc "ao.|")
               const dotMatch = textBeforePointer.match(
                 /([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]*)$/,
               );
 
               let suggestions = [];
 
+              // ── TRƯỜNG HỢP 1: CÓ DẤU CHẤM (context: "prefix.") ──────────────
               if (dotMatch) {
-                const prefix = dotMatch[1].toLowerCase(); // Ví dụ: "td"
-                const typedWord = dotMatch[2]; // Phần chữ đã gõ sau dấu chấm, ví dụ: "fn_cre" hoặc rỗng ""
+                // prefix: tên schema, tên bảng, hoặc alias
+                const prefix = dotMatch[1].toLowerCase();
+                // typedWord: phần chữ user đã gõ sau dấu chấm (có thể rỗng)
+                const typedWord = dotMatch[2];
 
+                // Điều chỉnh range để thay thế cả "prefix.typedWord"
                 const totalOffset = prefix.length + 1 + typedWord.length;
                 range = {
                   startLineNumber: position.lineNumber,
@@ -500,7 +542,7 @@ export default {
                   endColumn: position.column,
                 };
 
-                // 1. Prefix là alias -> gợi ý cột
+                // 1a. Prefix là alias -> gợi ý cột của bảng mà alias trỏ đến
                 if (aliasMap.has(prefix)) {
                   const mapped = aliasMap.get(prefix);
                   let key = mapped.schema
@@ -513,12 +555,12 @@ export default {
                   cols.forEach((c) => {
                     suggestions.push({
                       ...c,
-                      filterText: `${prefix}.${c.label}`, // Đặt filter khớp với text trên editor
+                      filterText: `${prefix}.${c.label}`,
                       insertText: `${prefix}.${c.insertText}`,
                     });
                   });
                 }
-                // 2. Prefix là tên bảng -> gợi ý cột
+                // 1b. Prefix là tên bảng -> gợi ý cột của bảng đó
                 else if (columnsByTable.has(prefix)) {
                   let cols = columnsByTable.get(prefix) || [];
                   cols.forEach((c) => {
@@ -529,12 +571,13 @@ export default {
                     });
                   });
                 }
-                // 3. Prefix là tên schema -> gợi ý bảng + functions
+                // 1c. Prefix là tên schema -> gợi ý bảng + functions trong schema đó
+                //     kèm tự động tạo alias (vd: "sme.account_object ao")
                 else if (
                   tablesBySchema.has(prefix) ||
                   functionsBySchema.has(prefix)
                 ) {
-                  // Bảng
+                  // Gợi ý bảng thuộc schema, kèm alias tự động
                   (tablesBySchema.get(prefix) ?? new Set()).forEach((tbl) => {
                     const alias = me._generateUniqueAlias(tbl, text, me._pgKeywordSet);
                     suggestions.push({
@@ -546,12 +589,11 @@ export default {
                     });
                   });
 
-                  // Functions
+                  // Gợi ý functions thuộc schema, kèm alias tự động
                   (functionsBySchema.get(prefix) ?? []).forEach((fnItem) => {
                     const alias = me._generateUniqueAlias(fnItem.label, text, me._pgKeywordSet);
                     suggestions.push({
                       ...fnItem,
-                      // QUAN TRỌNG: filterText phải bao gồm cả schema prefix để Monaco so khớp được chuỗi "td.fn_create_user"
                       filterText: `${prefix}.${fnItem.label}`,
                       insertText: alias ? `${fnItem.fullInsertText} ${alias}` : fnItem.fullInsertText,
                       insertTextRules:
@@ -560,10 +602,13 @@ export default {
                     });
                   });
                 }
-              } else {
-                // Đang gõ chay (không có chấm)
+              }
+              // ── TRƯỜNG HỢP 2: KHÔNG CÓ DẤU CHẤM (gõ chay) ──────────────────
+              else {
+                // Gợi ý keyword PostgreSQL
                 suggestions.push(...keywordSuggestions);
 
+                // Gợi ý schema (vd: "sme", "tm", "public")
                 allSchemas.forEach((schema) => {
                   suggestions.push({
                     label: schema,
@@ -573,6 +618,7 @@ export default {
                   });
                 });
 
+                // Gợi ý bảng, kèm alias tự động (vd: "account_object ao")
                 allTables.forEach((tbl) => {
                   const alias = me._generateUniqueAlias(tbl, text, me._pgKeywordSet);
                   suggestions.push({
@@ -583,6 +629,7 @@ export default {
                   });
                 });
 
+                // Gợi ý functions, kèm alias tự động
                 suggestions.push(
                   ...functionSuggestions.map((fnItem) => {
                     const alias = me._generateUniqueAlias(fnItem.label, text, me._pgKeywordSet);
@@ -590,8 +637,10 @@ export default {
                   }),
                 );
 
+                // Nếu có alias trong câu SQL, hiển thị alias name và cột của chúng
                 if (aliasMap.size > 0) {
                   aliasMap.forEach((mapped, alias) => {
+                    // Ưu tiên hiển thị alias name để user gõ alias.column
                     suggestions.push({
                       label: alias,
                       kind: monaco.languages.CompletionItemKind.Variable,
@@ -601,6 +650,7 @@ export default {
                         ? `${mapped.schema}.${mapped.table}`
                         : mapped.table,
                     });
+                    // Hiển thị luôn columns của bảng mà alias trỏ đến
                     let key = mapped.schema
                       ? `${mapped.schema}.${mapped.table}`
                       : mapped.table;
@@ -615,17 +665,20 @@ export default {
                       });
                     });
                   });
-                } else if (word.word && word.word.length > 1) {
+                }
+                // Nếu không có alias và user đã gõ ít nhất 2 ký tự, gợi ý tất cả cột
+                else if (word.word && word.word.length > 1) {
                   suggestions.push(...allColumns);
                 }
               }
 
-              // Khử trùng lặp danh sách gợi ý
+              // Loại bỏ các suggestion trùng nhau (dựa trên label + kind + insertText)
               const uniqueMap = new Map();
               suggestions.forEach((s) => {
                 uniqueMap.set(s.label + s.kind + s.insertText, s);
               });
 
+              // Gán range và insertTextRules cho từng suggestion
               const finalSuggestions = Array.from(uniqueMap.values()).map(
                 (s) => ({
                   ...s,
@@ -645,17 +698,18 @@ export default {
 
         me.intellisenseDisposable = [disposable];
 
-        // ── Register hover provider ────────────────────────────────────────────
+        // ═══════════════════════════════════════════════════════════════════════
+        //  ĐĂNG KÝ HOVER PROVIDER (hiển thị thông tin object khi di chuột)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        // Tra cứu object trong inspectLookup theo tên (có hoặc không schema prefix)
         function findInspectObject(word) {
           if (!me._inspectLookup) return null;
           const w = word.toLowerCase();
-          // Check tables
           let entry = me._inspectLookup.tables.get(w);
           if (entry) return { ...entry, type: "table" };
-          // Check views
           entry = me._inspectLookup.views.get(w);
           if (entry) return { ...entry, type: "view" };
-          // Check functions
           entry = me._inspectLookup.functions.get(w);
           if (entry) return { ...entry, type: "function" };
           return null;
@@ -667,12 +721,12 @@ export default {
             provideHover: async (model, position) => {
               if (!me.selectedConnectionId || !me._inspectLookup) return null;
 
-              // Lấy full word tại vị trí hover (vd: "sample_data")
+              // Lấy từ tại vị trí hover
               const word = model.getWordAtPosition(position);
               if (!word) return null;
               const objectName = word.word.toLowerCase();
 
-              // Kiểm tra phía trước word có schema prefix không (vd: "tm.")
+              // Kiểm tra phía trước có schema prefix không (vd: "tm.")
               const lineContent = model.getLineContent(position.lineNumber);
               const textBeforeWord = lineContent.substring(
                 0,
@@ -680,6 +734,7 @@ export default {
               );
               const dotMatch = textBeforeWord.match(/([a-zA-Z0-9_]+)\.$/);
 
+              // Nếu có dạng "schema.object" thì tra theo key "schema.object"
               if (dotMatch) {
                 const schemaName = dotMatch[1].toLowerCase();
                 const key = `${schemaName}.${objectName}`;
@@ -688,7 +743,7 @@ export default {
                 return buildHoverContent(obj, objectName);
               }
 
-              // Bare word, không có schema prefix
+              // Không có schema prefix, tra theo tên object
               const obj = findInspectObject(objectName);
               if (!obj) return null;
               return buildHoverContent(obj, objectName);
@@ -697,7 +752,7 @@ export default {
         );
         me.intellisenseDisposable.push(hoverDisposable);
 
-        // Helper build nội dung hover
+        // Helper: tạo nội dung hover tooltip (hiển thị type, schema, arguments của function)
         function buildHoverContent(obj, name) {
           const typeLabel =
             obj.type === "table"
@@ -730,7 +785,9 @@ export default {
     },
 
     /**
-     * Fetch DDL của object từ database
+     * Lấy DDL (câu lệnh CREATE) của một object database
+     * bằng cách gọi template SQL tương ứng với type (table/view/function).
+     * Dùng cho chức năng Inspect Object (F12).
      */
     async fetchObjectDDL(schema, name, type) {
       if (!this.selectedConnectionId) return "-- No connection selected";
@@ -773,18 +830,27 @@ export default {
       }
     },
 
+    /**
+     * Tạo alias tự động từ tên object (table/view/function) dạng viết tắt chữ cái đầu.
+     * Ví dụ: "account_object" -> "ao", "inventory_item" -> "ii".
+     * Nếu alias đã tồn tại trong câu SQL hoặc trùng keyword PostgreSQL, tự động thêm số (ao1, ao2...).
+     */
     _generateUniqueAlias(objectName, sqlText, keywordSet) {
+      // Bỏ qua nếu không có tên object
       if (!objectName) return null;
 
+      // Lấy phần tên cuối cùng (bỏ schema prefix như "sme." nếu có)
       const parts = objectName.split(".");
       const name = parts[parts.length - 1];
 
+      // Tách theo underscore và lấy chữ cái đầu mỗi từ
       const words = name.split("_").filter((w) => w.length > 0);
       if (words.length === 0) return null;
 
       let alias = words.map((w) => w[0]).join("").toLowerCase();
       if (!alias) return null;
 
+      // Thu thập tất cả tên bảng/alias đã dùng trong FROM/JOIN
       const used = new Set();
       const re = /(?:from|join)\s+([a-zA-Z0-9_]+)(?:\.([a-zA-Z0-9_]+))?(?:\s+as)?\s+([a-zA-Z0-9_]+)?/gi;
       let m;
@@ -794,6 +860,7 @@ export default {
         if (m[3]) used.add(m[3].toLowerCase());
       }
 
+      // Nếu alias bị trùng thì thêm số đếm (ao1, ao2, ...)
       let finalAlias = alias;
       let counter = 1;
       while (
@@ -802,7 +869,7 @@ export default {
       ) {
         counter++;
         finalAlias = alias + counter;
-        if (counter > 1000) return alias;
+        if (counter > 1000) return alias; // safety: tránh vòng lặp vô hạn
       }
 
       return finalAlias;
