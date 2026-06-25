@@ -248,7 +248,10 @@ export default {
     },
     updateEditorVal() {
       if (this.editor) {
-        this.editor.setValue(this.modelValue ? this.modelValue : "");
+        const newVal = this.modelValue ? this.modelValue : "";
+        if (this.editor.getValue() !== newVal) {
+          this.editor.setValue(newVal);
+        }
       }
     },
     updateValToEditor() {
