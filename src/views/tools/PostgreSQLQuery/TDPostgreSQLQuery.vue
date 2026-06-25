@@ -73,16 +73,10 @@
           <div class="td-pg-result-error" v-if="queryError">
             {{ queryError }}
           </div>
-          <div
-            class="td-pg-result-empty"
-            v-else-if="!hasQueryResults"
-          >
+          <div class="td-pg-result-empty" v-else-if="!hasQueryResults">
             <TDDynamicBackgroundEffect />
           </div>
-          <div
-            v-else
-            class="flex flex-col td-pg-result-body"
-          >
+          <div v-else class="flex flex-col td-pg-result-body">
             <div
               class="flex td-pg-result-tabs-wrap"
               v-if="hasMultipleResultStatement"
@@ -483,17 +477,17 @@ export default {
        * Cấu hình layout mặc định của tool
        */
       currentConfigLayout: {
-        isShowSidebar: true,               // Hiển thị sidebar
-        enableHighlight: true,             // Bật highlight cú pháp
-        wrapText: false,                    // Không wrap text
+        isShowSidebar: true, // Hiển thị sidebar
+        enableHighlight: true, // Bật highlight cú pháp
+        wrapText: false, // Không wrap text
         showReponse: true,
         splitHorizontal: true,
         currentSidebarOption:
           this.$tdEnum.PostgreSQLQuerySidebarOption.Connection,
-        autoSaveQueryAfterExec: true,      // Tự động lưu query sau khi chạy
-        loadFunctionIntellisense: true,    // Tải intellisense cho function
-        defaultQueryLimit: 1000,           // Giới hạn số dòng mặc định
-        limitResults: true,                // Bật giới hạn kết quả
+        autoSaveQueryAfterExec: true, // Tự động lưu query sau khi chạy
+        loadFunctionIntellisense: true, // Tải intellisense cho function
+        defaultQueryLimit: 1000, // Giới hạn số dòng mặc định
+        limitResults: true, // Bật giới hạn kết quả
         limitResultsBackup: 1000,
       },
       /**
@@ -510,10 +504,10 @@ export default {
 
       // ── Connection ───────────────────────────────────────────────────
       selectedConnectionId: "",
-      allGroups: [],          // Danh sách nhóm connection
-      allConnections: [],     // Danh sách tất cả connection
-      openGroups: {},         // Trạng thái đóng/mở của từng nhóm
-      newGroupName: "",       // Tên nhóm mới khi tạo
+      allGroups: [], // Danh sách nhóm connection
+      allConnections: [], // Danh sách tất cả connection
+      openGroups: {}, // Trạng thái đóng/mở của từng nhóm
+      newGroupName: "", // Tên nhóm mới khi tạo
 
       // ── Saved Queries ────────────────────────────────────────────────
       allSavedQueries: [],
@@ -524,12 +518,12 @@ export default {
       sqlText: "",
 
       // ── Results ──────────────────────────────────────────────────────
-      queryResult: null,      // Tương thích code cũ
-      queryResults: [],       // Danh sách result theo từng statement
-      activeResultIndex: 0,   // Index của result tab đang active
-      queryError: null,       // Lỗi query (nếu có)
-      isRunning: false,       // Đang chạy query
-      isLoading: false,       // Đang tải connections
+      queryResult: null, // Tương thích code cũ
+      queryResults: [], // Danh sách result theo từng statement
+      activeResultIndex: 0, // Index của result tab đang active
+      queryError: null, // Lỗi query (nếu có)
+      isRunning: false, // Đang chạy query
+      isLoading: false, // Đang tải connections
       isLoadingIntellisense: false, // Đang tải intellisense data
 
       // ── Intellisense ─────────────────────────────────────────────────
@@ -707,6 +701,32 @@ export default {
       let me = this;
       return {
         onInit: (editor, monacoInstance) => {
+          // Đăng ký DocumentFormattingEditProvider dùng sql-formatter
+          monacoInstance.languages.registerDocumentFormattingEditProvider(
+            "pgsql",
+            {
+              provideDocumentFormattingEdits(model) {
+                const rawCode = model.getValue();
+                if (!rawCode?.trim()) return [];
+                try {
+                  const formattedCode = sqlFormat(rawCode, {
+                    language: "postgresql",
+                    indent: "  ",
+                    uppercase: true,
+                  });
+                  return [
+                    {
+                      range: model.getFullModelRange(),
+                      text: formattedCode,
+                    },
+                  ];
+                } catch {
+                  return [];
+                }
+              },
+            },
+          );
+
           // Action: chạy query (Alt+Enter hoặc Ctrl+Enter)
           editor.addAction({
             id: "execute-pg-sql",
@@ -714,24 +734,10 @@ export default {
             contextMenuGroupId: "navigation",
             contextMenuOrder: 1.1,
             keybindings: [
-              monacoInstance.KeyMod.Alt | monacoInstance.KeyCode.Enter,
+              monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.Enter,
             ],
             run: () => {
               me.endEditFromEditor(editor, me.handleRunQuery);
-            },
-          });
-
-          // Action: format SQL (Ctrl+U / Cmd+U)
-          editor.addAction({
-            id: "format-pg-sql",
-            label: me.$t("i18nCommon.postgreSQLQuery.formatCode"),
-            contextMenuGroupId: "navigation",
-            contextMenuOrder: 1.2,
-            keybindings: [
-              monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyU,
-            ],
-            run: () => {
-              me.endEditFromEditor(editor, me.handleFormatSQL);
             },
           });
 
@@ -741,9 +747,7 @@ export default {
             label: me.$t("i18nCommon.postgreSQLQuery.dbInspect.inspectObject"),
             contextMenuGroupId: "navigation",
             contextMenuOrder: 1.3,
-            keybindings: [
-              monacoInstance.KeyCode.F12,
-            ],
+            keybindings: [monacoInstance.KeyCode.F12],
             run: async (ed) => {
               const position = ed.getPosition();
               const model = ed.getModel();
@@ -1613,13 +1617,6 @@ export default {
      */
     onTabEnter() {
       let me = this;
-      TDShortcutAction.unregisterByEnum(
-        TDShortcutActionEnum.FormatCodeTextEditor,
-      );
-      TDShortcutAction.register(
-        "formatCodePostgreSQL",
-        me.getConfigFormatCode(),
-      );
       TDShortcutAction.register(
         "executePosgreSQLCode",
         me.getConfigExecuteSQLCode(),
@@ -1635,10 +1632,6 @@ export default {
      */
     onTabLeave() {
       let me = this;
-      TDShortcutAction.registerByEnum(
-        TDShortcutActionEnum.FormatCodeTextEditor,
-      );
-      TDShortcutAction.unregister("formatCodePostgreSQL");
       TDShortcutAction.unregister("executePosgreSQLCode");
       TDShortcutAction.unregister("dllInspect");
       if (me.intellisenseDisposable) {
@@ -1648,28 +1641,14 @@ export default {
     },
 
     /**
-     * Cấu hình shortcut format code (Ctrl+U / Cmd+U)
-     */
-    getConfigFormatCode() {
-      let me = this;
-      let configKeyboard = {
-        sortOrder: 4,
-        key: me.$tdUtility.newGuid(),
-        presentKey: [me.$tdUtility.ctrlKey(), "u"],
-        labelKey: "i18nCommon.shortKeyAction.formatCodeTextEditor",
-      };
-      return configKeyboard;
-    },
-
-    /**
-     * Cấu hình shortcut chạy query (Alt+Enter)
+     * Cấu hình shortcut chạy query (Ctrl+Enter)
      */
     getConfigExecuteSQLCode() {
       let me = this;
       let configKeyboard = {
         sortOrder: 5,
         key: me.$tdUtility.newGuid(),
-        presentKey: [me.$tdUtility.altKey(), me.$tdUtility.enterKey()],
+        presentKey: [me.$tdUtility.ctrlKey(), me.$tdUtility.enterKey()],
         labelKey: "i18nCommon.postgreSQLQuery.runQuery",
       };
       return configKeyboard;
