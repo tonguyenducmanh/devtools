@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strconv"
 	"td_core_service/internal/database"
 	"td_core_service/internal/model"
 
@@ -170,6 +171,25 @@ func decodeTextValue(raw []byte, dataTypeOID uint32) any {
 		return false
 	case pgtype.UUIDOID:
 		return string(raw)
+
+	// Integer types — trả về JSON number
+	case pgtype.Int2OID, pgtype.Int4OID, pgtype.Int8OID:
+		if len(raw) > 0 {
+			if n, err := strconv.ParseInt(string(raw), 10, 64); err == nil {
+				return n
+			}
+		}
+		return string(raw)
+
+	// Floating-point types — trả về JSON number
+	case pgtype.Float4OID, pgtype.Float8OID, pgtype.NumericOID:
+		if len(raw) > 0 {
+			if f, err := strconv.ParseFloat(string(raw), 64); err == nil {
+				return f
+			}
+		}
+		return string(raw)
+
 	default:
 		// Thử decode bằng pgtype — nếu ra slice (array/composite) thì dùng,
 		// còn lại fallback về string giữ nguyên text thô

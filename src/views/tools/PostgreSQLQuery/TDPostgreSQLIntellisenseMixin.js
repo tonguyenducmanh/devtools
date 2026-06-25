@@ -333,8 +333,13 @@ export default {
           return argsStr.split(",").map((segment) => {
             const parts = segment.trim().split(/\s+/);
             const name = parts.length >= 2 ? parts[0] : null;
-            const type =
+            let type =
               parts.length >= 2 ? parts.slice(1).join(" ") : parts[0];
+            // Loại bỏ phần DEFAULT … dư thừa (vd: "date DEFAULT NULL::date" -> "date")
+            const defaultIdx = type.search(/\bDEFAULT\b/i);
+            if (defaultIdx !== -1) {
+              type = type.substring(0, defaultIdx).trim();
+            }
             return { name: name || null, type: type || "" };
           });
         }
@@ -349,9 +354,9 @@ export default {
           const paramLines = args.map((arg) => {
             const ts = tabStop++;
             if (arg.name) {
-              return `  ${arg.name} => \${${ts}:'value'}::${arg.type}`;
+              return `  ${arg.name} => \${${ts}:''}::${arg.type}`;
             }
-            return `  \${${ts}:'value'}::${arg.type}`;
+            return `  \${${ts}:''}::${arg.type}`;
           });
           return `${fnName}(\n` + paramLines.join(",\n") + `\n)`;
         }
@@ -366,9 +371,9 @@ export default {
           const paramLines = args.map((arg) => {
             const ts = tabStop++;
             if (arg.name) {
-              return `  ${arg.name} => \${${ts}:'value'}::${arg.type}`;
+              return `  ${arg.name} => \${${ts}:''}::${arg.type}`;
             }
-            return `  \${${ts}:'value'}::${arg.type}`;
+            return `  \${${ts}:''}::${arg.type}`;
           });
           return `${schema}.${fnName}(\n` + paramLines.join(",\n") + `\n)`;
         }

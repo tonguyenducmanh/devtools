@@ -75,12 +75,12 @@
           </div>
           <div
             class="td-pg-result-empty"
-            v-if="!hasQueryResults && !queryError"
+            v-else-if="!hasQueryResults"
           >
             <TDDynamicBackgroundEffect />
           </div>
           <div
-            v-else-if="hasQueryResults"
+            v-else
             class="flex flex-col td-pg-result-body"
           >
             <div
@@ -1082,7 +1082,7 @@ export default {
       let labelTab = null;
       try {
         if (!result) {
-          `${index + 1} result`;
+          return `${index + 1} result`;
         }
         if (result.is_select) {
           let tableName = result.table_names?.find((x) => !!x);
@@ -1316,6 +1316,7 @@ export default {
         me.queryResult = normalizedResults[0] || null;
 
         if (!response?.data?.success) {
+          me.resetQueryResults();
           me.queryError =
             response?.data?.message ?? me.$t("i18nCommon.toastMessage.error");
         }
