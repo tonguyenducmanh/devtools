@@ -84,16 +84,34 @@ WITH
           con.conrelid = c.oid
           AND con.conindid = i.indexrelid
       )
+  ),
+  trigger_def AS (
+    SELECT
+      string_agg(
+        'DROP TRIGGER IF EXISTS ' || quote_ident(tg.tgname) || ' ON ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ';' || E'\n' ||
+        pg_get_triggerdef(tg.oid) || ';',
+        E'\n\n'
+      ) AS trg_def
+    FROM
+      pg_trigger tg
+      JOIN pg_class c ON tg.tgrelid = c.oid
+      JOIN pg_namespace n ON c.relnamespace = n.oid
+    WHERE
+      n.nspname = '{schema}'
+      AND c.relname = '{name}'
+      AND NOT tg.tgisinternal
   )
 SELECT
   (
     SELECT
+      '-- Create table script' || E'\n' ||
       def
     FROM
       table_def
   ) || COALESCE(
     E'\n\n' || (
       SELECT
+        '-- Constraint scripts' || E'\n' ||
         cons_def
       FROM
         constraint_def
@@ -104,11 +122,23 @@ SELECT
   ) || COALESCE(
     E'\n\n' || (
       SELECT
+        '-- Index scripts' || E'\n' ||
         idx_def
       FROM
         index_def
       WHERE
         idx_def IS NOT NULL
+    ),
+    ''
+  ) || COALESCE(
+    E'\n\n' || (
+      SELECT
+        '-- Trigger scripts' || E'\n' ||
+        trg_def
+      FROM
+        trigger_def
+      WHERE
+        trg_def IS NOT NULL
     ),
     ''
   ) AS ddl

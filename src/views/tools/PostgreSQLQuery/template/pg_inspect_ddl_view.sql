@@ -1,4 +1,5 @@
 SELECT
+  '-- Create view script' || E'\n' ||
   CASE
     WHEN c.relkind = 'm' THEN 'DROP MATERIALIZED VIEW IF EXISTS '
     ELSE 'DROP VIEW IF EXISTS '

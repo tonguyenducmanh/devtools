@@ -8,6 +8,62 @@
   >
     <div class="flex flex-col td-pg-inspect-popup">
       <div class="flex td-inspect-search-bar">
+        <div
+          class="td-history-btn-wrap"
+          @mouseenter="cancelBackClose(); showBackFlyout = true"
+          @mouseleave="scheduleBackClose()"
+        >
+          <TDButton
+            :noMargin="true"
+            iconClass="td-undo-icon"
+            :class="historyPointer <= 0 ? 'td-toolbar-btn-disabled' : ''"
+            @click="handleBack"
+            v-tooltip="backTooltip"
+          />
+          <div
+            v-if="showBackFlyout && backHistory.length > 0"
+            class="td-flyout-panel td-history-flyout"
+            @mouseenter="cancelBackClose()"
+            @mouseleave="scheduleBackClose()"
+          >
+            <div
+              v-for="item in backHistory"
+              :key="item.index"
+              class="td-flyout-item"
+              @click="goToHistoryEntry(item.index)"
+            >
+              <span>{{ entryLabel(item.entry) }}</span>
+            </div>
+          </div>
+        </div>
+        <div
+          class="td-history-btn-wrap"
+          @mouseenter="cancelNextClose(); showNextFlyout = true"
+          @mouseleave="scheduleNextClose()"
+        >
+          <TDButton
+            :noMargin="true"
+            iconClass="td-redo-icon"
+            :class="historyPointer >= sessionHistory.length - 1 ? 'td-toolbar-btn-disabled' : ''"
+            @click="handleNext"
+            v-tooltip="nextTooltip"
+          />
+          <div
+            v-if="showNextFlyout && nextHistory.length > 0"
+            class="td-flyout-panel td-history-flyout"
+            @mouseenter="cancelNextClose()"
+            @mouseleave="scheduleNextClose()"
+          >
+            <div
+              v-for="item in nextHistory"
+              :key="item.index"
+              class="td-flyout-item"
+              @click="goToHistoryEntry(item.index)"
+            >
+              <span>{{ entryLabel(item.entry) }}</span>
+            </div>
+          </div>
+        </div>
         <TDComboBox
           :width="150"
           v-model="searchType"
@@ -96,12 +152,14 @@
             </div>
             <TDTextarea
               v-else
+              ref="ddlEditor"
               v-model="ddlContent"
               language="pgsql"
               :enableHighlight="true"
               :wrapText="true"
               :isLabelTop="false"
               :readOnly="true"
+              :monacoOptions="ddlMonacoOptions"
             />
           </div>
         </template>
@@ -167,6 +225,14 @@ export default {
       ],
 
       agentAPI: null,
+
+      sessionHistory: [],
+      historyPointer: -1,
+      _isHistoryNav: false,
+      showBackFlyout: false,
+      showNextFlyout: false,
+      backCloseTimer: null,
+      nextCloseTimer: null,
     };
   },
 
@@ -191,6 +257,71 @@ export default {
       let style = { width: `${me.responseSectionSize}%` };
       return style;
     },
+    backHistory() {
+      let items = [];
+      for (let i = this.historyPointer - 1; i >= 0; i--) {
+        items.push({ index: i, entry: this.sessionHistory[i] });
+      }
+      return items;
+    },
+    nextHistory() {
+      let items = [];
+      for (let i = this.historyPointer + 1; i < this.sessionHistory.length; i++) {
+        items.push({ index: i, entry: this.sessionHistory[i] });
+      }
+      return items;
+    },
+    backTooltip() {
+      if (this.historyPointer <= 0) return "";
+      let entry = this.sessionHistory[this.historyPointer - 1];
+      return this.entryLabel(entry);
+    },
+    nextTooltip() {
+      if (this.historyPointer >= this.sessionHistory.length - 1) return "";
+      let entry = this.sessionHistory[this.historyPointer + 1];
+      return this.entryLabel(entry);
+    },
+    ddlMonacoOptions() {
+      let me = this;
+      return {
+        onInit: (editor, monacoInstance) => {
+          editor.addAction({
+            id: "inspect-pg-object-ddl",
+            label: me.$t("i18nCommon.postgreSQLQuery.dbInspect.inspectObject"),
+            contextMenuGroupId: "navigation",
+            contextMenuOrder: 1.3,
+            keybindings: [monacoInstance.KeyCode.F12],
+            run: async (ed) => {
+              const position = ed.getPosition();
+              const model = ed.getModel();
+              if (!position || !model) return;
+
+              const word = model.getWordAtPosition(position);
+              if (!word) {
+                me.$tdToast.warning(
+                  me.$t("i18nCommon.postgreSQLQuery.dbInspect.noObjectSelected"),
+                );
+                return;
+              }
+              let objectName = word.word;
+              let schemaName = "";
+
+              const lineContent = model.getLineContent(position.lineNumber);
+              const textBeforeWord = lineContent.substring(
+                0,
+                word.startColumn - 1,
+              );
+              const dotMatch = textBeforeWord.match(/([a-zA-Z0-9_]+)\.$/);
+              if (dotMatch) {
+                schemaName = dotMatch[1];
+              }
+
+              await me.navigateToObject(objectName, schemaName);
+            },
+          });
+        },
+      };
+    },
   },
   methods: {
     handleResize(sizes) {
@@ -204,6 +335,8 @@ export default {
       this.ddlContent = "";
       this.activeIndex = -1;
       this.searchError = "";
+      this.sessionHistory = [];
+      this.historyPointer = -1;
 
       // Hỗ trợ pre-fill từ context menu inspect
       if (param?.preSearchType) {
@@ -316,7 +449,8 @@ export default {
         .replace(/{oid}/g, oid);
     },
 
-    async handleSearch() {
+    async handleSearch(targetIndex = 0) {
+      if (typeof targetIndex !== "number") targetIndex = 0;
       if (!this.connectionId) {
         this.$tdToast.warning(
           this.$t("i18nCommon.postgreSQLQuery.noConnectionSelected"),
@@ -338,9 +472,12 @@ export default {
 
         if (resp?.data?.success && result?.rows?.length > 0) {
           this.results = result.rows;
-          // Tự động chọn item đầu tiên khi có kết quả
+          let idx = Math.min(targetIndex, result.rows.length - 1);
           this.$nextTick(() => {
-            this.selectItem(0);
+            this.selectItem(idx, true);
+            if (!this._isHistoryNav) {
+              this.pushHistory();
+            }
           });
         } else {
           this.searchError =
@@ -356,7 +493,7 @@ export default {
       }
     },
 
-    async selectItem(idx) {
+    async selectItem(idx, skipHistory = false) {
       this.activeIndex = idx;
       let item = this.results[idx];
       if (!item) return;
@@ -387,10 +524,175 @@ export default {
           this.$t("i18nCommon.postgreSQLQuery.dbInspect.ddlErrorFallback");
       } finally {
         this.isLoadingDDL = false;
+        if (!skipHistory && !this._isHistoryNav) {
+          this.pushHistory();
+        }
       }
     },
     buildNameResult(item) {
       return `${item.schema_name}.${item.object_name}`;
+    },
+
+    pushHistory() {
+      if (this.historyPointer < this.sessionHistory.length - 1) {
+        this.sessionHistory = this.sessionHistory.slice(
+          0,
+          this.historyPointer + 1,
+        );
+      }
+      let newEntry = {
+        searchType: this.searchType,
+        searchSchema: this.searchSchema,
+        searchValue: this.searchValue,
+        activeIndex: this.activeIndex,
+      };
+      let lastEntry =
+        this.sessionHistory[this.sessionHistory.length - 1];
+      if (
+        lastEntry &&
+        lastEntry.searchType === newEntry.searchType &&
+        lastEntry.searchSchema === newEntry.searchSchema &&
+        lastEntry.searchValue === newEntry.searchValue &&
+        lastEntry.activeIndex === newEntry.activeIndex
+      ) {
+        return;
+      }
+      this.sessionHistory.push(newEntry);
+      this.historyPointer = this.sessionHistory.length - 1;
+    },
+
+    handleBack() {
+      if (this.historyPointer <= 0) return;
+      this.historyPointer--;
+      this._isHistoryNav = true;
+      this.restoreHistoryEntry(this.sessionHistory[this.historyPointer]);
+    },
+
+    handleNext() {
+      if (this.historyPointer >= this.sessionHistory.length - 1) return;
+      this.historyPointer++;
+      this._isHistoryNav = true;
+      this.restoreHistoryEntry(this.sessionHistory[this.historyPointer]);
+    },
+
+    restoreHistoryEntry(entry) {
+      this.searchType = entry.searchType;
+      this.searchSchema = entry.searchSchema;
+      this.searchValue = entry.searchValue;
+      let targetIdx = entry.activeIndex;
+      this.handleSearch(targetIdx).finally(() => {
+        this._isHistoryNav = false;
+      });
+    },
+
+    async navigateToObject(objectName, schemaName) {
+      this.pushHistory();
+
+      let foundType = null;
+      let foundIdx = -1;
+      let foundResults = null;
+      let savedType = this.searchType;
+      let savedValue = this.searchValue;
+      let savedSchema = this.searchSchema;
+
+      this.searchValue = objectName;
+      this.searchSchema = schemaName || "";
+
+      for (const type of ["table", "view", "function"]) {
+        this.searchType = type;
+        let sql = this.buildSearchSQL();
+        if (!sql) { this.searchType = savedType; continue; }
+        try {
+          let resp = await this.agentAPI.executeQuery(this.connectionId, sql);
+          let result =
+            resp?.data?.data?.results?.[0] || resp?.data?.data || null;
+          if (resp?.data?.success && result?.rows?.length > 0) {
+            let idx = result.rows.findIndex((r) => {
+              let objName =
+                type === "function"
+                  ? r.object_name.split("(")[0]
+                  : r.object_name;
+              return (
+                objName.toLowerCase() === objectName.toLowerCase() &&
+                (!schemaName ||
+                  r.schema_name.toLowerCase() === schemaName.toLowerCase())
+              );
+            });
+            if (idx >= 0) {
+              foundType = type;
+              foundIdx = idx;
+              foundResults = result.rows;
+              break;
+            }
+          }
+        } catch (e) {
+          // try next type
+        } finally {
+          this.searchType = savedType;
+        }
+      }
+
+      if (foundType && foundResults) {
+        this.searchType = foundType;
+        if (schemaName) this.searchSchema = schemaName;
+        this.searchValue = objectName;
+        this.results = foundResults;
+        this.$nextTick(() => {
+          this.selectItem(foundIdx, true);
+          this.pushHistory();
+        });
+      } else {
+        this.sessionHistory.pop();
+        this.historyPointer = this.sessionHistory.length - 1;
+        this.searchType = savedType;
+        this.searchValue = savedValue;
+        this.searchSchema = savedSchema;
+        this.$tdToast.warning(
+          this.$t("i18nCommon.postgreSQLQuery.dbInspect.objectNotFound"),
+        );
+      }
+    },
+
+    entryLabel(entry) {
+      let typeLabel =
+        this.$t(
+          `i18nCommon.postgreSQLQuery.dbInspect.${entry.searchType}`,
+        ) || entry.searchType;
+      let name = entry.searchValue || "";
+      if (!name)
+        return (
+          this.$t("i18nCommon.postgreSQLQuery.dbInspect.viewAll") +
+          " " +
+          typeLabel
+        );
+      if (entry.searchSchema) name = entry.searchSchema + "." + name;
+      return typeLabel + ": " + name;
+    },
+
+    goToHistoryEntry(index) {
+      if (index < 0 || index >= this.sessionHistory.length) return;
+      this.showBackFlyout = false;
+      this.showNextFlyout = false;
+      this.historyPointer = index;
+      this._isHistoryNav = true;
+      this.restoreHistoryEntry(this.sessionHistory[index]);
+    },
+
+    cancelBackClose() {
+      clearTimeout(this.backCloseTimer);
+    },
+    scheduleBackClose() {
+      this.backCloseTimer = setTimeout(() => {
+        this.showBackFlyout = false;
+      }, 200);
+    },
+    cancelNextClose() {
+      clearTimeout(this.nextCloseTimer);
+    },
+    scheduleNextClose() {
+      this.nextCloseTimer = setTimeout(() => {
+        this.showNextFlyout = false;
+      }, 200);
     },
   },
 };
@@ -460,5 +762,20 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.td-history-btn-wrap {
+  position: relative;
+}
+
+.td-history-flyout {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
+  min-width: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 4px;
 }
 </style>

@@ -892,6 +892,10 @@ export default {
         inspectObject: "Inspect Object DDL",
         inspectHint: "Right-click → Inspect DDL",
         noObjectSelected: "No object name found at cursor",
+        objectNotFound: "Object not found",
+        back: "Back",
+        forward: "Forward",
+        viewAll: "View all",
       },
       dbList: {
         title: "Database List",

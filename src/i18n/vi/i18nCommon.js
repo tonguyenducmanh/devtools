@@ -888,6 +888,10 @@ export default {
         inspectObject: "Xem DDL Object",
         inspectHint: "Chuột phải → Xem DDL",
         noObjectSelected: "Không tìm thấy tên object tại vị trí con trỏ",
+        objectNotFound: "Không tìm thấy object",
+        back: "Quay lại",
+        forward: "Tiến tới",
+        viewAll: "Xem tất cả",
       },
       dbList: {
         title: "Danh sách Database",
