@@ -15,7 +15,7 @@ namespace TDTools
     }
 
     /// <summary>
-    /// Class biểu diễn dữ liệu đầu vào cho hàm CosinSimilarity
+    /// Class biểu diễn dữ liệu đầu vào cho hàm đọc connection gửi từ UI lên
     /// (Đã bỏ kế thừa từ JsonSerializerContext vì đây là class chứa dữ liệu)
     /// </summary>
     public class TDPosgreSQLCnonectionString
