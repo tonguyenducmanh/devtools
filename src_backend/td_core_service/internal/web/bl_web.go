@@ -68,17 +68,18 @@ func openBrowser(url string) {
 
 // log folder được dùng để run static web
 func logDirectory(publicFS fs.FS) {
-	td_common.LogDebug("Embedded web files:")
-	fs.WalkDir(publicFS, ".", func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		// chỉ log file, không log folder
-		if !d.IsDir() {
-			td_common.LogDebug(path)
-		}
-		return nil
-	})
+	// khi nào cần thì mở log lại, giờ không cần nữa
+	// td_common.LogDebug("Embedded web files:")
+	// fs.WalkDir(publicFS, ".", func(path string, d fs.DirEntry, err error) error {
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	// chỉ log file, không log folder
+	// 	if !d.IsDir() {
+	// 		td_common.LogDebug(path)
+	// 	}
+	// 	return nil
+	// })
 }
 
 /**
