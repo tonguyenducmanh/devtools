@@ -354,9 +354,9 @@ export default {
           const paramLines = args.map((arg) => {
             const ts = tabStop++;
             if (arg.name) {
-              return `  ${arg.name} => \${${ts}:''}::${arg.type}`;
+              return `  ${arg.name} => '\${${ts}}'::${arg.type}`;
             }
-            return `  \${${ts}:''}::${arg.type}`;
+            return `  '\${${ts}}'::${arg.type}`;
           });
           return `${fnName}(\n` + paramLines.join(",\n") + `\n)`;
         }
@@ -371,9 +371,9 @@ export default {
           const paramLines = args.map((arg) => {
             const ts = tabStop++;
             if (arg.name) {
-              return `  ${arg.name} => \${${ts}:''}::${arg.type}`;
+              return `  ${arg.name} => '\${${ts}}'::${arg.type}`;
             }
-            return `  \${${ts}:''}::${arg.type}`;
+            return `  '\${${ts}}'::${arg.type}`;
           });
           return `${schema}.${fnName}(\n` + paramLines.join(",\n") + `\n)`;
         }
@@ -597,7 +597,7 @@ export default {
                       label: tbl,
                       kind: monaco.languages.CompletionItemKind.Module,
                       filterText: `${prefix}.${tbl}`,
-                      insertText: alias ? `${prefix}.${tbl} ${alias}` : `${prefix}.${tbl}`,
+                      insertText: alias ? `${prefix}.${tbl} ${alias} ` : `${prefix}.${tbl}`,
                       detail: `Table (${prefix})`,
                     });
                   });
@@ -608,7 +608,7 @@ export default {
                     suggestions.push({
                       ...fnItem,
                       filterText: `${prefix}.${fnItem.label}`,
-                      insertText: alias ? `${fnItem.fullInsertText} ${alias}` : fnItem.fullInsertText,
+                      insertText: alias ? `${fnItem.fullInsertText} ${alias} ` : fnItem.fullInsertText,
                       insertTextRules:
                         monaco.languages.CompletionItemInsertTextRule
                           .InsertAsSnippet,
@@ -637,7 +637,7 @@ export default {
                   suggestions.push({
                     label: tbl,
                     kind: monaco.languages.CompletionItemKind.Module,
-                    insertText: alias ? `${tbl} ${alias}` : tbl,
+                    insertText: alias ? `${tbl} ${alias} ` : tbl,
                     detail: "Table",
                   });
                 });
@@ -646,7 +646,7 @@ export default {
                 suggestions.push(
                   ...functionSuggestions.map((fnItem) => {
                     const alias = me._generateUniqueAlias(fnItem.label, text, me._pgKeywordSet);
-                    return alias ? { ...fnItem, insertText: `${fnItem.insertText} ${alias}` } : fnItem;
+                    return alias ? { ...fnItem, insertText: `${fnItem.insertText} ${alias} ` } : fnItem;
                   }),
                 );
 
