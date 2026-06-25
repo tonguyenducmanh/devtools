@@ -25,7 +25,10 @@ WITH
             AND con.contype = 'p'
         ),
         ''
-      ) || E'\n);' AS def
+      ) || E'\n)' || COALESCE(
+        E'\nWITH (' || array_to_string(c.reloptions, ', ') || ')',
+        ''
+      ) || ';' AS def
     FROM
       pg_class c
       JOIN pg_namespace n ON c.relnamespace = n.oid
@@ -38,7 +41,8 @@ WITH
       AND NOT a.attisdropped
     GROUP BY
       n.nspname,
-      c.relname
+      c.relname,
+      c.reloptions
   ),
   constraint_def AS (
     SELECT
@@ -100,6 +104,59 @@ WITH
       n.nspname = '{schema}'
       AND c.relname = '{name}'
       AND NOT tg.tgisinternal
+  ),
+  sequence_def AS (
+    SELECT
+      string_agg(
+        'CREATE SEQUENCE IF NOT EXISTS ' || quote_ident(n.nspname) || '.' || quote_ident(s.relname) ||
+        ' AS ' || format_type(a.atttypid, a.atttypmod) ||
+        ' START WITH ' || COALESCE(sq.seqstart, 1)::text ||
+        ' INCREMENT BY ' || COALESCE(sq.seqincrement, 1)::text ||
+        CASE WHEN sq.seqcycle THEN ' CYCLE' ELSE ' NO CYCLE' END || ';' || E'\n' ||
+        'ALTER SEQUENCE ' || quote_ident(n.nspname) || '.' || quote_ident(s.relname) ||
+        ' OWNED BY ' || quote_ident(tn.nspname) || '.' || quote_ident(t.relname) || '.' || quote_ident(a.attname) || ';',
+        E'\n\n'
+      ) AS seq_def
+    FROM
+      pg_class s
+      JOIN pg_namespace n ON s.relnamespace = n.oid
+      JOIN pg_depend d ON d.objid = s.oid AND d.deptype = 'a'
+      JOIN pg_class t ON d.refobjid = t.oid
+      JOIN pg_namespace tn ON t.relnamespace = tn.oid
+      JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = d.refobjsubid
+      LEFT JOIN pg_sequence sq ON sq.seqrelid = s.oid
+    WHERE
+      tn.nspname = '{schema}'
+      AND t.relname = '{name}'
+      AND s.relkind = 'S'
+  ),
+  comment_def AS (
+    SELECT
+      string_agg(
+        'COMMENT ON ' || com_type || ' ' || com_object || ' IS ' || quote_literal(com_text) || ';',
+        E'\n\n'
+      ) AS comm_def
+    FROM (
+      SELECT
+        'TABLE' AS com_type,
+        quote_ident(n.nspname) || '.' || quote_ident(c.relname) AS com_object,
+        pg_catalog.obj_description(c.oid, 'pg_class') AS com_text
+      FROM pg_class c
+      JOIN pg_namespace n ON c.relnamespace = n.oid
+      WHERE n.nspname = '{schema}' AND c.relname = '{name}'
+        AND pg_catalog.obj_description(c.oid, 'pg_class') IS NOT NULL
+      UNION ALL
+      SELECT
+        'COLUMN' AS com_type,
+        quote_ident(n.nspname) || '.' || quote_ident(c.relname) || '.' || quote_ident(a.attname) AS com_object,
+        pg_catalog.col_description(a.attrelid, a.attnum) AS com_text
+      FROM pg_class c
+      JOIN pg_namespace n ON c.relnamespace = n.oid
+      JOIN pg_attribute a ON a.attrelid = c.oid
+      WHERE n.nspname = '{schema}' AND c.relname = '{name}'
+        AND a.attnum > 0 AND NOT a.attisdropped
+        AND pg_catalog.col_description(a.attrelid, a.attnum) IS NOT NULL
+    ) comments
   )
 SELECT
   (
@@ -139,6 +196,28 @@ SELECT
         trigger_def
       WHERE
         trg_def IS NOT NULL
+    ),
+    ''
+  ) || COALESCE(
+    E'\n\n' || (
+      SELECT
+        '-- Sequence scripts' || E'\n' ||
+        seq_def
+      FROM
+        sequence_def
+      WHERE
+        seq_def IS NOT NULL
+    ),
+    ''
+  ) || COALESCE(
+    E'\n\n' || (
+      SELECT
+        '-- Comment scripts' || E'\n' ||
+        comm_def
+      FROM
+        comment_def
+      WHERE
+        comm_def IS NOT NULL
     ),
     ''
   ) AS ddl

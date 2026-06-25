@@ -540,10 +540,11 @@ export default {
           this.historyPointer + 1,
         );
       }
+      let item = this.results?.[this.activeIndex];
       let newEntry = {
         searchType: this.searchType,
-        searchSchema: this.searchSchema,
-        searchValue: this.searchValue,
+        searchSchema: item ? (item.schema_name || "") : this.searchSchema,
+        searchValue: item ? (item.object_name || "") : this.searchValue,
         activeIndex: this.activeIndex,
       };
       let lastEntry =
