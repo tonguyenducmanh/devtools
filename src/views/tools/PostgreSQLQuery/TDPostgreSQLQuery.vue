@@ -433,6 +433,7 @@ import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDCache from "@/common/cache/TDCache.js";
 import pgQueries from "./templates.js";
 import TDPostgreSQLIntellisenseMixin from "./TDPostgreSQLIntellisenseMixin.js";
+import { registerPgsqlFormatProvider } from "@/components/monarch/pgsqlFormatProvider.js";
 import TDShortcutAction, {
   TDShortcutActionEnum,
 } from "@/common/TDShortcutAction.js";
@@ -701,31 +702,7 @@ export default {
       let me = this;
       return {
         onInit: (editor, monacoInstance) => {
-          // Đăng ký DocumentFormattingEditProvider dùng sql-formatter
-          monacoInstance.languages.registerDocumentFormattingEditProvider(
-            "pgsql",
-            {
-              provideDocumentFormattingEdits(model) {
-                const rawCode = model.getValue();
-                if (!rawCode?.trim()) return [];
-                try {
-                  const formattedCode = sqlFormat(rawCode, {
-                    language: "postgresql",
-                    indent: "  ",
-                    uppercase: true,
-                  });
-                  return [
-                    {
-                      range: model.getFullModelRange(),
-                      text: formattedCode,
-                    },
-                  ];
-                } catch {
-                  return [];
-                }
-              },
-            },
-          );
+          registerPgsqlFormatProvider(monacoInstance);
 
           // Action: chạy query (Alt+Enter hoặc Ctrl+Enter)
           editor.addAction({

@@ -9,6 +9,7 @@
         :enableHighlight="currentConfigLayout.enableHighlight"
         :language="currentConfigLayout.language"
         :wrapText="currentConfigLayout.wrapText"
+        :monacoOptions="monacoOptions"
       ></TDTextarea>
     </div>
     <div class="flex tool-footer">
@@ -44,6 +45,7 @@
   </div>
 </template>
 <script>
+import { registerPgsqlFormatProvider } from "@/components/monarch/pgsqlFormatProvider.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
   extends: TDToolBase,
@@ -86,6 +88,15 @@ export default {
       if (oldVal != newVal) {
         this.reBuildTabTitle(this.content);
       }
+    },
+  },
+  computed: {
+    monacoOptions() {
+      return {
+        onInit: (editor, monacoInstance) => {
+          registerPgsqlFormatProvider(monacoInstance);
+        },
+      };
     },
   },
   methods: {
