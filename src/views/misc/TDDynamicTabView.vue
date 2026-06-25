@@ -91,7 +91,6 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
     <div class="td-tab-content">
       <!-- Tab mode: render sẵn tất cả bằng v-show -->
       <template v-if="isTabMode">
-        <Transition name="td-tab-switch" mode="out-in">
           <KeepAlive>
             <component
               v-if="activeTab"
@@ -103,7 +102,6 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
               @updateTabTitle="(payload) => onTabTitleUpdate(payload)"
             />
           </KeepAlive>
-        </Transition>
       </template>
 
       <!-- zero tabs mode: show Welcome -->
@@ -681,32 +679,6 @@ export default {
     opacity: 1 !important;
   }
   transform: scale(1.15);
-}
-.td-tab-switch-enter-active,
-.td-tab-switch-leave-active {
-  transition:
-    opacity 0.18s ease,
-    transform 0.18s ease;
-}
-
-.td-tab-switch-enter-from {
-  opacity: 0;
-  transform: translateY(-6px);
-}
-
-.td-tab-switch-enter-to {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.td-tab-switch-leave-from {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.td-tab-switch-leave-to {
-  opacity: 0;
-  transform: translateY(6px);
 }
 /* ── Exit button ── */
 .td-tab-exit-btn {
