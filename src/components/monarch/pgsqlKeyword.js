@@ -1,6 +1,27 @@
 /**
  * file tổng hợp toàn bộ các keyword mà postgresql có để hightlight
  */
+
+// cấu hình màu sắc của chủ đề darrk mode
+export const DARK_THEME_RULES = [
+  { token: "namespace", foreground: "66d9ef" },
+  { token: "variable", foreground: "f8c555" },
+  { token: "type", foreground: "66d9ef" },
+  { token: "function", foreground: "a6e22e" },
+  { token: "property", foreground: "fd971f" },
+  { token: "string.sql", foreground: "e6db74" },
+];
+
+// cấu hình màu sắc của chủ đề light mode
+export const LIGHT_THEME_RULES = [
+  { token: "namespace", foreground: "2674b8" },
+  { token: "variable", foreground: "c04e01" },
+  { token: "type", foreground: "2674b8" },
+  { token: "function", foreground: "50a14f" },
+  { token: "property", foreground: "d9730d" },
+  { token: "string.sql", foreground: "8b7500" },
+];
+
 // danh sách các keyword build in mà mọi phiên bản PostgreSQL đều có
 export const BUILTIN_KEYWORDS = [
   "SELECT",
@@ -357,6 +378,7 @@ export const BUILTIN_KEYWORDS = [
   "GENERATED",
   "ALWAYS",
 ];
+
 // danh sách các object mặc định ở trong PostgreSQL
 export const BUILTIN_OBJECT_KEYWORDS = [
   "TABLE",
@@ -389,6 +411,7 @@ export const BUILTIN_OBJECT_KEYWORDS = [
   "WINDOW",
   "MATERIALIZED",
 ];
+
 // danh sách type mặc định ở trong PostgreSQL
 export const BUILTIN_TYPE_KEYWORDS = [
   "INTEGER",

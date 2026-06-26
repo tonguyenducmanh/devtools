@@ -9,27 +9,9 @@ import {
   BUILTIN_KEYWORDS,
   BUILTIN_TYPE_KEYWORDS,
   BUILTIN_OBJECT_KEYWORDS,
+  DARK_THEME_RULES,
+  LIGHT_THEME_RULES,
 } from "./pgsqlKeyword.js";
-
-// cấu hình màu sắc của chủ đề darrk mode
-const DARK_THEME_RULES = [
-  { token: "namespace", foreground: "66d9ef" },
-  { token: "variable", foreground: "f8c555" },
-  { token: "type", foreground: "66d9ef" },
-  { token: "function", foreground: "a6e22e" },
-  { token: "property", foreground: "fd971f" },
-  { token: "string.sql", foreground: "e6db74" },
-];
-
-// cấu hình màu sắc của chủ đề light mode
-const LIGHT_THEME_RULES = [
-  { token: "namespace", foreground: "2674b8" },
-  { token: "variable", foreground: "c04e01" },
-  { token: "type", foreground: "2674b8" },
-  { token: "function", foreground: "50a14f" },
-  { token: "property", foreground: "d9730d" },
-  { token: "string.sql", foreground: "8b7500" },
-];
 
 /**
  * Lấy ra rule theme tương ứng
