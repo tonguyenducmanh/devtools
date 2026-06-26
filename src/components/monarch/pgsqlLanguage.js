@@ -9,19 +9,8 @@ import {
   BUILTIN_KEYWORDS,
   BUILTIN_TYPE_KEYWORDS,
   BUILTIN_OBJECT_KEYWORDS,
-  DARK_THEME_RULES,
-  LIGHT_THEME_RULES,
   SEMANTIC_LEGEND,
 } from "./pgsqlKeyword.js";
-
-/**
- * Lấy ra rule theme tương ứng
- * @param {Boolean} isDark có phải chế độ dark mode không
- * @returns bộ rule theme tương ứng
- */
-export function getPgsqlThemeRules(isDark) {
-  return isDark ? DARK_THEME_RULES : LIGHT_THEME_RULES;
-}
 
 // các biến lưu lại thông tin được
 // toàn bộ schema ứng với database hiện tại

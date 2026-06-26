@@ -52,7 +52,12 @@
 <script>
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
 import * as monaco from "monaco-editor";
-import { getPgsqlThemeRules } from "@/components/monarch/pgsqlLanguage.js";
+import {
+  registerAllMonacoThemes,
+  getMonacoSyntaxRules,
+} from "@/components/monarch/TDMonacoTheme.js";
+import { IQuickInputService } from "monaco-editor/esm/vs/platform/quickinput/common/quickInput.js";
+import { StandaloneServices } from "monaco-editor/esm/vs/editor/standalone/browser/standaloneServices.js";
 import _ from "@/common/TDCommonFunction.js";
 
 export default {
@@ -146,6 +151,7 @@ export default {
   data() {
     return {
       value: null,
+      monacoThemeName: null,
     };
   },
   watch: {
@@ -207,12 +213,29 @@ export default {
     getRuleThemeMonacoEditorByLanguage() {
       let me = this;
       let rules = [];
-      let isDarkTheme = me.currentTheme == me.$tdEnum.theme.dark;
-      // riêng language PostgreSQL thì custom lại 1 số quy tắc theme do monaco editor mặc định chưa support
-      if (me.language === "pgsql") {
-        rules = getPgsqlThemeRules(isDarkTheme);
+      if (me.language === "pgsql" && me.monacoThemeName) {
+        rules = getMonacoSyntaxRules(me.monacoThemeName);
       }
       return rules;
+    },
+
+    /**
+     * lấy theme mặc định dựa theo app theme
+     */
+    getDefaultMonacoTheme() {
+      return this.currentTheme == this.$tdEnum.theme.dark ? "vs-dark" : "vs";
+    },
+
+    /**
+     * áp dụng theme monaco và lưu vào cache
+     */
+    async selectMonacoTheme(themeName) {
+      let me = this;
+      me.monacoThemeName = themeName;
+      if (me.editor) {
+        monaco.editor.setTheme(themeName);
+      }
+      await me.$tdUtility.setMonacoTheme(themeName);
     },
 
     /**
@@ -224,17 +247,15 @@ export default {
       if (me.enableHighlight) {
         me.currentTheme = await me.$tdUtility.getUserSettings("theme");
         monaco.languages.register({ id: me.language });
-        let isDarkTheme = me.currentTheme == me.$tdEnum.theme.dark;
-        let myThemeName = "my-theme";
-        monaco.editor.defineTheme(myThemeName, {
-          base: isDarkTheme ? "vs-dark" : "vs",
-          inherit: true,
-          rules: me.getRuleThemeMonacoEditorByLanguage(),
-          colors: {
-            "editor.background": isDarkTheme ? "#252525" : "#f6f6f7",
-          },
-        });
-        monaco.editor.setTheme(myThemeName);
+
+        // đăng ký toàn bộ theme monaco một lần
+        registerAllMonacoThemes(monaco);
+
+        // load theme từ cache, nếu null thì dùng default theo app theme
+        let cachedTheme = await me.$tdUtility.getMonacoTheme();
+        me.monacoThemeName = cachedTheme || me.getDefaultMonacoTheme();
+        monaco.editor.setTheme(me.monacoThemeName);
+
         me.editorModel = monaco.editor.createModel(
           me.getDefaultModelValueForEditor(),
           me.language,
@@ -242,7 +263,7 @@ export default {
         let configObject = {
           model: me.editorModel,
           language: me.language,
-          theme: myThemeName,
+          theme: me.monacoThemeName,
           fontSize: 16,
           fontFamily:
             'ui-monospace, "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
@@ -256,11 +277,59 @@ export default {
           configObject.wrappingIndent = "none";
         }
         me.editor = monaco.editor.create(me.$refs.textareaWrap, configObject);
+
+        // đăng ký command đổi theme (context menu + keyboard)
+        me.editor.addAction({
+          id: "td-change-monaco-theme",
+          label: me.$t("i18nCommon.changeMonacoTheme"),
+          contextMenuGroupId: "change_theme",
+          contextMenuOrder: 1,
+          keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
+          run: function () {
+            try {
+              var quickInputService =
+                StandaloneServices.get(IQuickInputService);
+              var quickPick = quickInputService.createQuickPick();
+              quickPick.items = me.$tdEnum.monacoThemeList.map(function (t) {
+                return { label: t.label, id: t.value };
+              });
+              quickPick.activeItems = quickPick.items.filter(function (i) {
+                return i.id === me.monacoThemeName;
+              });
+              quickPick.canSelectMany = false;
+              quickPick.onDidAccept(function () {
+                var selected = quickPick.selectedItems[0];
+                if (selected) {
+                  me.selectMonacoTheme(selected.id);
+                }
+                quickPick.dispose();
+              });
+              quickPick.onDidHide(function () {
+                quickPick.dispose();
+              });
+              quickPick.show();
+            } catch (_e) {
+              var input = window.prompt(
+                "Enter theme name\n" +
+                  me.$tdEnum.monacoThemeList
+                    .map(function (t) {
+                      return t.value;
+                    })
+                    .join(", "),
+                me.monacoThemeName,
+              );
+              if (input && input.trim()) {
+                me.selectMonacoTheme(input.trim());
+              }
+            }
+          },
+        });
+
         // Lắng nghe sự kiện phím tắt từ cấu hình cha truyền xuống
         if (me.monacoOptions && typeof me.monacoOptions.onInit === "function") {
           me.monacoOptions.onInit(me.editor, monaco);
         }
-        me.editor.onDidBlurEditorWidget((e) => {
+        me.editor.onDidBlurEditorWidget(function () {
           me.debounceUpdateValToEditor();
         });
       } else {

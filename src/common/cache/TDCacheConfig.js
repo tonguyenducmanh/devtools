@@ -274,4 +274,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache kết nối database gần nhất thao tác",
   },
+  MonacoTheme: {
+    KeyFormat: "MonacoTheme",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache theme monaco editor do user chọn riêng",
+  },
 };

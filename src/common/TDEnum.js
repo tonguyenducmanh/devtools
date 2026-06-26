@@ -129,6 +129,22 @@ class TDEnum {
     NpgSQLDotNet: 0,
     PgxGo: 1,
   };
+  // danh sách theme monaco editor
+  monacoThemeList = [
+    { label: "VS", value: "vs" },
+    { label: "VS Dark", value: "vs-dark" },
+    { label: "GitHub Light", value: "github-light" },
+    { label: "GitHub Dark", value: "github-dark" },
+    { label: "Solarized Light", value: "solarized-light" },
+    { label: "Solarized Dark", value: "solarized-dark" },
+    { label: "One Light", value: "one-light" },
+    { label: "One Dark", value: "one-dark" },
+    { label: "Gruvbox Light", value: "gruvbox-light" },
+    { label: "Gruvbox Dark", value: "gruvbox-dark" },
+    { label: "Catppuccin Latte", value: "catppuccin-light" },
+    { label: "Catppuccin Mocha", value: "catppuccin-dark" },
+    { label: "Monokai", value: "monokai" },
+  ];
 }
 
 export default new TDEnum();

@@ -461,6 +461,19 @@ class TDUtility {
     await cache.set(enumeration.cacheConfig.UserSettings, allSettings);
   }
   /**
+   * lấy theme monaco editor đã lưu, null = theo app theme
+   */
+  async getMonacoTheme() {
+    let saved = await cache.get(enumeration.cacheConfig.MonacoTheme);
+    return saved || null;
+  }
+  /**
+   * lưu theme monaco editor
+   */
+  async setMonacoTheme(themeName) {
+    await cache.set(enumeration.cacheConfig.MonacoTheme, themeName);
+  }
+  /**
    * Lấy ngày trong năm (1-365/366)
    * @returns {number} Ngày trong năm
    */
