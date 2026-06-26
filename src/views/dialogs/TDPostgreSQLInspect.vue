@@ -541,10 +541,17 @@ export default {
         );
       }
       let item = this.results?.[this.activeIndex];
+      let entryValue = this.searchValue;
+      if (item) {
+        entryValue = item.object_name || "";
+        if (this.searchType === "function" && entryValue.includes("(")) {
+          entryValue = entryValue.split("(")[0];
+        }
+      }
       let newEntry = {
         searchType: this.searchType,
         searchSchema: item ? (item.schema_name || "") : this.searchSchema,
-        searchValue: item ? (item.object_name || "") : this.searchValue,
+        searchValue: entryValue,
         activeIndex: this.activeIndex,
       };
       let lastEntry =
