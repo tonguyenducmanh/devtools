@@ -33,7 +33,7 @@ export default {
         let limitResults = false;
 
         // Bước 1: Lấy danh sách keyword PostgreSQL từ hệ thống
-        let keywordsResult = me.fetchAllKeyWordInCurrentDatabase();
+        let keywordsResult = await me.fetchAllKeyWordInCurrentDatabase();
 
         // Bước 2: Đếm tổng số bảng/view để biết số trang cần tải
         let totalRows = await me.fetchTotalTableAndViewInCurrentDatabase();
