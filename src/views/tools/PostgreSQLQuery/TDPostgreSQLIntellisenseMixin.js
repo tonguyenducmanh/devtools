@@ -32,155 +32,24 @@ export default {
         let defaultQueryLimit = 5000;
         let limitResults = false;
 
-        // Bước 1: Lấy danh sách keyword PostgreSQL từ hệ thống (pg_catalog.pg_get_keywords)
-        let keywordResponse = await me.agentAPI.executeQuery(
-          me.selectedConnectionId,
-          pgQueries.pg_get_keywords,
-          defaultQueryLimit,
-          !limitResults,
-        );
+        // Bước 1: Lấy danh sách keyword PostgreSQL từ hệ thống
+        let keywordsResult = me.fetchAllKeyWordInCurrentDatabase();
 
         // Bước 2: Đếm tổng số bảng/view để biết số trang cần tải
-        let countResponse = await me.agentAPI.executeQuery(
-          me.selectedConnectionId,
-          pgQueries.pg_get_tables_count,
-          defaultQueryLimit,
-          !limitResults,
-        );
-
-        let totalRows = 0;
-        const countResult =
-          countResponse?.data?.data?.results?.[0] ||
-          countResponse?.data?.data ||
-          null;
-
-        if (countResponse?.data?.success && countResult?.rows?.length > 0) {
-          totalRows = parseInt(countResult.rows[0].total || 0, 10);
-        }
+        let totalRows = await me.fetchTotalTableAndViewInCurrentDatabase();
 
         // Bước 3: Tải dữ liệu bảng/view theo từng trang (LIMIT/OFFSET)
-        let allTableRows = [];
-
-        for (let offset = 0; offset < totalRows; offset += defaultQueryLimit) {
-          // Ghép LIMIT/OFFSET vào câu SQL mẫu
-          let pagingQuery = `${pgQueries.pg_get_tables_paging} LIMIT ${defaultQueryLimit} OFFSET ${offset};`;
-
-          let pagingResponse = await me.agentAPI.executeQuery(
-            me.selectedConnectionId,
-            pagingQuery,
-            defaultQueryLimit,
-            !limitResults,
-          );
-
-          const pagingResult =
-            pagingResponse?.data?.data?.results?.[0] ||
-            pagingResponse?.data?.data ||
-            null;
-
-          // Nếu lỗi ở trang nào thì dừng luôn để tránh treo
-          if (pagingResponse?.data?.success && pagingResult?.rows) {
-            allTableRows.push(...pagingResult.rows);
-          } else {
-            console.error(
-              `Gặp lỗi khi tải dữ liệu tại vị trí dòng (offset): ${offset}`,
-            );
-            break;
-          }
-        }
-
-        // Đóng gói kết quả bảng/view đúng cấu trúc để Monaco xử lý
-        let tablesResult = {
-          columns: [
-            "table_schema",
-            "table_name",
-            "table_type",
-            "column_name",
-            "data_type",
-            "ordinal_position",
-          ],
-          rows: allTableRows,
-        };
-
-        // Trích xuất kết quả keywords từ response
-        let keywordResult =
-          keywordResponse?.data?.data?.results?.[0] ||
-          keywordResponse?.data?.data ||
-          null;
-
-        let keywordsResult = keywordResponse?.data?.success
-          ? keywordResult
-          : null;
+        let tablesResult = await me.fetchAllTableRows(
+          totalRows,
+          defaultQueryLimit,
+          limitResults,
+        );
 
         // Bước 4: Tải functions (chỉ khi user bật tuỳ chọn trong sidebar)
-        let allFunctionRows = [];
-        if (me.currentConfigLayout.loadFunctionIntellisense) {
-          try {
-            // Đếm tổng số function để phân trang
-            let funcCountResponse = await me.agentAPI.executeQuery(
-              me.selectedConnectionId,
-              pgQueries.pg_get_functions_count,
-              defaultQueryLimit,
-              !limitResults,
-            );
-
-            let totalFuncRows = 0;
-            const funcCountResult =
-              funcCountResponse?.data?.data?.results?.[0] ||
-              funcCountResponse?.data?.data ||
-              null;
-
-            if (
-              funcCountResponse?.data?.success &&
-              funcCountResult?.rows?.length > 0
-            ) {
-              totalFuncRows = parseInt(funcCountResult.rows[0].total || 0, 10);
-            }
-
-            // Tải từng trang function
-            for (
-              let offset = 0;
-              offset < totalFuncRows;
-              offset += defaultQueryLimit
-            ) {
-              let funcPagingQuery = `${pgQueries.pg_get_functions_paging} LIMIT ${defaultQueryLimit} OFFSET ${offset};`;
-
-              let funcPagingResponse = await me.agentAPI.executeQuery(
-                me.selectedConnectionId,
-                funcPagingQuery,
-                defaultQueryLimit,
-                !limitResults,
-              );
-
-              const funcPagingResult =
-                funcPagingResponse?.data?.data?.results?.[0] ||
-                funcPagingResponse?.data?.data ||
-                null;
-
-              if (funcPagingResponse?.data?.success && funcPagingResult?.rows) {
-                allFunctionRows.push(...funcPagingResult.rows);
-              } else {
-                console.error(
-                  `Gặp lỗi khi tải functions tại vị trí dòng (offset): ${offset}`,
-                );
-                break;
-              }
-            }
-          } catch (e) {
-            console.warn("Load functions intellisense warning:", e);
-          }
-        }
-
-        // Đóng gói kết quả functions
-        let functionsResult = {
-          columns: [
-            "function_schema",
-            "function_name",
-            "function_arguments",
-            "return_type",
-            "function_oid",
-          ],
-          rows: allFunctionRows,
-        };
+        let functionsResult = await me.fetchAllFunctionInCurrentDatabase(
+          defaultQueryLimit,
+          limitResults,
+        );
 
         // Gom tất cả dữ liệu intellisense lại
         let intellisenseData = {
@@ -204,6 +73,178 @@ export default {
       } finally {
         me.isLoadingIntellisense = false;
       }
+    },
+
+    /**
+     * Lấy ra toàn bộ keyword của database hiện tại
+     */
+    async fetchAllKeyWordInCurrentDatabase() {
+      let me = this;
+      let keywordResponse = await me.agentAPI.executeQuery(
+        me.selectedConnectionId,
+        pgQueries.pg_get_keywords,
+        9999,
+        true,
+      );
+      // Trích xuất kết quả keywords từ response
+      let keywordResult =
+        keywordResponse?.data?.data?.results?.[0] ||
+        keywordResponse?.data?.data ||
+        null;
+
+      let keywordsResult = keywordResponse?.data?.success
+        ? keywordResult
+        : null;
+      return keywordsResult;
+    },
+
+    /**
+     * Đếm tổng số bản ghi table và view có trong database hiện tại
+     */
+    async fetchTotalTableAndViewInCurrentDatabase() {
+      let me = this;
+      let totalRows = 0;
+      let countResponse = await me.agentAPI.executeQuery(
+        me.selectedConnectionId,
+        pgQueries.pg_get_tables_count,
+        1,
+      );
+
+      const countResult =
+        countResponse?.data?.data?.results?.[0] ||
+        countResponse?.data?.data ||
+        null;
+
+      if (countResponse?.data?.success && countResult?.rows?.length > 0) {
+        totalRows = parseInt(countResult.rows[0].total || 0, 10);
+      }
+      return totalRows;
+    },
+
+    /**
+     * lấy toàn bộ dữ liệu table và view ở database hiện tại
+     */
+    async fetchAllTableRows(totalRows, defaultQueryLimit, limitResults) {
+      let me = this;
+      let allTableRows = [];
+
+      for (let offset = 0; offset < totalRows; offset += defaultQueryLimit) {
+        // Ghép LIMIT/OFFSET vào câu SQL mẫu
+        let pagingQuery = `${pgQueries.pg_get_tables_paging} LIMIT ${defaultQueryLimit} OFFSET ${offset};`;
+
+        let pagingResponse = await me.agentAPI.executeQuery(
+          me.selectedConnectionId,
+          pagingQuery,
+          defaultQueryLimit,
+          !limitResults,
+        );
+
+        const pagingResult =
+          pagingResponse?.data?.data?.results?.[0] ||
+          pagingResponse?.data?.data ||
+          null;
+
+        // Nếu lỗi ở trang nào thì dừng luôn để tránh treo
+        if (pagingResponse?.data?.success && pagingResult?.rows) {
+          allTableRows.push(...pagingResult.rows);
+        } else {
+          console.error(
+            `Gặp lỗi khi tải dữ liệu tại vị trí dòng (offset): ${offset}`,
+          );
+          break;
+        }
+      }
+
+      // Đóng gói kết quả bảng/view đúng cấu trúc để Monaco xử lý
+      let tablesResult = {
+        columns: [
+          "table_schema",
+          "table_name",
+          "table_type",
+          "column_name",
+          "data_type",
+          "ordinal_position",
+        ],
+        rows: allTableRows,
+      };
+      return tablesResult;
+    },
+
+    /**
+     * lấy ra toàn bộ function từ db hiện tại
+     */
+    async fetchAllFunctionInCurrentDatabase(defaultQueryLimit, limitResults) {
+      let me = this;
+      let allFunctionRows = [];
+      if (me.currentConfigLayout.loadFunctionIntellisense) {
+        try {
+          // Đếm tổng số function để phân trang
+          let funcCountResponse = await me.agentAPI.executeQuery(
+            me.selectedConnectionId,
+            pgQueries.pg_get_functions_count,
+            defaultQueryLimit,
+            !limitResults,
+          );
+
+          let totalFuncRows = 0;
+          const funcCountResult =
+            funcCountResponse?.data?.data?.results?.[0] ||
+            funcCountResponse?.data?.data ||
+            null;
+
+          if (
+            funcCountResponse?.data?.success &&
+            funcCountResult?.rows?.length > 0
+          ) {
+            totalFuncRows = parseInt(funcCountResult.rows[0].total || 0, 10);
+          }
+
+          // Tải từng trang function
+          for (
+            let offset = 0;
+            offset < totalFuncRows;
+            offset += defaultQueryLimit
+          ) {
+            let funcPagingQuery = `${pgQueries.pg_get_functions_paging} LIMIT ${defaultQueryLimit} OFFSET ${offset};`;
+
+            let funcPagingResponse = await me.agentAPI.executeQuery(
+              me.selectedConnectionId,
+              funcPagingQuery,
+              defaultQueryLimit,
+              !limitResults,
+            );
+
+            const funcPagingResult =
+              funcPagingResponse?.data?.data?.results?.[0] ||
+              funcPagingResponse?.data?.data ||
+              null;
+
+            if (funcPagingResponse?.data?.success && funcPagingResult?.rows) {
+              allFunctionRows.push(...funcPagingResult.rows);
+            } else {
+              console.error(
+                `Gặp lỗi khi tải functions tại vị trí dòng (offset): ${offset}`,
+              );
+              break;
+            }
+          }
+        } catch (e) {
+          console.warn("Load functions intellisense warning:", e);
+        }
+      }
+
+      // Đóng gói kết quả functions
+      let functionsResult = {
+        columns: [
+          "function_schema",
+          "function_name",
+          "function_arguments",
+          "return_type",
+          "function_oid",
+        ],
+        rows: allFunctionRows,
+      };
+      return functionsResult;
     },
 
     /**
