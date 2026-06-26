@@ -1,8 +1,11 @@
 <template>
+  <!-- container chính: chia làm 2 phần (main + sidebar) -->
   <div class="flex td-pg-query-container">
     <div class="flex flex-col td-pg-query-main">
+      <!-- header toolbar: menu flyout ở trái, nút Run Query ở phải -->
       <div class="flex flex-start td-tool-header-menu-group">
         <div class="flex flex-one td-header-menu-group">
+          <!-- từng menu item (Code Complete, Edit, Export, Explore, Help) -->
           <div
             v-for="(items, menuKey) in menuConfig"
             :key="menuKey"
@@ -14,6 +17,7 @@
             <span>{{ $t(`i18nCommon.postgreSQLQuery.${menuKey}`) }}</span>
           </div>
         </div>
+        <!-- nút chạy query -->
         <TDButton
           :noMargin="true"
           @click="handleRunQuery"
@@ -21,6 +25,7 @@
           :isSmallButton="true"
           v-tooltip="$t('i18nCommon.postgreSQLQuery.runQuery')"
         ></TDButton>
+        <!-- flyout panel chứa danh sách action theo menu đang active -->
         <TDFlyoutPanel
           :show="!!activeKeyFlyOut"
           :anchorElFlyout="anchorElFlyout"
@@ -41,6 +46,7 @@
           </div>
         </TDFlyoutPanel>
       </div>
+      <!-- editor SQL Monaco (chiếm phần trên, có thể kéo resize) -->
       <div
         class="flex flex-one td-pg-query-editor"
         :style="editorSectionSizeStyle"
@@ -63,20 +69,28 @@
         </TDTextarea>
       </div>
 
+      <!-- thanh kéo resize phân cách editor và result -->
       <TDResizer :direction="'vertical'" @resize="handleResize" />
+
+      <!-- khu vực hiển thị kết quả query (chiếm phần dưới) -->
       <div class="td-pg-query-result" :style="resultSectionSizeStyle">
+        <!-- loading spinner khi đang chạy query -->
         <div class="flex td-pg-result-loading" v-if="isRunning">
           <div class="loader"></div>
         </div>
 
         <template v-else>
+          <!-- hiển thị lỗi nếu có -->
           <div class="td-pg-result-error" v-if="queryError">
             {{ queryError }}
           </div>
+          <!-- màn hình chờ nếu chưa có kết quả -->
           <div class="td-pg-result-empty" v-else-if="!hasQueryResults">
             <TDDynamicBackgroundEffect />
           </div>
+          <!-- kết quả query (hỗ trợ multi-statement với tabs) -->
           <div v-else class="flex flex-col td-pg-result-body">
+            <!-- tabs chuyển đổi giữa các result (khi query có nhiều câu lệnh) -->
             <div
               class="flex td-pg-result-tabs-wrap"
               v-if="hasMultipleResultStatement"
@@ -96,6 +110,7 @@
               </div>
             </div>
             <div class="flex flex-col flex-one td-pg-result-content">
+              <!-- bảng hiển thị dữ liệu SELECT (dùng KeepAlive để giữ cache) -->
               <div class="td-pg-result-table">
                 <KeepAlive>
                   <TDTableViewer
@@ -112,6 +127,7 @@
                   />
                 </KeepAlive>
               </div>
+              <!-- hiển thị số dòng bị ảnh hưởng (INSERT/UPDATE/DELETE) -->
               <div
                 v-if="activeQueryResult && !activeQueryResult.is_select"
                 class="flex td-pg-result-affected"
@@ -128,12 +144,13 @@
       </div>
     </div>
 
+    <!-- sidebar phải: chứa các tab Help / Setting / Connection / SQL Save -->
     <TDSubSidebar
       ref="subSidebar"
       v-model="currentConfigLayout.isShowSidebar"
       @toggleSidebar="toggleSidebar"
     >
-      <!-- menu tab options -->
+      <!-- thanh menu trên sidebar (slide option để chuyển tab) -->
       <template v-slot:menu>
         <div class="td-sidebar-menu">
           <TDSlideOption
@@ -148,6 +165,7 @@
       </template>
 
       <template v-slot:main>
+        <!-- tab Help: hướng dẫn sử dụng -->
         <div
           class="td-sidebar-content"
           v-show="
@@ -157,6 +175,8 @@
         >
           <TDPostgreSQLQueryHelp />
         </div>
+
+        <!-- tab Setting: cấu hình editor, intellisense, giới hạn kết quả -->
         <div
           class="td-sidebar-content"
           v-show="
@@ -215,6 +235,8 @@
             />
           </div>
         </div>
+
+        <!-- tab Connection: danh sách kết nối database được nhóm theo group -->
         <div
           class="flex flex-col td-sidebar-content"
           v-show="
@@ -222,6 +244,7 @@
             $tdEnum.PostgreSQLQuerySidebarOption.Connection
           "
         >
+          <!-- header: input tạo group mới + nút add group + nút reload -->
           <div class="flex td-header-collection">
             <div class="td-new-collection">
               <TDInput
@@ -245,6 +268,7 @@
               v-tooltip="$t('i18nCommon.postgreSQLQuery.refreshData')"
             />
           </div>
+          <!-- danh sách group và connection -->
           <div class="td-collection">
             <div class="flex flex-col response-loading" v-if="isLoading">
               <div class="loader"></div>
@@ -255,7 +279,7 @@
                 class="flex flex-col no-select td-collection-item"
                 :key="index"
               >
-                <!-- phần sửa nhanh tên thư mục request nếu đang ở chế độ edit -->
+                <!-- chế độ rename group -->
                 <div v-if="group.is_renaming" class="td-collection-rename">
                   <TDInput
                     v-model="group.temp_name"
@@ -267,6 +291,7 @@
                   >
                   </TDInput>
                 </div>
+                <!-- header group (click để expand/collapse) -->
                 <div
                   v-else
                   class="flex td-collection-header"
@@ -275,6 +300,7 @@
                   <div
                     class="flex text-nowrap-collection td-collection-header-left"
                   >
+                    <!-- mũi tên chỉ trạng thái expand/collapse -->
                     <TDArrow
                       :openProp="openGroups[group.id || '__ungrouped__']"
                       :arrowOpenDirection="$tdEnum.Direction.bottom"
@@ -290,6 +316,7 @@
                       }}
                     </div>
                   </div>
+                  <!-- nút edit/add/delete group (chỉ hiện khi hover) -->
                   <div class="flex td-collection-edit-btn" v-if="group.id">
                     <div
                       class="td-icon td-edit-icon"
@@ -315,6 +342,7 @@
                     ></div>
                   </div>
                 </div>
+                <!-- danh sách connection trong group -->
                 <div
                   v-if="
                     openGroups[group.id || '__ungrouped__'] &&
@@ -338,6 +366,7 @@
                         {{ conn.connection_name }}
                       </div>
                     </span>
+                    <!-- nút edit/delete connection (chỉ hiện khi hover) -->
                     <span class="flex td-connection-actions">
                       <div
                         class="td-icon td-edit-icon"
@@ -358,6 +387,8 @@
             </div>
           </div>
         </div>
+
+        <!-- tab SQL Save: danh sách query đã lưu -->
         <div
           class="flex flex-col td-sidebar-content"
           v-show="
@@ -365,6 +396,7 @@
             $tdEnum.PostgreSQLQuerySidebarOption.SQLSave
           "
         >
+          <!-- header: input tên query + nút save + nút reload -->
           <div class="flex td-header-collection">
             <div class="td-new-collection">
               <TDInput
@@ -388,6 +420,7 @@
               v-tooltip="$t('i18nCommon.postgreSQLQuery.refreshData')"
             />
           </div>
+          <!-- danh sách saved queries -->
           <div class="td-collection">
             <div class="td-collection-sql-body">
               <div
@@ -730,7 +763,7 @@ export default {
               const model = ed.getModel();
               if (!position || !model) return;
 
-              // Lấy từ tại vị trí con trỏ (vd: "sample_data" hoặc "account_object")
+              // lấy từ tại vị trí con trỏ (vd: "sample_data" hoặc "account_object")
               const word = model.getWordAtPosition(position);
               if (!word) {
                 me.$tdToast.warning(
@@ -743,7 +776,11 @@ export default {
               let objectName = word.word;
               let schemaName = "";
 
-              // Kiểm tra phía trước word có schema prefix không (vd: "sme.")
+              // kiểm tra phía trước từ có schema prefix không (vd: "sme.account_object")
+              // regex: khớp 1 từ [a-zA-Z0-9_]+ + dấu chấm ở cuối trước vị trí con trỏ
+              // ([a-zA-Z0-9_]+) - capturing group: tên schema
+              // \.$ - dấu chấm + end-of-string (end of đoạn textBeforeWord)
+              // ví dụ: "select * from sme." -> dotMatch[1] = "sme"
               const lineContent = model.getLineContent(position.lineNumber);
               const textBeforeWord = lineContent.substring(
                 0,
@@ -1267,8 +1304,13 @@ export default {
     /**
      * Chạy câu query SQL: gọi API, xử lý kết quả, tự động save nếu bật option
      */
+    /**
+     * chạy câu query SQL: gọi API, xử lý kết quả (hỗ trợ multi-statement),
+     * tự động lưu query vào danh sách saved queries nếu bật option
+     */
     async handleRunQuery() {
       let me = this;
+      // kiểm tra connection và nội dung query trước khi gửi
       if (!me.selectedConnectionId) {
         me.$tdToast.warning(
           me.$t("i18nCommon.postgreSQLQuery.noConnectionSelected"),
@@ -1281,6 +1323,7 @@ export default {
       me.resetQueryResults();
 
       try {
+        // gửi query đến server backend qua agentAPI
         const response = await me.agentAPI.executeQuery(
           me.selectedConnectionId,
           me.sqlText,
@@ -1288,6 +1331,7 @@ export default {
           !me.currentConfigLayout.limitResults,
         );
 
+        // chuẩn hóa kết quả (hỗ trợ cả single và multi-statement)
         const normalizedResults = me.normalizeMultiQueryResult(
           response?.data?.data,
         );
@@ -1296,18 +1340,21 @@ export default {
         me.activeResultIndex = normalizedResults.length > 0 ? 0 : 0;
         me.queryResult = normalizedResults[0] || null;
 
+        // nếu server trả về lỗi thì reset kết quả và hiển thị error message
         if (!response?.data?.success) {
           me.resetQueryResults();
           me.queryError =
             response?.data?.message ?? me.$t("i18nCommon.toastMessage.error");
         }
       } catch (error) {
+        // lỗi mạng hoặc exception
         me.resetQueryResults();
         me.queryError =
           error?.message ?? me.$t("i18nCommon.toastMessage.error");
       } finally {
         me.isRunning = false;
-        // Tự động lưu query sau khi chạy (nếu bật setting)
+        // tự động lưu query sau khi chạy thành công (nếu bật setting)
+        // kiểm tra nội dung thay đổi so với lần auto-save trước để tránh lưu trùng
         if (me.currentConfigLayout.autoSaveQueryAfterExec) {
           if (
             me.sqlText !== me.lastAutoSavedQueryText ||

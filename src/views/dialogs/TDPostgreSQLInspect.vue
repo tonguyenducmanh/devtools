@@ -1,4 +1,5 @@
 <template>
+  <!-- popup toàn màn hình: inspect object database (table/view/function) -->
   <TDPopup
     :visible="true"
     :showHeader="true"
@@ -7,7 +8,9 @@
     :title="$t('i18nCommon.postgreSQLQuery.dbInspect.title')"
   >
     <div class="flex flex-col td-pg-inspect-popup">
+      <!-- thanh tìm kiếm: back/next history + type + schema + name + limit + exec -->
       <div class="flex td-inspect-search-bar">
+        <!-- nút Back (undo) kèm flyout danh sách lịch sử -->
         <div
           class="td-history-btn-wrap"
           @mouseenter="cancelBackClose(); showBackFlyout = true"
@@ -36,6 +39,7 @@
             </div>
           </div>
         </div>
+        <!-- nút Next (redo) kèm flyout -->
         <div
           class="td-history-btn-wrap"
           @mouseenter="cancelNextClose(); showNextFlyout = true"
@@ -64,6 +68,7 @@
             </div>
           </div>
         </div>
+        <!-- combo chọn loại object: table / view / function -->
         <TDComboBox
           :width="150"
           v-model="searchType"
@@ -72,6 +77,7 @@
           :isEditable="false"
           @selected="handleSearch"
         />
+        <!-- combo chọn schema (load động từ database) -->
         <TDComboBox
           v-model="searchSchema"
           :noMargin="true"
@@ -84,6 +90,7 @@
           "
           @selected="handleSearch"
         />
+        <!-- input tìm kiếm theo tên object -->
         <div class="flex-one">
           <TDInput
             v-model="searchValue"
@@ -94,6 +101,7 @@
             @keyup.enter="handleSearch"
           />
         </div>
+        <!-- input giới hạn số kết quả trả về -->
         <div>
           <TDInput
             v-model="limitCount"
@@ -104,6 +112,7 @@
             "
           />
         </div>
+        <!-- nút thực hiện tìm kiếm -->
         <TDButton
           :noMargin="true"
           iconClass="td-send-icon"
@@ -112,11 +121,15 @@
           :readOnly="isSearching"
         />
       </div>
+
+      <!-- thân popup: danh sách kết quả bên trái + preview DDL bên phải -->
       <div class="flex flex-one td-inspect-body">
+        <!-- loading khi đang tìm kiếm -->
         <div v-if="isSearching" class="flex td-inspect-loading">
           <div class="loader"></div>
         </div>
         <template v-else-if="results && results.length > 0">
+          <!-- danh sách object tìm được (bên trái) -->
           <div
             class="flex flex-col td-inspect-list"
             :style="requestSectionSizeStyle"
@@ -141,8 +154,9 @@
               </span>
             </div>
           </div>
-          <!-- Resizer -->
+          <!-- thanh kéo resize giữa danh sách và preview -->
           <TDResizer :direction="'horizontal'" @resize="handleResize" />
+          <!-- panel preview DDL (bên phải) -->
           <div
             class="flex flex-col flex-one td-inspect-preview"
             :style="responseSectionSizeStyle"
@@ -163,6 +177,7 @@
             />
           </div>
         </template>
+        <!-- trạng thái rỗng / lỗi -->
         <div v-else class="td-empty-result">
           <div>
             {{
@@ -190,25 +205,27 @@ export default {
   },
   data() {
     return {
+      // tỉ lệ % chiều rộng giữa danh sách (trái) và preview DDL (phải)
       requestSectionSize: 20,
       responseSectionSize: 80,
-      // connection
+      // connection hiện tại
       connectionId: "",
-      // search
-      searchType: "table",
-      searchSchema: "",
-      searchValue: "",
-      limitCount: 20,
-      isLoadingSchemas: false,
-      schemaOptions: [],
-      // state
+      // tham số tìm kiếm
+      searchType: "table",          // loại object: table | view | function
+      searchSchema: "",             // schema filter (rỗng = tất cả)
+      searchValue: "",              // tên object cần tìm
+      limitCount: 20,               // giới hạn số kết quả
+      isLoadingSchemas: false,      // đang load danh sách schema
+      schemaOptions: [],            // danh sách schema để đổ vào combo
+      // trạng thái
       isSearching: false,
       isLoadingDDL: false,
       searchError: "",
-      results: [],
-      activeIndex: -1,
-      ddlContent: "",
+      results: [],                  // kết quả tìm kiếm
+      activeIndex: -1,              // index item đang được chọn
+      ddlContent: "",               // nội dung DDL của object đang xem
 
+      // options cho combo loại object
       searchTypeOptions: [
         {
           value: "table",
@@ -226,13 +243,14 @@ export default {
 
       agentAPI: null,
 
+      // lịch sử duyệt (back/forward) - mỗi entry là 1 state tìm kiếm
       sessionHistory: [],
       historyPointer: -1,
-      _isHistoryNav: false,
+      _isHistoryNav: false,         // cờ đang điều hướng lịch sử (tránh đẩy duplicate history)
       showBackFlyout: false,
       showNextFlyout: false,
-      backCloseTimer: null,
-      nextCloseTimer: null,
+      backCloseTimer: null,         // timer đóng flyout back
+      nextCloseTimer: null,         // timer đóng flyout next
     };
   },
 
@@ -357,17 +375,22 @@ export default {
       this.$emit("close", payload);
     },
 
-    /** Load danh sách schema từ PostgreSQL để đổ vào combo */
+    /**
+     * load danh sách schema từ PostgreSQL (chỉ lấy 1 lần khi mở popup)
+     * kết quả được gán vào schemaOptions để đổ vào combo box chọn schema
+     */
     async loadSchemas() {
       if (!this.connectionId) return;
       this.isLoadingSchemas = true;
       try {
+        // gọi template pg_inspect_list_schemas để lấy danh sách schema
         let resp = await this.agentAPI.executeQuery(
           this.connectionId,
           pgQueries.pg_inspect_list_schemas,
         );
         let result = resp?.data?.data?.results?.[0] || resp?.data?.data || null;
         let rows = result?.rows ?? [];
+        // cột schema_names là array chứa tên các schema
         let schemaNames = rows?.[0]?.schema_names;
         this.schemaOptions = [
           {
@@ -386,20 +409,30 @@ export default {
       }
     },
 
-    /** Build SQL tìm kiếm theo loại */
+    /**
+     * build câu SQL tìm kiếm object theo loại (table/view/function)
+     * thay thế các placeholder: {schemaFilter}, {value}, {limit}
+     * - schemaFilter: lọc theo schema hoặc loại trừ system schema
+     * - value: LIKE pattern (escape dấu nháy đơn để tránh SQL injection)
+     * - limit: giới hạn số dòng (1-100)
+     */
     buildSearchSQL() {
       let schema = this.searchSchema?.trim();
       let rawValue = this.searchValue?.trim();
+      // escape dấu nháy đơn trong giá trị tìm kiếm (SQL injection prevention)
       let value = rawValue ? `%${rawValue.replace(/'/g, "''")}%` : "%";
+      // giới hạn limit trong khoảng 1-100
       let limit = Math.min(
         Math.max(parseInt(this.limitCount, 10) || 20, 1),
         100,
       );
+      // nếu có schema filter thì thêm điều kiện AND, nếu không thì loại trừ system schemas
       let schemaFilter = schema
         ? `AND n.nspname = '${schema.replace(/'/g, "''")}'`
         : `AND n.nspname NOT IN ('pg_catalog','information_schema','pg_toast')`;
 
       let queryTemplate = "";
+      // chọn template SQL tương ứng với loại object
       switch (this.searchType) {
         case "table":
           queryTemplate = pgQueries.pg_inspect_search_table;
@@ -421,8 +454,13 @@ export default {
         .replace(/{limit}/g, limit);
     },
 
-    /** Build SQL lấy DDL theo loại và item */
+    /**
+     * build câu SQL lấy DDL (CREATE script) của một object
+     * thay thế {schema}, {name}, {oid} vào template tương ứng
+     * @param {*} item object từ kết quả tìm kiếm (chứa schema_name, object_name, object_oid)
+     */
     buildDDLSQL(item) {
+      // escape SQL injection
       let schema = item.schema_name?.replace(/'/g, "''");
       let name = item.object_name?.replace(/'/g, "''");
       let oid = item.object_oid || 0;
@@ -436,6 +474,7 @@ export default {
           queryTemplate = pgQueries.pg_inspect_ddl_view;
           break;
         case "function":
+          // function cần cả oid để phân biệt overload
           queryTemplate = pgQueries.pg_inspect_ddl_function;
           break;
 
@@ -449,6 +488,11 @@ export default {
         .replace(/{oid}/g, oid);
     },
 
+    /**
+     * thực hiện tìm kiếm object, tự động chọn item đầu tiên (hoặc targetIndex)
+     * và push history (trừ khi đang điều hướng lịch sử)
+     * @param {number} targetIndex index item cần chọn sau khi search (mặc định 0)
+     */
     async handleSearch(targetIndex = 0) {
       if (typeof targetIndex !== "number") targetIndex = 0;
       if (!this.connectionId) {
@@ -493,11 +537,17 @@ export default {
       }
     },
 
+    /**
+     * chọn 1 item trong danh sách kết quả, tải DDL tương ứng và hiển thị ở panel preview
+     * @param {number} idx index item cần chọn
+     * @param {boolean} skipHistory nếu true thì không push vào lịch sử (dùng khi khôi phục history)
+     */
     async selectItem(idx, skipHistory = false) {
       this.activeIndex = idx;
       let item = this.results[idx];
       if (!item) return;
 
+      // build SQL lấy DDL dựa trên loại object và thông tin item
       let sql = this.buildDDLSQL(item);
       if (!sql) return;
 
@@ -505,11 +555,12 @@ export default {
       this.ddlContent = "";
 
       try {
+        // gọi API để lấy DDL
         let resp = await this.agentAPI.executeQuery(this.connectionId, sql);
         let result = resp?.data?.data?.results?.[0] || resp?.data?.data || null;
 
         if (resp?.data?.success && result?.rows?.length > 0) {
-          // lấy giá trị cột đầu tiên của dòng đầu tiên
+          // lấy giá trị cột đầu tiên của dòng đầu tiên (cột này chứa DDL text)
           let firstRow = result.rows[0];
           let firstKey = Object.keys(firstRow)[0];
           this.ddlContent = firstRow[firstKey] ?? "";
@@ -524,6 +575,7 @@ export default {
           this.$t("i18nCommon.postgreSQLQuery.dbInspect.ddlErrorFallback");
       } finally {
         this.isLoadingDDL = false;
+        // push history nếu không phải đang skip (khôi phục history) và không phải history nav
         if (!skipHistory && !this._isHistoryNav) {
           this.pushHistory();
         }
@@ -533,7 +585,13 @@ export default {
       return `${item.schema_name}.${item.object_name}`;
     },
 
+    /**
+     * đẩy trạng thái hiện tại vào lịch sử duyệt (sessionHistory)
+     * nếu đang ở giữa lịch sử (đã back), xóa các entry phía trước (như browser history)
+     * bỏ qua nếu entry mới trùng với entry cuối (tránh duplicate)
+     */
     pushHistory() {
+      // nếu đang ở giữa lịch sử, cắt bỏ những entry phía sau (forward history)
       if (this.historyPointer < this.sessionHistory.length - 1) {
         this.sessionHistory = this.sessionHistory.slice(
           0,
@@ -543,7 +601,9 @@ export default {
       let item = this.results?.[this.activeIndex];
       let entryValue = this.searchValue;
       if (item) {
+        // ưu tiên lấy tên object từ item (chính xác hơn searchValue nhập tay)
         entryValue = item.object_name || "";
+        // với function, bỏ phần tham số trong ngoặc (vd: "func(a int)" -> "func")
         if (this.searchType === "function" && entryValue.includes("(")) {
           entryValue = entryValue.split("(")[0];
         }
@@ -554,6 +614,7 @@ export default {
         searchValue: entryValue,
         activeIndex: this.activeIndex,
       };
+      // kiểm tra entry cuối có giống entry mới không để tránh push duplicate
       let lastEntry =
         this.sessionHistory[this.sessionHistory.length - 1];
       if (
@@ -569,6 +630,7 @@ export default {
       this.historyPointer = this.sessionHistory.length - 1;
     },
 
+    /** back: quay lại entry trước trong lịch sử */
     handleBack() {
       if (this.historyPointer <= 0) return;
       this.historyPointer--;
@@ -576,6 +638,7 @@ export default {
       this.restoreHistoryEntry(this.sessionHistory[this.historyPointer]);
     },
 
+    /** next: tiến tới entry tiếp theo trong lịch sử */
     handleNext() {
       if (this.historyPointer >= this.sessionHistory.length - 1) return;
       this.historyPointer++;
@@ -593,19 +656,29 @@ export default {
       });
     },
 
+    /**
+     * điều hướng đến 1 object cụ thể (dùng từ F12 trong Monaco Editor).
+     * thử tìm object ở cả 3 loại (table/view/function) và chọn kết quả đầu tiên khớp
+     * @param {string} objectName tên object cần tìm
+     * @param {string} schemaName schema (có thể rỗng)
+     */
     async navigateToObject(objectName, schemaName) {
+      // push trạng thái hiện tại vào history trước khi navigate
       this.pushHistory();
 
       let foundType = null;
       let foundIdx = -1;
       let foundResults = null;
+      // lưu lại trạng thái search hiện tại để khôi phục nếu không tìm thấy
       let savedType = this.searchType;
       let savedValue = this.searchValue;
       let savedSchema = this.searchSchema;
 
+      // thiết lập tham số tìm kiếm theo object cần navigate
       this.searchValue = objectName;
       this.searchSchema = schemaName || "";
 
+      // thử tìm ở cả 3 loại: table -> view -> function
       for (const type of ["table", "view", "function"]) {
         this.searchType = type;
         let sql = this.buildSearchSQL();
@@ -615,7 +688,9 @@ export default {
           let result =
             resp?.data?.data?.results?.[0] || resp?.data?.data || null;
           if (resp?.data?.success && result?.rows?.length > 0) {
+            // tìm item khớp chính xác tên object (và cả schema nếu có)
             let idx = result.rows.findIndex((r) => {
+              // function có thể có dạng "func_name(args...)" -> bỏ phần args
               let objName =
                 type === "function"
                   ? r.object_name.split("(")[0]
@@ -630,26 +705,29 @@ export default {
               foundType = type;
               foundIdx = idx;
               foundResults = result.rows;
-              break;
+              break; // tìm thấy, thoát vòng lặp
             }
           }
         } catch (e) {
-          // try next type
+          // thử loại tiếp theo
         } finally {
+          // tạm thời gán lại savedType (sẽ set lại sau nếu tìm thấy)
           this.searchType = savedType;
         }
       }
 
       if (foundType && foundResults) {
+        // tìm thấy object: cập nhật state và chọn item tương ứng
         this.searchType = foundType;
         if (schemaName) this.searchSchema = schemaName;
         this.searchValue = objectName;
         this.results = foundResults;
         this.$nextTick(() => {
           this.selectItem(foundIdx, true);
-          this.pushHistory();
+          this.pushHistory(); // push vào history sau khi chọn
         });
       } else {
+        // không tìm thấy: pop history vừa push, khôi phục trạng thái cũ
         this.sessionHistory.pop();
         this.historyPointer = this.sessionHistory.length - 1;
         this.searchType = savedType;

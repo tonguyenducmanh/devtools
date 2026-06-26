@@ -1,10 +1,15 @@
-// file này tách ra chỉ để dễ đọc code, không nhúng vào file nào khác ngoài tool src/views/tools/PostgreSQLQuery/TDPostgreSQLQuery.vue
+// mixin chứa toàn bộ logic xử lý intellisense (gợi ý code, tô màu cú pháp) cho tool PostgreSQL Query
+// tách riêng file để dễ đọc và bảo trì, được import vào TDPostgreSQLQuery.vue
 import TDCache from "@/common/cache/TDCache.js";
 import pgQueries from "./templates.js";
-import { registerPgsqlLanguage, updatePgsqlIntellisenseData } from "@/components/monarch/pgsqlLanguage.js";
+import {
+  registerPgsqlLanguage,
+  updatePgsqlIntellisenseData,
+} from "@/components/monarch/pgsqlLanguage.js";
 
 export default {
   created() {
+    // đăng ký ngôn ngữ pgsql cho Monaco Editor ngay khi component được tạo
     registerPgsqlLanguage();
   },
   methods: {
@@ -250,9 +255,7 @@ export default {
 
         // Lưu set keyword để kiểm tra xung đột khi tạo alias tự động
         me._pgKeywordSet = new Set(
-          keywords
-            .map((k) => String(k.word).toLowerCase())
-            .filter(Boolean),
+          keywords.map((k) => String(k.word).toLowerCase()).filter(Boolean),
         );
 
         // Đăng ký language + Monarch + semantic provider + cập nhật dữ liệu
@@ -261,11 +264,11 @@ export default {
 
         // ── Xây dựng lookup map cho bảng/view/cột ──────────────────────────────
         const tableRows = data?.tables?.rows ?? [];
-        const columnsByTable = new Map();   // table_name -> column list, schema.table -> column list
-        const tablesBySchema = new Map();   // schema -> Set<table_name>
-        const allSchemas = new Set();       // tất cả schema
-        const allTables = new Set();        // tất cả tên bảng (không kèm schema)
-        const allColumns = [];              // tất cả cột (dùng khi không có alias)
+        const columnsByTable = new Map(); // table_name -> column list, schema.table -> column list
+        const tablesBySchema = new Map(); // schema -> Set<table_name>
+        const allSchemas = new Set(); // tất cả schema
+        const allTables = new Set(); // tất cả tên bảng (không kèm schema)
+        const allColumns = []; // tất cả cột (dùng khi không có alias)
 
         tableRows.forEach((row) => {
           const tbl = row.table_name;
@@ -300,8 +303,8 @@ export default {
 
         // ── Build inspect lookup (dùng cho hover và F12 inspect) ───────────────
         me._inspectLookup = {
-          tables: new Map(),    // key: table_name hoặc schema.table -> { schema, name }
-          views: new Map(),     // key: view_name hoặc schema.view -> { schema, name }
+          tables: new Map(), // key: table_name hoặc schema.table -> { schema, name }
+          views: new Map(), // key: view_name hoặc schema.view -> { schema, name }
           functions: new Map(), // key: function_name hoặc schema.func -> { schema, name, args, ... }
         };
 
@@ -333,8 +336,7 @@ export default {
           return argsStr.split(",").map((segment) => {
             const parts = segment.trim().split(/\s+/);
             const name = parts.length >= 2 ? parts[0] : null;
-            let type =
-              parts.length >= 2 ? parts.slice(1).join(" ") : parts[0];
+            let type = parts.length >= 2 ? parts.slice(1).join(" ") : parts[0];
             // Loại bỏ phần DEFAULT … dư thừa (vd: "date DEFAULT NULL::date" -> "date")
             const defaultIdx = type.search(/\bDEFAULT\b/i);
             if (defaultIdx !== -1) {
@@ -380,7 +382,7 @@ export default {
 
         // ── Xây dựng function suggestions ──────────────────────────────────────
         const functionRows = data?.functions?.rows ?? [];
-        const functionSuggestions = [];      // dùng cho context không có dấu chấm
+        const functionSuggestions = []; // dùng cho context không có dấu chấm
         const functionsBySchema = new Map(); // schema -> function items, dùng cho context có dấu chấm
 
         functionRows.forEach((row) => {
@@ -472,11 +474,18 @@ export default {
               const text = model.getValue();
               const aliasMap = new Map();
 
-              // Regex phát hiện alias từ các mệnh đề FROM/JOIN
-              // Ví dụ: "FROM sme.account_object ao" -> alias "ao" trỏ đến sme.account_object
+              // regex phát hiện alias từ mệnh đề FROM/JOIN, có flag g để dùng lastIndex
+              // /(?:from|join)\s+/ - khớp từ khóa FROM hoặc JOIN + khoảng trắng
+              // ([a-zA-Z0-9_]+) - capturing group 1: tên schema hoặc tên bảng (vd: "sme" hoặc "account_object")
+              // (?:\.([a-zA-Z0-9_]+))? - optional: dấu chấm + capturing group 2: tên bảng nếu group 1 là schema
+              // (?:\s+as)? - optional: từ khóa "as" (vd: "as ao")
+              // \s+([a-zA-Z0-9_]+)? - capturing group 3: alias (có thể không có)
+              // flag gi: ignore case + global (dùng lastIndex để duyệt tiếp)
+              // ví dụ: "FROM sme.account_object ao" -> match[1]="sme", match[2]="account_object", match[3]="ao"
               const regex =
                 /(?:from|join)\s+([a-zA-Z0-9_]+)(?:\.([a-zA-Z0-9_]+))?(?:\s+as)?\s+([a-zA-Z0-9_]+)?/gi;
               let match;
+              // danh sách keyword SQL để phân biệt với alias (vd: "from" không phải alias)
               const sqlKeywords = [
                 "where",
                 "join",
@@ -495,7 +504,11 @@ export default {
                 "or",
               ];
 
-              // Duyệt tất cả các alias trong câu SQL và build aliasMap
+              // vòng lặp dùng exec() với regex flag g:
+              // - mỗi lần regex.exec(text) tìm match từ vị trí regex.lastIndex hiện tại
+              // - tìm thấy: lastIndex được cập nhật đến cuối match, trả về mảng kết quả
+              // - không tìm thấy: reset lastIndex về 0, trả về null => thoát vòng lặp
+              // nhờ lastIndex, while này duyệt lần lượt từng FROM/JOIN trong câu SQL
               while ((match = regex.exec(text)) !== null) {
                 let schemaOrTable = match[1];
                 let tableIfSchema = match[2];
@@ -505,15 +518,17 @@ export default {
                 let table = "";
                 let alias = "";
 
-                // Nếu có dạng "schema.table alias" thì match[1]=schema, match[2]=table
+                // nếu match[2] tồn tại => dạng "schema.table alias" (vd: sme.account_object ao)
                 if (tableIfSchema) {
                   schema = schemaOrTable.toLowerCase();
                   table = tableIfSchema.toLowerCase();
                 } else {
+                  // nếu chỉ có match[1] => dạng "table alias" (vd: account_object ao)
                   table = schemaOrTable.toLowerCase();
                 }
 
-                // Nếu match[3] là một từ khoá SQL thì coi như không có alias, lấy tên bảng làm alias
+                // nếu match[3] (alias) trùng với keyword SQL (vd: "where", "join", ...)
+                // thì coi như không có alias, lấy tên bảng làm alias luôn
                 if (
                   aliasOrTable &&
                   !sqlKeywords.includes(aliasOrTable.toLowerCase())
@@ -592,23 +607,35 @@ export default {
                 ) {
                   // Gợi ý bảng thuộc schema, kèm alias tự động
                   (tablesBySchema.get(prefix) ?? new Set()).forEach((tbl) => {
-                    const alias = me._generateUniqueAlias(tbl, text, me._pgKeywordSet);
+                    const alias = me._generateUniqueAlias(
+                      tbl,
+                      text,
+                      me._pgKeywordSet,
+                    );
                     suggestions.push({
                       label: tbl,
                       kind: monaco.languages.CompletionItemKind.Module,
                       filterText: `${prefix}.${tbl}`,
-                      insertText: alias ? `${prefix}.${tbl} ${alias} ` : `${prefix}.${tbl}`,
+                      insertText: alias
+                        ? `${prefix}.${tbl} ${alias} `
+                        : `${prefix}.${tbl}`,
                       detail: `Table (${prefix})`,
                     });
                   });
 
                   // Gợi ý functions thuộc schema, kèm alias tự động
                   (functionsBySchema.get(prefix) ?? []).forEach((fnItem) => {
-                    const alias = me._generateUniqueAlias(fnItem.label, text, me._pgKeywordSet);
+                    const alias = me._generateUniqueAlias(
+                      fnItem.label,
+                      text,
+                      me._pgKeywordSet,
+                    );
                     suggestions.push({
                       ...fnItem,
                       filterText: `${prefix}.${fnItem.label}`,
-                      insertText: alias ? `${fnItem.fullInsertText} ${alias} ` : fnItem.fullInsertText,
+                      insertText: alias
+                        ? `${fnItem.fullInsertText} ${alias} `
+                        : fnItem.fullInsertText,
                       insertTextRules:
                         monaco.languages.CompletionItemInsertTextRule
                           .InsertAsSnippet,
@@ -633,7 +660,11 @@ export default {
 
                 // Gợi ý bảng, kèm alias tự động (vd: "account_object ao")
                 allTables.forEach((tbl) => {
-                  const alias = me._generateUniqueAlias(tbl, text, me._pgKeywordSet);
+                  const alias = me._generateUniqueAlias(
+                    tbl,
+                    text,
+                    me._pgKeywordSet,
+                  );
                   suggestions.push({
                     label: tbl,
                     kind: monaco.languages.CompletionItemKind.Module,
@@ -645,8 +676,17 @@ export default {
                 // Gợi ý functions, kèm alias tự động
                 suggestions.push(
                   ...functionSuggestions.map((fnItem) => {
-                    const alias = me._generateUniqueAlias(fnItem.label, text, me._pgKeywordSet);
-                    return alias ? { ...fnItem, insertText: `${fnItem.insertText} ${alias} ` } : fnItem;
+                    const alias = me._generateUniqueAlias(
+                      fnItem.label,
+                      text,
+                      me._pgKeywordSet,
+                    );
+                    return alias
+                      ? {
+                          ...fnItem,
+                          insertText: `${fnItem.insertText} ${alias} `,
+                        }
+                      : fnItem;
                   }),
                 );
 
@@ -860,13 +900,24 @@ export default {
       const words = name.split("_").filter((w) => w.length > 0);
       if (words.length === 0) return null;
 
-      let alias = words.map((w) => w[0]).join("").toLowerCase();
+      let alias = words
+        .map((w) => w[0])
+        .join("")
+        .toLowerCase();
       if (!alias) return null;
 
-      // Thu thập tất cả tên bảng/alias đã dùng trong FROM/JOIN
+      // thu thập tất cả tên bảng/alias đã dùng trong FROM/JOIN để kiểm tra trùng lặp
+      // regex tương tự như ở completion provider, flag g để duyệt bằng lastIndex
+      // (?:from|join)\s+ - khớp từ khóa FROM/JOIN
+      // ([a-zA-Z0-9_]+) - group 1: schema hoặc tên bảng
+      // (?:\.([a-zA-Z0-9_]+))? - group 2: tên bảng nếu có schema prefix
+      // (?:\s+as)? - optional "as"
+      // \s+([a-zA-Z0-9_]+)? - group 3: alias (có thể không có)
       const used = new Set();
-      const re = /(?:from|join)\s+([a-zA-Z0-9_]+)(?:\.([a-zA-Z0-9_]+))?(?:\s+as)?\s+([a-zA-Z0-9_]+)?/gi;
+      const re =
+        /(?:from|join)\s+([a-zA-Z0-9_]+)(?:\.([a-zA-Z0-9_]+))?(?:\s+as)?\s+([a-zA-Z0-9_]+)?/gi;
       let m;
+      // duyệt lần lượt từng FROM/JOIN nhờ lastIndex, thu thập tất cả tên đã dùng
       while ((m = re.exec(sqlText)) !== null) {
         if (m[1]) used.add(m[1].toLowerCase());
         if (m[2]) used.add(m[2].toLowerCase());
