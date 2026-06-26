@@ -60,6 +60,8 @@ export default {
   mixins: [TDStylePremitiveMixin],
 
   created() {
+    // để hạn chế làm đơ trình duyệt, thêm debounce để xử lý update model value sau khi người dùng delay nhập
+    // monacoeditor và v-model hoạt động song song với nhau
     this.debounceUpdateEditorVal = _.debounce(this.updateEditorVal, 100);
     this.debounceUpdateValToEditor = _.debounce(this.updateValToEditor, 100);
   },
@@ -198,6 +200,25 @@ export default {
       let editorVal = me.modelValue;
       return editorVal;
     },
+
+    /**
+     * Lấy ra rule theme custom theo 1 số loại ngôn ngữ
+     */
+    getRuleThemeMonacoEditorByLanguage() {
+      let me = this;
+      let rules = [];
+      let isDarkTheme = me.currentTheme == me.$tdEnum.theme.dark;
+      // riêng language PostgreSQL thì custom lại 1 số quy tắc theme do monaco editor mặc định chưa support
+      if (me.language === "pgsql") {
+        rules = getPgsqlThemeRules(isDarkTheme);
+      }
+      return rules;
+    },
+
+    /**
+     * Bật chế độ highlight synctax (chuyển sang sử dụng monaco editor)
+     * Thì sẽ gọi 1 số api của thư viện để update syntax, theme, ...
+     */
     async updateHighlight() {
       let me = this;
       if (me.enableHighlight) {
@@ -208,7 +229,7 @@ export default {
         monaco.editor.defineTheme(myThemeName, {
           base: isDarkTheme ? "vs-dark" : "vs",
           inherit: true,
-          rules: me.language === "pgsql" ? getPgsqlThemeRules(isDarkTheme) : [],
+          rules: me.getRuleThemeMonacoEditorByLanguage(),
           colors: {
             "editor.background": isDarkTheme ? "#252525" : "#f6f6f7",
           },
