@@ -1,5 +1,17 @@
-import * as monaco from "monaco-editor";
+/**
+ * file định nghĩa cú pháp (Syntax Highlighting) cho thư viện monaco editor được dùng
+ * làm editor chính của app này, do thư viện này chưa support chuẩn cho PostgreSQL
+ * mà đang preview theo MySQL, cần tự định nghĩa 1 số rule đặc thù để hiển thị theo nhu cầu riêng
+ */
 
+import * as monaco from "monaco-editor";
+import {
+  BUILTIN_KEYWORDS,
+  BUILTIN_TYPE_KEYWORDS,
+  BUILTIN_OBJECT_KEYWORDS,
+} from "./pgsqlKeyword.js";
+
+// cấu hình màu sắc của chủ đề darrk mode
 const DARK_THEME_RULES = [
   { token: "namespace", foreground: "66d9ef" },
   { token: "variable", foreground: "f8c555" },
@@ -9,6 +21,7 @@ const DARK_THEME_RULES = [
   { token: "string.sql", foreground: "e6db74" },
 ];
 
+// cấu hình màu sắc của chủ đề light mode
 const LIGHT_THEME_RULES = [
   { token: "namespace", foreground: "2674b8" },
   { token: "variable", foreground: "c04e01" },
@@ -18,177 +31,60 @@ const LIGHT_THEME_RULES = [
   { token: "string.sql", foreground: "8b7500" },
 ];
 
+/**
+ * Lấy ra rule theme tương ứng
+ * @param {Boolean} isDark có phải chế độ dark mode không
+ * @returns bộ rule theme tương ứng
+ */
 export function getPgsqlThemeRules(isDark) {
   return isDark ? DARK_THEME_RULES : LIGHT_THEME_RULES;
 }
 
+// các biến lưu lại thông tin được
+// toàn bộ schema ứng với database hiện tại
 let _allSchemas = new Set();
+// toàn bộ bảng ứng với database hiện tại
 let _allTables = new Set();
+// toàn bộ function ứng với database hiện tại
 let _allFunctionNames = new Set();
+// toàn bộ keyword ứng với database hiện tại (tùy từng version PostgreSQL sẽ có bộ keyword có thể khác nhau)
 let _pgKeywordSet = new Set();
+
+// Trong Monaco Editor, Monarch và Semantic Highlighting là hai cơ chế tô màu cú pháp
+// (syntax highlighting) hoàn toàn khác nhau về cách thức hoạt động, hiệu năng và độ chính xác.
+
+// cờ nhận biết đã đăng ký monarch chưa
+// Monarch (Tô màu dựa trên Khai báo Cú pháp / Từ vựng)
+// Hoạt động dựa trên các quy tắc biểu thức chính quy (Regex) và máy trạng thái (state machine) tĩnh do dev định nghĩa trước. Nó quét qua từng dòng code độc lập, tìm các chuỗi
+// khớp với Regex (ví dụ: if, function, chuỗi ký tự nằm trong dấu ngoặc kép "")
+// và gán nhãn cho chúng (gọi là token như keyword, string, comment)
 let _monarchRegistered = false;
+
+// cờ nhận biết đã đăng ký semantic hightlight chưa
+// Semantic Highlighting (Tô màu dựa trên Ngữ nghĩa)
+// Hoạt động dựa trên kết quả phân tích của một Language Server hoặc Trình biên dịch
+// (Compiler) đứng phía sau (ví dụ: TypeScript Language Service, LSP cho C++, Java, v.v.).
+// Nó parse toàn bộ mã nguồn thành một Cây cú pháp trừu tượng (AST - Abstract Syntax Tree),
+// từ đó hiểu rõ mối quan hệ giữa các thành phần.
 let _semanticRegistered = false;
-
-const BUILTIN_KEYWORDS = [
-  "SELECT", "FROM", "WHERE", "INSERT", "INTO", "VALUES", "UPDATE", "SET",
-  "DELETE", "CREATE", "ALTER", "DROP", "GRANT", "REVOKE",
-  "AND", "OR", "NOT", "IN", "EXISTS", "BETWEEN", "LIKE", "ILIKE",
-  "IS", "NULL", "TRUE", "FALSE", "PRIMARY", "KEY", "FOREIGN", "REFERENCES",
-  "CASCADE", "RESTRICT", "UNIQUE", "CHECK", "DEFAULT", "CONSTRAINT",
-  "JOIN", "LEFT", "RIGHT", "INNER", "OUTER", "CROSS", "FULL", "ON",
-  "AS", "ORDER", "BY", "GROUP", "HAVING", "LIMIT", "OFFSET",
-  "DISTINCT", "ALL", "UNION", "INTERSECT", "EXCEPT",
-  "CASE", "WHEN", "THEN", "ELSE", "END", "BEGIN", "COMMIT", "ROLLBACK",
-  "TRANSACTION", "RETURNING", "WITH", "RECURSIVE", "LATERAL",
-  "DO", "IF", "ELSIF", "LOOP", "WHILE", "FOR", "FOREACH", "EXECUTE",
-  "OPEN", "CLOSE", "FETCH", "MOVE", "DECLARE",
-  "RETURN", "RETURNS", "CALL", "LANGUAGE", "IMMUTABLE", "STABLE", "VOLATILE",
-  "STRICT", "LEAKPROOF", "PARALLEL", "COST", "ROWS", "SECURITY", "INVOKER",
-  "DEFINER", "CALLED", "CONTAINS", "SQL", "NO", "DATA",
-  "PARTITION", "RANGE", "UNBOUNDED", "PRECEDING",
-  "FOLLOWING", "CURRENT", "ROW", "FILTER", "OVER",
-  "EXPLAIN", "ANALYZE", "BUFFERS", "VERBOSE", "TIMING",
-  "VACUUM", "CLUSTER", "REINDEX", "TRUNCATE",
-  "COMMENT", "OWNER", "STORAGE",
-  "LOGGED", "UNLOGGED", "TEMPORARY", "TEMP",
-  "SIMILAR", "REGEXP",
-  "ARRAY", "ROW",
-  "BEFORE", "AFTER", "INSTEAD", "OF",
-  "DEFERRABLE", "INITIALLY", "DEFERRED", "IMMEDIATE",
-  "REFRESH", "CONCURRENTLY",
-  "LISTEN", "NOTIFY", "UNLISTEN",
-  "LOAD", "SET", "RESET", "SHOW",
-  "COPY", "STDIN", "STDOUT", "DELIMITER", "CSV", "HEADER", "QUOTE", "ESCAPE",
-  "FREEZE", "FORCE",
-  "PREPARE", "DEALLOCATE",
-  "SAVEPOINT", "RELEASE", "TO",
-  "ABORT",
-  "LOCK", "NOWAIT", "SHARE", "EXCLUSIVE",
-  "CHECKPOINT", "IMPORT", "OPTIONS",
-  "CURRENT_USER", "SESSION_USER", "ADMIN",
-  "PRIVILEGES", "ALL", "PUBLIC",
-  "TABLESAMPLE", "SYSTEM", "BERNOULLI",
-  "NATURAL", "USING", "CROSS", "APPLY",
-  "NEXT", "PRIOR", "FIRST", "LAST", "ABSOLUTE", "RELATIVE",
-  "FORWARD", "BACKWARD", "SCROLL", "WITHOUT", "HOLD",
-  "BINARY", "INSENSITIVE",
-  "CONNECT", "DISCONNECT",
-  "CHARACTER", "CHAR", "NCHAR", "VARYING",
-  "NATIONAL", "LARGE", "OBJECT", "CLOB", "BLOB",
-  "ANY", "SOME", "EVERY",
-  "CONVERT", "TRANSLATE", "OVERLAY", "POSITION", "SUBSTRING", "TRAILING",
-  "LEADING", "BOTH", "TREAT", "TRIM",
-  "COALESCE", "GREATEST", "LEAST",
-  "NULLIF", "NVL", "NVL2",
-  "EXTRACT", "CHAR_LENGTH", "CHARACTER_LENGTH",
-  "OCTET_LENGTH", "BIT_LENGTH", "CARDINALITY",
-  "ABS", "CEIL", "CEILING", "FLOOR", "MOD", "POWER", "SQRT",
-  "EXP", "LN", "LOG", "ROUND", "TRUNC", "SIGN",
-  "SIN", "COS", "TAN", "ASIN", "ACOS", "ATAN", "ATAN2",
-  "DEGREES", "RADIANS", "PI",
-  "WIDTH_BUCKET",
-  "RANDOM", "SETSEED",
-  "COUNT", "SUM", "AVG", "MIN", "MAX",
-  "ARRAY_AGG", "STRING_AGG", "JSON_AGG", "JSONB_AGG",
-  "XMLAGG", "GROUPING",
-  "RANK", "DENSE_RANK", "ROW_NUMBER", "NTILE", "LEAD", "LAG",
-  "FIRST_VALUE", "LAST_VALUE", "NTH_VALUE",
-  "PERCENT_RANK", "CUME_DIST", "PERCENTILE_CONT", "PERCENTILE_DISC",
-  "CORR", "COVAR_POP", "COVAR_SAMP", "REGR_SLOPE", "REGR_INTERCEPT",
-  "STDDEV", "STDDEV_POP", "STDDEV_SAMP", "VARIANCE", "VAR_POP", "VAR_SAMP",
-  "CAST", "OPERATOR",
-  "MEMBER",
-  "ENCRYPTED", "UNENCRYPTED", "PASSWORD", "VALID", "UNTIL",
-  "INHERIT", "NOINHERIT", "CREATEDB", "NOCREATEDB",
-  "CREATEROLE", "NOCREATEROLE", "SUPERUSER", "NOSUPERUSER",
-  "LOGIN", "NOLOGIN",
-  "BYPASSRLS", "NOBYPASSRLS",
-  "CONNECTION", "LIMIT",
-  "SESSION", "LOCAL",
-  "AT", "TIME", "ZONE", "TIMEZONE",
-  "ISOLATION", "LEVEL", "SERIALIZABLE", "REPEATABLE", "READ",
-  "COMMITTED", "UNCOMMITTED",
-  "CONSTRAINTS",
-  "SESSION", "AUTHORIZATION",
-  "XMLCOMMENT", "XMLCONCAT", "XMLELEMENT", "XMLFOREST",
-  "XMLPARSE", "XMLPI", "XMLROOT", "XMLSERIALIZE", "XMLTABLE",
-  "JSON_OBJECT", "JSON_ARRAY", "JSON_SCALAR", "JSON_SERIALIZE",
-  "JSON_TABLE", "JSON_VALUE", "JSON_QUERY", "JSON_EXISTS",
-  "MERGE", "MATCHED",
-  "UPSERT", "CONFLICT", "NOTHING",
-  "OVERRIDING", "VALUE",
-  "IDENTITY", "GENERATED", "ALWAYS", "BY", "DEFAULT",
-];
-
-const PLPGSQL_KEYWORDS = [
-  "THEN", "ELSE", "ELSIF", "ELSEIF",
-  "EXIT", "CONTINUE", "WHEN",
-  "RAISE", "EXCEPTION", "DETAIL", "HINT", "ERRCODE",
-  "PERFORM", "GET", "DIAGNOSTICS",
-  "NOTICE", "WARNING", "DEBUG", "INFO", "LOG",
-  "NEW", "OLD",
-  "INTO", "STRICT",
-  "FOUND", "ROW_COUNT",
-  "TG_OP", "TG_NAME", "TG_WHEN", "TG_LEVEL", "TG_RELID",
-  "TG_RELNAME", "TG_TABLE_NAME", "TG_TABLE_SCHEMA",
-  "TG_NARGS", "TG_ARGV",
-  "COLLATE",
-  "TRANSFORM", "VARIADIC",
-  "OUT", "INOUT", "IN",
-  "ARGUMENT", "MODE",
-  "PLPGSQL",
-];
-
-const BUILTIN_OBJECT_KEYWORDS = [
-  "TABLE", "VIEW", "INDEX", "FUNCTION", "TRIGGER", "PROCEDURE",
-  "SCHEMA", "DATABASE", "SEQUENCE", "DOMAIN", "TYPE", "EXTENSION",
-  "ENUM", "CURSOR", "TABLESPACE", "SERVER", "WRAPPER",
-  "POLICY", "PUBLICATION", "SUBSCRIPTION", "REPLICATION", "SLOT",
-  "STATISTICS", "ROLE", "EVENT",
-  "HANDLER", "VALIDATOR", "WINDOW",
-  "MATERIALIZED",
-];
-
-const BUILTIN_TYPE_KEYWORDS = [
-  "INTEGER", "INT", "SMALLINT", "BIGINT", "TINYINT",
-  "SERIAL", "BIGSERIAL", "SMALLSERIAL",
-  "NUMERIC", "DECIMAL", "DEC", "REAL", "FLOAT", "DOUBLE", "PRECISION",
-  "CHAR", "VARCHAR", "TEXT", "BPCHAR",
-  "BOOLEAN", "BOOL",
-  "DATE", "TIME", "TIMESTAMP", "TIMESTAMPTZ", "INTERVAL",
-  "UUID", "JSON", "JSONB", "BYTEA", "XML", "ARRAY",
-  "GEOMETRY", "GEOGRAPHY", "POINT", "LINE", "LSEG", "BOX",
-  "PATH", "POLYGON", "CIRCLE",
-  "TSVECTOR", "TSQUERY",
-  "INET", "CIDR", "MACADDR", "PG_LSN",
-  "MONEY", "OID",
-  "INT4RANGE", "INT8RANGE", "NUMRANGE",
-  "TSRANGE", "TSTZRANGE", "DATERANGE",
-  "INT4MULTIRANGE", "INT8MULTIRANGE", "NUMMULTIRANGE",
-  "TSMULTIRANGE", "TSTMULTIRANGE", "DATEMULTIRANGE",
-];
 
 function buildMonarchDefinition() {
   const allKeywords = [
     ...new Set([
       ...BUILTIN_KEYWORDS,
-      ...PLPGSQL_KEYWORDS,
       ...Array.from(_pgKeywordSet).map((k) => k.toUpperCase()),
     ]),
   ];
 
-  const allTypeKeywords = [...new Set([
-    ...BUILTIN_TYPE_KEYWORDS,
-    ...BUILTIN_OBJECT_KEYWORDS,
-  ])];
+  const allTypeKeywords = [
+    ...new Set([...BUILTIN_TYPE_KEYWORDS, ...BUILTIN_OBJECT_KEYWORDS]),
+  ];
 
   return {
     defaultToken: "",
     ignoreCase: true,
     tokenPostfix: ".pgsql",
-    brackets: [
-      { open: "(", close: ")", token: "delimiter.parenthesis" },
-    ],
+    brackets: [{ open: "(", close: ")", token: "delimiter.parenthesis" }],
     keywords: allKeywords,
     builtinFunctions: [],
     typeKeywords: allTypeKeywords,
@@ -199,14 +95,17 @@ function buildMonarchDefinition() {
         { include: "@numbers" },
         { include: "@strings" },
         { include: "@operators" },
-        [/[a-zA-Z_][a-zA-Z0-9_]*/, {
-          cases: {
-            "@typeKeywords": "type",
-            "@keywords": "keyword",
-            "@builtinFunctions": "predefined",
-            "@default": "identifier",
+        [
+          /[a-zA-Z_][a-zA-Z0-9_]*/,
+          {
+            cases: {
+              "@typeKeywords": "type",
+              "@keywords": "keyword",
+              "@builtinFunctions": "predefined",
+              "@default": "identifier",
+            },
           },
-        }],
+        ],
         [/[;,.()]/, "delimiter"],
       ],
       comments: [
@@ -218,15 +117,14 @@ function buildMonarchDefinition() {
         [/\*\//, { token: "comment.quote", next: "@pop" }],
         [/./, "comment"],
       ],
-      whitespace: [
-        [/[ \t\r\n]+/, "white"],
-      ],
-      numbers: [
-        [/(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?/, "number"],
-      ],
+      whitespace: [[/[ \t\r\n]+/, "white"]],
+      numbers: [[/(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?/, "number"]],
       strings: [
         [/'/, { token: "string", next: "@string" }],
-        [/\$[a-zA-Z_][a-zA-Z0-9_]*\$/, { token: "string.sql", next: "@pgCode" }],
+        [
+          /\$[a-zA-Z_][a-zA-Z0-9_]*\$/,
+          { token: "string.sql", next: "@pgCode" },
+        ],
       ],
       string: [
         [/[^']+/, "string"],
@@ -240,19 +138,20 @@ function buildMonarchDefinition() {
         { include: "@numbers" },
         { include: "@strings" },
         { include: "@operators" },
-        [/[a-zA-Z_][a-zA-Z0-9_]*/, {
-          cases: {
-            "@typeKeywords": "type",
-            "@keywords": "keyword",
-            "@builtinFunctions": "predefined",
-            "@default": "identifier",
+        [
+          /[a-zA-Z_][a-zA-Z0-9_]*/,
+          {
+            cases: {
+              "@typeKeywords": "type",
+              "@keywords": "keyword",
+              "@builtinFunctions": "predefined",
+              "@default": "identifier",
+            },
           },
-        }],
+        ],
         [/[;,.()]/, "delimiter"],
       ],
-      operators: [
-        [/[<>=!~:&|+\-*/%^#]+/, "operator"],
-      ],
+      operators: [[/[<>=!~:&|+\-*/%^#]+/, "operator"]],
     },
   };
 }
@@ -268,8 +167,16 @@ export function registerPgsqlLanguage() {
 
 const semanticLegend = {
   tokenTypes: [
-    "comment", "string", "keyword", "number", "operator",
-    "namespace", "type", "function", "variable", "property",
+    "comment",
+    "string",
+    "keyword",
+    "number",
+    "operator",
+    "namespace",
+    "type",
+    "function",
+    "variable",
+    "property",
   ],
   tokenModifiers: [],
 };
@@ -278,7 +185,8 @@ function _extractAliases(text, outMap) {
   const clauseRe = /(?:from|join)\s+/gi;
   const tableAliasRe = /^(?:\w+\.)?(\w+)(?:\s+as)?\s+(\w+)$/i;
   const funcAliasRe = /^(?:\w+\.)?(\w+)\([^)]*\)\s+(?:as\s+)?(\w+)$/i;
-  const clauseEndRe = /\b(?:where|group\s+by|order\s+by|having|limit|offset|returning|union|intersect|except)\b/i;
+  const clauseEndRe =
+    /\b(?:where|group\s+by|order\s+by|having|limit|offset|returning|union|intersect|except)\b/i;
   let clauseMatch;
 
   while ((clauseMatch = clauseRe.exec(text)) !== null) {
@@ -288,11 +196,16 @@ function _extractAliases(text, outMap) {
     let block = text.slice(after, end);
     // Strip ON/USING conditions to avoid false matches like "p.project_id = e.project_id"
     block = block.replace(/\s+ON\s+.+$/is, "");
-    block = block.replace(/\s+USING\s*\([^)]*\)/ig, "");
+    block = block.replace(/\s+USING\s*\([^)]*\)/gi, "");
     // Split by comma or newline to get individual table/alias references
     const fragments = block.split(/[,\n]+/);
     for (const fragment of fragments) {
-      const trimmed = fragment.trim().replace(/^(?:inner|cross|left|right|full|natural|outer)?\s*(?:from|join)\s+/i, "");
+      const trimmed = fragment
+        .trim()
+        .replace(
+          /^(?:inner|cross|left|right|full|natural|outer)?\s*(?:from|join)\s+/i,
+          "",
+        );
       if (!trimmed) continue;
       let m = trimmed.match(tableAliasRe);
       if (m) {
@@ -449,7 +362,9 @@ function registerSemanticProvider() {
 }
 
 const _reservedTypeSet = new Set(
-  [...BUILTIN_TYPE_KEYWORDS, ...BUILTIN_OBJECT_KEYWORDS].map((k) => k.toLowerCase()),
+  [...BUILTIN_TYPE_KEYWORDS, ...BUILTIN_OBJECT_KEYWORDS].map((k) =>
+    k.toLowerCase(),
+  ),
 );
 
 export function updatePgsqlIntellisenseData(data) {
