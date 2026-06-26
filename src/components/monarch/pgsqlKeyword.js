@@ -476,3 +476,20 @@ export const BUILTIN_TYPE_KEYWORDS = [
   "TSTMULTIRANGE",
   "DATEMULTIRANGE",
 ];
+
+// các legend cấu hình
+export const SEMANTIC_LEGEND = {
+  tokenTypes: [
+    "comment",
+    "string",
+    "keyword",
+    "number",
+    "operator",
+    "namespace",
+    "type",
+    "function",
+    "variable",
+    "property",
+  ],
+  tokenModifiers: [],
+};

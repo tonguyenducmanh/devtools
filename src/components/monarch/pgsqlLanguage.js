@@ -11,6 +11,7 @@ import {
   BUILTIN_OBJECT_KEYWORDS,
   DARK_THEME_RULES,
   LIGHT_THEME_RULES,
+  SEMANTIC_LEGEND,
 } from "./pgsqlKeyword.js";
 
 /**
@@ -50,7 +51,11 @@ let _monarchRegistered = false;
 // từ đó hiểu rõ mối quan hệ giữa các thành phần.
 let _semanticRegistered = false;
 
+/**
+ * build ra danh sách định nghĩa để gợi ý syntax cho editor
+ */
 function buildMonarchDefinition() {
+  // build ra toàn bộ keyword bao gồm keyword default và keyword lấy được từ database
   const allKeywords = [
     ...new Set([
       ...BUILTIN_KEYWORDS,
@@ -58,10 +63,12 @@ function buildMonarchDefinition() {
     ]),
   ];
 
+  // tượng tự, đây là toàn bộ type tìm được
   const allTypeKeywords = [
     ...new Set([...BUILTIN_TYPE_KEYWORDS, ...BUILTIN_OBJECT_KEYWORDS]),
   ];
 
+  // return cấu hình monarch
   return {
     defaultToken: "",
     ignoreCase: true,
@@ -138,39 +145,40 @@ function buildMonarchDefinition() {
   };
 }
 
+// đăng ký language PostgreSQL vào trong monacoeditor
 export function registerPgsqlLanguage() {
   if (_monarchRegistered) return;
+  // đăng ký ngôn ngữ
   monaco.languages.register({ id: "pgsql" });
+  // đăng ký sử dụng monarch để highlight syntax theo cú pháp đã xác định trước
   const definition = buildMonarchDefinition();
   monaco.languages.setMonarchTokensProvider("pgsql", definition);
   _monarchRegistered = true;
+  // đăng ký sử dụng semantic để highlight syntax theo các từ khóa mới mà user nhập
   registerSemanticProvider();
 }
 
-const semanticLegend = {
-  tokenTypes: [
-    "comment",
-    "string",
-    "keyword",
-    "number",
-    "operator",
-    "namespace",
-    "type",
-    "function",
-    "variable",
-    "property",
-  ],
-  tokenModifiers: [],
-};
-
+/**
+ * bóc tách văn bản user nhập liệu để xem đâu là alias
+ * @param {*} text văn bản user nhập liệu
+ * @param {*} outMap dictionary danh sách các alias
+ */
 function _extractAliases(text, outMap) {
+  // mệnh đề from, join để nhận biết alias phía sau nó
+  // ví dụ: select * from tm.order ot join tm.invoice it thì sẽ bóc tách được ra tm.order, tm.invoice
   const clauseRe = /(?:from|join)\s+/gi;
+  // nhận biết alias của table
+  // ví dụ: select * from tm.order ot join tm.invoice it thì sẽ bóc tách được ra ot, it
   const tableAliasRe = /^(?:\w+\.)?(\w+)(?:\s+as)?\s+(\w+)$/i;
+  // nhận biết alias của function
+  // ví dụ: select * from tm.func_rebuild_invoice_dashboard(p_from_date, p_to_date) frid thì sẽ bóc tách được ra frid
   const funcAliasRe = /^(?:\w+\.)?(\w+)\([^)]*\)\s+(?:as\s+)?(\w+)$/i;
+  // dấu hiệu nhận biết kết thúc phần mệnh đề của user
   const clauseEndRe =
     /\b(?:where|group\s+by|order\s+by|having|limit|offset|returning|union|intersect|except)\b/i;
   let clauseMatch;
 
+  // chạy vòng for để bóc tách ra từng thông tin nhỏ 1 trong câu sql của user
   while ((clauseMatch = clauseRe.exec(text)) !== null) {
     const after = clauseMatch.index + clauseMatch[0].length;
     const endRest = text.slice(after).search(clauseEndRe);
@@ -208,7 +216,7 @@ function registerSemanticProvider() {
 
   monaco.languages.registerDocumentSemanticTokensProvider("pgsql", {
     getLegend() {
-      return semanticLegend;
+      return SEMANTIC_LEGEND;
     },
 
     provideDocumentSemanticTokens(model) {
@@ -304,7 +312,7 @@ function registerSemanticProvider() {
               }
 
               if (type) {
-                const typeIndex = semanticLegend.tokenTypes.indexOf(type);
+                const typeIndex = SEMANTIC_LEGEND.tokenTypes.indexOf(type);
                 if (typeIndex !== -1) {
                   data.push(
                     i - prevLine,
