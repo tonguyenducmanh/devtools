@@ -613,6 +613,7 @@ import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDAPITestingHelp from "@/views/helps/TDAPITestingHelp.vue";
 import proModeTemplates from "./templates.js";
 import { registerTdApiPromodeLanguage } from "@/components/monarch/tdApiPromodeLanguage.js";
+import { registerTdApiPromodeFormatProvider } from "@/components/monarch/tdApiPromodeFormatProvider.js";
 export default {
   extends: TDToolBase,
   name: "TDAPITesting",
@@ -865,6 +866,8 @@ export default {
               },
             });
           me._proModeDisposables.push(hoverDisposable);
+
+          registerTdApiPromodeFormatProvider(monacoInstance);
         },
       };
     },
