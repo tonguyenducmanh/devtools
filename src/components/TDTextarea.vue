@@ -83,6 +83,10 @@ export default {
       },
     );
   },
+  activated() {
+    // Khi tab được reactivate (KeepAlive), DOM đã được gắn lại — đồng bộ footer
+    this.$nextTick(() => this._applyFooterTheme());
+  },
   beforeUnmount() {
     if (this.debounceUpdateEditorVal?.cancel) {
       this.debounceUpdateEditorVal.cancel();
