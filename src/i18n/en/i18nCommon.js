@@ -9,6 +9,7 @@ export default {
       showTabNumber: "Show tab number",
       tabPrevious: "Previous tab",
       tabNext: "Next tab",
+      tabClose: "Close tab",
     },
     group: {
       QRCode: "QR tooling",

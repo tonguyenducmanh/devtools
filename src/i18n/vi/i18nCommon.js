@@ -9,6 +9,7 @@ export default {
       showTabNumber: "Đánh số thứ tự tab",
       tabPrevious: "Tab trước",
       tabNext: "Tab sau",
+      tabClose: "Đóng tab",
     },
     group: {
       QRCode: "Công cụ QR",

@@ -130,6 +130,18 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
               {{ getTabLabel(tab) }}
             </div>
           </div>
+          <div class="td-tab-preview-footer">
+            <div
+              v-for="item in tabShortcuts"
+              :key="item.key"
+              class="td-tab-preview-footer__item"
+            >
+              <span class="td-tab-preview-footer__keys">
+                <kbd v-for="part in item.presentKey" :key="part">{{ part }}</kbd>
+              </span>
+              <span class="td-tab-preview-footer__label">{{ $t(item.labelKey) }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </Teleport>
@@ -168,6 +180,7 @@ export default {
   beforeUnmount() {
     TDShortcutAction.unregister("tabPrevious");
     TDShortcutAction.unregister("tabNext");
+    TDShortcutAction.unregister("tabClose");
   },
   data() {
     return {
@@ -197,6 +210,13 @@ export default {
         key: guid(),
         presentKey: [altKey, "D"],
         labelKey: "i18nCommon.tabManager.tabNext",
+      });
+
+      TDShortcutAction.register("tabClose", {
+        sortOrder: 7,
+        key: guid(),
+        presentKey: [altKey, "Q"],
+        labelKey: "i18nCommon.tabManager.tabClose",
       });
     },
   },
@@ -469,7 +489,13 @@ export default {
       );
     }
 
-    // ── Tab preview (Alt+A / Alt+D) ──────────────────────────────────────
+    // ── Tab preview (Alt+A / Alt+D / Alt+Q) ──────────────────────────────
+    const altKeyName = isMacOS ? 'Option' : 'Alt';
+    const tabShortcuts = [
+      { key: 'tabPrevious', presentKey: [altKeyName, 'A'], labelKey: 'i18nCommon.tabManager.tabPrevious' },
+      { key: 'tabNext', presentKey: [altKeyName, 'D'], labelKey: 'i18nCommon.tabManager.tabNext' },
+      { key: 'tabClose', presentKey: [altKeyName, 'Q'], labelKey: 'i18nCommon.tabManager.tabClose' },
+    ];
     const showTabPreview = ref(false);
     const previewIndex = ref(0);
 
@@ -503,6 +529,12 @@ export default {
         const idx = cur < tabList.length - 1 ? cur + 1 : 0;
         previewIndex.value = idx;
         activateTab(tabList[idx].id);
+      } else if (event.code === 'KeyQ') {
+        event.preventDefault();
+        showTabPreview.value = false;
+        if (activeTabId.value) {
+          closeTab(activeTabId.value);
+        }
       }
     }
 
@@ -555,6 +587,8 @@ export default {
       previewIndex,
       previewColumns,
       selectTabFromPreview,
+      tabShortcuts,
+      altKeyName,
     };
   },
 };
@@ -878,5 +912,39 @@ export default {
   color: var(--bg-main-color);
   font-weight: 600;
   border-color: var(--focus-color) !important;
+}
+.td-tab-preview-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+}
+.td-tab-preview-footer__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.td-tab-preview-footer__keys {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.td-tab-preview-footer__label {
+  font-size: 12px;
+  color: var(--text-secondary-color);
+  white-space: nowrap;
+}
+.td-tab-preview-footer kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-family: inherit;
+  background: var(--bg-layer-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-color);
 }
 </style>
