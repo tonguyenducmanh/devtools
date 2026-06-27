@@ -3,9 +3,9 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
 -->
 <template>
   <div class="td-dynamic-tab-view">
-    <!-- Tab bar: chỉ hiện khi có tab -->
+    <!-- Tab bar: chỉ hiện khi có tab và không ở zen mode -->
     <Transition name="td-tabbar">
-      <div v-if="isTabMode" class="flex td-tab-wrap">
+      <div v-if="isTabMode && !zenMode" class="flex td-tab-wrap">
         <div
           class="td-tab-bar"
           :class="{ 'td-tab-bar-wrap': wrapTab }"
@@ -88,7 +88,27 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
     </Transition>
 
     <!-- Content area -->
-    <div class="td-tab-content">
+    <div class="td-tab-content" :class="{ 'td-zen-active': zenMode }">
+      <!-- Zen mode toolbar -->
+      <div v-if="zenMode" class="td-zen-toolbar" :class="{ 'td-zen-toolbar-pinned': zenToolbarPinned }">
+        <div v-if="!zenToolbarPinned" class="flex toolbar-btn" @click="pinZenToolbar" v-tooltip="$t('i18nCommon.remoteDesktop.pin')">
+          <span class="td-icon td-pin-icon"></span>
+        </div>
+        <div v-else class="flex toolbar-btn" @click="unpinZenToolbar" v-tooltip="$t('i18nCommon.remoteDesktop.unpin')">
+          <span class="td-icon td-unpin-icon"></span>
+        </div>
+        <div class="flex toolbar-btn" @click="zenPrevTab" v-tooltip="$t('i18nCommon.tabManager.tabPrevious')">
+          <TDArrow :arrowDirection="tdEnum.Direction.left" />
+        </div>
+        <div class="flex toolbar-btn" @click="zenNextTab" v-tooltip="$t('i18nCommon.tabManager.tabNext')">
+          <TDArrow :arrowDirection="tdEnum.Direction.right" />
+        </div>
+        <span class="td-zen-toolbar-separator"></span>
+        <div class="flex toolbar-btn" @click="exitZenMode" v-tooltip="$t('i18nCommon.tdheader.exitZenMode')">
+          <span class="td-icon td-center-icon"></span>
+        </div>
+      </div>
+
       <!-- Tab mode: render sẵn tất cả bằng v-show -->
       <template v-if="isTabMode">
         <KeepAlive>
@@ -161,6 +181,10 @@ import { useTabManager } from "@/stores/TDTabManager.js";
 import i18nData from "@/i18n/i18nData.js";
 import tdUtility from "@/common/TDUtility.js";
 import TDShortcutAction from "@/common/TDShortcutAction.js";
+import eventBus from "@/common/event/TDEventBus.js";
+import { TDEnumEventBus } from "@/common/event/TDEnumEventBus.js";
+import TDArrow from "@/components/TDArrow.vue";
+import tdEnum from "@/common/TDEnum.js";
 const isMacOS = tdUtility.isMacOS();
 // 2. Thay bằng defineAsyncComponent để import động:
 const TDWelcome = defineAsyncComponent(
@@ -168,22 +192,31 @@ const TDWelcome = defineAsyncComponent(
 );
 export default {
   name: "TDDynamicTabView",
-  components: { TDWelcome },
+  components: { TDWelcome, TDArrow },
   created() {
     this.processWhenMouted();
   },
   mounted() {
     this.registerTabShortcuts();
+    this.zenModeUnsubscribe = eventBus.on(
+      TDEnumEventBus.zenModeToggle,
+      this.toggleZenMode,
+    );
   },
   beforeUnmount() {
     TDShortcutAction.unregister("tabPrevious");
     TDShortcutAction.unregister("tabNext");
     TDShortcutAction.unregister("tabClose");
+    if (this.zenModeUnsubscribe) {
+      this.zenModeUnsubscribe();
+    }
   },
   data() {
     return {
       wrapTab: true,
       showTabNumber: false,
+      zenMode: false,
+      zenToolbarPinned: false,
     };
   },
   methods: {
@@ -191,6 +224,36 @@ export default {
       let me = this;
       me.wrapTab = await me.$tdUtility.getUserSettings("wrapTab");
       me.showTabNumber = await me.$tdUtility.getUserSettings("showTabNumber");
+    },
+    toggleZenMode() {
+      this.zenMode = !this.zenMode;
+      if (!this.zenMode) {
+        this.zenToolbarPinned = false;
+      }
+    },
+    exitZenMode() {
+      this.zenMode = false;
+      this.zenToolbarPinned = false;
+    },
+    pinZenToolbar() {
+      this.zenToolbarPinned = true;
+    },
+    unpinZenToolbar() {
+      this.zenToolbarPinned = false;
+    },
+    zenPrevTab() {
+      const tabList = this.tabs;
+      if (!tabList.length) return;
+      const cur = tabList.findIndex((t) => t.id === this.activeTabId);
+      const idx = cur > 0 ? cur - 1 : tabList.length - 1;
+      this.activateTab(tabList[idx].id);
+    },
+    zenNextTab() {
+      const tabList = this.tabs;
+      if (!tabList.length) return;
+      const cur = tabList.findIndex((t) => t.id === this.activeTabId);
+      const idx = cur < tabList.length - 1 ? cur + 1 : 0;
+      this.activateTab(tabList[idx].id);
     },
     registerTabShortcuts() {
       const altKey = isMacOS ? "Option" : "Alt";
@@ -558,6 +621,7 @@ export default {
       activeTab,
       activeTabId,
       isTabMode,
+      tdEnum,
       activateTab,
       closeTab,
       duplicateTab,
@@ -862,6 +926,75 @@ export default {
 .td-tab-pane {
   width: 100%;
   height: 100%;
+}
+
+/* ── Zen mode ── */
+.td-zen-active {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 5 !important;
+  border-radius: 0 !important;
+  padding: var(--padding) !important;
+}
+
+.td-zen-toolbar {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  display: flex;
+  gap: 4px;
+  background-color: var(--bg-layer-color);
+  border-radius: var(--border-radius);
+  padding: 4px;
+  z-index: 6;
+  transition: all 0.3s ease-in-out;
+  transform: translateX(calc(-100% + 8px));
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+    transform: translateX(0);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  }
+
+  &.td-zen-toolbar-pinned {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -50px;
+    right: -20px;
+    bottom: -20px;
+    z-index: -1;
+  }
+
+  .td-zen-toolbar-separator {
+    width: 1px;
+    height: 20px;
+    background-color: var(--border-color);
+    align-self: center;
+  }
+
+  .toolbar-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    &:hover {
+      background-color: var(--bg-main-color);
+      border: 1px solid var(--border-color);
+    }
+  }
 }
 </style>
 

@@ -122,6 +122,13 @@ export default {
           action: this.appDataMinerFunc,
         },
       ],
+      view: [
+        {
+          key: "zenMode",
+          labelKey: "i18nCommon.tdheader.zenMode",
+          action: this.toggleZenMode,
+        },
+      ],
       utilities: [
         {
           key: "genUUID",
@@ -228,6 +235,10 @@ export default {
       } catch {
         this.$tdUtility.showErrorNotFoundAgentServer();
       }
+      this.closeFlyout();
+    },
+    toggleZenMode() {
+      eventBus.emit(TDEnumEventBus.zenModeToggle);
       this.closeFlyout();
     },
     reloadAppFunc() {

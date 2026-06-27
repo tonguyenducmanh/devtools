@@ -7,4 +7,7 @@ export const TDEnumEventBus = {
 
   // Monaco theme thay đổi — các editor sync footer theo
   monacoThemeChange: "monacoThemeChange",
+
+  // Zen mode (fullscreen tab content)
+  zenModeToggle: "zenModeToggle",
 };

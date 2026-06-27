@@ -47,7 +47,8 @@ export default {
       executeSQLCode: "Run SQL code",
       executeAPITesting: "Gửi API request",
     },
-    footerHelp: "Chuột phải vào dòng hoặc ô để xem thêm tùy chọn · Kéo thả để di chuyển nhanh",
+    footerHelp:
+      "Chuột phải vào dòng hoặc ô để xem thêm tùy chọn · Kéo thả để di chuyển nhanh",
     footerHelpDesc:
       "Chuột phải vào số dòng để copy hoặc xem toàn bộ dòng, chuột phải vào ô để copy giá trị hoặc xem toàn bộ dữ liệu. Kéo thả chuột trái trong bảng để di chuyển nhanh.",
     noDataAvailable: "Không có dữ liệu",
@@ -64,6 +65,8 @@ export default {
       toggleTheme: "Thay đổi chủ đề",
       changeLanguage: "Thay đổi ngôn ngữ",
       goToSource: "Source code",
+      zenMode: "Chế độ Zen",
+      exitZenMode: "Thoát chế độ Zen",
     },
     splitHorizontal: "Chia ngang",
     deleteAll: "Xóa tất cả lịch sử",
@@ -102,6 +105,9 @@ export default {
       title: "Tiện ích",
       getCurrentDate: "Lấy ngày hiện tại",
       getCurrentDateTime: "Lấy ngày và giờ hiện tại",
+    },
+    view: {
+      title: "Xem",
     },
     feature: {
       welcome: "Tổng quan",
@@ -810,8 +816,10 @@ export default {
       loadFunctionIntellisense: "Load gợi ý cả function",
       defaultQueryLimit: "Số dòng tối đa",
       resultLimit: "Giới hạn kết quả",
-      resultLimitDesc: "Server trả về toàn bộ dòng khi tắt. Nếu bật mà để trống số, server dùng mặc định 1000.",
-      defaultQueryLimitDesc: "Số dòng tối đa trả về khi bật 'Giới hạn kết quả'.",
+      resultLimitDesc:
+        "Server trả về toàn bộ dòng khi tắt. Nếu bật mà để trống số, server dùng mặc định 1000.",
+      defaultQueryLimitDesc:
+        "Số dòng tối đa trả về khi bật 'Giới hạn kết quả'.",
       addGroup: "Thêm nhóm",
       editConnection: "Sửa kết nối",
       addConnection: "Thêm kết nối",
@@ -868,8 +876,7 @@ export default {
         "Vui lòng nhập chuỗi connection string trước.",
       convertNpgsqlSuccess: "Chuyển đổi dữ liệu Npgsql thành công!",
       convertNpgsqlError: "Chuỗi Npgsql không hợp lệ hoặc lỗi phân tích.",
-      dotNetWasmNotReady:
-        "Hệ thống phân tích C# WASM chưa sẵn sàng.",
+      dotNetWasmNotReady: "Hệ thống phân tích C# WASM chưa sẵn sàng.",
       copyConnectionStringSuccess: "Đã sao chép connection string!",
       copyDSNConnectionString: "Sao chép connection string DSN/URI",
       sidebarOption: {

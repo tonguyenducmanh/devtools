@@ -64,6 +64,8 @@ export default {
       toggleTheme: "Change theme",
       changeLanguage: "Change language",
       goToSource: "Source code",
+      zenMode: "Zen Mode",
+      exitZenMode: "Exit Zen Mode",
     },
     splitHorizontal: "Split horizontal",
     deleteAll: "Delete all history",
@@ -102,6 +104,9 @@ export default {
       title: "Utilities",
       getCurrentDate: "Get current date",
       getCurrentDateTime: "Get current date and time",
+    },
+    view: {
+      title: "View",
     },
     feature: {
       welcome: "Welcome",
