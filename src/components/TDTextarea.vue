@@ -242,7 +242,7 @@ export default {
      * lấy theme mặc định dựa theo app theme
      */
     getDefaultMonacoTheme() {
-      return this.currentTheme == this.$tdEnum.theme.dark ? "vs-dark" : "vs";
+      return this.currentTheme == this.$tdEnum.theme.dark ? "catppuccin-dark" : "catppuccin-light";
     },
 
     /**
