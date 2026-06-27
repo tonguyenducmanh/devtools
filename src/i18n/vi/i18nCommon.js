@@ -7,6 +7,8 @@ export default {
       openInDynamicTab: "Mở trong tab động",
       duplicateTab: "Nhân bản tab",
       showTabNumber: "Đánh số thứ tự tab",
+      tabPrevious: "Tab trước",
+      tabNext: "Tab sau",
     },
     group: {
       QRCode: "Công cụ QR",

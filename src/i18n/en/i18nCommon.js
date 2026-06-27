@@ -7,6 +7,8 @@ export default {
       openInDynamicTab: "Open in dynamic tab",
       duplicateTab: "Dupplicate tab",
       showTabNumber: "Show tab number",
+      tabPrevious: "Previous tab",
+      tabNext: "Next tab",
     },
     group: {
       QRCode: "QR tooling",

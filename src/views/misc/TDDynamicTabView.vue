@@ -107,6 +107,32 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
       <!-- zero tabs mode: show Welcome -->
       <TDWelcome v-else />
     </div>
+
+      <!-- Tab preview overlay (Alt+A / Alt+D) -->
+    <Teleport to="body">
+      <div
+        v-if="showTabPreview && isTabMode"
+        class="td-tab-preview-overlay"
+      >
+        <div class="td-tab-preview-container">
+          <div
+            class="td-tab-preview-grid"
+            :style="{ gridTemplateColumns: `repeat(${previewColumns}, 1fr)` }"
+          >
+            <div
+              v-for="(tab, index) in tabs"
+              :key="tab.id"
+              class="td-tab-preview-item"
+              :class="{ 'td-tab-preview-item--active': previewIndex === index }"
+              @click="selectTabFromPreview(tab.id)"
+              @mouseenter="previewIndex = index"
+            >
+              {{ getTabLabel(tab) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -118,9 +144,14 @@ import {
   watch as vueWatch,
   nextTick,
   defineAsyncComponent,
+  onMounted,
+  onBeforeUnmount,
 } from "vue";
 import { useTabManager } from "@/stores/TDTabManager.js";
 import i18nData from "@/i18n/i18nData.js";
+import tdUtility from "@/common/TDUtility.js";
+import TDShortcutAction from "@/common/TDShortcutAction.js";
+const isMacOS = tdUtility.isMacOS();
 // 2. Thay bằng defineAsyncComponent để import động:
 const TDWelcome = defineAsyncComponent(
   () => import("@/views/misc/TDWelcome.vue"),
@@ -130,6 +161,13 @@ export default {
   components: { TDWelcome },
   created() {
     this.processWhenMouted();
+  },
+  mounted() {
+    this.registerTabShortcuts();
+  },
+  beforeUnmount() {
+    TDShortcutAction.unregister("tabPrevious");
+    TDShortcutAction.unregister("tabNext");
   },
   data() {
     return {
@@ -142,6 +180,24 @@ export default {
       let me = this;
       me.wrapTab = await me.$tdUtility.getUserSettings("wrapTab");
       me.showTabNumber = await me.$tdUtility.getUserSettings("showTabNumber");
+    },
+    registerTabShortcuts() {
+      const altKey = isMacOS ? 'Option' : 'Alt';
+      const guid = () => this.$tdUtility.newGuid();
+
+      TDShortcutAction.register("tabPrevious", {
+        sortOrder: 5,
+        key: guid(),
+        presentKey: [altKey, "A"],
+        labelKey: "i18nCommon.tabManager.tabPrevious",
+      });
+
+      TDShortcutAction.register("tabNext", {
+        sortOrder: 6,
+        key: guid(),
+        presentKey: [altKey, "D"],
+        labelKey: "i18nCommon.tabManager.tabNext",
+      });
     },
   },
   setup() {
@@ -413,6 +469,61 @@ export default {
       );
     }
 
+    // ── Tab preview (Alt+A / Alt+D) ──────────────────────────────────────
+    const showTabPreview = ref(false);
+    const previewIndex = ref(0);
+
+    const previewColumns = computed(() => {
+      const count = tabs.value.length;
+      if (count <= 0) return 1;
+      return Math.min(Math.ceil(Math.sqrt(count)), 6);
+    });
+
+    function selectTabFromPreview(tabId) {
+      activateTab(tabId);
+      showTabPreview.value = false;
+    }
+
+    function handleTabPreviewKeydown(event) {
+      if (!event.altKey) return;
+      const tabList = tabs.value;
+      if (!tabList.length) return;
+
+      if (event.code === 'KeyA') {
+        event.preventDefault();
+        showTabPreview.value = true;
+        const cur = tabList.findIndex(t => t.id === activeTabId.value);
+        const idx = cur > 0 ? cur - 1 : tabList.length - 1;
+        previewIndex.value = idx;
+        activateTab(tabList[idx].id);
+      } else if (event.code === 'KeyD') {
+        event.preventDefault();
+        showTabPreview.value = true;
+        const cur = tabList.findIndex(t => t.id === activeTabId.value);
+        const idx = cur < tabList.length - 1 ? cur + 1 : 0;
+        previewIndex.value = idx;
+        activateTab(tabList[idx].id);
+      }
+    }
+
+    function handleTabPreviewKeyup(event) {
+      if (event.code === 'AltLeft' || event.code === 'AltRight' || event.key === 'Alt') {
+        showTabPreview.value = false;
+      } else if (event.code === 'Escape') {
+        showTabPreview.value = false;
+      }
+    }
+
+    onMounted(() => {
+      window.addEventListener('keydown', handleTabPreviewKeydown);
+      window.addEventListener('keyup', handleTabPreviewKeyup);
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener('keydown', handleTabPreviewKeydown);
+      window.removeEventListener('keyup', handleTabPreviewKeyup);
+    });
+
     return {
       tabs,
       activeTab,
@@ -439,6 +550,11 @@ export default {
       onDragEnd,
       shouldShiftRight,
       shouldShiftLeft,
+      // tab preview
+      showTabPreview,
+      previewIndex,
+      previewColumns,
+      selectTabFromPreview,
     };
   },
 };
@@ -716,5 +832,51 @@ export default {
 .td-tab-pane {
   width: 100%;
   height: 100%;
+}
+</style>
+
+<style>
+/* Tab preview — unscoped because Teleport to body */
+.td-tab-preview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.td-tab-preview-container {
+  background: var(--bg-main-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: calc(var(--padding) * 1.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+}
+.td-tab-preview-grid {
+  display: grid;
+  gap: 6px;
+}
+.td-tab-preview-item {
+  padding: 8px 18px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  color: var(--text-color);
+  font-size: var(--font-size-medium-rare);
+  text-align: center;
+  white-space: nowrap;
+  border: 1px solid var(--border-color);
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.td-tab-preview-item:hover {
+  background: var(--border-color);
+  border-color: var(--text-secondary-color);
+}
+.td-tab-preview-item--active {
+  background: var(--focus-color) !important;
+  color: var(--bg-main-color);
+  font-weight: 600;
+  border-color: var(--focus-color) !important;
 }
 </style>
