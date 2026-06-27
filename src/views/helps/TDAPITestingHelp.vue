@@ -49,13 +49,53 @@
           {{ $t("i18nHelp.apiTesting.requirement.note") }}
         </p>
       </div>
+
+      <div class="help-section">
+        <h3 class="section-subtitle">
+          {{ $t("i18nHelp.apiTesting.proModeHelp.title") }}
+        </h3>
+        <p class="section-text">
+          {{ $t("i18nHelp.apiTesting.proModeHelp.builtinFunctions") }}
+        </p>
+        <div class="flex flex-col section-list">
+          <div class="section-item section-code">
+            <code>{{ $t("i18nHelp.apiTesting.proModeHelp.requestCURL") }}</code>
+          </div>
+          <div class="section-item section-code">
+            <code>{{ $t("i18nHelp.apiTesting.proModeHelp.parseResponseCURL") }}</code>
+          </div>
+        </div>
+        <p class="section-note">
+          {{ triggerIntelliSenseText }}
+        </p>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import TDShortcutAction, {
+  TDShortcutActionEnum,
+} from "@/common/TDShortcutAction.js";
+
 export default {
   name: "TDAPITestingHelp",
+  computed: {
+    triggerIntelliSenseText() {
+      let shortcuts = TDShortcutAction.getActiveShortcuts();
+      let intelliSenseShortcut = shortcuts.find(
+        (s) =>
+          s.labelKey === "i18nCommon.shortKeyAction.showIntelliSense",
+      );
+      let shortcutText = "";
+      if (intelliSenseShortcut?.presentKey) {
+        shortcutText = intelliSenseShortcut.presentKey.join(" + ");
+      }
+      return this.$t(
+        "i18nHelp.apiTesting.proModeHelp.triggerIntelliSense",
+      ).format(shortcutText);
+    },
+  },
 };
 </script>
 

@@ -275,6 +275,17 @@ export default {
         title: "Requirements",
         note: "This tool requires downloading and running the Agent app (desktop application) as backend. Please click Help menu in the header to download Agent.",
       },
+      proModeHelp: {
+        title: "Pro Mode - Built-in Functions",
+        builtinFunctions:
+          "Pro Mode provides 2 built-in functions that are automatically available in your script:",
+        requestCURL:
+          "requestCURL(curlString) - Execute a CURL request via the Agent server. This is an async function, must be called with await.",
+        parseResponseCURL:
+          "parseResponseCURL(response) - Parse the response from requestCURL, returns the body parsed as JSON (or raw string if parsing fails).",
+        triggerIntelliSense:
+          "Press {0} to trigger intellisense suggestions for the built-in functions.",
+      },
     },
     qrCodeToText: {
       purpose: {

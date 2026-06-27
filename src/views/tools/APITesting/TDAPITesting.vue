@@ -306,8 +306,10 @@
               <TDTextarea
                 :isLabelTop="true"
                 v-model="proModeSecranioCode"
+                language="td-api-promode"
                 :wrapText="currentConfigLayout.wrapText"
                 :enableHighlight="currentConfigLayout.enableHighlight"
+                :monacoOptions="proModeMonacoOptions"
                 :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
                 :label="$t('i18nCommon.apiTesting.scriptExecute')"
               ></TDTextarea>
@@ -606,10 +608,11 @@ import TDAPIResponseStatus from "@/views/tools/APITesting/TDAPIResponseStatus.vu
 import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
-import TDMockAPIProMode from "@/common/mock/TDMockAPIProMode.js";
 import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDAPITestingHelp from "@/views/helps/TDAPITestingHelp.vue";
+import proModeTemplates from "./templates.js";
+import { registerTdApiPromodeLanguage } from "@/components/monarch/tdApiPromodeLanguage.js";
 export default {
   extends: TDToolBase,
   name: "TDAPITesting",
@@ -670,10 +673,8 @@ export default {
         { value: this.$tdEnum.APIMode.Normal, label: "Normal" },
         { value: this.$tdEnum.APIMode.ProMode, label: "Pro" },
       ],
-      proModeSecranioCode:
-        this.$t("i18nCommon.apiTesting.tutorialProModeCode") +
-        TDMockAPIProMode[0].content,
-      proModeTemplate: TDMockAPIProMode,
+      proModeSecranioCode: "",
+      proModeTemplate: proModeTemplates,
       requestSectionSize: 50, // Phần request chiếm 50%
       responseSectionSize: 50, // Phần response chiếm 50%
       agentAPI: null,
@@ -682,6 +683,7 @@ export default {
   },
   async mounted() {
     this.agentAPI = new TDServerTestingAPI();
+    registerTdApiPromodeLanguage();
     await this.loadAllTestingData();
   },
   watch: {
@@ -770,11 +772,110 @@ export default {
         return null;
       }
     },
+    proModeMonacoOptions() {
+      let me = this;
+      return {
+        onInit: (editor, monacoInstance) => {
+          if (me._proModeDisposables) {
+            me._proModeDisposables.forEach((d) => d?.dispose?.());
+          }
+          me._proModeDisposables = [];
+
+          const completionDisposable =
+            monacoInstance.languages.registerCompletionItemProvider(
+              "td-api-promode",
+              {
+                provideCompletionItems: (model, position) => {
+                  const word = model.getWordUntilPosition(position);
+                  const range = {
+                    startLineNumber: position.lineNumber,
+                    endLineNumber: position.lineNumber,
+                    startColumn: word.startColumn,
+                    endColumn: word.endColumn,
+                  };
+                  return {
+                    suggestions: [
+                      {
+                        label: "requestCURL",
+                        kind:
+                          monacoInstance.languages.CompletionItemKind.Function,
+                        insertText:
+                          "await requestCURL(${1:curlString})",
+                        insertTextRules:
+                          monacoInstance.languages
+                            .CompletionItemInsertTextRule.InsertAsSnippet,
+                        sortText: "0",
+                        detail: me.$t(
+                          "i18nCommon.apiTesting.requestCURLDescription",
+                        ),
+                        documentation: {
+                          value: me.$t(
+                            "i18nCommon.apiTesting.requestCURLDescription",
+                          ),
+                          isTrusted: true,
+                        },
+                      },
+                      {
+                        label: "parseResponseCURL",
+                        kind:
+                          monacoInstance.languages.CompletionItemKind.Function,
+                        insertText:
+                          "parseResponseCURL(${1:response})",
+                        insertTextRules:
+                          monacoInstance.languages
+                            .CompletionItemInsertTextRule.InsertAsSnippet,
+                        sortText: "1",
+                        detail: me.$t(
+                          "i18nCommon.apiTesting.parseResponseCURLDescription",
+                        ),
+                        documentation: {
+                          value: me.$t(
+                            "i18nCommon.apiTesting.parseResponseCURLDescription",
+                          ),
+                          isTrusted: true,
+                        },
+                      },
+                    ],
+                  };
+                },
+              },
+            );
+          me._proModeDisposables.push(completionDisposable);
+
+          const hoverDisposable =
+            monacoInstance.languages.registerHoverProvider("td-api-promode", {
+              provideHover: (model, position) => {
+                const word = model.getWordAtPosition(position);
+                if (!word) return null;
+                const name = word.word;
+                let description = null;
+                if (name === "requestCURL") {
+                  description = me.$t(
+                    "i18nCommon.apiTesting.requestCURLDescription",
+                  );
+                } else if (name === "parseResponseCURL") {
+                  description = me.$t(
+                    "i18nCommon.apiTesting.parseResponseCURLDescription",
+                  );
+                }
+                if (!description) return null;
+                return {
+                  contents: [{ value: description, isTrusted: true }],
+                };
+              },
+            });
+          me._proModeDisposables.push(hoverDisposable);
+        },
+      };
+    },
   },
   beforeUnmount() {
     // rời khỏi tool này phải hủy request
     if (this.currentRequest && this.currentRequest.cancel) {
       this.currentRequest.cancel();
+    }
+    if (this._proModeDisposables) {
+      this._proModeDisposables.forEach((d) => d?.dispose?.());
     }
   },
   methods: {

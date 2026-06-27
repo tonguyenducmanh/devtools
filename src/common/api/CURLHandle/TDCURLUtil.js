@@ -196,6 +196,23 @@ class TDCURLUtil {
       };
     }
   }
+  /**
+   * Parse response từ requestCURL, trả về body đã parse JSON
+   * @param {Object} response - Response từ requestCURL
+   * @returns {any} Body đã parse JSON (hoặc string gốc)
+   */
+  parseResponseCURL(response) {
+    if (!response) return null;
+    let body = response.body;
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      } catch {
+        // keep as string
+      }
+    }
+    return body;
+  }
   setGlobalInfoBeforeRequest(options) {
     let me = this;
     window.__tdInfo = {
@@ -203,6 +220,7 @@ class TDCURLUtil {
       requestCURL: me.requestCURL,
       parseCURL: me.parseCURL,
       fetchAgent: me.fetchAgent,
+      parseResponseCURL: me.parseResponseCURL,
     };
     return window.__tdInfo;
   }
@@ -214,6 +232,7 @@ class TDCURLUtil {
     let me = this;
     return `
 let requestCURL = window.__tdInfo.requestCURL;
+let parseResponseCURL = window.__tdInfo.parseResponseCURL;
 let result = 
 (async () => {
   ${secranioCode}

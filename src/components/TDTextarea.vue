@@ -282,6 +282,9 @@ export default {
         // Tạo inner div để Monaco mount vào — footer sẽ là sibling bên ngoài
         const editorMountEl = document.createElement("div");
         editorMountEl.className = "td-monaco-editor-inner";
+        if (!me.$refs.textareaWrap) {
+          return;
+        }
         me.$refs.textareaWrap.appendChild(editorMountEl);
         me._editorMountEl = editorMountEl;
 

@@ -270,6 +270,17 @@ export default {
         title: "Yêu cầu",
         note: "Công cụ này cần tải và chạy app Agent (ứng dụng desktop) để làm backend. Vui lòng bấm menu Trợ giúp ở header để tải Agent.",
       },
+      proModeHelp: {
+        title: "Pro Mode - Hàm dựng sẵn",
+        builtinFunctions:
+          "Pro Mode cung cấp 2 hàm dựng sẵn, tự động có sẵn trong script của bạn:",
+        requestCURL:
+          "requestCURL(curlString) - Thực thi một request CURL thông qua Agent server. Đây là hàm bất đồng bộ, phải gọi với await.",
+        parseResponseCURL:
+          "parseResponseCURL(response) - Parse response từ requestCURL, trả về body đã parse JSON (hoặc string gốc nếu không parse được).",
+        triggerIntelliSense:
+          "Nhấn {0} để hiển thị gợi ý intellisense cho các hàm dựng sẵn.",
+      },
     },
     qrCodeToText: {
       purpose: {
