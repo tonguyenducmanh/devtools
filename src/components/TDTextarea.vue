@@ -58,6 +58,8 @@ import {
 import { IQuickInputService } from "monaco-editor/esm/vs/platform/quickinput/common/quickInput.js";
 import { StandaloneServices } from "monaco-editor/esm/vs/editor/standalone/browser/standaloneServices.js";
 import _ from "@/common/TDCommonFunction.js";
+import TDEventBus from "@/common/event/TDEventBus.js";
+import { TDEnumEventBus } from "@/common/event/TDEnumEventBus.js";
 
 export default {
   name: "TDTextarea",
@@ -69,6 +71,18 @@ export default {
     this.debounceUpdateEditorVal = _.debounce(this.updateEditorVal, 100);
     this.debounceUpdateValToEditor = _.debounce(this.updateValToEditor, 100);
   },
+  mounted() {
+    let me = this;
+    this.updateHighlight();
+
+    // Lắng nghe sự kiện đổi theme monaco để đồng bộ footer
+    this._unsubscribeThemeChange = TDEventBus.on(
+      TDEnumEventBus.monacoThemeChange,
+      () => {
+        me._applyFooterTheme();
+      },
+    );
+  },
   beforeUnmount() {
     if (this.debounceUpdateEditorVal?.cancel) {
       this.debounceUpdateEditorVal.cancel();
@@ -76,10 +90,10 @@ export default {
     if (this.debounceUpdateValToEditor?.cancel) {
       this.debounceUpdateValToEditor.cancel();
     }
-  },
-  mounted() {
-    let me = this;
-    this.updateHighlight();
+    if (this._unsubscribeThemeChange) {
+      this._unsubscribeThemeChange();
+    }
+    this.unmountEditor();
   },
   computed: {
     styleComputed() {
@@ -235,10 +249,10 @@ export default {
       me.monacoThemeName = themeName;
       if (me.editor) {
         monaco.editor.setTheme(themeName);
-        // đồng bộ màu footer sau khi theme thay đổi
-        me.$nextTick(() => me._applyFooterTheme());
       }
       await me.$tdUtility.setMonacoTheme(themeName);
+      // Thông báo cho tất cả editor khác đồng bộ footer theme
+      TDEventBus.emit(TDEnumEventBus.monacoThemeChange);
     },
 
     /**
@@ -502,9 +516,6 @@ export default {
       me.editor = null;
       me.editorModel = null;
     },
-  },
-  beforeUnmount() {
-    this.unmountEditor();
   },
 };
 </script>
