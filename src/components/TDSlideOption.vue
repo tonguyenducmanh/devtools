@@ -227,7 +227,8 @@ export default {
     left: 0;
     background-color: var(--focus-color);
     border-radius: var(--border-radius);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transition:
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
       width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
       height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
@@ -244,7 +245,7 @@ export default {
   }
 
   .td-slide-item-selected {
-    color: white;
+    color: var(--selected-item-text-color);
   }
 }
 

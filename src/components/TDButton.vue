@@ -88,7 +88,7 @@ export default {
   padding: var(--padding) var(--padding-x-medium);
   margin: var(--padding);
   background-color: var(--btn-color);
-  color: white;
+  color: var(--selected-item-text-color);
   border: none;
   cursor: pointer;
   font-size: 16px;

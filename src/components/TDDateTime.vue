@@ -840,7 +840,7 @@ export default {
         }
         &.selected {
           background: var(--btn-color);
-          color: white;
+          color: var(--selected-item-text-color);
         }
       }
     }
@@ -881,7 +881,7 @@ export default {
           }
           &.selected {
             background: var(--btn-color);
-            color: white;
+            color: var(--selected-item-text-color);
           }
           &.today {
             border: 1px solid var(--btn-color);

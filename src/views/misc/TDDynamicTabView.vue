@@ -1083,7 +1083,7 @@ export default {
 }
 .td-tab-preview-item--active {
   background: var(--focus-color) !important;
-  color: white;
+  color: var(--selected-item-text-color);
   font-weight: 600;
   border-color: var(--focus-color) !important;
 }
