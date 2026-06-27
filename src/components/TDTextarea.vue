@@ -7,10 +7,9 @@
     <div
       class="td-label"
       :class="{
-        'td-label-top': isLabelTop && !enableHighlight,
-        'td-label-editor': enableHighlight,
+        'td-label-top': isLabelTop,
       }"
-      v-if="label"
+      v-if="label && !enableHighlight"
     >
       {{ label.capitalize() }}
     </div>
@@ -171,6 +170,8 @@ export default {
     language(value, oldVal) {
       if (this.editor && value && oldVal && value != oldVal) {
         monaco.editor.setModelLanguage(this.editorModel, value);
+        // cập nhật label ngôn ngữ trên footer
+        this.updateFooterLanguage(value);
       }
     },
   },
@@ -234,6 +235,8 @@ export default {
       me.monacoThemeName = themeName;
       if (me.editor) {
         monaco.editor.setTheme(themeName);
+        // đồng bộ màu footer sau khi theme thay đổi
+        me.$nextTick(() => me._applyFooterTheme());
       }
       await me.$tdUtility.setMonacoTheme(themeName);
     },
@@ -276,7 +279,16 @@ export default {
           configObject.wordWrapColumn = 0;
           configObject.wrappingIndent = "none";
         }
-        me.editor = monaco.editor.create(me.$refs.textareaWrap, configObject);
+        // Tạo inner div để Monaco mount vào — footer sẽ là sibling bên ngoài
+        const editorMountEl = document.createElement("div");
+        editorMountEl.className = "td-monaco-editor-inner";
+        me.$refs.textareaWrap.appendChild(editorMountEl);
+        me._editorMountEl = editorMountEl;
+
+        me.editor = monaco.editor.create(editorMountEl, configObject);
+
+        // Tạo footer nằm ngoài Monaco, trải dài toàn chiều rộng giống VS Code status bar
+        me.createFooterWidget();
 
         // đăng ký command đổi theme (context menu + keyboard)
         me.editor.addAction({
@@ -332,6 +344,11 @@ export default {
         me.editor.onDidBlurEditorWidget(function () {
           me.debounceUpdateValToEditor();
         });
+
+        // cập nhật cursor position trên footer mỗi khi con trỏ di chuyển
+        me.editor.onDidChangeCursorPosition(function (e) {
+          me.updateFooterCursorPosition(e.position);
+        });
       } else {
         me.unmountEditor();
       }
@@ -355,12 +372,127 @@ export default {
         me.$emit("update:modelValue", editorVal);
       }
     },
+    /**
+     * Tạo footer nằm BÊN NGOÀI Monaco editor (sibling của editorMountEl).
+     *
+     * Kiến trúc giống VS Code:
+     *   .highlight-layer  (flex column)
+     *     ├── .td-monaco-editor-inner  (flex: 1) ← Monaco mount ở đây
+     *     └── .td-monaco-footer         (22px)   ← footer trải dài toàn chiều rộng
+     *
+     * Màu lấy từ getComputedStyle của .monaco-editor DOM sau mỗi theme change.
+     */
+    createFooterWidget() {
+      let me = this;
+      if (!me.editor || !me.label) return;
+
+      // Tạo DOM gốc cho footer
+      const footerDom = document.createElement("div");
+      footerDom.className = "td-monaco-footer";
+
+      // --- Nhóm trái: label ---
+      const leftGroup = document.createElement("span");
+      leftGroup.className = "td-monaco-footer__group";
+      const labelEl = document.createElement("span");
+      labelEl.className = "td-monaco-footer__label";
+      labelEl.textContent = me.label.capitalize
+        ? me.label.capitalize()
+        : me.label;
+      leftGroup.appendChild(labelEl);
+      footerDom.appendChild(leftGroup);
+
+      // --- Nhóm phải: language + cursor position ---
+      const rightGroup = document.createElement("span");
+      rightGroup.className = "td-monaco-footer__group";
+      const langEl = document.createElement("span");
+      langEl.className = "td-monaco-footer__language";
+      langEl.textContent = me.language || "";
+      rightGroup.appendChild(langEl);
+      const cursorEl = document.createElement("span");
+      cursorEl.className = "td-monaco-footer__cursor";
+      const pos = me.editor.getPosition();
+      cursorEl.textContent = pos
+        ? `Ln ${pos.lineNumber}, Col ${pos.column}`
+        : "Ln 1, Col 1";
+      rightGroup.appendChild(cursorEl);
+      footerDom.appendChild(rightGroup);
+
+      // Lưu tham chiếu để update realtime
+      me._footerDom = footerDom;
+      me._footerCursorEl = cursorEl;
+      me._footerLanguageEl = langEl;
+
+      // Đưa footer vào .highlight-layer (sibling của editorMountEl, không nằm trong Monaco)
+      me.$refs.textareaWrap.appendChild(footerDom);
+
+      // Áp màu theme sau khi Monaco render xong
+      me.$nextTick(() => me._applyFooterTheme());
+    },
+
+    /**
+     * Đồng bộ màu footer theo computed style của Monaco editor.
+     * Gọn gàng hơn CSS vars vì hoạt động bất kể Monaco mount ở đâu.
+     */
+    _applyFooterTheme() {
+      const me = this;
+      if (!me.editor || !me._footerDom) return;
+      const editorDom = me.editor.getDomNode();
+      if (!editorDom) return;
+      const computed = window.getComputedStyle(editorDom);
+      me._footerDom.style.backgroundColor = computed.backgroundColor;
+      me._footerDom.style.color = computed.color;
+      // border top: dùng màu sā́ng/tối hơn nền một chút
+      me._footerDom.style.borderTopColor = `color-mix(in srgb, ${computed.backgroundColor} 70%, ${computed.color} 30%)`;
+    },
+
+    /**
+     * Cập nhật thông tin vị trí cursor trên footer
+     */
+    updateFooterCursorPosition(position) {
+      if (this._footerCursorEl && position) {
+        this._footerCursorEl.textContent = `Ln ${position.lineNumber}, Col ${position.column}`;
+      }
+    },
+
+    /**
+     * Cập nhật nhãn ngôn ngữ trên footer
+     */
+    updateFooterLanguage(lang) {
+      if (this._footerLanguageEl) {
+        this._footerLanguageEl.textContent = lang || "";
+      }
+    },
+
     unmountEditor() {
       let me = this;
       if (me.editor) {
+        // Gỡ bỏ layout listener
+        if (me._layoutChangeDisposable) {
+          me._layoutChangeDisposable.dispose();
+          me._layoutChangeDisposable = null;
+        }
+        // Gỡ bỏ footer widget trước khi dispose editor
+        if (me._footerWidget) {
+          try {
+            me.editor.removeOverlayWidget(me._footerWidget);
+          } catch (_) {}
+          me._footerWidget = null;
+        }
         me.updateValueFromEditor();
         me.editor.dispose();
       }
+      // Gỡ footer DOM
+      if (me._footerDom && me._footerDom.parentElement) {
+        me._footerDom.parentElement.removeChild(me._footerDom);
+      }
+      me._footerDom = null;
+      me._footerCursorEl = null;
+      me._footerLanguageEl = null;
+      // Gỡ editor mount el
+      if (me._editorMountEl && me._editorMountEl.parentElement) {
+        me._editorMountEl.parentElement.removeChild(me._editorMountEl);
+      }
+      me._editorMountEl = null;
       if (me.editorModel) {
         me.editorModel.dispose();
       }
@@ -391,21 +523,6 @@ export default {
   .td-label-top {
     padding-bottom: var(--padding);
   }
-  .td-label-editor {
-    position: absolute;
-    bottom: var(--padding);
-    left: var(--padding);
-    z-index: 1;
-    font-size: var(--font-size-medium-rare);
-    color: var(--text-secondary-color);
-    background-color: var(--bg-layer-color);
-    padding: var(--padding-medium);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-component);
-  }
-  .td-label-editor:hover {
-    opacity: 0.5;
-  }
   .textarea-wrapper {
     position: relative;
     width: 100%;
@@ -420,6 +537,59 @@ export default {
     height: 100%;
     margin: 0;
     border: 1px solid var(--border-color);
+    // Footer là sibling của editor — dùng flex-column để editor + footer xếp dọc
+    display: flex;
+    flex-direction: column;
+
+    // Inner wrapper chứa Monaco editor, chiếm hết chiều cao còn lại sau footer
+    :deep(.td-monaco-editor-inner) {
+      flex: 1;
+      min-height: 0; // quan trọng để flex child không vượt ra ngoài
+      overflow: hidden;
+      position: relative;
+    }
+
+    // Footer trải dài toàn chiều rộng, nằm ngoài Monaco
+    // Màu được set bằng JS qua _applyFooterTheme() để khớp theme hiện tại
+    :deep(.td-monaco-footer) {
+      flex-shrink: 0;
+      height: 22px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      gap: 12px;
+      font-size: 12px;
+      font-family: "Consolas", "Monaco", monospace;
+      border-top-width: 1px;
+      border-top-style: solid;
+      user-select: none;
+      pointer-events: none;
+      box-sizing: border-box;
+    }
+
+    :deep(.td-monaco-footer__group) {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    :deep(.td-monaco-footer__label) {
+      opacity: 0.6;
+      letter-spacing: 0.02em;
+    }
+
+    :deep(.td-monaco-footer__language) {
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 11px;
+    }
+
+    :deep(.td-monaco-footer__cursor) {
+      opacity: 0.9;
+    }
   }
 
   textarea {
