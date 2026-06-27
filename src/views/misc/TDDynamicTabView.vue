@@ -91,38 +91,32 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
     <div class="td-tab-content">
       <!-- Tab mode: render sẵn tất cả bằng v-show -->
       <template v-if="isTabMode">
-          <KeepAlive>
-            <component
-              v-if="activeTab"
-              :ref="setTabRef"
-              :is="activeTab.resolvedComponent"
-              :key="activeTab.id"
-              :tabId="activeTab.id"
-              class="td-tab-pane"
-              @updateTabTitle="(payload) => onTabTitleUpdate(payload)"
-            />
-          </KeepAlive>
+        <KeepAlive>
+          <component
+            v-if="activeTab"
+            :ref="setTabRef"
+            :is="activeTab.resolvedComponent"
+            :key="activeTab.id"
+            :tabId="activeTab.id"
+            class="td-tab-pane"
+            @updateTabTitle="(payload) => onTabTitleUpdate(payload)"
+          />
+        </KeepAlive>
       </template>
 
       <!-- zero tabs mode: show Welcome -->
       <TDWelcome v-else />
     </div>
 
-      <!-- Tab preview overlay (Alt+A / Alt+D) -->
+    <!-- Tab preview overlay (Alt+A / Alt+D) -->
     <Teleport to="body">
-      <div
-        v-if="showTabPreview && isTabMode"
-        class="td-tab-preview-overlay"
-      >
+      <div v-if="showTabPreview && isTabMode" class="td-tab-preview-overlay">
         <div class="td-tab-preview-container">
-          <div
-            class="td-tab-preview-grid"
-            :style="{ gridTemplateColumns: `repeat(${previewColumns}, 1fr)` }"
-          >
+          <div class="td-tab-preview-grid">
             <div
               v-for="(tab, index) in tabs"
               :key="tab.id"
-              class="td-tab-preview-item"
+              class="text-nowrap td-tab-preview-item"
               :class="{ 'td-tab-preview-item--active': previewIndex === index }"
               @click="selectTabFromPreview(tab.id)"
               @mouseenter="previewIndex = index"
@@ -137,9 +131,13 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
               class="td-tab-preview-footer__item"
             >
               <span class="td-tab-preview-footer__keys">
-                <kbd v-for="part in item.presentKey" :key="part">{{ part }}</kbd>
+                <kbd v-for="part in item.presentKey" :key="part">{{
+                  part
+                }}</kbd>
               </span>
-              <span class="td-tab-preview-footer__label">{{ $t(item.labelKey) }}</span>
+              <span class="td-tab-preview-footer__label">{{
+                $t(item.labelKey)
+              }}</span>
             </div>
           </div>
         </div>
@@ -195,7 +193,7 @@ export default {
       me.showTabNumber = await me.$tdUtility.getUserSettings("showTabNumber");
     },
     registerTabShortcuts() {
-      const altKey = isMacOS ? 'Option' : 'Alt';
+      const altKey = isMacOS ? "Option" : "Alt";
       const guid = () => this.$tdUtility.newGuid();
 
       TDShortcutAction.register("tabPrevious", {
@@ -490,20 +488,10 @@ export default {
     }
 
     // ── Tab preview (Alt+A / Alt+D / Alt+Q) ──────────────────────────────
-    const altKeyName = isMacOS ? 'Option' : 'Alt';
-    const tabShortcuts = [
-      { key: 'tabPrevious', presentKey: [altKeyName, 'A'], labelKey: 'i18nCommon.tabManager.tabPrevious' },
-      { key: 'tabNext', presentKey: [altKeyName, 'D'], labelKey: 'i18nCommon.tabManager.tabNext' },
-      { key: 'tabClose', presentKey: [altKeyName, 'Q'], labelKey: 'i18nCommon.tabManager.tabClose' },
-    ];
+    const altKeyName = isMacOS ? "Option" : "Alt";
+    const tabShortcuts = ref(TDShortcutAction.getActiveShortcuts());
     const showTabPreview = ref(false);
     const previewIndex = ref(0);
-
-    const previewColumns = computed(() => {
-      const count = tabs.value.length;
-      if (count <= 0) return 1;
-      return Math.min(Math.ceil(Math.sqrt(count)), 6);
-    });
 
     function selectTabFromPreview(tabId) {
       activateTab(tabId);
@@ -515,21 +503,21 @@ export default {
       const tabList = tabs.value;
       if (!tabList.length) return;
 
-      if (event.code === 'KeyA') {
+      if (event.code === "KeyA") {
         event.preventDefault();
         showTabPreview.value = true;
-        const cur = tabList.findIndex(t => t.id === activeTabId.value);
+        const cur = tabList.findIndex((t) => t.id === activeTabId.value);
         const idx = cur > 0 ? cur - 1 : tabList.length - 1;
         previewIndex.value = idx;
         activateTab(tabList[idx].id);
-      } else if (event.code === 'KeyD') {
+      } else if (event.code === "KeyD") {
         event.preventDefault();
         showTabPreview.value = true;
-        const cur = tabList.findIndex(t => t.id === activeTabId.value);
+        const cur = tabList.findIndex((t) => t.id === activeTabId.value);
         const idx = cur < tabList.length - 1 ? cur + 1 : 0;
         previewIndex.value = idx;
         activateTab(tabList[idx].id);
-      } else if (event.code === 'KeyQ') {
+      } else if (event.code === "KeyQ") {
         event.preventDefault();
         showTabPreview.value = false;
         if (activeTabId.value) {
@@ -539,21 +527,30 @@ export default {
     }
 
     function handleTabPreviewKeyup(event) {
-      if (event.code === 'AltLeft' || event.code === 'AltRight' || event.key === 'Alt') {
+      if (
+        event.code === "AltLeft" ||
+        event.code === "AltRight" ||
+        event.key === "Alt"
+      ) {
         showTabPreview.value = false;
-      } else if (event.code === 'Escape') {
+      } else if (event.code === "Escape") {
         showTabPreview.value = false;
       }
     }
 
     onMounted(() => {
-      window.addEventListener('keydown', handleTabPreviewKeydown);
-      window.addEventListener('keyup', handleTabPreviewKeyup);
+      window.addEventListener("keydown", handleTabPreviewKeydown);
+      window.addEventListener("keyup", handleTabPreviewKeyup);
+
+      tabShortcuts.value = TDShortcutAction.getActiveShortcuts();
+      TDShortcutAction.onChange(() => {
+        tabShortcuts.value = TDShortcutAction.getActiveShortcuts();
+      });
     });
 
     onBeforeUnmount(() => {
-      window.removeEventListener('keydown', handleTabPreviewKeydown);
-      window.removeEventListener('keyup', handleTabPreviewKeyup);
+      window.removeEventListener("keydown", handleTabPreviewKeydown);
+      window.removeEventListener("keyup", handleTabPreviewKeyup);
     });
 
     return {
@@ -585,7 +582,6 @@ export default {
       // tab preview
       showTabPreview,
       previewIndex,
-      previewColumns,
       selectTabFromPreview,
       tabShortcuts,
       altKeyName,
@@ -887,9 +883,11 @@ export default {
   padding: var(--padding);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   pointer-events: auto;
+  max-width: min(90vw, 680px);
 }
 .td-tab-preview-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: var(--padding);
 }
 .td-tab-preview-item {
@@ -901,7 +899,9 @@ export default {
   text-align: center;
   white-space: nowrap;
   border: 1px solid var(--border-color);
-  transition: background 0.12s ease, border-color 0.12s ease;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
 }
 .td-tab-preview-item:hover {
   background: var(--border-color);
@@ -915,9 +915,10 @@ export default {
 }
 .td-tab-preview-footer {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 8px 16px;
   margin-top: 8px;
   padding-top: 8px;
   border-top: 1px solid var(--border-color);
