@@ -45,6 +45,7 @@ export default {
       showIntelliSense: "Hiển thị intelliSense",
       formatCodeTextEditor: "Định dạng code",
       executeSQLCode: "Run SQL code",
+      executeAPITesting: "Gửi API request",
     },
     footerHelp: "Chuột phải vào dòng hoặc ô để xem thêm tùy chọn · Kéo thả để di chuyển nhanh",
     footerHelpDesc:

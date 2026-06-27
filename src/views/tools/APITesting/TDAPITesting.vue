@@ -614,6 +614,8 @@ import TDAPITestingHelp from "@/views/helps/TDAPITestingHelp.vue";
 import proModeTemplates from "./templates.js";
 import { registerTdApiPromodeLanguage } from "@/components/monarch/tdApiPromodeLanguage.js";
 import { registerTdApiPromodeFormatProvider } from "@/components/monarch/tdApiPromodeFormatProvider.js";
+import _ from "@/common/TDCommonFunction.js";
+import TDShortcutAction from "@/common/TDShortcutAction.js";
 export default {
   extends: TDToolBase,
   name: "TDAPITesting",
@@ -681,6 +683,9 @@ export default {
       agentAPI: null,
       isLoadingData: false,
     };
+  },
+  created() {
+    this.debouncedHandleSend = _.debounce(this.handleSend, 300);
   },
   async mounted() {
     this.agentAPI = new TDServerTestingAPI();
@@ -880,8 +885,29 @@ export default {
     if (this._proModeDisposables) {
       this._proModeDisposables.forEach((d) => d?.dispose?.());
     }
+    if (this.debouncedHandleSend?.cancel) {
+      this.debouncedHandleSend.cancel();
+    }
   },
   methods: {
+    onTabEnter() {
+      let me = this;
+      TDShortcutAction.register("executeAPITesting", {
+        sortOrder: 5,
+        key: me.$tdUtility.newGuid(),
+        presentKey: [me.$tdUtility.ctrlKey(), me.$tdUtility.enterKey()],
+        labelKey: "i18nCommon.shortKeyAction.executeAPITesting",
+        action: (event) => {
+          if (event && (event.metaKey || event.ctrlKey) && event.key === "Enter") {
+            event.preventDefault();
+            me.debouncedHandleSend();
+          }
+        },
+      });
+    },
+    onTabLeave() {
+      TDShortcutAction.unregister("executeAPITesting");
+    },
     handleResize(sizes) {
       this.requestSectionSize = sizes.leftSize;
       this.responseSectionSize = sizes.rightSize;

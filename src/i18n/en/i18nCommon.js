@@ -45,6 +45,7 @@ export default {
       showIntelliSense: "Show intelliSense",
       formatCodeTextEditor: "Format code",
       executeSQLCode: "Run SQL code",
+      executeAPITesting: "Run API request",
     },
     footerHelp: "Right-click a row or cell for more options · Drag to scroll",
     footerHelpDesc:
