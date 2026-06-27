@@ -111,10 +111,12 @@
             </div>
             <div class="flex flex-col flex-one td-pg-result-content">
               <!-- bảng hiển thị dữ liệu SELECT (dùng KeepAlive để giữ cache) -->
-              <div class="td-pg-result-table">
+              <div
+                v-if="activeQueryResult && activeQueryResult.is_select"
+                class="td-pg-result-table"
+              >
                 <KeepAlive>
                   <TDTableViewer
-                    v-if="activeQueryResult && activeQueryResult.is_select"
                     :key="activeResultCacheKey"
                     :tableData="activeQueryResult.rows"
                     :columns="activeTableColumns"
@@ -1887,7 +1889,7 @@ export default {
   position: relative;
   padding: var(--padding);
   color: var(--text-secondary-color);
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-medium);
 }
 
 .td-pg-result-empty {
