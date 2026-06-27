@@ -90,21 +90,47 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
     <!-- Content area -->
     <div class="td-tab-content" :class="{ 'td-zen-active': zenMode }">
       <!-- Zen mode toolbar -->
-      <div v-if="zenMode" class="td-zen-toolbar" :class="{ 'td-zen-toolbar-pinned': zenToolbarPinned }">
-        <div v-if="!zenToolbarPinned" class="flex toolbar-btn" @click="pinZenToolbar" v-tooltip="$t('i18nCommon.remoteDesktop.pin')">
+      <div
+        v-if="zenMode"
+        class="td-zen-toolbar"
+        :class="{ 'td-zen-toolbar-pinned': zenToolbarPinned }"
+      >
+        <div
+          v-if="!zenToolbarPinned"
+          class="flex toolbar-btn"
+          @click="pinZenToolbar"
+          v-tooltip="$t('i18nCommon.remoteDesktop.pin')"
+        >
           <span class="td-icon td-pin-icon"></span>
         </div>
-        <div v-else class="flex toolbar-btn" @click="unpinZenToolbar" v-tooltip="$t('i18nCommon.remoteDesktop.unpin')">
+        <div
+          v-else
+          class="flex toolbar-btn"
+          @click="unpinZenToolbar"
+          v-tooltip="$t('i18nCommon.remoteDesktop.unpin')"
+        >
           <span class="td-icon td-unpin-icon"></span>
         </div>
-        <div class="flex toolbar-btn" @click="zenPrevTab" v-tooltip="$t('i18nCommon.tabManager.tabPrevious')">
+        <div
+          class="flex toolbar-btn"
+          @click="zenPrevTab"
+          v-tooltip="$t('i18nCommon.tabManager.tabPrevious')"
+        >
           <TDArrow :arrowDirection="tdEnum.Direction.left" />
         </div>
-        <div class="flex toolbar-btn" @click="zenNextTab" v-tooltip="$t('i18nCommon.tabManager.tabNext')">
+        <div
+          class="flex toolbar-btn"
+          @click="zenNextTab"
+          v-tooltip="$t('i18nCommon.tabManager.tabNext')"
+        >
           <TDArrow :arrowDirection="tdEnum.Direction.right" />
         </div>
         <span class="td-zen-toolbar-separator"></span>
-        <div class="flex toolbar-btn" @click="exitZenMode" v-tooltip="$t('i18nCommon.tdheader.exitZenMode')">
+        <div
+          class="flex toolbar-btn"
+          @click="exitZenMode"
+          v-tooltip="$t('i18nCommon.tdheader.exitZenMode')"
+        >
           <span class="td-icon td-center-icon"></span>
         </div>
       </div>
@@ -1057,7 +1083,7 @@ export default {
 }
 .td-tab-preview-item--active {
   background: var(--focus-color) !important;
-  color: var(--bg-main-color);
+  color: white;
   font-weight: 600;
   border-color: var(--focus-color) !important;
 }
