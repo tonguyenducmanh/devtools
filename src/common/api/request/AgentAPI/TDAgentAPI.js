@@ -14,7 +14,7 @@ class TDAgentAPI extends TDBaseAPI {
     super(baseUrl, controllerName);
   }
   getBaseUrl() {
-    return window.__tdInfo?.agentURL;
+    return window.__tdAPI?.apiTesting?.agentURL;
   }
 
   /**

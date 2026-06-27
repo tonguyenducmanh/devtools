@@ -13,7 +13,7 @@ class TDCURLUtil {
    * (dạng text code để inject động)
    */
   fetchAgent(request) {
-    let serverAgent = window.__tdInfo?.agentURL;
+    let serverAgent = window.__tdAPI?.apiTesting?.agentURL;
     if (!serverAgent) {
       throw new Error("Agent server not configured");
     }
@@ -173,14 +173,14 @@ class TDCURLUtil {
    */
   async requestCURL(curlText) {
     try {
-      let parsed = window.__tdInfo.parseCURL(curlText);
+      let parsed = window.__tdAPI.apiTesting.parseCURL(curlText);
       let requestData = {
         api_url: parsed.url,
         http_method: parsed.method || "GET",
         headers_text: parsed.headersText || "",
         body_text: parsed.bodyText || null,
       };
-      let req = window.__tdInfo.fetchAgent(requestData);
+      let req = window.__tdAPI.apiTesting.fetchAgent(requestData);
       let resp = await req.promise;
       return resp;
     } catch (ex) {
@@ -215,14 +215,15 @@ class TDCURLUtil {
   }
   setGlobalInfoBeforeRequest(options) {
     let me = this;
-    window.__tdInfo = {
+    window.__tdAPI = window.__tdAPI ?? {};
+    window.__tdAPI.apiTesting = {
       agentURL: options?.agentURL ?? window.__env?.APITesting?.agentServer,
       requestCURL: me.requestCURL,
       parseCURL: me.parseCURL,
       fetchAgent: me.fetchAgent,
       parseResponseCURL: me.parseResponseCURL,
     };
-    return window.__tdInfo;
+    return window.__tdAPI.apiTesting;
   }
   /**
    * Đoạn code build ra script javascript động để chạy request bằng CURL
@@ -231,8 +232,8 @@ class TDCURLUtil {
   buildInjectCode(secranioCode) {
     let me = this;
     return `
-let requestCURL = window.__tdInfo.requestCURL;
-let parseResponseCURL = window.__tdInfo.parseResponseCURL;
+let requestCURL = window.__tdAPI.apiTesting.requestCURL;
+let parseResponseCURL = window.__tdAPI.apiTesting.parseResponseCURL;
 let result = 
 (async () => {
   ${secranioCode}
