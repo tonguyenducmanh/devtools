@@ -884,13 +884,13 @@ export default {
   background: var(--bg-main-color);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  padding: calc(var(--padding) * 1.5);
+  padding: var(--padding);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   pointer-events: auto;
 }
 .td-tab-preview-grid {
   display: grid;
-  gap: 6px;
+  gap: var(--padding);
 }
 .td-tab-preview-item {
   padding: 8px 18px;
