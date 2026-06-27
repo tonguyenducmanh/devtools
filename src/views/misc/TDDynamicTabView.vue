@@ -207,6 +207,7 @@ export default {
     TDShortcutAction.unregister("tabPrevious");
     TDShortcutAction.unregister("tabNext");
     TDShortcutAction.unregister("tabClose");
+    TDShortcutAction.unregister("tabZenMode");
     if (this.zenModeUnsubscribe) {
       this.zenModeUnsubscribe();
     }
@@ -278,6 +279,13 @@ export default {
         key: guid(),
         presentKey: [altKey, "Q"],
         labelKey: "i18nCommon.tabManager.tabClose",
+      });
+
+      TDShortcutAction.register("tabZenMode", {
+        sortOrder: 8,
+        key: guid(),
+        presentKey: [altKey, "F"],
+        labelKey: "i18nCommon.tdheader.zenMode",
       });
     },
   },
@@ -563,6 +571,13 @@ export default {
 
     function handleTabPreviewKeydown(event) {
       if (!event.altKey) return;
+
+      if (event.code === "KeyF") {
+        event.preventDefault();
+        eventBus.emit(TDEnumEventBus.zenModeToggle);
+        return;
+      }
+
       const tabList = tabs.value;
       if (!tabList.length) return;
 
