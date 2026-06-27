@@ -9,5 +9,6 @@ export function getUserSettingDefault() {
     wrapTab: true,
     showSideBar: true,
     showTabNumber: false,
+    toastInHeader: false,
   };
 }

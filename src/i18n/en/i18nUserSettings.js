@@ -9,6 +9,7 @@ export default {
       theme: "Theme app",
       language: "Language",
       wrapTab: "Multi line tab in Multi tab mode",
+      toastInHeader: "Show notifications in header",
     },
   },
 };

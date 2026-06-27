@@ -38,6 +38,14 @@
         ></TDCheckbox>
       </div>
       <div class="flex user-setting-item">
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="currentUserSetting.toastInHeader"
+          :label="$t('i18nUserSettings.settings.toastInHeader')"
+          :noMargin="true"
+        ></TDCheckbox>
+      </div>
+      <div class="flex user-setting-item">
         <div>{{ $t("i18nUserSettings.settings.language") }}</div>
         <TDComboBox
           :width="200"
@@ -81,6 +89,7 @@
 import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
 import TDAgentAPI from "@/common/api/request/AgentAPI/TDAgentAPI.js";
 import { getUserSettingDefault } from "@/common/TDUserSettingDefault.js";
+import { toast } from "@/common/plugin/TDToastPlugin.js";
 
 export default {
   name: "TDUserSettings",
@@ -132,6 +141,7 @@ export default {
       let me = this;
       me.saveTheme();
       me.handleChangeAgentURL();
+      toast.setUseHeaderToast(me.currentUserSetting.toastInHeader !== false);
       await me.$tdCache.set(
         me.$tdEnum.cacheConfig.UserSettings,
         me.currentUserSetting,
