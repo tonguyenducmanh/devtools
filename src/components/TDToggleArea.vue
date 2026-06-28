@@ -164,7 +164,7 @@ export default {
 <style scoped>
 .td-toggle-button {
   position: absolute;
-  z-index: 10;
+  z-index: 5;
   background: var(--bg-main-color);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
