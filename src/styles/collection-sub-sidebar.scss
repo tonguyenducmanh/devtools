@@ -30,6 +30,7 @@
         border-radius: var(--border-radius);
         .td-collection-header-left {
           gap: var(--padding);
+          display: flex;
         }
       }
       .td-collection-header:hover {
@@ -85,4 +86,17 @@
 
 .td-collection-request-item:hover .td-collection-item-edit-btn {
   opacity: 1;
+}
+.text-nowrap {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  vertical-align: middle;
+
+  & > div {
+    display: inline;
+    white-space: nowrap;
+  }
 }
