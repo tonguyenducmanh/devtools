@@ -874,8 +874,7 @@ export default {
     onTabEnter() {
       let me = this;
       TDShortcutAction.register(TDShortcutActionEnum.ExecuteAPITesting, {
-        sortOrder: 5,
-        key: me.$tdUtility.newGuid(),
+        sortOrder: 100,
         presentKey: [me.$tdUtility.ctrlKey(), me.$tdUtility.enterKey()],
         labelKey: "i18nCommon.shortKeyAction.executeAPITesting",
         action: (event) => {

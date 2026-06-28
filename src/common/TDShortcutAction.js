@@ -26,7 +26,7 @@ const ShortcutConfigMap = {
     sortOrder: 1,
     key: tdUtility.newGuid(),
     presentKey: (() => {
-      return [tdUtility.ctrlKey(), "p"];
+      return [tdUtility.ctrlKey(), "P"];
     })(),
     labelKey: "i18nCommon.shortKeyAction.search",
     action: (event) => {
@@ -61,11 +61,11 @@ const ShortcutConfigMap = {
     key: tdUtility.newGuid(),
     presentKey: (() => {
       if (isLinux) {
-        return ["Ctrl", "Shift", "i"];
+        return ["Ctrl", "Shift", "I"];
       } else if (isMacOS) {
-        return ["Shift", "Option", "f"];
+        return ["Shift", "Option", "F"];
       } else {
-        return ["Shift", "Alt", "f"];
+        return ["Shift", "Alt", "F"];
       }
     })(),
 
@@ -83,6 +83,7 @@ class TDShortcutAction {
 
   register(name, config) {
     if (!this.activeShortcuts.has(name)) {
+      config.key = tdUtility.newGuid();
       this.activeShortcuts.set(name, config);
       this.updateListeners();
       this.notifyListeners();

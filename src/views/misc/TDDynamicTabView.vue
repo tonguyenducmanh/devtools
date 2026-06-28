@@ -292,29 +292,25 @@ export default {
       const guid = () => this.$tdUtility.newGuid();
 
       TDShortcutAction.register(TDShortcutActionEnum.TabPrevious, {
-        sortOrder: 5,
-        key: guid(),
+        sortOrder: 10,
         presentKey: [altKey, "A"],
         labelKey: "i18nCommon.tabManager.tabPrevious",
       });
 
       TDShortcutAction.register(TDShortcutActionEnum.TabNext, {
-        sortOrder: 6,
-        key: guid(),
+        sortOrder: 11,
         presentKey: [altKey, "D"],
         labelKey: "i18nCommon.tabManager.tabNext",
       });
 
       TDShortcutAction.register(TDShortcutActionEnum.TabClose, {
-        sortOrder: 7,
-        key: guid(),
+        sortOrder: 12,
         presentKey: [altKey, "Q"],
         labelKey: "i18nCommon.tabManager.tabClose",
       });
 
       TDShortcutAction.register(TDShortcutActionEnum.TabZenMode, {
-        sortOrder: 8,
-        key: guid(),
+        sortOrder: 13,
         presentKey: [altKey, "F"],
         labelKey: "i18nCommon.tdheader.zenMode",
       });

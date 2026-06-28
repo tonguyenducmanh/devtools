@@ -1638,7 +1638,10 @@ export default {
         TDShortcutActionEnum.ExecutePosgreSQLCode,
         me.getConfigExecuteSQLCode(),
       );
-      TDShortcutAction.register(TDShortcutActionEnum.DllInspect, me.getConfigDLLInspect());
+      TDShortcutAction.register(
+        TDShortcutActionEnum.DllInspect,
+        me.getConfigDLLInspect(),
+      );
       if (me.selectedConnectionId) {
         me.loadCachedIntellisense();
       }
@@ -1663,8 +1666,7 @@ export default {
     getConfigExecuteSQLCode() {
       let me = this;
       let configKeyboard = {
-        sortOrder: 5,
-        key: me.$tdUtility.newGuid(),
+        sortOrder: 100,
         presentKey: [me.$tdUtility.ctrlKey(), me.$tdUtility.enterKey()],
         labelKey: "i18nCommon.postgreSQLQuery.runQuery",
       };
@@ -1677,8 +1679,7 @@ export default {
     getConfigDLLInspect() {
       let me = this;
       let configKeyboard = {
-        sortOrder: 6,
-        key: me.$tdUtility.newGuid(),
+        sortOrder: 101,
         presentKey: ["F12"],
         labelKey: "i18nCommon.postgreSQLQuery.dbInspect.inspectObject",
       };
