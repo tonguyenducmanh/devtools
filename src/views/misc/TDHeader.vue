@@ -26,7 +26,10 @@
     <div class="td-header-toast">
       <div
         v-if="currentHeaderToast"
-        :class="['td-header-toast-item', `td-header-toast--${currentHeaderToast.type}`]"
+        :class="[
+          'td-header-toast-item',
+          `td-header-toast--${currentHeaderToast.type}`,
+        ]"
         @click="removeHeaderToast(currentHeaderToast.id)"
       >
         {{ currentHeaderToast.message }}
@@ -62,6 +65,7 @@ import TDFlyoutPanel from "@/components/TDFlyoutPanel.vue";
 import { useFlyout } from "@/common/plugin/TDUseFlyout.js";
 import eventBus from "@/common/event/TDEventBus.js";
 import { TDEnumEventBus } from "@/common/event/TDEnumEventBus.js";
+import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 
 export default {
   name: "TDHeader",
@@ -127,6 +131,11 @@ export default {
           key: "zenMode",
           labelKey: "i18nCommon.tdheader.zenMode",
           action: this.toggleZenMode,
+        },
+        {
+          key: "showAllShortcut",
+          labelKey: "i18nCommon.tdheader.showAllShortcut",
+          action: this.showAllShortcutPopup,
         },
       ],
       utilities: [
@@ -239,6 +248,14 @@ export default {
     },
     toggleZenMode() {
       eventBus.emit(TDEnumEventBus.zenModeToggle);
+      this.closeFlyout();
+    },
+    showAllShortcutPopup() {
+      TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDShowAllShortcutPopup,
+        ownerForm: this,
+        props: {},
+      });
       this.closeFlyout();
     },
     reloadAppFunc() {

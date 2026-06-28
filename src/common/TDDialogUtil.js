@@ -13,6 +13,7 @@ export const TDDialogEnum = {
   TDQuickPreview: 7,
   TDPostgreSQLDatabaseList: 8,
   TDPostgreSQLCloneCachePopup: 9,
+  TDShowAllShortcutPopup: 10,
 };
 
 /**
@@ -38,6 +39,8 @@ const DialogComponentMap = {
     import("@/views/dialogs/TDPostgreSQLDatabaseList.vue"),
   [TDDialogEnum.TDPostgreSQLCloneCachePopup]: () =>
     import("@/views/dialogs/TDPostgreSQLCloneCachePopup.vue"),
+  [TDDialogEnum.TDShowAllShortcutPopup]: () =>
+    import("@/views/dialogs/TDShowAllShortcutPopup.vue"),
 };
 
 class TDDialogUtil {
@@ -117,7 +120,7 @@ class TDDialogUtil {
 
     const vm = app.mount(container);
     // Gọi hàm show trên component instance (vm) thay vì object methods
-    if (typeof vm.show === 'function' && param !== undefined) {
+    if (typeof vm.show === "function" && param !== undefined) {
       vm.show(param);
     } else if (app._component.methods?.show && param !== undefined) {
       // Dành cho trường hợp fallback nếu chưa expose (Vue 3 script setup)
