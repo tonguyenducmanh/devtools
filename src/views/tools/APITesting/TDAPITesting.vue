@@ -296,7 +296,7 @@
               <TDTextarea
                 :isLabelTop="true"
                 v-model="proModeSecranioCode"
-                language="td-api-promode"
+                language="td-api-javascript"
                 :wrapText="currentConfigLayout.wrapText"
                 :enableHighlight="true"
                 :monacoOptions="proModeMonacoOptions"
@@ -772,7 +772,7 @@ export default {
 
           const completionDisposable =
             monacoInstance.languages.registerCompletionItemProvider(
-              "td-api-promode",
+              "td-api-javascript",
               {
                 provideCompletionItems: (model, position) => {
                   const word = model.getWordUntilPosition(position);
@@ -830,27 +830,30 @@ export default {
           me._proModeDisposables.push(completionDisposable);
 
           const hoverDisposable =
-            monacoInstance.languages.registerHoverProvider("td-api-promode", {
-              provideHover: (model, position) => {
-                const word = model.getWordAtPosition(position);
-                if (!word) return null;
-                const name = word.word;
-                let description = null;
-                if (name === "requestCURL") {
-                  description = me.$t(
-                    "i18nCommon.apiTesting.requestCURLDescription",
-                  );
-                } else if (name === "parseResponseCURL") {
-                  description = me.$t(
-                    "i18nCommon.apiTesting.parseResponseCURLDescription",
-                  );
-                }
-                if (!description) return null;
-                return {
-                  contents: [{ value: description, isTrusted: true }],
-                };
+            monacoInstance.languages.registerHoverProvider(
+              "td-api-javascript",
+              {
+                provideHover: (model, position) => {
+                  const word = model.getWordAtPosition(position);
+                  if (!word) return null;
+                  const name = word.word;
+                  let description = null;
+                  if (name === "requestCURL") {
+                    description = me.$t(
+                      "i18nCommon.apiTesting.requestCURLDescription",
+                    );
+                  } else if (name === "parseResponseCURL") {
+                    description = me.$t(
+                      "i18nCommon.apiTesting.parseResponseCURLDescription",
+                    );
+                  }
+                  if (!description) return null;
+                  return {
+                    contents: [{ value: description, isTrusted: true }],
+                  };
+                },
               },
-            });
+            );
           me._proModeDisposables.push(hoverDisposable);
 
           registerTdApiPromodeFormatProvider(monacoInstance);
