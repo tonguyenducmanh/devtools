@@ -27,6 +27,7 @@
             <span v-if="label" class="td-monaco-footer__label">
               {{ label.capitalize ? label.capitalize() : label }}
             </span>
+            <slot name="footer-main" />
           </span>
           <span class="td-monaco-footer__group">
             <span class="td-monaco-footer__language">{{ language }}</span>
@@ -503,7 +504,13 @@ export default {
           var(--td-monaco-footer-fg) 30%
         );
     }
-
+    .td-monaco-footer,
+    .td-monaco-footer__group {
+      pointer-events: auto !important;
+    }
+    .td-monaco-footer * {
+      pointer-events: auto !important; /* Đảm bảo mọi phần tử con bên trong slot đều nhận chuột */
+    }
     .td-monaco-footer__group {
       display: flex;
       align-items: center;

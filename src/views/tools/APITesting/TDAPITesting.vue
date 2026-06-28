@@ -175,28 +175,6 @@
               class="flex flex-col td-api-request"
               :style="requestSectionSizeStyle"
             >
-              <div class="flex td-api-request-title">
-                <TDSlideOption
-                  v-model="currentConfigLayout.currentAPIInfoOption"
-                  :options="APIInfoOptions"
-                  :noMargin="true"
-                  @change="updateConfigLayout"
-                />
-
-                <!-- phần hiển thị loader nếu như không chọn show reponse -->
-                <div
-                  class="flex loader-without-response"
-                  v-if="!currentConfigLayout.showReponse && isLoading"
-                >
-                  <div class="loader"></div>
-                </div>
-                <!-- phần hiển thị status code và thời gian chạy request -->
-                <TDAPIResponseStatus
-                  v-if="currentConfigLayout.splitHorizontal && !isLoading"
-                  :statusCode="statusCode"
-                  :responseTime="responseTime"
-                />
-              </div>
               <!-- phần cấu hình header api -->
               <TDTextarea
                 v-if="
@@ -210,7 +188,18 @@
                 :wrapText="currentConfigLayout.wrapText"
                 :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
                 :label="$t('i18nCommon.apiTesting.headersPlaceholder')"
-              ></TDTextarea>
+              >
+                <template v-slot:footer-main>
+                  <div class="flex">
+                    <div
+                      class="td-request-footer-btn"
+                      @click="changeToViewBodyRequest"
+                    >
+                      {{ $t("i18nCommon.apiTesting.changeToViewBody") }}
+                    </div>
+                  </div>
+                </template>
+              </TDTextarea>
               <!-- phần cấu hình body api -->
               <div
                 class="td-text-area-wrap"
@@ -227,7 +216,18 @@
                   language="json"
                   :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
                   :label="$t('i18nCommon.apiTesting.bodyPlaceholder')"
-                ></TDTextarea>
+                >
+                  <template v-slot:footer-main>
+                    <div class="flex">
+                      <div
+                        class="td-request-footer-btn"
+                        @click="changeToViewHeaderRequest"
+                      >
+                        {{ $t("i18nCommon.apiTesting.changeToViewHeader") }}
+                      </div>
+                    </div>
+                  </template>
+                </TDTextarea>
               </div>
             </div>
             <!-- Resizer -->
@@ -244,14 +244,9 @@
               class="flex flex-col td-api-response"
               :style="responseSectionSizeStyle"
             >
-              <!-- phần hiển thị httpstatus bên trên response -->
-              <TDAPIResponseStatus
-                class="flex td-api-response-title"
-                v-if="!currentConfigLayout.splitHorizontal"
+              <TDAPIResponse
                 :statusCode="statusCode"
                 :responseTime="responseTime"
-              />
-              <TDAPIResponse
                 :isLoading="isLoading"
                 :responseText="responseText"
                 :currentConfigLayout="currentConfigLayout"
@@ -276,22 +271,6 @@
               class="flex flex-col td-api-request"
               :style="requestSectionSizeStyle"
             >
-              <div class="flex td-api-request-title">
-                <div class="title-request">
-                  {{ $t("i18nCommon.apiTesting.proModeTitle") }}
-                </div>
-                <div
-                  class="flex loader-without-response"
-                  v-if="!currentConfigLayout.showReponse && isLoading"
-                >
-                  <div class="loader"></div>
-                </div>
-                <TDAPIResponseStatus
-                  v-if="currentConfigLayout.splitHorizontal && !isLoading"
-                  :statusCode="statusCode"
-                  :responseTime="responseTime"
-                />
-              </div>
               <!-- phần nội dung code pro mode -->
               <TDTextarea
                 :isLabelTop="true"
@@ -317,13 +296,9 @@
               class="flex flex-col td-api-response"
               :style="responseSectionSizeStyle"
             >
-              <TDAPIResponseStatus
-                class="flex td-api-response-title"
-                v-if="!currentConfigLayout.splitHorizontal"
+              <TDAPIResponse
                 :statusCode="statusCode"
                 :responseTime="responseTime"
-              />
-              <TDAPIResponse
                 :isLoading="isLoading"
                 :responseText="responseText"
                 :currentConfigLayout="currentConfigLayout"
@@ -586,7 +561,6 @@ import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDArrow from "@/components/TDArrow.vue";
 import JSZip from "jszip";
-import TDAPIResponseStatus from "@/views/tools/APITesting/TDAPIResponseStatus.vue";
 import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
@@ -607,7 +581,6 @@ export default {
     TDSubSidebar,
     TDArrow,
     TDAPIResponse,
-    TDAPIResponseStatus,
     TDHistorySidebar,
     TDAPITestingHelp,
   },
@@ -894,6 +867,18 @@ export default {
     },
     onTabLeave() {
       TDShortcutAction.unregister(TDShortcutActionEnum.ExecuteAPITesting);
+    },
+    changeToViewBodyRequest() {
+      let me = this;
+      me.currentConfigLayout.currentAPIInfoOption =
+        me.$tdEnum.APIInfoOption.body;
+      me.updateConfigLayout();
+    },
+    changeToViewHeaderRequest() {
+      let me = this;
+      me.currentConfigLayout.currentAPIInfoOption =
+        me.$tdEnum.APIInfoOption.header;
+      me.updateConfigLayout();
     },
     handleResize(sizes) {
       this.requestSectionSize = sizes.leftSize;
@@ -1657,6 +1642,7 @@ export default {
     width: 100%;
   }
   .td-api-input-area {
+    margin-top: var(--padding);
     // gap: var(--padding);
     flex: 1;
     .td-api-request {
@@ -1684,11 +1670,11 @@ export default {
   gap: var(--padding);
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--padding);
   position: relative;
   width: 100%;
 }
 .td-api-info-btn {
+  margin-top: var(--padding);
   gap: var(--padding);
 }
 
@@ -1832,5 +1818,11 @@ body[data-theme="dark"] {
 .td-import-request-group {
   gap: var(--padding);
   margin-left: var(--padding);
+}
+.td-request-footer-btn {
+  cursor: pointer;
+}
+.td-request-footer-btn:hover {
+  background-color: var(--bg-layer-color);
 }
 </style>

@@ -93,8 +93,8 @@ export default {
 }
 
 .status-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 0.25rem;
+  border-radius: var(--border-radius-component);
+  padding: 0 var(--padding);
   font-weight: 600;
   color: white;
 }

@@ -450,6 +450,8 @@ export default {
       help: "Type to search features, use ↑↓ to navigate and Enter to select",
     },
     apiTesting: {
+      changeToViewBody: "Switch to body",
+      changeToViewHeader: "Switch to header",
       pingAgent: "Ping server agent",
       copyCURLFromAPI: "Copy CURL",
       saveForNewCollection: "Save in collection {0}",
@@ -818,8 +820,10 @@ export default {
       loadFunctionIntellisense: "Load function intellisense",
       defaultQueryLimit: "Max rows",
       resultLimit: "Limit results",
-      resultLimitDesc: "Unchecked = unlimited rows. Checked with empty field = server defaults to 1000.",
-      defaultQueryLimitDesc: "Max rows returned when 'Limit results' is enabled.",
+      resultLimitDesc:
+        "Unchecked = unlimited rows. Checked with empty field = server defaults to 1000.",
+      defaultQueryLimitDesc:
+        "Max rows returned when 'Limit results' is enabled.",
       addGroup: "Add group",
       editConnection: "Edit connection",
       addConnection: "Add connection",
@@ -839,7 +843,8 @@ export default {
       cloneIntellisenseSearch: "Filter connections...",
       cloneIntellisense: "Clone saved intellisense from another database",
       cloneIntellisenseTitle: "Select source database",
-      cloneIntellisenseTooltip: "Click to clone intellisense to current database",
+      cloneIntellisenseTooltip:
+        "Click to clone intellisense to current database",
       cloneIntellisenseEmpty: "No other connections available",
       cloneIntellisenseNoCache: "No intellisense cache found for this database",
       cloneIntellisenseSuccess: "Intellisense cloned from {name} successfully",
@@ -873,12 +878,10 @@ export default {
       sqlEditorPlaceholder: "SELECT * FROM table_name LIMIT 100;",
       sqlEditorLabel: "SQL Query",
       ungrouped: "Ungrouped",
-      convertConnectionStringRequired:
-        "Please enter a connection string.",
+      convertConnectionStringRequired: "Please enter a connection string.",
       convertNpgsqlSuccess: "Data conversion successful!",
       convertNpgsqlError: "Invalid Npgsql string or parsing error.",
-      dotNetWasmNotReady:
-        "C# WASM analysis system is not ready.",
+      dotNetWasmNotReady: "C# WASM analysis system is not ready.",
       copyConnectionStringSuccess: "Connection string copied!",
       copyDSNConnectionString: "Copy connection string DSN/URI",
       sidebarOption: {

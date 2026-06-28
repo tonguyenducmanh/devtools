@@ -449,6 +449,8 @@ export default {
       help: "Gõ để tìm kiếm các tính năng, sử dụng ↑↓ để điều hướng và Enter để chọn",
     },
     apiTesting: {
+      changeToViewBody: "Chuyển sang body",
+      changeToViewHeader: "Chuyển sang header",
       pingAgent: "Kiểm tra server agent",
       copyCURLFromAPI: "Sao chép CURL",
       saveForNewCollection: "Lưu vào bộ sưu tập {0}",

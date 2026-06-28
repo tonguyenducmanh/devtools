@@ -12,16 +12,36 @@
       :label="$t('i18nCommon.apiTesting.responsePlaceholder')"
       :readOnly="true"
       :wrapText="currentConfigLayout.wrapText"
-    ></TDTextarea>
+    >
+      <template v-slot:footer-main>
+        <div class="flex">
+          <TDAPIResponseStatus
+            class="flex td-api-response-title"
+            :statusCode="statusCode"
+            :responseTime="responseTime"
+          />
+        </div>
+      </template>
+    </TDTextarea>
   </div>
 </template>
 <script>
+import TDAPIResponseStatus from "./TDAPIResponseStatus.vue";
 export default {
   name: "TDAPIResponse",
   data() {
     return {};
   },
+  components: { TDAPIResponseStatus },
   props: {
+    responseTime: {
+      type: Number,
+      default: null,
+    },
+    statusCode: {
+      type: Number,
+      default: null,
+    },
     isLoading: {
       type: Boolean,
       default: false,
