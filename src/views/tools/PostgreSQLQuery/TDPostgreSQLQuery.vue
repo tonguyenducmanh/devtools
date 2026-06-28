@@ -417,13 +417,13 @@
           </div>
           <!-- danh sách saved queries -->
           <div class="td-collection">
-            <div class="td-collection-sql-body">
+            <div class="td-collection-body">
               <div
                 v-for="(q, qi) in allSavedQueries"
                 :key="qi"
-                class="flex td-collection-sql-item"
+                class="flex td-collection-request-item"
                 :class="{
-                  'td-collection-sql-item-selected':
+                  'td-collection-request-item-selected':
                     currentSavedQueryId === q.id,
                 }"
                 @click="loadSavedQuery(q)"
@@ -431,7 +431,7 @@
                 <span class="text-nowrap flex-one td-sql-text">
                   <div v-tooltip="q.query_name">{{ q.query_name }}</div>
                 </span>
-                <span>
+                <span class="td-collection-item-edit-btn">
                   <div
                     class="td-icon td-close-icon"
                     v-tooltip="$t('i18nCommon.postgreSQLQuery.deleteQuery')"

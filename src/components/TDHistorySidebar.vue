@@ -83,7 +83,7 @@ export default {
     width: 100%;
     .td-history-item {
       cursor: pointer;
-      height: 40px;
+      height: 30px;
       width: 100%;
       padding: var(--padding);
       border-radius: var(--border-radius);

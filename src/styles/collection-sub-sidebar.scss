@@ -40,24 +40,26 @@
         justify-content: flex-start;
         gap: var(--padding);
         width: 100%;
-        .td-collection-request-item {
-          position: relative;
-          height: 30px;
-          justify-content: space-between;
-          width: 100%;
-          padding: var(--padding);
-          border-radius: var(--border-radius-component);
-        }
-        .td-collection-request-item:hover {
-          background-color: var(--bg-layer-color);
-        }
-        .td-collection-request-item-selected {
-          background-color: var(--bg-layer-color);
-          font-weight: 600;
-        }
       }
     }
   }
+}
+
+.td-collection-request-item {
+  cursor: pointer;
+  position: relative;
+  height: 30px;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--padding);
+  border-radius: var(--border-radius-component);
+}
+.td-collection-request-item:hover {
+  background-color: var(--bg-layer-color);
+}
+.td-collection-request-item-selected {
+  background-color: var(--bg-layer-color);
+  font-weight: 600;
 }
 
 .td-collection-edit-btn {
