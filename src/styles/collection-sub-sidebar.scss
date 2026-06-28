@@ -27,7 +27,7 @@
         justify-content: space-between;
         width: 100%;
         background-color: var(--bg-thirt-color);
-        border-radius: var(--border-radius);
+        border-radius: var(--border-radius-component);
         .td-collection-header-left {
           gap: var(--padding);
           display: flex;
@@ -46,7 +46,7 @@
           justify-content: space-between;
           width: 100%;
           padding: var(--padding);
-          border-radius: var(--border-radius);
+          border-radius: var(--border-radius-component);
         }
         .td-collection-request-item:hover {
           background-color: var(--bg-layer-color);
