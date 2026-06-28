@@ -445,10 +445,28 @@ export function registerAllMonacoThemes(monaco) {
 }
 
 export function getMonacoSyntaxRules(themeName) {
-  var theme = THEMES.find(function (t) { return t.name === themeName; });
+  var theme = THEMES.find(function (t) {
+    return t.name === themeName;
+  });
   return theme ? theme.rules : [];
 }
 
 export var monacoThemeList = THEMES.map(function (t) {
   return { label: t.label, value: t.name };
 });
+
+/**
+ * Map tra màu bg/fg của từng Monaco theme.
+ * Dùng để set CSS vars --td-monaco-footer-bg / --td-monaco-footer-fg lên :root bằng JS.
+ */
+export var monacoThemeColorMap = THEMES.reduce(function (map, t) {
+  map[t.name] = {
+    bg:
+      t.colors["editor.background"] ||
+      (t.base === "vs" ? "#ffffff" : "#1e1e1e"),
+    fg:
+      t.colors["editor.foreground"] ||
+      (t.base === "vs" ? "#000000" : "#d4d4d4"),
+  };
+  return map;
+}, {});
