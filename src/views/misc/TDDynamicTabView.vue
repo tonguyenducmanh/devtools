@@ -171,20 +171,23 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
             </div>
           </div>
           <div class="td-tab-preview-footer">
-            <div
-              v-for="item in tabShortcuts"
-              :key="item.key"
-              class="td-tab-preview-footer__item"
-            >
-              <span class="td-tab-preview-footer__keys">
-                <kbd v-for="part in item.presentKey" :key="part">{{
-                  part
-                }}</kbd>
-              </span>
-              <span class="td-tab-preview-footer__label">{{
-                $t(item.labelKey)
-              }}</span>
+            <div class="td-tab-preview-footer__grid">
+              <div
+                v-for="item in tabShortcuts"
+                :key="item.key"
+                class="td-tab-preview-footer__item"
+              >
+                <span class="td-tab-preview-footer__keys">
+                  <kbd v-for="part in item.presentKey" :key="part">{{
+                    part
+                  }}</kbd>
+                </span>
+                <span class="td-tab-preview-footer__label">{{
+                  $t(item.labelKey)
+                }}</span>
+              </div>
             </div>
+            <!-- /__grid -->
           </div>
         </div>
       </div>
@@ -1057,20 +1060,26 @@ export default {
   padding: var(--padding);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   pointer-events: auto;
-  max-width: min(90vw, 680px);
+  /* tự giãn theo content, giới hạn tối đa 90vw */
+  width: max-content;
+  max-width: 90vw;
 }
 .td-tab-preview-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  /*
+    minmax(0, 1fr): 2 cột đều nhau, mỗi cột tự giãn theo item dài nhất trong grid.
+    Container max-content sẽ tính chiều rộng dựa theo grid → tự fit.
+  */
+  grid-template-columns: repeat(2, minmax(max-content, 1fr));
   gap: var(--padding);
 }
 .td-tab-preview-item {
-  padding: 8px 18px;
-  border-radius: var(--border-radius);
+  padding: var(--padding);
+  border-radius: var(--border-radius-component);
   cursor: pointer;
   color: var(--text-color);
   font-size: var(--font-size-medium-rare);
-  text-align: center;
+  text-align: left;
   white-space: nowrap;
   border: 1px solid var(--border-color);
   transition:
@@ -1088,38 +1097,48 @@ export default {
   border-color: var(--focus-color) !important;
 }
 .td-tab-preview-footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 8px 16px;
-  margin-top: 8px;
-  padding-top: 8px;
+  margin-top: var(--padding);
+  padding-top: var(--padding);
   border-top: 1px solid var(--border-color);
+  /* wrapper để center inline-grid bên trong */
+  display: flex;
+  justify-content: center;
+}
+.td-tab-preview-footer__grid {
+  /* inline-grid: tự co width vừa đủ nội dung, không ép full width */
+  display: inline-grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 4px 16px;
+  align-items: center;
 }
 .td-tab-preview-footer__item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--padding);
+  white-space: nowrap;
 }
 .td-tab-preview-footer__keys {
   display: flex;
   align-items: center;
   gap: 2px;
+  flex-shrink: 0;
 }
 .td-tab-preview-footer__label {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary-color);
   white-space: nowrap;
 }
 .td-tab-preview-footer kbd {
-  display: inline-block;
-  padding: 1px 6px;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
   font-size: 11px;
   font-family: inherit;
   background: var(--bg-layer-color);
   border: 1px solid var(--border-color);
   border-radius: 4px;
   color: var(--text-color);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 </style>
