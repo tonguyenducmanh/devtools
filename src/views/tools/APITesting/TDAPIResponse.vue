@@ -16,7 +16,7 @@
       <template v-slot:footer-main>
         <div class="flex">
           <TDAPIResponseStatus
-            class="flex td-api-response-title"
+            class="flex"
             :statusCode="statusCode"
             :responseTime="responseTime"
           />

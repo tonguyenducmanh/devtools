@@ -65,6 +65,7 @@
           :monacoOptions="monacoOptions"
           @keydown.ctrl.enter.prevent="handleRunQuery"
           @keydown.meta.enter.prevent="handleRunQuery"
+          :showCursorTextFooter="true"
         >
         </TDTextarea>
       </div>

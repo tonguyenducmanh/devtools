@@ -31,7 +31,11 @@
           </span>
           <span class="td-monaco-footer__group">
             <span class="td-monaco-footer__language">{{ language }}</span>
-            <span class="td-monaco-footer__cursor">{{ footerCursorText }}</span>
+            <span
+              v-if="showCursorTextFooter"
+              class="td-monaco-footer__cursor"
+              >{{ footerCursorText }}</span
+            >
           </span>
         </div>
       </div>
@@ -136,6 +140,10 @@ export default {
     isShowFooter: {
       type: Boolean,
       default: true,
+    },
+    showCursorTextFooter: {
+      type: Boolean,
+      default: false,
     },
     width: {
       type: String,

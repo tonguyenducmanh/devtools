@@ -1822,7 +1822,4 @@ body[data-theme="dark"] {
 .td-request-footer-btn {
   cursor: pointer;
 }
-.td-request-footer-btn:hover {
-  background-color: var(--bg-layer-color);
-}
 </style>
