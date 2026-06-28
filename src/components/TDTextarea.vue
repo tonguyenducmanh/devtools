@@ -29,7 +29,7 @@
             </span>
           </span>
           <span class="td-monaco-footer__group">
-            <span class="td-monaco-footer__language">{{ footerLanguage }}</span>
+            <span class="td-monaco-footer__language">{{ language }}</span>
             <span class="td-monaco-footer__cursor">{{ footerCursorText }}</span>
           </span>
         </div>
@@ -170,7 +170,6 @@ export default {
       value: null,
       monacoThemeName: null,
       footerCursorText: "Ln 1, Col 1",
-      footerLanguage: null,
     };
   },
   watch: {
@@ -190,8 +189,6 @@ export default {
     language(value, oldVal) {
       if (this.editor && value && oldVal && value != oldVal) {
         monaco.editor.setModelLanguage(this.editorModel, value);
-        // cập nhật label ngôn ngữ trên footer
-        this.updateFooterLanguage(value);
       }
     },
   },
@@ -308,9 +305,6 @@ export default {
 
         me.editor = monaco.editor.create(me.$refs.textareaWrap, configObject);
 
-        // Init footer language
-        me.footerLanguage = me.language;
-
         // đăng ký command đổi theme (context menu + keyboard)
         me.editor.addAction({
           id: "td-change-monaco-theme",
@@ -397,10 +391,6 @@ export default {
       if (position) {
         this.footerCursorText = `Ln ${position.lineNumber}, Col ${position.column}`;
       }
-    },
-
-    updateFooterLanguage(lang) {
-      this.footerLanguage = lang || "";
     },
 
     /**
