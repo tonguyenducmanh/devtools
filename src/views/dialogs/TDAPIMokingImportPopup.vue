@@ -89,6 +89,6 @@ export default {
 </script>
 <style scoped lang="scss">
 .td-api-import-curl {
-  height: 500px;
+  height: 100%;
 }
 </style>

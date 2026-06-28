@@ -299,9 +299,7 @@
                   class="flex td-collection-header"
                   @click="toggleGroup(group.id || '__ungrouped__')"
                 >
-                  <div
-                    class="flex text-nowrap-collection td-collection-header-left"
-                  >
+                  <div class="flex text-nowrap td-collection-header-left">
                     <!-- mũi tên chỉ trạng thái expand/collapse -->
                     <TDArrow
                       :openProp="openGroups[group.id || '__ungrouped__']"
@@ -369,7 +367,7 @@
                       </div>
                     </span>
                     <!-- nút edit/delete connection (chỉ hiện khi hover) -->
-                    <span class="flex td-connection-actions">
+                    <span class="td-collection-item-edit-btn">
                       <div
                         class="td-icon td-edit-icon"
                         v-tooltip="$t('i18nCommon.edit')"
@@ -1789,6 +1787,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/collection-sub-sidebar.scss";
+
 .td-pg-query-container {
   width: 100%;
   height: 100%;
@@ -1910,120 +1910,6 @@ export default {
   border-radius: var(--border-radius);
 }
 
-.td-collection {
-  flex: 1;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  position: relative;
-
-  .td-collection-body {
-    margin-top: var(--padding);
-    position: relative;
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-
-    .td-collection-item {
-      cursor: pointer;
-      justify-content: flex-start;
-      gap: var(--padding);
-      width: 100%;
-      min-height: 40px;
-      margin-bottom: var(--padding);
-
-      .td-collection-header {
-        gap: var(--padding);
-        padding: var(--padding);
-        height: 40px;
-        justify-content: space-between;
-        width: 100%;
-        background-color: var(--bg-thirt-color);
-        border-radius: var(--border-radius);
-
-        .td-collection-header-left {
-          gap: var(--padding);
-        }
-      }
-
-      .td-collection-header:hover {
-        background-color: var(--bg-layer-color);
-      }
-
-      .td-collection-content {
-        justify-content: flex-start;
-        gap: var(--padding);
-        width: 100%;
-
-        .td-collection-request-item {
-          height: 40px;
-          justify-content: space-between;
-          width: 100%;
-          padding: var(--padding);
-          border-radius: var(--border-radius);
-          align-items: center;
-
-          .td-connection-actions {
-            gap: 4px;
-            opacity: 0;
-            transition: opacity 0.2s;
-          }
-        }
-
-        .td-collection-request-item:hover {
-          background-color: var(--bg-layer-color);
-
-          .td-connection-actions {
-            opacity: 1;
-          }
-        }
-
-        .td-collection-request-item-selected {
-          background-color: var(--bg-layer-color);
-          font-weight: 600;
-        }
-      }
-    }
-  }
-  .td-collection-sql-body {
-    margin-top: var(--padding);
-    position: relative;
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-
-    .td-collection-sql-item {
-      cursor: pointer;
-      height: 40px;
-      justify-content: space-between;
-      width: 100%;
-      padding: var(--padding);
-      border-radius: var(--border-radius);
-      align-items: center;
-
-      .td-connection-actions {
-        gap: 4px;
-        opacity: 0;
-        transition: opacity 0.2s;
-      }
-    }
-
-    .td-collection-sql-item:hover {
-      background-color: var(--bg-layer-color);
-
-      .td-connection-actions {
-        opacity: 1;
-      }
-    }
-
-    .td-collection-sql-item-selected {
-      background-color: var(--bg-layer-color);
-      font-weight: 600;
-    }
-  }
-}
-
 .td-sidebar-content {
   flex: 1;
   width: 100%;
@@ -2037,27 +1923,6 @@ export default {
 
   .td-new-collection {
     flex: 1;
-  }
-}
-
-.td-collection-edit-btn {
-  display: flex;
-  gap: var(--padding);
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.td-collection-header:hover .td-collection-edit-btn {
-  opacity: 1;
-}
-
-.text-nowrap-collection {
-  max-width: 200px !important;
-
-  div {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 }
 

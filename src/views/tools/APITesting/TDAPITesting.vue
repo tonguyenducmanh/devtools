@@ -462,9 +462,7 @@
                     class="flex td-collection-header"
                     @click="toggleCollection(collection)"
                   >
-                    <div
-                      class="flex text-nowrap-collection td-collection-header-left"
-                    >
+                    <div class="flex text-nowrap td-collection-header-left">
                       <TDArrow
                         :openProp="collection.openingCollection"
                         :arrowOpenDirection="$tdEnum.Direction.bottom"
@@ -511,7 +509,7 @@
                           {{ request.requestName }}
                         </div>
                       </span>
-                      <span class="text-nowrap">
+                      <span class="td-collection-item-edit-btn">
                         <div
                           class="td-icon td-close-icon"
                           v-tooltip="$t('i18nCommon.apiTesting.delete')"
@@ -803,13 +801,12 @@ export default {
                     suggestions: [
                       {
                         label: "requestCURL",
-                        kind:
-                          monacoInstance.languages.CompletionItemKind.Function,
-                        insertText:
-                          "await requestCURL(${1:curlString})",
+                        kind: monacoInstance.languages.CompletionItemKind
+                          .Function,
+                        insertText: "await requestCURL(${1:curlString})",
                         insertTextRules:
-                          monacoInstance.languages
-                            .CompletionItemInsertTextRule.InsertAsSnippet,
+                          monacoInstance.languages.CompletionItemInsertTextRule
+                            .InsertAsSnippet,
                         sortText: "0",
                         detail: me.$t(
                           "i18nCommon.apiTesting.requestCURLDescription",
@@ -823,13 +820,12 @@ export default {
                       },
                       {
                         label: "parseResponseCURL",
-                        kind:
-                          monacoInstance.languages.CompletionItemKind.Function,
-                        insertText:
-                          "parseResponseCURL(${1:response})",
+                        kind: monacoInstance.languages.CompletionItemKind
+                          .Function,
+                        insertText: "parseResponseCURL(${1:response})",
                         insertTextRules:
-                          monacoInstance.languages
-                            .CompletionItemInsertTextRule.InsertAsSnippet,
+                          monacoInstance.languages.CompletionItemInsertTextRule
+                            .InsertAsSnippet,
                         sortText: "1",
                         detail: me.$t(
                           "i18nCommon.apiTesting.parseResponseCURLDescription",
@@ -898,7 +894,11 @@ export default {
         presentKey: [me.$tdUtility.ctrlKey(), me.$tdUtility.enterKey()],
         labelKey: "i18nCommon.shortKeyAction.executeAPITesting",
         action: (event) => {
-          if (event && (event.metaKey || event.ctrlKey) && event.key === "Enter") {
+          if (
+            event &&
+            (event.metaKey || event.ctrlKey) &&
+            event.key === "Enter"
+          ) {
             event.preventDefault();
             me.debouncedHandleSend();
           }
@@ -1648,6 +1648,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@use "@/styles/collection-sub-sidebar.scss";
+
 .td-api-container {
   width: 100%;
   height: 100%;
@@ -1709,7 +1711,7 @@ export default {
 .td-header-collection {
   width: 100%;
   height: 30px;
-  margin: var(--padding);
+  margin-top: var(--padding);
   gap: var(--padding);
   .td-new-collection {
     flex: 1;
@@ -1718,87 +1720,12 @@ export default {
     cursor: pointer;
   }
 }
-.td-collection {
-  flex: 1;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  position: relative;
-  .td-collection-body {
-    position: relative;
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    .td-collection-item {
-      cursor: pointer;
-      justify-content: flex-start;
-      gap: var(--padding);
-      width: 100%;
-      min-height: 40px;
-      margin-bottom: var(--padding);
-
-      .td-collection-header {
-        gap: var(--padding);
-        padding: var(--padding);
-        height: 40px;
-        justify-content: space-between;
-        width: 100%;
-        background-color: var(--bg-thirt-color);
-        border-radius: var(--border-radius);
-        .td-collection-header-left {
-          gap: var(--padding);
-        }
-      }
-      .td-collection-header:hover {
-        background-color: var(--bg-layer-color);
-      }
-      .td-collection-content {
-        justify-content: flex-start;
-        width: 100%;
-        .td-collection-request-item {
-          height: 40px;
-          justify-content: space-between;
-          width: 100%;
-          padding: var(--padding);
-          border-radius: var(--border-radius);
-        }
-        .td-collection-request-item:hover {
-          background-color: var(--bg-layer-color);
-        }
-        .td-collection-request-item-selected {
-          background-color: var(--bg-layer-color);
-          font-weight: 600;
-        }
-      }
-    }
-  }
-}
 .response-loading {
   width: 100%;
   height: 100%;
   background-color: var(--bg-layer-color);
   border: 1px solid transparent;
   border-radius: var(--border-radius);
-}
-.td-collection-edit-btn {
-  display: flex;
-  gap: var(--padding);
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.td-collection-header:hover .td-collection-edit-btn {
-  opacity: 1;
-}
-
-.text-nowrap-collection {
-  max-width: 215px !important;
-  div {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 }
 .td-sidebar-content {
   flex: 1;
@@ -1851,22 +1778,6 @@ export default {
     }
   }
 }
-.text-nowrap-collection {
-  max-width: 215px !important;
-  div {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
-.text-nowrap {
-  max-width: 250px;
-  div {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
 .td-text-area-wrap {
   position: relative;
   width: 100%;
@@ -1913,9 +1824,7 @@ body[data-theme="dark"] {
 .td-collection-rename {
   width: 100%;
 }
-.td-collection-edit-btn {
-  gap: var(--padding);
-}
+
 .td-template-content {
   height: 100%;
   width: 100%;

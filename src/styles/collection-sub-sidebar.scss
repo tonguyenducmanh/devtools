@@ -1,0 +1,88 @@
+.td-collection {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+  .td-collection-body {
+    margin-top: var(--padding);
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    .td-collection-item {
+      cursor: pointer;
+      justify-content: flex-start;
+      gap: var(--padding);
+      width: 100%;
+      min-height: 35px;
+      margin-bottom: var(--padding);
+
+      .td-collection-header {
+        position: relative;
+        gap: var(--padding);
+        padding: var(--padding);
+        height: 35px;
+        justify-content: space-between;
+        width: 100%;
+        background-color: var(--bg-thirt-color);
+        border-radius: var(--border-radius);
+        .td-collection-header-left {
+          gap: var(--padding);
+        }
+      }
+      .td-collection-header:hover {
+        background-color: var(--bg-layer-color);
+      }
+      .td-collection-content {
+        justify-content: flex-start;
+        gap: var(--padding);
+        width: 100%;
+        .td-collection-request-item {
+          position: relative;
+          height: 30px;
+          justify-content: space-between;
+          width: 100%;
+          padding: var(--padding);
+          border-radius: var(--border-radius);
+        }
+        .td-collection-request-item:hover {
+          background-color: var(--bg-layer-color);
+        }
+        .td-collection-request-item-selected {
+          background-color: var(--bg-layer-color);
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+.td-collection-edit-btn {
+  position: absolute;
+  right: var(--padding);
+  display: flex;
+  gap: var(--padding);
+  opacity: 0;
+  transition: opacity 0.2s;
+  background-color: var(--bg-layer-color);
+}
+
+.td-collection-header:hover .td-collection-edit-btn {
+  opacity: 1;
+}
+
+.td-collection-item-edit-btn {
+  position: absolute;
+  right: var(--padding);
+  display: flex;
+  gap: var(--padding);
+  opacity: 0;
+  transition: opacity 0.2s;
+  background-color: var(--bg-layer-color);
+}
+
+.td-collection-request-item:hover .td-collection-item-edit-btn {
+  opacity: 1;
+}
