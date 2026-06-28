@@ -4,14 +4,14 @@
       <!-- <div class="title">{{ $t("i18nCommon.textCompress.title") }}</div> -->
       <div class="paste-box">
         <div class="flex compress-input">
-          <TDTextarea
+          <TDTextEditor
             :placeHolder="$t('i18nCommon.textCompress.input.compress')"
             v-model="inputSource"
-          ></TDTextarea>
-          <TDTextarea
+          ></TDTextEditor>
+          <TDTextEditor
             :placeHolder="$t('i18nCommon.textCompress.input.decompress')"
             v-model="outputSource"
-          ></TDTextarea>
+          ></TDTextEditor>
         </div>
       </div>
       <div>

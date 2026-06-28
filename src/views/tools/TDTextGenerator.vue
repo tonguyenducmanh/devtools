@@ -2,11 +2,11 @@
   <div class="flex td-text-generator">
     <div class="flex flex-col td-text-gen-container">
       <div class="td-text-gen-result">
-        <TDTextarea
+        <TDTextEditor
           :placeHolder="$t('i18nCommon.textgenerator.resultPlaceholder')"
           v-model="randomTextGenerated"
           :readOnly="true"
-        ></TDTextarea>
+        ></TDTextEditor>
       </div>
       <div class="flex build-area">
         <TDComboBox

@@ -2,12 +2,12 @@
   <div class="flex td-text-manipulation">
     <div class="flex flex-col container">
       <div class="mb-medium td-input-source">
-        <TDTextarea
+        <TDTextEditor
           :placeHolder="$t('i18nCommon.textManipulation.inputSource')"
           v-model="inputSource"
           class="td-input-source-textbox"
         >
-        </TDTextarea>
+        </TDTextEditor>
         <div class="td-row-num">
           {{ totalRow }}
         </div>
@@ -28,11 +28,11 @@
       </div>
 
       <div class="mb-medium td-input-source">
-        <TDTextarea
+        <TDTextEditor
           :placeHolder="$t('i18nCommon.textManipulation.expressionSource')"
           v-model="expressionSource"
           class="td-input-source-textbox"
-        ></TDTextarea>
+        ></TDTextEditor>
         <div class="flex td-seperate">
           <TDInput
             v-model="outputRowSeperator"
@@ -43,11 +43,11 @@
         </div>
       </div>
       <div class="td-input-source">
-        <TDTextarea
+        <TDTextEditor
           :placeHolder="$t('i18nCommon.textManipulation.outputSource')"
           v-model="outputSource"
           :readOnly="true"
-        ></TDTextarea>
+        ></TDTextEditor>
       </div>
       <div class="flex">
         <TDButton

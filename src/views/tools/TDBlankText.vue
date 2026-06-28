@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col container">
     <div class="flex editor-container">
-      <TDTextarea
+      <TDTextEditor
         :placeHolder="$t('i18nCommon.blanktext.placeholder')"
         v-model="content"
         height="100%"
@@ -10,7 +10,7 @@
         :language="currentConfigLayout.language"
         :wrapText="currentConfigLayout.wrapText"
         :monacoOptions="monacoOptions"
-      ></TDTextarea>
+      ></TDTextEditor>
     </div>
     <div class="flex tool-footer">
       <TDComboBox

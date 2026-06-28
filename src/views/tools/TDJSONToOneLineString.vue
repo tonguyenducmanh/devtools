@@ -1,8 +1,11 @@
 <template>
   <div class="flex container">
     <div class="flex flex-col main-area">
-      <div class="flex io-section" :class="{ 'flex-col': currentConfigLayout.splitHorizontal }">
-        <TDTextarea
+      <div
+        class="flex io-section"
+        :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
+      >
+        <TDTextEditor
           isLabelTop
           :enableHighlight="currentConfigLayout.enableHighlight"
           language="json"
@@ -10,8 +13,8 @@
           :placeHolder="$t('i18nCommon.JSONToOneLineString.inputPlaceholder')"
           v-model="inputJSON"
           :wrapText="currentConfigLayout.wrapText"
-        ></TDTextarea>
-        <TDTextarea
+        ></TDTextEditor>
+        <TDTextEditor
           isLabelTop
           :label="$t('i18nCommon.JSONToOneLineString.outputLabel')"
           :readOnly="true"
@@ -20,7 +23,7 @@
           :placeHolder="$t('i18nCommon.JSONToOneLineString.outputPlaceholder')"
           v-model="outputString"
           :wrapText="currentConfigLayout.wrapText"
-        ></TDTextarea>
+        ></TDTextEditor>
       </div>
       <div class="flex">
         <TDButton
@@ -57,13 +60,19 @@
       <template v-slot:main>
         <div
           class="flex flex-col td-sidebar-content"
-          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.Help
+          "
         >
           <TDJSONToOneLineStringHelp />
         </div>
         <div
           class="flex flex-col td-sidebar-content"
-          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.Setting
+          "
         >
           <div class="flex flex-col group-section">
             <TDComboBox

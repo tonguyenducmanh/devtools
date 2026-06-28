@@ -58,14 +58,14 @@
       </div>
     </div>
     <div class="flex td-script-query" v-if="isServerAgentMode">
-      <TDTextarea
+      <TDTextEditor
         v-model="scriptQuery"
         :enableHighlight="true"
         language="sql"
         :wrapText="false"
         :placeHolder="$t('i18nCommon.AppDataMiner.queryAgentSQl')"
         :label="$t('i18nCommon.AppDataMiner.queryAgentSQl')"
-      ></TDTextarea>
+      ></TDTextEditor>
     </div>
     <div class="td-app-data-viewer">
       <TDTableViewer

@@ -10,12 +10,12 @@
       ></TDHistory>
     </div>
     <div class="flex input-container">
-      <TDTextarea
+      <TDTextEditor
         :placeHolder="$t('i18nCommon.htmlPreview.inputHTML')"
         v-model="inputHtml"
         height="100%"
         :width="isFullscreenPreview ? '100%' : '50%'"
-      ></TDTextarea>
+      ></TDTextEditor>
       <iframe
         v-if="!isFullscreenPreview"
         ref="previewFrame"

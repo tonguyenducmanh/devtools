@@ -13,7 +13,10 @@
         <!-- nút Back (undo) kèm flyout danh sách lịch sử -->
         <div
           class="td-history-btn-wrap"
-          @mouseenter="cancelBackClose(); showBackFlyout = true"
+          @mouseenter="
+            cancelBackClose();
+            showBackFlyout = true;
+          "
           @mouseleave="scheduleBackClose()"
         >
           <TDButton
@@ -42,13 +45,20 @@
         <!-- nút Next (redo) kèm flyout -->
         <div
           class="td-history-btn-wrap"
-          @mouseenter="cancelNextClose(); showNextFlyout = true"
+          @mouseenter="
+            cancelNextClose();
+            showNextFlyout = true;
+          "
           @mouseleave="scheduleNextClose()"
         >
           <TDButton
             :noMargin="true"
             iconClass="td-redo-icon"
-            :class="historyPointer >= sessionHistory.length - 1 ? 'td-toolbar-btn-disabled' : ''"
+            :class="
+              historyPointer >= sessionHistory.length - 1
+                ? 'td-toolbar-btn-disabled'
+                : ''
+            "
             @click="handleNext"
             v-tooltip="nextTooltip"
           />
@@ -164,7 +174,7 @@
             <div v-if="isLoadingDDL" class="flex td-inspect-loading">
               <div class="loader"></div>
             </div>
-            <TDTextarea
+            <TDTextEditor
               v-else
               ref="ddlEditor"
               v-model="ddlContent"
@@ -211,19 +221,19 @@ export default {
       // connection hiện tại
       connectionId: "",
       // tham số tìm kiếm
-      searchType: "table",          // loại object: table | view | function
-      searchSchema: "",             // schema filter (rỗng = tất cả)
-      searchValue: "",              // tên object cần tìm
-      limitCount: 20,               // giới hạn số kết quả
-      isLoadingSchemas: false,      // đang load danh sách schema
-      schemaOptions: [],            // danh sách schema để đổ vào combo
+      searchType: "table", // loại object: table | view | function
+      searchSchema: "", // schema filter (rỗng = tất cả)
+      searchValue: "", // tên object cần tìm
+      limitCount: 20, // giới hạn số kết quả
+      isLoadingSchemas: false, // đang load danh sách schema
+      schemaOptions: [], // danh sách schema để đổ vào combo
       // trạng thái
       isSearching: false,
       isLoadingDDL: false,
       searchError: "",
-      results: [],                  // kết quả tìm kiếm
-      activeIndex: -1,              // index item đang được chọn
-      ddlContent: "",               // nội dung DDL của object đang xem
+      results: [], // kết quả tìm kiếm
+      activeIndex: -1, // index item đang được chọn
+      ddlContent: "", // nội dung DDL của object đang xem
 
       // options cho combo loại object
       searchTypeOptions: [
@@ -246,11 +256,11 @@ export default {
       // lịch sử duyệt (back/forward) - mỗi entry là 1 state tìm kiếm
       sessionHistory: [],
       historyPointer: -1,
-      _isHistoryNav: false,         // cờ đang điều hướng lịch sử (tránh đẩy duplicate history)
+      _isHistoryNav: false, // cờ đang điều hướng lịch sử (tránh đẩy duplicate history)
       showBackFlyout: false,
       showNextFlyout: false,
-      backCloseTimer: null,         // timer đóng flyout back
-      nextCloseTimer: null,         // timer đóng flyout next
+      backCloseTimer: null, // timer đóng flyout back
+      nextCloseTimer: null, // timer đóng flyout next
     };
   },
 
@@ -284,7 +294,11 @@ export default {
     },
     nextHistory() {
       let items = [];
-      for (let i = this.historyPointer + 1; i < this.sessionHistory.length; i++) {
+      for (
+        let i = this.historyPointer + 1;
+        i < this.sessionHistory.length;
+        i++
+      ) {
         items.push({ index: i, entry: this.sessionHistory[i] });
       }
       return items;
@@ -317,7 +331,9 @@ export default {
               const word = model.getWordAtPosition(position);
               if (!word) {
                 me.$tdToast.warning(
-                  me.$t("i18nCommon.postgreSQLQuery.dbInspect.noObjectSelected"),
+                  me.$t(
+                    "i18nCommon.postgreSQLQuery.dbInspect.noObjectSelected",
+                  ),
                 );
                 return;
               }
@@ -610,13 +626,12 @@ export default {
       }
       let newEntry = {
         searchType: this.searchType,
-        searchSchema: item ? (item.schema_name || "") : this.searchSchema,
+        searchSchema: item ? item.schema_name || "" : this.searchSchema,
         searchValue: entryValue,
         activeIndex: this.activeIndex,
       };
       // kiểm tra entry cuối có giống entry mới không để tránh push duplicate
-      let lastEntry =
-        this.sessionHistory[this.sessionHistory.length - 1];
+      let lastEntry = this.sessionHistory[this.sessionHistory.length - 1];
       if (
         lastEntry &&
         lastEntry.searchType === newEntry.searchType &&
@@ -682,7 +697,10 @@ export default {
       for (const type of ["table", "view", "function"]) {
         this.searchType = type;
         let sql = this.buildSearchSQL();
-        if (!sql) { this.searchType = savedType; continue; }
+        if (!sql) {
+          this.searchType = savedType;
+          continue;
+        }
         try {
           let resp = await this.agentAPI.executeQuery(this.connectionId, sql);
           let result =
@@ -741,9 +759,8 @@ export default {
 
     entryLabel(entry) {
       let typeLabel =
-        this.$t(
-          `i18nCommon.postgreSQLQuery.dbInspect.${entry.searchType}`,
-        ) || entry.searchType;
+        this.$t(`i18nCommon.postgreSQLQuery.dbInspect.${entry.searchType}`) ||
+        entry.searchType;
       let name = entry.searchValue || "";
       if (!name)
         return (

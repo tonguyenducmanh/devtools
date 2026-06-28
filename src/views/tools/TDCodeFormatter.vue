@@ -2,7 +2,7 @@
   <div class="flex td-code-formatter">
     <div class="flex flex-col container">
       <div class="flex input-container">
-        <TDTextarea
+        <TDTextEditor
           :placeHolder="$t('i18nCommon.codeFormatter.inputCode')"
           :label="$t('i18nCommon.codeFormatter.inputCode')"
           v-model="inputSource"
@@ -10,8 +10,8 @@
           width="50%"
           :enableHighlight="currentConfigLayout.enableHighlight"
           :language="language"
-        ></TDTextarea>
-        <TDTextarea
+        ></TDTextEditor>
+        <TDTextEditor
           :placeHolder="$t('i18nCommon.codeFormatter.outputCode')"
           :label="$t('i18nCommon.codeFormatter.outputCode')"
           v-model="outputSource"
@@ -20,7 +20,7 @@
           :enableHighlight="currentConfigLayout.enableHighlight"
           :language="language"
           :readOnly="true"
-        ></TDTextarea>
+        ></TDTextEditor>
       </div>
       <div class="flex tool-header">
         <TDComboBox

@@ -3,7 +3,7 @@
     <div class="flex flex-col main-tool">
       <div class="input-area">
         <template v-if="!currentConfigLayout.enableFileUpload">
-          <TDTextarea
+          <TDTextEditor
             isLabelTop
             :label="$t('i18nCommon.jsonToExcel.inputLabel')"
             :placeHolder="$t('i18nCommon.jsonToExcel.inputPlaceholder')"

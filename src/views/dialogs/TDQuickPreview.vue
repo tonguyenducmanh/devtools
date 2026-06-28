@@ -16,7 +16,7 @@
       />
     </template>
     <div class="td-preview-editor">
-      <TDTextarea
+      <TDTextEditor
         :modelValue="previewValue"
         :readOnly="true"
         :wrapText="true"
@@ -29,12 +29,12 @@
 
 <script>
 import TDPopup from "@/components/TDPopup.vue";
-import TDTextarea from "@/components/TDTextarea.vue";
+import TDTextEditor from "@/components/TDTextEditor.vue";
 import TDComboBox from "@/components/TDComboBox.vue";
 
 export default {
   name: "TDQuickPreview",
-  components: { TDPopup, TDTextarea, TDComboBox },
+  components: { TDPopup, TDTextEditor, TDComboBox },
   props: {
     ownerForm: { type: Object, default: null },
     onClose: { type: Function, default: null },

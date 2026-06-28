@@ -6,7 +6,7 @@
         :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
       >
         <template v-if="!currentConfigLayout.enableFileUpload">
-          <TDTextarea
+          <TDTextEditor
             isLabelTop
             :enableHighlight="currentConfigLayout.enableHighlight"
             language="json"
@@ -14,7 +14,7 @@
             :placeHolder="$t('i18nCommon.jsonToPostgreSQL.inputPlaceholder')"
             v-model="inputJSON"
             :wrapText="currentConfigLayout.wrapText"
-          ></TDTextarea>
+          ></TDTextEditor>
         </template>
         <template v-else>
           <div class="upload-container">
@@ -26,7 +26,7 @@
           </div>
         </template>
         <template v-if="!currentConfigLayout.enableFileUpload">
-          <TDTextarea
+          <TDTextEditor
             isLabelTop
             :label="$t('i18nCommon.jsonToPostgreSQL.outputLabel')"
             :readOnly="true"
@@ -35,7 +35,7 @@
             :placeHolder="$t('i18nCommon.jsonToPostgreSQL.outputPlaceholder')"
             v-model="outputSQL"
             :wrapText="currentConfigLayout.wrapText"
-          ></TDTextarea>
+          ></TDTextEditor>
         </template>
       </div>
       <div class="flex">

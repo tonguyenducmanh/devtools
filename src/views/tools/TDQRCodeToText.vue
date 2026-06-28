@@ -29,13 +29,13 @@
         <div class="flex flex-col response-loading" v-if="isLoading">
           <div class="loader"></div>
         </div>
-        <TDTextarea
+        <TDTextEditor
           v-else
           class="input-area"
           :placeHolder="$t('i18nCommon.qrCodeToText.result')"
           v-model="textOutput"
           :readOnly="true"
-        ></TDTextarea>
+        ></TDTextEditor>
       </div>
     </div>
     <TDSubSidebar
@@ -181,7 +181,7 @@ export default {
         );
         try {
           let rawResults = await imagesQRToText(me.$refs.uploadArea, {
-            scanMultipleQR: me.currentConfigLayout.scanMultipleQR
+            scanMultipleQR: me.currentConfigLayout.scanMultipleQR,
           });
           if (rawResults && rawResults.length > 0) {
             let finalOutput = "";

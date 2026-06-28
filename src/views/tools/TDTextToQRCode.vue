@@ -3,10 +3,10 @@
     <div class="flex flex-col main-tool">
       <div class="flex flex-col input-section" :style="firstSectionResizeStyle">
         <div class="flex input-area">
-          <TDTextarea
+          <TDTextEditor
             :placeHolder="$t('i18nCommon.textToQRCode.input.placeholder')"
             v-model="textGenQR"
-          ></TDTextarea>
+          ></TDTextEditor>
           <div class="flex flex-col button-generate">
             <TDButton
               :noMargin="true"

@@ -3,7 +3,7 @@
     <div class="loader"></div>
   </div>
   <div v-else class="td-text-area-wrap">
-    <TDTextarea
+    <TDTextEditor
       :isLabelTop="true"
       :modelValue="responseText"
       :enableHighlight="true"
@@ -22,7 +22,7 @@
           />
         </div>
       </template>
-    </TDTextarea>
+    </TDTextEditor>
   </div>
 </template>
 <script>

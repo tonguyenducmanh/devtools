@@ -61,7 +61,7 @@
               :noMargin="true"
               :borderRadiusPosition="[
                 $tdEnum.BorderRadiusPosition.TopRight,
-              $tdEnum.BorderRadiusPosition.BottomRight,
+                $tdEnum.BorderRadiusPosition.BottomRight,
               ]"
               v-model="addNewObject.issuer"
               :placeHolder="$t('i18nCommon.oneTimePassword.inputs.issuer')"
@@ -120,7 +120,7 @@
           />
         </div>
         <div class="flex td-decoded-data">
-          <TDTextarea
+          <TDTextEditor
             v-if="isShowDecoded"
             :placeHolder="$t('i18nCommon.oneTimePassword.decodeData')"
             v-model="decodedDataString"
@@ -128,7 +128,7 @@
             isLabelTop
             :readOnly="true"
             height="400px"
-          ></TDTextarea>
+          ></TDTextEditor>
         </div>
         <div v-if="isShowProgress" class="otp-progress-wrapper">
           <progress :value="progress" max="100"></progress>

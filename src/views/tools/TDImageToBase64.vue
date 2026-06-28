@@ -21,13 +21,13 @@
           </div>
         </div>
         <div class="panel right-panel">
-          <TDTextarea
+          <TDTextEditor
             isLabelTop
             :label="$t('i18nCommon.imageToBase64.output')"
             :placeHolder="$t('i18nCommon.imageToBase64.placeHolder')"
             v-model="base64Result"
             :readOnly="true"
-          ></TDTextarea>
+          ></TDTextEditor>
         </div>
       </div>
       <div class="tool-footer">

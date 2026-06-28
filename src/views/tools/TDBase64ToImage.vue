@@ -3,12 +3,12 @@
     <div class="container">
       <div class="io-section">
         <div class="panel left-panel">
-          <TDTextarea
+          <TDTextEditor
             isLabelTop
             :label="$t('i18nCommon.base64ToImage.input')"
             :placeHolder="$t('i18nCommon.base64ToImage.placeHolder')"
             v-model="base64Result"
-          ></TDTextarea>
+          ></TDTextEditor>
         </div>
         <div class="panel right-panel">
           <label class="panel-label">{{

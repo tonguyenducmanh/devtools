@@ -7,14 +7,14 @@
     :title="$t('i18nCommon.APIMocking.ImportPlaceHolder')"
   >
     <div class="flex flex-col td-api-import-curl">
-      <TDTextarea
+      <TDTextEditor
         :isLabelTop="true"
         v-model="mockContent"
         :enableHighlight="currentConfigLayout.enableHighlight"
         language="shell"
         ref="mockContentInput"
         :placeHolder="$t('i18nCommon.apiTesting.contentCURL')"
-      ></TDTextarea>
+      ></TDTextEditor>
       <!-- các nút dưới ô nhập curl -->
       <div class="flex">
         <TDButton

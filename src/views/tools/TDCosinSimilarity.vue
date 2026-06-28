@@ -4,19 +4,19 @@
       <!-- <div class="title">{{ $t("i18nCommon.feature.cosinSimilarity") }}</div> -->
 
       <div class="flex io-section">
-        <TDTextarea
+        <TDTextEditor
           isLabelTop
           :label="$t('i18nCommon.cosinSimilarity.firstVector')"
           :placeHolder="$t('i18nCommon.cosinSimilarity.vectorPlaceholder')"
           v-model="firstVector"
-        ></TDTextarea>
+        ></TDTextEditor>
 
-        <TDTextarea
+        <TDTextEditor
           isLabelTop
           :label="$t('i18nCommon.cosinSimilarity.secondVector')"
           :placeHolder="$t('i18nCommon.cosinSimilarity.vectorPlaceholder')"
           v-model="secondVector"
-        ></TDTextarea>
+        ></TDTextEditor>
       </div>
 
       <div class="flex result-section">

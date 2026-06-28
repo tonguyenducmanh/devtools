@@ -51,7 +51,7 @@
         class="flex flex-one td-pg-query-editor"
         :style="editorSectionSizeStyle"
       >
-        <TDTextarea
+        <TDTextEditor
           ref="sqlEditor"
           v-model="sqlText"
           language="pgsql"
@@ -67,7 +67,7 @@
           @keydown.meta.enter.prevent="handleRunQuery"
           :showCursorTextFooter="true"
         >
-        </TDTextarea>
+        </TDTextEditor>
       </div>
 
       <!-- thanh kéo resize phân cách editor và result -->

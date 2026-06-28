@@ -1,8 +1,11 @@
 <template>
   <div class="flex container">
     <div class="flex flex-col main-area">
-      <div class="flex io-section" :class="{ 'flex-col': currentConfigLayout.splitHorizontal }">
-        <TDTextarea
+      <div
+        class="flex io-section"
+        :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
+      >
+        <TDTextEditor
           isLabelTop
           :enableHighlight="currentConfigLayout.enableHighlight"
           language="json"
@@ -10,8 +13,8 @@
           :placeHolder="$t('i18nCommon.JSONToModel.inputPlaceholder')"
           v-model="inputJSON"
           :wrapText="currentConfigLayout.wrapText"
-        ></TDTextarea>
-        <TDTextarea
+        ></TDTextEditor>
+        <TDTextEditor
           isLabelTop
           :label="$t('i18nCommon.JSONToModel.outputLabel')"
           :readOnly="true"
@@ -20,7 +23,7 @@
           :placeHolder="$t('i18nCommon.JSONToModel.outputPlaceholder')"
           v-model="outputModel"
           :wrapText="currentConfigLayout.wrapText"
-        ></TDTextarea>
+        ></TDTextEditor>
       </div>
       <div class="flex">
         <TDButton
@@ -58,13 +61,19 @@
       <template v-slot:main>
         <div
           class="flex flex-col td-sidebar-content"
-          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Help"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.Help
+          "
         >
           <TDJSONToModelHelp />
         </div>
         <div
           class="flex flex-col td-sidebar-content"
-          v-show="currentConfigLayout.currentSidebarOption == $tdEnum.ToolSidebarOption.Setting"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.Setting
+          "
         >
           <div class="flex flex-col group-section">
             <TDComboBox
@@ -263,7 +272,8 @@ export default {
      */
     toPascalCase(str, alwayBuild) {
       if (
-        (this.currentConfigLayout.csharp.usePascalCase && this.selectedLanguage == LANG.CSharp) ||
+        (this.currentConfigLayout.csharp.usePascalCase &&
+          this.selectedLanguage == LANG.CSharp) ||
         this.selectedLanguage == LANG.Go ||
         alwayBuild
       ) {
@@ -343,10 +353,14 @@ export default {
       const lines = [];
 
       // using
-      if (me.currentConfigLayout.csharp.useJsonProperty) lines.push("using Newtonsoft.Json;");
+      if (me.currentConfigLayout.csharp.useJsonProperty)
+        lines.push("using Newtonsoft.Json;");
       if (me.currentConfigLayout.csharp.useDataAnnotation)
         lines.push("using System.ComponentModel.DataAnnotations;");
-      if (me.currentConfigLayout.csharp.useJsonProperty || me.currentConfigLayout.csharp.useDataAnnotation)
+      if (
+        me.currentConfigLayout.csharp.useJsonProperty ||
+        me.currentConfigLayout.csharp.useDataAnnotation
+      )
         lines.push("");
 
       // namespace
@@ -371,7 +385,9 @@ export default {
     buildCSharpClass(obj, className, classes) {
       const me = this;
       const pascal = me.toPascalCase(className, true);
-      const keyword = me.currentConfigLayout.csharp.useRecord ? "record" : "class";
+      const keyword = me.currentConfigLayout.csharp.useRecord
+        ? "record"
+        : "class";
       const props = [];
 
       const source = Array.isArray(obj) ? obj[0] : obj;
@@ -395,7 +411,9 @@ export default {
         }
 
         const nullable =
-          me.currentConfigLayout.csharp.useNullable && !typeInfo.isArray && csType !== "string"
+          me.currentConfigLayout.csharp.useNullable &&
+          !typeInfo.isArray &&
+          csType !== "string"
             ? "?"
             : "";
 
@@ -404,7 +422,10 @@ export default {
         if (me.currentConfigLayout.csharp.useJsonProperty) {
           propLines.push(`    [JsonProperty("${key}")]`);
         }
-        if (me.currentConfigLayout.csharp.useDataAnnotation && typeInfo.base === "string") {
+        if (
+          me.currentConfigLayout.csharp.useDataAnnotation &&
+          typeInfo.base === "string"
+        ) {
           propLines.push(`    [MaxLength(256)]`);
         }
 
@@ -502,7 +523,11 @@ export default {
           goType = me.goPrimitive(typeInfo.base, typeInfo.isArray);
         }
 
-        if (me.currentConfigLayout.golang.usePointer && !typeInfo.isArray && goType !== "string") {
+        if (
+          me.currentConfigLayout.golang.usePointer &&
+          !typeInfo.isArray &&
+          goType !== "string"
+        ) {
           goType = `*${goType}`;
         }
 
@@ -510,7 +535,9 @@ export default {
 
         let tag = "";
         if (me.currentConfigLayout.golang.useJsonTag) {
-          const omit = me.currentConfigLayout.golang.useOmitempty ? ",omitempty" : "";
+          const omit = me.currentConfigLayout.golang.useOmitempty
+            ? ",omitempty"
+            : "";
           tag = ` \`json:"${key}${omit}"\``;
         }
 

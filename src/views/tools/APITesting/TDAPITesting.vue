@@ -176,7 +176,7 @@
               :style="requestSectionSizeStyle"
             >
               <!-- phần cấu hình header api -->
-              <TDTextarea
+              <TDTextEditor
                 v-if="
                   currentConfigLayout.currentAPIInfoOption ==
                   $tdEnum.APIInfoOption.header
@@ -199,7 +199,7 @@
                     </div>
                   </div>
                 </template>
-              </TDTextarea>
+              </TDTextEditor>
               <!-- phần cấu hình body api -->
               <div
                 class="td-text-area-wrap"
@@ -208,7 +208,7 @@
                   $tdEnum.APIInfoOption.body
                 "
               >
-                <TDTextarea
+                <TDTextEditor
                   :isLabelTop="true"
                   v-model="bodyText"
                   :wrapText="currentConfigLayout.wrapText"
@@ -227,7 +227,7 @@
                       </div>
                     </div>
                   </template>
-                </TDTextarea>
+                </TDTextEditor>
               </div>
             </div>
             <!-- Resizer -->
@@ -272,7 +272,7 @@
               :style="requestSectionSizeStyle"
             >
               <!-- phần nội dung code pro mode -->
-              <TDTextarea
+              <TDTextEditor
                 :isLabelTop="true"
                 v-model="proModeSecranioCode"
                 language="td-api-javascript"
@@ -281,7 +281,7 @@
                 :monacoOptions="proModeMonacoOptions"
                 :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
                 :label="$t('i18nCommon.apiTesting.scriptExecute')"
-              ></TDTextarea>
+              ></TDTextEditor>
             </div>
             <!-- Resizer -->
             <TDResizer

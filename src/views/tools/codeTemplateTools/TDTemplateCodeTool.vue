@@ -1,7 +1,7 @@
 <template>
   <div class="flex container">
     <div class="flex flex-col main-area">
-      <TDTextarea
+      <TDTextEditor
         :isLabelTop="true"
         :readOnly="true"
         :label="selectedTemplateName"
@@ -10,7 +10,7 @@
         :placeHolder="''"
         v-model="currentCode"
         :wrapText="currentConfigLayout.wrapText"
-      ></TDTextarea>
+      ></TDTextEditor>
     </div>
 
     <TDSubSidebar

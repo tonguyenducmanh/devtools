@@ -1,14 +1,14 @@
 <template>
   <TDPopup :visible="true" :showHeader="false" @close="handleClose">
     <div class="flex flex-col td-api-import-curl">
-      <TDTextarea
+      <TDTextEditor
         :isLabelTop="true"
         v-model="curlContent"
         :enableHighlight="currentConfigLayout.enableHighlight"
         language="shell"
         ref="inputCURL"
         :placeHolder="$t('i18nCommon.apiTesting.contentCURL')"
-      ></TDTextarea>
+      ></TDTextEditor>
       <!-- các nút dưới ô nhập curl -->
       <div class="flex">
         <TDButton

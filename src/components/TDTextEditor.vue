@@ -77,7 +77,7 @@ import { StandaloneServices } from "monaco-editor/esm/vs/editor/standalone/brows
 import _ from "@/common/TDCommonFunction.js";
 
 export default {
-  name: "TDTextarea",
+  name: "TDTextEditor",
   mixins: [TDStylePremitiveMixin],
 
   created() {

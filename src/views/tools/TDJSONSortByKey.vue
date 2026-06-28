@@ -2,7 +2,7 @@
   <div class="flex container">
     <div class="flex flex-col main-area">
       <div class="flex io-section">
-        <TDTextarea
+        <TDTextEditor
           isLabelTop
           :enableHighlight="currentConfigLayout.enableHighlight"
           language="json"
@@ -10,7 +10,7 @@
           :placeHolder="$t('i18nCommon.JSONSortByKey.inputPlaceholder')"
           v-model="inputJSON"
           :wrapText="currentConfigLayout.wrapText"
-        ></TDTextarea>
+        ></TDTextEditor>
       </div>
       <div class="flex">
         <TDButton

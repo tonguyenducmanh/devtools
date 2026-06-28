@@ -109,7 +109,7 @@
         class="flex td-mocking-content"
         :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
       >
-        <TDTextarea
+        <TDTextEditor
           :isLabelTop="true"
           v-model="bodyText"
           :wrapText="currentConfigLayout.wrapText"
@@ -118,14 +118,14 @@
           :placeHolder="$t('i18nCommon.APIMocking.bodyPlaceholder')"
           :label="$t('i18nCommon.APIMocking.bodyPlaceholder')"
           :style="requestSectionSizeStyle"
-        ></TDTextarea>
+        ></TDTextEditor>
         <TDResizer
           :direction="
             currentConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
           "
           @resize="handleResize"
         />
-        <TDTextarea
+        <TDTextEditor
           :isLabelTop="true"
           v-model="responseText"
           :wrapText="currentConfigLayout.wrapText"
@@ -134,7 +134,7 @@
           :placeHolder="$t('i18nCommon.APIMocking.responsePlaceholder')"
           :label="$t('i18nCommon.APIMocking.responsePlaceholder')"
           :style="responseSectionSizeStyle"
-        ></TDTextarea>
+        ></TDTextEditor>
       </div>
     </div>
     <!-- hết phần thao tác chính của tool -->
