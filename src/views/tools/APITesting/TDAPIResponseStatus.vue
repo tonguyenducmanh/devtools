@@ -88,8 +88,7 @@ export default {
   align-items: center;
   gap: var(--padding);
   background-color: var(--bg-secondary);
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
+  border-radius: var(--border-radius-component);
 }
 
 .status-badge {
