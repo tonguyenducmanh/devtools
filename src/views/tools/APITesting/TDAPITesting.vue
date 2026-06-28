@@ -205,7 +205,7 @@
                 "
                 :isLabelTop="true"
                 v-model="headersText"
-                :enableHighlight="currentConfigLayout.enableHighlight"
+                :enableHighlight="true"
                 language="text/plan"
                 :wrapText="currentConfigLayout.wrapText"
                 :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
@@ -223,21 +223,11 @@
                   :isLabelTop="true"
                   v-model="bodyText"
                   :wrapText="currentConfigLayout.wrapText"
-                  :enableHighlight="currentConfigLayout.enableHighlight"
+                  :enableHighlight="true"
                   language="json"
                   :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
                   :label="$t('i18nCommon.apiTesting.bodyPlaceholder')"
                 ></TDTextarea>
-                <span
-                  v-if="!currentConfigLayout.enableHighlight"
-                  class="no-select td-top-right-btn"
-                >
-                  <div
-                    class="td-icon td-json-icon"
-                    @click="formatBody"
-                    v-tooltip="$t('i18nCommon.apiTesting.beautify')"
-                  ></div>
-                </span>
               </div>
             </div>
             <!-- Resizer -->
@@ -308,7 +298,7 @@
                 v-model="proModeSecranioCode"
                 language="td-api-promode"
                 :wrapText="currentConfigLayout.wrapText"
-                :enableHighlight="currentConfigLayout.enableHighlight"
+                :enableHighlight="true"
                 :monacoOptions="proModeMonacoOptions"
                 :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
                 :label="$t('i18nCommon.apiTesting.scriptExecute')"
@@ -541,12 +531,6 @@
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="currentConfigLayout.enableHighlight"
-            :label="$t('i18nCommon.enableHighlight')"
-            @change="updateConfigLayout"
-          ></TDCheckbox>
-          <TDCheckbox
-            :variant="$tdEnum.checkboxType.switch"
             v-model="currentConfigLayout.showReponse"
             :label="$t('i18nCommon.apiTesting.showReponse')"
             @change="updateConfigLayout"
@@ -645,7 +629,6 @@ export default {
       currentRequest: null,
       currentConfigLayout: {
         showReponse: true,
-        enableHighlight: true,
         wrapText: true,
         splitHorizontal: false,
         currentAPIMode: this.$tdEnum.APIMode.Normal,

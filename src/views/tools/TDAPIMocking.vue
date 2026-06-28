@@ -113,7 +113,7 @@
           :isLabelTop="true"
           v-model="bodyText"
           :wrapText="currentConfigLayout.wrapText"
-          :enableHighlight="currentConfigLayout.enableHighlight"
+          :enableHighlight="true"
           language="json"
           :placeHolder="$t('i18nCommon.APIMocking.bodyPlaceholder')"
           :label="$t('i18nCommon.APIMocking.bodyPlaceholder')"
@@ -129,7 +129,7 @@
           :isLabelTop="true"
           v-model="responseText"
           :wrapText="currentConfigLayout.wrapText"
-          :enableHighlight="currentConfigLayout.enableHighlight"
+          :enableHighlight="true"
           language="json"
           :placeHolder="$t('i18nCommon.APIMocking.responsePlaceholder')"
           :label="$t('i18nCommon.APIMocking.responsePlaceholder')"
@@ -287,12 +287,6 @@
           ></TDCheckbox>
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
-            v-model="currentConfigLayout.enableHighlight"
-            :label="$t('i18nCommon.enableHighlight')"
-            @change="updateConfigLayout"
-          ></TDCheckbox>
-          <TDCheckbox
-            :variant="$tdEnum.checkboxType.switch"
             v-model="currentConfigLayout.splitHorizontal"
             :label="$t('i18nCommon.splitHorizontal')"
             @change="updateConfigLayout"
@@ -349,7 +343,6 @@ export default {
         },
       ],
       currentConfigLayout: {
-        enableHighlight: true,
         wrapText: true,
         splitHorizontal: false,
         isShowSidebar: true,

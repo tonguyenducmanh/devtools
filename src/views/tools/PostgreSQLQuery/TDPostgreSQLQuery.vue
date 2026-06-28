@@ -55,7 +55,7 @@
           ref="sqlEditor"
           v-model="sqlText"
           language="pgsql"
-          :enableHighlight="currentConfigLayout.enableHighlight"
+          :enableHighlight="true"
           :wrapText="currentConfigLayout.wrapText"
           :placeHolder="$t('i18nCommon.postgreSQLQuery.sqlEditorPlaceholder')"
           :label="$t('i18nCommon.postgreSQLQuery.sqlEditorLabel')"
@@ -186,12 +186,6 @@
             $tdEnum.PostgreSQLQuerySidebarOption.Setting
           "
         >
-          <TDCheckbox
-            :variant="$tdEnum.checkboxType.switch"
-            v-model="currentConfigLayout.enableHighlight"
-            :label="$t('i18nCommon.enableHighlight')"
-            @change="updateConfigLayout"
-          />
           <TDCheckbox
             :variant="$tdEnum.checkboxType.switch"
             v-model="currentConfigLayout.wrapText"
@@ -512,7 +506,6 @@ export default {
        */
       currentConfigLayout: {
         isShowSidebar: true, // Hiển thị sidebar
-        enableHighlight: true, // Bật highlight cú pháp
         wrapText: false, // Không wrap text
         showReponse: true,
         splitHorizontal: true,

@@ -6,23 +6,13 @@
     <TDTextarea
       :isLabelTop="true"
       :modelValue="responseText"
-      :enableHighlight="currentConfigLayout.enableHighlight"
+      :enableHighlight="true"
       language="json"
       :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
       :label="$t('i18nCommon.apiTesting.responsePlaceholder')"
       :readOnly="true"
       :wrapText="currentConfigLayout.wrapText"
     ></TDTextarea>
-    <span
-      v-if="!currentConfigLayout.enableHighlight"
-      class="no-select td-top-right-btn"
-    >
-      <div
-        class="td-icon td-copy-icon"
-        @click="handleCopyResponse"
-        v-tooltip="$t('i18nCommon.apiTesting.copyResponse')"
-      ></div>
-    </span>
   </div>
 </template>
 <script>
@@ -46,13 +36,7 @@ export default {
     },
   },
   computed: {},
-  methods: {
-    handleCopyResponse() {
-      if (this.responseText) {
-        this.$tdUtility.copyToClipboard(this.responseText);
-      }
-    },
-  },
+  methods: {},
 };
 </script>
 
