@@ -22,9 +22,9 @@
         <!-- Monaco mount point -->
         <div ref="textareaWrap" class="td-monaco-editor-wrap"></div>
         <!-- Footer — sibling của editor wrap, nằm bên dưới -->
-        <div v-if="label" class="td-monaco-footer">
+        <div v-if="isShowFooter" class="td-monaco-footer">
           <span class="td-monaco-footer__group">
-            <span class="td-monaco-footer__label">
+            <span v-if="label" class="td-monaco-footer__label">
               {{ label.capitalize ? label.capitalize() : label }}
             </span>
           </span>
@@ -131,6 +131,10 @@ export default {
     label: {
       type: String,
       default: null,
+    },
+    isShowFooter: {
+      type: Boolean,
+      default: true,
     },
     width: {
       type: String,
