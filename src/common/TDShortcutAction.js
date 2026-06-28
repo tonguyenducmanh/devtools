@@ -12,6 +12,13 @@ export const TDShortcutActionEnum = {
   ShowCommandTextEditor: "showCommandTextEditor",
   FormatCodeTextEditor: "formatCodeTextEditor",
   ShowIntelliSense: "ShowIntelliSense",
+  TabPrevious: "TabPrevious",
+  TabNext: "TabNext",
+  TabClose: "TabClose",
+  TabZenMode: "TabZenMode",
+  ExecuteAPITesting: "ExecuteAPITesting",
+  ExecutePosgreSQLCode: "ExecutePosgreSQLCode",
+  DllInspect: "DllInspect",
 };
 
 const ShortcutConfigMap = {

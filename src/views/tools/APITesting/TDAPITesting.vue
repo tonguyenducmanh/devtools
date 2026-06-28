@@ -597,7 +597,9 @@ import proModeTemplates from "./templates.js";
 import { registerTdApiPromodeLanguage } from "@/components/monarch/tdApiPromodeLanguage.js";
 import { registerTdApiPromodeFormatProvider } from "@/components/monarch/tdApiPromodeFormatProvider.js";
 import _ from "@/common/TDCommonFunction.js";
-import TDShortcutAction from "@/common/TDShortcutAction.js";
+import TDShortcutAction, {
+  TDShortcutActionEnum,
+} from "@/common/TDShortcutAction.js";
 export default {
   extends: TDToolBase,
   name: "TDAPITesting",
@@ -871,7 +873,7 @@ export default {
   methods: {
     onTabEnter() {
       let me = this;
-      TDShortcutAction.register("executeAPITesting", {
+      TDShortcutAction.register(TDShortcutActionEnum.ExecuteAPITesting, {
         sortOrder: 5,
         key: me.$tdUtility.newGuid(),
         presentKey: [me.$tdUtility.ctrlKey(), me.$tdUtility.enterKey()],
@@ -889,7 +891,7 @@ export default {
       });
     },
     onTabLeave() {
-      TDShortcutAction.unregister("executeAPITesting");
+      TDShortcutAction.unregister(TDShortcutActionEnum.ExecuteAPITesting);
     },
     handleResize(sizes) {
       this.requestSectionSize = sizes.leftSize;

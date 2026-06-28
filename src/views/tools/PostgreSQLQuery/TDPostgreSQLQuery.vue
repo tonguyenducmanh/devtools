@@ -1635,10 +1635,10 @@ export default {
     onTabEnter() {
       let me = this;
       TDShortcutAction.register(
-        "executePosgreSQLCode",
+        TDShortcutActionEnum.ExecutePosgreSQLCode,
         me.getConfigExecuteSQLCode(),
       );
-      TDShortcutAction.register("dllInspect", me.getConfigDLLInspect());
+      TDShortcutAction.register(TDShortcutActionEnum.DllInspect, me.getConfigDLLInspect());
       if (me.selectedConnectionId) {
         me.loadCachedIntellisense();
       }
@@ -1649,8 +1649,8 @@ export default {
      */
     onTabLeave() {
       let me = this;
-      TDShortcutAction.unregister("executePosgreSQLCode");
-      TDShortcutAction.unregister("dllInspect");
+      TDShortcutAction.unregister(TDShortcutActionEnum.ExecutePosgreSQLCode);
+      TDShortcutAction.unregister(TDShortcutActionEnum.DllInspect);
       if (me.intellisenseDisposable) {
         me.intellisenseDisposable.forEach((d) => d?.dispose?.());
         me.intellisenseDisposable = [];

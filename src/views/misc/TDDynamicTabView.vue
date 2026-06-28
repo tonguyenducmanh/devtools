@@ -209,7 +209,9 @@ import {
 import { useTabManager } from "@/stores/TDTabManager.js";
 import i18nData from "@/i18n/i18nData.js";
 import tdUtility from "@/common/TDUtility.js";
-import TDShortcutAction from "@/common/TDShortcutAction.js";
+import TDShortcutAction, {
+  TDShortcutActionEnum,
+} from "@/common/TDShortcutAction.js";
 import eventBus from "@/common/event/TDEventBus.js";
 import { TDEnumEventBus } from "@/common/event/TDEnumEventBus.js";
 import TDArrow from "@/components/TDArrow.vue";
@@ -233,10 +235,10 @@ export default {
     );
   },
   beforeUnmount() {
-    TDShortcutAction.unregister("tabPrevious");
-    TDShortcutAction.unregister("tabNext");
-    TDShortcutAction.unregister("tabClose");
-    TDShortcutAction.unregister("tabZenMode");
+    TDShortcutAction.unregister(TDShortcutActionEnum.TabPrevious);
+    TDShortcutAction.unregister(TDShortcutActionEnum.TabNext);
+    TDShortcutAction.unregister(TDShortcutActionEnum.TabClose);
+    TDShortcutAction.unregister(TDShortcutActionEnum.TabZenMode);
     if (this.zenModeUnsubscribe) {
       this.zenModeUnsubscribe();
     }
@@ -289,28 +291,28 @@ export default {
       const altKey = isMacOS ? "Option" : "Alt";
       const guid = () => this.$tdUtility.newGuid();
 
-      TDShortcutAction.register("tabPrevious", {
+      TDShortcutAction.register(TDShortcutActionEnum.TabPrevious, {
         sortOrder: 5,
         key: guid(),
         presentKey: [altKey, "A"],
         labelKey: "i18nCommon.tabManager.tabPrevious",
       });
 
-      TDShortcutAction.register("tabNext", {
+      TDShortcutAction.register(TDShortcutActionEnum.TabNext, {
         sortOrder: 6,
         key: guid(),
         presentKey: [altKey, "D"],
         labelKey: "i18nCommon.tabManager.tabNext",
       });
 
-      TDShortcutAction.register("tabClose", {
+      TDShortcutAction.register(TDShortcutActionEnum.TabClose, {
         sortOrder: 7,
         key: guid(),
         presentKey: [altKey, "Q"],
         labelKey: "i18nCommon.tabManager.tabClose",
       });
 
-      TDShortcutAction.register("tabZenMode", {
+      TDShortcutAction.register(TDShortcutActionEnum.TabZenMode, {
         sortOrder: 8,
         key: guid(),
         presentKey: [altKey, "F"],
