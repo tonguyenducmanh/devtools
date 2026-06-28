@@ -19,6 +19,7 @@ export const TDShortcutActionEnum = {
   ExecuteAPITesting: "ExecuteAPITesting",
   ExecutePosgreSQLCode: "ExecutePosgreSQLCode",
   DllInspect: "DllInspect",
+  ChangeEditorTheme: "ChangeEditorTheme",
 };
 
 const ShortcutConfigMap = {
@@ -70,6 +71,15 @@ const ShortcutConfigMap = {
     })(),
 
     labelKey: "i18nCommon.shortKeyAction.formatCodeTextEditor",
+  },
+  [TDShortcutActionEnum.ChangeEditorTheme]: {
+    sortOrder: 5,
+    key: tdUtility.newGuid(),
+    presentKey: (() => {
+      return [tdUtility.ctrlKey(), "K"];
+    })(),
+
+    labelKey: "i18nCommon.changeMonacoTheme",
   },
 };
 
