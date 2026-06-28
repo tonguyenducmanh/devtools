@@ -1056,7 +1056,7 @@ export default {
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: var(--padding);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--box-shadow);
   pointer-events: auto;
   /* tự giãn theo content, giới hạn tối đa 90vw */
   width: max-content;
