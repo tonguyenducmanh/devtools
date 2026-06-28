@@ -144,6 +144,9 @@ class TDEnum {
     { label: "Catppuccin Latte", value: "catppuccin-light" },
     { label: "Catppuccin Mocha", value: "catppuccin-dark" },
     { label: "Monokai", value: "monokai" },
+    { label: "Synthwave84", value: "synthwave84" },
+    { label: "Tokyo Night", value: "tokyo-night" },
+    { label: "Dracula", value: "dracula" },
   ];
 }
 
