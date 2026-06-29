@@ -14,5 +14,11 @@ export default {
       MaxThreadUsingTaskWhenAny: "Task.WhenAny n thread",
       MaxThreadUsingSemaphoreSlim: "SemaphoreSlim n thread",
     },
+    JavaScriptTemplate: {
+      JSONFileHandle: "Handle file json",
+    },
+    PowerShellTemplate: {
+      PullCodeFromRepo: "pull code multi repo",
+    },
   },
 };

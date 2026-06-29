@@ -750,12 +750,6 @@ export default {
       getAllIndexDefinition: "All index of table",
       killAllSession: "Kill all session db",
     },
-    JavaScriptTemplate: {
-      JSONFileHandle: "Handle file json",
-    },
-    PowerShellTemplate: {
-      PullCodeFromRepo: "pull code multi repo",
-    },
     dateTime: {
       placeholder: "dd/mm/yyyy hh:mm:ss",
       placeholderDateOnly: "dd/mm/yyyy",

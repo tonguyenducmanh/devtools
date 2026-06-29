@@ -5,10 +5,10 @@ const codeModules = import.meta.glob("./*.ps1", {
   eager: true,
 });
 
-export default [
-  {
-    key: "PullCodeFromRepo",
-    labelKey: "i18nCommon.PowerShellTemplate.PullCodeFromRepo",
-    code: codeModules["./PullCodeFromRepo.ps1"],
-  },
-];
+const templates = Object.entries(codeModules).map(([path, code]) => {
+  const key = path.split("/").pop().replace(".ps1", "");
+  let labelKey = `i18nTemplate.PowerShellTemplate.${key}`;
+  return { key, labelKey, code };
+});
+
+export default templates;

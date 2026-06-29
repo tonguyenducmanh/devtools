@@ -748,12 +748,6 @@ export default {
       getAllIndexDefinition: "Danh sách index của bảng",
       killAllSession: "Đóng toàn bộ session db",
     },
-    JavaScriptTemplate: {
-      JSONFileHandle: "Xử lý file json",
-    },
-    PowerShellTemplate: {
-      PullCodeFromRepo: "pull code từ nhiều repo",
-    },
     dateTime: {
       placeholder: "dd/mm/yyyy hh:mm:ss",
       placeholderDateOnly: "dd/mm/yyyy",
