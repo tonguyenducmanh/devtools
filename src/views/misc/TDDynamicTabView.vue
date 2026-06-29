@@ -355,6 +355,16 @@ export default {
     vueWatch(
       activeTabId,
       async (newId, oldId) => {
+        // Update document title
+        if (newId) {
+          const tab = tabs.value.find((t) => t.id === newId);
+          if (tab) {
+            document.title = getTabLabel(tab);
+          }
+        } else {
+          document.title = `${tdUtility.defaultTitleApp()} - ${tdUtility.getAuthorApp()}`;
+        }
+
         // nếu có tab cũ thì remove event của tab cũ đi
         if (oldId && tabRefs[oldId]) {
           if (typeof tabRefs[oldId].onTabLeave === "function") {
@@ -426,6 +436,12 @@ export default {
         titleFull: payload.title,
         append: !!payload.append,
       });
+
+      // Cập nhật document.title nếu đây là tab đang active
+      if (activeTabId.value === payload.tabId) {
+        const tab = tabs.value.find((t) => t.id === payload.tabId);
+        if (tab) document.title = getTabLabel(tab);
+      }
     }
 
     function getTabLabel(tab) {

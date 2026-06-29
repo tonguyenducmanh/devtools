@@ -3,7 +3,7 @@
  */
 (function (window) {
   window.__env = window.__env || {};
-  window.__env.appName = "Dev Tools";
+  window.__env.appName = "Tools";
   window.__env.author = "Tô Mạnh";
   window.__env.footerQuote = "";
   window.__env.defaultValue = {

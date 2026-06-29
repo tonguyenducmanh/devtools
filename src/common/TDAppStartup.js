@@ -18,8 +18,7 @@ class TDAppStartup {
     toast.setUseHeaderToast(userSetting["toastInHeader"] !== false);
     // đảm bảo rằng __env là một đối tượng bất biến
     utility.freezeDeepObject(window.__env);
-    let defaulAppName = utility.defaultTitleApp();
-    document.title = defaulAppName;
+    document.title = `${utility.defaultTitleApp()} - ${utility.getAuthorApp()}`;
   }
 }
 
