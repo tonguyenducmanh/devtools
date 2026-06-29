@@ -1,6 +1,6 @@
 <template>
   <TDTemplateCodeTool
-    :language="'javascript'"
+    :language="'powershell'"
     :templatesFull="getTemplate()"
   ></TDTemplateCodeTool>
 </template>
@@ -8,11 +8,11 @@
 <script>
 import TDTemplateCodeTool from "@/views/tools/codeTemplateTools/TDTemplateCodeTool.vue";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
-import templates from "./templates.js";
+import templates from "@templates/powershell/templates.js";
 
 export default {
   extends: TDToolBase,
-  name: "JavaScriptTemplate",
+  name: "TDPowerShellTemplate",
   components: { TDTemplateCodeTool },
   created() {},
   computed: {},

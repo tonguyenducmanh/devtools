@@ -148,25 +148,25 @@ const sidebarConfig = [
       {
         name: "postgresqltemplate",
         component: () =>
-          import("@/views/tools/codeTemplateTools/PostgreSQLTemplate/TDPostgreSQLTemplate.vue"),
+          import("@/views/tools/codeTemplateTools/TDPostgreSQLTemplate.vue"),
         meta: { titleKey: "i18nCommon.feature.PostgreSQLTemplate" },
       },
       {
         name: "javadcripttemplate",
         component: () =>
-          import("@/views/tools/codeTemplateTools/JavaScriptTemplate/TDJavaScriptTemplate.vue"),
+          import("@/views/tools/codeTemplateTools/TDJavaScriptTemplate.vue"),
         meta: { titleKey: "i18nCommon.feature.JavaScriptTemplate" },
       },
       {
         name: "csharptemplate",
         component: () =>
-          import("@/views/tools/codeTemplateTools/CSharpTemplate/TDCSharpTemplate.vue"),
+          import("@/views/tools/codeTemplateTools/TDCSharpTemplate.vue"),
         meta: { titleKey: "i18nCommon.feature.CSharpTemplate" },
       },
       {
         name: "powershelltemplate",
         component: () =>
-          import("@/views/tools/codeTemplateTools/PowerShellTemplate/TDPowerShellTemplate.vue"),
+          import("@/views/tools/codeTemplateTools/TDPowerShellTemplate.vue"),
         meta: { titleKey: "i18nCommon.feature.PowerShellTemplate" },
       },
     ],
