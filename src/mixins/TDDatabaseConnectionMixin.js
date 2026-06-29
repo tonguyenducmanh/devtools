@@ -1,4 +1,4 @@
-import { pgQueries } from "@/templates/postgresql/templates.js";
+import { pgQueries } from "@/templates/postgresqlToolQuery/templates.js";
 
 export default {
   methods: {

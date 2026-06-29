@@ -53,7 +53,7 @@
 
 <script>
 import TDServerPostgreSQLAPI from "@/common/api/request/AgentAPI/TDServerPostgreSQLAPI.js";
-import { pgQueries } from "@/templates/postgresql/templates.js";
+import { pgQueries } from "@/templates/postgresqlToolQuery/templates.js";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 
 export default {

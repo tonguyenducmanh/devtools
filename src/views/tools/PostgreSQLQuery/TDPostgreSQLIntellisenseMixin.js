@@ -1,7 +1,7 @@
 // mixin chứa toàn bộ logic xử lý intellisense (gợi ý code, tô màu cú pháp) cho tool PostgreSQL Query
 // tách riêng file để dễ đọc và bảo trì, được import vào TDPostgreSQLQuery.vue
 import TDCache from "@/common/cache/TDCache.js";
-import { pgQueries } from "@/templates/postgresql/templates.js";
+import { pgQueries } from "@/templates/postgresqlToolQuery/templates.js";
 import {
   registerPgsqlLanguage,
   updatePgsqlIntellisenseData,
