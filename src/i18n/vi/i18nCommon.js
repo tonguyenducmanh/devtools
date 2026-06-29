@@ -522,12 +522,6 @@ export default {
         "**requestCURL(curlString)**\n\nHàm gọi một request CURL thông qua agent server.\nTham số:\n- `curlString`: Nội dung CURL cần thực thi\n\nTrả về `{ status, headers, body }`.\nDùng `parseResponseCURL()` để parse kết quả.",
       parseResponseCURLDescription:
         "**parseResponseCURL(response)**\n\nHàm parse response từ `requestCURL`, trả về body đã parse JSON.\nTham số:\n- `response`: Response từ `requestCURL`\n\nTrả về body đã parse JSON (hoặc string gốc nếu không parse được).",
-      DemoRequestPromode: "Gọi 1 api đơn giản",
-      MultipleCurl: "Gọi nhiều api tuần tự",
-      RunBatchPromiseAll: "Tạo lô api gọi đồng thời",
-      APIBatchSequency: "Tạo lô api gọi tuần tự",
-      RetryAPIDelay: "Gọi api có retry",
-      AutoPagination: "Gọi lấy dữ liệu paging",
     },
     APIMocking: {
       ImportPlaceHolder:
