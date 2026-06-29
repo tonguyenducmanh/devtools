@@ -45,18 +45,21 @@
             />
           </div>
 
-          <div class="template-list">
-            <div
-              v-for="template in filteredTemplates"
-              :key="template.key"
-              class="text-nowrap template-item"
-              v-tooltip="$t(template.labelKey)"
-              :class="{
-                'template-item-selected': selectedTemplateKey === template.key,
-              }"
-              @click="selectTemplate(template)"
-            >
-              {{ $t(template.labelKey) }}
+          <div class="flex flex-col template-list">
+            <div class="flex flex-col template-wrapper">
+              <div
+                v-for="template in filteredTemplates"
+                :key="template.key"
+                class="text-nowrap template-item"
+                v-tooltip="getTemplateName(template)"
+                :class="{
+                  'template-item-selected':
+                    selectedTemplateKey === template.key,
+                }"
+                @click="selectTemplate(template)"
+              >
+                {{ getTemplateName(template) }}
+              </div>
             </div>
             <div v-if="filteredTemplates.length === 0" class="no-template">
               {{ $t("i18nTemplate.postgreSQLTemplate.no_template_found") }}
@@ -142,7 +145,15 @@ export default {
       let template = this.templates.find(
         (t) => t.key === this.selectedTemplateKey,
       );
+      let me = this;
+      let templateNeme = me.getTemplateName(template);
+      return templateNeme;
+    },
+  },
+  methods: {
+    getTemplateName(template) {
       let templateNeme = "";
+      let me = this;
       if (template) {
         templateNeme = template.key;
         if (this.$te(template.labelKey)) {
@@ -151,8 +162,6 @@ export default {
       }
       return templateNeme;
     },
-  },
-  methods: {
     loadTemplates() {
       let me = this;
       me.templates = me.templatesFull || [];
@@ -209,14 +218,16 @@ export default {
 }
 .template-list {
   width: 100%;
-  display: flex;
-  flex-direction: column;
   gap: var(--padding);
-  margin-bottom: var(--padding);
   flex: 1;
-  overflow-y: auto;
+  .template-wrapper {
+    width: 100%;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
 }
 .template-item {
+  max-width: 100%;
   padding: var(--padding);
   border-radius: var(--border-radius);
   cursor: pointer;

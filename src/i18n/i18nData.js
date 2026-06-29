@@ -42,7 +42,8 @@ let t = (key) => {
  */
 
 let te = (key, locale = state.locale) => {
-  return getNestedValue(state.messages[locale], key) !== undefined;
+  let valueGet = getNestedValue(state.messages[locale], key);
+  return valueGet !== undefined;
 };
 
 /**
