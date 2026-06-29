@@ -220,6 +220,7 @@ export default {
   width: 100%;
   gap: var(--padding);
   flex: 1;
+  justify-content: flex-start;
   .template-wrapper {
     width: 100%;
     align-items: flex-start;
