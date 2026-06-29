@@ -362,7 +362,7 @@
               >
                 <span class="no-select text-nowrap">
                   <div>
-                    {{ $t(template.tooltipKey) }}
+                    {{ $t(template.labelKey) }}
                   </div>
                 </span>
               </div>
@@ -1463,10 +1463,10 @@ export default {
     },
     applyRequestProMode(template) {
       let me = this;
-      if (template && template.tooltipKey && template.content) {
-        me.requestName = me.$t(template.tooltipKey);
+      if (template && template.labelKey && template.code) {
+        me.requestName = me.$t(template.labelKey);
         me.proModeSecranioCode =
-          me.$t("i18nCommon.apiTesting.tutorialProModeCode") + template.content;
+          me.$t("i18nCommon.apiTesting.tutorialProModeCode") + template.code;
       }
     },
     getRequestObj() {

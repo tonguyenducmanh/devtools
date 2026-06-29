@@ -4,10 +4,10 @@ const codeModules = import.meta.glob("./*.js", {
   eager: true,
 });
 
-const templates = Object.entries(codeModules).map(([path, content]) => {
-  const i18nField = path.split("/").pop().replace(".js", "");
-  let tooltipKey = `i18nTemplate.apiTesting.${i18nField}`;
-  return { tooltipKey, content };
+const templates = Object.entries(codeModules).map(([path, code]) => {
+  const key = path.split("/").pop().replace(".js", "");
+  let labelKey = `i18nTemplate.apiTesting.${key}`;
+  return { key, labelKey, code };
 });
 
 export default templates;

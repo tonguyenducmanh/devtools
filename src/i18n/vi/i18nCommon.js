@@ -748,12 +748,6 @@ export default {
       getAllIndexDefinition: "Danh sách index của bảng",
       killAllSession: "Đóng toàn bộ session db",
     },
-    CSharpTemplate: {
-      TwoThreadUsingList: "List 2 thread",
-      TwoThreadUsingConcurrentQueue: "ConcurrentQueue 2 thread",
-      MaxThreadUsingTaskWhenAny: "Task WhenAny cho n thread",
-      MaxThreadUsingSemaphoreSlim: "SemaphoreSlim cho n thread",
-    },
     JavaScriptTemplate: {
       JSONFileHandle: "Xử lý file json",
     },

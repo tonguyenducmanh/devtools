@@ -8,5 +8,11 @@ export default {
       RetryAPIDelay: "Gọi api có retry",
       AutoPagination: "Gọi lấy dữ liệu paging",
     },
+    CSharpTemplate: {
+      TwoThreadUsingList: "List 2 thread",
+      TwoThreadUsingConcurrentQueue: "ConcurrentQueue 2 thread",
+      MaxThreadUsingTaskWhenAny: "Task WhenAny cho n thread",
+      MaxThreadUsingSemaphoreSlim: "SemaphoreSlim cho n thread",
+    },
   },
 };

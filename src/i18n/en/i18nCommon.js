@@ -750,12 +750,6 @@ export default {
       getAllIndexDefinition: "All index of table",
       killAllSession: "Kill all session db",
     },
-    CSharpTemplate: {
-      TwoThreadUsingList: "List 2 thread",
-      TwoThreadUsingConcurrentQueue: "ConcurrentQueue 2 thread",
-      MaxThreadUsingTaskWhenAny: "Task.WhenAny n thread",
-      MaxThreadUsingSemaphoreSlim: "SemaphoreSlim n thread",
-    },
     JavaScriptTemplate: {
       JSONFileHandle: "Handle file json",
     },

@@ -8,5 +8,11 @@ export default {
       RetryAPIDelay: "Call API with retry",
       AutoPagination: "Call API paging",
     },
+    CSharpTemplate: {
+      TwoThreadUsingList: "List 2 thread",
+      TwoThreadUsingConcurrentQueue: "ConcurrentQueue 2 thread",
+      MaxThreadUsingTaskWhenAny: "Task.WhenAny n thread",
+      MaxThreadUsingSemaphoreSlim: "SemaphoreSlim n thread",
+    },
   },
 };
