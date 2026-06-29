@@ -95,7 +95,7 @@ import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 
 export default {
   extends: TDToolBase,
-  name: "TDTemplateCodeTool",
+  name: "TDCodeTemplateTool",
   components: { TDSubSidebar },
   props: {
     language: {
@@ -142,7 +142,14 @@ export default {
       let template = this.templates.find(
         (t) => t.key === this.selectedTemplateKey,
       );
-      return template ? this.$t(template.labelKey) : "";
+      let templateNeme = "";
+      if (template) {
+        templateNeme = template.key;
+        if (this.$te(template.labelKey)) {
+          templateNeme = this.$t(template.labelKey);
+        }
+      }
+      return templateNeme;
     },
   },
   methods: {

@@ -1,19 +1,19 @@
 <template>
-  <TDTemplateCodeTool
+  <TDCodeTemplateTool
     :language="'csharp'"
     :templatesFull="getTemplate()"
-  ></TDTemplateCodeTool>
+  ></TDCodeTemplateTool>
 </template>
 
 <script>
-import TDTemplateCodeTool from "@/views/tools/codeTemplateTools/TDTemplateCodeTool.vue";
+import TDCodeTemplateTool from "@/views/tools/codeTemplateTools/TDCodeTemplateTool.vue";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import templates from "@/templates/csharp/templates.js";
 
 export default {
   extends: TDToolBase,
   name: "TDCodeTemplateCSharp",
-  components: { TDTemplateCodeTool },
+  components: { TDCodeTemplateTool },
   created() {},
   computed: {},
   methods: {
