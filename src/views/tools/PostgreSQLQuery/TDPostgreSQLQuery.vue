@@ -1713,7 +1713,7 @@ export default {
         titleKey: "i18nCommon.feature.PostgreSQLTemplate",
         groupPath: "",
         component: () =>
-          import("@/views/tools/codeTemplateTools/PostgreSQLTemplate/TDPostgreSQLTemplate.vue"),
+          import("@/views/tools/codeTemplateTools/PostgreSQLTemplate/TDCodeTemplatePostgreSQL.vue"),
       });
     },
 

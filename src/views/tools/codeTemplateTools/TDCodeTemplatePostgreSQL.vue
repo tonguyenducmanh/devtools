@@ -1,6 +1,6 @@
 <template>
   <TDTemplateCodeTool
-    :language="'javascript'"
+    :language="'pgsql'"
     :templatesFull="getTemplate()"
   ></TDTemplateCodeTool>
 </template>
@@ -8,11 +8,11 @@
 <script>
 import TDTemplateCodeTool from "@/views/tools/codeTemplateTools/TDTemplateCodeTool.vue";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
-import templates from "@/templates/javascript/templates.js";
+import templates from "@/templates/postgresql/templates.js";
 
 export default {
   extends: TDToolBase,
-  name: "JavaScriptTemplate",
+  name: "TDCodeTemplatePostgreSQL",
   components: { TDTemplateCodeTool },
   created() {},
   computed: {},
