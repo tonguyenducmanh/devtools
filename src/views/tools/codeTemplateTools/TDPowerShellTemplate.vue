@@ -8,7 +8,7 @@
 <script>
 import TDTemplateCodeTool from "@/views/tools/codeTemplateTools/TDTemplateCodeTool.vue";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
-import templates from "@templates/powershell/templates.js";
+import templates from "@/templates/powershell/templates.js";
 
 export default {
   extends: TDToolBase,
