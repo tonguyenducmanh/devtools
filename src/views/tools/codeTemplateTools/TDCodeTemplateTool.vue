@@ -208,7 +208,7 @@ export default {
   width: 100%;
   height: 100%;
   justify-content: flex-start;
-  overflow: auto;
+  overflow: hidden;
 }
 .sidebar-input {
   width: 100%;
@@ -221,6 +221,8 @@ export default {
   gap: var(--padding);
   flex: 1;
   justify-content: flex-start;
+  overflow-y: auto;
+  min-height: 0;
   .template-wrapper {
     width: 100%;
     align-items: flex-start;
