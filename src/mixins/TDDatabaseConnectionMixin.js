@@ -1,4 +1,4 @@
-import pgQueries from "@/views/tools/PostgreSQLQuery/templates.js";
+import { pgQueries } from "@/templates/postgresql/templates.js";
 
 export default {
   methods: {
@@ -31,34 +31,25 @@ export default {
           fields.database = url.pathname?.replace(/^\//, "") || "";
           fields.username = decodeURIComponent(url.username || "");
           fields.password = decodeURIComponent(url.password || "");
-          fields.sslmode =
-            url.searchParams.get("sslmode") || "disable";
+          fields.sslmode = url.searchParams.get("sslmode") || "disable";
         } else {
           // Xử lý định dạng DSN: host=xxx port=xxx user=xxx password=xxx dbname=xxx sslmode=xxx
-          const parts =
-            connStr.match(/(?:[^\s']+|'[^']*')+/g) || [];
+          const parts = connStr.match(/(?:[^\s']+|'[^']*')+/g) || [];
           parts.forEach((p) => {
             const eqIdx = p.indexOf("=");
             if (eqIdx > -1) {
               const key = p.substring(0, eqIdx).trim();
               let val = p.substring(eqIdx + 1).trim();
               // Bỏ dấu nháy đơn nếu giá trị được bọc trong ''
-              if (
-                val.startsWith("'") &&
-                val.endsWith("'")
-              ) {
-                val = val
-                  .substring(1, val.length - 1)
-                  .replace(/\\'/g, "'");
+              if (val.startsWith("'") && val.endsWith("'")) {
+                val = val.substring(1, val.length - 1).replace(/\\'/g, "'");
               }
               if (key === "host") fields.host = val;
               if (key === "port") fields.port = val;
               if (key === "dbname") fields.database = val;
               if (key === "user") fields.username = val;
-              if (key === "password")
-                fields.password = val;
-              if (key === "sslmode")
-                fields.sslmode = val;
+              if (key === "password") fields.password = val;
+              if (key === "sslmode") fields.sslmode = val;
             }
           });
         }
@@ -77,18 +68,32 @@ export default {
      */
     async testDatabaseConnection(agentAPI, connectionId) {
       if (!connectionId) {
-        this.$tdToast.warning(this.$t("i18nCommon.postgreSQLQuery.noConnectionString"));
-        return { success: false, message: this.$t("i18nCommon.postgreSQLQuery.noConnectionString") };
+        this.$tdToast.warning(
+          this.$t("i18nCommon.postgreSQLQuery.noConnectionString"),
+        );
+        return {
+          success: false,
+          message: this.$t("i18nCommon.postgreSQLQuery.noConnectionString"),
+        };
       }
 
       try {
-        let response = await agentAPI.executeQuery(connectionId, pgQueries.pg_test_connection);
+        let response = await agentAPI.executeQuery(
+          connectionId,
+          pgQueries.pg_test_connection,
+        );
         if (response?.data?.success) {
-          let msg = response.data.message || this.$t("i18nCommon.postgreSQLQuery.connectionSuccess");
-          this.$tdToast.success(this.$t("i18nCommon.postgreSQLQuery.connectionSuccess"));
+          let msg =
+            response.data.message ||
+            this.$t("i18nCommon.postgreSQLQuery.connectionSuccess");
+          this.$tdToast.success(
+            this.$t("i18nCommon.postgreSQLQuery.connectionSuccess"),
+          );
           return { success: true, message: msg };
         } else {
-          let msg = response?.data?.message || this.$t("i18nCommon.postgreSQLQuery.connectionFail");
+          let msg =
+            response?.data?.message ||
+            this.$t("i18nCommon.postgreSQLQuery.connectionFail");
           return { success: false, message: msg };
         }
       } catch (error) {
@@ -97,6 +102,6 @@ export default {
           message: error?.message || this.$t("i18nCommon.toastMessage.error"),
         };
       }
-    }
-  }
+    },
+  },
 };

@@ -459,7 +459,7 @@ import TDPostgreSQLQueryHelp from "@/views/helps/TDPostgreSQLQueryHelp.vue";
 import TDServerPostgreSQLAPI from "@/common/api/request/AgentAPI/TDServerPostgreSQLAPI.js";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDCache from "@/common/cache/TDCache.js";
-import pgQueries from "./templates.js";
+import { pgQueries } from "@/templates/postgresql/templates.js";
 import TDPostgreSQLIntellisenseMixin from "./TDPostgreSQLIntellisenseMixin.js";
 import { registerPgsqlFormatProvider } from "@/components/monarch/pgsqlFormatProvider.js";
 import TDShortcutAction, {
