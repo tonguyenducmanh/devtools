@@ -567,7 +567,7 @@ import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDAPITestingHelp from "@/views/helps/TDAPITestingHelp.vue";
-import proModeTemplates from "./templates.js";
+import proModeTemplates from "@/templates/apiTesting/templates.js";
 import { registerTdApiPromodeLanguage } from "@/components/monarch/tdApiPromodeLanguage.js";
 import { registerTdApiPromodeFormatProvider } from "@/components/monarch/tdApiPromodeFormatProvider.js";
 import _ from "@/common/TDCommonFunction.js";

@@ -1,4 +1,4 @@
-const codeModules = import.meta.glob("./template/*.js", {
+const codeModules = import.meta.glob("./*.js", {
   query: "?raw",
   import: "default",
   eager: true,
