@@ -228,6 +228,7 @@ export default {
   }
 }
 .template-item {
+  width: 100%;
   max-width: 100%;
   padding: var(--padding);
   border-radius: var(--border-radius);

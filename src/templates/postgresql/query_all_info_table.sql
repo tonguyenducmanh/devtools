@@ -1,17 +1,21 @@
---query danh sách cột của bảng
-select
-    c.column_name || ',',
-    'l.' || c.column_name || ',',
-    c.column_name
-    || ' ' || c.data_type
-    || case when c.is_nullable = 'NO' then ' not null' else '' end
-    || case when c.column_default is not null then ' default ' || c.column_default else '' end
-    || ',',
-    'COMMENT ON COLUMN ' || c.table_schema || '.' || c.table_name || '.' || c.column_name || ' IS ''' || coalesce(d.description,'') || ''';',
-    c.*
-FROM information_schema.columns as c
-left join pg_catalog.pg_statio_all_tables as t on c.table_name = t.relname and c.table_schema = t.schemaname
-left join pg_catalog.pg_description as d on d.objoid = t.relid and d.objsubid = c.ordinal_position
-WHERE (c.table_schema, c.table_name) = ('public','your_table_name')
-order by c.ordinal_position
-LIMIT 10;
+WITH input AS (
+  SELECT
+    'public'::text AS schema_name,
+    'your_table_name'::text AS table_name
+)
+SELECT
+  c.column_name || ',' AS column_name_with_comma,
+  'l.' || c.column_name || ',' AS alias_column_with_comma,
+  c.column_name || ' ' || c.data_type
+    || CASE WHEN c.is_nullable = 'NO' THEN ' not null' ELSE '' END
+    || CASE WHEN c.column_default IS NOT NULL THEN ' default ' || c.column_default ELSE '' END
+    || ',' AS column_declare,
+  'COMMENT ON COLUMN ' || c.table_schema || '.' || c.table_name || '.' || c.column_name
+    || ' IS ' || COALESCE(quote_literal(d.description), 'NULL') || ';' AS comment_sql,
+  c.*
+FROM input i
+JOIN information_schema.columns c ON c.table_schema = i.schema_name AND c.table_name = i.table_name
+LEFT JOIN pg_catalog.pg_statio_all_tables t ON c.table_name = t.relname AND c.table_schema = t.schemaname
+LEFT JOIN pg_catalog.pg_description d ON d.objoid = t.relid AND d.objsubid = c.ordinal_position
+ORDER BY c.ordinal_position
+LIMIT 100;

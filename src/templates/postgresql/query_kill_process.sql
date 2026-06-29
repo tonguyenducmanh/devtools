@@ -1,20 +1,25 @@
--- kill 1 lệnh SQL đang chạy theo pid cụ thể
--- Bước 1: dùng pg_cancel_backend để gửi tín hiệu cancel (nhẹ, ưu tiên dùng trước)
-SELECT pg_cancel_backend(12345);
-
--- Bước 2: nếu cancel không hiệu quả, dùng pg_terminate_backend để kill hẳn process
--- SELECT pg_terminate_backend(12345);
-
- 
--- Kill tất cả các lệnh đang chạy quá X giây (ví dụ 300 giây / 5 phút)
--- SELECT
---     pid,
---     usename,
---     now() - query_start AS duration,
---     query,
---     pg_terminate_backend(pid) AS killed
--- FROM pg_stat_activity
--- WHERE state != 'idle'
---   AND pid != pg_backend_pid()
---   AND now() - query_start > interval '300 seconds'
--- ORDER BY duration DESC;
+WITH input AS (
+  SELECT
+    'your_db_name'::text AS db_name,
+    'idle in transaction'::text AS state_filter, -- 'active', 'idle in transaction', '%' for all
+    'SELECT'::text AS query_keyword,             -- từ khóa trong câu query để lọc (ví dụ: 'SELECT', 'DELETE', '%' cho tất cả)
+    300::int AS min_duration_seconds             -- chỉ kill các process chạy lâu hơn X giây (0 để kill tất cả)
+),
+targets AS (
+  SELECT pid, usename, state, now() - query_start AS duration, left(query, 200) AS query_preview
+  FROM input i
+  JOIN pg_stat_activity a ON a.datname = i.db_name
+  WHERE a.state ILIKE i.state_filter
+    AND a.pid != pg_backend_pid()
+    AND a.query ILIKE '%' || i.query_keyword || '%'
+    AND (i.min_duration_seconds = 0 OR now() - a.query_start > (i.min_duration_seconds || ' seconds')::interval)
+)
+-- Bước 1: Xem danh sách các process sẽ bị kill
+SELECT pid, usename, state, duration, query_preview, 'will be cancelled' AS action
+FROM targets
+UNION ALL
+-- Bước 2: Thực hiện kill (comment nếu chỉ muốn xem trước)
+-- SELECT pid, usename, state, duration, query_preview, pg_cancel_backend(pid)::text AS action
+-- FROM targets
+ORDER BY duration DESC
+LIMIT 50;
