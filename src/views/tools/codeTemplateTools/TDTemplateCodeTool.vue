@@ -39,7 +39,9 @@
           <div class="sidebar-input">
             <TDInput
               v-model="templateFilter"
-              :placeHolder="$t('i18nCommon.postgreSQLTemplate.searchTemplate')"
+              :placeHolder="
+                $t('i18nTemplate.postgreSQLTemplate.search_template')
+              "
             />
           </div>
 
@@ -57,7 +59,7 @@
               {{ $t(template.labelKey) }}
             </div>
             <div v-if="filteredTemplates.length === 0" class="no-template">
-              {{ $t("i18nCommon.postgreSQLTemplate.noTemplateFound") }}
+              {{ $t("i18nTemplate.postgreSQLTemplate.no_template_found") }}
             </div>
           </div>
         </div>
@@ -114,7 +116,7 @@ export default {
       let options = [];
       options.push({
         value: this.$tdEnum.PostgreSQLTemplateSidebarOption.Template,
-        label: this.$t("i18nCommon.postgreSQLTemplate.template"),
+        label: this.$t("i18nTemplate.postgreSQLTemplate.template"),
         icon: "td-folder-icon",
       });
       options.push({
