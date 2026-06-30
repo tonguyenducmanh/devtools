@@ -1,7 +1,7 @@
 SELECT 
     pg_size_pretty(
         pg_total_relation_size(
-            'sme.account_suggestion_voucher_ba_ca'
+            'schema.your_table_name'
         )
     ) 
 limit 1;
