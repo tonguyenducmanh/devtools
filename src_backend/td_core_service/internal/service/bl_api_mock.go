@@ -141,82 +141,85 @@ func BuildNotFoundResponse(w http.ResponseWriter, r *http.Request, messageNotFou
 // Đăng ký route vào mux cụ thể với hỗ trợ nhiều response theo body
 func registerMockRouteOnMux(mux *http.ServeMux, pattern string, mocks []model.TDAPIMockItem) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		// Thêm CORS cho mock API
-		middleware.BypassCORSConfig(w)
-
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		// Đọc body của request
-		bodyBytes, err := io.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, "Lỗi đọc request body", http.StatusBadRequest)
-			return
-		}
-		defer r.Body.Close()
-
-		// Tìm mock phù hợp dựa trên body
-		selectedMock, notFoundBody := findMatchingMockBodyGroupByEndpoint(mocks, bodyBytes)
-
-		// không tìm thấy mock phù hợp thì trả về not found
-		if notFoundBody == true {
-			notFoundMess := "404 Not Found - API endpoint mock có tồn tại nhưng không tìm được body mock tương ứng"
-			BuildNotFoundResponse(w, r, &notFoundMess)
-		} else {
-			// Set response headers từ mock nếu có
-			if selectedMock.ResponseHeadersText != "" {
-				parsed := false
-				// thử parse dạng map[string]string {"Key":"value"}
-				var respHeaders map[string]string
-				if err := json.Unmarshal([]byte(selectedMock.ResponseHeadersText), &respHeaders); err == nil {
-					for k, v := range respHeaders {
-						w.Header().Set(k, v)
-					}
-					parsed = true
-				}
-				if !parsed {
-					// thử parse dạng map[string][]string {"Key":["value1","value2"]}
-					var respHeadersSlice map[string][]string
-					if err := json.Unmarshal([]byte(selectedMock.ResponseHeadersText), &respHeadersSlice); err == nil {
-						for k, values := range respHeadersSlice {
-							for _, v := range values {
-								w.Header().Add(k, v)
-							}
-						}
-						parsed = true
-					}
-				}
-				if !parsed {
-					// fallback: parse dạng text "Key: Value"
-					lines := strings.Split(selectedMock.ResponseHeadersText, "\n")
-					for _, line := range lines {
-						trimmed := strings.TrimSpace(line)
-						if trimmed == "" {
-							continue
-						}
-						parts := strings.SplitN(trimmed, ":", 2)
-						if len(parts) == 2 {
-							w.Header().Set(strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]))
-						}
-					}
-				}
-			}
-			// Set status code từ mock nếu có
-			statusCode := http.StatusOK
-			if selectedMock.StatusCode > 0 {
-				statusCode = selectedMock.StatusCode
-			}
-			w.WriteHeader(statusCode)
-			w.Write([]byte(selectedMock.ResponeText))
-		}
-
+		handleMockRequest(w, r, mocks)
 	}
-
 	mux.HandleFunc(pattern, handler)
 	td_common.LogInfo(fmt.Sprintf("Đã đăng ký mock API: %s với %d biến thể", pattern, len(mocks)))
+}
+
+func handleMockRequest(w http.ResponseWriter, r *http.Request, mocks []model.TDAPIMockItem) {
+	w.Header().Set("Content-Type", "application/json")
+	middleware.BypassCORSConfig(w)
+
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Lỗi đọc request body", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	selectedMock, notFoundBody := findMatchingMockBodyGroupByEndpoint(mocks, bodyBytes)
+	if notFoundBody {
+		msg := "404 Not Found - API endpoint mock có tồn tại nhưng không tìm được body mock tương ứng"
+		BuildNotFoundResponse(w, r, &msg)
+		return
+	}
+
+	writeMockResponseHeaders(w, selectedMock)
+
+	statusCode := http.StatusOK
+	if selectedMock.StatusCode > 0 {
+		statusCode = selectedMock.StatusCode
+	}
+	w.WriteHeader(statusCode)
+	w.Write([]byte(selectedMock.ResponeText))
+}
+
+func writeMockResponseHeaders(w http.ResponseWriter, mock *model.TDAPIMockItem) {
+	if mock.ResponseHeadersText == "" {
+		return
+	}
+
+	var parsed bool
+
+	var strMap map[string]string
+	if err := json.Unmarshal([]byte(mock.ResponseHeadersText), &strMap); err == nil {
+		for k, v := range strMap {
+			w.Header().Set(k, v)
+		}
+		parsed = true
+	}
+
+	if !parsed {
+		var sliceMap map[string][]string
+		if err := json.Unmarshal([]byte(mock.ResponseHeadersText), &sliceMap); err == nil {
+			for k, values := range sliceMap {
+				for _, v := range values {
+					w.Header().Add(k, v)
+				}
+			}
+			parsed = true
+		}
+	}
+
+	if !parsed {
+		lines := strings.Split(mock.ResponseHeadersText, "\n")
+		for _, line := range lines {
+			trimmed := strings.TrimSpace(line)
+			if trimmed == "" {
+				continue
+			}
+			parts := strings.SplitN(trimmed, ":", 2)
+			if len(parts) == 2 {
+				w.Header().Set(strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]))
+			}
+		}
+	}
 }
 
 // Tìm mock phù hợp dựa trên request body, các body này có chung endpoint api
