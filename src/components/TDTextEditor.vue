@@ -511,6 +511,7 @@ export default {
       font-family: "Consolas", "Monaco", monospace;
       user-select: none;
       box-sizing: border-box;
+      width: 100%;
       background-color: var(--td-monaco-footer-bg);
       color: var(--td-monaco-footer-fg);
       border-bottom: 1px solid
@@ -531,6 +532,7 @@ export default {
       display: flex;
       align-items: center;
       gap: 10px;
+      width: 100%;
     }
 
     // Footer — sibling bên dưới editor wrap

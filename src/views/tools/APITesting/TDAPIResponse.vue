@@ -13,29 +13,32 @@
       :enableHighlight="true"
       language="json"
       :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
-      label="Response"
+      :label="$t('i18nCommon.APIMocking.response')"
       :readOnly="true"
       :wrapText="currentConfigLayout.wrapText"
     >
       <template v-slot:header-main>
         <div class="flex td-header-options">
-          <span
-            v-if="responseHeadersText"
-            class="td-header-option"
-            @click="changeToViewHeaderResponse"
-            >{{ $t("i18nCommon.apiTesting.changeToViewHeaderResponse") }}</span
-          >
-          <span class="td-header-option active">{{
-            $t("i18nCommon.apiTesting.changeToViewBodyResponse")
-          }}</span>
+          <div class="flex td-header-options-left">
+            <span
+              class="td-header-option"
+              @click="changeToViewHeaderResponse"
+              >{{
+                $t("i18nCommon.apiTesting.changeToViewHeaderResponse")
+              }}</span
+            >
+            <span class="td-header-option active">{{
+              $t("i18nCommon.apiTesting.changeToViewBodyResponse")
+            }}</span>
+          </div>
+          <div class="flex td-header-options-right">
+            <TDAPIResponseStatus
+              class="flex"
+              :statusCode="statusCode"
+              :responseTime="responseTime"
+            />
+          </div>
         </div>
-      </template>
-      <template v-slot:footer-main>
-        <TDAPIResponseStatus
-          class="flex"
-          :statusCode="statusCode"
-          :responseTime="responseTime"
-        />
       </template>
     </TDTextEditor>
     <TDTextEditor
@@ -48,26 +51,28 @@
       :enableHighlight="true"
       language="text/plan"
       :placeHolder="$t('i18nCommon.apiTesting.responseHeadersPlaceholder')"
-      label="Response"
+      :label="$t('i18nCommon.APIMocking.response')"
       :readOnly="true"
       :wrapText="currentConfigLayout.wrapText"
     >
       <template v-slot:header-main>
         <div class="flex td-header-options">
-          <span class="td-header-option active">{{
-            $t("i18nCommon.apiTesting.changeToViewHeaderResponse")
-          }}</span>
-          <span class="td-header-option" @click="changeToViewBodyResponse">{{
-            $t("i18nCommon.apiTesting.changeToViewBodyResponse")
-          }}</span>
+          <div class="flex td-header-options-left">
+            <span class="td-header-option active">{{
+              $t("i18nCommon.apiTesting.changeToViewHeaderResponse")
+            }}</span>
+            <span class="td-header-option" @click="changeToViewBodyResponse">{{
+              $t("i18nCommon.apiTesting.changeToViewBodyResponse")
+            }}</span>
+          </div>
+          <div class="flex td-header-options-right">
+            <TDAPIResponseStatus
+              class="flex"
+              :statusCode="statusCode"
+              :responseTime="responseTime"
+            />
+          </div>
         </div>
-      </template>
-      <template v-slot:footer-main>
-        <TDAPIResponseStatus
-          class="flex"
-          :statusCode="statusCode"
-          :responseTime="responseTime"
-        />
       </template>
     </TDTextEditor>
   </div>
@@ -179,6 +184,13 @@ body[data-theme="dark"] {
   }
 }
 .td-header-options {
+  width: 100%;
+  justify-content: space-between;
+  gap: var(--padding);
+}
+.td-header-options-left,
+.td-header-options-right {
+  align-items: center;
   gap: var(--padding);
 }
 .td-header-option {

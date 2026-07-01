@@ -124,18 +124,20 @@
             :enableHighlight="true"
             language="text/plan"
             :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
-            label="Request"
+            :label="$t('i18nCommon.APIMocking.request')"
           >
             <template v-slot:header-main>
               <div class="flex td-header-options">
-                <span class="td-header-option active">{{
-                  $t("i18nCommon.apiTesting.changeToViewHeader")
-                }}</span>
-                <span
-                  class="td-header-option"
-                  @click="changeToViewBodyRequest"
-                  >{{ $t("i18nCommon.apiTesting.changeToViewBody") }}</span
-                >
+                <div class="flex td-header-options-left">
+                  <span class="td-header-option active">{{
+                    $t("i18nCommon.apiTesting.changeToViewHeader")
+                  }}</span>
+                  <span
+                    class="td-header-option"
+                    @click="changeToViewBodyRequest"
+                    >{{ $t("i18nCommon.apiTesting.changeToViewBody") }}</span
+                  >
+                </div>
               </div>
             </template>
           </TDTextEditor>
@@ -150,18 +152,20 @@
             :enableHighlight="true"
             language="json"
             :placeHolder="$t('i18nCommon.APIMocking.bodyPlaceholder')"
-            label="Request"
+            :label="$t('i18nCommon.APIMocking.request')"
           >
             <template v-slot:header-main>
               <div class="flex td-header-options">
-                <span
-                  class="td-header-option"
-                  @click="changeToViewHeaderRequest"
-                  >{{ $t("i18nCommon.apiTesting.changeToViewHeader") }}</span
-                >
-                <span class="td-header-option active">{{
-                  $t("i18nCommon.apiTesting.changeToViewBody")
-                }}</span>
+                <div class="flex td-header-options-left">
+                  <span
+                    class="td-header-option"
+                    @click="changeToViewHeaderRequest"
+                    >{{ $t("i18nCommon.apiTesting.changeToViewHeader") }}</span
+                  >
+                  <span class="td-header-option active">{{
+                    $t("i18nCommon.apiTesting.changeToViewBody")
+                  }}</span>
+                </div>
               </div>
             </template>
           </TDTextEditor>
@@ -189,29 +193,33 @@
             :placeHolder="
               $t('i18nCommon.apiTesting.responseHeadersPlaceholder')
             "
-            label="Response"
+            :label="$t('i18nCommon.APIMocking.response')"
           >
             <template v-slot:header-main>
               <div class="flex td-header-options">
-                <span class="td-header-option active">{{
-                  $t("i18nCommon.apiTesting.changeToViewHeaderResponse")
-                }}</span>
-                <span
-                  class="td-header-option"
-                  @click="changeToViewBodyResponse"
-                  >{{
-                    $t("i18nCommon.apiTesting.changeToViewBodyResponse")
-                  }}</span
-                >
+                <div class="flex td-header-options-left">
+                  <span class="td-header-option active">{{
+                    $t("i18nCommon.apiTesting.changeToViewHeaderResponse")
+                  }}</span>
+                  <span
+                    class="td-header-option"
+                    @click="changeToViewBodyResponse"
+                    >{{
+                      $t("i18nCommon.apiTesting.changeToViewBodyResponse")
+                    }}</span
+                  >
+                </div>
+                <div class="flex td-header-options-right">
+                  <span class="td-response-status-label">{{
+                    $t("i18nCommon.APIMocking.status")
+                  }}</span>
+                  <input
+                    class="td-response-status-input"
+                    type="number"
+                    v-model.number="statusCode"
+                  />
+                </div>
               </div>
-            </template>
-            <template v-slot:footer-main>
-              <span class="td-response-status-label">Status:</span>
-              <input
-                class="td-response-status-input"
-                type="number"
-                v-model.number="statusCode"
-              />
             </template>
           </TDTextEditor>
           <TDTextEditor
@@ -225,29 +233,33 @@
             :enableHighlight="true"
             language="json"
             :placeHolder="$t('i18nCommon.APIMocking.responsePlaceholder')"
-            label="Response"
+            :label="$t('i18nCommon.APIMocking.response')"
           >
             <template v-slot:header-main>
               <div class="flex td-header-options">
-                <span
-                  class="td-header-option"
-                  @click="changeToViewHeaderResponse"
-                  >{{
-                    $t("i18nCommon.apiTesting.changeToViewHeaderResponse")
-                  }}</span
-                >
-                <span class="td-header-option active">{{
-                  $t("i18nCommon.apiTesting.changeToViewBodyResponse")
-                }}</span>
+                <div class="flex td-header-options-left">
+                  <span
+                    class="td-header-option"
+                    @click="changeToViewHeaderResponse"
+                    >{{
+                      $t("i18nCommon.apiTesting.changeToViewHeaderResponse")
+                    }}</span
+                  >
+                  <span class="td-header-option active">{{
+                    $t("i18nCommon.apiTesting.changeToViewBodyResponse")
+                  }}</span>
+                </div>
+                <div class="flex td-header-options-right">
+                  <span class="td-response-status-label">{{
+                    $t("i18nCommon.APIMocking.status")
+                  }}</span>
+                  <input
+                    class="td-response-status-input"
+                    type="number"
+                    v-model.number="statusCode"
+                  />
+                </div>
               </div>
-            </template>
-            <template v-slot:footer-main>
-              <span class="td-response-status-label">Status:</span>
-              <input
-                class="td-response-status-input"
-                type="number"
-                v-model.number="statusCode"
-              />
             </template>
           </TDTextEditor>
         </div>
@@ -924,6 +936,13 @@ export default {
   cursor: pointer;
 }
 .td-header-options {
+  width: 100%;
+  justify-content: space-between;
+  gap: var(--padding);
+}
+.td-header-options-left,
+.td-header-options-right {
+  align-items: center;
   gap: var(--padding);
 }
 .td-header-option {

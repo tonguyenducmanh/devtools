@@ -187,7 +187,7 @@
                 language="text/plan"
                 :wrapText="currentConfigLayout.wrapText"
                 :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
-                label="Request"
+                :label="$t('i18nCommon.APIMocking.request')"
               >
                 <template v-slot:header-main>
                   <div class="flex td-header-options">
@@ -217,7 +217,7 @@
                   :enableHighlight="true"
                   language="json"
                   :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
-                  label="Request"
+                  :label="$t('i18nCommon.APIMocking.request')"
                 >
                   <template v-slot:header-main>
                     <div class="flex td-header-options">
