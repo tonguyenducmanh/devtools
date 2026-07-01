@@ -66,7 +66,7 @@ func BatchImportTestingData(batch *model.TDAPITestingImportBatch) error {
 }
 
 // log dữ liệu vào db
-func LogDataCallAPIToDatabase(reqData model.TDAPITestingParam, responseText string, statusCode int, id string) {
+func LogDataCallAPIToDatabase(reqData model.TDAPITestingParam, responseText string, responseHeadersText string, statusCode int, id string) {
 	db, err := GetConnectionDB()
 	if err != nil {
 		// không làm gì
@@ -81,13 +81,14 @@ func LogDataCallAPIToDatabase(reqData model.TDAPITestingParam, responseText stri
 			headers_text,
 			body_text,
 			response_text,
+			response_headers_text,
 			status_code
 		) 
 		VALUES (
-			?, ?, ?, ?, ?, ?, ?
+			?, ?, ?, ?, ?, ?, ?, ?
 		)
 	`
-	_, err = db.Exec(sqlQuery, id, reqData.ApiURL, reqData.HttpMethod, reqData.HeadersText, reqData.BodyText, responseText, statusCode)
+	_, err = db.Exec(sqlQuery, id, reqData.ApiURL, reqData.HttpMethod, reqData.HeadersText, reqData.BodyText, responseText, responseHeadersText, statusCode)
 
 	// không làm gì
 }

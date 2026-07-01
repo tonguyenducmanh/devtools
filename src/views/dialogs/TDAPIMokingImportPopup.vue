@@ -78,8 +78,11 @@ export default {
           me.ownerForm.httpMethod = mockData.method;
           let pathname = new URL(mockData.api_url).pathname;
           me.ownerForm.apiUrl = pathname;
-          me.ownerForm.bodyText = mockData.body_text;
-          me.ownerForm.responseText = mockData.response_text;
+          me.ownerForm.headersText = mockData.headers_text || "";
+          me.ownerForm.bodyText = mockData.body_text || "";
+          me.ownerForm.responseText = mockData.response_text || "";
+          me.ownerForm.responseHeadersText = mockData.response_headers_text || "";
+          me.ownerForm.statusCode = mockData.status_code || null;
         }
       }
       me.handleClose();

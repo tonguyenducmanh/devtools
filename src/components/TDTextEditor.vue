@@ -19,6 +19,12 @@
     >
       <!-- Editor area -->
       <div v-show="enableHighlight" class="highlight-layer">
+        <!-- Header — sibling phía trên editor wrap -->
+        <div v-if="isShowHeader" class="td-monaco-header">
+          <span class="td-monaco-header__group">
+            <slot name="header-main" />
+          </span>
+        </div>
         <!-- Monaco mount point -->
         <div ref="textareaWrap" class="td-monaco-editor-wrap"></div>
         <!-- Footer — sibling của editor wrap, nằm bên dưới -->
@@ -140,6 +146,10 @@ export default {
     isShowFooter: {
       type: Boolean,
       default: true,
+    },
+    isShowHeader: {
+      type: Boolean,
+      default: false,
     },
     showCursorTextFooter: {
       type: Boolean,
@@ -487,6 +497,40 @@ export default {
       min-height: 0;
       overflow: hidden;
       position: relative;
+    }
+
+    // Header — sibling phía trên editor wrap
+    .td-monaco-header {
+      flex-shrink: 0;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 12px;
+      font-size: 12px;
+      font-family: "Consolas", "Monaco", monospace;
+      user-select: none;
+      box-sizing: border-box;
+      background-color: var(--td-monaco-footer-bg);
+      color: var(--td-monaco-footer-fg);
+      border-bottom: 1px solid
+        color-mix(
+          in srgb,
+          var(--td-monaco-footer-bg) 70%,
+          var(--td-monaco-footer-fg) 30%
+        );
+    }
+    .td-monaco-header,
+    .td-monaco-header__group {
+      pointer-events: auto !important;
+    }
+    .td-monaco-header * {
+      pointer-events: auto !important;
+    }
+    .td-monaco-header__group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     // Footer — sibling bên dưới editor wrap

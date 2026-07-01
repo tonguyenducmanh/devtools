@@ -166,8 +166,34 @@ func registerMockRouteOnMux(mux *http.ServeMux, pattern string, mocks []model.TD
 			notFoundMess := "404 Not Found - API endpoint mock có tồn tại nhưng không tìm được body mock tương ứng"
 			BuildNotFoundResponse(w, r, &notFoundMess)
 		} else {
-			// trả về mock phù hợp
-			w.WriteHeader(http.StatusOK)
+			// Set response headers từ mock nếu có
+			if selectedMock.ResponseHeadersText != "" {
+				var respHeaders map[string]string
+				if err := json.Unmarshal([]byte(selectedMock.ResponseHeadersText), &respHeaders); err == nil {
+					for k, v := range respHeaders {
+						w.Header().Set(k, v)
+					}
+				} else {
+					// fallback: parse dạng text "Key: Value"
+					lines := strings.Split(selectedMock.ResponseHeadersText, "\n")
+					for _, line := range lines {
+						trimmed := strings.TrimSpace(line)
+						if trimmed == "" {
+							continue
+						}
+						parts := strings.SplitN(trimmed, ":", 2)
+						if len(parts) == 2 {
+							w.Header().Set(strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]))
+						}
+					}
+				}
+			}
+			// Set status code từ mock nếu có
+			statusCode := http.StatusOK
+			if selectedMock.StatusCode > 0 {
+				statusCode = selectedMock.StatusCode
+			}
+			w.WriteHeader(statusCode)
 			w.Write([]byte(selectedMock.ResponeText))
 		}
 

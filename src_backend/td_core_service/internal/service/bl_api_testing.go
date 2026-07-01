@@ -72,7 +72,7 @@ func executeRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingRespons
 	headerJson, _ := json.Marshal(resp.Header)
 
 	// log dữ liệu vào db
-	logDataCallAPIToDatabase(reqData, string(respBody), resp.StatusCode)
+	logDataCallAPIToDatabase(reqData, string(respBody), string(headerJson), resp.StatusCode)
 
 	return &model.TDAPITestingResponse{
 		Status:  resp.StatusCode,
@@ -82,9 +82,9 @@ func executeRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingRespons
 }
 
 // log dữ liệu vào db
-func logDataCallAPIToDatabase(reqData model.TDAPITestingParam, responseText string, statusCode int) {
+func logDataCallAPIToDatabase(reqData model.TDAPITestingParam, responseText string, responseHeadersText string, statusCode int) {
 	id := td_common.GenUUID()
-	database.LogDataCallAPIToDatabase(reqData, responseText, statusCode, id)
+	database.LogDataCallAPIToDatabase(reqData, responseText, responseHeadersText, statusCode, id)
 }
 
 // parse header được stringify từ frontend

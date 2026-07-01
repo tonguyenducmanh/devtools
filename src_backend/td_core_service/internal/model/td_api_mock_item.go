@@ -3,12 +3,15 @@ package model
 // param api mock muốn tạo
 type TDAPIMockItem struct {
 	TDBaseModel
-	RequestName string `json:"request_name"`
-	GroupID     string `json:"group_id"`
-	Method      string `json:"method"`
-	Endpoint    string `json:"end_point"`
-	BodyText    string `json:"body_text"`
-	ResponeText string `json:"response_text"`
+	RequestName         string `json:"request_name"`
+	GroupID             string `json:"group_id"`
+	Method              string `json:"method"`
+	Endpoint            string `json:"end_point"`
+	HeadersText         string `json:"headers_text"`
+	BodyText            string `json:"body_text"`
+	ResponeText         string `json:"response_text"`
+	ResponseHeadersText string `json:"response_headers_text"`
+	StatusCode          int    `json:"status_code"`
 }
 
 func (m TDAPIMockItem) TableName() string {

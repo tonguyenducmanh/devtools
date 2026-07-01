@@ -181,22 +181,24 @@
                   currentConfigLayout.currentAPIInfoOption ==
                   $tdEnum.APIInfoOption.header
                 "
-                :isLabelTop="true"
+                :isShowHeader="true"
                 v-model="headersText"
                 :enableHighlight="true"
                 language="text/plan"
                 :wrapText="currentConfigLayout.wrapText"
                 :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
-                :label="$t('i18nCommon.apiTesting.headersPlaceholder')"
+                label="Request"
               >
-                <template v-slot:footer-main>
-                  <div class="flex">
-                    <div
-                      class="td-request-footer-btn"
+                <template v-slot:header-main>
+                  <div class="flex td-header-options">
+                    <span class="td-header-option active">{{
+                      $t("i18nCommon.apiTesting.changeToViewHeader")
+                    }}</span>
+                    <span
+                      class="td-header-option"
                       @click="changeToViewBodyRequest"
+                      >{{ $t("i18nCommon.apiTesting.changeToViewBody") }}</span
                     >
-                      {{ $t("i18nCommon.apiTesting.changeToViewBody") }}
-                    </div>
                   </div>
                 </template>
               </TDTextEditor>
@@ -209,22 +211,26 @@
                 "
               >
                 <TDTextEditor
-                  :isLabelTop="true"
+                  :isShowHeader="true"
                   v-model="bodyText"
                   :wrapText="currentConfigLayout.wrapText"
                   :enableHighlight="true"
                   language="json"
                   :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
-                  :label="$t('i18nCommon.apiTesting.bodyPlaceholder')"
+                  label="Request"
                 >
-                  <template v-slot:footer-main>
-                    <div class="flex">
-                      <div
-                        class="td-request-footer-btn"
+                  <template v-slot:header-main>
+                    <div class="flex td-header-options">
+                      <span
+                        class="td-header-option"
                         @click="changeToViewHeaderRequest"
+                        >{{
+                          $t("i18nCommon.apiTesting.changeToViewHeader")
+                        }}</span
                       >
-                        {{ $t("i18nCommon.apiTesting.changeToViewHeader") }}
-                      </div>
+                      <span class="td-header-option active">{{
+                        $t("i18nCommon.apiTesting.changeToViewBody")
+                      }}</span>
                     </div>
                   </template>
                 </TDTextEditor>
@@ -249,6 +255,7 @@
                 :responseTime="responseTime"
                 :isLoading="isLoading"
                 :responseText="responseText"
+                :responseHeadersText="responseHeadersText"
                 :currentConfigLayout="currentConfigLayout"
               />
             </div>
@@ -301,6 +308,7 @@
                 :responseTime="responseTime"
                 :isLoading="isLoading"
                 :responseText="responseText"
+                :responseHeadersText="responseHeadersText"
                 :currentConfigLayout="currentConfigLayout"
               />
             </div>
@@ -597,6 +605,7 @@ export default {
       headersText: "Content-Type: application/json",
       bodyText: "",
       responseText: "",
+      responseHeadersText: null,
       statusCode: null,
       responseTime: null,
       isLoading: false,
@@ -610,6 +619,7 @@ export default {
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.APISidebarOption.Setting,
         currentAPIInfoOption: this.$tdEnum.APIInfoOption.body,
+        currentAPIResponseInfoOption: this.$tdEnum.APIInfoOption.body,
       },
       curlContent: "",
       methodOptions: [
@@ -1309,6 +1319,7 @@ export default {
       me.headersText = "Content-Type: application/json";
       me.bodyText = "";
       me.responseText = "";
+      me.responseHeadersText = null;
       me.statusCode = null;
       me.responseTime = null;
       me.isLoading = false;
@@ -1363,6 +1374,7 @@ export default {
       this.isLoading = true;
       this.startTime = performance.now();
       this.responseText = "";
+      this.responseHeadersText = null;
       this.statusCode = null;
 
       try {
@@ -1383,6 +1395,7 @@ export default {
         let endTime = performance.now();
         this.responseTime = Math.round(endTime - this.startTime);
         this.statusCode = response.status;
+        this.responseHeadersText = response.headers || null;
 
         // Format response body
         if (typeof response.body === "object") {
@@ -1609,8 +1622,11 @@ export default {
           mockData.request_name = me.requestName;
           mockData.method = me.httpMethod;
           mockData.api_url = me.apiUrl;
+          mockData.headers_text = me.headersText;
           mockData.body_text = me.bodyText;
           mockData.response_text = me.responseText;
+          mockData.response_headers_text = me.responseHeadersText;
+          mockData.status_code = me.statusCode;
           me.$tdUtility.copyToClipboard(JSON.stringify(mockData));
         }
       }
@@ -1821,5 +1837,17 @@ body[data-theme="dark"] {
 }
 .td-request-footer-btn {
   cursor: pointer;
+}
+.td-header-options {
+  gap: var(--padding);
+}
+.td-header-option {
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.15s;
+}
+.td-header-option.active {
+  opacity: 1;
+  font-weight: 600;
 }
 </style>

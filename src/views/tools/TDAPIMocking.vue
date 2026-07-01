@@ -109,32 +109,148 @@
         class="flex td-mocking-content"
         :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
       >
-        <TDTextEditor
-          :isLabelTop="true"
-          v-model="bodyText"
-          :wrapText="currentConfigLayout.wrapText"
-          :enableHighlight="true"
-          language="json"
-          :placeHolder="$t('i18nCommon.APIMocking.bodyPlaceholder')"
-          :label="$t('i18nCommon.APIMocking.bodyPlaceholder')"
+        <div
+          class="flex flex-col td-mock-request-section"
           :style="requestSectionSizeStyle"
-        ></TDTextEditor>
+        >
+          <TDTextEditor
+            v-if="
+              currentConfigLayout.currentAPIInfoOption ==
+              $tdEnum.APIInfoOption.header
+            "
+            :isShowHeader="true"
+            v-model="headersText"
+            :wrapText="currentConfigLayout.wrapText"
+            :enableHighlight="true"
+            language="text/plan"
+            :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
+            label="Request"
+          >
+            <template v-slot:header-main>
+              <div class="flex td-header-options">
+                <span class="td-header-option active">{{
+                  $t("i18nCommon.apiTesting.changeToViewHeader")
+                }}</span>
+                <span
+                  class="td-header-option"
+                  @click="changeToViewBodyRequest"
+                  >{{ $t("i18nCommon.apiTesting.changeToViewBody") }}</span
+                >
+              </div>
+            </template>
+          </TDTextEditor>
+          <TDTextEditor
+            v-if="
+              currentConfigLayout.currentAPIInfoOption ==
+              $tdEnum.APIInfoOption.body
+            "
+            :isShowHeader="true"
+            v-model="bodyText"
+            :wrapText="currentConfigLayout.wrapText"
+            :enableHighlight="true"
+            language="json"
+            :placeHolder="$t('i18nCommon.APIMocking.bodyPlaceholder')"
+            label="Request"
+          >
+            <template v-slot:header-main>
+              <div class="flex td-header-options">
+                <span
+                  class="td-header-option"
+                  @click="changeToViewHeaderRequest"
+                  >{{ $t("i18nCommon.apiTesting.changeToViewHeader") }}</span
+                >
+                <span class="td-header-option active">{{
+                  $t("i18nCommon.apiTesting.changeToViewBody")
+                }}</span>
+              </div>
+            </template>
+          </TDTextEditor>
+        </div>
         <TDResizer
           :direction="
             currentConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
           "
           @resize="handleResize"
         />
-        <TDTextEditor
-          :isLabelTop="true"
-          v-model="responseText"
-          :wrapText="currentConfigLayout.wrapText"
-          :enableHighlight="true"
-          language="json"
-          :placeHolder="$t('i18nCommon.APIMocking.responsePlaceholder')"
-          :label="$t('i18nCommon.APIMocking.responsePlaceholder')"
+        <div
+          class="flex flex-col td-mock-response-section"
           :style="responseSectionSizeStyle"
-        ></TDTextEditor>
+        >
+          <TDTextEditor
+            v-if="
+              currentConfigLayout.currentAPIResponseInfoOption ==
+              $tdEnum.APIInfoOption.header
+            "
+            :isShowHeader="true"
+            v-model="responseHeadersText"
+            :wrapText="currentConfigLayout.wrapText"
+            :enableHighlight="true"
+            language="text/plan"
+            :placeHolder="
+              $t('i18nCommon.apiTesting.responseHeadersPlaceholder')
+            "
+            label="Response"
+          >
+            <template v-slot:header-main>
+              <div class="flex td-header-options">
+                <span class="td-header-option active">{{
+                  $t("i18nCommon.apiTesting.changeToViewHeaderResponse")
+                }}</span>
+                <span
+                  class="td-header-option"
+                  @click="changeToViewBodyResponse"
+                  >{{
+                    $t("i18nCommon.apiTesting.changeToViewBodyResponse")
+                  }}</span
+                >
+              </div>
+            </template>
+            <template v-slot:footer-main>
+              <span class="td-response-status-label">Status:</span>
+              <input
+                class="td-response-status-input"
+                type="number"
+                v-model.number="statusCode"
+              />
+            </template>
+          </TDTextEditor>
+          <TDTextEditor
+            v-if="
+              currentConfigLayout.currentAPIResponseInfoOption ==
+              $tdEnum.APIInfoOption.body
+            "
+            :isShowHeader="true"
+            v-model="responseText"
+            :wrapText="currentConfigLayout.wrapText"
+            :enableHighlight="true"
+            language="json"
+            :placeHolder="$t('i18nCommon.APIMocking.responsePlaceholder')"
+            label="Response"
+          >
+            <template v-slot:header-main>
+              <div class="flex td-header-options">
+                <span
+                  class="td-header-option"
+                  @click="changeToViewHeaderResponse"
+                  >{{
+                    $t("i18nCommon.apiTesting.changeToViewHeaderResponse")
+                  }}</span
+                >
+                <span class="td-header-option active">{{
+                  $t("i18nCommon.apiTesting.changeToViewBodyResponse")
+                }}</span>
+              </div>
+            </template>
+            <template v-slot:footer-main>
+              <span class="td-response-status-label">Status:</span>
+              <input
+                class="td-response-status-input"
+                type="number"
+                v-model.number="statusCode"
+              />
+            </template>
+          </TDTextEditor>
+        </div>
       </div>
     </div>
     <!-- hết phần thao tác chính của tool -->
@@ -324,8 +440,11 @@ export default {
       requestName: "",
       groupId: "",
       httpMethod: "GET",
+      headersText: "",
       bodyText: "",
       responseText: "",
+      responseHeadersText: "",
+      statusCode: null,
       currentMockId: null,
       allMockAPIs: [],
       openGroups: {},
@@ -347,6 +466,8 @@ export default {
         splitHorizontal: false,
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.APISidebarOption.Collection,
+        currentAPIInfoOption: this.$tdEnum.APIInfoOption.body,
+        currentAPIResponseInfoOption: this.$tdEnum.APIInfoOption.body,
       },
       newGroupName: "",
       allGroups: [],
@@ -457,6 +578,22 @@ export default {
       this.requestSectionSize = sizes.leftSize;
       this.responseSectionSize = sizes.rightSize;
     },
+    changeToViewBodyRequest() {
+      this.currentConfigLayout.currentAPIInfoOption =
+        this.$tdEnum.APIInfoOption.body;
+    },
+    changeToViewHeaderRequest() {
+      this.currentConfigLayout.currentAPIInfoOption =
+        this.$tdEnum.APIInfoOption.header;
+    },
+    changeToViewBodyResponse() {
+      this.currentConfigLayout.currentAPIResponseInfoOption =
+        this.$tdEnum.APIInfoOption.body;
+    },
+    changeToViewHeaderResponse() {
+      this.currentConfigLayout.currentAPIResponseInfoOption =
+        this.$tdEnum.APIInfoOption.header;
+    },
     /**
      * Toggle mở/đóng nhóm
      */
@@ -563,8 +700,11 @@ export default {
       me.groupId = mock.group_id;
       me.httpMethod = mock.method;
       me.apiUrl = mock.end_point;
-      me.bodyText = mock.body_text;
-      me.responseText = mock.response_text;
+      me.headersText = mock.headers_text || "";
+      me.bodyText = mock.body_text || "";
+      me.responseText = mock.response_text || "";
+      me.responseHeadersText = mock.response_headers_text || "";
+      me.statusCode = mock.status_code || null;
     },
     /**
      * Tạo mới mock API
@@ -576,8 +716,11 @@ export default {
       me.groupId = "";
       me.httpMethod = "GET";
       me.apiUrl = "";
+      me.headersText = "";
       me.bodyText = "";
       me.responseText = "";
+      me.responseHeadersText = "";
+      me.statusCode = null;
     },
     async restartMockServer() {
       let me = this;
@@ -606,8 +749,11 @@ export default {
         group_id: me.groupId,
         method: me.httpMethod,
         end_point: me.apiUrl,
+        headers_text: me.headersText,
         body_text: me.bodyText,
         response_text: me.responseText,
+        response_headers_text: me.responseHeadersText,
+        status_code: me.statusCode,
       };
 
       try {
@@ -661,7 +807,7 @@ export default {
       return {
         apiUrl: apiUrl,
         httpMethod: me.httpMethod,
-        headersText: null,
+        headersText: me.headersText,
         bodyText: me.bodyText,
       };
     },
@@ -720,6 +866,15 @@ export default {
     .td-mocking-content {
       flex: 1;
       width: 100%;
+      min-height: 0;
+      gap: 0;
+    }
+    .td-mock-request-section,
+    .td-mock-response-section {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      min-width: 0;
     }
   }
 }
@@ -764,5 +919,43 @@ export default {
 }
 .td-base-url:hover {
   border: 1px solid var(--focus-color);
+}
+.td-request-footer-btn {
+  cursor: pointer;
+}
+.td-header-options {
+  gap: var(--padding);
+}
+.td-header-option {
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.15s;
+}
+.td-header-option.active {
+  opacity: 1;
+  font-weight: 600;
+}
+.td-response-status-label {
+  font-size: 12px;
+  font-family: "Consolas", "Monaco", monospace;
+  opacity: 0.6;
+}
+.td-response-status-input {
+  width: 50px;
+  border: none;
+  background: transparent;
+  color: var(--td-monaco-footer-fg);
+  font-size: 12px;
+  font-family: "Consolas", "Monaco", monospace;
+  font-weight: 600;
+  outline: none;
+  padding: 0;
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  -moz-appearance: textfield;
+  appearance: textfield;
 }
 </style>
