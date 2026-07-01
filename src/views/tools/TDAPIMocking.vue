@@ -135,6 +135,7 @@
                   <span
                     class="td-header-option"
                     @click="changeToViewBodyRequest"
+                    v-tooltip="$t('i18nCommon.apiTesting.clickToViewBody')"
                     >{{ $t("i18nCommon.apiTesting.changeToViewBody") }}</span
                   >
                 </div>
@@ -160,6 +161,7 @@
                   <span
                     class="td-header-option"
                     @click="changeToViewHeaderRequest"
+                    v-tooltip="$t('i18nCommon.apiTesting.clickToViewHeader')"
                     >{{ $t("i18nCommon.apiTesting.changeToViewHeader") }}</span
                   >
                   <span class="td-header-option active">{{
@@ -204,6 +206,9 @@
                   <span
                     class="td-header-option"
                     @click="changeToViewBodyResponse"
+                    v-tooltip="
+                      $t('i18nCommon.apiTesting.clickToViewBodyResponse')
+                    "
                     >{{
                       $t("i18nCommon.apiTesting.changeToViewBodyResponse")
                     }}</span
@@ -217,6 +222,7 @@
                     class="td-response-status-input"
                     type="number"
                     v-model.number="statusCode"
+                    v-tooltip="$t('i18nCommon.apiTesting.statusCodeTooltip')"
                   />
                 </div>
               </div>
@@ -241,6 +247,9 @@
                   <span
                     class="td-header-option"
                     @click="changeToViewHeaderResponse"
+                    v-tooltip="
+                      $t('i18nCommon.apiTesting.clickToViewHeaderResponse')
+                    "
                     >{{
                       $t("i18nCommon.apiTesting.changeToViewHeaderResponse")
                     }}</span
@@ -257,6 +266,7 @@
                     class="td-response-status-input"
                     type="number"
                     v-model.number="statusCode"
+                    v-tooltip="$t('i18nCommon.apiTesting.statusCodeTooltip')"
                   />
                 </div>
               </div>

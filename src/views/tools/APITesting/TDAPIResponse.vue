@@ -23,6 +23,7 @@
             <span
               class="td-header-option"
               @click="changeToViewHeaderResponse"
+              v-tooltip="$t('i18nCommon.apiTesting.clickToViewHeaderResponse')"
               >{{
                 $t("i18nCommon.apiTesting.changeToViewHeaderResponse")
               }}</span
@@ -61,10 +62,15 @@
             <span class="td-header-option active">{{
               $t("i18nCommon.apiTesting.changeToViewHeaderResponse")
             }}</span>
-            <span class="td-header-option" @click="changeToViewBodyResponse">{{
-              $t("i18nCommon.apiTesting.changeToViewBodyResponse")
-            }}</span>
+            <span
+              class="td-header-option"
+              @click="changeToViewBodyResponse"
+              v-tooltip="$t('i18nCommon.apiTesting.clickToViewBodyResponse')"
+            >
+              {{ $t("i18nCommon.apiTesting.changeToViewBodyResponse") }}
+            </span>
           </div>
+
           <div class="flex td-header-options-right">
             <TDAPIResponseStatus
               class="flex"
