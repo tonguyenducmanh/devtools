@@ -201,11 +201,11 @@ body[data-theme="dark"] {
 }
 .td-header-option {
   cursor: pointer;
-  opacity: 0.4;
-  transition: opacity 0.15s;
+  color: var(--td-monaco-text-inactive);
+  transition: color 0.15s;
 }
 .td-header-option.active {
-  opacity: 1;
+  color: var(--td-monaco-text-active);
   font-weight: 600;
 }
 </style>

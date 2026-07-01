@@ -581,6 +581,13 @@ export var monacoThemeColorMap = THEMES.reduce(function (map, t) {
     fg:
       t.colors["editor.foreground"] ||
       (t.base === "vs" ? "#000000" : "#d4d4d4"),
+    activeFg:
+      t.colors["editorLineNumber.activeForeground"] ||
+      t.colors["editor.foreground"] ||
+      (t.base === "vs" ? "#000000" : "#d4d4d4"),
+    inactiveFg:
+      t.colors["editorLineNumber.foreground"] ||
+      (t.base === "vs" ? "#8b949e" : "#636e7b"),
   };
   return map;
 }, {});

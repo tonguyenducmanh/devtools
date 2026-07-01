@@ -426,6 +426,8 @@ export default {
       const root = document.documentElement;
       root.style.setProperty("--td-monaco-footer-bg", colors.bg);
       root.style.setProperty("--td-monaco-footer-fg", colors.fg);
+      root.style.setProperty("--td-monaco-text-active", colors.activeFg);
+      root.style.setProperty("--td-monaco-text-inactive", colors.inactiveFg);
     },
 
     unmountEditor() {
@@ -572,7 +574,7 @@ export default {
     }
 
     .td-monaco-footer__label {
-      opacity: 0.6;
+      color: var(--td-monaco-text-active);
       letter-spacing: 0.02em;
     }
 
