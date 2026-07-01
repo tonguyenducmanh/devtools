@@ -4,7 +4,7 @@
       <TDTextEditor
         :isLabelTop="true"
         v-model="curlContent"
-        :enableHighlight="currentConfigLayout.enableHighlight"
+        :enableHighlight="true"
         language="shell"
         ref="inputCURL"
         :placeHolder="$t('i18nCommon.apiTesting.contentCURL')"

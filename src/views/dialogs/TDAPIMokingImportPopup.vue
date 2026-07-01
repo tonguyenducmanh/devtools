@@ -10,8 +10,8 @@
       <TDTextEditor
         :isLabelTop="true"
         v-model="mockContent"
-        :enableHighlight="currentConfigLayout.enableHighlight"
-        language="shell"
+        :enableHighlight="true"
+        language="json"
         ref="mockContentInput"
         :placeHolder="$t('i18nCommon.apiTesting.contentCURL')"
       ></TDTextEditor>
@@ -81,7 +81,8 @@ export default {
           me.ownerForm.headersText = mockData.headers_text || "";
           me.ownerForm.bodyText = mockData.body_text || "";
           me.ownerForm.responseText = mockData.response_text || "";
-          me.ownerForm.responseHeadersText = mockData.response_headers_text || "";
+          me.ownerForm.responseHeadersText =
+            mockData.response_headers_text || "";
           me.ownerForm.statusCode = mockData.status_code || null;
         }
       }
