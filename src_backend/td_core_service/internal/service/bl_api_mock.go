@@ -168,12 +168,28 @@ func registerMockRouteOnMux(mux *http.ServeMux, pattern string, mocks []model.TD
 		} else {
 			// Set response headers từ mock nếu có
 			if selectedMock.ResponseHeadersText != "" {
+				parsed := false
+				// thử parse dạng map[string]string {"Key":"value"}
 				var respHeaders map[string]string
 				if err := json.Unmarshal([]byte(selectedMock.ResponseHeadersText), &respHeaders); err == nil {
 					for k, v := range respHeaders {
 						w.Header().Set(k, v)
 					}
-				} else {
+					parsed = true
+				}
+				if !parsed {
+					// thử parse dạng map[string][]string {"Key":["value1","value2"]}
+					var respHeadersSlice map[string][]string
+					if err := json.Unmarshal([]byte(selectedMock.ResponseHeadersText), &respHeadersSlice); err == nil {
+						for k, values := range respHeadersSlice {
+							for _, v := range values {
+								w.Header().Add(k, v)
+							}
+						}
+						parsed = true
+					}
+				}
+				if !parsed {
 					// fallback: parse dạng text "Key: Value"
 					lines := strings.Split(selectedMock.ResponseHeadersText, "\n")
 					for _, line := range lines {
