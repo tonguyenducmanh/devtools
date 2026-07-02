@@ -229,6 +229,26 @@ export default {
         note: "Both vectors must have the same dimensions (number of elements).",
       },
     },
+    vectorMockGenerator: {
+      purpose: {
+        title: "What is Mock Embedding Generator?",
+        content:
+          "A tool that simulates embedding vector generation from text, mimicking AI models like text-embedding-ada-002. Uses N-Gram with SimHash algorithm to produce customizable-dimension vectors. The result can be copied and used in the Cosine Similarity tool to compare similarity.",
+      },
+      howToUse: {
+        title: "How to Use",
+        setDimensions: "Choose vector dimensions (default 128) and N-Gram size (default 3).",
+        enterText: "Enter text in the Text Input field.",
+        generate: "Click Generate Vector to create the embedding vector.",
+        copy: "Copy the result vector (JSON) and paste it into the Cosine Similarity tool for comparison.",
+      },
+      algorithm: {
+        title: "Algorithm",
+        content:
+          "Input text is normalized (lowercase, trim) and split into consecutive N-Grams. Each N-Gram is deterministically hashed into a byte array; bits in each byte determine whether to add (+1) or subtract (-1) from the n-dimensional vector. The final vector is normalized to unit length.",
+        note: "The same text always produces the same vector. Texts sharing more N-Grams produce closer vectors.",
+      },
+    },
     apiMocking: {
       purpose: {
         title: "What is API Mocking?",

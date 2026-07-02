@@ -225,6 +225,26 @@ export default {
         note: "Cả 2 vector phải có cùng số chiều (số phần tử).",
       },
     },
+    vectorMockGenerator: {
+      purpose: {
+        title: "Mock Embedding Generator là gì?",
+        content:
+          "Công cụ giả lập tạo vector embedding từ văn bản, mô phỏng cách hoạt động của các mô hình AI như text-embedding-ada-002. Sử dụng thuật toán N-Gram kết hợp với SimHash để tạo ra các vector có số chiều tuỳ chỉnh. Kết quả có thể copy và dùng ở tool Cosine Similarity để so sánh độ tương đồng.",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        setDimensions: "Chọn số chiều vector (mặc định 128) và kích thước N-Gram (mặc định 3).",
+        enterText: "Nhập văn bản vào ô Text Input.",
+        generate: "Nhấn Generate Vector để tạo vector embedding.",
+        copy: "Copy vector kết quả (dạng JSON) và dán vào tool Cosine Similarity để so sánh.",
+      },
+      algorithm: {
+        title: "Thuật toán",
+        content:
+          "Văn bản đầu vào được chuẩn hoá (lowercase, trim) và cắt thành các N-Gram liên tiếp. Mỗi N-Gram được băm deterministic thành một mảng byte, các bit trong byte sẽ quyết định cộng (+1) hoặc trừ (-1) vào vector n chiều. Cuối cùng vector được chuẩn hoá về độ dài đơn vị (unit vector).",
+        note: "Cùng một văn bản luôn cho ra cùng một vector. Văn bản giống nhau càng nhiều N-Gram thì vector càng gần nhau.",
+      },
+    },
     apiMocking: {
       purpose: {
         title: "Mock API là gì?",

@@ -117,6 +117,7 @@ export default {
       blanktext: "Blank text",
       AppDataMiner: "App data miner",
       cosinSimilarity: "Cosine Similarity",
+      vectorMockGenerator: "Mock Embedding Generator",
       oneTimePassword: "OTP gen",
       textCompress: "Text Compress",
       compareCode: "Compare code",
@@ -434,6 +435,16 @@ export default {
       invalidVectors:
         "Invalid vectors. Both vectors must have same length and contain valid numbers.",
       calculated: "Similarity calculated successfully",
+    },
+    vectorMockGenerator: {
+      dimensions: "Dimensions",
+      nGram: "N-Gram",
+      textInput: "Text Input",
+      textPlaceholder: "Enter text to generate embedding vector...",
+      vectorResult: "Vector Result",
+      vectorPlaceholder: "Embedding vector will appear here...",
+      generateVector: "Generate Vector",
+      generated: "Vector generated successfully",
     },
     textManipulation: {
       inputSource: "Data to be processed",

@@ -118,6 +118,7 @@ export default {
       blanktext: "Văn bản trống",
       AppDataMiner: "Dữ liệu ứng dụng",
       cosinSimilarity: "Độ tương đồng",
+      vectorMockGenerator: "Tạo Embedding giả",
       oneTimePassword: "Tạo mã OTP",
       textCompress: "Nén văn bản",
       compareCode: "So sánh mã",
@@ -433,6 +434,16 @@ export default {
       invalidVectors:
         "Vector không hợp lệ. Cả hai vector phải có cùng độ dài và chứa các số hợp lệ.",
       calculated: "Đã tính độ tương đồng thành công",
+    },
+    vectorMockGenerator: {
+      dimensions: "Số chiều",
+      nGram: "N-Gram",
+      textInput: "Văn bản đầu vào",
+      textPlaceholder: "Nhập văn bản để tạo vector embedding...",
+      vectorResult: "Vector kết quả",
+      vectorPlaceholder: "Vector embedding sẽ hiển thị ở đây...",
+      generateVector: "Tạo vector",
+      generated: "Đã tạo vector thành công",
     },
     textManipulation: {
       inputSource: "Dữ liệu cần xử lý",

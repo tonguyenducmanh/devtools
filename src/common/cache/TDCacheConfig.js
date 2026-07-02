@@ -280,4 +280,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache theme monaco editor do user chọn riêng",
   },
+  VectorMockGeneratorConfigLayout: {
+    KeyFormat: "VectorMockGeneratorConfigLayout",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool vector mock generator",
+  },
 };

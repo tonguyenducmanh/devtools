@@ -254,6 +254,14 @@ const sidebarConfig = [
           titleKey: "i18nCommon.feature.cosinSimilarity",
         },
       },
+      {
+        name: "vectormockgenerator",
+        component: () =>
+          import("@/views/tools/TDVectorMockGenerator.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.vectorMockGenerator",
+        },
+      },
     ],
   },
   {
