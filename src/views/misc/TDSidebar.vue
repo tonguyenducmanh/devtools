@@ -1,9 +1,25 @@
 <template>
+  <!-- Trigger vô hình ở mép trái, fixed riêng không bị ảnh hưởng bởi transform -->
+  <div
+    v-if="zenMode"
+    class="td-sidebar-zen-trigger"
+    @mouseenter="onZenMouseEnter"
+    @mouseleave="onZenMouseLeave"
+  ></div>
   <div
     class="td-sidebar-container"
     :class="{ 'td-sidebar-container-collapsed': !showSideBar }"
   >
-    <div v-if="showSideBar" class="td-sidebar">
+    <div
+      v-if="showSideBar || zenMode"
+      class="td-sidebar"
+      :class="{
+        'td-sidebar--zen': zenMode,
+        'td-sidebar--zen-hover': zenHover,
+      }"
+      @mouseenter="onZenMouseEnter"
+      @mouseleave="onZenMouseLeave"
+    >
       <div class="td-tool-group">
         <template v-for="(item, index) in sidebarItems" :key="index">
           <!-- Group item: hover → flyout -->
@@ -38,6 +54,7 @@
     </div>
 
     <TDToggleArea
+      v-if="!zenMode"
       :collapsed="!showSideBar"
       edge="left"
       v-tooltip="
@@ -80,6 +97,7 @@ import TDFlyoutPanel from "@/components/TDFlyoutPanel.vue";
 import { useTabManager } from "@/stores/TDTabManager.js";
 import { useFlyout } from "@/common/plugin/TDUseFlyout.js";
 import _ from "@/common/TDCommonFunction.js";
+import { appState } from "@/stores/TDAppState.js";
 
 export default {
   name: "TDSidebar",
@@ -110,10 +128,15 @@ export default {
     return {
       sidebarItems: getSidebarItems(),
       showSideBar: true,
+      zenHover: false,
+      zenHideTimer: null,
     };
   },
 
   computed: {
+    zenMode() {
+      return appState.zenMode;
+    },
     activeItem() {
       return (
         this.sidebarItems.find(
@@ -130,6 +153,10 @@ export default {
     this.processWhenCreated();
   },
 
+  beforeUnmount() {
+    clearTimeout(this.zenHideTimer);
+  },
+
   methods: {
     async processWhenCreated() {
       let me = this;
@@ -140,6 +167,17 @@ export default {
       let me = this;
       me.showSideBar = !me.showSideBar;
       await me.$tdUtility.saveUserSettings("showSideBar", me.showSideBar);
+    },
+
+    onZenMouseEnter() {
+      clearTimeout(this.zenHideTimer);
+      this.zenHover = true;
+    },
+    onZenMouseLeave() {
+      clearTimeout(this.zenHideTimer);
+      this.zenHideTimer = setTimeout(() => {
+        this.zenHover = false;
+      }, 400);
     },
 
     // Mở tất từ group
@@ -254,6 +292,58 @@ export default {
   &--route {
     &:hover .td-sidebar-pin-btn {
       opacity: 1;
+    }
+  }
+}
+
+// Zen hover trigger: fixed ở mép trái, chỉ vài px, chừa khoảng toolbar phía trên
+.td-sidebar-zen-trigger {
+  position: fixed;
+  left: 0;
+  top: 50px;
+  width: var(--padding);
+  height: calc(100vh - 50px);
+  z-index: 99;
+}
+
+// Zen mode: floating panel with gaps and rounded corners
+.td-sidebar--zen {
+  position: fixed;
+  left: var(--padding);
+  top: 50px;
+  height: calc(100vh - 100px);
+  z-index: 100;
+  transform: translateX(calc(-100% - var(--padding)));
+  transition:
+    transform 0.3s ease-in-out,
+    opacity 0.3s ease-in-out;
+  opacity: 0.6;
+  animation: none;
+  border-radius: var(--border-radius);
+  border: none;
+  padding: 4px;
+  overflow: hidden;
+
+  .td-tool-group {
+    overflow: hidden;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &:hover,
+  &.td-sidebar--zen-hover {
+    transform: translateX(0);
+    opacity: 1;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+
+    .td-tool-group {
+      overflow-y: auto;
+      scrollbar-width: thin;
+      &::-webkit-scrollbar {
+        display: block;
+      }
     }
   }
 }

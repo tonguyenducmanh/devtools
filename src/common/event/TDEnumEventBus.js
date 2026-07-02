@@ -7,4 +7,7 @@ export const TDEnumEventBus = {
 
   // Zen mode (fullscreen tab content)
   zenModeToggle: "zenModeToggle",
+
+  // Zen mode state change (broadcast current zen mode)
+  zenModeState: "zenModeState",
 };

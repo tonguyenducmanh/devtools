@@ -216,6 +216,7 @@ import eventBus from "@/common/event/TDEventBus.js";
 import { TDEnumEventBus } from "@/common/event/TDEnumEventBus.js";
 import TDArrow from "@/components/TDArrow.vue";
 import tdEnum from "@/common/TDEnum.js";
+import { appState } from "@/stores/TDAppState.js";
 const isMacOS = tdUtility.isMacOS();
 // 2. Thay bằng defineAsyncComponent để import động:
 const TDWelcome = defineAsyncComponent(
@@ -247,25 +248,37 @@ export default {
     return {
       wrapTab: true,
       showTabNumber: false,
-      zenMode: false,
       zenToolbarPinned: false,
     };
+  },
+  computed: {
+    zenMode: {
+      get() {
+        return appState.zenMode;
+      },
+      set(val) {
+        appState.zenMode = val;
+      },
+    },
   },
   methods: {
     async processWhenMouted() {
       let me = this;
       me.wrapTab = await me.$tdUtility.getUserSettings("wrapTab");
       me.showTabNumber = await me.$tdUtility.getUserSettings("showTabNumber");
+      appState.zenMode = await me.$tdUtility.getUserSettings("zenMode") || false;
     },
     toggleZenMode() {
-      this.zenMode = !this.zenMode;
-      if (!this.zenMode) {
+      appState.zenMode = !appState.zenMode;
+      if (!appState.zenMode) {
         this.zenToolbarPinned = false;
       }
+      this.$tdUtility.saveUserSettings("zenMode", appState.zenMode);
     },
     exitZenMode() {
-      this.zenMode = false;
+      appState.zenMode = false;
       this.zenToolbarPinned = false;
+      this.$tdUtility.saveUserSettings("zenMode", false);
     },
     pinZenToolbar() {
       this.zenToolbarPinned = true;
