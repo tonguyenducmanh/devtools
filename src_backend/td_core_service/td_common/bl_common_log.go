@@ -11,20 +11,28 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+// Console logger - mỗi log gồm 2 dòng:
+//   Dòng 1: thời gian │ level │ nơi gọi (file:line · function)
+//   Dòng 2: nội dung message
+
 var (
-	// Style thời gian gọn gàng (màu xám xanh thanh lịch)
-	styleTime = lipgloss.NewStyle().Foreground(lipgloss.Color("#6272A4"))
-
-	// Base tag cho level log
-	baseTag = lipgloss.NewStyle().Bold(true).Padding(0, 1).Foreground(lipgloss.Color("#FFFFFF"))
-
-	// Cố định chiều rộng tag là 7 ký tự để thẳng hàng tuyệt đối
-	styleInfo   = baseTag.Width(7).Background(lipgloss.Color("#50FA7B")).Foreground(lipgloss.Color("#282A36"))
-	styleDebug  = baseTag.Width(7).Background(lipgloss.Color("#8BE9FD")).Foreground(lipgloss.Color("#282A36"))
-	styleError  = baseTag.Width(7).Background(lipgloss.Color("#FF5555"))
-	styleExcept = baseTag.Width(7).Background(lipgloss.Color("#BD93F9"))
-
+	styleTime    = lipgloss.NewStyle().Foreground(lipgloss.Color("#6272A4"))
+	styleSep     = lipgloss.NewStyle().Foreground(lipgloss.Color("#44475A"))
+	styleCaller  = lipgloss.NewStyle().Foreground(lipgloss.Color("#8BE9FD"))
 	styleMessage = lipgloss.NewStyle().Foreground(lipgloss.Color("#F8F8F2"))
+
+	styleLevelInfo    = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#50FA7B"))
+	styleLevelDebug   = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#8BE9FD"))
+	styleLevelError   = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF5555"))
+	styleLevelExcept  = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#BD93F9"))
+	styleLevelDefault = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#F1FA8C"))
+
+	levelLabels = map[string]string{
+		"info":      "INFO",
+		"debug":     "DEBUG",
+		"error":     "ERROR",
+		"exception": "EXCPT",
+	}
 )
 
 func logData(message string, level string) {
@@ -32,13 +40,13 @@ func logData(message string, level string) {
 		return
 	}
 
-	// Làm sạch tin nhắn, loại bỏ khoảng trắng thừa ở đầu/cuối
 	message = strings.TrimSpace(message)
 	if message == "" {
 		return
 	}
 
-	// Ghi tên file, hàm và dòng để dễ detect
+	// Lấy thông tin nơi gọi log
+	callerPlain := ""
 	if pc, file, line, ok := runtime.Caller(2); ok {
 		shortFile := file
 		if idx := strings.LastIndexByte(file, '/'); idx >= 0 {
@@ -55,35 +63,47 @@ func logData(message string, level string) {
 		if idx := strings.LastIndexByte(funcName, '.'); idx >= 0 {
 			funcName = funcName[idx+1:]
 		}
-		message = fmt.Sprintf("[%s:%d %s] %s", shortFile, line, funcName, message)
+		callerPlain = fmt.Sprintf("%s:%d · %s", shortFile, line, funcName)
 	}
 
-	t := time.Now()
-
-	if td_config.GetConfigGlobal().LogConfig.LogConsole {
-		levelLogName := strings.ToUpper(level)
-
-		var styledLevel string
-		switch level {
-		case "info":
-			styledLevel = styleInfo.Render(levelLogName)
-		case "debug":
-			styledLevel = styleDebug.Render(levelLogName)
-		case "error":
-			styledLevel = styleError.Render(levelLogName)
-		case "exception":
-			styledLevel = styleExcept.Render(levelLogName)
-		default:
-			styledLevel = baseTag.Width(7).Background(lipgloss.Color("#44475A")).Render(levelLogName)
-		}
-
-		// Đổi ở đây: Hiển thị đầy đủ Ngày/Tháng/Năm Giờ:Phút:Giây.Mili-giây
-		formattedTime := styleTime.Render(fmt.Sprintf("[%s]", t.Format("02/01/2006 15:04:05.000")))
-		styledMessage := styleMessage.Render(message)
-
-		// Xuất ra màn hình thẳng hàng tăm tắp
-		fmt.Printf("%s  %s  %s\n", formattedTime, styledLevel, styledMessage)
+	if !td_config.GetConfigGlobal().LogConfig.LogConsole {
+		return
 	}
+
+	levelPlain, ok := levelLabels[level]
+	if !ok {
+		levelPlain = strings.ToUpper(level)
+	}
+
+	var levelStyle lipgloss.Style
+	switch level {
+	case "info":
+		levelStyle = styleLevelInfo
+	case "debug":
+		levelStyle = styleLevelDebug
+	case "error":
+		levelStyle = styleLevelError
+	case "exception":
+		levelStyle = styleLevelExcept
+	default:
+		levelStyle = styleLevelDefault
+	}
+
+	timePlain := time.Now().Format("2006-01-02 15:04:05.000")
+	sep := styleSep.Render("│")
+
+	// Dòng 1: thời gian │ level │ nơi gọi
+	headerLine := fmt.Sprintf(
+		"%s %s %s %s %s",
+		styleTime.Render(timePlain), sep,
+		levelStyle.Render(levelPlain), sep,
+		styleCaller.Render(callerPlain),
+	)
+
+	// Dòng 2: nội dung message, in nguyên vẹn, không wrap
+	messageLine := styleMessage.Render(message)
+
+	fmt.Printf("%s\n%s\n\n", headerLine, messageLine)
 }
 
 func LogInfo(message string)      { logData(message, "info") }
