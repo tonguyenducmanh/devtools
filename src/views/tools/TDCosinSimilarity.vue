@@ -1,8 +1,6 @@
 <template>
   <div class="flex td-cosin-similarity">
     <div class="flex flex-col container">
-      <!-- <div class="title">{{ $t("i18nCommon.feature.cosinSimilarity") }}</div> -->
-
       <div class="flex io-section">
         <TDTextEditor
           isLabelTop
@@ -24,10 +22,8 @@
       </div>
 
       <div class="flex result-section">
-        <div class="result-container">
-          <label>{{ $t("i18nCommon.cosinSimilarity.result") }}</label>
-          <div class="result">{{ similarity }}</div>
-        </div>
+        <label>{{ $t("i18nCommon.cosinSimilarity.result") }}</label>
+        <div class="result">{{ similarity }}</div>
       </div>
 
       <div class="flex">
@@ -123,12 +119,16 @@ export default {
       this.$tdUtility.copyToClipboard(this.similarity);
     },
     applyExample() {
-      this.firstVector = JSON.stringify([
-        -0.017751375, 0.04524436, 0.004933944, 0.014026112, 0.014828892,
-      ], null, 2);
-      this.secondVector = JSON.stringify([
-        -0.0026613525, 0.043090295, 0.02586871, 0.022998447, 0.010381999,
-      ], null, 2);
+      this.firstVector = JSON.stringify(
+        [-0.017751375, 0.04524436, 0.004933944, 0.014026112, 0.014828892],
+        null,
+        2,
+      );
+      this.secondVector = JSON.stringify(
+        [-0.0026613525, 0.043090295, 0.02586871, 0.022998447, 0.010381999],
+        null,
+        2,
+      );
       this.$tdToast.success(
         this.$t("i18nCommon.toastMessage.applyMockSuccess"),
       );
@@ -150,28 +150,11 @@ export default {
 
 .io-section {
   flex: 1;
-  column-gap: var(--padding);
-  width: 95%;
+  width: 100%;
 }
 
 .result-section {
-  width: 95%;
-  margin-top: var(--padding);
-}
-
-.result-container {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: var(--padding);
-}
-
-.result {
-  padding: var(--padding);
-  background-color: var(--td-background-color);
-  border: 1px solid var(--td-border-color);
-  border-radius: var(--border-radius);
-  min-height: 42px;
 }
 
 .flex {
@@ -181,11 +164,5 @@ export default {
 
 .flex-col {
   flex-direction: column;
-}
-
-.title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: var(--padding);
 }
 </style>
