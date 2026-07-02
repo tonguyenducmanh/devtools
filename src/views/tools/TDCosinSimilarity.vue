@@ -9,6 +9,8 @@
           :label="$t('i18nCommon.cosinSimilarity.firstVector')"
           :placeHolder="$t('i18nCommon.cosinSimilarity.vectorPlaceholder')"
           v-model="firstVector"
+          language="json"
+          :enableHighlight="true"
         ></TDTextEditor>
 
         <TDTextEditor
@@ -16,6 +18,8 @@
           :label="$t('i18nCommon.cosinSimilarity.secondVector')"
           :placeHolder="$t('i18nCommon.cosinSimilarity.vectorPlaceholder')"
           v-model="secondVector"
+          language="json"
+          :enableHighlight="true"
         ></TDTextEditor>
       </div>
 
@@ -55,7 +59,6 @@
 </template>
 
 <script>
-import mock from "@/common/mock/TDMockCosinSimilarity.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDCosinSimilarityHelp from "@/views/helps/TDCosinSimilarityHelp.vue";
@@ -80,11 +83,9 @@ export default {
   methods: {
     async calculateSimilarity() {
       try {
-        // Parse input vectors
-        const vector1 = this.parseVector(this.firstVector);
-        const vector2 = this.parseVector(this.secondVector);
+        const vector1 = JSON.parse(this.firstVector);
+        const vector2 = JSON.parse(this.secondVector);
 
-        // Validate vectors
         if (!vector1 || !vector2 || vector1.length !== vector2.length) {
           this.$tdToast.error(
             this.$t("i18nCommon.cosinSimilarity.invalidVectors"),
@@ -92,7 +93,6 @@ export default {
           return;
         }
 
-        // Calculate similarity
         const resultString = this.cosineSimilarity(vector1, vector2);
         this.similarity = resultString;
 
@@ -119,30 +119,16 @@ export default {
       return dot / (Math.sqrt(normA) * Math.sqrt(normB));
     },
 
-    parseVector(input) {
-      try {
-        // Remove brackets if present
-        let processedInput = input;
-        if (input.startsWith("[") && input.endsWith("]")) {
-          processedInput = input.slice(1, -1);
-        }
-
-        // Split by commas and convert to numbers
-        return processedInput
-          .split(",")
-          .map((num) => num.trim())
-          .filter((num) => num !== "")
-          .map((num) => parseFloat(num));
-      } catch {
-        return null;
-      }
-    },
     handleCopyResult() {
       this.$tdUtility.copyToClipboard(this.similarity);
     },
     applyExample() {
-      this.firstVector = mock.firstVector.join(", ");
-      this.secondVector = mock.secondVector.join(", ");
+      this.firstVector = JSON.stringify([
+        -0.017751375, 0.04524436, 0.004933944, 0.014026112, 0.014828892,
+      ], null, 2);
+      this.secondVector = JSON.stringify([
+        -0.0026613525, 0.043090295, 0.02586871, 0.022998447, 0.010381999,
+      ], null, 2);
       this.$tdToast.success(
         this.$t("i18nCommon.toastMessage.applyMockSuccess"),
       );
