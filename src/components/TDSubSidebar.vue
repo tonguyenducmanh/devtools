@@ -54,6 +54,7 @@ import { appState } from "@/stores/TDAppState.js";
 export default {
   name: "TDSubSidebar",
   components: { TDToggleArea },
+  emits: ["update:modelValue", "toggleSidebar"],
   props: {
     modelValue: {
       type: Boolean,
