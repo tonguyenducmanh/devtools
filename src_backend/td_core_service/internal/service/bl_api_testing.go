@@ -22,12 +22,14 @@ func Execute(w http.ResponseWriter, r *http.Request) {
 	var req model.TDAPITestingParam
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		td_common.LogError(fmt.Sprintf("Dữ liệu không hợp lệ: %v", err))
 		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
 		return
 	}
 
 	result, err := executeRequest(req)
 	if err != nil {
+		td_common.LogError(fmt.Sprintf("executeRequest thất bại: %v", err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -49,6 +51,7 @@ func executeRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingRespons
 	// Tạo request
 	req, err := http.NewRequest(strings.ToUpper(reqData.HttpMethod), reqData.ApiURL, bytes.NewBufferString(reqData.BodyText))
 	if err != nil {
+		td_common.LogError(fmt.Sprintf("Tạo request thất bại: %v", err))
 		return nil, err
 	}
 
@@ -61,6 +64,7 @@ func executeRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingRespons
 	// Thực thi
 	resp, err := client.Do(req)
 	if err != nil {
+		td_common.LogError(fmt.Sprintf("Request failed: %v", err))
 		return nil, fmt.Errorf("request failed: %v", err)
 	}
 	defer resp.Body.Close()
@@ -68,6 +72,7 @@ func executeRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingRespons
 	// Đọc body trả về
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
+		td_common.LogError(fmt.Sprintf("Đọc response body thất bại: %v", err))
 		return nil, fmt.Errorf("đọc response body thất bại: %v", err)
 	}
 

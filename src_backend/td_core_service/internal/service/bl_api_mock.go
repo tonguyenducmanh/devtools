@@ -64,7 +64,7 @@ func RestartMockServer() {
 	// gán 1 số route theo thiết lập từ phía client
 	mocks, err := (&database.TDDLBase[model.TDAPIMockItem]{}).GetAll()
 	if err != nil {
-		td_common.LogInfo(fmt.Sprintf("Lỗi query mock APIs: %v", err))
+		td_common.LogError(fmt.Sprintf("Lỗi query mock APIs: %v", err))
 	} else {
 		// Nhóm các mock theo endpoint và method
 		mocksByRoute := groupMocksByRoute(mocks)
@@ -86,7 +86,7 @@ func RestartMockServer() {
 	go func() {
 		td_common.BuildRunningAddressServer("Server Mock API", &mockPort)
 		if err := mockServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			td_common.LogInfo(fmt.Sprintf("Lỗi Mock API Server: %v", err))
+			td_common.LogError(fmt.Sprintf("Lỗi Mock API Server: %v", err))
 		}
 	}()
 }
@@ -158,6 +158,7 @@ func handleMockRequest(w http.ResponseWriter, r *http.Request, mocks []model.TDA
 
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
+		td_common.LogError(fmt.Sprintf("Lỗi đọc request body: %v", err))
 		http.Error(w, "Lỗi đọc request body", http.StatusBadRequest)
 		return
 	}

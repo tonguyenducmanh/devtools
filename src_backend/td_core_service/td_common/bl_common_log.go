@@ -2,6 +2,7 @@ package td_common
 
 import (
 	"fmt"
+	"runtime"
 	"slices"
 	"strings"
 	"td_config"
@@ -35,6 +36,26 @@ func logData(message string, level string) {
 	message = strings.TrimSpace(message)
 	if message == "" {
 		return
+	}
+
+	// Ghi tên file, hàm và dòng để dễ detect
+	if pc, file, line, ok := runtime.Caller(2); ok {
+		shortFile := file
+		if idx := strings.LastIndexByte(file, '/'); idx >= 0 {
+			if idx2 := strings.LastIndexByte(file[:idx], '/'); idx2 >= 0 {
+				shortFile = file[idx2+1:]
+			} else {
+				shortFile = file[idx+1:]
+			}
+		}
+		funcName := runtime.FuncForPC(pc).Name()
+		if idx := strings.LastIndexByte(funcName, '/'); idx >= 0 {
+			funcName = funcName[idx+1:]
+		}
+		if idx := strings.LastIndexByte(funcName, '.'); idx >= 0 {
+			funcName = funcName[idx+1:]
+		}
+		message = fmt.Sprintf("[%s:%d %s] %s", shortFile, line, funcName, message)
 	}
 
 	t := time.Now()
