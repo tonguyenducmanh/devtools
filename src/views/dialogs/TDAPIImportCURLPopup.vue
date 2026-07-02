@@ -1,5 +1,10 @@
 <template>
-  <TDPopup :visible="true" :showHeader="false" @close="handleClose">
+  <TDPopup
+    :visible="true"
+    @close="handleClose"
+    width="1000px"
+    :title="$t('i18nCommon.apiTesting.contentCURL')"
+  >
     <div class="flex flex-col td-api-import-curl">
       <TDTextEditor
         :isLabelTop="true"
@@ -75,6 +80,6 @@ export default {
 </script>
 <style scoped lang="scss">
 .td-api-import-curl {
-  height: 500px;
+  height: 100%;
 }
 </style>
