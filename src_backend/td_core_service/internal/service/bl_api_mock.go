@@ -180,9 +180,47 @@ func handleMockRequest(w http.ResponseWriter, r *http.Request, mocks []model.TDA
 	w.Write([]byte(selectedMock.ResponeText))
 }
 
+// các header mô tả khung truyền tải (hop-by-hop / framing) của LẦN GỌI GỐC.
+// Không được replay nguyên xi các header này vì:
+//   - Content-Length: response_text lưu trong mock có thể đã bị format lại
+//     (frontend pretty-print bằng JSON.stringify(body, null, 2)) hoặc bị user
+//     sửa tay -> số byte thực tế khác với số đã ghi lại lúc gọi API thật.
+//     Set sai Content-Length khiến Go http server cắt cụt hoặc treo response.
+//   - Transfer-Encoding / Connection / Keep-Alive: do Go tự quản lý theo kết nối
+//     hiện tại của mock server, không liên quan gì tới lần gọi gốc.
+//   - Content-Encoding: response gốc có thể là gzip, nhưng response_text lưu
+//     trong DB luôn là dữ liệu đã giải nén (plain text) -> nếu giữ header này,
+//     client sẽ cố gunzip 1 body không hề được nén và nhận về rác/rỗng.
+var nonReplayableResponseHeaders = map[string]bool{
+	"Content-Length":    true,
+	"Transfer-Encoding": true,
+	"Connection":        true,
+	"Keep-Alive":        true,
+	"Content-Encoding":  true,
+	"Trailer":           true,
+	"Upgrade":           true,
+}
+
+// ghi lại header response cho mock, đảm bảo:
+//   - Đúng với header đã ghi nhận khi gọi API thật (fidelity)
+//   - Không phá vỡ khung truyền tải HTTP do body hiện tại (đã format/sửa) có
+//     thể lệch độ dài so với lúc ghi log ban đầu
 func writeMockResponseHeaders(w http.ResponseWriter, mock *model.TDAPIMockItem) {
 	if mock.ResponseHeadersText == "" {
 		return
+	}
+
+	setHeader := func(k, v string) {
+		if nonReplayableResponseHeaders[http.CanonicalHeaderKey(k)] {
+			return
+		}
+		w.Header().Set(k, v)
+	}
+	addHeader := func(k, v string) {
+		if nonReplayableResponseHeaders[http.CanonicalHeaderKey(k)] {
+			return
+		}
+		w.Header().Add(k, v)
 	}
 
 	var parsed bool
@@ -190,7 +228,7 @@ func writeMockResponseHeaders(w http.ResponseWriter, mock *model.TDAPIMockItem) 
 	var strMap map[string]string
 	if err := json.Unmarshal([]byte(mock.ResponseHeadersText), &strMap); err == nil {
 		for k, v := range strMap {
-			w.Header().Set(k, v)
+			setHeader(k, v)
 		}
 		parsed = true
 	}
@@ -200,7 +238,7 @@ func writeMockResponseHeaders(w http.ResponseWriter, mock *model.TDAPIMockItem) 
 		if err := json.Unmarshal([]byte(mock.ResponseHeadersText), &sliceMap); err == nil {
 			for k, values := range sliceMap {
 				for _, v := range values {
-					w.Header().Add(k, v)
+					addHeader(k, v)
 				}
 			}
 			parsed = true
@@ -216,7 +254,7 @@ func writeMockResponseHeaders(w http.ResponseWriter, mock *model.TDAPIMockItem) 
 			}
 			parts := strings.SplitN(trimmed, ":", 2)
 			if len(parts) == 2 {
-				w.Header().Set(strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]))
+				setHeader(strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]))
 			}
 		}
 	}

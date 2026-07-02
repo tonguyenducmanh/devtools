@@ -66,7 +66,10 @@ func executeRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingRespons
 	defer resp.Body.Close()
 
 	// Đọc body trả về
-	respBody, _ := io.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("đọc response body thất bại: %v", err)
+	}
 
 	// Ép kiểu headers về JSON string như code cũ
 	headerJson, _ := json.Marshal(resp.Header)
