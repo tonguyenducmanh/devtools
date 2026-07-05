@@ -10,12 +10,12 @@ const APP_VERSION = packageJson.version;
 // Không ảnh hưởng khi chạy dev (npm run dev)
 const stripDataTestId = {
   name: 'strip-data-testid',
+  enforce: 'pre',
   transform(code, id) {
     if (process.env.NODE_ENV === 'production' && id.endsWith('.vue')) {
-      // Xóa data-testid="..." dạng tĩnh
-      code = code.replace(/\s*data-testid="[^"]*"/g, '');
-      // Xóa data-testid='...' dạng single-quote
-      code = code.replace(/\s*data-testid='[^']*'/g, '');
+      // Xóa cả data-testid tĩnh và động (:data-testid="...")
+      code = code.replace(/\s*:?data-testid="[^"]*"/g, '');
+      code = code.replace(/\s*:?data-testid='[^']*'/g, '');
       return { code, map: null };
     }
   },
