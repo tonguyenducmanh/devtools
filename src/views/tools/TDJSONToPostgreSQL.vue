@@ -7,6 +7,7 @@
       >
         <template v-if="!currentConfigLayout.enableFileUpload">
           <TDTextEditor
+            data-testid="json-input-editor"
             isLabelTop
             :enableHighlight="currentConfigLayout.enableHighlight"
             language="json"
@@ -27,6 +28,7 @@
         </template>
         <template v-if="!currentConfigLayout.enableFileUpload">
           <TDTextEditor
+            data-testid="sql-output-editor"
             isLabelTop
             :label="$t('i18nCommon.jsonToPostgreSQL.outputLabel')"
             :readOnly="true"
@@ -41,10 +43,12 @@
       <div class="flex">
         <template v-if="!currentConfigLayout.enableFileUpload">
           <TDButton
+            data-testid="btn-convert"
             :label="$t('i18nCommon.jsonToPostgreSQL.convert')"
             @click="convertToPostgresSQL"
           ></TDButton>
           <TDButton
+            data-testid="btn-copy"
             @click="haddleCopyEvent"
             :type="$tdEnum.buttonType.secondary"
             :label="$t('i18nCommon.jsonToPostgreSQL.copy')"
@@ -58,6 +62,7 @@
           ></TDButton>
         </template>
         <TDButton
+          data-testid="btn-example"
           @click="applyMock"
           :type="$tdEnum.buttonType.secondary"
           :label="$t('i18nCommon.jsonToPostgreSQL.example')"
@@ -97,30 +102,35 @@
           "
         >
           <TDCheckbox
+            data-testid="toggle-wrap-text"
             :variant="$tdEnum.checkboxType.switch"
             v-model="currentConfigLayout.wrapText"
             :label="$t('i18nCommon.apiTesting.wrapText')"
             @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
+            data-testid="toggle-enable-highlight"
             :variant="$tdEnum.checkboxType.switch"
             v-model="currentConfigLayout.enableHighlight"
             :label="$t('i18nCommon.enableHighlight')"
             @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
+            data-testid="toggle-enable-file-upload"
             :variant="$tdEnum.checkboxType.switch"
             v-model="currentConfigLayout.enableFileUpload"
             :label="$t('i18nCommon.jsonToPostgreSQL.useFileUpload')"
             @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
+            data-testid="toggle-create-table"
             :variant="$tdEnum.checkboxType.switch"
             v-model="currentConfigLayout.enableCreateTable"
             :label="$t('i18nCommon.jsonToPostgreSQL.createTable')"
             @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
+            data-testid="toggle-delete-old"
             :variant="$tdEnum.checkboxType.switch"
             v-model="currentConfigLayout.enableDeleteScript"
             :label="$t('i18nCommon.jsonToPostgreSQL.deleteOld')"
@@ -134,16 +144,19 @@
           ></TDCheckbox>
           <div class="flex flex-col group-info">
             <TDInput
+              data-testid="input-schema-name"
               :placeHolder="$t('i18nCommon.jsonToPostgreSQL.schemaName')"
               type="text"
               v-model="schemaName"
             />
             <TDInput
+              data-testid="input-table-name"
               :placeHolder="$t('i18nCommon.jsonToPostgreSQL.tableName')"
               type="text"
               v-model="tableName"
             />
             <TDInput
+              data-testid="input-primary-key"
               :placeHolder="$t('i18nCommon.jsonToPostgreSQL.primaryKey')"
               type="text"
               v-model="primaryKeyField"
