@@ -539,9 +539,3 @@ __debug*
 .sisyphus/
 
 config.json
-
-# Playwright
-test/test-results/
-test/playwright-report/
-test/blob-report/
-playwright/.cache/

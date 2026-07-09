@@ -6,25 +6,9 @@ import packageJson from "./package.json";
 
 const APP_VERSION = packageJson.version;
 
-// Plugin tự động strip data-testid khi build production
-// Không ảnh hưởng khi chạy dev (npm run dev)
-const stripDataTestId = {
-  name: 'strip-data-testid',
-  transform(code, id) {
-    if (process.env.NODE_ENV === 'production' && id.endsWith('.vue')) {
-      // Xóa data-testid="..." dạng tĩnh
-      code = code.replace(/\s*data-testid="[^"]*"/g, '');
-      // Xóa data-testid='...' dạng single-quote
-      code = code.replace(/\s*data-testid='[^']*'/g, '');
-      return { code, map: null };
-    }
-  },
-};
-
 export default defineConfig({
   plugins: [
     vue(),
-    stripDataTestId,
     viteStaticCopy({
       targets: [
         // Cấu hình copy folder dotnet sang dist/assets-wasm khi build

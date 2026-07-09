@@ -26,7 +26,6 @@
           <div
             v-if="item.type === 'group'"
             class="td-sidebar-item"
-            :data-testid="'menu-group-' + item.groupKey"
             :class="{
               'td-sidebar-item--active': activeKeyFlyOut === item.groupKey,
             }"
@@ -42,7 +41,7 @@
           </div>
 
           <!-- Standalone route item: link + nút pin -->
-          <div v-else class="td-sidebar-item td-sidebar-item--route" :data-testid="'menu-item-' + item.route.name">
+          <div v-else class="td-sidebar-item td-sidebar-item--route">
             <div
               class="no-select td-item-content flex"
               @click="onOpenRouteTab(item.route)"
@@ -82,7 +81,6 @@
       >
         <div
           class="td-sidebar-flyout-item"
-          :data-testid="'menu-item-' + child.name"
           @click="onOpenGroupChildTab(activeItem, child)"
         >
           {{ $t(child.meta.titleKey) }}

@@ -16,7 +16,6 @@
 
       <div
         class="td-slide-item"
-        :data-testid="'slide-option-' + option.value"
         :class="{ 'td-slide-item-selected': option.value == modelValue }"
         v-for="(option, index) in options"
         :key="index"
