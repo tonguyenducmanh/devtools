@@ -8,9 +8,9 @@ import (
 	"td_core_service/internal/model"
 )
 
-// thực hiện lấy danh sách toàn bộ bảng trong database
-func GetAllTableInDatabase(w http.ResponseWriter, r *http.Request) {
-	allTables, err := database.GetAllTableInDatabase()
+// lấy danh sách toàn bộ bảng kèm columns (dùng cho intellisense)
+func GetAllTableAndColumnsHandler(w http.ResponseWriter, r *http.Request) {
+	allData, err := database.GetAllTableAndColumns()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Lỗi query: %v", err), http.StatusInternalServerError)
 		return
@@ -19,23 +19,7 @@ func GetAllTableInDatabase(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
-		"data":    allTables,
-	})
-}
-
-// thực hiện lấy danh sách toàn bộ dữ liệu theo 1 bảng có trong database
-func GetAllDataByTableName(w http.ResponseWriter, r *http.Request) {
-	currentTableName := r.URL.Query().Get("table_name")
-	allDataByTableName, err := database.GetAllDataByTableName(currentTableName)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Lỗi query: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    allDataByTableName,
+		"data":    allData,
 	})
 }
 
@@ -59,5 +43,4 @@ func DataMinerExecuteQuery(w http.ResponseWriter, r *http.Request) {
 		"success": true,
 		"data":    allDataDynamic,
 	})
-
 }

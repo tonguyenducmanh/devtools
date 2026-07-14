@@ -7,7 +7,6 @@ import (
 
 // Inject các router liên quan đến xem dữ liệu ứng dụng
 func InjectAppDataMiner(app *http.ServeMux) {
-	app.HandleFunc("GET /data_miner/get_all_table_name", service.GetAllTableInDatabase)
-	app.HandleFunc("GET /data_miner/get_data_by_table_name", service.GetAllDataByTableName)
+	app.HandleFunc("GET  /data_miner/get_all_table_and_columns", service.GetAllTableAndColumnsHandler)
 	app.HandleFunc("POST /data_miner/execute_query", service.DataMinerExecuteQuery)
 }

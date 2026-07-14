@@ -2,66 +2,68 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 )
 
-// thực hiện lấy danh sách toàn bộ bảng trong database
-func GetAllTableInDatabase() ([]string, error) {
+// GetAllTableAndColumns trả về danh sách tất cả bảng kèm columns (dùng cho intellisense)
+func GetAllTableAndColumns() ([]map[string]any, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
 		return nil, err
 	}
 	defer db.Close()
 
-	sqlQuery := `
-		SELECT 
-			name 
-		FROM 
-			sqlite_master 
-		WHERE 
-			type='table' 
-			AND name NOT LIKE 'sqlite_%';
+	query := `
+	SELECT
+		m.name as table_name,
+		p.name as column_name,
+		p.type as data_type,
+		p.pk
+	FROM
+		sqlite_master m
+		JOIN pragma_table_info (m.name) p
+	WHERE
+		m.type = 'table'
+		AND m.name NOT LIKE 'sqlite_%'
+	ORDER BY
+		m.name,
+		p.cid;
 	`
-	rows, err := db.Query(sqlQuery)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var allTableNames []string
-	for rows.Next() {
-		var currentTableName string
-		err := rows.Scan(&currentTableName)
-		if err != nil {
-			continue
-		}
-		allTableNames = append(allTableNames, currentTableName)
-	}
-
-	return allTableNames, nil
-}
-
-// thực hiện lấy danh sách toàn bộ dữ liệu trong 1 bảng trong database
-func GetAllDataByTableName(tableName string) ([]map[string]any, error) {
-	db, err := GetConnectionDB()
-	if err != nil {
-		return nil, err
-	}
-	defer db.Close()
-
-	// Sử dụng Sprintf vì tên bảng không thể dùng placeholder (?)
-	query := fmt.Sprintf("SELECT * FROM %s WHERE 1 = 1 ORDER BY created_date DESC;", tableName)
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	// Lấy danh sách tên các cột để map dữ liệu chính xác
-	return appMinerReadDynamicData(rows)
+	tableMap := make(map[string][]map[string]any)
+	var tableOrder []string
+	for rows.Next() {
+		var tableName, columnName, dataType string
+		var pk int
+		if err := rows.Scan(&tableName, &columnName, &dataType, &pk); err != nil {
+			continue
+		}
+		if _, ok := tableMap[tableName]; !ok {
+			tableOrder = append(tableOrder, tableName)
+			tableMap[tableName] = []map[string]any{}
+		}
+		tableMap[tableName] = append(tableMap[tableName], map[string]any{
+			"name": columnName,
+			"type": dataType,
+			"pk":   pk,
+		})
+	}
+
+	var result []map[string]any
+	for _, table := range tableOrder {
+		result = append(result, map[string]any{
+			"table_name": table,
+			"columns":    tableMap[table],
+		})
+	}
+	return result, nil
 }
 
-// thực hiện query động theo yêu cầu của user
+// DataMinerExecuteQuery thực hiện query động theo yêu cầu của user
 func DataMinerExecuteQuery(script string) ([]map[string]any, error) {
 	db, err := GetConnectionDB()
 	if err != nil {
@@ -75,7 +77,6 @@ func DataMinerExecuteQuery(script string) ([]map[string]any, error) {
 	}
 	defer rows.Close()
 
-	// Lấy danh sách tên các cột để map dữ liệu chính xác
 	return appMinerReadDynamicData(rows)
 }
 
@@ -89,24 +90,19 @@ func appMinerReadDynamicData(rows *sql.Rows) ([]map[string]any, error) {
 	var results []map[string]any
 
 	for rows.Next() {
-		// Tạo một slice chứa các interface để nhận dữ liệu từ Scan
 		values := make([]any, len(columns))
 		valuePtrs := make([]any, len(columns))
 		for i := range columns {
 			valuePtrs[i] = &values[i]
 		}
 
-		// Scan dữ liệu vào các con trỏ
 		if err := rows.Scan(valuePtrs...); err != nil {
 			return nil, err
 		}
 
-		// Chuyển dữ liệu từ slice vào map
 		rowMap := make(map[string]any)
 		for i, colName := range columns {
 			val := values[i]
-
-			// SQLite đôi khi trả về []byte cho chuỗi, có thể ép kiểu tại đây nếu cần
 			if b, ok := val.([]byte); ok {
 				rowMap[colName] = string(b)
 			} else {

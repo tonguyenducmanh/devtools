@@ -9,19 +9,10 @@ class TDServerAppDataMiner extends TDAgentAPI {
   }
 
   /**
-   * Lấy tất cả table mà ứng dụng này đang lưu trữ
+   * Lấy danh sách toàn bộ bảng kèm columns (dùng cho intellisense)
    */
-  async getAllTable() {
-    return await this.get("/data_miner/get_all_table_name");
-  }
-
-  /**
-   * Lấy tất cả data trong 1 database
-   */
-  async getAllDataByTableName(tableName) {
-    return await this.get(
-      `/data_miner/get_data_by_table_name?table_name=${tableName}`,
-    );
+  async getAllTableAndColumns() {
+    return await this.get("/data_miner/get_all_table_and_columns");
   }
 
   /**

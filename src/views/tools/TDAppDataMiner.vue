@@ -15,29 +15,10 @@
         <template v-if="isServerAgentMode">
           <div class="flex td-data-btn">
             <TDButton
-              @click="queryDynamicData"
+              @click="handleRunQuery"
               :label="$t('i18nCommon.AppDataMiner.getData')"
               :noMargin="true"
             ></TDButton>
-            <div class="flex">
-              <TDComboBox
-                class="td-table-select-combo"
-                v-model="tableName"
-                :placeHolder="$t('i18nCommon.AppDataMiner.selectTable')"
-                :options="allTables"
-                :noMargin="true"
-                :usingStylePercent="true"
-                :isCapitalizeText="false"
-                @selected="showDataByTable"
-              ></TDComboBox>
-              <TDButton
-                @click="reloadTable"
-                :noMargin="true"
-                :type="$tdEnum.buttonType.secondary"
-                iconClass="td-reload-icon"
-                v-tooltip="$t('i18nCommon.AppDataMiner.refreshTableData')"
-              ></TDButton>
-            </div>
           </div>
         </template>
         <template v-else-if="isClipboardMode">
@@ -59,12 +40,16 @@
     </div>
     <div class="flex td-script-query" v-if="isServerAgentMode">
       <TDTextEditor
+        ref="sqlEditor"
         v-model="scriptQuery"
         :enableHighlight="true"
-        language="sql"
+        language="sqlite"
         :wrapText="false"
         :placeHolder="$t('i18nCommon.AppDataMiner.queryAgentSQl')"
         :label="$t('i18nCommon.AppDataMiner.queryAgentSQl')"
+        :monacoOptions="monacoOptions"
+        @keydown.ctrl.enter.prevent="handleRunQuery"
+        @keydown.meta.enter.prevent="handleRunQuery"
       ></TDTextEditor>
     </div>
     <div class="td-app-data-viewer">
@@ -86,11 +71,19 @@
 import TDServerAppDataMiner from "@/common/api/request/AgentAPI/TDServerAppDataMiner.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import cache from "@/common/cache/TDCache.js";
+import { SQLITE_KEYWORDS } from "@/components/monarch/sqliteKeyword.js";
+import {
+  registerSqliteLanguage,
+  updateSqliteIntellisenseData,
+} from "@/components/monarch/sqliteLanguage.js";
+import { registerSqliteFormatProvider } from "@/components/monarch/sqliteFormatProvider.js";
 
 const DATA_SOURCE_TYPE = {
   Clipboard: 1,
   ServerAgent: 2,
 };
+
+let _sqlCompletionRegistered = false;
 
 export default {
   extends: TDToolBase,
@@ -101,8 +94,6 @@ export default {
   data() {
     return {
       agentAPI: null,
-      tableName: null,
-      allTables: [],
       currentTableDatas: [],
       scriptQuery: null,
       dataSourceType: DATA_SOURCE_TYPE.Clipboard,
@@ -116,10 +107,13 @@ export default {
           label: this.$t("i18nCommon.AppDataMiner.dataSourceServerAgent"),
         },
       ],
+      allTableColumns: [],
+      columnsByTable: new Map(),
     };
   },
   async mounted() {
     this.agentAPI = new TDServerAppDataMiner();
+    registerSqliteLanguage();
     this.loadClipboardHistory();
   },
   computed: {
@@ -129,9 +123,220 @@ export default {
     isClipboardMode() {
       return this.dataSourceType === DATA_SOURCE_TYPE.Clipboard;
     },
+    monacoOptions() {
+      let me = this;
+      return {
+        onInit: (editor, monaco) => {
+          editor.addAction({
+            id: "execute-sql",
+            label: me.$t("i18nCommon.AppDataMiner.getData"),
+            contextMenuGroupId: "navigation",
+            contextMenuOrder: 1.1,
+            keybindings: [
+              monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+            ],
+            run: (ed) => {
+              me.scriptQuery = ed.getValue();
+              me.$nextTick(() => me.handleRunQuery());
+            },
+          });
+
+          registerSqliteFormatProvider(monaco);
+
+          if (!_sqlCompletionRegistered) {
+            _sqlCompletionRegistered = true;
+            monaco.languages.registerCompletionItemProvider("sqlite", {
+            triggerCharacters: ["."],
+            provideCompletionItems: (model, position) => {
+              let wordInfo = model.getWordUntilPosition(position);
+              let range = {
+                startLineNumber: position.lineNumber,
+                endLineNumber: position.lineNumber,
+                startColumn: wordInfo.startColumn,
+                endColumn: wordInfo.endColumn,
+              };
+
+              const text = model.getValue();
+              const aliasMap = new Map();
+              const regex =
+                /(?:from|join)\s+(\w+)(?:\s+as)?\s+(\w+)?/gi;
+              const sqlKeywords = [
+                "where", "join", "on", "left", "right", "inner", "outer",
+                "cross", "group", "order", "having", "limit", "select",
+                "and", "or", "union", "except", "intersect",
+              ];
+              let match;
+              while ((match = regex.exec(text)) !== null) {
+                let table = match[1].toLowerCase();
+                let alias = match[2] && !sqlKeywords.includes(match[2].toLowerCase())
+                  ? match[2].toLowerCase()
+                  : table;
+                aliasMap.set(alias, { table });
+              }
+
+              let lineContent = model.getLineContent(position.lineNumber);
+              let textBeforeCursor = lineContent.substring(0, position.column - 1);
+              let dotMatch = textBeforeCursor.match(
+                /([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]*)$/,
+              );
+
+              let suggestions = [];
+
+              if (dotMatch) {
+                let prefix = dotMatch[1].toLowerCase();
+                let typedWord = dotMatch[2];
+                let totalOffset = prefix.length + 1 + typedWord.length;
+                range = {
+                  startLineNumber: position.lineNumber,
+                  endLineNumber: position.lineNumber,
+                  startColumn: position.column - totalOffset,
+                  endColumn: position.column,
+                };
+
+                if (aliasMap.has(prefix)) {
+                  let mapped = aliasMap.get(prefix);
+                  let cols = me.columnsByTable.get(mapped.table) || [];
+                  cols.forEach((col) => {
+                    suggestions.push({
+                      label: col.name,
+                      kind: monaco.languages.CompletionItemKind.Field,
+                      detail: col.type || "",
+                      filterText: `${prefix}.${col.name}`,
+                      insertText: `${prefix}.${col.name}`,
+                      range: range,
+                    });
+                  });
+                } else if (me.columnsByTable.has(prefix)) {
+                  let cols = me.columnsByTable.get(prefix) || [];
+                  cols.forEach((col) => {
+                    suggestions.push({
+                      label: col.name,
+                      kind: monaco.languages.CompletionItemKind.Field,
+                      detail: col.type || "",
+                      filterText: `${prefix}.${col.name}`,
+                      insertText: `${prefix}.${col.name}`,
+                      range: range,
+                    });
+                  });
+                }
+              } else {
+                const usedNames = new Set();
+                const re =
+                  /(?:from|join)\s+(\w+)(?:\s+as)?\s+(\w+)?/gi;
+                let m;
+                while ((m = re.exec(text)) !== null) {
+                  if (m[1]) usedNames.add(m[1].toLowerCase());
+                  if (m[2]) usedNames.add(m[2].toLowerCase());
+                }
+
+                const genAlias = (name) => {
+                  if (!name) return null;
+                  const base = name.split(".").pop();
+                  const words = base.split("_").filter((w) => w.length > 0);
+                  if (words.length === 0) return null;
+                  let alias = words.map((w) => w[0]).join("").toLowerCase();
+                  if (!alias) return null;
+                  let finalAlias = alias;
+                  let counter = 1;
+                  while (usedNames.has(finalAlias)) {
+                    counter++;
+                    finalAlias = alias + counter;
+                    if (counter > 100) return alias;
+                  }
+                  return finalAlias;
+                };
+
+                SQLITE_KEYWORDS.forEach((kw) => {
+                  suggestions.push({
+                    label: kw,
+                    kind: monaco.languages.CompletionItemKind.Keyword,
+                    insertText: kw,
+                    range: range,
+                  });
+                });
+
+                me.allTableColumns.forEach((t) => {
+                  const alias = genAlias(t.table_name);
+                  suggestions.push({
+                    label: t.table_name,
+                    kind: monaco.languages.CompletionItemKind.Struct,
+                    detail: "table",
+                    insertText: alias ? `${t.table_name} ${alias} ` : t.table_name,
+                    range: range,
+                  });
+                });
+
+                let allColNames = new Set();
+                me.allTableColumns.forEach((t) => {
+                  (t.columns || []).forEach((col) => {
+                    if (!allColNames.has(col.name)) {
+                      allColNames.add(col.name);
+                      suggestions.push({
+                        label: col.name,
+                        kind: monaco.languages.CompletionItemKind.Field,
+                        detail: col.type || "",
+                        insertText: col.name,
+                        range: range,
+                      });
+                    }
+                  });
+                });
+
+                aliasMap.forEach((mapped, alias) => {
+                  let cols = me.columnsByTable.get(mapped.table) || [];
+                  cols.forEach((col) => {
+                    suggestions.push({
+                      label: `${alias}.${col.name}`,
+                      kind: monaco.languages.CompletionItemKind.Field,
+                      detail: col.type || "",
+                      filterText: `${alias}.${col.name}`,
+                      insertText: `${alias}.${col.name}`,
+                      range: range,
+                    });
+                  });
+                });
+              }
+
+              return { suggestions };
+              },
+            });
+          }
+        },
+      };
+    },
   },
   beforeUnmount() {},
   methods: {
+    /**
+     * Load schema metadata (tables + columns) cho intellisense
+     */
+    async loadSchemaMetadata() {
+      let me = this;
+      try {
+        let res = await me.agentAPI.getAllTableAndColumns();
+        if (res && res.success && Array.isArray(res.data.data)) {
+          me.allTableColumns = res.data.data;
+          me.columnsByTable = new Map();
+          res.data.data.forEach((t) => {
+            let tableName = (t.table_name || "").toLowerCase();
+            me.columnsByTable.set(tableName, t.columns || []);
+          });
+          updateSqliteIntellisenseData(res.data.data);
+        }
+      } catch (error) {
+        console.error("Lỗi tải schema metadata:", error);
+      }
+    },
+
+    /**
+     * Chạy query SQL (Ctrl+Enter shortcut)
+     */
+    handleRunQuery() {
+      let me = this;
+      if (!me.scriptQuery?.trim()) return;
+      me.queryDynamicData();
+    },
+
     /**
      * Xử lý khi đổi loại nguồn dữ liệu
      */
@@ -142,7 +347,7 @@ export default {
       if (me.isClipboardMode) {
         await me.loadClipboardHistory();
       } else {
-        await me.reloadTable();
+        await me.loadSchemaMetadata();
       }
     },
 
@@ -165,8 +370,7 @@ export default {
           }
         }
         if (Array.isArray(history)) {
-          // Chuyển mảng string thành mảng object để hiển thị trong TDTableViewer
-          me.currentTableDatas = history.map((text, index) => ({
+          me.currentTableDatas = history.map((text) => ({
             content: text,
           }));
         }
@@ -180,41 +384,9 @@ export default {
       await cache.remove(me.$tdEnum.cacheConfig.CopyTextHistory);
       await me.loadClipboardHistory();
     },
-    async reloadTable() {
-      let me = this;
-      me.allTables = [];
-      try {
-        let res = await me.agentAPI.getAllTable();
-        if (
-          res &&
-          res.success &&
-          res.data &&
-          Array.isArray(res.data.data) &&
-          res.data.data.length > 0
-        ) {
-          res.data.data.forEach((currentTable) => {
-            me.allTables.push({
-              value: currentTable,
-              label: currentTable,
-            });
-          });
-        }
-      } catch (error) {
-        console.error("Lỗi tải table APIs:", error);
-        me.$tdUtility.showErrorNotFoundAgentServer();
-      }
-    },
-
-    async showDataByTable() {
-      let me = this;
-      if (me.tableName) {
-        me.scriptQuery = `select * from ${me.tableName} order by created_date desc limit 20;`;
-        await me.queryDynamicData();
-      }
-    },
 
     /**
-     * Query dữ liệu động (chỉ dùng cho Server Agent mode)
+     * Query dữ liệu động
      */
     async queryDynamicData() {
       let me = this;
@@ -235,7 +407,7 @@ export default {
             me.currentTableDatas = res.data.data;
           }
         } catch (error) {
-          console.error("Lỗi tải table APIs:", error);
+          console.error("Lỗi query:", error);
           me.$tdUtility.showErrorNotFoundAgentServer();
         }
       }
@@ -264,13 +436,10 @@ export default {
       .td-data-source-combo {
         width: 200px;
       }
-      .td-table-select-combo {
-        width: 350px;
-        margin-right: var(--padding);
-      }
       .td-data-btn {
         flex: 1;
-        justify-content: space-between;
+        justify-content: flex-start;
+        gap: var(--padding);
       }
     }
   }
