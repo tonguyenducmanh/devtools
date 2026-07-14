@@ -507,9 +507,9 @@ export default {
       height: 22px;
       display: flex;
       align-items: center;
-      padding: 0 10px;
-      gap: 12px;
-      font-size: 12px;
+      padding: 0 var(--padding);
+      gap: var(--padding);
+      font-size: var(--font-size-medium-rare);
       font-family: "Consolas", "Monaco", monospace;
       user-select: none;
       box-sizing: border-box;
@@ -544,9 +544,9 @@ export default {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 10px;
-      gap: 12px;
-      font-size: 12px;
+      padding: 0 var(--padding);
+      gap: var(--padding);
+      font-size: var(--font-size-medium-rare);
       font-family: "Consolas", "Monaco", monospace;
       user-select: none;
       pointer-events: none;
@@ -582,7 +582,7 @@ export default {
       opacity: 0.9;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      font-size: 11px;
+      font-size: var(--font-size-medium-rare);
     }
 
     .td-monaco-footer__cursor {
