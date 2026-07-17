@@ -13,6 +13,7 @@ export default {
       TwoThreadUsingConcurrentQueue: "ConcurrentQueue 2 thread",
       MaxThreadUsingTaskWhenAny: "Task.WhenAny n thread",
       MaxThreadUsingSemaphoreSlim: "SemaphoreSlim n thread",
+      TimerUsingSystemThreading: "Timer run task periodically",
     },
     JavaScriptTemplate: {
       JSONFileHandle: "Handle file json",

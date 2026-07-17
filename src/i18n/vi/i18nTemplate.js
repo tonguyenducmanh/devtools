@@ -13,6 +13,7 @@ export default {
       TwoThreadUsingConcurrentQueue: "ConcurrentQueue 2 thread",
       MaxThreadUsingTaskWhenAny: "Task WhenAny cho n thread",
       MaxThreadUsingSemaphoreSlim: "SemaphoreSlim cho n thread",
+      TimerUsingSystemThreading: "Timer chạy task định kỳ",
     },
     JavaScriptTemplate: {
       JSONFileHandle: "Xử lý file json",
