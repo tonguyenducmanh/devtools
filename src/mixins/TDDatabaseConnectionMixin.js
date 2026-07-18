@@ -1,6 +1,14 @@
 import { pgQueries } from "@/templates/postgresqlToolQuery/templates.js";
 
 export default {
+  computed: {
+    pgBinPlaceholder() {
+      const os = this.$tdUtility.getOS();
+      if (os === "mac") return "/Library/PostgreSQL/16/bin";
+      if (os === "linux") return "/usr/lib/postgresql/16/bin";
+      return "C:\\Program Files\\PostgreSQL\\16\\bin";
+    },
+  },
   methods: {
     /**
      * Phân tích connection string PostgreSQL (URI hoặc DSN) thành object các trường riêng lẻ

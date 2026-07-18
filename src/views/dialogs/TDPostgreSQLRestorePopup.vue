@@ -171,12 +171,6 @@ export default {
     isValid() {
       return this.fields.host && this.fields.database && this.fields.username;
     },
-    pgBinPlaceholder() {
-      const os = this.$tdUtility.getOS();
-      if (os === "mac") return "/Library/PostgreSQL/16/bin";
-      if (os === "linux") return "/usr/lib/postgresql/16/bin";
-      return "C:\\Program Files\\PostgreSQL\\16\\bin";
-    },
   },
   mounted() {
     this.agentAPI = new TDServerPostgreSQLAPI();
