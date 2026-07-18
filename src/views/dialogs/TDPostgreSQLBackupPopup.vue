@@ -93,13 +93,16 @@
       <div class="flex td-popup-actions">
         <TDButton
           :noMargin="true"
-          @click="handleBackup"
+          @click="handleBackup(false)"
           :readOnly="isProcessing || !isValid"
-          :label="
-            isProcessing
-              ? $t('i18nCommon.postgreSQLQuery.databaseOps.processing')
-              : $t('i18nCommon.postgreSQLQuery.databaseOps.backupToSql')
-          "
+          :label="isProcessing ? $t('i18nCommon.postgreSQLQuery.databaseOps.processing') : $t('i18nCommon.postgreSQLQuery.databaseOps.backupToSql')"
+        />
+        <TDButton
+          :noMargin="true"
+          @click="handleBackup(true)"
+          :readOnly="isProcessing || !isValid"
+          :type="$tdEnum.buttonType.secondary"
+          :label="isProcessing ? $t('i18nCommon.postgreSQLQuery.databaseOps.processing') : $t('i18nCommon.postgreSQLQuery.databaseOps.backupSchemaOnly')"
         />
         <TDButton
           :noMargin="true"
@@ -232,7 +235,7 @@ export default {
         );
       }
     },
-    async handleBackup() {
+    async handleBackup(schemaOnly = false) {
       this.isProcessing = true;
       try {
         const resp = await this.agentAPI.backupDatabase(
@@ -244,25 +247,21 @@ export default {
             dbname: this.fields.database,
           },
           this.pgBinPath,
+          schemaOnly,
         );
         if (
           resp?.success &&
           typeof resp.data === "string" &&
           resp.data.length > 0
         ) {
-          const blob = new Blob([resp.data], {
-            type: "text/sql;charset=utf-8",
-          });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
           const d = new Date();
           const ts = `${d.getFullYear()}_${String(d.getMonth() + 1).padStart(2, "0")}_${String(d.getDate()).padStart(2, "0")}_${String(d.getHours()).padStart(2, "0")}_${String(d.getMinutes()).padStart(2, "0")}_${String(d.getSeconds()).padStart(2, "0")}`;
-          a.download = `${this.fields.database}_${ts}.sql`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
+          const suffix = schemaOnly ? "_schema" : "";
+          const fileName = this.$tdUtility.createFileDownloadName(
+            `${this.fields.database}${suffix}_${ts}`,
+            { ext: "sql" },
+          );
+          this.$tdUtility.createDownloadFileFromBuffer(resp.data, "text/sql;charset=utf-8", fileName);
           this.$tdToast.success(
             this.$t("i18nCommon.postgreSQLQuery.databaseOps.backupSuccess"),
           );

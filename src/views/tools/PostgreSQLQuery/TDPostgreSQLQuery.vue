@@ -689,19 +689,19 @@ export default {
           },
           {
             key: "backupDatabase",
-            label: me.$t("i18nCommon.postgreSQLQuery.databaseOps.backupToSql"),
+            label: me.$t("i18nCommon.postgreSQLQuery.databaseOps.menuBackupDatabase"),
             disabled: false,
             run: me.handleOpenBackupPopup,
           },
           {
             key: "restoreDatabase",
-            label: me.$t("i18nCommon.postgreSQLQuery.databaseOps.restoreFromSql"),
+            label: me.$t("i18nCommon.postgreSQLQuery.databaseOps.menuRestoreDatabase"),
             disabled: false,
             run: me.handleOpenRestorePopup,
           },
           {
             key: "cloneDatabase",
-            label: me.$t("i18nCommon.postgreSQLQuery.databaseOps.cloneDatabase"),
+            label: me.$t("i18nCommon.postgreSQLQuery.databaseOps.menuCloneDatabase"),
             disabled: false,
             run: me.handleOpenClonePopup,
           },

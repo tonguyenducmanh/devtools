@@ -177,13 +177,16 @@
       <div class="flex td-popup-actions">
         <TDButton
           :noMargin="true"
-          @click="handleClone"
+          @click="handleClone(false)"
           :readOnly="isProcessing || !isSourceValid || !isTargetValid"
-          :label="
-            isProcessing
-              ? $t('i18nCommon.postgreSQLQuery.databaseOps.processing')
-              : $t('i18nCommon.postgreSQLQuery.databaseOps.cloneDatabase')
-          "
+          :label="isProcessing ? $t('i18nCommon.postgreSQLQuery.databaseOps.processing') : $t('i18nCommon.postgreSQLQuery.databaseOps.cloneDatabase')"
+        />
+        <TDButton
+          :noMargin="true"
+          @click="handleClone(true)"
+          :readOnly="isProcessing || !isSourceValid || !isTargetValid"
+          :type="$tdEnum.buttonType.secondary"
+          :label="isProcessing ? $t('i18nCommon.postgreSQLQuery.databaseOps.processing') : $t('i18nCommon.postgreSQLQuery.databaseOps.cloneSchemaOnly')"
         />
         <TDButton
           :noMargin="true"
@@ -375,7 +378,7 @@ export default {
         );
       }
     },
-    async handleClone() {
+    async handleClone(schemaOnly = false) {
       this.isProcessing = true;
       try {
         const resp = await this.agentAPI.cloneDatabase(
@@ -393,7 +396,7 @@ export default {
             password: this.tgtFields.password,
             dbname: this.tgtFields.database,
           },
-          { pgBinPath: this.pgBinPath },
+          { pgBinPath: this.pgBinPath, schemaOnly },
         );
         if (resp?.data?.success) {
           this.$tdToast.success(

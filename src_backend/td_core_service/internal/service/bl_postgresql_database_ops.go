@@ -277,6 +277,9 @@ func handleBackup(w http.ResponseWriter, req *model.TDPgDatabaseOpsRequest) {
 		"--clean",
 		"--if-exists",
 	}
+	if req.SchemaOnly {
+		args = append(args, "--schema-only")
+	}
 
 	cmd := exec.Command(pgDumpPath, args...)
 	cmd.Env = append(os.Environ(), fmt.Sprintf("PGPASSWORD=%s", password))
@@ -369,6 +372,9 @@ func handleClone(w http.ResponseWriter, req *model.TDPgDatabaseOpsRequest) {
 		"--no-privileges",
 		"--clean",
 		"--if-exists",
+	}
+	if req.SchemaOnly {
+		dumpArgs = append(dumpArgs, "--schema-only")
 	}
 
 	dumpCmd := exec.Command(pgDumpPath, dumpArgs...)

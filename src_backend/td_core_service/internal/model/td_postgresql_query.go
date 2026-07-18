@@ -43,4 +43,7 @@ type TDPgDatabaseOpsRequest struct {
 
 	// Đường dẫn tới thư mục chứa pg_dump/psql/pg_restore (nếu rỗng sẽ tìm trong PATH)
 	PgBinPath string `json:"pg_bin_path,omitempty"`
+
+	// Chỉ backup/clone cấu trúc (schema), không lấy data
+	SchemaOnly bool `json:"schema_only,omitempty"`
 }

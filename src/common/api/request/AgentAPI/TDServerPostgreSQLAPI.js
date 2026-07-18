@@ -34,9 +34,10 @@ class TDServerPostgreSQLAPI extends TDAgentAPI {
    * Backup database bằng pg_dump, trả về file SQL text
    * @param {Object} sourceConn - { host, port, user, password, dbname }
    * @param {string} [pgBinPath]
+   * @param {boolean} [schemaOnly]
    * @returns {Promise<Object>} - { success, status, data: string (SQL text), contentType }
    */
-  async backupDatabase(sourceConn, pgBinPath) {
+  async backupDatabase(sourceConn, pgBinPath, schemaOnly = false) {
     return await this.post("/postgresql/database_ops", {
       operation: "backup",
       source_host: sourceConn.host,
@@ -45,6 +46,7 @@ class TDServerPostgreSQLAPI extends TDAgentAPI {
       source_password: sourceConn.password,
       source_db: sourceConn.dbname,
       pg_bin_path: pgBinPath || "",
+      schema_only: schemaOnly,
     });
   }
 
@@ -83,6 +85,7 @@ class TDServerPostgreSQLAPI extends TDAgentAPI {
       target_password: targetConn.password,
       target_db: targetConn.dbname,
       pg_bin_path: opts.pgBinPath || "",
+      schema_only: !!opts.schemaOnly,
     });
   }
 
