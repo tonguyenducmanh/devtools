@@ -667,7 +667,7 @@ export default {
             run: me.handleCopyDSNConnectionString,
           },
         ],
-        // Nhóm Explore: chạy query, inspect object, xem danh sách database
+        // Nhóm Explore: chạy query, inspect object, xem danh sách database, backup/restore/clone
         explore: [
           {
             key: "runQuery",
@@ -686,6 +686,24 @@ export default {
             label: me.$t("i18nCommon.postgreSQLQuery.dbList.title"),
             disabled: !me.selectedConnectionId,
             run: me.handleOpenDatabaseList,
+          },
+          {
+            key: "backupDatabase",
+            label: me.$t("i18nCommon.postgreSQLQuery.databaseOps.backupToSql"),
+            disabled: false,
+            run: me.handleOpenBackupPopup,
+          },
+          {
+            key: "restoreDatabase",
+            label: me.$t("i18nCommon.postgreSQLQuery.databaseOps.restoreFromSql"),
+            disabled: false,
+            run: me.handleOpenRestorePopup,
+          },
+          {
+            key: "cloneDatabase",
+            label: me.$t("i18nCommon.postgreSQLQuery.databaseOps.cloneDatabase"),
+            disabled: false,
+            run: me.handleOpenClonePopup,
           },
         ],
         // Nhóm Help: test connection, reload, xem template
@@ -1555,6 +1573,36 @@ export default {
         dialogType: TDDialogEnum.TDPostgreSQLDatabaseList,
         ownerForm: me,
         param: { connectionId: me.selectedConnectionId },
+      });
+    },
+
+    /**
+     * Mở popup backup database
+     */
+    async handleOpenBackupPopup() {
+      await TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDPostgreSQLBackupPopup,
+        ownerForm: this,
+      });
+    },
+
+    /**
+     * Mở popup restore database
+     */
+    async handleOpenRestorePopup() {
+      await TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDPostgreSQLRestorePopup,
+        ownerForm: this,
+      });
+    },
+
+    /**
+     * Mở popup clone database
+     */
+    async handleOpenClonePopup() {
+      await TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDPostgreSQLClonePopup,
+        ownerForm: this,
       });
     },
 

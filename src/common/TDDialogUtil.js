@@ -14,6 +14,9 @@ export const TDDialogEnum = {
   TDPostgreSQLDatabaseList: 8,
   TDPostgreSQLCloneCachePopup: 9,
   TDShowAllShortcutPopup: 10,
+  TDPostgreSQLBackupPopup: 11,
+  TDPostgreSQLRestorePopup: 12,
+  TDPostgreSQLClonePopup: 13,
 };
 
 /**
@@ -41,6 +44,12 @@ const DialogComponentMap = {
     import("@/views/dialogs/TDPostgreSQLCloneCachePopup.vue"),
   [TDDialogEnum.TDShowAllShortcutPopup]: () =>
     import("@/views/dialogs/TDShowAllShortcutPopup.vue"),
+  [TDDialogEnum.TDPostgreSQLBackupPopup]: () =>
+    import("@/views/dialogs/TDPostgreSQLBackupPopup.vue"),
+  [TDDialogEnum.TDPostgreSQLRestorePopup]: () =>
+    import("@/views/dialogs/TDPostgreSQLRestorePopup.vue"),
+  [TDDialogEnum.TDPostgreSQLClonePopup]: () =>
+    import("@/views/dialogs/TDPostgreSQLClonePopup.vue"),
 };
 
 class TDDialogUtil {

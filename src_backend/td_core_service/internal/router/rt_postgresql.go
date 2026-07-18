@@ -15,4 +15,10 @@ func InjectPostgreSQLRouter(app *http.ServeMux) {
 
 	// Endpoint duy nhất để thực thi query (dùng cho cả query thường lẫn intellisense)
 	app.HandleFunc("POST /postgresql/execute_query", service.ExecutePostgreSQLQueryHandler)
+
+	// Endpoint cho các thao tác backup/clone database (JSON body)
+	app.HandleFunc("POST /postgresql/database_ops", service.ExecutePostgreSQLDatabaseOpsHandler)
+
+	// Endpoint cho restore database qua file upload (multipart/form-data)
+	app.HandleFunc("POST /postgresql/database_ops_upload", service.ExecutePostgreSQLDatabaseOpsUploadHandler)
 }

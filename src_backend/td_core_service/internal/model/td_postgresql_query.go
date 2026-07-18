@@ -22,3 +22,25 @@ type TDPostgeSQLRequest struct {
 	DefaultLimit int    `json:"default_limit"`
 	Unlimited    bool   `json:"unlimited"`
 }
+
+// TDPgDatabaseOpsRequest là request body cho các thao tác backup/restore/clone database
+type TDPgDatabaseOpsRequest struct {
+	Operation string `json:"operation"` // "backup", "restore", "clone"
+
+	// Connection fields cho nguồn (backup: nguồn, clone: nguồn)
+	SourceHost     string `json:"source_host"`
+	SourcePort     string `json:"source_port"`
+	SourceUser     string `json:"source_user"`
+	SourcePassword string `json:"source_password"`
+	SourceDB       string `json:"source_db"`
+
+	// Connection fields cho đích (clone: đích)
+	TargetHost     string `json:"target_host,omitempty"`
+	TargetPort     string `json:"target_port,omitempty"`
+	TargetUser     string `json:"target_user,omitempty"`
+	TargetPassword string `json:"target_password,omitempty"`
+	TargetDB       string `json:"target_db,omitempty"`
+
+	// Đường dẫn tới thư mục chứa pg_dump/psql/pg_restore (nếu rỗng sẽ tìm trong PATH)
+	PgBinPath string `json:"pg_bin_path,omitempty"`
+}
