@@ -1,3 +1,4 @@
+// 50 requests chạy đồng thời trên Go backend (goroutines)
 function makeCurlRequest(index) {
   let curl = `
     curl 'http://localhost:3000/api/get_list_item?limit=5'\\
@@ -5,13 +6,14 @@ function makeCurlRequest(index) {
 `;
   return curl;
 }
+
 async function concurrentRequests() {
-  let promises = [];
+  let curlTexts = [];
   for (let i = 0; i < 50; i++) {
-    const curlStr = makeCurlRequest(i);
-    promises.push(requestCURL(curlStr));
+    curlTexts.push(makeCurlRequest(i));
   }
-  let results = await Promise.all(promises);
+  // Tất cả requests được gửi về backend, chạy đồng thời bằng goroutines
+  let results = await parallelRequests(curlTexts);
   return results.map(r => parseResponseCURL(r));
 }
 return await concurrentRequests();

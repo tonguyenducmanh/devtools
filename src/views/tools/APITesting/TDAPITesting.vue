@@ -809,6 +809,25 @@ export default {
                           isTrusted: true,
                         },
                       },
+                      {
+                        label: "parallelRequests",
+                        kind: monacoInstance.languages.CompletionItemKind
+                          .Function,
+                        insertText: "await parallelRequests(${1:[curlString1, curlString2]})",
+                        insertTextRules:
+                          monacoInstance.languages.CompletionItemInsertTextRule
+                            .InsertAsSnippet,
+                        sortText: "2",
+                        detail: me.$t(
+                          "i18nCommon.apiTesting.parallelRequestsDescription",
+                        ),
+                        documentation: {
+                          value: me.$t(
+                            "i18nCommon.apiTesting.parallelRequestsDescription",
+                          ),
+                          isTrusted: true,
+                        },
+                      },
                     ],
                   };
                 },
@@ -832,6 +851,10 @@ export default {
                   } else if (name === "parseResponseCURL") {
                     description = me.$t(
                       "i18nCommon.apiTesting.parseResponseCURLDescription",
+                    );
+                  } else if (name === "parallelRequests") {
+                    description = me.$t(
+                      "i18nCommon.apiTesting.parallelRequestsDescription",
                     );
                   }
                   if (!description) return null;

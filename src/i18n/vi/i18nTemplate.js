@@ -7,6 +7,7 @@ export default {
       APIBatchSequency: "Tạo lô api gọi tuần tự",
       RetryAPIDelay: "Gọi api có retry",
       AutoPagination: "Gọi lấy dữ liệu paging",
+      DynamicParallel: "Đồng thời động",
     },
     CSharpTemplate: {
       TwoThreadUsingList: "List 2 thread",

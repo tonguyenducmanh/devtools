@@ -197,6 +197,52 @@ class TDCURLUtil {
     }
   }
   /**
+   * Hàm thực hiện nhiều request CURL đồng thời thông qua backend goroutines
+   * @param {string[]} curlTexts - Mảng các curl command text
+   * @returns {Promise<Array>} Mảng response theo thứ tự input
+   */
+  async parallelRequests(curlTexts) {
+    try {
+      if (!Array.isArray(curlTexts) || curlTexts.length === 0) {
+        throw new Error("parallelRequests requires a non-empty array of curl texts");
+      }
+
+      // Parse tất cả curl text thành request objects
+      let requests = curlTexts.map((curlText) => {
+        let parsed = window.__tdAPI.apiTesting.parseCURL(curlText);
+        return {
+          api_url: parsed.url,
+          http_method: parsed.method || "GET",
+          headers_text: parsed.headersText || "",
+          body_text: parsed.bodyText || null,
+        };
+      });
+
+      // Gọi backend parallel executor
+      let res = await new TDServerTestingAPI().executeParallel(requests);
+      let data = res.data;
+
+      // Map response về dạng chuẩn
+      return (data.results || []).map((r) => ({
+        status: r.status,
+        headers: r.headers,
+        body: r.body,
+        totalTimeMs: data.total_time_ms,
+      }));
+    } catch (ex) {
+      let msgErr = "parallelRequests call api error";
+      console.log(msgErr + ex);
+      return curlTexts.map(() => ({
+        status: 599,
+        body: {
+          message: msgErr,
+          ex: ex.toString(),
+        },
+      }));
+    }
+  }
+
+  /**
    * Parse response từ requestCURL, trả về body đã parse JSON
    * @param {Object} response - Response từ requestCURL
    * @returns {any} Body đã parse JSON (hoặc string gốc)
@@ -219,6 +265,7 @@ class TDCURLUtil {
     window.__tdAPI.apiTesting = {
       agentURL: options?.agentURL ?? window.__env?.APITesting?.agentServer,
       requestCURL: me.requestCURL,
+      parallelRequests: me.parallelRequests,
       parseCURL: me.parseCURL,
       fetchAgent: me.fetchAgent,
       parseResponseCURL: me.parseResponseCURL,
@@ -233,6 +280,7 @@ class TDCURLUtil {
     let me = this;
     return `
 let requestCURL = window.__tdAPI.apiTesting.requestCURL;
+let parallelRequests = window.__tdAPI.apiTesting.parallelRequests;
 let parseResponseCURL = window.__tdAPI.apiTesting.parseResponseCURL;
 let result = 
 (async () => {

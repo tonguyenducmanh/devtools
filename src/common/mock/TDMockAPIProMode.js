@@ -45,13 +45,13 @@ return finalResponeArr;`,
   return curl;
 }
 async function concurrentRequests() {
-  let promises = [];
+  let curlTexts = [];
   for (let i = 0; i < 50; i++) {
-    const curlStr = makeCurlRequest(i);
-    promises.push(requestCURL(curlStr));
+    curlTexts.push(makeCurlRequest(i));
   }
-  let results = await Promise.all(promises);
-  return results;
+  // Tat ca requests gui ve backend, chay dong thoi bang goroutines
+  let results = await parallelRequests(curlTexts);
+  return results.map(r => r.body);
 }
 return await concurrentRequests();`,
   },
@@ -144,5 +144,46 @@ return await requestWithRetry(curl);`,
   return allData;
 }
 return await fetchAllPages('http://localhost:3000/api/products');`,
+  },
+  {
+    tooltipKey: "DynamicParallel",
+    content: `// Dynamic Parallel: ket hop sequential + parallel theo logic runtime
+let baseUrl = "http://localhost:3000";
+
+// Buoc 1: Sequential - Lay danh sach users
+let curlUsers = \`curl '\${baseUrl}/api/users?limit=10'\`;
+let usersRes = await requestCURL(curlUsers);
+let users = usersRes.body;
+
+if (!users || !users.data) {
+  return { error: "Khong lay duoc danh sach users" };
+}
+
+// Buoc 2: Dynamic construct - Tao curl texts cho tung user detail
+let userCurls = users.data.map(u => \`curl '\${baseUrl}/api/users/\${u.id}'\`);
+
+// Buoc 3: Parallel tren backend - Fetch tat ca user detail cung luc
+let userDetails = await parallelRequests(userCurls);
+
+// Buoc 4: Lay ket qua, roi dynamic construct tiep cho orders
+let ordersCurls = [];
+let validUsers = [];
+for (let i = 0; i < userDetails.length; i++) {
+  let detail = userDetails[i].body;
+  if (detail && detail.data) {
+    validUsers.push({ user: users.data[i], detail: detail.data });
+    ordersCurls.push(\`curl '\${baseUrl}/api/users/\${users.data[i].id}/orders'\`);
+  }
+}
+
+// Buoc 5: Parallel tiep - Fetch orders cua tat ca users
+let ordersResults = await parallelRequests(ordersCurls);
+
+// Buoc 6: Tong hop ket qua
+return validUsers.map((u, idx) => ({
+  user: u.user,
+  detail: u.detail,
+  orders: ordersResults[idx] ? ordersResults[idx].body : null,
+}));`,
   },
 ];

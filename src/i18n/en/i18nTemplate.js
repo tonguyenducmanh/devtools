@@ -7,6 +7,7 @@ export default {
       APIBatchSequency: "Batch API sequency",
       RetryAPIDelay: "Call API with retry",
       AutoPagination: "Call API paging",
+      DynamicParallel: "Dynamic parallel",
     },
     CSharpTemplate: {
       TwoThreadUsingList: "List 2 thread",

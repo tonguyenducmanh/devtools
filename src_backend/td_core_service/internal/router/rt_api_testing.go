@@ -10,6 +10,9 @@ func InjectAPITestingRouter(app *http.ServeMux) {
 	// Thực thi API
 	app.HandleFunc("POST /api_test/exec", service.Execute)
 
+	// Thực thi API đồng thời (goroutines)
+	app.HandleFunc("POST /api_test/exec_parallel", service.ExecuteParallel)
+
 	// CRUD API Testing và Group sử dụng base controller
 	service.GetTestingAPIController().RegisterRoutes(app)
 	service.GetTestingGroupController().RegisterRoutes(app)

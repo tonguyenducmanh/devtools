@@ -18,6 +18,13 @@ class TDServerTestingAPI extends TDAgentAPI {
   }
 
   /**
+   * Xử lý gọi nối api đồng thời (goroutines backend)
+   */
+  async executeParallel(requests, signal) {
+    return await this.post("/api_test/exec_parallel", { requests }, null, signal);
+  }
+
+  /**
    * Import batch (Groups + Items)
    */
   async importTestingDataBatch(batchData) {
