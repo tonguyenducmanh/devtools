@@ -1,6 +1,6 @@
 // file này chứa logic backup, restore, clone database PostgreSQL bằng pg_dump / pg_restore
 
-package service
+package postgresql
 
 import (
 	"bytes"

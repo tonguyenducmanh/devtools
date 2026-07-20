@@ -1,12 +1,12 @@
 // file này chứa logic thực thi SQL query tới PostgreSQL và load intellisense
 
-package service
+package postgresql
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"td_core_service/internal/database/postgresql"
+	pgdb "td_core_service/internal/database/postgresql"
 	"td_core_service/internal/model"
 	"td_core_service/td_common"
 )
@@ -38,7 +38,7 @@ func ExecutePostgreSQLQueryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Lấy connection từ cache (tránh đọc SQLite mỗi lần)
-	conn, err := postgresql.GetCachedPostgreSQLConnection(req.ConnectionID)
+	conn, err := pgdb.GetCachedPostgreSQLConnection(req.ConnectionID)
 	if err != nil {
 		http.Error(w, "Không tìm thấy connection", http.StatusNotFound)
 		return
@@ -49,7 +49,7 @@ func ExecutePostgreSQLQueryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := postgresql.ExecutePostgreSQLQuery(conn.ConnectionString, req.SQL, req.DefaultLimit, req.Unlimited)
+	result, err := pgdb.ExecutePostgreSQLQuery(conn.ConnectionString, req.SQL, req.DefaultLimit, req.Unlimited)
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
