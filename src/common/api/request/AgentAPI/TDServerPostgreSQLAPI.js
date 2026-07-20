@@ -89,6 +89,14 @@ class TDServerPostgreSQLAPI extends TDAgentAPI {
     });
   }
 
+  /**
+   * Tự động tìm đường dẫn PostgreSQL bin trên hệ thống
+   * @returns {Promise<Object>} - { success, data: { success, path, message } }
+   */
+  async detectBinPath() {
+    return await this.get("/postgresql/detect_bin_path");
+  }
+
 }
 
 export default TDServerPostgreSQLAPI;

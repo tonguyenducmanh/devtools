@@ -21,4 +21,7 @@ func InjectPostgreSQLRouter(app *http.ServeMux) {
 
 	// Endpoint cho restore database qua file upload (multipart/form-data)
 	app.HandleFunc("POST /postgresql/database_ops_upload", service.ExecutePostgreSQLDatabaseOpsUploadHandler)
+
+	// Endpoint tự động tìm đường dẫn PostgreSQL bin trên hệ thống
+	app.HandleFunc("GET /postgresql/detect_bin_path", service.DetectPostgreSQLBinPathHandler)
 }

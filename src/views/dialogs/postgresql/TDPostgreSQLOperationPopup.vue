@@ -60,7 +60,18 @@ export default {
       );
       if (cached) {
         this.pgBinPath = cached;
+        return;
       }
+      this.detectPgBinPath();
+    },
+    async detectPgBinPath() {
+      try {
+        const resp = await this.agentAPI.detectBinPath();
+        if (resp?.data?.success && resp.data.path) {
+          this.pgBinPath = resp.data.path;
+          this.saveCachedPgBinPath();
+        }
+      } catch {}
     },
     async saveCachedPgBinPath() {
       await this.$tdCache.set(
