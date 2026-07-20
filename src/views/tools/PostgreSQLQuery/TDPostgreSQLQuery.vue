@@ -4,7 +4,7 @@
     <div class="flex flex-col td-pg-query-main">
       <!-- header toolbar: menu flyout ở trái, nút Run Query ở phải -->
       <div class="flex flex-start td-tool-header-menu-group">
-        <div class="flex flex-one td-header-menu-group">
+        <div class="flex flex-one flex-wrap td-header-menu-group">
           <!-- từng menu item (Code Complete, Edit, Export, Explore, Help) -->
           <div
             v-for="(items, menuKey) in menuConfig"
@@ -689,19 +689,25 @@ export default {
           },
           {
             key: "backupDatabase",
-            label: me.$t("i18nCommon.postgreSQLQuery.databaseOps.menuBackupDatabase"),
+            label: me.$t(
+              "i18nCommon.postgreSQLQuery.databaseOps.menuBackupDatabase",
+            ),
             disabled: false,
             run: me.handleOpenBackupPopup,
           },
           {
             key: "restoreDatabase",
-            label: me.$t("i18nCommon.postgreSQLQuery.databaseOps.menuRestoreDatabase"),
+            label: me.$t(
+              "i18nCommon.postgreSQLQuery.databaseOps.menuRestoreDatabase",
+            ),
             disabled: false,
             run: me.handleOpenRestorePopup,
           },
           {
             key: "cloneDatabase",
-            label: me.$t("i18nCommon.postgreSQLQuery.databaseOps.menuCloneDatabase"),
+            label: me.$t(
+              "i18nCommon.postgreSQLQuery.databaseOps.menuCloneDatabase",
+            ),
             disabled: false,
             run: me.handleOpenClonePopup,
           },
