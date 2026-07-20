@@ -168,7 +168,7 @@ export default {
         dialogType: TDDialogEnum.TDPostgreSQLConnectionPopup,
         ownerForm: this.ownerForm,
         param: {
-          connection_name: `${db.database_name} - ${fields.host}`,
+          connection_name: db.database_name,
           group_id: currentConn.group_id ?? "",
           connFields: {
             host: fields.host,
