@@ -12,8 +12,27 @@ import (
 
 	"td_core_service/internal/database"
 	"td_core_service/internal/model"
+	"td_config"
 	"td_core_service/td_common"
 )
+
+// Shared HTTP client - tái sử dụng connection pool, tránh tạo mới transport mỗi request
+// Được khởi tạo 1 lần duy nhất khi package load, đọc config từ td_config
+var sharedHTTPClient = buildHTTPClient()
+
+func buildHTTPClient() *http.Client {
+	cfg := td_config.GetConfigGlobal().HTTPClientConfig
+	return &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
+			MaxIdleConns:          cfg.MaxIdleConns,
+			MaxIdleConnsPerHost:   cfg.MaxIdleConnsPerHost,
+			IdleConnTimeout:       cfg.IdleConnTimeout,
+			TLSHandshakeTimeout:   cfg.TLSHandshakeTimeout,
+		},
+		Timeout: cfg.ClientTimeout,
+	}
+}
 
 /**
  * thực hiện request
@@ -42,12 +61,6 @@ func Execute(w http.ResponseWriter, r *http.Request) {
  * thực hiện gọi nối api cho frontend
  */
 func executeRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingResponse, error) {
-	// Cấu hình Client bỏ qua SSL (tương đương rejectUnauthorized: false)
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{Transport: tr}
-
 	// Tạo request
 	req, err := http.NewRequest(strings.ToUpper(reqData.HttpMethod), reqData.ApiURL, bytes.NewBufferString(reqData.BodyText))
 	if err != nil {
@@ -61,8 +74,8 @@ func executeRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingRespons
 		req.Header.Set(k, v)
 	}
 
-	// Thực thi
-	resp, err := client.Do(req)
+	// Thực thi bằng shared client (tái sử dụng connection pool)
+	resp, err := sharedHTTPClient.Do(req)
 	if err != nil {
 		td_common.LogError(fmt.Sprintf("Request failed: %v", err))
 		return nil, fmt.Errorf("request failed: %v", err)
