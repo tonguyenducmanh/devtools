@@ -33,23 +33,23 @@ const DialogComponentMap = {
   [TDDialogEnum.TDAPIMokingImportPopup]: () =>
     import("@/views/dialogs/TDAPIMokingImportPopup.vue"),
   [TDDialogEnum.TDPostgreSQLConnectionPopup]: () =>
-    import("@/views/dialogs/TDPostgreSQLConnectionPopup.vue"),
+    import("@/views/dialogs/postgresql/TDPostgreSQLConnectionPopup.vue"),
   [TDDialogEnum.TDPostgreSQLInspect]: () =>
-    import("@/views/dialogs/TDPostgreSQLInspect.vue"),
+    import("@/views/dialogs/postgresql/TDPostgreSQLInspect.vue"),
   [TDDialogEnum.TDQuickPreview]: () =>
     import("@/views/dialogs/TDQuickPreview.vue"),
   [TDDialogEnum.TDPostgreSQLDatabaseList]: () =>
-    import("@/views/dialogs/TDPostgreSQLDatabaseList.vue"),
+    import("@/views/dialogs/postgresql/TDPostgreSQLDatabaseList.vue"),
   [TDDialogEnum.TDPostgreSQLCloneCachePopup]: () =>
-    import("@/views/dialogs/TDPostgreSQLCloneCachePopup.vue"),
+    import("@/views/dialogs/postgresql/TDPostgreSQLCloneCachePopup.vue"),
   [TDDialogEnum.TDShowAllShortcutPopup]: () =>
     import("@/views/dialogs/TDShowAllShortcutPopup.vue"),
   [TDDialogEnum.TDPostgreSQLBackupPopup]: () =>
-    import("@/views/dialogs/TDPostgreSQLBackupPopup.vue"),
+    import("@/views/dialogs/postgresql/TDPostgreSQLBackupPopup.vue"),
   [TDDialogEnum.TDPostgreSQLRestorePopup]: () =>
-    import("@/views/dialogs/TDPostgreSQLRestorePopup.vue"),
+    import("@/views/dialogs/postgresql/TDPostgreSQLRestorePopup.vue"),
   [TDDialogEnum.TDPostgreSQLClonePopup]: () =>
-    import("@/views/dialogs/TDPostgreSQLClonePopup.vue"),
+    import("@/views/dialogs/postgresql/TDPostgreSQLClonePopup.vue"),
 };
 
 class TDDialogUtil {

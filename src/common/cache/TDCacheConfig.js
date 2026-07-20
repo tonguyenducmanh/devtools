@@ -286,4 +286,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool vector mock generator",
   },
+  PostgreSQLBinPath: {
+    KeyFormat: "PostgreSQLBinPath",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache đường dẫn file bin PostgreSQL của user",
+  },
 };

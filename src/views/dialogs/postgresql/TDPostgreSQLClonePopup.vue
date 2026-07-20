@@ -200,37 +200,13 @@
 </template>
 
 <script>
-import TDServerPostgreSQLAPI from "@/common/api/request/AgentAPI/TDServerPostgreSQLAPI.js";
-import TDDatabaseConnectionMixin from "@/mixins/TDDatabaseConnectionMixin.js";
-import TDDotNetWasmMixin from "@/mixins/TDDotNetWasmMixin.js";
+import TDPostgreSQLOperationPopup from "@/views/dialogs/postgresql/TDPostgreSQLOperationPopup.vue";
 
 export default {
   name: "TDPostgreSQLClonePopup",
-  mixins: [TDDatabaseConnectionMixin, TDDotNetWasmMixin],
-  props: {
-    ownerForm: { type: Object, required: true },
-  },
+  extends: TDPostgreSQLOperationPopup,
   data() {
     return {
-      isProcessing: false,
-      importTypeOptions: [
-        {
-          value: this.$tdEnum.PostreSQLConnectionImportType.NpgSQLDotNet,
-          label: this.$t("i18nCommon.postgreSQLQuery.importNpgSQL"),
-        },
-        {
-          value: this.$tdEnum.PostreSQLConnectionImportType.PgxGo,
-          label: this.$t("i18nCommon.postgreSQLQuery.importPgxGo"),
-        },
-      ],
-      sslModeOptions: [
-        { value: "disable", label: "disable" },
-        { value: "require", label: "require" },
-        { value: "verify-ca", label: "verify-ca" },
-        { value: "verify-full", label: "verify-full" },
-        { value: "prefer", label: "prefer" },
-        { value: "allow", label: "allow" },
-      ],
       srcImportType: this.$tdEnum.PostreSQLConnectionImportType.NpgSQLDotNet,
       srcConnStringFromApp: "",
       srcFields: {
@@ -251,8 +227,6 @@ export default {
         password: "",
         sslmode: "disable",
       },
-      pgBinPath: "",
-      agentAPI: null,
     };
   },
   computed: {
@@ -271,15 +245,7 @@ export default {
       );
     },
   },
-  mounted() {
-    this.agentAPI = new TDServerPostgreSQLAPI();
-    this.loadCurrentConnection();
-  },
   methods: {
-    show() {},
-    handleClose(payload) {
-      this.$emit("close", payload);
-    },
     loadCurrentConnection() {
       const conn = this.ownerForm?.allConnections?.find(
         (c) => c.id === this.ownerForm.selectedConnectionId,
@@ -380,6 +346,7 @@ export default {
     },
     async handleClone(schemaOnly = false) {
       this.isProcessing = true;
+      this.saveCachedPgBinPath();
       try {
         const resp = await this.agentAPI.cloneDatabase(
           {
