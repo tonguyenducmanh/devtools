@@ -5,7 +5,7 @@ let curlOne = `
 `;
 
 let responseOne = await requestCURL(curlOne);
-let bodyOne = parseResponseCURL(responseOne);
+let bodyOne = parseResponse(responseOne);
 
 // Bước 2: Dynamic construct curl texts từ kết quả bước 1
 let keyReplace = "##item_id##";
@@ -25,10 +25,10 @@ if (bodyOne && bodyOne.data && bodyOne.data.length > 0) {
 }
 
 // Bước 3: Fetch tất cả detail đồng thời trên backend
-let detailResults = await parallelRequests(curlTexts);
+let detailResults = await requestMultiCURL(curlTexts);
 
 // Bước 4: Map kết quả về dạng chuẩn
 return itemIds.map((itemId, idx) => ({
   item_id: itemId,
-  res: parseResponseCURL(detailResults[idx]),
+  res: parseResponse(detailResults[idx]),
 }));

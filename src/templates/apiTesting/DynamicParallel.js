@@ -6,7 +6,7 @@ let baseUrl = "http://localhost:3000";
 // Bước 1: Sequential - Lấy danh sách users
 let curlUsers = `curl '${baseUrl}/api/users?limit=10'`;
 let usersRes = await requestCURL(curlUsers);
-let users = parseResponseCURL(usersRes);
+let users = parseResponse(usersRes);
 
 if (!users || !users.data) {
   return { error: "Không lấy được danh sách users" };
@@ -16,13 +16,13 @@ if (!users || !users.data) {
 let userCurls = users.data.map(u => `curl '${baseUrl}/api/users/${u.id}'`);
 
 // Bước 3: Parallel trên backend - Fetch tất cả user detail cùng lúc
-let userDetails = await parallelRequests(userCurls);
+let userDetails = await requestMultiCURL(userCurls);
 
 // Bước 4: Lấy kết quả, rồi dynamic construct tiếp cho orders
 let ordersCurls = [];
 let validUsers = [];
 for (let i = 0; i < userDetails.length; i++) {
-  let detail = parseResponseCURL(userDetails[i]);
+  let detail = parseResponse(userDetails[i]);
   if (detail && detail.data) {
     validUsers.push({ user: users.data[i], detail: detail.data });
     ordersCurls.push(`curl '${baseUrl}/api/users/${users.data[i].id}/orders'`);
@@ -30,11 +30,11 @@ for (let i = 0; i < userDetails.length; i++) {
 }
 
 // Bước 5: Parallel tiếp - Fetch orders của tất cả users
-let ordersResults = await parallelRequests(ordersCurls);
+let ordersResults = await requestMultiCURL(ordersCurls);
 
 // Bước 6: Tổng hợp kết quả
 return validUsers.map((u, idx) => ({
   user: u.user,
   detail: u.detail,
-  orders: parseResponseCURL(ordersResults[idx]),
+  orders: parseResponse(ordersResults[idx]),
 }));

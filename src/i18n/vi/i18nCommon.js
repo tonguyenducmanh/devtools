@@ -522,7 +522,7 @@ export default {
       copyMockData:
         "Sao chép dữ liệu endpoint, request, response của api vừa gọi để làm mock data ở tool API Mocking (dùng cho các môi trường không gọi được api bên ngoài cần mock data)",
       tutorialProModeCode:
-        "//requestCURL() là hàm cung cấp sẵn dùng để gọi api bằng CURL\n//nếu trong curl text có chứa ký tự \\ thì phải dùng \\\\ \n//nếu text có chứa ký tự ' thì thay bằng '\\\\'' \n",
+        "//requestCURL(curl) - gọi api bằng CURL\n//request({method,url,headers,body}) - gọi api trực tiếp\n//parseResponse(res) - parse JSON từ response\n//requestMulti([{method,url,headers,body}]) - gửi nhiều request song song\n//requestMultiCURL([curl1,curl2]) - gửi nhiều CURL song song\n",
       newCollectionName: "Tên collection mới",
       save: "Lưu request",
       createNewRequest: "Tạo request mới",
@@ -537,12 +537,6 @@ export default {
       },
       FindCollectionTitle: "Nhập tên bộ sưu tập",
       NeedRequestName: "Cần điền tên request trước khi lưu",
-      requestCURLDescription:
-        "**requestCURL(curlString)**\n\nHàm gọi một request CURL thông qua agent server.\nTham số:\n- `curlString`: Nội dung CURL cần thực thi\n\nTrả về `{ status, headers, body }`.\nDùng `parseResponseCURL()` để parse kết quả.",
-      parseResponseCURLDescription:
-        "**parseResponseCURL(response)**\n\nHàm parse response từ `requestCURL`, trả về body đã parse JSON.\nTham số:\n- `response`: Response từ `requestCURL`\n\nTrả về body đã parse JSON (hoặc string gốc nếu không parse được).",
-      parallelRequestsDescription:
-        "**parallelRequests(curlTexts[])**\n\nGửi nhiều request CURL về backend chạy đồng thời bằng Go goroutines.\nTham số:\n- `curlTexts`: Mảng các CURL string cần chạy song song\n\nTrả về `Promise<Array<{status, headers, body}>>` theo đúng thứ tự input.\nVí dụ:\n```js\nlet results = await parallelRequests([\n  `curl 'https://api.example.com/a'`,\n  `curl 'https://api.example.com/b'`,\n]);\n```",
     },
     APIMocking: {
       ImportPlaceHolder:

@@ -29,8 +29,8 @@ async function batchRequests() {
     let curlTexts = batchTenantIds.map(id => makeCurlRequest(`"${id}"`));
 
     // Parallel trên backend trong cùng 1 batch
-    let batchResults = await parallelRequests(curlTexts);
-    allResults.push(...batchResults.map(r => parseResponseCURL(r)));
+    let batchResults = await requestMultiCURL(curlTexts);
+    allResults.push(...batchResults.map(r => parseResponse(r)));
 
     // Delay giữa các batch (nếu cần throttle)
     if (i + batchSize < tenantIds.length) {

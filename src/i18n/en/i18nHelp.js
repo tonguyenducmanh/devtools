@@ -298,11 +298,17 @@ export default {
       proModeHelp: {
         title: "Pro Mode - Built-in Functions",
         builtinFunctions:
-          "Pro Mode provides 2 built-in functions that are automatically available in your script:",
+          "Pro Mode provides built-in functions that are automatically available in your script:",
         requestCURL:
-          "requestCURL(curlString) - Execute a CURL request via the Agent server. This is an async function, must be called with await.",
-        parseResponseCURL:
-          "parseResponseCURL(response) - Parse the response from requestCURL, returns the body parsed as JSON (or raw string if parsing fails).",
+          "requestCURL(curlString) - Call API using CURL via Agent server. Async, must use await.",
+        request:
+          "request({method, url, headers, body}) - Call HTTP directly without CURL.",
+        parseResponse:
+          "parseResponse(response) - Parse JSON from response of request() or requestCURL().",
+        requestMulti:
+          "requestMulti(requests[]) - Send multiple requests in parallel with explicit parameters.",
+        requestMultiCURL:
+          "requestMultiCURL(curlTexts[]) - Send multiple CURLs in parallel on backend.",
         triggerIntelliSense:
           "Press {0} to trigger intellisense suggestions for the built-in functions.",
       },

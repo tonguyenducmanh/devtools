@@ -62,7 +62,16 @@
             <code>{{ $t("i18nHelp.apiTesting.proModeHelp.requestCURL") }}</code>
           </div>
           <div class="section-item section-code">
-            <code>{{ $t("i18nHelp.apiTesting.proModeHelp.parseResponseCURL") }}</code>
+            <code>{{ $t("i18nHelp.apiTesting.proModeHelp.request") }}</code>
+          </div>
+          <div class="section-item section-code">
+            <code>{{ $t("i18nHelp.apiTesting.proModeHelp.parseResponse") }}</code>
+          </div>
+          <div class="section-item section-code">
+            <code>{{ $t("i18nHelp.apiTesting.proModeHelp.requestMulti") }}</code>
+          </div>
+          <div class="section-item section-code">
+            <code>{{ $t("i18nHelp.apiTesting.proModeHelp.requestMultiCURL") }}</code>
           </div>
         </div>
         <p class="section-note">

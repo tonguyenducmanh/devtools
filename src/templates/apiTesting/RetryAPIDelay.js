@@ -2,7 +2,7 @@ async function requestWithRetry(curlStr, maxRetries = 3) {
   for (let i = 0; i < maxRetries; i++) {
     try {
       let response = await requestCURL(curlStr);
-      let body = parseResponseCURL(response);
+      let body = parseResponse(response);
       if (body && !body.error) {
         return body;
       }

@@ -478,9 +478,9 @@ export default {
       importCollectionZip: "Import zip",
       importCollectionZipTooltip:
         'Importing a zip file should follow this structure: "zip_folder/", -> this is the parent folder after extraction; "zip_folder/collection_name_01/", -> folder containing a specific collection; "zip_folder/collection_name_01/01_vector_embedding.txt", -> text file containing the curl API.',
-      importCollectionPostman: "Nhập postman",
+      importCollectionPostman: "Import postman",
       importCollectionPostmanTooltip:
-        "Nhập khẩu file có định dạng json, được export từ collection Postman, hỗ trợ nhập 1 lúc nhiều file json",
+        "Import JSON files exported from Postman collections. Supports importing multiple JSON files at once.",
       agentUrl: "Enter url agent",
       title: "API Testing Tool!",
       url: "URL",
@@ -524,7 +524,7 @@ export default {
       copyMockData:
         "Copy the endpoint, request, and response data of the recently called API to create mock data in the API Mocking tool (used in environments where external APIs cannot be called and data mocking is necessary).",
       tutorialProModeCode:
-        "//requestCURL() is a built-in function used to call APIs using CURL\n//if curl text contain keyword \\ then change to \\\\ \n//if text contain keyword ' then change to '\\\\'' \n",
+        "//requestCURL(curl) - call API using CURL\n//request({method,url,headers,body}) - call API directly\n//parseResponse(res) - parse JSON from response\n//requestMulti([{method,url,headers,body}]) - send multiple requests in parallel\n//requestMultiCURL([curl1,curl2]) - send multiple CURLs in parallel\n",
       newCollectionName: "New collection name",
       save: "Save request",
       createNewRequest: "New request",
@@ -539,12 +539,6 @@ export default {
       },
       FindCollectionTitle: "Enter collection name",
       NeedRequestName: "Need request name before save",
-      requestCURLDescription:
-        "**requestCURL(curlString)**\n\nHàm gọi một request CURL thông qua agent server.\nTham số:\n- `curlString`: Nội dung CURL cần thực thi\n\nTrả về `{ status, headers, body }`.\nDùng `parseResponseCURL()` để parse kết quả.",
-      parseResponseCURLDescription:
-        "**parseResponseCURL(response)**\n\nHàm parse response từ `requestCURL`, trả về body đã parse JSON.\nTham số:\n- `response`: Response từ `requestCURL`\n\nTrả về body đã parse JSON (hoặc string gốc nếu không parse được).",
-      parallelRequestsDescription:
-        "**parallelRequests(curlTexts[])**\n\nGửi nhiều request CURL về backend chạy đồng thời bằng Go goroutines.\nTham số:\n- `curlTexts`: Mảng các CURL string cần chạy song song\n\nTrả về `Promise<Array<{status, headers, body}>>` theo đúng thứ tự input.\nVí dụ:\n```js\nlet results = await parallelRequests([\n  `curl 'https://api.example.com/a'`,\n  `curl 'https://api.example.com/b'`,\n]);\n```",
     },
     APIMocking: {
       ImportPlaceHolder:

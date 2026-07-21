@@ -582,6 +582,8 @@ import TDAPITestingHelp from "@/views/helps/TDAPITestingHelp.vue";
 import proModeTemplates from "@/templates/apiTesting/templates.js";
 import { registerTdApiPromodeLanguage } from "@/components/monarch/tdApiPromodeLanguage.js";
 import { registerTdApiPromodeFormatProvider } from "@/components/monarch/tdApiPromodeFormatProvider.js";
+import { registerTdApiPromodeCompletionProvider } from "@/components/monarch/tdApiPromodeCompletionProvider.js";
+import { registerTdApiPromodeHoverProvider } from "@/components/monarch/tdApiPromodeHoverProvider.js";
 import _ from "@/common/TDCommonFunction.js";
 import { TDShortcutActionEnum } from "@/common/TDShortcutAction.js";
 export default {
@@ -818,109 +820,13 @@ export default {
       }
       me._proModeDisposables = [];
 
-      const completionDisposable =
-        monacoInstance.languages.registerCompletionItemProvider(
-          "td-api-javascript",
-          {
-            provideCompletionItems: (model, position) => {
-              const word = model.getWordUntilPosition(position);
-              const range = {
-                startLineNumber: position.lineNumber,
-                endLineNumber: position.lineNumber,
-                startColumn: word.startColumn,
-                endColumn: word.endColumn,
-              };
-              return {
-                suggestions: [
-                  {
-                    label: "requestCURL",
-                    kind: monacoInstance.languages.CompletionItemKind.Function,
-                    insertText: "await requestCURL(${1:curlString})",
-                    insertTextRules:
-                      monacoInstance.languages.CompletionItemInsertTextRule
-                        .InsertAsSnippet,
-                    sortText: "0",
-                    detail: me.$t(
-                      "i18nCommon.apiTesting.requestCURLDescription",
-                    ),
-                    documentation: {
-                      value: me.$t(
-                        "i18nCommon.apiTesting.requestCURLDescription",
-                      ),
-                      isTrusted: true,
-                    },
-                  },
-                  {
-                    label: "parseResponseCURL",
-                    kind: monacoInstance.languages.CompletionItemKind.Function,
-                    insertText: "parseResponseCURL(${1:response})",
-                    insertTextRules:
-                      monacoInstance.languages.CompletionItemInsertTextRule
-                        .InsertAsSnippet,
-                    sortText: "1",
-                    detail: me.$t(
-                      "i18nCommon.apiTesting.parseResponseCURLDescription",
-                    ),
-                    documentation: {
-                      value: me.$t(
-                        "i18nCommon.apiTesting.parseResponseCURLDescription",
-                      ),
-                      isTrusted: true,
-                    },
-                  },
-                  {
-                    label: "parallelRequests",
-                    kind: monacoInstance.languages.CompletionItemKind.Function,
-                    insertText:
-                      "await parallelRequests(${1:[curlString1, curlString2]})",
-                    insertTextRules:
-                      monacoInstance.languages.CompletionItemInsertTextRule
-                        .InsertAsSnippet,
-                    sortText: "2",
-                    detail: me.$t(
-                      "i18nCommon.apiTesting.parallelRequestsDescription",
-                    ),
-                    documentation: {
-                      value: me.$t(
-                        "i18nCommon.apiTesting.parallelRequestsDescription",
-                      ),
-                      isTrusted: true,
-                    },
-                  },
-                ],
-              };
-            },
-          },
-        );
+      const completionDisposable = registerTdApiPromodeCompletionProvider(
+        monacoInstance,
+      );
       me._proModeDisposables.push(completionDisposable);
 
-      const hoverDisposable = monacoInstance.languages.registerHoverProvider(
-        "td-api-javascript",
-        {
-          provideHover: (model, position) => {
-            const word = model.getWordAtPosition(position);
-            if (!word) return null;
-            const name = word.word;
-            let description = null;
-            if (name === "requestCURL") {
-              description = me.$t(
-                "i18nCommon.apiTesting.requestCURLDescription",
-              );
-            } else if (name === "parseResponseCURL") {
-              description = me.$t(
-                "i18nCommon.apiTesting.parseResponseCURLDescription",
-              );
-            } else if (name === "parallelRequests") {
-              description = me.$t(
-                "i18nCommon.apiTesting.parallelRequestsDescription",
-              );
-            }
-            if (!description) return null;
-            return {
-              contents: [{ value: description, isTrusted: true }],
-            };
-          },
-        },
+      const hoverDisposable = registerTdApiPromodeHoverProvider(
+        monacoInstance,
       );
       me._proModeDisposables.push(hoverDisposable);
 

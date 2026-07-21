@@ -197,17 +197,16 @@ class TDCURLUtil {
     }
   }
   /**
-   * Hàm thực hiện nhiều request CURL đồng thời thông qua backend goroutines
+   * Hàm thực hiện nhiều request CURL đồng thời thông qua backend goroutines.
    * @param {string[]} curlTexts - Mảng các curl command text
    * @returns {Promise<Array>} Mảng response theo thứ tự input
    */
-  async parallelRequests(curlTexts) {
+  async requestMultiCURL(curlTexts) {
     try {
       if (!Array.isArray(curlTexts) || curlTexts.length === 0) {
-        throw new Error("parallelRequests requires a non-empty array of curl texts");
+        throw new Error("requestMultiCURL requires a non-empty array of curl texts");
       }
 
-      // Parse tất cả curl text thành request objects
       let requests = curlTexts.map((curlText) => {
         let parsed = window.__tdAPI.apiTesting.parseCURL(curlText);
         return {
@@ -218,11 +217,9 @@ class TDCURLUtil {
         };
       });
 
-      // Gọi backend parallel executor
       let res = await new TDServerTestingAPI().executeParallel(requests);
       let data = res.data;
 
-      // Map response về dạng chuẩn
       return (data.results || []).map((r) => ({
         status: r.status,
         headers: r.headers,
@@ -230,7 +227,7 @@ class TDCURLUtil {
         totalTimeMs: data.total_time_ms,
       }));
     } catch (ex) {
-      let msgErr = "parallelRequests call api error";
+      let msgErr = "requestMultiCURL call api error";
       console.log(msgErr + ex);
       return curlTexts.map(() => ({
         status: 599,
@@ -243,11 +240,59 @@ class TDCURLUtil {
   }
 
   /**
-   * Parse response từ requestCURL, trả về body đã parse JSON
-   * @param {Object} response - Response từ requestCURL
-   * @returns {any} Body đã parse JSON (hoặc string gốc)
+   * Gọi HTTP request trực tiếp với tham số rõ ràng (không cần CURL string).
+   * @param {Object} options - Request options
+   * @param {string} options.method - HTTP method (GET, POST, PUT, PATCH, DELETE)
+   * @param {string} options.url - URL endpoint
+   * @param {string|object} options.headers - Headers (text format "key:value" per line, hoặc object)
+   * @param {string|object|null} options.body - Request body (JSON string hoặc object)
+   * @returns {Promise<{status, headers, body}>}
    */
-  parseResponseCURL(response) {
+  async request({ method, url, headers, body }) {
+    try {
+      let headersText = "";
+      if (typeof headers === "object" && headers !== null) {
+        headersText = Object.entries(headers)
+          .map(([k, v]) => `${k}:${v}`)
+          .join("\n");
+      } else if (typeof headers === "string") {
+        headersText = headers;
+      }
+
+      let bodyText = null;
+      if (body !== null && body !== undefined) {
+        bodyText = typeof body === "object" ? JSON.stringify(body) : String(body);
+      }
+
+      let requestData = {
+        api_url: url,
+        http_method: (method || "GET").toUpperCase(),
+        headers_text: headersText,
+        body_text: bodyText,
+      };
+      let req = window.__tdAPI.apiTesting.fetchAgent(requestData);
+      let resp = await req.promise;
+      return resp;
+    } catch (ex) {
+      let msgErr = "request call api error";
+      console.log(msgErr + ex);
+      return {
+        status: 599,
+        body: {
+          message: msgErr,
+          ex: ex.toString(),
+          stackTrace: ex.stack ? ex.stack.split("\n") : [],
+        },
+      };
+    }
+  }
+
+  /**
+   * Parse response từ request(), trả về body đã parse JSON.
+   * @param {Object} response - Response từ request() hoặc requestCURL()
+   * @returns {any} Body đã parse JSON (hoặc string gốc nếu không parse được)
+   */
+  parseResponse(response) {
     if (!response) return null;
     let body = response.body;
     if (typeof body === "string") {
@@ -259,16 +304,75 @@ class TDCURLUtil {
     }
     return body;
   }
+
+  /**
+   * Gửi nhiều request song song với tham số rõ ràng (không cần CURL string).
+   * @param {Array<{method, url, headers, body}>} requests - Mảng request objects
+   * @returns {Promise<Array<{status, headers, body}>>}
+   */
+  async requestMulti(requests) {
+    try {
+      if (!Array.isArray(requests) || requests.length === 0) {
+        throw new Error("requestMulti requires a non-empty array of request objects");
+      }
+
+      let apiRequests = requests.map((req) => {
+        let headersText = "";
+        if (typeof req.headers === "object" && req.headers !== null) {
+          headersText = Object.entries(req.headers)
+            .map(([k, v]) => `${k}:${v}`)
+            .join("\n");
+        } else if (typeof req.headers === "string") {
+          headersText = req.headers;
+        }
+
+        let bodyText = null;
+        if (req.body !== null && req.body !== undefined) {
+          bodyText = typeof req.body === "object" ? JSON.stringify(req.body) : String(req.body);
+        }
+
+        return {
+          api_url: req.url,
+          http_method: (req.method || "GET").toUpperCase(),
+          headers_text: headersText,
+          body_text: bodyText,
+        };
+      });
+
+      let res = await new TDServerTestingAPI().executeParallel(apiRequests);
+      let data = res.data;
+
+      return (data.results || []).map((r) => ({
+        status: r.status,
+        headers: r.headers,
+        body: r.body,
+        totalTimeMs: data.total_time_ms,
+      }));
+    } catch (ex) {
+      let msgErr = "requestMulti call api error";
+      console.log(msgErr + ex);
+      return requests.map(() => ({
+        status: 599,
+        body: {
+          message: msgErr,
+          ex: ex.toString(),
+        },
+      }));
+    }
+  }
+
   setGlobalInfoBeforeRequest(options) {
     let me = this;
     window.__tdAPI = window.__tdAPI ?? {};
     window.__tdAPI.apiTesting = {
       agentURL: options?.agentURL ?? window.__env?.APITesting?.agentServer,
       requestCURL: me.requestCURL,
-      parallelRequests: me.parallelRequests,
+      request: me.request,
+      parseResponse: me.parseResponse,
+      requestMulti: me.requestMulti,
+      requestMultiCURL: me.requestMultiCURL,
       parseCURL: me.parseCURL,
       fetchAgent: me.fetchAgent,
-      parseResponseCURL: me.parseResponseCURL,
     };
     return window.__tdAPI.apiTesting;
   }
@@ -280,8 +384,10 @@ class TDCURLUtil {
     let me = this;
     return `
 let requestCURL = window.__tdAPI.apiTesting.requestCURL;
-let parallelRequests = window.__tdAPI.apiTesting.parallelRequests;
-let parseResponseCURL = window.__tdAPI.apiTesting.parseResponseCURL;
+let request = window.__tdAPI.apiTesting.request;
+let parseResponse = window.__tdAPI.apiTesting.parseResponse;
+let requestMulti = window.__tdAPI.apiTesting.requestMulti;
+let requestMultiCURL = window.__tdAPI.apiTesting.requestMultiCURL;
 let result = 
 (async () => {
   ${secranioCode}

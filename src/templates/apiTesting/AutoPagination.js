@@ -7,7 +7,7 @@ async function fetchAllPages(baseUrl) {
   while (hasNext) {
     let curl = `curl '${baseUrl}?page=${page}&limit=${limit}'`;
     let res = await requestCURL(curl);
-    let body = parseResponseCURL(res);
+    let body = parseResponse(res);
 
     if (body && body.data && body.data.length > 0) {
       allData.push(...body.data);

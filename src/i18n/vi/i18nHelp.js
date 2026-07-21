@@ -293,11 +293,17 @@ export default {
       proModeHelp: {
         title: "Pro Mode - Hàm dựng sẵn",
         builtinFunctions:
-          "Pro Mode cung cấp 2 hàm dựng sẵn, tự động có sẵn trong script của bạn:",
+          "Pro Mode cung cấp các hàm dựng sẵn, tự động có sẵn trong script của bạn:",
         requestCURL:
-          "requestCURL(curlString) - Thực thi một request CURL thông qua Agent server. Đây là hàm bất đồng bộ, phải gọi với await.",
-        parseResponseCURL:
-          "parseResponseCURL(response) - Parse response từ requestCURL, trả về body đã parse JSON (hoặc string gốc nếu không parse được).",
+          "requestCURL(curlString) - Gọi API bằng CURL qua Agent server. Async, phải gọi với await.",
+        request:
+          "request({method, url, headers, body}) - Gọi HTTP trực tiếp, không cần CURL.",
+        parseResponse:
+          "parseResponse(response) - Parse JSON từ response của request() hoặc requestCURL().",
+        requestMulti:
+          "requestMulti(requests[]) - Gửi nhiều request song song với tham số rõ ràng.",
+        requestMultiCURL:
+          "requestMultiCURL(curlTexts[]) - Gửi nhiều CURL song song trên backend.",
         triggerIntelliSense:
           "Nhấn {0} để hiển thị gợi ý intellisense cho các hàm dựng sẵn.",
       },

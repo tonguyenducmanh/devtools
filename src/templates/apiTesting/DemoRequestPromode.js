@@ -4,4 +4,4 @@ let curlOne = `
 `;
 
 let responseOne = await requestCURL(curlOne);
-return parseResponseCURL(responseOne);
+return parseResponse(responseOne);

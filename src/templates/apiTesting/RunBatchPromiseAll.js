@@ -13,7 +13,7 @@ async function concurrentRequests() {
     curlTexts.push(makeCurlRequest(i));
   }
   // Tất cả requests được gửi về backend, chạy đồng thời bằng goroutines
-  let results = await parallelRequests(curlTexts);
-  return results.map(r => parseResponseCURL(r));
+  let results = await requestMultiCURL(curlTexts);
+  return results.map(r => parseResponse(r));
 }
 return await concurrentRequests();
