@@ -204,7 +204,7 @@
 <script>
 import TDServerPostgreSQLAPI from "@/common/api/request/AgentAPI/TDServerPostgreSQLAPI.js";
 import { pgQueries } from "@/templates/postgresqlToolQuery/templates.js";
-import { registerPgsqlLanguage } from "@/components/monarch/pgsqlLanguage.js";
+import { registerPgsqlLanguage } from "@/components/monarch/pgsql/pgsqlLanguage.js";
 export default {
   name: "TDPostgreSQLInspect",
   props: {

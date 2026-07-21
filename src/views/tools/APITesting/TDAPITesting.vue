@@ -580,10 +580,10 @@ import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDAPITestingHelp from "@/views/helps/TDAPITestingHelp.vue";
 import proModeTemplates from "@/templates/apiTesting/templates.js";
-import { registerTdApiPromodeLanguage } from "@/components/monarch/tdApiPromodeLanguage.js";
-import { registerTdApiPromodeFormatProvider } from "@/components/monarch/tdApiPromodeFormatProvider.js";
-import { registerTdApiPromodeCompletionProvider } from "@/components/monarch/tdApiPromodeCompletionProvider.js";
-import { registerTdApiPromodeHoverProvider } from "@/components/monarch/tdApiPromodeHoverProvider.js";
+import { registerTdApiPromodeLanguage } from "@/components/monarch/apiTesting/tdApiPromodeLanguage.js";
+import { registerTdApiPromodeFormatProvider } from "@/components/monarch/apiTesting/tdApiPromodeFormatProvider.js";
+import { registerTdApiPromodeCompletionProvider } from "@/components/monarch/apiTesting/tdApiPromodeCompletionProvider.js";
+import { registerTdApiPromodeHoverProvider } from "@/components/monarch/apiTesting/tdApiPromodeHoverProvider.js";
 import _ from "@/common/TDCommonFunction.js";
 import { TDShortcutActionEnum } from "@/common/TDShortcutAction.js";
 export default {

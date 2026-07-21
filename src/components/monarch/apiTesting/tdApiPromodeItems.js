@@ -7,14 +7,14 @@
  * 2. Thêm entry vào ITEMS_CONFIG bên dưới
  */
 
-const docModules = import.meta.glob("./apiTesting/*.md", {
+const docModules = import.meta.glob("./docs/*.md", {
   query: "?raw",
   import: "default",
   eager: true,
 });
 
 function getDoc(name) {
-  return docModules[`./apiTesting/${name}.md`];
+  return docModules[`./docs/${name}.md`];
 }
 
 const ITEMS_CONFIG = [
