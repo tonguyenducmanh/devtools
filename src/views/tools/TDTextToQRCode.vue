@@ -398,18 +398,18 @@ export default {
     },
     /**
      * Hàm này được gọi khi tab được active hoặc khi component được mount (nếu đang active)
-     * Component con cần add event (ví dụ listener trên window/document) thì override lại
+     * Component con override onTabEnterCustom / onTabLeaveCustom
      */
-    onTabEnter() {
+    onTabEnterCustom() {
       let me = this;
       document.addEventListener("keydown", me.handleKeydownEvent);
     },
 
     /**
      * Hàm này được gọi khi tab bị inactive hoặc trước khi component bị unmount (nếu đang active)
-     * Component con cần remove event thì override lại
+     * Component con override onTabEnterCustom / onTabLeaveCustom
      */
-    onTabLeave() {
+    onTabLeaveCustom() {
       let me = this;
       document.removeEventListener("keydown", me.handleKeydownEvent);
     },

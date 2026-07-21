@@ -292,4 +292,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache đường dẫn file bin PostgreSQL của user",
   },
+  AppDataMinerSchema: {
+    KeyFormat: "AppDataMinerSchema",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "cache schema tables+columns của AppDataMiner",
+  },
 };

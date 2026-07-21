@@ -14,6 +14,27 @@ export default {
   },
   methods: {
     /**
+     * Đăng ký lại intellisense từ cache khi tab được active
+     */
+    registerIntellisense() {
+      let me = this;
+      if (me.selectedConnectionId) {
+        me.loadCachedIntellisense();
+      }
+    },
+
+    /**
+     * Hủy bỏ tất cả intellisense provider khi tab bị inactive
+     */
+    disposeIntellisense() {
+      let me = this;
+      if (me.intellisenseDisposable) {
+        me.intellisenseDisposable.forEach((d) => d?.dispose?.());
+        me.intellisenseDisposable = null;
+      }
+    },
+
+    /**
      * Tải toàn bộ dữ liệu intellisense (keywords, tables, functions) từ database
      * bằng cách gọi các câu SQL mẫu trong templates.js, phân trang để tránh quá tải.
      * Kết quả được lưu vào IndexedDB cache và áp dụng lên Monaco Editor.

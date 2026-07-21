@@ -48,4 +48,5 @@ export const EnumCacheConfig = {
   MonacoTheme: 52,
   VectorMockGeneratorConfigLayout: 53,
   PostgreSQLBinPath: 54,
+  AppDataMinerSchema: 55,
 };

@@ -70,7 +70,6 @@
 <script>
 import TDServerAppDataMiner from "@/common/api/request/AgentAPI/TDServerAppDataMiner.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
-import cache from "@/common/cache/TDCache.js";
 import { SQLITE_KEYWORDS } from "@/components/monarch/sqliteKeyword.js";
 import {
   registerSqliteLanguage,
@@ -82,8 +81,6 @@ const DATA_SOURCE_TYPE = {
   Clipboard: 1,
   ServerAgent: 2,
 };
-
-let _sqlCompletionRegistered = false;
 
 export default {
   extends: TDToolBase,
@@ -109,6 +106,8 @@ export default {
       ],
       allTableColumns: [],
       columnsByTable: new Map(),
+      _intellisenseDisposables: null,
+      _monacoInstance: null,
     };
   },
   async mounted() {
@@ -127,6 +126,8 @@ export default {
       let me = this;
       return {
         onInit: (editor, monaco) => {
+          me._monacoInstance = monaco;
+
           editor.addAction({
             id: "execute-sql",
             label: me.$t("i18nCommon.AppDataMiner.getData"),
@@ -143,163 +144,8 @@ export default {
 
           registerSqliteFormatProvider(monaco);
 
-          if (!_sqlCompletionRegistered) {
-            _sqlCompletionRegistered = true;
-            monaco.languages.registerCompletionItemProvider("sqlite", {
-            triggerCharacters: ["."],
-            provideCompletionItems: (model, position) => {
-              let wordInfo = model.getWordUntilPosition(position);
-              let range = {
-                startLineNumber: position.lineNumber,
-                endLineNumber: position.lineNumber,
-                startColumn: wordInfo.startColumn,
-                endColumn: wordInfo.endColumn,
-              };
-
-              const text = model.getValue();
-              const aliasMap = new Map();
-              const regex =
-                /(?:from|join)\s+(\w+)(?:\s+as)?\s+(\w+)?/gi;
-              const sqlKeywords = [
-                "where", "join", "on", "left", "right", "inner", "outer",
-                "cross", "group", "order", "having", "limit", "select",
-                "and", "or", "union", "except", "intersect",
-              ];
-              let match;
-              while ((match = regex.exec(text)) !== null) {
-                let table = match[1].toLowerCase();
-                let alias = match[2] && !sqlKeywords.includes(match[2].toLowerCase())
-                  ? match[2].toLowerCase()
-                  : table;
-                aliasMap.set(alias, { table });
-              }
-
-              let lineContent = model.getLineContent(position.lineNumber);
-              let textBeforeCursor = lineContent.substring(0, position.column - 1);
-              let dotMatch = textBeforeCursor.match(
-                /([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]*)$/,
-              );
-
-              let suggestions = [];
-
-              if (dotMatch) {
-                let prefix = dotMatch[1].toLowerCase();
-                let typedWord = dotMatch[2];
-                let totalOffset = prefix.length + 1 + typedWord.length;
-                range = {
-                  startLineNumber: position.lineNumber,
-                  endLineNumber: position.lineNumber,
-                  startColumn: position.column - totalOffset,
-                  endColumn: position.column,
-                };
-
-                if (aliasMap.has(prefix)) {
-                  let mapped = aliasMap.get(prefix);
-                  let cols = me.columnsByTable.get(mapped.table) || [];
-                  cols.forEach((col) => {
-                    suggestions.push({
-                      label: col.name,
-                      kind: monaco.languages.CompletionItemKind.Field,
-                      detail: col.type || "",
-                      filterText: `${prefix}.${col.name}`,
-                      insertText: `${prefix}.${col.name}`,
-                      range: range,
-                    });
-                  });
-                } else if (me.columnsByTable.has(prefix)) {
-                  let cols = me.columnsByTable.get(prefix) || [];
-                  cols.forEach((col) => {
-                    suggestions.push({
-                      label: col.name,
-                      kind: monaco.languages.CompletionItemKind.Field,
-                      detail: col.type || "",
-                      filterText: `${prefix}.${col.name}`,
-                      insertText: `${prefix}.${col.name}`,
-                      range: range,
-                    });
-                  });
-                }
-              } else {
-                const usedNames = new Set();
-                const re =
-                  /(?:from|join)\s+(\w+)(?:\s+as)?\s+(\w+)?/gi;
-                let m;
-                while ((m = re.exec(text)) !== null) {
-                  if (m[1]) usedNames.add(m[1].toLowerCase());
-                  if (m[2]) usedNames.add(m[2].toLowerCase());
-                }
-
-                const genAlias = (name) => {
-                  if (!name) return null;
-                  const base = name.split(".").pop();
-                  const words = base.split("_").filter((w) => w.length > 0);
-                  if (words.length === 0) return null;
-                  let alias = words.map((w) => w[0]).join("").toLowerCase();
-                  if (!alias) return null;
-                  let finalAlias = alias;
-                  let counter = 1;
-                  while (usedNames.has(finalAlias)) {
-                    counter++;
-                    finalAlias = alias + counter;
-                    if (counter > 100) return alias;
-                  }
-                  return finalAlias;
-                };
-
-                SQLITE_KEYWORDS.forEach((kw) => {
-                  suggestions.push({
-                    label: kw,
-                    kind: monaco.languages.CompletionItemKind.Keyword,
-                    insertText: kw,
-                    range: range,
-                  });
-                });
-
-                me.allTableColumns.forEach((t) => {
-                  const alias = genAlias(t.table_name);
-                  suggestions.push({
-                    label: t.table_name,
-                    kind: monaco.languages.CompletionItemKind.Struct,
-                    detail: "table",
-                    insertText: alias ? `${t.table_name} ${alias} ` : t.table_name,
-                    range: range,
-                  });
-                });
-
-                let allColNames = new Set();
-                me.allTableColumns.forEach((t) => {
-                  (t.columns || []).forEach((col) => {
-                    if (!allColNames.has(col.name)) {
-                      allColNames.add(col.name);
-                      suggestions.push({
-                        label: col.name,
-                        kind: monaco.languages.CompletionItemKind.Field,
-                        detail: col.type || "",
-                        insertText: col.name,
-                        range: range,
-                      });
-                    }
-                  });
-                });
-
-                aliasMap.forEach((mapped, alias) => {
-                  let cols = me.columnsByTable.get(mapped.table) || [];
-                  cols.forEach((col) => {
-                    suggestions.push({
-                      label: `${alias}.${col.name}`,
-                      kind: monaco.languages.CompletionItemKind.Field,
-                      detail: col.type || "",
-                      filterText: `${alias}.${col.name}`,
-                      insertText: `${alias}.${col.name}`,
-                      range: range,
-                    });
-                  });
-                });
-              }
-
-              return { suggestions };
-              },
-            });
+          if (me.allTableColumns.length > 0) {
+            me._registerSqliteProviders(monaco);
           }
         },
       };
@@ -308,20 +154,245 @@ export default {
   beforeUnmount() {},
   methods: {
     /**
-     * Load schema metadata (tables + columns) cho intellisense
+     * Đăng ký intellisense: load schema từ cache, register provider
+     */
+    registerIntellisense() {
+      let me = this;
+      me._loadCachedSchema();
+    },
+
+    /**
+     * Hủy bỏ intellisense providers
+     */
+    disposeIntellisense() {
+      let me = this;
+      if (me._intellisenseDisposables) {
+        me._intellisenseDisposables.forEach((d) => d?.dispose?.());
+        me._intellisenseDisposables = null;
+      }
+    },
+
+    /**
+     * Load schema từ IndexedDB cache
+     */
+    async _loadCachedSchema() {
+      let me = this;
+      try {
+        let cached = await me.$tdCache.get(
+          me.$tdEnum.cacheConfig.AppDataMinerSchema
+        );
+        if (cached && Array.isArray(cached) && cached.length > 0) {
+          me._applySchemaData(cached);
+          if (me._monacoInstance) {
+            me._registerSqliteProviders(me._monacoInstance);
+          }
+        }
+      } catch (e) {
+        // cache chưa có, bỏ qua
+      }
+    },
+
+    /**
+     * Cập nhật allTableColumns và columnsByTable từ raw data
+     */
+    _applySchemaData(data) {
+      let me = this;
+      me.allTableColumns = data;
+      me.columnsByTable = new Map();
+      data.forEach((t) => {
+        let tableName = (t.table_name || "").toLowerCase();
+        me.columnsByTable.set(tableName, t.columns || []);
+      });
+      updateSqliteIntellisenseData(data);
+    },
+
+    /**
+     * Đăng ký completion provider cho sqlite
+     */
+    _registerSqliteProviders(monaco) {
+      let me = this;
+      if (me._intellisenseDisposables) {
+        me._intellisenseDisposables.forEach((d) => d?.dispose?.());
+      }
+      me._intellisenseDisposables = [];
+
+      const disposable = monaco.languages.registerCompletionItemProvider(
+        "sqlite",
+        {
+          triggerCharacters: ["."],
+          provideCompletionItems: (model, position) => {
+            let wordInfo = model.getWordUntilPosition(position);
+            let range = {
+              startLineNumber: position.lineNumber,
+              endLineNumber: position.lineNumber,
+              startColumn: wordInfo.startColumn,
+              endColumn: wordInfo.endColumn,
+            };
+
+            const text = model.getValue();
+            const aliasMap = new Map();
+            const regex =
+              /(?:from|join)\s+(\w+)(?:\s+as)?\s+(\w+)?/gi;
+            const sqlKeywords = [
+              "where", "join", "on", "left", "right", "inner", "outer",
+              "cross", "group", "order", "having", "limit", "select",
+              "and", "or", "union", "except", "intersect",
+            ];
+            let match;
+            while ((match = regex.exec(text)) !== null) {
+              let table = match[1].toLowerCase();
+              let alias = match[2] && !sqlKeywords.includes(match[2].toLowerCase())
+                ? match[2].toLowerCase()
+                : table;
+              aliasMap.set(alias, { table });
+            }
+
+            let lineContent = model.getLineContent(position.lineNumber);
+            let textBeforeCursor = lineContent.substring(0, position.column - 1);
+            let dotMatch = textBeforeCursor.match(
+              /([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]*)$/,
+            );
+
+            let suggestions = [];
+
+            if (dotMatch) {
+              let prefix = dotMatch[1].toLowerCase();
+              let typedWord = dotMatch[2];
+              let totalOffset = prefix.length + 1 + typedWord.length;
+              range = {
+                startLineNumber: position.lineNumber,
+                endLineNumber: position.lineNumber,
+                startColumn: position.column - totalOffset,
+                endColumn: position.column,
+              };
+
+              if (aliasMap.has(prefix)) {
+                let mapped = aliasMap.get(prefix);
+                let cols = me.columnsByTable.get(mapped.table) || [];
+                cols.forEach((col) => {
+                  suggestions.push({
+                    label: col.name,
+                    kind: monaco.languages.CompletionItemKind.Field,
+                    detail: col.type || "",
+                    filterText: `${prefix}.${col.name}`,
+                    insertText: `${prefix}.${col.name}`,
+                    range: range,
+                  });
+                });
+              } else if (me.columnsByTable.has(prefix)) {
+                let cols = me.columnsByTable.get(prefix) || [];
+                cols.forEach((col) => {
+                  suggestions.push({
+                    label: col.name,
+                    kind: monaco.languages.CompletionItemKind.Field,
+                    detail: col.type || "",
+                    filterText: `${prefix}.${col.name}`,
+                    insertText: `${prefix}.${col.name}`,
+                    range: range,
+                  });
+                });
+              }
+            } else {
+              const usedNames = new Set();
+              const re =
+                /(?:from|join)\s+(\w+)(?:\s+as)?\s+(\w+)?/gi;
+              let m;
+              while ((m = re.exec(text)) !== null) {
+                if (m[1]) usedNames.add(m[1].toLowerCase());
+                if (m[2]) usedNames.add(m[2].toLowerCase());
+              }
+
+              const genAlias = (name) => {
+                if (!name) return null;
+                const base = name.split(".").pop();
+                const words = base.split("_").filter((w) => w.length > 0);
+                if (words.length === 0) return null;
+                let alias = words.map((w) => w[0]).join("").toLowerCase();
+                if (!alias) return null;
+                let finalAlias = alias;
+                let counter = 1;
+                while (usedNames.has(finalAlias)) {
+                  counter++;
+                  finalAlias = alias + counter;
+                  if (counter > 100) return alias;
+                }
+                return finalAlias;
+              };
+
+              SQLITE_KEYWORDS.forEach((kw) => {
+                suggestions.push({
+                  label: kw,
+                  kind: monaco.languages.CompletionItemKind.Keyword,
+                  insertText: kw,
+                  range: range,
+                });
+              });
+
+              me.allTableColumns.forEach((t) => {
+                const alias = genAlias(t.table_name);
+                suggestions.push({
+                  label: t.table_name,
+                  kind: monaco.languages.CompletionItemKind.Struct,
+                  detail: "table",
+                  insertText: alias ? `${t.table_name} ${alias} ` : t.table_name,
+                  range: range,
+                });
+              });
+
+              let allColNames = new Set();
+              me.allTableColumns.forEach((t) => {
+                (t.columns || []).forEach((col) => {
+                  if (!allColNames.has(col.name)) {
+                    allColNames.add(col.name);
+                    suggestions.push({
+                      label: col.name,
+                      kind: monaco.languages.CompletionItemKind.Field,
+                      detail: col.type || "",
+                      insertText: col.name,
+                      range: range,
+                    });
+                  }
+                });
+              });
+
+              aliasMap.forEach((mapped, alias) => {
+                let cols = me.columnsByTable.get(mapped.table) || [];
+                cols.forEach((col) => {
+                  suggestions.push({
+                    label: `${alias}.${col.name}`,
+                    kind: monaco.languages.CompletionItemKind.Field,
+                    detail: col.type || "",
+                    filterText: `${alias}.${col.name}`,
+                    insertText: `${alias}.${col.name}`,
+                    range: range,
+                  });
+                });
+              });
+            }
+
+            return { suggestions };
+          },
+        },
+      );
+      me._intellisenseDisposables.push(disposable);
+    },
+
+    /**
+     * Load schema metadata (tables + columns) từ API, lưu cache, áp dụng intellisense
      */
     async loadSchemaMetadata() {
       let me = this;
       try {
         let res = await me.agentAPI.getAllTableAndColumns();
         if (res && res.success && Array.isArray(res.data.data)) {
-          me.allTableColumns = res.data.data;
-          me.columnsByTable = new Map();
-          res.data.data.forEach((t) => {
-            let tableName = (t.table_name || "").toLowerCase();
-            me.columnsByTable.set(tableName, t.columns || []);
-          });
-          updateSqliteIntellisenseData(res.data.data);
+          me._applySchemaData(res.data.data);
+          await me.$tdCache.set(
+            me.$tdEnum.cacheConfig.AppDataMinerSchema,
+            res.data.data
+          );
+          if (me._monacoInstance) {
+            me._registerSqliteProviders(me._monacoInstance);
+          }
         }
       } catch (error) {
         console.error("Lỗi tải schema metadata:", error);
@@ -358,7 +429,9 @@ export default {
       let me = this;
       me.currentTableDatas = [];
       try {
-        let history = await cache.get(me.$tdEnum.cacheConfig.CopyTextHistory);
+        let history = await me.$tdCache.get(
+          me.$tdEnum.cacheConfig.CopyTextHistory
+        );
         if (!history) {
           history = [];
         }
@@ -381,7 +454,7 @@ export default {
     },
     async deleteClipboardHistory() {
       let me = this;
-      await cache.remove(me.$tdEnum.cacheConfig.CopyTextHistory);
+      await me.$tdCache.remove(me.$tdEnum.cacheConfig.CopyTextHistory);
       await me.loadClipboardHistory();
     },
 

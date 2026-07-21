@@ -573,13 +573,9 @@ export default {
   },
 
   /**
-   * Dọn dẹp intellisense provider khi component bị huỷ
+   * Dọn dẹp khi component bị huỷ (đã xử lý qua onTabLeave → disposeIntellisense)
    */
-  beforeUnmount() {
-    if (this.intellisenseDisposable) {
-      this.intellisenseDisposable.forEach((d) => d?.dispose?.());
-    }
-  },
+  beforeUnmount() {},
 
   computed: {
     /**
@@ -1685,9 +1681,9 @@ export default {
     },
 
     /**
-     * Khi tab được active: đăng ký shortcut, load intellisense từ cache
+     * Khi tab được active: đăng ký shortcut
      */
-    onTabEnter() {
+    onTabEnterCustom() {
       let me = this;
       TDShortcutAction.register(
         TDShortcutActionEnum.ExecutePosgreSQLCode,
@@ -1697,22 +1693,14 @@ export default {
         TDShortcutActionEnum.DllInspect,
         me.getConfigDLLInspect(),
       );
-      if (me.selectedConnectionId) {
-        me.loadCachedIntellisense();
-      }
     },
 
     /**
-     * Khi tab bị inactive: restore shortcut gốc, dispose intellisense providers
+     * Khi tab bị inactive: restore shortcut gốc
      */
-    onTabLeave() {
-      let me = this;
+    onTabLeaveCustom() {
       TDShortcutAction.unregister(TDShortcutActionEnum.ExecutePosgreSQLCode);
       TDShortcutAction.unregister(TDShortcutActionEnum.DllInspect);
-      if (me.intellisenseDisposable) {
-        me.intellisenseDisposable.forEach((d) => d?.dispose?.());
-        me.intellisenseDisposable = [];
-      }
     },
 
     /**
