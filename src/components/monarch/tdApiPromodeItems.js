@@ -4,50 +4,32 @@
  *
  * Khi thêm hàm mới:
  * 1. Tạo file .md trong thư mục docs/
- * 2. Thêm entry vào API_ITEMS bên dưới
+ * 2. Thêm entry vào ITEMS_CONFIG bên dưới
  */
-import requestCURLDoc from "./docs/requestCURL.md?raw";
-import requestDoc from "./docs/request.md?raw";
-import parseResponseDoc from "./docs/parseResponse.md?raw";
-import requestMultiDoc from "./docs/requestMulti.md?raw";
-import requestMultiCURLDoc from "./docs/requestMultiCURL.md?raw";
 
-export const API_ITEMS = [
-  {
-    label: "requestCURL",
-    insertText: "await requestCURL(${1:curlString})",
-    sortText: "0",
-    documentation: requestCURLDoc,
-  },
-  {
-    label: "request",
-    insertText: "await request({ method: ${1:'GET'}, url: ${2:url}, headers: ${3:headers}, body: ${4:body} })",
-    sortText: "1",
-    documentation: requestDoc,
-  },
-  {
-    label: "parseResponse",
-    insertText: "parseResponse(${1:response})",
-    sortText: "2",
-    documentation: parseResponseDoc,
-  },
-  {
-    label: "requestMulti",
-    insertText: "await requestMulti(${1:[{method, url, headers, body}]})",
-    sortText: "3",
-    documentation: requestMultiDoc,
-  },
-  {
-    label: "requestMultiCURL",
-    insertText: "await requestMultiCURL(${1:[curlString1, curlString2]})",
-    sortText: "4",
-    documentation: requestMultiCURLDoc,
-  },
+const docModules = import.meta.glob("./apiTesting/*.md", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+});
+
+function getDoc(name) {
+  return docModules[`./apiTesting/${name}.md`];
+}
+
+const ITEMS_CONFIG = [
+  { label: "requestCURL", insertText: "await requestCURL()", sortText: "0", doc: "requestCURL" },
+  { label: "request", insertText: "await request()", sortText: "1", doc: "request" },
+  { label: "parseResponse", insertText: "parseResponse()", sortText: "2", doc: "parseResponse" },
+  { label: "requestMulti", insertText: "await requestMulti()", sortText: "3", doc: "requestMulti" },
+  { label: "requestMultiCURL", insertText: "await requestMultiCURL()", sortText: "4", doc: "requestMultiCURL" },
 ];
 
-/**
- * Trả về danh sách label tất cả các items (dùng cho hover lookup).
- */
+export const API_ITEMS = ITEMS_CONFIG.map((item) => ({
+  ...item,
+  documentation: getDoc(item.doc),
+}));
+
 export function getItemLabels() {
   return API_ITEMS.map((item) => item.label);
 }
