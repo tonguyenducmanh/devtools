@@ -1,16 +1,11 @@
-**requestMulti(requests[])**
+Send multiple HTTP requests in parallel. Preserves input order.
 
-Gửi nhiều request song song với tham số rõ ràng, không cần CURL string.
+Takes an array of `{ method, url, headers, body }`. Returns an array of `{ status, headers, body }`.
 
-Tham số:
-- `requests`: Mảng object `{ method, url, headers, body }`
-
-Trả về `Promise<Array<{status, headers, body}>>` theo đúng thứ tự input.
-
-Ví dụ:
+### Examples
 ```js
-let results = await requestMulti([
-  { method: 'GET', url: 'https://api.example.com/a', headers: '', body: null },
-  { method: 'POST', url: 'https://api.example.com/b', headers: 'Content-Type:application/json', body: '{"key":"value"}' },
+let [res1, res2] = await requestMulti([
+  { method: 'GET', url: 'https://api.example.com/a', headers: {}, body: null },
+  { method: 'POST', url: 'https://api.example.com/b', headers: {}, body: '{"k":"v"}' },
 ]);
 ```

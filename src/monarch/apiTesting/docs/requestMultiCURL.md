@@ -1,15 +1,10 @@
-**requestMultiCURL(curlTexts[])**
+Send multiple CURL requests in parallel on the backend. Preserves input order.
 
-Gửi nhiều request CURL về backend chạy đồng thời bằng Go goroutines.
+Takes an array of CURL strings. Returns an array of `{ status, headers, body }`.
 
-Tham số:
-- `curlTexts`: Mảng các CURL string cần chạy song song
-
-Trả về `Promise<Array<{status, headers, body}>>` theo đúng thứ tự input.
-
-Ví dụ:
+### Examples
 ```js
-let results = await requestMultiCURL([
+let [res1, res2] = await requestMultiCURL([
   `curl 'https://api.example.com/a'`,
   `curl 'https://api.example.com/b'`,
 ]);

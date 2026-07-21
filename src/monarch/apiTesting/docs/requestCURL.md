@@ -1,9 +1,9 @@
-**requestCURL(curlString)**
+Execute a single CURL request via the agent server.
 
-Hàm gọi một request CURL thông qua agent server.
+Returns `{ status, headers, body }`. Use `parseResponse()` to extract JSON.
 
-Tham số:
-- `curlString`: Nội dung CURL cần thực thi
-
-Trả về `{ status, headers, body }`.
-Dùng `parseResponse()` để parse kết quả.
+### Examples
+```js
+let res = await requestCURL(`curl 'https://api.example.com/users'`);
+let data = parseResponse(res);
+```

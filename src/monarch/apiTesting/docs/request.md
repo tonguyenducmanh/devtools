@@ -1,21 +1,13 @@
-**request({method, url, headers, body})**
+Send an HTTP request with explicit parameters.
 
-Gọi HTTP request trực tiếp, không cần CURL string.
+Takes `{ method, url, headers, body }`. Returns `{ status, headers, body }`.
 
-Tham số:
-- `method`: HTTP method (GET, POST, PUT, PATCH, DELETE)
-- `url`: URL endpoint
-- `headers`: Headers - object `{key: value}` hoặc string `"key:value"` mỗi dòng
-- `body`: Request body - object (tự stringify JSON), string, hoặc null
-
-Trả về `Promise<{status, headers, body}>`.
-
-Ví dụ:
+### Examples
 ```js
 let res = await request({
-  method: 'POST',
+  method: 'GET',
   url: 'https://api.example.com/users',
-  headers: { 'Content-Type': 'application/json' },
-  body: { name: 'Alice', age: 30 }
+  headers: {},
+  body: null,
 });
 ```

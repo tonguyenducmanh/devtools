@@ -1,8 +1,9 @@
-**parseResponse(response)**
+Parse the body of a response as JSON.
 
-Hàm parse response từ `request()` hoặc `requestCURL()`, trả về body đã parse JSON.
+Works with results from `request()` or `requestCURL()`. Returns the parsed object, or the raw string if parsing fails.
 
-Tham số:
-- `response`: Response từ `request()` hoặc `requestCURL()`
-
-Trả về body đã parse JSON (hoặc string gốc nếu không parse được).
+### Examples
+```js
+let res = await requestCURL(`curl 'https://api.example.com/users'`);
+let data = parseResponse(res);
+```
