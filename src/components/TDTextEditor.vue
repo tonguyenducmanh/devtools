@@ -77,7 +77,7 @@ import {
   registerAllMonacoThemes,
   getMonacoSyntaxRules,
   monacoThemeColorMap,
-} from "@/components/monarch/TDMonacoTheme.js";
+} from "@/monarch/TDMonacoTheme.js";
 import { IQuickInputService } from "monaco-editor/esm/vs/platform/quickinput/common/quickInput.js";
 import { StandaloneServices } from "monaco-editor/esm/vs/editor/standalone/browser/standaloneServices.js";
 import _ from "@/common/TDCommonFunction.js";

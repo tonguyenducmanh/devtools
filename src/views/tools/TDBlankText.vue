@@ -45,7 +45,7 @@
   </div>
 </template>
 <script>
-import { registerPgsqlFormatProvider } from "@/components/monarch/pgsql/pgsqlFormatProvider.js";
+import { registerPgsqlFormatProvider } from "@/monarch/pgsql/pgsqlFormatProvider.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 export default {
   extends: TDToolBase,

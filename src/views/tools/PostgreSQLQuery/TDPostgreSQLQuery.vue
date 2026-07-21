@@ -461,7 +461,7 @@ import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDCache from "@/common/cache/TDCache.js";
 import { pgQueries } from "@/templates/postgresqlToolQuery/templates.js";
 import TDPostgreSQLIntellisenseMixin from "./TDPostgreSQLIntellisenseMixin.js";
-import { registerPgsqlFormatProvider } from "@/components/monarch/pgsql/pgsqlFormatProvider.js";
+import { registerPgsqlFormatProvider } from "@/monarch/pgsql/pgsqlFormatProvider.js";
 import { TDShortcutActionEnum } from "@/common/TDShortcutAction.js";
 import TDDatabaseConnectionMixin from "@/mixins/TDDatabaseConnectionMixin.js";
 import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";

@@ -70,12 +70,12 @@
 <script>
 import TDServerAppDataMiner from "@/common/api/request/AgentAPI/TDServerAppDataMiner.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
-import { SQLITE_KEYWORDS } from "@/components/monarch/sqlite/sqliteKeyword.js";
+import { SQLITE_KEYWORDS } from "@/monarch/sqlite/sqliteKeyword.js";
 import {
   registerSqliteLanguage,
   updateSqliteIntellisenseData,
-} from "@/components/monarch/sqlite/sqliteLanguage.js";
-import { registerSqliteFormatProvider } from "@/components/monarch/sqlite/sqliteFormatProvider.js";
+} from "@/monarch/sqlite/sqliteLanguage.js";
+import { registerSqliteFormatProvider } from "@/monarch/sqlite/sqliteFormatProvider.js";
 
 const DATA_SOURCE_TYPE = {
   Clipboard: 1,

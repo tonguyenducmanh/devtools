@@ -5,7 +5,7 @@ import { pgQueries } from "@/templates/postgresqlToolQuery/templates.js";
 import {
   registerPgsqlLanguage,
   updatePgsqlIntellisenseData,
-} from "@/components/monarch/pgsql/pgsqlLanguage.js";
+} from "@/monarch/pgsql/pgsqlLanguage.js";
 
 export default {
   created() {
