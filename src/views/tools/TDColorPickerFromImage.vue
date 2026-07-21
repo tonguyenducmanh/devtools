@@ -152,21 +152,14 @@ export default {
       me.$tdUtility.copyToClipboard(value);
     },
     /**
-     * Hàm này được gọi khi tab được active hoặc khi component được mount (nếu đang active)
-     * Component con override onTabEnterCustom / onTabLeaveCustom
+     * Cấu hình lifecycle tab: đăng ký paste event
      */
-    onTabEnterCustom() {
+    getTabLifecycleConfig() {
       let me = this;
-      document.addEventListener("paste", me.handlePasteEvent);
-    },
-
-    /**
-     * Hàm này được gọi khi tab bị inactive hoặc trước khi component bị unmount (nếu đang active)
-     * Component con override onTabEnterCustom / onTabLeaveCustom
-     */
-    onTabLeaveCustom() {
-      let me = this;
-      document.removeEventListener("paste", me.handlePasteEvent);
+      return {
+        shortcuts: [],
+        domEvents: [{ event: "paste", handler: me.handlePasteEvent }],
+      };
     },
     /**
      * Xử lý event paste mã QR

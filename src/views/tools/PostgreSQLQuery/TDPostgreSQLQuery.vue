@@ -462,9 +462,7 @@ import TDCache from "@/common/cache/TDCache.js";
 import { pgQueries } from "@/templates/postgresqlToolQuery/templates.js";
 import TDPostgreSQLIntellisenseMixin from "./TDPostgreSQLIntellisenseMixin.js";
 import { registerPgsqlFormatProvider } from "@/components/monarch/pgsqlFormatProvider.js";
-import TDShortcutAction, {
-  TDShortcutActionEnum,
-} from "@/common/TDShortcutAction.js";
+import { TDShortcutActionEnum } from "@/common/TDShortcutAction.js";
 import TDDatabaseConnectionMixin from "@/mixins/TDDatabaseConnectionMixin.js";
 import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";
 import TDDotNetWasmMixin from "@/mixins/TDDotNetWasmMixin.js";
@@ -1681,26 +1679,23 @@ export default {
     },
 
     /**
-     * Khi tab được active: đăng ký shortcut
+     * Cấu hình lifecycle tab: đăng ký shortcuts
      */
-    onTabEnterCustom() {
+    getTabLifecycleConfig() {
       let me = this;
-      TDShortcutAction.register(
-        TDShortcutActionEnum.ExecutePosgreSQLCode,
-        me.getConfigExecuteSQLCode(),
-      );
-      TDShortcutAction.register(
-        TDShortcutActionEnum.DllInspect,
-        me.getConfigDLLInspect(),
-      );
-    },
-
-    /**
-     * Khi tab bị inactive: restore shortcut gốc
-     */
-    onTabLeaveCustom() {
-      TDShortcutAction.unregister(TDShortcutActionEnum.ExecutePosgreSQLCode);
-      TDShortcutAction.unregister(TDShortcutActionEnum.DllInspect);
+      return {
+        shortcuts: [
+          {
+            enum: TDShortcutActionEnum.ExecutePosgreSQLCode,
+            config: me.getConfigExecuteSQLCode(),
+          },
+          {
+            enum: TDShortcutActionEnum.DllInspect,
+            config: me.getConfigDLLInspect(),
+          },
+        ],
+        domEvents: [],
+      };
     },
 
     /**

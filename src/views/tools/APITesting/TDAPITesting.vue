@@ -583,9 +583,7 @@ import proModeTemplates from "@/templates/apiTesting/templates.js";
 import { registerTdApiPromodeLanguage } from "@/components/monarch/tdApiPromodeLanguage.js";
 import { registerTdApiPromodeFormatProvider } from "@/components/monarch/tdApiPromodeFormatProvider.js";
 import _ from "@/common/TDCommonFunction.js";
-import TDShortcutAction, {
-  TDShortcutActionEnum,
-} from "@/common/TDShortcutAction.js";
+import { TDShortcutActionEnum } from "@/common/TDShortcutAction.js";
 export default {
   extends: TDToolBase,
   name: "TDAPITesting",
@@ -768,26 +766,34 @@ export default {
     }
   },
   methods: {
-    onTabEnterCustom() {
+    /**
+     * Cấu hình lifecycle tab: đăng ký shortcut execute
+     */
+    getTabLifecycleConfig() {
       let me = this;
-      TDShortcutAction.register(TDShortcutActionEnum.ExecuteAPITesting, {
-        sortOrder: 100,
-        presentKey: [me.$tdUtility.ctrlKey(), me.$tdUtility.enterKey()],
-        labelKey: "i18nCommon.shortKeyAction.executeAPITesting",
-        action: (event) => {
-          if (
-            event &&
-            (event.metaKey || event.ctrlKey) &&
-            event.key === "Enter"
-          ) {
-            event.preventDefault();
-            me.debouncedHandleSend();
-          }
-        },
-      });
-    },
-    onTabLeaveCustom() {
-      TDShortcutAction.unregister(TDShortcutActionEnum.ExecuteAPITesting);
+      return {
+        shortcuts: [
+          {
+            enum: TDShortcutActionEnum.ExecuteAPITesting,
+            config: {
+              sortOrder: 100,
+              presentKey: [me.$tdUtility.ctrlKey(), me.$tdUtility.enterKey()],
+              labelKey: "i18nCommon.shortKeyAction.executeAPITesting",
+              action: (event) => {
+                if (
+                  event &&
+                  (event.metaKey || event.ctrlKey) &&
+                  event.key === "Enter"
+                ) {
+                  event.preventDefault();
+                  me.debouncedHandleSend();
+                }
+              },
+            },
+          },
+        ],
+        domEvents: [],
+      };
     },
     registerIntellisense() {
       let me = this;

@@ -2,6 +2,7 @@
 <script>
 import _ from "@/common/TDCommonFunction.js";
 import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
+import TDShortcutAction from "@/common/TDShortcutAction.js";
 
 export default {
   name: "TDToolBase",
@@ -27,7 +28,7 @@ export default {
      */
     onTabEnter() {
       this.registerIntellisense();
-      this.onTabEnterCustom();
+      this._applyTabLifecycleEnter();
     },
 
     /**
@@ -37,7 +38,7 @@ export default {
      */
     onTabLeave() {
       this.disposeIntellisense();
-      this.onTabLeaveCustom();
+      this._applyTabLifecycleLeave();
     },
 
     /**
@@ -53,16 +54,53 @@ export default {
     disposeIntellisense() {},
 
     /**
-     * Logic riêng của tool khi tab được active (vd: đăng ký shortcut)
-     * Component con override nếu cần
+     * Trả về cấu hình lifecycle khi tab enter/leave.
+     * Component con override để khai báo shortcuts và domEvents.
+     *
+     * Cấu trúc:
+     * {
+     *   shortcuts: [{ enum, config }],
+     *   domEvents: [{ event, handler }]
+     * }
      */
-    onTabEnterCustom() {},
+    getTabLifecycleConfig() {
+      return {
+        shortcuts: [],
+        domEvents: [],
+      };
+    },
 
     /**
-     * Logic riêng của tool khi tab bị inactive (vd: unregister shortcut)
-     * Component con override nếu cần
+     * Đăng ký shortcuts và thêm DOM event khi tab enter
      */
-    onTabLeaveCustom() {},
+    _applyTabLifecycleEnter() {
+      let me = this;
+      let config = me.getTabLifecycleConfig();
+
+      (config.shortcuts || []).forEach((item) => {
+        TDShortcutAction.register(item.enum, item.config);
+      });
+
+      (config.domEvents || []).forEach((item) => {
+        if (item.handler) document.addEventListener(item.event, item.handler);
+      });
+    },
+
+    /**
+     * Hủy shortcuts và xóa DOM event khi tab leave
+     */
+    _applyTabLifecycleLeave() {
+      let me = this;
+      let config = me.getTabLifecycleConfig();
+
+      (config.shortcuts || []).forEach((item) => {
+        TDShortcutAction.unregister(item.enum);
+      });
+
+      (config.domEvents || []).forEach((item) => {
+        if (item.handler) document.removeEventListener(item.event, item.handler);
+      });
+    },
 
     reBuildTabTitle: _.debounce(function (content) {
       let me = this;

@@ -397,21 +397,14 @@ export default {
       return timestamp;
     },
     /**
-     * Hàm này được gọi khi tab được active hoặc khi component được mount (nếu đang active)
-     * Component con override onTabEnterCustom / onTabLeaveCustom
+     * Cấu hình lifecycle tab: đăng ký keydown event
      */
-    onTabEnterCustom() {
+    getTabLifecycleConfig() {
       let me = this;
-      document.addEventListener("keydown", me.handleKeydownEvent);
-    },
-
-    /**
-     * Hàm này được gọi khi tab bị inactive hoặc trước khi component bị unmount (nếu đang active)
-     * Component con override onTabEnterCustom / onTabLeaveCustom
-     */
-    onTabLeaveCustom() {
-      let me = this;
-      document.removeEventListener("keydown", me.handleKeydownEvent);
+      return {
+        shortcuts: [],
+        domEvents: [{ event: "keydown", handler: me.handleKeydownEvent }],
+      };
     },
     handleKeydownEvent(event) {
       let me = this;
