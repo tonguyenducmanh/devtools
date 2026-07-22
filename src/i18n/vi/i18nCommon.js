@@ -527,6 +527,7 @@ export default {
       newCollectionName: "Tên collection mới",
       save: "Lưu request",
       createNewRequest: "Tạo request mới",
+      copyAIDocs: "Sao chép API reference cho AI prompt",
       beautify: "Làm đẹp",
       delete: "Xoá",
       add: "Thêm",

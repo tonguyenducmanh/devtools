@@ -86,9 +86,7 @@
         <template v-else>
           <TDUpload
             v-tooltip="{
-              text: $t(
-                'i18nCommon.apiTesting.importCollectionZipTooltip',
-              ),
+              text: $t('i18nCommon.apiTesting.importCollectionZipTooltip'),
               maxWidth: '500px',
             }"
             iconClass="td-upload-icon"
@@ -115,6 +113,14 @@
             :noMargin="true"
             iconClass="td-save-icon"
             v-tooltip="$t('i18nCommon.apiTesting.save')"
+          ></TDButton>
+          <!-- nút copy AI docs -->
+          <TDButton
+            :noMargin="true"
+            @click="copyAIDocsToClipboard"
+            :type="$tdEnum.buttonType.secondary"
+            iconClass="td-copy-icon"
+            v-tooltip="$t('i18nCommon.apiTesting.copyAIDocs')"
           ></TDButton>
         </template>
       </div>
@@ -727,6 +733,7 @@ import { registerTdApiPromodeLanguage } from "@/monarch/apiTesting/tdApiPromodeL
 import { registerTdApiPromodeFormatProvider } from "@/monarch/apiTesting/tdApiPromodeFormatProvider.js";
 import { registerTdApiPromodeCompletionProvider } from "@/monarch/apiTesting/tdApiPromodeCompletionProvider.js";
 import { registerTdApiPromodeHoverProvider } from "@/monarch/apiTesting/tdApiPromodeHoverProvider.js";
+import { API_ITEMS } from "@/monarch/apiTesting/tdApiPromodeItems.js";
 import _ from "@/common/TDCommonFunction.js";
 import { TDShortcutActionEnum } from "@/common/TDShortcutAction.js";
 export default {
@@ -966,14 +973,11 @@ export default {
       }
       me._proModeDisposables = [];
 
-      const completionDisposable = registerTdApiPromodeCompletionProvider(
-        monacoInstance,
-      );
+      const completionDisposable =
+        registerTdApiPromodeCompletionProvider(monacoInstance);
       me._proModeDisposables.push(completionDisposable);
 
-      const hoverDisposable = registerTdApiPromodeHoverProvider(
-        monacoInstance,
-      );
+      const hoverDisposable = registerTdApiPromodeHoverProvider(monacoInstance);
       me._proModeDisposables.push(hoverDisposable);
 
       registerTdApiPromodeFormatProvider(monacoInstance);
@@ -1317,7 +1321,11 @@ export default {
     },
     async saveProModeRequest() {
       let me = this;
-      if (me.requestName && me.allProModeCollection && me.allProModeCollection.length > 0) {
+      if (
+        me.requestName &&
+        me.allProModeCollection &&
+        me.allProModeCollection.length > 0
+      ) {
         if (me.currentProModeRequestId) {
           let currentCollection = me.allProModeCollection.find((c) =>
             c.requests.find((r) => r.requestId == me.currentProModeRequestId),
@@ -1426,6 +1434,31 @@ export default {
         }
       }
     },
+    copyAIDocsToClipboard() {
+      let me = this;
+      let prompt = me.buildAIDocsPrompt();
+      me.$tdUtility.copyToClipboard(prompt);
+    },
+    buildAIDocsPrompt() {
+      let lines = [];
+      lines.push("# API Testing ProMode Reference");
+      lines.push("");
+      lines.push("Available functions in APITesting ProMode tool:");
+      lines.push("");
+
+      API_ITEMS.forEach((item) => {
+        lines.push(`## ${item.label}`);
+        lines.push("");
+        if (item.documentation) {
+          lines.push(item.documentation.trim());
+        }
+        lines.push("");
+      });
+
+      lines.push("# End of Reference");
+
+      return lines.join("\n");
+    },
     async deleteProModeCollection(collectionId) {
       let me = this;
       if (collectionId) {
@@ -1501,7 +1534,32 @@ export default {
     async buildProModeCollectionsFromZip(zip) {
       let me = this;
       let collections = {};
-      let textExtensions = [".txt", ".js", ".ts", ".jsx", ".tsx", ".json", ".md", ".sh", ".py", ".sql", ".html", ".css", ".xml", ".yaml", ".yml", ".cs", ".java", ".go", ".rb", ".php", ".vue", ".env", ".conf", ".log"];
+      let textExtensions = [
+        ".txt",
+        ".js",
+        ".ts",
+        ".jsx",
+        ".tsx",
+        ".json",
+        ".md",
+        ".sh",
+        ".py",
+        ".sql",
+        ".html",
+        ".css",
+        ".xml",
+        ".yaml",
+        ".yml",
+        ".cs",
+        ".java",
+        ".go",
+        ".rb",
+        ".php",
+        ".vue",
+        ".env",
+        ".conf",
+        ".log",
+      ];
 
       for (let file of Object.values(zip.files)) {
         if (file.dir) continue;
@@ -1598,7 +1656,32 @@ export default {
     async buildCollectionsFromZip(zip) {
       let me = this;
       let collections = {};
-      let textExtensions = [".txt", ".js", ".ts", ".jsx", ".tsx", ".json", ".md", ".sh", ".py", ".sql", ".html", ".css", ".xml", ".yaml", ".yml", ".cs", ".java", ".go", ".rb", ".php", ".vue", ".env", ".conf", ".log"];
+      let textExtensions = [
+        ".txt",
+        ".js",
+        ".ts",
+        ".jsx",
+        ".tsx",
+        ".json",
+        ".md",
+        ".sh",
+        ".py",
+        ".sql",
+        ".html",
+        ".css",
+        ".xml",
+        ".yaml",
+        ".yml",
+        ".cs",
+        ".java",
+        ".go",
+        ".rb",
+        ".php",
+        ".vue",
+        ".env",
+        ".conf",
+        ".log",
+      ];
 
       for (let file of Object.values(zip.files)) {
         if (file.dir) continue;

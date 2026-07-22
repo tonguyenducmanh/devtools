@@ -529,6 +529,7 @@ export default {
       newCollectionName: "New collection name",
       save: "Save request",
       createNewRequest: "New request",
+      copyAIDocs: "Copy API reference for AI prompt",
       beautify: "Beautify",
       delete: "Delete",
       add: "Add",
