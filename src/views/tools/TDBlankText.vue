@@ -39,6 +39,7 @@
           v-model="currentConfigLayout.wrapText"
           @change="updateConfigLayout"
           :label="$t('i18nCommon.wrapText')"
+          :variant="$tdEnum.checkboxType.switch"
         ></TDCheckbox>
       </div>
     </div>
