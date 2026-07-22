@@ -147,6 +147,7 @@ export default {
       CSharpTemplate: "Code mẫu C#",
       JavaScriptTemplate: "Code mẫu JavaScript",
       PowerShellTemplate: "Code mẫu PowerShell",
+      APITestingTemplate: "Code mẫu API Testing",
       BilingualWeb: "Web song ngữ",
       agentDownload: {
         title: "Tải Agent",

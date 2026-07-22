@@ -146,6 +146,7 @@ export default {
       CSharpTemplate: "C# template",
       JavaScriptTemplate: "JavaScript template",
       PowerShellTemplate: "PowerShell template",
+      APITestingTemplate: "API Testing template",
       BilingualWeb: "Bilingual Web",
       agentDownload: {
         title: "Download Agent",

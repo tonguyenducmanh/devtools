@@ -359,29 +359,7 @@
             $tdEnum.APISidebarOption.Collection
           "
         >
-          <template
-            v-if="currentConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode"
-          >
-            <div
-              v-if="proModeTemplate && proModeTemplate.length > 0"
-              class="flex flex-col td-template-content"
-            >
-              <div
-                v-for="(template, indexRequest) in proModeTemplate"
-                :key="indexRequest"
-                class="flex td-template-item"
-                @click="applyRequestProMode(template)"
-              >
-                <span class="no-select text-nowrap">
-                  <div>
-                    {{ $t(template.labelKey) }}
-                  </div>
-                </span>
-              </div>
-            </div>
-          </template>
-          <template v-else>
-            <!-- phần header của bộ sưu tập request -->
+          <!-- phần header của bộ sưu tập request -->
             <div class="flex td-header-collection">
               <div class="td-new-collection">
                 <TDInput
@@ -500,7 +478,6 @@
                 </div>
               </div>
             </div>
-          </template>
         </div>
         <!-- phần sidebar nếu đang tùy chọn thiết lập api -->
         <div
@@ -579,7 +556,6 @@ import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDAPITestingHelp from "@/views/helps/TDAPITestingHelp.vue";
-import proModeTemplates from "@/templates/apiTesting/templates.js";
 import { registerTdApiPromodeLanguage } from "@/monarch/apiTesting/tdApiPromodeLanguage.js";
 import { registerTdApiPromodeFormatProvider } from "@/monarch/apiTesting/tdApiPromodeFormatProvider.js";
 import { registerTdApiPromodeCompletionProvider } from "@/monarch/apiTesting/tdApiPromodeCompletionProvider.js";
@@ -647,7 +623,6 @@ export default {
         { value: this.$tdEnum.APIMode.ProMode, label: "Pro" },
       ],
       proModeSecranioCode: "",
-      proModeTemplate: proModeTemplates,
       requestSectionSize: 50, // Phần request chiếm 50%
       responseSectionSize: 50, // Phần response chiếm 50%
       agentAPI: null,
@@ -1428,14 +1403,6 @@ export default {
         me.currentRequestId = null;
       }
     },
-    applyRequestProMode(template) {
-      let me = this;
-      if (template && template.labelKey && template.code) {
-        me.requestName = me.$t(template.labelKey);
-        me.proModeSecranioCode =
-          me.$t("i18nCommon.apiTesting.tutorialProModeCode") + template.code;
-      }
-    },
     getRequestObj() {
       let me = this;
       return {
@@ -1768,23 +1735,6 @@ body[data-theme="dark"] {
   width: 100%;
 }
 
-.td-template-content {
-  height: 100%;
-  width: 100%;
-  justify-content: flex-start;
-  margin: var(--padding);
-  .td-template-item {
-    cursor: pointer;
-    height: 40px;
-    width: 100%;
-    padding: var(--padding);
-    border-radius: var(--border-radius);
-    justify-content: flex-start;
-  }
-  .td-template-item:hover {
-    background-color: var(--bg-layer-color);
-  }
-}
 .td-import-request-group {
   gap: var(--padding);
   margin-left: var(--padding);
