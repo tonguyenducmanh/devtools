@@ -1,13 +1,10 @@
 export default {
   i18nTemplate: {
     apiTesting: {
-      DemoRequestPromode: "Call a single API",
-      MultipleCurl: "Call multiple APIs",
-      RunBatchPromiseAll: "Batch API concurency",
-      APIBatchSequency: "Batch API sequency",
-      RetryAPIDelay: "Call API with retry",
-      AutoPagination: "Call API paging",
-      DynamicParallel: "Dynamic parallel",
+      "1_SQLTablePaging": "Query table with paging",
+      "2_DemoRequestPromode": "Call a single API",
+      "3_DynamicParallel": "Dynamic parallel",
+      "4_RetryAPIDelay": "Call API with retry",
     },
     CSharpTemplate: {
       TwoThreadUsingList: "List 2 thread",
