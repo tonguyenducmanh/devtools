@@ -266,7 +266,8 @@ export default {
       let me = this;
       me.wrapTab = await me.$tdUtility.getUserSettings("wrapTab");
       me.showTabNumber = await me.$tdUtility.getUserSettings("showTabNumber");
-      appState.zenMode = await me.$tdUtility.getUserSettings("zenMode") || false;
+      appState.zenMode =
+        (await me.$tdUtility.getUserSettings("zenMode")) || false;
     },
     toggleZenMode() {
       appState.zenMode = !appState.zenMode;
@@ -466,7 +467,10 @@ export default {
     }
 
     function getTabTitle(tab) {
-      return tab.customTitle?.titleFull;
+      return {
+        text: tab.customTitle?.titleFull,
+        maxWidth: "600px",
+      };
     }
 
     // Drag state
