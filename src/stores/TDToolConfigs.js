@@ -152,6 +152,12 @@ const sidebarConfig = [
         meta: { titleKey: "i18nCommon.feature.PostgreSQLTemplate" },
       },
       {
+        name: "apitestingtemplate",
+        component: () =>
+          import("@/views/tools/codeTemplateTools/TDCodeTemplateAPITesting.vue"),
+        meta: { titleKey: "i18nCommon.feature.APITestingTemplate" },
+      },
+      {
         name: "javadcripttemplate",
         component: () =>
           import("@/views/tools/codeTemplateTools/TDCodeTemplateJavascript.vue"),
@@ -168,12 +174,6 @@ const sidebarConfig = [
         component: () =>
           import("@/views/tools/codeTemplateTools/TDCodeTemplatePowerShell.vue"),
         meta: { titleKey: "i18nCommon.feature.PowerShellTemplate" },
-      },
-      {
-        name: "apitestingtemplate",
-        component: () =>
-          import("@/views/tools/codeTemplateTools/TDCodeTemplateAPITesting.vue"),
-        meta: { titleKey: "i18nCommon.feature.APITestingTemplate" },
       },
     ],
   },
@@ -262,8 +262,7 @@ const sidebarConfig = [
       },
       {
         name: "vectormockgenerator",
-        component: () =>
-          import("@/views/tools/TDVectorMockGenerator.vue"),
+        component: () => import("@/views/tools/TDVectorMockGenerator.vue"),
         meta: {
           titleKey: "i18nCommon.feature.vectorMockGenerator",
         },
