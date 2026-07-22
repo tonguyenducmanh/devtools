@@ -56,11 +56,10 @@ async function fetchAllRows() {
   for (let i = 0; i < curlCommands.length; i += CONCURRENCY_CHUNK) {
     const chunk = curlCommands.slice(i, i + CONCURRENCY_CHUNK);
     const responses = await requestMultiCURL(chunk);
+    const allData = parseResponseMulti(responses);
 
-    for (const res of responses) {
-      const data = parseResponse(res);
+    for (const data of allData) {
       const rows = data?.Data ?? data?.Result ?? data;
-
       if (Array.isArray(rows)) {
         allRows = allRows.concat(rows);
       }
@@ -71,5 +70,4 @@ async function fetchAllRows() {
 }
 
 // ====== CHẠY ======
-const result = await fetchAllRows();
-return result;
+return await fetchAllRows();

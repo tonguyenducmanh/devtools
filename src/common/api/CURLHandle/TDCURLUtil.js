@@ -306,6 +306,17 @@ class TDCURLUtil {
   }
 
   /**
+   * Parse nhiều response cùng lúc.
+   * @param {Array} responses - Mảng response từ requestMultiCURL() hoặc requestMulti()
+   * @returns {Array} Mảng body đã parse JSON
+   */
+  parseResponseMulti(responses) {
+    let me = this;
+    if (!Array.isArray(responses)) return [];
+    return responses.map((r) => me.parseResponse(r));
+  }
+
+  /**
    * Gửi nhiều request song song với tham số rõ ràng (không cần CURL string).
    * @param {Array<{method, url, headers, body}>} requests - Mảng request objects
    * @returns {Promise<Array<{status, headers, body}>>}
@@ -369,6 +380,7 @@ class TDCURLUtil {
       requestCURL: me.requestCURL,
       request: me.request,
       parseResponse: me.parseResponse,
+      parseResponseMulti: me.parseResponseMulti,
       requestMulti: me.requestMulti,
       requestMultiCURL: me.requestMultiCURL,
       parseCURL: me.parseCURL,
@@ -386,6 +398,7 @@ class TDCURLUtil {
 let requestCURL = window.__tdAPI.apiTesting.requestCURL;
 let request = window.__tdAPI.apiTesting.request;
 let parseResponse = window.__tdAPI.apiTesting.parseResponse;
+let parseResponseMulti = window.__tdAPI.apiTesting.parseResponseMulti;
 let requestMulti = window.__tdAPI.apiTesting.requestMulti;
 let requestMultiCURL = window.__tdAPI.apiTesting.requestMultiCURL;
 let result = 

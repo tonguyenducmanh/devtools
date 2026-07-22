@@ -21,6 +21,7 @@ const ITEMS_CONFIG = [
   { label: "requestCURL", insertText: "await requestCURL()", sortText: "0", doc: "requestCURL" },
   { label: "request", insertText: "await request()", sortText: "1", doc: "request" },
   { label: "parseResponse", insertText: "parseResponse()", sortText: "2", doc: "parseResponse" },
+  { label: "parseResponseMulti", insertText: "parseResponseMulti()", sortText: "2a", doc: "parseResponseMulti" },
   { label: "requestMulti", insertText: "await requestMulti()", sortText: "3", doc: "requestMulti" },
   { label: "requestMultiCURL", insertText: "await requestMultiCURL()", sortText: "4", doc: "requestMultiCURL" },
 ];
