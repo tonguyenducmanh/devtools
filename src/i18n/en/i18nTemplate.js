@@ -43,6 +43,7 @@ export default {
       inspect_search_function: "Search Functions",
       inspect_list_databases: "List Databases",
       inspect_list_schemas: "List Schemas",
+      explain_analyze: "Explain Analyze",
     },
   },
 };

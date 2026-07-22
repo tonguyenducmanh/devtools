@@ -43,6 +43,7 @@ export default {
       inspect_search_function: "Tìm function",
       inspect_list_databases: "Xem danh sách database",
       inspect_list_schemas: "Xem danh sách schema",
+      explain_analyze: "Phân tích câu query",
     },
   },
 };
