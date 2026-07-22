@@ -84,6 +84,19 @@
           ></TDButton>
         </template>
         <template v-else>
+          <TDUpload
+            v-tooltip="{
+              text: $t(
+                'i18nCommon.apiTesting.importCollectionZipTooltip',
+              ),
+              maxWidth: '500px',
+            }"
+            iconClass="td-upload-icon"
+            :accept="'.zip'"
+            @change="importProModeCollectionZip"
+            ref="uploadAreaProMode"
+            :isShowSelect="false"
+          />
           <!-- nút thêm script mới (promode) -->
           <TDButton
             v-if="currentProModeRequestId"
@@ -1429,6 +1442,101 @@ export default {
       }
     },
 
+    // ─── ProMode ZIP Import ──────────────────────────────────────────
+    async importProModeCollectionZip() {
+      let me = this;
+      if (
+        me.$refs.uploadAreaProMode &&
+        typeof me.$refs.uploadAreaProMode.getFileSelected == "function" &&
+        typeof me.$refs.uploadAreaProMode.clearFileSelected == "function"
+      ) {
+        let zip = new JSZip();
+        let files = me.$refs.uploadAreaProMode.getFileSelected();
+        me.$refs.uploadAreaProMode.clearFileSelected();
+        if (files && Array.isArray(files) && files.length > 0) {
+          let zipData = await zip.loadAsync(files[0]);
+          let newCollections = await me.buildProModeCollectionsFromZip(zipData);
+          await me.saveProModeImportCollection(newCollections);
+        }
+      }
+    },
+    async saveProModeImportCollection(newCollections) {
+      let me = this;
+      if (!newCollections || newCollections.length === 0) return;
+
+      let groups = [];
+      let items = [];
+
+      newCollections.forEach((col) => {
+        groups.push({
+          id: col.collection_id,
+          name: col.name,
+        });
+
+        if (col.requests && col.requests.length > 0) {
+          col.requests.forEach((req) => {
+            items.push({
+              id: req.requestId,
+              request_name: req.requestName,
+              group_id: col.collection_id,
+              script_code: req.scriptCode,
+            });
+          });
+        }
+      });
+
+      try {
+        let response = await me.agentAPI.importProModeBatch({
+          groups: groups,
+          items: items,
+        });
+        if (response && response.success && response.data?.success) {
+          me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+          await me.loadAllProModeData();
+        }
+      } catch (e) {
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+      }
+    },
+    async buildProModeCollectionsFromZip(zip) {
+      let me = this;
+      let collections = {};
+      let textExtensions = [".txt", ".js", ".ts", ".jsx", ".tsx", ".json", ".md", ".sh", ".py", ".sql", ".html", ".css", ".xml", ".yaml", ".yml", ".cs", ".java", ".go", ".rb", ".php", ".vue", ".env", ".conf", ".log"];
+
+      for (let file of Object.values(zip.files)) {
+        if (file.dir) continue;
+        let lowerName = file.name.toLowerCase();
+        if (!textExtensions.some((ext) => lowerName.endsWith(ext))) continue;
+
+        // bỏ root folder
+        let parts = file.name.split("/").filter(Boolean);
+        if (parts.length < 2) continue;
+
+        let collectionName = parts[1];
+        let fileName = parts.at(-1);
+        // bỏ mọi extension để lấy tên script
+        let scriptName = fileName.replace(/\.[^.]+$/, "");
+
+        let content = await file.async("string");
+
+        if (!collections[collectionName]) {
+          collections[collectionName] = {
+            name: collectionName,
+            collection_id: me.$tdUtility.newGuid(),
+            openingCollection: false,
+            requests: [],
+          };
+        }
+        collections[collectionName].requests.push({
+          requestName: scriptName,
+          scriptCode: content,
+          requestId: me.$tdUtility.newGuid(),
+        });
+      }
+
+      return Object.values(collections);
+    },
+
     async importCollectionZip() {
       let me = this;
       if (
@@ -1490,10 +1598,12 @@ export default {
     async buildCollectionsFromZip(zip) {
       let me = this;
       let collections = {};
+      let textExtensions = [".txt", ".js", ".ts", ".jsx", ".tsx", ".json", ".md", ".sh", ".py", ".sql", ".html", ".css", ".xml", ".yaml", ".yml", ".cs", ".java", ".go", ".rb", ".php", ".vue", ".env", ".conf", ".log"];
 
       for (let file of Object.values(zip.files)) {
         if (file.dir) continue;
-        if (!file.name.endsWith(".txt")) continue;
+        let lowerName = file.name.toLowerCase();
+        if (!textExtensions.some((ext) => lowerName.endsWith(ext))) continue;
 
         // bỏ root folder
         let parts = file.name.split("/").filter(Boolean);
@@ -1501,7 +1611,7 @@ export default {
 
         let collectionName = parts[1]; // Shopee
         let fileName = parts.at(-1); // 01_xxx.txt
-        let requestName = fileName.replace(".txt", "");
+        let requestName = fileName.replace(/\.[^.]+$/, "");
 
         let content = await file.async("string");
 

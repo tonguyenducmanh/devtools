@@ -21,3 +21,9 @@ type TDAPITestingProModeGroup struct {
 func (g TDAPITestingProModeGroup) TableName() string {
 	return "td_api_testing_pro_mode_group"
 }
+
+// model import batch cho promode
+type TDAPITestingProModeImportBatch struct {
+	Groups []TDAPITestingProModeGroup `json:"groups"`
+	Items  []TDAPITestingProModeItem  `json:"items"`
+}

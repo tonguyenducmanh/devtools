@@ -23,4 +23,5 @@ func InjectAPITestingRouter(app *http.ServeMux) {
 
 	// Import Batch
 	app.HandleFunc("POST /api_test/import_batch", service.BatchImportTestingData)
+	app.HandleFunc("POST /api_test/import_pro_mode_batch", service.BatchImportProModeTestingData)
 }

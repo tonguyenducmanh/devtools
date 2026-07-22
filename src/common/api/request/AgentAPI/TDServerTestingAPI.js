@@ -32,6 +32,13 @@ class TDServerTestingAPI extends TDAgentAPI {
   async importTestingDataBatch(batchData) {
     return await this.post("/api_test/import_batch", batchData);
   }
+
+  /**
+   * Import batch ProMode (Groups + Items)
+   */
+  async importProModeBatch(batchData) {
+    return await this.post("/api_test/import_pro_mode_batch", batchData);
+  }
 }
 
 export default TDServerTestingAPI;

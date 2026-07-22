@@ -86,3 +86,34 @@ func GetTestingProModeGroupController() *TDBLBase[model.TDAPITestingProModeGroup
 		BeforeDelete: beforeDeleteTestingProModeGroup,
 	}
 }
+
+// BatchImportProModeTestingData import batch API testing promode (Groups + Items)
+func BatchImportProModeTestingData(w http.ResponseWriter, r *http.Request) {
+	var batch model.TDAPITestingProModeImportBatch
+	if err := json.NewDecoder(r.Body).Decode(&batch); err != nil {
+		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
+		return
+	}
+
+	for i := range batch.Groups {
+		if batch.Groups[i].ID == "" {
+			batch.Groups[i].ID = fmt.Sprintf("pro_group_%d_%d", time.Now().UnixNano(), i)
+		}
+	}
+	for i := range batch.Items {
+		if batch.Items[i].ID == "" {
+			batch.Items[i].ID = fmt.Sprintf("pro_test_%d_%d", time.Now().UnixNano(), i)
+		}
+	}
+
+	err := database.BatchImportProModeData(&batch)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+	})
+}

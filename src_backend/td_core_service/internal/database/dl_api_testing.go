@@ -72,6 +72,60 @@ func BatchImportTestingData(batch *model.TDAPITestingImportBatch) error {
 	return tx.Commit()
 }
 
+// Import hàng loạt dữ liệu API testing promode (Groups + Items) trong 1 transaction
+func BatchImportProModeData(batch *model.TDAPITestingProModeImportBatch) error {
+	db, err := GetConnectionDB()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+
+	// 1. Insert Groups
+	if len(batch.Groups) > 0 {
+		sqlGroup := `INSERT OR IGNORE INTO td_api_testing_pro_mode_group (id, name) VALUES (?, ?)`
+		stmtGroup, err := tx.Prepare(sqlGroup)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+		defer stmtGroup.Close()
+
+		for _, group := range batch.Groups {
+			_, err = stmtGroup.Exec(group.ID, group.Name)
+			if err != nil {
+				tx.Rollback()
+				return err
+			}
+		}
+	}
+
+	// 2. Insert Items
+	if len(batch.Items) > 0 {
+		sqlItem := `INSERT INTO td_api_testing_pro_mode (id, request_name, group_id, script_code) VALUES (?, ?, ?, ?)`
+		stmtItem, err := tx.Prepare(sqlItem)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+		defer stmtItem.Close()
+
+		for _, item := range batch.Items {
+			_, err = stmtItem.Exec(item.ID, item.RequestName, item.GroupID, item.ScriptCode)
+			if err != nil {
+				tx.Rollback()
+				return err
+			}
+		}
+	}
+
+	return tx.Commit()
+}
+
 // log dữ liệu vào db
 func LogDataCallAPIToDatabase(reqData model.TDAPITestingParam, responseText string, responseHeadersText string, statusCode int, id string) {
 	db, err := GetConnectionDB()
