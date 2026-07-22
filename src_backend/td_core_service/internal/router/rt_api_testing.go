@@ -17,6 +17,10 @@ func InjectAPITestingRouter(app *http.ServeMux) {
 	service.GetTestingAPIController().RegisterRoutes(app)
 	service.GetTestingGroupController().RegisterRoutes(app)
 
+	// CRUD API Testing ProMode và Group sử dụng base controller
+	service.GetTestingProModeAPIController().RegisterRoutes(app)
+	service.GetTestingProModeGroupController().RegisterRoutes(app)
+
 	// Import Batch
 	app.HandleFunc("POST /api_test/import_batch", service.BatchImportTestingData)
 }

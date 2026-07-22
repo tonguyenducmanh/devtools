@@ -11,6 +11,13 @@ func DeleteTestingItemsByGroupID(groupID string) error {
 	return err
 }
 
+// Xóa các testing api promode thuộc nhóm đó
+func DeleteTestingProModeItemsByGroupID(groupID string) error {
+	repoItems := TDDLBase[model.TDAPITestingProModeItem]{}
+	_, err := repoItems.ExecRaw("DELETE FROM td_api_testing_pro_mode WHERE group_id = ?", groupID)
+	return err
+}
+
 // Import hàng loạt dữ liệu API testing (Groups + Items) trong 1 transaction
 func BatchImportTestingData(batch *model.TDAPITestingImportBatch) error {
 	db, err := GetConnectionDB()

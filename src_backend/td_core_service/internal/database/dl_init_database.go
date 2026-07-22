@@ -73,6 +73,22 @@ func InitDatabase() {
 			created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 			modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
+		// td_api_testing_pro_mode
+		`CREATE TABLE IF NOT EXISTS td_api_testing_pro_mode (
+			id TEXT PRIMARY KEY NOT NULL,
+			request_name TEXT NOT NULL,
+			group_id TEXT,
+			script_code TEXT,
+			created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+			modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
+		);`,
+		// td_api_testing_pro_mode_group
+		`CREATE TABLE IF NOT EXISTS td_api_testing_pro_mode_group (
+			id TEXT PRIMARY KEY NOT NULL,
+			name TEXT NOT NULL,
+			created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+			modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
+		);`,
 		// td_rdp_connection
 		`CREATE TABLE IF NOT EXISTS td_rdp_connection (
 			id TEXT PRIMARY KEY NOT NULL,

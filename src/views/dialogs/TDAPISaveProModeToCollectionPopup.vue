@@ -1,0 +1,192 @@
+<template>
+  <TDPopup :visible="true" :showHeader="false" @close="handleClose">
+    <div class="flex flex-col td-search-modal">
+      <div class="td-search-input-container">
+        <div class="td-icon td-search-icon"></div>
+        <input
+          ref="searchInput"
+          v-model="searchQuery"
+          class="td-search-input"
+          :placeholder="$t('i18nCommon.apiTesting.FindCollectionTitle')"
+        />
+      </div>
+      <div
+        v-if="filteredCollection.length === 0"
+        class="flex flex-col td-search-empty"
+      >
+        <div class="td-search-empty-text">
+          {{ $t("i18nCommon.search.noResults") }}
+        </div>
+        <TDButton
+          :label="buttonName"
+          :type="$tdEnum.buttonType.secondary"
+          :readOnly="!searchQuery"
+          @click="addNewCollection"
+        >
+        </TDButton>
+      </div>
+      <div class="flex-one td-search-results" v-else>
+        <div class="td-search-section">
+          <div
+            v-for="(collection, index) in filteredCollection"
+            :key="collection.name"
+            class="td-search-item"
+            @click="save(collection)"
+          >
+            <div class="td-search-item-content">
+              <div class="td-search-item-title">
+                {{ collection.name }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </TDPopup>
+</template>
+
+<script>
+export default {
+  name: "TDAPISaveProModeToCollectionPopup",
+
+  props: {
+    allCollection: {
+      type: Array,
+      default: () => [],
+    },
+    ownerForm: {
+      type: Object,
+      required: true,
+    },
+  },
+
+  data() {
+    return {
+      searchQuery: "",
+    };
+  },
+
+  computed: {
+    filteredCollection() {
+      let me = this;
+      if (!this.searchQuery) return me.allCollection;
+      let query = this.searchQuery.normalizeText();
+
+      return me.allCollection
+        .filter((collection) => {
+          let collectionName = collection.name.normalizeText();
+          return collectionName.includes(query);
+        })
+        .slice(0, 8);
+    },
+    buttonName() {
+      let me = this;
+      let title = me
+        .$t("i18nCommon.apiTesting.saveForNewCollection")
+        .format(me.searchQuery);
+      return title;
+    },
+  },
+  mounted() {
+    let me = this;
+    if (me.$refs.searchInput) {
+      me.$refs.searchInput.focus();
+    }
+  },
+  methods: {
+    show(param) {},
+    handleClose() {
+      this.$emit("close");
+    },
+    async save(collection) {
+      this.ownerForm.saveToProModeCollection(collection);
+      this.handleClose();
+    },
+    async addNewCollection() {
+      let me = this;
+      let collection = await this.ownerForm.addNewProModeCollection(
+        me.searchQuery,
+      );
+      if (collection) {
+        this.ownerForm.saveToProModeCollection(collection);
+      }
+      this.handleClose();
+    },
+  },
+};
+</script>
+<style scoped lang="scss">
+.td-search-modal {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-main-color);
+  border: 1px solid var(--border-color);
+  border-radius: calc(var(--border-radius) * 1.5);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+
+  .td-search-input-container {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    width: 100%;
+    border-bottom: 1px solid var(--border-color);
+    .td-search-icon {
+      margin-right: var(--padding);
+    }
+    .td-search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 16px;
+      color: var(--text-color);
+
+      &::placeholder {
+        color: var(--text-color-secondary);
+      }
+    }
+  }
+
+  .td-search-results {
+    width: 100%;
+    overflow: auto;
+
+    .td-search-section {
+      padding: 8px 0;
+
+      .td-search-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover,
+        &.td-search-item-active {
+          background-color: var(--bg-layer-color);
+        }
+
+        .td-search-item-content {
+          flex: 1;
+
+          .td-search-item-title {
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 2px;
+          }
+        }
+      }
+    }
+  }
+
+  .td-search-empty {
+    padding: 40px 16px;
+    text-align: center;
+    .td-search-empty-text {
+      color: var(--text-color-secondary);
+      font-size: 14px;
+    }
+  }
+}
+</style>

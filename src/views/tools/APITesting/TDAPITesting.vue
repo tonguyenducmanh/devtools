@@ -83,6 +83,27 @@
             v-tooltip="$t('i18nCommon.apiTesting.save')"
           ></TDButton>
         </template>
+        <template v-else>
+          <!-- nút thêm script mới (promode) -->
+          <TDButton
+            v-if="currentProModeRequestId"
+            :readOnly="isLoadingData"
+            @click="createNewProModeRequest"
+            :type="$tdEnum.buttonType.secondary"
+            :noMargin="true"
+            iconClass="td-new-file-icon"
+            v-tooltip="$t('i18nCommon.apiTesting.createNewRequest')"
+          ></TDButton>
+          <!-- nút lưu script (promode) -->
+          <TDButton
+            :readOnly="isLoadingData || !requestName"
+            @click="saveProModeRequest"
+            :type="$tdEnum.buttonType.secondary"
+            :noMargin="true"
+            iconClass="td-save-icon"
+            v-tooltip="$t('i18nCommon.apiTesting.save')"
+          ></TDButton>
+        </template>
       </div>
       <!-- hết phần danh sách nút đầu của api -->
       <!-- phần nội dung tùy thuộc vào từng loại api -->
@@ -359,7 +380,11 @@
             $tdEnum.APISidebarOption.Collection
           "
         >
-          <!-- phần header của bộ sưu tập request -->
+          <!-- Normal Mode Collection -->
+          <template
+            v-if="currentConfigLayout.currentAPIMode != $tdEnum.APIMode.ProMode"
+          >
+            <!-- phần header của bộ sưu tập request -->
             <div class="flex td-header-collection">
               <div class="td-new-collection">
                 <TDInput
@@ -478,6 +503,135 @@
                 </div>
               </div>
             </div>
+          </template>
+          <!-- ProMode Collection -->
+          <template v-else>
+            <!-- phần header của bộ sưu tập script -->
+            <div class="flex td-header-collection">
+              <div class="td-new-collection">
+                <TDInput
+                  v-model="newProModeCollectionName"
+                  :noMargin="true"
+                  :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
+                />
+              </div>
+              <TDButton
+                :noMargin="true"
+                @click="addNewProModeCollection"
+                :type="$tdEnum.buttonType.secondary"
+                iconClass="td-plus-icon"
+                v-tooltip="$t('i18nCommon.apiTesting.add')"
+              />
+              <TDButton
+                :noMargin="true"
+                @click="loadAllProModeData"
+                :type="$tdEnum.buttonType.secondary"
+                iconClass="td-reload-icon"
+                v-tooltip="$t('i18nCommon.APIMocking.refresh')"
+              />
+            </div>
+            <!-- phần danh sách các script đã lưu theo thư mục -->
+            <div class="td-collection">
+              <div class="flex flex-col response-loading" v-if="isLoadingData">
+                <div class="loader"></div>
+              </div>
+              <div class="td-collection-body" v-else>
+                <div
+                  v-for="(collection, index) in allProModeCollection"
+                  class="flex flex-col no-select td-collection-item"
+                  :key="'pro-' + index"
+                >
+                  <!-- phần sửa nhanh tên thư mục script nếu đang ở chế độ edit -->
+                  <div
+                    v-if="collection.is_renaming"
+                    class="td-collection-rename"
+                  >
+                    <TDInput
+                      v-model="collection.temp_name"
+                      :noMargin="true"
+                      :placeHolder="
+                        $t('i18nCommon.apiTesting.collectionRename')
+                      "
+                      :ref="'pro_' + collection.temp_name"
+                      @keyup.enter="saveNewProModeCollectionName(collection)"
+                      @clickOutSide="saveNewProModeCollectionName(collection)"
+                    >
+                    </TDInput>
+                  </div>
+                  <!-- phần tên thư mục -->
+                  <div
+                    v-else
+                    class="flex td-collection-header"
+                    @click="toggleCollection(collection)"
+                  >
+                    <div class="flex text-nowrap td-collection-header-left">
+                      <TDArrow
+                        :openProp="collection.openingCollection"
+                        :arrowOpenDirection="$tdEnum.Direction.bottom"
+                        :arrowDirection="$tdEnum.Direction.right"
+                      />
+                      <div class="" v-tooltip="collection.name">
+                        {{ collection.name }}
+                      </div>
+                    </div>
+                    <div class="flex td-collection-edit-btn">
+                      <div
+                        class="td-icon td-edit-icon"
+                        v-tooltip="$t('i18nCommon.edit')"
+                        @click.stop="enableRenameProModeCollection(collection)"
+                      ></div>
+                      <div
+                        v-tooltip="$t('i18nCommon.apiTesting.delete')"
+                        class="td-icon td-close-icon"
+                        @click.stop="
+                          deleteProModeCollection(collection.collection_id)
+                        "
+                      ></div>
+                    </div>
+                  </div>
+                  <!-- danh sách các script có trong 1 thư mục, chỉ render khi đang mở thư mục -->
+                  <div
+                    v-if="
+                      collection.openingCollection &&
+                      collection.requests &&
+                      collection.requests.length > 0
+                    "
+                    class="flex flex-col td-collection-content"
+                  >
+                    <div
+                      v-for="(request, indexRequest) in collection.requests"
+                      :key="indexRequest"
+                      class="flex td-collection-request-item"
+                      :class="{
+                        'td-collection-request-item-selected':
+                          request &&
+                          currentProModeRequestId == request.requestId,
+                      }"
+                      @click="applyProModeRequest(request)"
+                    >
+                      <span class="text-nowrap">
+                        <div v-tooltip="request.requestName">
+                          {{ request.requestName }}
+                        </div>
+                      </span>
+                      <span class="td-collection-item-edit-btn">
+                        <div
+                          class="td-icon td-close-icon"
+                          v-tooltip="$t('i18nCommon.apiTesting.delete')"
+                          @click.stop="
+                            deleteProModeRequest(
+                              collection.collection_id,
+                              request,
+                            )
+                          "
+                        ></div>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
         </div>
         <!-- phần sidebar nếu đang tùy chọn thiết lập api -->
         <div
@@ -579,8 +733,11 @@ export default {
       apiUrl: "",
       requestName: "",
       currentRequestId: null,
+      currentProModeRequestId: null,
       newCollectionName: "",
+      newProModeCollectionName: "",
       allCollection: [],
+      allProModeCollection: [],
       httpMethod: "GET",
       headersText: "Content-Type: application/json",
       bodyText: "",
@@ -636,6 +793,7 @@ export default {
     this.agentAPI = new TDServerTestingAPI();
     registerTdApiPromodeLanguage();
     await this.loadAllTestingData();
+    await this.loadAllProModeData();
   },
   watch: {
     requestName(oldVal, newVal) {
@@ -1050,6 +1208,220 @@ export default {
           if (response && response.success && response.data?.success) {
             me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
             await me.loadAllTestingData();
+          }
+        } catch (e) {
+          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+        }
+      }
+    },
+
+    // ─── ProMode CRUD methods ──────────────────────────────────────────
+    async loadAllProModeData() {
+      let me = this;
+      me.isLoadingData = true;
+      try {
+        let [groupsParams, itemsParams] = await Promise.all([
+          me.agentAPI.proModeGroup.getAll(),
+          me.agentAPI.proModeItem.getAll(),
+        ]);
+
+        let groups = groupsParams?.data?.data || [];
+        let items = itemsParams?.data?.data || [];
+
+        let collections = groups.map((g) => ({
+          name: g.name,
+          collection_id: g.id,
+          openingCollection: false,
+          requests: [],
+          is_renaming: false,
+        }));
+
+        items.forEach((t) => {
+          let collection = collections.find(
+            (c) => c.collection_id === t.group_id,
+          );
+          if (collection) {
+            collection.requests.push({
+              requestName: t.request_name,
+              scriptCode: t.script_code,
+              requestId: t.id,
+            });
+          }
+        });
+
+        if (me.allProModeCollection && me.allProModeCollection.length > 0) {
+          collections.forEach((newCol) => {
+            let oldCol = me.allProModeCollection.find(
+              (c) => c.collection_id === newCol.collection_id,
+            );
+            if (oldCol) {
+              newCol.openingCollection = oldCol.openingCollection;
+            }
+          });
+        }
+
+        me.allProModeCollection = collections;
+      } catch (error) {
+        console.error("Lỗi tải dữ liệu promode:", error);
+        me.$tdUtility.showErrorNotFoundAgentServer();
+      } finally {
+        me.isLoadingData = false;
+      }
+    },
+    async addNewProModeCollection(collectionName) {
+      let me = this;
+      if (typeof collectionName == "string") {
+        me.newProModeCollectionName = collectionName;
+      }
+      if (me.newProModeCollectionName) {
+        try {
+          let response = await me.agentAPI.proModeGroup.create({
+            name: me.newProModeCollectionName,
+          });
+          if (response && response.success && response.data?.success) {
+            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+            me.newProModeCollectionName = "";
+            await me.loadAllProModeData();
+          }
+        } catch (error) {
+          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+        }
+      }
+    },
+    applyProModeRequest(request) {
+      let me = this;
+      if (request) {
+        me.requestName = request.requestName;
+        me.proModeSecranioCode = request.scriptCode || "";
+        me.currentProModeRequestId = request.requestId;
+      }
+    },
+    createNewProModeRequest() {
+      let me = this;
+      me.requestName = "";
+      me.proModeSecranioCode = "";
+      me.currentProModeRequestId = null;
+    },
+    async saveProModeRequest() {
+      let me = this;
+      if (me.requestName && me.allProModeCollection && me.allProModeCollection.length > 0) {
+        if (me.currentProModeRequestId) {
+          let currentCollection = me.allProModeCollection.find((c) =>
+            c.requests.find((r) => r.requestId == me.currentProModeRequestId),
+          );
+          if (currentCollection) {
+            let testData = {
+              id: me.currentProModeRequestId,
+              request_name: me.requestName,
+              group_id: currentCollection.collection_id,
+              script_code: me.proModeSecranioCode,
+            };
+            try {
+              let response = await me.agentAPI.proModeItem.update(testData);
+              if (response && response.success && response.data?.success) {
+                me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+                await me.loadAllProModeData();
+              }
+            } catch (e) {
+              me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+            }
+          }
+        } else {
+          TDDialogUtil.showPopup({
+            dialogType: TDDialogEnum.TDAPISaveProModeToCollectionPopup,
+            ownerForm: this,
+            props: {
+              allCollection: me.allProModeCollection,
+            },
+          });
+        }
+      }
+    },
+    async saveToProModeCollection(collection) {
+      let me = this;
+      let testData = {
+        request_name: me.requestName || "Untitled Script",
+        group_id: collection.collection_id,
+        script_code: me.proModeSecranioCode,
+      };
+      try {
+        let response = await me.agentAPI.proModeItem.create(testData);
+        if (response && response.success && response.data?.success) {
+          me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+          me.currentProModeRequestId = response.data.data.id;
+          await me.loadAllProModeData();
+        }
+      } catch (e) {
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+      }
+    },
+    async deleteProModeRequest(collectionId, request) {
+      let me = this;
+      if (request && request.requestId) {
+        try {
+          let response = await me.agentAPI.proModeItem.deleteById(
+            request.requestId,
+          );
+          if (response && response.success && response.data?.success) {
+            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+            if (me.currentProModeRequestId == request.requestId) {
+              me.currentProModeRequestId = null;
+            }
+            await me.loadAllProModeData();
+          }
+        } catch (e) {
+          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+        }
+      }
+    },
+    enableRenameProModeCollection(collection) {
+      let me = this;
+      if (collection) {
+        collection.is_renaming = true;
+        collection.temp_name = collection.name;
+        this.$nextTick(() => {
+          if (me.$refs && me.$refs["pro_" + collection.temp_name]) {
+            let refs = me.$refs["pro_" + collection.temp_name];
+            if (refs) {
+              if (Array.isArray(refs)) {
+                refs[0].focus();
+              } else {
+                refs.focus();
+              }
+            }
+          }
+        });
+      }
+    },
+    async saveNewProModeCollectionName(collection) {
+      let me = this;
+      if (collection) {
+        delete collection.is_renaming;
+        if (collection.temp_name && collection.temp_name !== collection.name) {
+          try {
+            let response = await me.agentAPI.proModeGroup.update({
+              id: collection.collection_id,
+              name: collection.temp_name,
+            });
+            if (response && response.success && response.data?.success) {
+              me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+              await me.loadAllProModeData();
+            }
+          } catch (e) {
+            me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+          }
+        }
+      }
+    },
+    async deleteProModeCollection(collectionId) {
+      let me = this;
+      if (collectionId) {
+        try {
+          let response =
+            await me.agentAPI.proModeGroup.deleteById(collectionId);
+          if (response && response.success && response.data?.success) {
+            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+            await me.loadAllProModeData();
           }
         } catch (e) {
           me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));

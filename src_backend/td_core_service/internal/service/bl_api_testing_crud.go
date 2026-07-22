@@ -64,3 +64,25 @@ func BatchImportTestingData(w http.ResponseWriter, r *http.Request) {
 		"success": true,
 	})
 }
+
+// GetTestingProModeAPIController trả về controller quản lý API testing promode
+func GetTestingProModeAPIController() *TDBLBase[model.TDAPITestingProModeItem] {
+	return &TDBLBase[model.TDAPITestingProModeItem]{
+		PathPrefix: "api_testing_pro_mode",
+		Repo:       database.TDDLBase[model.TDAPITestingProModeItem]{},
+	}
+}
+
+func beforeDeleteTestingProModeGroup(id string, r *http.Request) error {
+	// Xóa các item liên quan trước ở tầng DL
+	return database.DeleteTestingProModeItemsByGroupID(id)
+}
+
+// GetTestingProModeGroupController trả về controller quản lý nhóm API testing promode
+func GetTestingProModeGroupController() *TDBLBase[model.TDAPITestingProModeGroup] {
+	return &TDBLBase[model.TDAPITestingProModeGroup]{
+		PathPrefix:   "api_testing_pro_mode_group",
+		Repo:         database.TDDLBase[model.TDAPITestingProModeGroup]{},
+		BeforeDelete: beforeDeleteTestingProModeGroup,
+	}
+}

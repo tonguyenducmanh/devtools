@@ -8,6 +8,8 @@ class TDServerTestingAPI extends TDAgentAPI {
     super(baseUrl, controllerName);
     this.testingItem = new TDAgentAPI(baseUrl, "api_testing");
     this.testingGroup = new TDAgentAPI(baseUrl, "api_testing_group");
+    this.proModeItem = new TDAgentAPI(baseUrl, "api_testing_pro_mode");
+    this.proModeGroup = new TDAgentAPI(baseUrl, "api_testing_pro_mode_group");
   }
 
   /**
