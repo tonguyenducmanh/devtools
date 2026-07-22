@@ -8,7 +8,7 @@
         <template v-if="!currentConfigLayout.enableFileUpload">
           <TDTextEditor
             isLabelTop
-            :enableHighlight="currentConfigLayout.enableHighlight"
+            :enableHighlight="true"
             language="json"
             :label="$t('i18nCommon.jsonToPostgreSQL.inputLabel')"
             :placeHolder="$t('i18nCommon.jsonToPostgreSQL.inputPlaceholder')"
@@ -21,42 +21,45 @@
             <TDUpload
               :label="$t('i18nCommon.jsonToPostgreSQL.uploadLabel')"
               :accept="'.json'"
-              @change="handleFileUpload"
+              @selected="handleFileUpload"
             />
           </div>
         </template>
-        <template v-if="!currentConfigLayout.enableFileUpload">
-          <TDTextEditor
-            isLabelTop
-            :label="$t('i18nCommon.jsonToPostgreSQL.outputLabel')"
-            :readOnly="true"
-            :enableHighlight="currentConfigLayout.enableHighlight"
-            language="sql"
-            :placeHolder="$t('i18nCommon.jsonToPostgreSQL.outputPlaceholder')"
-            v-model="outputSQL"
-            :wrapText="currentConfigLayout.wrapText"
-          ></TDTextEditor>
-        </template>
+        <TDTextEditor
+          isLabelTop
+          :label="$t('i18nCommon.jsonToPostgreSQL.outputLabel')"
+          :readOnly="true"
+          :enableHighlight="true"
+          language="sql"
+          :placeHolder="$t('i18nCommon.jsonToPostgreSQL.outputPlaceholder')"
+          v-model="outputSQL"
+          :wrapText="currentConfigLayout.wrapText"
+        ></TDTextEditor>
       </div>
       <div class="flex">
-        <template v-if="!currentConfigLayout.enableFileUpload">
-          <TDButton
-            :label="$t('i18nCommon.jsonToPostgreSQL.convert')"
-            @click="convertToPostgresSQL"
-          ></TDButton>
-          <TDButton
-            @click="haddleCopyEvent"
-            :type="$tdEnum.buttonType.secondary"
-            :label="$t('i18nCommon.jsonToPostgreSQL.copy')"
-          ></TDButton>
-        </template>
-        <template v-else>
-          <TDButton
-            :label="$t('i18nCommon.jsonToPostgreSQL.downloadSQL')"
-            @click="downloadSQLFile"
-            :disabled="!outputSQL"
-          ></TDButton>
-        </template>
+        <TDButton
+          v-if="!currentConfigLayout.enableFileUpload"
+          :label="$t('i18nCommon.jsonToPostgreSQL.convert')"
+          @click="convertToPostgresSQL"
+        ></TDButton>
+        <TDButton
+          v-else
+          :label="$t('i18nCommon.jsonToPostgreSQL.convert')"
+          @click="convertToPostgresSQL"
+          :disabled="!inputJSON"
+        ></TDButton>
+        <TDButton
+          @click="haddleCopyEvent"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.jsonToPostgreSQL.copy')"
+          :disabled="!outputSQL"
+        ></TDButton>
+        <TDButton
+          @click="downloadSQLFile"
+          :type="$tdEnum.buttonType.secondary"
+          :label="$t('i18nCommon.jsonToPostgreSQL.downloadSQL')"
+          :disabled="!outputSQL"
+        ></TDButton>
         <TDButton
           @click="applyMock"
           :type="$tdEnum.buttonType.secondary"
@@ -100,12 +103,6 @@
             :variant="$tdEnum.checkboxType.switch"
             v-model="currentConfigLayout.wrapText"
             :label="$t('i18nCommon.apiTesting.wrapText')"
-            @change="updateConfigLayout"
-          ></TDCheckbox>
-          <TDCheckbox
-            :variant="$tdEnum.checkboxType.switch"
-            v-model="currentConfigLayout.enableHighlight"
-            :label="$t('i18nCommon.enableHighlight')"
             @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
@@ -230,11 +227,11 @@ export default {
       let me = this;
       me.$tdUtility.copyToClipboard(me.outputSQL);
     },
-    async handleFileUpload(event) {
+    async handleFileUpload(files) {
       let me = this;
       try {
-        const file = event.target.files[0];
-        if (file) {
+        if (files && files.length > 0) {
+          const file = files[0];
           const reader = new FileReader();
           reader.onload = async (e) => {
             try {
@@ -433,7 +430,6 @@ export default {
       currentConfigLayout: {
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
-        enableHighlight: true,
         splitHorizontal: true,
         wrapText: true,
         enableCreateTable: false,

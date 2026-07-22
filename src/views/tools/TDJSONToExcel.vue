@@ -8,7 +8,7 @@
             :label="$t('i18nCommon.jsonToExcel.inputLabel')"
             :placeHolder="$t('i18nCommon.jsonToExcel.inputPlaceholder')"
             :wrapText="currentConfigLayout.wrapText"
-            :enableHighlight="currentConfigLayout.enableHighlight"
+            :enableHighlight="true"
             language="json"
             v-model="jsonSource"
           />
@@ -78,12 +78,6 @@
             :variant="$tdEnum.checkboxType.switch"
             v-model="currentConfigLayout.wrapText"
             :label="$t('i18nCommon.apiTesting.wrapText')"
-            @change="updateConfigLayout"
-          />
-          <TDCheckbox
-            :variant="$tdEnum.checkboxType.switch"
-            v-model="currentConfigLayout.enableHighlight"
-            :label="$t('i18nCommon.enableHighlight')"
             @change="updateConfigLayout"
           />
           <TDCheckbox
@@ -279,7 +273,6 @@ export default {
       currentConfigLayout: {
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
-        enableHighlight: true,
         enableFileUpload: false,
         wrapText: true,
         isBoldColName: true,

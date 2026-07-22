@@ -7,7 +7,7 @@
       >
         <TDTextEditor
           isLabelTop
-          :enableHighlight="currentConfigLayout.enableHighlight"
+          :enableHighlight="true"
           language="json"
           :label="$t('i18nCommon.JSONToModel.inputLabel')"
           :placeHolder="$t('i18nCommon.JSONToModel.inputPlaceholder')"
@@ -18,7 +18,7 @@
           isLabelTop
           :label="$t('i18nCommon.JSONToModel.outputLabel')"
           :readOnly="true"
-          :enableHighlight="currentConfigLayout.enableHighlight"
+          :enableHighlight="true"
           :language="outputHighlightLanguage"
           :placeHolder="$t('i18nCommon.JSONToModel.outputPlaceholder')"
           v-model="outputModel"
@@ -162,12 +162,6 @@
             :variant="$tdEnum.checkboxType.switch"
             v-model="currentConfigLayout.wrapText"
             :label="$t('i18nCommon.apiTesting.wrapText')"
-            @change="updateConfigLayout"
-          ></TDCheckbox>
-          <TDCheckbox
-            :variant="$tdEnum.checkboxType.switch"
-            v-model="currentConfigLayout.enableHighlight"
-            :label="$t('i18nCommon.enableHighlight')"
             @change="updateConfigLayout"
           ></TDCheckbox>
           <TDCheckbox
@@ -605,7 +599,6 @@ export default {
       currentConfigLayout: {
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
-        enableHighlight: true,
         splitHorizontal: true,
         wrapText: true,
         csharp: {

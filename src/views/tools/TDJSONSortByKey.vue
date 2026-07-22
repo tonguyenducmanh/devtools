@@ -4,7 +4,7 @@
       <div class="flex io-section">
         <TDTextEditor
           isLabelTop
-          :enableHighlight="currentConfigLayout.enableHighlight"
+          :enableHighlight="true"
           language="json"
           :label="$t('i18nCommon.JSONSortByKey.inputLabel')"
           :placeHolder="$t('i18nCommon.JSONSortByKey.inputPlaceholder')"
@@ -61,12 +61,6 @@
             :variant="$tdEnum.checkboxType.switch"
             v-model="currentConfigLayout.wrapText"
             :label="$t('i18nCommon.apiTesting.wrapText')"
-            @change="updateConfigLayout"
-          ></TDCheckbox>
-          <TDCheckbox
-            :variant="$tdEnum.checkboxType.switch"
-            v-model="currentConfigLayout.enableHighlight"
-            :label="$t('i18nCommon.enableHighlight')"
             @change="updateConfigLayout"
           ></TDCheckbox>
         </div>
@@ -220,7 +214,6 @@ export default {
       currentConfigLayout: {
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
-        enableHighlight: true,
         wrapText: true,
       },
       inputJSON: null,
