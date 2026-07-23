@@ -10,7 +10,6 @@ func GetAllTableAndColumns() ([]map[string]any, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
 
 	query := `
 	SELECT
@@ -69,7 +68,6 @@ func DataMinerExecuteQuery(script string) ([]map[string]any, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
 
 	rows, err := db.Query(script)
 	if err != nil {

@@ -24,7 +24,6 @@ func BatchImportTestingData(batch *model.TDAPITestingImportBatch) error {
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 
 	tx, err := db.Begin()
 	if err != nil {
@@ -78,7 +77,6 @@ func BatchImportProModeData(batch *model.TDAPITestingProModeImportBatch) error {
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 
 	tx, err := db.Begin()
 	if err != nil {
@@ -130,9 +128,8 @@ func BatchImportProModeData(batch *model.TDAPITestingProModeImportBatch) error {
 func LogDataCallAPIToDatabase(reqData model.TDAPITestingParam, responseText string, responseHeadersText string, statusCode int, id string) {
 	db, err := GetConnectionDB()
 	if err != nil {
-		// không làm gì
+		return
 	}
-	defer db.Close()
 
 	sqlQuery := `
 		INSERT INTO td_api_testing_log (

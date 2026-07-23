@@ -29,7 +29,6 @@ func DeletePostgreSQLConnectionsByGroupID(groupID string) error {
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 	_, err = db.Exec("DELETE FROM td_postgresql_connection WHERE group_id = ?", groupID)
 	return err
 }
