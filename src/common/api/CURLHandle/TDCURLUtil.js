@@ -208,7 +208,9 @@ class TDCURLUtil {
   async requestMultiCURL(curlTexts) {
     try {
       if (!Array.isArray(curlTexts) || curlTexts.length === 0) {
-        throw new Error("requestMultiCURL requires a non-empty array of curl texts");
+        throw new Error(
+          "requestMultiCURL requires a non-empty array of curl texts",
+        );
       }
 
       let requests = curlTexts.map((curlText) => {
@@ -265,7 +267,8 @@ class TDCURLUtil {
 
       let bodyText = null;
       if (body !== null && body !== undefined) {
-        bodyText = typeof body === "object" ? JSON.stringify(body) : String(body);
+        bodyText =
+          typeof body === "object" ? JSON.stringify(body) : String(body);
       }
 
       let requestData = {
@@ -328,7 +331,9 @@ class TDCURLUtil {
   async requestMulti(requests) {
     try {
       if (!Array.isArray(requests) || requests.length === 0) {
-        throw new Error("requestMulti requires a non-empty array of request objects");
+        throw new Error(
+          "requestMulti requires a non-empty array of request objects",
+        );
       }
 
       let apiRequests = requests.map((req) => {
@@ -343,7 +348,10 @@ class TDCURLUtil {
 
         let bodyText = null;
         if (req.body !== null && req.body !== undefined) {
-          bodyText = typeof req.body === "object" ? JSON.stringify(req.body) : String(req.body);
+          bodyText =
+            typeof req.body === "object"
+              ? JSON.stringify(req.body)
+              : String(req.body);
         }
 
         return {
@@ -449,10 +457,12 @@ class TDCURLUtil {
   createMockResponse(input, options = {}) {
     let me = this;
     // Normalize to array
-    let items = Array.isArray(input) ? input : (input ? [input] : []);
+    let items = Array.isArray(input) ? input : input ? [input] : [];
 
     if (items.length === 0) {
-      console.error("createMockResponse: input must be a non-empty item or array");
+      console.error(
+        "createMockResponse: input must be a non-empty item or array",
+      );
       return [];
     }
 
@@ -480,14 +490,18 @@ class TDCURLUtil {
       } else {
         // Backward-compat flat format: { status, headers, body, request? }
         reqInput = item.request || null;
-        resInput = { status: item.status, headers: item.headers, body: item.body };
+        resInput = {
+          status: item.status,
+          headers: item.headers,
+          body: item.body,
+        };
       }
 
       // ─── Parse request ───
       if (reqInput) {
         if (typeof reqInput === "string") {
           // CURL string format
-          let parsed = me.parseCURL(reqInput);
+          let parsed = window.__tdAPI.apiTesting.parseCURL(reqInput);
           if (parsed) {
             mock.method = (parsed.method || "GET").toUpperCase();
             mock.api_url = parsed.url || "";
@@ -496,7 +510,11 @@ class TDCURLUtil {
           }
         } else if (typeof reqInput === "object") {
           // Object format - support both { method, url, headers, body } and { apiUrl, httpMethod, headersText, bodyText }
-          mock.method = (reqInput.method || reqInput.httpMethod || "GET").toUpperCase();
+          mock.method = (
+            reqInput.method ||
+            reqInput.httpMethod ||
+            "GET"
+          ).toUpperCase();
           mock.api_url = reqInput.url || reqInput.apiUrl || "";
           // Headers
           if (reqInput.headers) {
@@ -512,9 +530,10 @@ class TDCURLUtil {
           }
           // Body
           if (reqInput.body !== undefined && reqInput.body !== null) {
-            mock.body_text = typeof reqInput.body === "string"
-              ? reqInput.body
-              : JSON.stringify(reqInput.body);
+            mock.body_text =
+              typeof reqInput.body === "string"
+                ? reqInput.body
+                : JSON.stringify(reqInput.body);
           } else if (reqInput.bodyText) {
             mock.body_text = reqInput.bodyText;
           }
@@ -530,7 +549,11 @@ class TDCURLUtil {
       if (resInput.body !== undefined && resInput.body !== null) {
         if (typeof resInput.body === "string") {
           try {
-            mock.response_text = JSON.stringify(JSON.parse(resInput.body), null, 2);
+            mock.response_text = JSON.stringify(
+              JSON.parse(resInput.body),
+              null,
+              2,
+            );
           } catch {
             mock.response_text = resInput.body;
           }
@@ -546,7 +569,11 @@ class TDCURLUtil {
         if (typeof resInput.headers === "string") {
           mock.response_headers_text = resInput.headers;
         } else if (typeof resInput.headers === "object") {
-          mock.response_headers_text = JSON.stringify(resInput.headers, null, 2);
+          mock.response_headers_text = JSON.stringify(
+            resInput.headers,
+            null,
+            2,
+          );
         }
       }
 
