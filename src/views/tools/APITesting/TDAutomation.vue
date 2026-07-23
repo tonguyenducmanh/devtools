@@ -86,7 +86,7 @@
             <TDTextEditor
               :isLabelTop="true"
               v-model="proModeSecranioCode"
-              language="td-api-javascript"
+              language="javascript"
               :wrapText="currentConfigLayout.wrapText"
               :enableHighlight="true"
               :monacoOptions="proModeMonacoOptions"

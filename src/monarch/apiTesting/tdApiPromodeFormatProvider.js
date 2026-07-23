@@ -4,7 +4,7 @@ import * as prettierPluginEstree from "prettier/plugins/estree";
 
 export function registerTdApiPromodeFormatProvider(monacoInstance) {
   monacoInstance.languages.registerDocumentFormattingEditProvider(
-    "td-api-javascript",
+    "javascript",
     {
       async provideDocumentFormattingEdits(model, options, token) {
         const code = model.getValue();
@@ -26,7 +26,7 @@ export function registerTdApiPromodeFormatProvider(monacoInstance) {
             },
           ];
         } catch (err) {
-          console.warn("[td-api-javascript] Format error:", err);
+          console.warn("[javascript] Format error:", err);
           return [];
         }
       },

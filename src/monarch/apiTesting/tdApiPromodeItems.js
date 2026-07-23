@@ -1,5 +1,5 @@
 /**
- * Cấu hình集中 cho tất cả completion/hover items của language "td-api-javascript".
+ * Cấu hình集中 cho tất cả completion/hover items của language "javascript".
  * Mỗi item chứa: label, insertText, sortText, và documentation từ file .md.
  *
  * Khi thêm hàm mới:

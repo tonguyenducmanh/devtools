@@ -1,13 +1,10 @@
 /**
- * Đăng ký ngôn ngữ "td-api-javascript" cho Monaco Editor:
- * - Syntax highlighting dùng tokenizer của JavaScript
- * - KHÔNG có built-in completion provider (chỉ gợi ý những gì được đăng ký riêng)
+ * Cấu hình IntelliSense cho language "javascript" trong Monaco Editor:
+ * - Đăng ký TypeScript declaration cho 10 API functions
+ * - Kế thừa toàn bộ built-in JavaScript intellisense
  */
-import {
-  conf as jsConf,
-  language as jsLanguage,
-} from "monaco-editor/esm/vs/basic-languages/javascript/javascript.js";
 import * as monaco from "monaco-editor";
+import apiTypeDeclarations from "./apiTypes.d.ts?raw";
 
 let _registered = false;
 
@@ -15,9 +12,19 @@ export function registerTdApiPromodeLanguage() {
   if (_registered) return;
   _registered = true;
 
-  monaco.languages.register({ id: "td-api-javascript" });
-  monaco.languages.setLanguageConfiguration("td-api-javascript", jsConf);
-  monaco.languages.setMonarchTokensProvider("td-api-javascript", jsLanguage);
+  monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+    target: monaco.languages.typescript.ScriptTarget.ESNext,
+    allowNonTsExtensions: true,
+    moduleResolution:
+      monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+    module: monaco.languages.typescript.ModuleKind.ESNext,
+    noSemanticValidation: false,
+  });
+
+  monaco.languages.typescript.javascriptDefaults.addExtraLib(
+    apiTypeDeclarations,
+    "ts:api-types.d.ts",
+  );
 }
 
 export function clearTdApiPromodeRegistration() {
