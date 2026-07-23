@@ -320,7 +320,7 @@ class TDCURLUtil {
   parseResponseMulti(responses) {
     let me = this;
     if (!Array.isArray(responses)) return [];
-    return responses.map((r) => me.parseResponse(r));
+    return responses.map((r) => window.__tdAPI.apiTesting.parseResponse(r));
   }
 
   /**
