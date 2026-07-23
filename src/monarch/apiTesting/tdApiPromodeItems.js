@@ -4,8 +4,10 @@
  *
  * Khi thêm hàm mới:
  * 1. Tạo file .md trong thư mục docs/
- * 2. Thêm entry vào ITEMS_CONFIG bên dưới
+ * 2. Thêm method vào TDAPITestingActions (auto-discover từ prototype)
  */
+
+import TDAutomationInject from "@/common/automation/TDAutomationInject.js";
 
 const docModules = import.meta.glob("./docs/*.md", {
   query: "?raw",
@@ -17,18 +19,20 @@ function getDoc(name) {
   return docModules[`./docs/${name}.md`];
 }
 
-const ITEMS_CONFIG = [
-  { label: "requestCURL", insertText: "await requestCURL()", sortText: "0", doc: "requestCURL" },
-  { label: "request", insertText: "await request()", sortText: "1", doc: "request" },
-  { label: "parseResponse", insertText: "parseResponse()", sortText: "2", doc: "parseResponse" },
-  { label: "parseResponseMulti", insertText: "parseResponseMulti()", sortText: "2a", doc: "parseResponseMulti" },
-  { label: "requestMulti", insertText: "await requestMulti()", sortText: "3", doc: "requestMulti" },
-  { label: "requestMultiCURL", insertText: "await requestMultiCURL()", sortText: "4", doc: "requestMultiCURL" },
-  { label: "readFile", insertText: "await readFile()", sortText: "5", doc: "readFile" },
-  { label: "readFolder", insertText: "await readFolder()", sortText: "6", doc: "readFolder" },
-  { label: "convertJSONToPostgreSQL", insertText: "convertJSONToPostgreSQL()", sortText: "7", doc: "convertJSONToPostgreSQL" },
-  { label: "createMockResponse", insertText: "createMockResponse()", sortText: "8", doc: "createMockResponse" },
-];
+const methodNames = Object.getOwnPropertyNames(
+  TDAutomationInject.prototype,
+).filter((name) => name !== "constructor");
+
+const ITEMS_CONFIG = methodNames.map((name, index) => {
+  let isAsync =
+    TDAutomationInject.prototype[name]?.constructor?.name === "AsyncFunction";
+  return {
+    label: name,
+    insertText: isAsync ? `await ${name}()` : `${name}()`,
+    sortText: String(index).padStart(2, "0"),
+    doc: name,
+  };
+});
 
 export const API_ITEMS = ITEMS_CONFIG.map((item) => ({
   ...item,

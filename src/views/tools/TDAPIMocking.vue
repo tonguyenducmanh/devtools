@@ -440,7 +440,7 @@
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDArrow from "@/components/TDArrow.vue";
 import TDServerMockAPI from "@/common/api/request/AgentAPI/TDServerMockAPI.js";
-import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
+import TDAutomation from "@/common/automation/TDAutomation.js";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDAPIMockingHelp from "@/views/helps/TDAPIMockingHelp.vue";
@@ -812,7 +812,7 @@ export default {
       let me = this;
       if (me.currentMockId) {
         let me = this;
-        let curlContent = TDCURLUtil.stringifyCURL(me.getRequestObj());
+        let curlContent = TDAutomation.stringifyCURL(me.getRequestObj());
         me.$tdUtility.copyToClipboard(curlContent);
       }
     },

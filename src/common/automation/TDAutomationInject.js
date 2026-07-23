@@ -1,13 +1,14 @@
-import * as insomniaCURL from "./insomnia/curl.ts";
+import * as insomniaCURL from "@/common/api/CURLHandle/insomnia/curl.ts";
 import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
 import { jsonToPostgreSQL } from "@/common/utils/TDJSONToPostgreSQLUtil.js";
 
-import * as curlReader from "./curlReader/index.ts";
+import * as curlReader from "@/common/api/CURLHandle/curlReader/index.ts";
 /**
- * các method CURL dùng cho toàn bộ frontend
+ * Các method injectable cho Automation (window.__tdAPI.apiTesting).
+ * Các method này được inject vào eval scope để user script sử dụng.
  * Created by tdmanh 16/12/2025
  */
-class TDCURLUtil {
+class TDAutomationInject {
   /**
    * Sử dụng agent để thực hiện chạy command curl gọi API,
    * không bị giới hạn bởi các tool của trình duyệt
@@ -131,60 +132,18 @@ class TDCURLUtil {
   }
 
   /**
-   * Build ra CURL dạng text
-   */
-  stringifyCURL(request) {
-    let me = this;
-    if (!request?.apiUrl) {
-      console.error("stringifyCURL: apiUrl is required");
-      return "";
-    }
-
-    let lines = [];
-    let escapeShell = function (value) {
-      return String(value).replace(/'/g, `'\\''`);
-    };
-    // base curl
-    lines.push(`curl '${request.apiUrl}'`);
-
-    // method
-    let method = (request.httpMethod || "GET").toUpperCase();
-    if (method !== "GET") {
-      lines.push(`--request ${method}`);
-    }
-
-    // headers
-    if (request.headersText) {
-      request.headersText
-        .split("\n")
-        .map((h) => h.trim())
-        .filter(Boolean)
-        .forEach((header) => {
-          lines.push(`--header '${escapeShell(header)}'`);
-        });
-    }
-
-    // body
-    if (request.bodyText && request.bodyText.trim() !== "") {
-      lines.push(`--data '${escapeShell(request.bodyText)}'`);
-    }
-    let curlContent = lines.join(" \\\n");
-    return curlContent;
-  }
-
-  /**
    * Hàm chính thực hiện việc gọi API thông qua CURL
    */
   async requestCURL(curlText) {
     try {
-      let parsed = window.__tdAPI.apiTesting.parseCURL(curlText);
+      let parsed = this.parseCURL(curlText);
       let requestData = {
         api_url: parsed.url,
         http_method: parsed.method || "GET",
         headers_text: parsed.headersText || "",
         body_text: parsed.bodyText || null,
       };
-      let req = window.__tdAPI.apiTesting.fetchAgent(requestData);
+      let req = this.fetchAgent(requestData);
       let resp = await req.promise;
       return resp;
     } catch (ex) {
@@ -214,7 +173,7 @@ class TDCURLUtil {
       }
 
       let requests = curlTexts.map((curlText) => {
-        let parsed = window.__tdAPI.apiTesting.parseCURL(curlText);
+        let parsed = this.parseCURL(curlText);
         return {
           api_url: parsed.url,
           http_method: parsed.method || "GET",
@@ -277,7 +236,7 @@ class TDCURLUtil {
         headers_text: headersText,
         body_text: bodyText,
       };
-      let req = window.__tdAPI.apiTesting.fetchAgent(requestData);
+      let req = this.fetchAgent(requestData);
       let resp = await req.promise;
       return resp;
     } catch (ex) {
@@ -318,9 +277,8 @@ class TDCURLUtil {
    * @returns {Array} Mảng body đã parse JSON
    */
   parseResponseMulti(responses) {
-    let me = this;
     if (!Array.isArray(responses)) return [];
-    return responses.map((r) => window.__tdAPI.apiTesting.parseResponse(r));
+    return responses.map((r) => this.parseResponse(r));
   }
 
   /**
@@ -437,6 +395,47 @@ class TDCURLUtil {
   }
 
   /**
+   * Build ra CURL dạng text
+   */
+  stringifyCURL(request) {
+    if (!request?.apiUrl) {
+      console.error("stringifyCURL: apiUrl is required");
+      return "";
+    }
+
+    let lines = [];
+    let escapeShell = function (value) {
+      return String(value).replace(/'/g, `'\\''`);
+    };
+    // base curl
+    lines.push(`curl '${request.apiUrl}'`);
+
+    // method
+    let method = (request.httpMethod || "GET").toUpperCase();
+    if (method !== "GET") {
+      lines.push(`--request ${method}`);
+    }
+
+    // headers
+    if (request.headersText) {
+      request.headersText
+        .split("\n")
+        .map((h) => h.trim())
+        .filter(Boolean)
+        .forEach((header) => {
+          lines.push(`--header '${escapeShell(header)}'`);
+        });
+    }
+
+    // body
+    if (request.bodyText && request.bodyText.trim() !== "") {
+      lines.push(`--data '${escapeShell(request.bodyText)}'`);
+    }
+    let curlContent = lines.join(" \\\n");
+    return curlContent;
+  }
+
+  /**
    * Build mock objects từ request/response data để export JSON (dùng import thủ công vào Mock API tool).
    * Không gọi API backend, chỉ xử lý local.
    *
@@ -455,7 +454,6 @@ class TDCURLUtil {
    * @returns {Array<Object>} mảng mock objects sẵn sàng để copy JSON import vào Mock API tool
    */
   createMockResponse(input, options = {}) {
-    let me = this;
     // Normalize to array
     let items = Array.isArray(input) ? input : input ? [input] : [];
 
@@ -501,7 +499,7 @@ class TDCURLUtil {
       if (reqInput) {
         if (typeof reqInput === "string") {
           // CURL string format
-          let parsed = window.__tdAPI.apiTesting.parseCURL(reqInput);
+          let parsed = this.parseCURL(reqInput);
           if (parsed) {
             mock.method = (parsed.method || "GET").toUpperCase();
             mock.api_url = parsed.url || "";
@@ -585,50 +583,6 @@ class TDCURLUtil {
       return mock;
     });
   }
-
-  setGlobalInfoBeforeRequest(options) {
-    let me = this;
-    window.__tdAPI = window.__tdAPI ?? {};
-    window.__tdAPI.apiTesting = {
-      agentURL: options?.agentURL ?? window.__env?.APITesting?.agentServer,
-      requestCURL: me.requestCURL,
-      request: me.request,
-      parseResponse: me.parseResponse,
-      parseResponseMulti: me.parseResponseMulti,
-      requestMulti: me.requestMulti,
-      requestMultiCURL: me.requestMultiCURL,
-      parseCURL: me.parseCURL,
-      fetchAgent: me.fetchAgent,
-      readFile: me.readFile,
-      readFolder: me.readFolder,
-      convertJSONToPostgreSQL: me.convertJSONToPostgreSQL,
-      createMockResponse: me.createMockResponse,
-    };
-    return window.__tdAPI.apiTesting;
-  }
-  /**
-   * Đoạn code build ra script javascript động để chạy request bằng CURL
-   * theo kịch bản người dùng tự viết
-   */
-  buildInjectCode(secranioCode) {
-    let me = this;
-    return `
-let requestCURL = window.__tdAPI.apiTesting.requestCURL;
-let request = window.__tdAPI.apiTesting.request;
-let parseResponse = window.__tdAPI.apiTesting.parseResponse;
-let parseResponseMulti = window.__tdAPI.apiTesting.parseResponseMulti;
-let requestMulti = window.__tdAPI.apiTesting.requestMulti;
-let requestMultiCURL = window.__tdAPI.apiTesting.requestMultiCURL;
-let readFile = window.__tdAPI.apiTesting.readFile;
-let readFolder = window.__tdAPI.apiTesting.readFolder;
-let convertJSONToPostgreSQL = window.__tdAPI.apiTesting.convertJSONToPostgreSQL;
-let createMockResponse = window.__tdAPI.apiTesting.createMockResponse;
-let result = 
-(async () => {
-  ${secranioCode}
-})();
-return result;`;
-  }
 }
 
-export default new TDCURLUtil();
+export default TDAutomationInject;

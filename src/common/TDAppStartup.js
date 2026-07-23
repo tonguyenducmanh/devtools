@@ -1,5 +1,5 @@
 import utility from "@/common/TDUtility.js";
-import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
+import TDAutomation from "@/common/automation/TDAutomation.js";
 import { toast } from "@/common/plugin/TDToastPlugin.js";
 
 class TDAppStartup {
@@ -10,7 +10,7 @@ class TDAppStartup {
    */
   async initialize() {
     let userSetting = await utility.getUserSettings();
-    let setConfig = TDCURLUtil.setGlobalInfoBeforeRequest({
+    let setConfig = TDAutomation.setGlobalInfoBeforeRequest({
       agentURL: userSetting["agentURL"],
     });
 

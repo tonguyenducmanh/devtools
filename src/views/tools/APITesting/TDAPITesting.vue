@@ -430,7 +430,7 @@
 </template>
 
 <script>
-import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
+import TDAutomation from "@/common/automation/TDAutomation.js";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDArrow from "@/components/TDArrow.vue";
 import JSZip from "jszip";
@@ -932,7 +932,7 @@ export default {
             requests: [],
           };
         }
-        let curlConent = TDCURLUtil.parseCURL(content);
+        let curlConent = TDAutomation.parseCURL(content);
         if (curlConent) {
           collections[collectionName].requests.push({
             requestName: requestName,
@@ -1093,7 +1093,7 @@ export default {
           body_text: this.bodyText || null,
         };
 
-        this.currentRequest = TDCURLUtil.fetchAgent(requestData);
+        this.currentRequest = TDAutomation.fetchAgent(requestData);
 
         let response = await this.currentRequest.promise;
 
@@ -1167,7 +1167,7 @@ export default {
         me.headersText = item.headersText;
         me.bodyText = item.bodyText;
         me.requestName = item.requestName;
-        me.curlContent = TDCURLUtil.stringifyCURL(me.getRequestObj());
+        me.curlContent = TDAutomation.stringifyCURL(me.getRequestObj());
         me.currentRequestId = null;
       }
     },
@@ -1207,12 +1207,12 @@ export default {
     },
     copyCURLFromNormalMode() {
       let me = this;
-      me.curlContent = TDCURLUtil.stringifyCURL(me.getRequestObj());
+      me.curlContent = TDAutomation.stringifyCURL(me.getRequestObj());
       me.$tdUtility.copyToClipboard(me.curlContent);
     },
     importCURL(isSilence = false) {
       let me = this;
-      let CURLParsed = TDCURLUtil.parseCURL(me.curlContent);
+      let CURLParsed = TDAutomation.parseCURL(me.curlContent);
       let result = false;
       if (CURLParsed) {
         me.apiUrl = CURLParsed.url;

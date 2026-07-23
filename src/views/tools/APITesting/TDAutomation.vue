@@ -329,7 +329,7 @@
 </template>
 
 <script>
-import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
+import TDAutomation from "@/common/automation/TDAutomation.js";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDArrow from "@/components/TDArrow.vue";
 import JSZip from "jszip";
@@ -898,7 +898,7 @@ export default {
       me.startTime = performance.now();
 
       try {
-        let injectedCode = TDCURLUtil.buildInjectCode(me.proModeSecranioCode);
+        let injectedCode = TDAutomation.buildInjectCode(me.proModeSecranioCode);
 
         let userFn = new Function(injectedCode);
         let result = await userFn();

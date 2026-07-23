@@ -86,7 +86,7 @@
   </div>
 </template>
 <script>
-import TDCURLUtil from "@/common/api/CURLHandle/TDCURLUtil.js";
+import TDAutomation from "@/common/automation/TDAutomation.js";
 import TDAgentAPI from "@/common/api/request/AgentAPI/TDAgentAPI.js";
 import { getUserSettingDefault } from "@/common/TDUserSettingDefault.js";
 import { toast } from "@/common/plugin/TDToastPlugin.js";
@@ -150,7 +150,7 @@ export default {
     },
     handleChangeAgentURL() {
       let me = this;
-      TDCURLUtil.setGlobalInfoBeforeRequest({
+      TDAutomation.setGlobalInfoBeforeRequest({
         agentURL: me.currentUserSetting.agentURL,
       });
     },
