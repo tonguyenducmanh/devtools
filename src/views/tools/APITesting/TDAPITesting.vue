@@ -578,8 +578,8 @@ export default {
     },
   },
   beforeUnmount() {
-    if (this.currentRequest && this.currentRequest.cancel) {
-      this.currentRequest.cancel();
+    if (this._abortController) {
+      this._abortController.abort();
     }
     if (this.debouncedHandleSend?.cancel) {
       this.debouncedHandleSend.cancel();
@@ -1043,6 +1043,7 @@ export default {
       me.isLoading = false;
       me.startTime = null;
       me.currentRequest = null;
+      me._abortController = null;
       me.curlContent = "";
     },
     formatBody() {
@@ -1093,9 +1094,12 @@ export default {
           body_text: this.bodyText || null,
         };
 
-        this.currentRequest = TDAutomation.fetchAgent(requestData);
-
-        let response = await this.currentRequest.promise;
+        this._abortController = new AbortController();
+        let res = await new TDServerTestingAPI().executeRequest(
+          requestData,
+          this._abortController.signal,
+        );
+        let response = await res.data;
 
         let endTime = performance.now();
         this.responseTime = Math.round(endTime - this.startTime);
@@ -1128,7 +1132,7 @@ export default {
         }
       } finally {
         this.isLoading = false;
-        this.currentRequest = null;
+        this._abortController = null;
 
         let historyItem = me.buildHistoryItemForSave();
         await me.$refs.history.saveToHistory(historyItem);
@@ -1149,15 +1153,12 @@ export default {
       return historyItem;
     },
     handleCancelRequest() {
-      if (
-        this.currentRequest &&
-        typeof this.currentRequest.cancel === "function"
-      ) {
-        this.currentRequest.cancel();
+      if (this._abortController) {
+        this._abortController.abort();
       }
 
       this.isLoading = false;
-      this.currentRequest = null;
+      this._abortController = null;
     },
     handleSendRequestFromHistory(item) {
       let me = this;

@@ -1,4 +1,11 @@
 import TDAutomationInject from "./TDAutomationInject.js";
+
+function getInjectableMethods() {
+  return Object.getOwnPropertyNames(TDAutomationInject.prototype).filter(
+    (name) => name !== "constructor",
+  );
+}
+
 /**
  * Các method CURL dùng cho toàn bộ frontend
  * Created by tdmanh 16/12/2025
@@ -12,10 +19,7 @@ class TDAutomation extends TDAutomationInject {
       agentURL: options?.agentURL ?? window.__env?.APITesting?.agentServer,
     };
 
-    let methodNames = Object.getOwnPropertyNames(
-      TDAutomationInject.prototype,
-    ).filter((name) => name !== "constructor");
-    methodNames.forEach((name) => {
+    getInjectableMethods().forEach((name) => {
       apiTesting[name] = me[name].bind(me);
     });
 
@@ -28,11 +32,7 @@ class TDAutomation extends TDAutomationInject {
    * theo kịch bản người dùng tự viết
    */
   buildInjectCode(scenarioCode) {
-    let methodNames = Object.getOwnPropertyNames(
-      TDAutomationInject.prototype,
-    ).filter((name) => name !== "constructor");
-
-    let bindings = methodNames
+    let bindings = getInjectableMethods()
       .map((name) => `let ${name} = window.__tdAPI.apiTesting.${name};`)
       .join("\n");
 

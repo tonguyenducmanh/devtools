@@ -10,52 +10,6 @@ import * as curlReader from "@/common/api/CURLHandle/curlReader/index.ts";
  */
 class TDAutomationInject {
   /**
-   * Sử dụng agent để thực hiện chạy command curl gọi API,
-   * không bị giới hạn bởi các tool của trình duyệt
-   * (dạng text code để inject động)
-   */
-  fetchAgent(request) {
-    let serverAgent = window.__tdAPI?.apiTesting?.agentURL;
-    if (!serverAgent) {
-      throw new Error("Agent server not configured");
-    }
-
-    let controller = new AbortController();
-    // thực hiện gọi api vào agent
-    let promise = new TDServerTestingAPI()
-      .executeRequest(request, controller.signal)
-      .then(async (res) => {
-        let data = await res.data;
-
-        try {
-          return {
-            status: data.status,
-            headers: data.headers,
-            body: data.body,
-          };
-        } catch {
-          data = data;
-          return {
-            status: 200,
-            headers: {},
-            body: data,
-          };
-        }
-      })
-      .catch((error) => {
-        throw error;
-      });
-
-    return {
-      promise,
-      cancel() {
-        controller.abort();
-        throw new Error("Request cancelled by user");
-      },
-    };
-  }
-
-  /**
    * Đọc nội dung CURL
    * @param {string} curlText
    */
@@ -143,9 +97,13 @@ class TDAutomationInject {
         headers_text: parsed.headersText || "",
         body_text: parsed.bodyText || null,
       };
-      let req = this.fetchAgent(requestData);
-      let resp = await req.promise;
-      return resp;
+      let res = await new TDServerTestingAPI().executeRequest(requestData);
+      let data = await res.data;
+      return {
+        status: data.status,
+        headers: data.headers,
+        body: data.body,
+      };
     } catch (ex) {
       let msgErr = "requestCURL call api error";
       console.log(msgErr + ex);
@@ -236,9 +194,13 @@ class TDAutomationInject {
         headers_text: headersText,
         body_text: bodyText,
       };
-      let req = this.fetchAgent(requestData);
-      let resp = await req.promise;
-      return resp;
+      let res = await new TDServerTestingAPI().executeRequest(requestData);
+      let data = await res.data;
+      return {
+        status: data.status,
+        headers: data.headers,
+        body: data.body,
+      };
     } catch (ex) {
       let msgErr = "request call api error";
       console.log(msgErr + ex);
@@ -582,6 +544,41 @@ class TDAutomationInject {
 
       return mock;
     });
+  }
+
+  /**
+   * Chờ đợi (sleep) trong khoảng thời gian nhất định.
+   * @param {number} seconds - Số giây muốn chờ
+   * @returns {Promise<void>}
+   */
+  delay(seconds) {
+    return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+  }
+
+  /**
+   * Thực thi 1 hàm với cơ chế retry (thử lại khi lỗi).
+   * @param {Function} fn - Hàm cần thực thi (có thể async)
+   * @param {Object} options - Tùy chọn
+   * @param {number} options.attempts - Số lần thử tối đa (mặc định 3)
+   * @param {number} options.delaySec - Thời gian chờ giữa các lần thử (mặc định 1 giây)
+   * @param {Function} options.shouldRetry - Hàm kiểm tra có nên retry không (mặc định: retry mọi lỗi)
+   * @returns {Promise<any>} Kết quả của fn nếu thành công
+   * @throws {Error} Lỗi cuối cùng nếu tất cả các lần thử đều thất bại
+   */
+  async retry(fn, options = {}) {
+    let { attempts = 3, delaySec = 1, shouldRetry = () => true } = options;
+    let lastError;
+    for (let i = 0; i < attempts; i++) {
+      try {
+        return await fn();
+      } catch (error) {
+        lastError = error;
+        if (i < attempts - 1 && shouldRetry(error)) {
+          await this.delay(delaySec);
+        }
+      }
+    }
+    throw lastError;
   }
 }
 
