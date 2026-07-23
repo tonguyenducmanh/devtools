@@ -183,6 +183,25 @@ export default {
         };
       });
 
+      // Nếu có mock chưa có group_id thì tự tạo group theo timestamp
+      let hasUngrouped = normalizedMocks.some((m) => !m.group_id);
+      if (hasUngrouped) {
+        let now = new Date();
+        let pad = (n) => String(n).padStart(2, "0");
+        let groupName = `mock_${pad(now.getDate())}_${pad(now.getMonth() + 1)}_${now.getFullYear()}_${pad(now.getHours())}_${pad(now.getMinutes())}_${pad(now.getSeconds())}`;
+        try {
+          let res = await me.agentAPI.mockGroup.create({ name: groupName });
+          if (res && res.success && res.data?.success) {
+            let newGroupId = res.data.data.id;
+            normalizedMocks.forEach((m) => {
+              if (!m.group_id) m.group_id = newGroupId;
+            });
+          }
+        } catch (e) {
+          console.error("Lỗi tạo group tự động:", e);
+        }
+      }
+
       try {
         let response = await me.agentAPI.importBatch(normalizedMocks);
         if (response && response.success && response.data?.success) {

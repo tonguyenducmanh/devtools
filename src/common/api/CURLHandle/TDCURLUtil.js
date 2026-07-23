@@ -429,85 +429,130 @@ class TDCURLUtil {
   }
 
   /**
-   * Build mock objects từ response data để export JSON (dùng import thủ công ở máy khác).
+   * Build mock objects từ request/response data để export JSON (dùng import thủ công vào Mock API tool).
    * Không gọi API backend, chỉ xử lý local.
    *
-   * @param {Array<Object>} responses - mảng response từ request() hoặc requestCURL(),
-   *   mỗi object chứa: { status, headers, body, request? }
-   *   request (optional): { method, url, headers, body } - nếu có sẽ tự điền endpoint/method
+   * @param {Object|Array<Object>} input - 1 item hoặc mảng items, mỗi item có dạng:
+   *   { request: string|Object, response: { status, headers, body } }
+   *   - request (string): CURL command text, ví dụ "curl 'https://...'"
+   *   - request (Object): { method, url, headers, body } hoặc { apiUrl, httpMethod, headersText, bodyText }
+   *   - response (Object): { status, headers, body } - kết quả từ request() hoặc requestCURL()
+   *
+   *   Hoặc backward-compat dạng flat: { status, headers, body, request? }
+   *
    * @param {Object} options - tùy chọn (optional)
-   * @param {string} options.group_id - group_id cho mock (optional)
+   * @param {string} options.request_name - tên mock (dùng khi input là 1 item)
+   * @param {string} options.group_id - group_id cho mock
    * @param {string} options.defaultStatusText - response text mặc định khi không có body
-   * @returns {Array<Object>} mảng mock objects sẵn sàng để copy JSON import
+   * @returns {Array<Object>} mảng mock objects sẵn sàng để copy JSON import vào Mock API tool
    */
-  createMockResponse(responses, options = {}) {
-    if (!Array.isArray(responses) || responses.length === 0) {
-      console.error("createMockResponse: responses must be a non-empty array");
+  createMockResponse(input, options = {}) {
+    let me = this;
+    // Normalize to array
+    let items = Array.isArray(input) ? input : (input ? [input] : []);
+
+    if (items.length === 0) {
+      console.error("createMockResponse: input must be a non-empty item or array");
       return [];
     }
 
-    return responses.map((res, index) => {
+    return items.map((item, index) => {
       let mock = {
-        request_name: options.request_name || `Mock ${index + 1}`,
+        request_name: options.request_name || "",
         group_id: options.group_id || "",
         method: "GET",
-        end_point: "/",
+        api_url: "",
         headers_text: "",
         body_text: "",
         response_text: "",
         response_headers_text: "",
-        status_code: res.status || 200,
+        status_code: 200,
       };
 
-      // Nếu có request info, tự extract method/endpoint/body
-      if (res.request) {
-        let req = res.request;
-        mock.method = (req.method || "GET").toUpperCase();
-        // Extract endpoint từ URL
-        try {
-          let urlObj = new URL(req.url);
-          mock.end_point = urlObj.pathname;
-        } catch {
-          mock.end_point = req.url || "/";
-        }
-        // Request body
-        if (req.body) {
-          mock.body_text = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
-        }
-        // Request headers
-        if (req.headers) {
-          if (typeof req.headers === "string") {
-            mock.headers_text = req.headers;
-          } else if (typeof req.headers === "object") {
-            mock.headers_text = Object.entries(req.headers)
-              .map(([k, v]) => `${k}:${v}`)
-              .join("\n");
+      // ─── Resolve request & response from input format ───
+      let reqInput = null;
+      let resInput = null;
+
+      if (item.request !== undefined || item.response !== undefined) {
+        // New format: { request, response }
+        reqInput = item.request || null;
+        resInput = item.response || {};
+      } else {
+        // Backward-compat flat format: { status, headers, body, request? }
+        reqInput = item.request || null;
+        resInput = { status: item.status, headers: item.headers, body: item.body };
+      }
+
+      // ─── Parse request ───
+      if (reqInput) {
+        if (typeof reqInput === "string") {
+          // CURL string format
+          let parsed = me.parseCURL(reqInput);
+          if (parsed) {
+            mock.method = (parsed.method || "GET").toUpperCase();
+            mock.api_url = parsed.url || "";
+            mock.headers_text = parsed.headersText || "";
+            mock.body_text = parsed.bodyText || "";
+          }
+        } else if (typeof reqInput === "object") {
+          // Object format - support both { method, url, headers, body } and { apiUrl, httpMethod, headersText, bodyText }
+          mock.method = (reqInput.method || reqInput.httpMethod || "GET").toUpperCase();
+          mock.api_url = reqInput.url || reqInput.apiUrl || "";
+          // Headers
+          if (reqInput.headers) {
+            if (typeof reqInput.headers === "string") {
+              mock.headers_text = reqInput.headers;
+            } else if (typeof reqInput.headers === "object") {
+              mock.headers_text = Object.entries(reqInput.headers)
+                .map(([k, v]) => `${k}:${v}`)
+                .join("\n");
+            }
+          } else if (reqInput.headersText) {
+            mock.headers_text = reqInput.headersText;
+          }
+          // Body
+          if (reqInput.body !== undefined && reqInput.body !== null) {
+            mock.body_text = typeof reqInput.body === "string"
+              ? reqInput.body
+              : JSON.stringify(reqInput.body);
+          } else if (reqInput.bodyText) {
+            mock.body_text = reqInput.bodyText;
           }
         }
       }
 
+      // ─── Parse response ───
+      if (resInput.status !== undefined) {
+        mock.status_code = resInput.status;
+      }
+
       // Response body
-      if (res.body !== undefined && res.body !== null) {
-        if (typeof res.body === "string") {
+      if (resInput.body !== undefined && resInput.body !== null) {
+        if (typeof resInput.body === "string") {
           try {
-            mock.response_text = JSON.stringify(JSON.parse(res.body), null, 2);
+            mock.response_text = JSON.stringify(JSON.parse(resInput.body), null, 2);
           } catch {
-            mock.response_text = res.body;
+            mock.response_text = resInput.body;
           }
         } else {
-          mock.response_text = JSON.stringify(res.body, null, 2);
+          mock.response_text = JSON.stringify(resInput.body, null, 2);
         }
       } else {
         mock.response_text = options.defaultStatusText || "{}";
       }
 
       // Response headers
-      if (res.headers) {
-        if (typeof res.headers === "string") {
-          mock.response_headers_text = res.headers;
-        } else if (typeof res.headers === "object") {
-          mock.response_headers_text = JSON.stringify(res.headers, null, 2);
+      if (resInput.headers) {
+        if (typeof resInput.headers === "string") {
+          mock.response_headers_text = resInput.headers;
+        } else if (typeof resInput.headers === "object") {
+          mock.response_headers_text = JSON.stringify(resInput.headers, null, 2);
         }
+      }
+
+      // ─── Fallback request_name → api_url ───
+      if (!mock.request_name && mock.api_url) {
+        mock.request_name = mock.api_url;
       }
 
       return mock;
