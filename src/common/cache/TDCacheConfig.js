@@ -88,6 +88,12 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool mock api",
   },
+  TDAutomationConfigLayout: {
+    KeyFormat: "TDAutomationConfigLayout",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool automation",
+  },
   UserSettings: {
     KeyFormat: "UserSettings",
     CacheLevel: tdEnum.cacheType.local,

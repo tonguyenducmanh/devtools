@@ -48,6 +48,14 @@ const sidebarConfig = [
     ],
   },
   {
+    type: "automation",
+    name: "TDAutomation",
+    component: () => import("@/views/tools/APITesting/TDAutomation.vue"),
+    meta: {
+      titleKey: "i18nCommon.feature.Automation",
+    },
+  },
+  {
     type: "group",
     groupKey: "qrcode",
     groupTitleKey: "i18nCommon.group.QRCode",

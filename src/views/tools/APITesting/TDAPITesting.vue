@@ -1,34 +1,20 @@
 <template>
   <div class="flex td-api-container">
-    <!-- phần thao tác chính của tool -->
     <div class="flex flex-col td-api-testing">
-      <!-- danh sách các nút ở đầu api -->
+      <!-- Header -->
       <div class="flex td-api-header-group">
-        <!-- lựa chọn chế độ api và tên request-->
         <div class="flex flex-one">
-          <TDComboBox
-            :width="100"
-            v-model="currentConfigLayout.currentAPIMode"
-            :options="APIModeOptions"
-            :noMargin="true"
-            :readOnly="isLoading"
-            @selected="handleSelectedAPIMode"
-            :borderRadiusPosition="[
-              $tdEnum.BorderRadiusPosition.TopLeft,
-              $tdEnum.BorderRadiusPosition.BottomLeft,
-            ]"
-          />
           <TDInput
             v-model="requestName"
             :noMargin="true"
-            :placeHolder="requestNameBuild"
+            :placeHolder="$t('i18nCommon.apiTesting.requestName')"
             :borderRadiusPosition="[
-              $tdEnum.BorderRadiusPosition.TopRight,
+              $tdEnum.BorderRadiusPosition.TopLeft,
+              $tdEnum.BorderRadiusPosition.BottomLeft,
               $tdEnum.BorderRadiusPosition.BottomRight,
             ]"
           ></TDInput>
         </div>
-        <!-- nút gửi hoặc hủy request -->
         <TDButton
           v-if="isLoading"
           :noMargin="true"
@@ -44,7 +30,6 @@
           iconClass="td-send-icon"
           v-tooltip="$t('i18nCommon.apiTesting.send')"
         ></TDButton>
-        <!-- nút tải xuống response -->
         <TDButton
           :noMargin="true"
           @click="handleDownloadReponse"
@@ -52,322 +37,200 @@
           iconClass="td-download-icon"
           v-tooltip="$t('i18nCommon.apiTesting.downloadReponse')"
         ></TDButton>
-        <template
-          v-if="currentConfigLayout.currentAPIMode != $tdEnum.APIMode.ProMode"
-        >
-          <TDButton
-            @click="copyCURLFromNormalMode"
-            :type="$tdEnum.buttonType.secondary"
-            :noMargin="true"
-            :readOnly="!(apiUrl && httpMethod) || isLoading"
-            iconClass="td-export-icon"
-            v-tooltip="$t('i18nCommon.apiTesting.copyCURLFromAPI')"
-          ></TDButton>
-          <!-- nút thêm request mới -->
-          <TDButton
-            v-if="currentRequestId"
-            :readOnly="isLoadingData"
-            @click="createNewRequest"
-            :type="$tdEnum.buttonType.secondary"
-            :noMargin="true"
-            iconClass="td-new-file-icon"
-            v-tooltip="$t('i18nCommon.apiTesting.createNewRequest')"
-          ></TDButton>
-          <!-- nút lưu request -->
-          <TDButton
-            :readOnly="isLoadingData || !requestName"
-            @click="saveRequest"
-            :type="$tdEnum.buttonType.secondary"
-            :noMargin="true"
-            iconClass="td-save-icon"
-            v-tooltip="$t('i18nCommon.apiTesting.save')"
-          ></TDButton>
-        </template>
-        <template v-else>
-          <TDUpload
-            v-tooltip="{
-              text: $t('i18nCommon.apiTesting.importCollectionZipTooltip'),
-              maxWidth: '500px',
-            }"
-            iconClass="td-upload-icon"
-            :accept="'.zip'"
-            @change="importProModeCollectionZip"
-            ref="uploadAreaProMode"
-            :isShowSelect="false"
-          />
-          <!-- nút thêm script mới (promode) -->
-          <TDButton
-            v-if="currentProModeRequestId"
-            :readOnly="isLoadingData"
-            @click="createNewProModeRequest"
-            :type="$tdEnum.buttonType.secondary"
-            :noMargin="true"
-            iconClass="td-new-file-icon"
-            v-tooltip="$t('i18nCommon.apiTesting.createNewRequest')"
-          ></TDButton>
-          <!-- nút lưu script (promode) -->
-          <TDButton
-            :readOnly="isLoadingData || !requestName"
-            @click="saveProModeRequest"
-            :type="$tdEnum.buttonType.secondary"
-            :noMargin="true"
-            iconClass="td-save-icon"
-            v-tooltip="$t('i18nCommon.apiTesting.save')"
-          ></TDButton>
-          <!-- nút copy AI docs -->
-          <TDButton
-            :noMargin="true"
-            @click="copyAIDocsToClipboard"
-            :type="$tdEnum.buttonType.secondary"
-            iconClass="td-copy-icon"
-            v-tooltip="$t('i18nCommon.apiTesting.copyAIDocs')"
-          ></TDButton>
-        </template>
+        <TDButton
+          @click="copyCURLFromNormalMode"
+          :type="$tdEnum.buttonType.secondary"
+          :noMargin="true"
+          :readOnly="!(apiUrl && httpMethod) || isLoading"
+          iconClass="td-export-icon"
+          v-tooltip="$t('i18nCommon.apiTesting.copyCURLFromAPI')"
+        ></TDButton>
+        <TDButton
+          v-if="currentRequestId"
+          :readOnly="isLoadingData"
+          @click="createNewRequest"
+          :type="$tdEnum.buttonType.secondary"
+          :noMargin="true"
+          iconClass="td-new-file-icon"
+          v-tooltip="$t('i18nCommon.apiTesting.createNewRequest')"
+        ></TDButton>
+        <TDButton
+          :readOnly="isLoadingData || !requestName"
+          @click="saveRequest"
+          :type="$tdEnum.buttonType.secondary"
+          :noMargin="true"
+          iconClass="td-save-icon"
+          v-tooltip="$t('i18nCommon.apiTesting.save')"
+        ></TDButton>
       </div>
-      <!-- hết phần danh sách nút đầu của api -->
-      <!-- phần nội dung tùy thuộc vào từng loại api -->
-      <!-- phần api truyền thống -->
-      <template
-        v-if="currentConfigLayout.currentAPIMode == $tdEnum.APIMode.Normal"
-      >
-        <div class="td-api-content">
-          <div class="flex td-api-info-btn">
-            <!-- dòng header bổ trợ 1 số thông tin cho mode api thường -->
-            <div class="flex flex-one">
-              <!-- combo chọn method http -->
-              <TDComboBox
-                :width="100"
-                v-model="httpMethod"
-                :options="methodOptions"
-                :customStyle="customStyleComboMethodAPI"
+      <!-- Content -->
+      <div class="td-api-content">
+        <div class="flex td-api-info-btn">
+          <div class="flex flex-one">
+            <TDComboBox
+              :width="100"
+              v-model="httpMethod"
+              :options="methodOptions"
+              :customStyle="customStyleComboMethodAPI"
+              :noMargin="true"
+              :borderRadiusPosition="[
+                $tdEnum.BorderRadiusPosition.TopLeft,
+                $tdEnum.BorderRadiusPosition.BottomLeft,
+              ]"
+            />
+            <TDInput
+              v-model="apiUrl"
+              :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
+              :noMargin="true"
+              :borderRadiusPosition="[
+                $tdEnum.BorderRadiusPosition.TopRight,
+                $tdEnum.BorderRadiusPosition.BottomRight,
+              ]"
+            ></TDInput>
+            <div class="flex td-import-request-group">
+              <TDButton
+                @click="openFormImportCURL"
+                :type="$tdEnum.buttonType.secondary"
                 :noMargin="true"
-                :borderRadiusPosition="[
-                  $tdEnum.BorderRadiusPosition.TopLeft,
-                  $tdEnum.BorderRadiusPosition.BottomLeft,
-                ]"
+                :readOnly="isLoading"
+                iconClass="td-import-icon"
+                v-tooltip="$t('i18nCommon.apiTesting.CURL')"
+              ></TDButton>
+              <TDButton
+                :noMargin="true"
+                :readOnly="!responseText"
+                @click="copyMockData"
+                :type="$tdEnum.buttonType.secondary"
+                iconClass="td-copy-icon"
+                v-tooltip="$t('i18nCommon.apiTesting.copyMockData')"
+              ></TDButton>
+              <TDUpload
+                v-tooltip="{
+                  text: $t('i18nCommon.apiTesting.importCollectionZipTooltip'),
+                  maxWidth: '500px',
+                }"
+                iconClass="td-upload-icon"
+                :accept="'.zip'"
+                @change="importCollectionZip"
+                ref="uploadArea"
+                :isShowSelect="false"
               />
-              <!-- nhập url endpoint api -->
-              <TDInput
-                v-model="apiUrl"
-                :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
-                :noMargin="true"
-                :borderRadiusPosition="[
-                  $tdEnum.BorderRadiusPosition.TopRight,
-                  $tdEnum.BorderRadiusPosition.BottomRight,
-                ]"
-              ></TDInput>
-              <!-- phần upload hàng loạt request -->
-              <div class="flex td-import-request-group">
-                <!-- nút mở chế độ api import curl -->
-                <TDButton
-                  @click="openFormImportCURL"
-                  :type="$tdEnum.buttonType.secondary"
-                  :noMargin="true"
-                  :readOnly="isLoading"
-                  iconClass="td-import-icon"
-                  v-tooltip="$t('i18nCommon.apiTesting.CURL')"
-                ></TDButton>
-                <!-- nút copy dữ liệu làm mock data -->
-                <TDButton
-                  :noMargin="true"
-                  :readOnly="!responseText"
-                  @click="copyMockData"
-                  :type="$tdEnum.buttonType.secondary"
-                  iconClass="td-copy-icon"
-                  v-tooltip="$t('i18nCommon.apiTesting.copyMockData')"
-                ></TDButton>
-                <TDUpload
-                  v-tooltip="{
-                    text: $t(
-                      'i18nCommon.apiTesting.importCollectionZipTooltip',
-                    ),
-                    maxWidth: '500px',
-                  }"
-                  iconClass="td-upload-icon"
-                  :accept="'.zip'"
-                  @change="importCollectionZip"
-                  ref="uploadArea"
-                  :isShowSelect="false"
-                />
-                <TDUpload
-                  v-tooltip="{
-                    text: $t(
-                      'i18nCommon.apiTesting.importCollectionPostmanTooltip',
-                    ),
-                    maxWidth: '500px',
-                  }"
-                  :accept="'.json'"
-                  iconClass="td-postman-icon"
-                  @change="importCollectionPostman"
-                  ref="uploadAreaPostman"
-                  :isShowSelect="false"
-                  :multiple="true"
-                />
-              </div>
+              <TDUpload
+                v-tooltip="{
+                  text: $t(
+                    'i18nCommon.apiTesting.importCollectionPostmanTooltip',
+                  ),
+                  maxWidth: '500px',
+                }"
+                :accept="'.json'"
+                iconClass="td-postman-icon"
+                @change="importCollectionPostman"
+                ref="uploadAreaPostman"
+                :isShowSelect="false"
+                :multiple="true"
+              />
             </div>
           </div>
-          <!-- phần nội dung  -->
+        </div>
+        <div
+          class="flex td-api-input-area"
+          :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
+        >
           <div
-            class="flex td-api-input-area"
-            :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
+            class="flex flex-col td-api-request"
+            :style="requestSectionSizeStyle"
           >
-            <div
-              class="flex flex-col td-api-request"
-              :style="requestSectionSizeStyle"
+            <TDTextEditor
+              v-if="
+                currentConfigLayout.currentAPIInfoOption ==
+                $tdEnum.APIInfoOption.header
+              "
+              :isShowHeader="true"
+              v-model="headersText"
+              :enableHighlight="true"
+              language="text/plan"
+              :wrapText="currentConfigLayout.wrapText"
+              :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
+              :label="$t('i18nCommon.APIMocking.request')"
             >
-              <!-- phần cấu hình header api -->
+              <template v-slot:header-main>
+                <div class="flex td-header-options">
+                  <span class="td-header-option active">{{
+                    $t("i18nCommon.apiTesting.changeToViewHeader")
+                  }}</span>
+                  <span
+                    class="td-header-option"
+                    @click="changeToViewBodyRequest"
+                    v-tooltip="$t('i18nCommon.apiTesting.clickToViewBody')"
+                    >{{ $t("i18nCommon.apiTesting.changeToViewBody") }}</span
+                  >
+                </div>
+              </template>
+            </TDTextEditor>
+            <div
+              class="td-text-area-wrap"
+              v-if="
+                currentConfigLayout.currentAPIInfoOption ==
+                $tdEnum.APIInfoOption.body
+              "
+            >
               <TDTextEditor
-                v-if="
-                  currentConfigLayout.currentAPIInfoOption ==
-                  $tdEnum.APIInfoOption.header
-                "
                 :isShowHeader="true"
-                v-model="headersText"
-                :enableHighlight="true"
-                language="text/plan"
+                v-model="bodyText"
                 :wrapText="currentConfigLayout.wrapText"
-                :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
+                :enableHighlight="true"
+                language="json"
+                :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
                 :label="$t('i18nCommon.APIMocking.request')"
               >
                 <template v-slot:header-main>
                   <div class="flex td-header-options">
-                    <span class="td-header-option active">{{
-                      $t("i18nCommon.apiTesting.changeToViewHeader")
-                    }}</span>
                     <span
                       class="td-header-option"
-                      @click="changeToViewBodyRequest"
-                      v-tooltip="$t('i18nCommon.apiTesting.clickToViewBody')"
-                      >{{ $t("i18nCommon.apiTesting.changeToViewBody") }}</span
+                      @click="changeToViewHeaderRequest"
+                      v-tooltip="$t('i18nCommon.apiTesting.clickToViewHeader')"
+                      >{{
+                        $t("i18nCommon.apiTesting.changeToViewHeader")
+                      }}</span
                     >
+                    <span class="td-header-option active">{{
+                      $t("i18nCommon.apiTesting.changeToViewBody")
+                    }}</span>
                   </div>
                 </template>
               </TDTextEditor>
-              <!-- phần cấu hình body api -->
-              <div
-                class="td-text-area-wrap"
-                v-if="
-                  currentConfigLayout.currentAPIInfoOption ==
-                  $tdEnum.APIInfoOption.body
-                "
-              >
-                <TDTextEditor
-                  :isShowHeader="true"
-                  v-model="bodyText"
-                  :wrapText="currentConfigLayout.wrapText"
-                  :enableHighlight="true"
-                  language="json"
-                  :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
-                  :label="$t('i18nCommon.APIMocking.request')"
-                >
-                  <template v-slot:header-main>
-                    <div class="flex td-header-options">
-                      <span
-                        class="td-header-option"
-                        @click="changeToViewHeaderRequest"
-                        v-tooltip="
-                          $t('i18nCommon.apiTesting.clickToViewHeader')
-                        "
-                        >{{
-                          $t("i18nCommon.apiTesting.changeToViewHeader")
-                        }}</span
-                      >
-                      <span class="td-header-option active">{{
-                        $t("i18nCommon.apiTesting.changeToViewBody")
-                      }}</span>
-                    </div>
-                  </template>
-                </TDTextEditor>
-              </div>
-            </div>
-            <!-- Resizer -->
-            <TDResizer
-              v-if="currentConfigLayout.showReponse"
-              :direction="
-                currentConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
-              "
-              @resize="handleResize"
-            />
-            <!-- phần response API -->
-            <div
-              v-if="currentConfigLayout.showReponse"
-              class="flex flex-col td-api-response"
-              :style="responseSectionSizeStyle"
-            >
-              <TDAPIResponse
-                :statusCode="statusCode"
-                :responseTime="responseTime"
-                :isLoading="isLoading"
-                :responseText="responseText"
-                :responseHeadersText="responseHeadersText"
-                :currentConfigLayout="currentConfigLayout"
-              />
             </div>
           </div>
-        </div>
-      </template>
-      <!-- phần api promode, xử lý nhiều kịch bản bằng javascript -->
-      <template
-        v-else-if="
-          currentConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode
-        "
-      >
-        <div class="td-api-content">
+          <TDResizer
+            v-if="currentConfigLayout.showReponse"
+            :direction="
+              currentConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
+            "
+            @resize="handleResize"
+          />
           <div
-            class="flex td-api-input-area"
-            :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
+            v-if="currentConfigLayout.showReponse"
+            class="flex flex-col td-api-response"
+            :style="responseSectionSizeStyle"
           >
-            <!-- phần 1 số info header promode như title và respone http -->
-            <div
-              class="flex flex-col td-api-request"
-              :style="requestSectionSizeStyle"
-            >
-              <!-- phần nội dung code pro mode -->
-              <TDTextEditor
-                :isLabelTop="true"
-                v-model="proModeSecranioCode"
-                language="td-api-javascript"
-                :wrapText="currentConfigLayout.wrapText"
-                :enableHighlight="true"
-                :monacoOptions="proModeMonacoOptions"
-                :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
-                :label="$t('i18nCommon.apiTesting.scriptExecute')"
-              ></TDTextEditor>
-            </div>
-            <!-- Resizer -->
-            <TDResizer
-              v-if="currentConfigLayout.showReponse"
-              :direction="
-                currentConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
-              "
-              @resize="handleResize"
+            <TDAPIResponse
+              :statusCode="statusCode"
+              :responseTime="responseTime"
+              :isLoading="isLoading"
+              :responseText="responseText"
+              :responseHeadersText="responseHeadersText"
+              :currentConfigLayout="currentConfigLayout"
             />
-            <div
-              v-if="currentConfigLayout.showReponse"
-              class="flex flex-col td-api-response"
-              :style="responseSectionSizeStyle"
-            >
-              <TDAPIResponse
-                :statusCode="statusCode"
-                :responseTime="responseTime"
-                :isLoading="isLoading"
-                :responseText="responseText"
-                :responseHeadersText="responseHeadersText"
-                :currentConfigLayout="currentConfigLayout"
-              />
-            </div>
           </div>
         </div>
-      </template>
-      <!-- hết phần nội dung tùy thuộc vào từng loại api -->
+      </div>
     </div>
-    <!-- phần nội dung sidebar -->
+    <!-- Sidebar -->
     <TDSubSidebar
       ref="subSidebar"
       v-model="currentConfigLayout.isShowSidebar"
       @toggleSidebar="toggleSidebar"
     >
-      <!-- slide tùy chọn như cài đặt hoặc collection -->
       <template v-slot:menu>
         <div class="td-sidebar-menu">
           <TDSlideOption
@@ -381,7 +244,7 @@
         </div>
       </template>
       <template v-slot:main>
-        <!-- phần help -->
+        <!-- Help -->
         <div
           class="td-sidebar-content"
           v-show="
@@ -391,7 +254,7 @@
         >
           <TDAPITestingHelp />
         </div>
-        <!-- phần bộ sưu tập các request -->
+        <!-- Collection -->
         <div
           class="flex flex-col td-sidebar-content"
           v-show="
@@ -399,260 +262,122 @@
             $tdEnum.APISidebarOption.Collection
           "
         >
-          <!-- Normal Mode Collection -->
-          <template
-            v-if="currentConfigLayout.currentAPIMode != $tdEnum.APIMode.ProMode"
-          >
-            <!-- phần header của bộ sưu tập request -->
-            <div class="flex td-header-collection">
-              <div class="td-new-collection">
-                <TDInput
-                  v-model="newCollectionName"
-                  :noMargin="true"
-                  :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
-                />
-              </div>
-              <TDButton
+          <div class="flex td-header-collection">
+            <div class="td-new-collection">
+              <TDInput
+                v-model="newCollectionName"
                 :noMargin="true"
-                @click="addNewCollection"
-                :type="$tdEnum.buttonType.secondary"
-                iconClass="td-plus-icon"
-                v-tooltip="$t('i18nCommon.apiTesting.add')"
-              />
-              <TDButton
-                :noMargin="true"
-                @click="loadAllTestingData"
-                :type="$tdEnum.buttonType.secondary"
-                iconClass="td-reload-icon"
-                v-tooltip="$t('i18nCommon.APIMocking.refresh')"
+                :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
               />
             </div>
-            <!-- phần danh sách các request đã lưu theo thư mục -->
-            <div class="td-collection">
-              <div class="flex flex-col response-loading" v-if="isLoadingData">
-                <div class="loader"></div>
-              </div>
-              <div class="td-collection-body" v-else>
+            <TDButton
+              :noMargin="true"
+              @click="addNewCollection"
+              :type="$tdEnum.buttonType.secondary"
+              iconClass="td-plus-icon"
+              v-tooltip="$t('i18nCommon.apiTesting.add')"
+            />
+            <TDButton
+              :noMargin="true"
+              @click="loadAllTestingData"
+              :type="$tdEnum.buttonType.secondary"
+              iconClass="td-reload-icon"
+              v-tooltip="$t('i18nCommon.APIMocking.refresh')"
+            />
+          </div>
+          <div class="td-collection">
+            <div class="flex flex-col response-loading" v-if="isLoadingData">
+              <div class="loader"></div>
+            </div>
+            <div class="td-collection-body" v-else>
+              <div
+                v-for="(collection, index) in allCollection"
+                class="flex flex-col no-select td-collection-item"
+                :key="index"
+              >
                 <div
-                  v-for="(collection, index) in allCollection"
-                  class="flex flex-col no-select td-collection-item"
-                  :key="index"
+                  v-if="collection.is_renaming"
+                  class="td-collection-rename"
                 >
-                  <!-- phần sửa nhanh tên thư mục request nếu đang ở chế độ edit -->
-                  <div
-                    v-if="collection.is_renaming"
-                    class="td-collection-rename"
-                  >
-                    <TDInput
-                      v-model="collection.temp_name"
-                      :noMargin="true"
-                      :placeHolder="
-                        $t('i18nCommon.apiTesting.collectionRename')
-                      "
-                      :ref="collection.temp_name"
-                      @keyup.enter="saveNewCollectionName(collection)"
-                      @clickOutSide="saveNewCollectionName(collection)"
-                    >
-                    </TDInput>
-                  </div>
-                  <!-- phần tên thư mục -->
-                  <div
-                    v-else
-                    class="flex td-collection-header"
-                    @click="toggleCollection(collection)"
-                  >
-                    <div class="flex text-nowrap td-collection-header-left">
-                      <TDArrow
-                        :openProp="collection.openingCollection"
-                        :arrowOpenDirection="$tdEnum.Direction.bottom"
-                        :arrowDirection="$tdEnum.Direction.right"
-                      />
-                      <div class="" v-tooltip="collection.name">
-                        {{ collection.name }}
-                      </div>
-                    </div>
-                    <div class="flex td-collection-edit-btn">
-                      <div
-                        class="td-icon td-edit-icon"
-                        v-tooltip="$t('i18nCommon.edit')"
-                        @click.stop="enableRenameCollection(collection)"
-                      ></div>
-                      <div
-                        v-tooltip="$t('i18nCommon.apiTesting.delete')"
-                        class="td-icon td-close-icon"
-                        @click.stop="deleteCollection(collection.collection_id)"
-                      ></div>
-                    </div>
-                  </div>
-                  <!-- danh sách các request có trong 1 thư mục, chỉ render khi đang mở thư mục -->
-                  <div
-                    v-if="
-                      collection.openingCollection &&
-                      collection.requests &&
-                      collection.requests.length > 0
+                  <TDInput
+                    v-model="collection.temp_name"
+                    :noMargin="true"
+                    :placeHolder="
+                      $t('i18nCommon.apiTesting.collectionRename')
                     "
-                    class="flex flex-col td-collection-content"
+                    :ref="collection.temp_name"
+                    @keyup.enter="saveNewCollectionName(collection)"
+                    @clickOutSide="saveNewCollectionName(collection)"
                   >
-                    <div
-                      v-for="(request, indexRequest) in collection.requests"
-                      :key="indexRequest"
-                      class="flex td-collection-request-item"
-                      :class="{
-                        'td-collection-request-item-selected':
-                          request && currentRequestId == request.requestId,
-                      }"
-                      @click="applyRequest(request)"
-                    >
-                      <span class="text-nowrap">
-                        <div v-tooltip="request.requestName">
-                          {{ request.requestName }}
-                        </div>
-                      </span>
-                      <span class="td-collection-item-edit-btn">
-                        <div
-                          class="td-icon td-close-icon"
-                          v-tooltip="$t('i18nCommon.apiTesting.delete')"
-                          @click.stop="
-                            deleteRequest(collection.collection_id, request)
-                          "
-                        ></div>
-                      </span>
+                  </TDInput>
+                </div>
+                <div
+                  v-else
+                  class="flex td-collection-header"
+                  @click="toggleCollection(collection)"
+                >
+                  <div class="flex text-nowrap td-collection-header-left">
+                    <TDArrow
+                      :openProp="collection.openingCollection"
+                      :arrowOpenDirection="$tdEnum.Direction.bottom"
+                      :arrowDirection="$tdEnum.Direction.right"
+                    />
+                    <div class="" v-tooltip="collection.name">
+                      {{ collection.name }}
                     </div>
+                  </div>
+                  <div class="flex td-collection-edit-btn">
+                    <div
+                      class="td-icon td-edit-icon"
+                      v-tooltip="$t('i18nCommon.edit')"
+                      @click.stop="enableRenameCollection(collection)"
+                    ></div>
+                    <div
+                      v-tooltip="$t('i18nCommon.apiTesting.delete')"
+                      class="td-icon td-close-icon"
+                      @click.stop="deleteCollection(collection.collection_id)"
+                    ></div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </template>
-          <!-- ProMode Collection -->
-          <template v-else>
-            <!-- phần header của bộ sưu tập script -->
-            <div class="flex td-header-collection">
-              <div class="td-new-collection">
-                <TDInput
-                  v-model="newProModeCollectionName"
-                  :noMargin="true"
-                  :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
-                />
-              </div>
-              <TDButton
-                :noMargin="true"
-                @click="addNewProModeCollection"
-                :type="$tdEnum.buttonType.secondary"
-                iconClass="td-plus-icon"
-                v-tooltip="$t('i18nCommon.apiTesting.add')"
-              />
-              <TDButton
-                :noMargin="true"
-                @click="loadAllProModeData"
-                :type="$tdEnum.buttonType.secondary"
-                iconClass="td-reload-icon"
-                v-tooltip="$t('i18nCommon.APIMocking.refresh')"
-              />
-            </div>
-            <!-- phần danh sách các script đã lưu theo thư mục -->
-            <div class="td-collection">
-              <div class="flex flex-col response-loading" v-if="isLoadingData">
-                <div class="loader"></div>
-              </div>
-              <div class="td-collection-body" v-else>
                 <div
-                  v-for="(collection, index) in allProModeCollection"
-                  class="flex flex-col no-select td-collection-item"
-                  :key="'pro-' + index"
+                  v-if="
+                    collection.openingCollection &&
+                    collection.requests &&
+                    collection.requests.length > 0
+                  "
+                  class="flex flex-col td-collection-content"
                 >
-                  <!-- phần sửa nhanh tên thư mục script nếu đang ở chế độ edit -->
                   <div
-                    v-if="collection.is_renaming"
-                    class="td-collection-rename"
+                    v-for="(request, indexRequest) in collection.requests"
+                    :key="indexRequest"
+                    class="flex td-collection-request-item"
+                    :class="{
+                      'td-collection-request-item-selected':
+                        request && currentRequestId == request.requestId,
+                    }"
+                    @click="applyRequest(request)"
                   >
-                    <TDInput
-                      v-model="collection.temp_name"
-                      :noMargin="true"
-                      :placeHolder="
-                        $t('i18nCommon.apiTesting.collectionRename')
-                      "
-                      :ref="'pro_' + collection.temp_name"
-                      @keyup.enter="saveNewProModeCollectionName(collection)"
-                      @clickOutSide="saveNewProModeCollectionName(collection)"
-                    >
-                    </TDInput>
-                  </div>
-                  <!-- phần tên thư mục -->
-                  <div
-                    v-else
-                    class="flex td-collection-header"
-                    @click="toggleCollection(collection)"
-                  >
-                    <div class="flex text-nowrap td-collection-header-left">
-                      <TDArrow
-                        :openProp="collection.openingCollection"
-                        :arrowOpenDirection="$tdEnum.Direction.bottom"
-                        :arrowDirection="$tdEnum.Direction.right"
-                      />
-                      <div class="" v-tooltip="collection.name">
-                        {{ collection.name }}
+                    <span class="text-nowrap">
+                      <div v-tooltip="request.requestName">
+                        {{ request.requestName }}
                       </div>
-                    </div>
-                    <div class="flex td-collection-edit-btn">
+                    </span>
+                    <span class="td-collection-item-edit-btn">
                       <div
-                        class="td-icon td-edit-icon"
-                        v-tooltip="$t('i18nCommon.edit')"
-                        @click.stop="enableRenameProModeCollection(collection)"
-                      ></div>
-                      <div
-                        v-tooltip="$t('i18nCommon.apiTesting.delete')"
                         class="td-icon td-close-icon"
+                        v-tooltip="$t('i18nCommon.apiTesting.delete')"
                         @click.stop="
-                          deleteProModeCollection(collection.collection_id)
+                          deleteRequest(collection.collection_id, request)
                         "
                       ></div>
-                    </div>
-                  </div>
-                  <!-- danh sách các script có trong 1 thư mục, chỉ render khi đang mở thư mục -->
-                  <div
-                    v-if="
-                      collection.openingCollection &&
-                      collection.requests &&
-                      collection.requests.length > 0
-                    "
-                    class="flex flex-col td-collection-content"
-                  >
-                    <div
-                      v-for="(request, indexRequest) in collection.requests"
-                      :key="indexRequest"
-                      class="flex td-collection-request-item"
-                      :class="{
-                        'td-collection-request-item-selected':
-                          request &&
-                          currentProModeRequestId == request.requestId,
-                      }"
-                      @click="applyProModeRequest(request)"
-                    >
-                      <span class="text-nowrap">
-                        <div v-tooltip="request.requestName">
-                          {{ request.requestName }}
-                        </div>
-                      </span>
-                      <span class="td-collection-item-edit-btn">
-                        <div
-                          class="td-icon td-close-icon"
-                          v-tooltip="$t('i18nCommon.apiTesting.delete')"
-                          @click.stop="
-                            deleteProModeRequest(
-                              collection.collection_id,
-                              request,
-                            )
-                          "
-                        ></div>
-                      </span>
-                    </div>
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
-          </template>
+          </div>
         </div>
-        <!-- phần sidebar nếu đang tùy chọn thiết lập api -->
+        <!-- Settings -->
         <div
           class="td-sidebar-content"
           v-show="
@@ -679,6 +404,7 @@
             @change="updateConfigLayout"
           ></TDCheckbox>
         </div>
+        <!-- History -->
         <div
           class="td-sidebar-content"
           v-show="
@@ -686,21 +412,7 @@
             $tdEnum.APISidebarOption.History
           "
         >
-          <!-- nút lịch sử reqeust -->
           <TDHistorySidebar
-            v-if="currentConfigLayout.currentAPIMode == $tdEnum.APIMode.ProMode"
-            ref="historyProMode"
-            :applyFunction="handleSendRequestFromHistoryProMode"
-            titleKey="requestName"
-            :noMargin="true"
-            :positionRelative="false"
-            :cacheKey="$tdEnum.cacheConfig.APIPromodeHistory"
-            :historyContainerStyleEnum="
-              $tdEnum.AbsolutePositionStyle.Top100Left
-            "
-          ></TDHistorySidebar>
-          <TDHistorySidebar
-            v-else
             ref="history"
             :applyFunction="handleSendRequestFromHistory"
             titleKey="requestName"
@@ -714,7 +426,6 @@
         </div>
       </template>
     </TDSubSidebar>
-    <!-- hết phần nội dung sidebar -->
   </div>
 </template>
 
@@ -729,11 +440,6 @@ import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDAPITestingHelp from "@/views/helps/TDAPITestingHelp.vue";
-import { registerTdApiPromodeLanguage } from "@/monarch/apiTesting/tdApiPromodeLanguage.js";
-import { registerTdApiPromodeFormatProvider } from "@/monarch/apiTesting/tdApiPromodeFormatProvider.js";
-import { registerTdApiPromodeCompletionProvider } from "@/monarch/apiTesting/tdApiPromodeCompletionProvider.js";
-import { registerTdApiPromodeHoverProvider } from "@/monarch/apiTesting/tdApiPromodeHoverProvider.js";
-import { API_ITEMS } from "@/monarch/apiTesting/tdApiPromodeItems.js";
 import _ from "@/common/TDCommonFunction.js";
 import { TDShortcutActionEnum } from "@/common/TDShortcutAction.js";
 export default {
@@ -753,11 +459,8 @@ export default {
       apiUrl: "",
       requestName: "",
       currentRequestId: null,
-      currentProModeRequestId: null,
       newCollectionName: "",
-      newProModeCollectionName: "",
       allCollection: [],
-      allProModeCollection: [],
       httpMethod: "GET",
       headersText: "Content-Type: application/json",
       bodyText: "",
@@ -772,7 +475,6 @@ export default {
         showReponse: true,
         wrapText: true,
         splitHorizontal: false,
-        currentAPIMode: this.$tdEnum.APIMode.Normal,
         isShowSidebar: true,
         currentSidebarOption: this.$tdEnum.APISidebarOption.Setting,
         currentAPIInfoOption: this.$tdEnum.APIInfoOption.body,
@@ -791,17 +493,8 @@ export default {
           label: "OPTIONS",
         },
       ],
-      APIInfoOptions: [
-        { value: this.$tdEnum.APIInfoOption.header, label: "Header" },
-        { value: this.$tdEnum.APIInfoOption.body, label: "Body" },
-      ],
-      APIModeOptions: [
-        { value: this.$tdEnum.APIMode.Normal, label: "Normal" },
-        { value: this.$tdEnum.APIMode.ProMode, label: "Pro" },
-      ],
-      proModeSecranioCode: "",
-      requestSectionSize: 50, // Phần request chiếm 50%
-      responseSectionSize: 50, // Phần response chiếm 50%
+      requestSectionSize: 50,
+      responseSectionSize: 50,
       agentAPI: null,
       isLoadingData: false,
     };
@@ -811,9 +504,7 @@ export default {
   },
   async mounted() {
     this.agentAPI = new TDServerTestingAPI();
-    registerTdApiPromodeLanguage();
     await this.loadAllTestingData();
-    await this.loadAllProModeData();
   },
   watch: {
     requestName(oldVal, newVal) {
@@ -823,13 +514,9 @@ export default {
     },
   },
   computed: {
-    /**
-     * Tính toán style động cho request area
-     */
     requestSectionSizeStyle() {
       let me = this;
       let style = {};
-      // nếu hiển thị response thì mới ưu tiên tính toán
       if (me.currentConfigLayout.showReponse) {
         if (me.currentConfigLayout.splitHorizontal) {
           style = { height: `${me.requestSectionSize}%` };
@@ -843,12 +530,8 @@ export default {
           style = { width: `100%` };
         }
       }
-
       return style;
     },
-    /**
-     * Tính toán style động cho response area
-     */
     responseSectionSizeStyle() {
       let me = this;
       let style = {};
@@ -858,14 +541,6 @@ export default {
         style = { width: `${me.responseSectionSize}%` };
       }
       return style;
-    },
-    requestNameBuild() {
-      let me = this;
-      let title = me.$t("i18nCommon.apiTesting.requestName");
-      if (me.currentConfigLayout.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
-        title = me.$t("i18nCommon.apiTesting.scriptName");
-      }
-      return title;
     },
     sidebarOptions() {
       let me = this;
@@ -901,18 +576,8 @@ export default {
         return null;
       }
     },
-    proModeMonacoOptions() {
-      let me = this;
-      return {
-        onInit: (editor, monacoInstance) => {
-          me._monacoInstance = monacoInstance;
-          me._registerProModeProviders(monacoInstance);
-        },
-      };
-    },
   },
   beforeUnmount() {
-    // rời khỏi tool này phải hủy request
     if (this.currentRequest && this.currentRequest.cancel) {
       this.currentRequest.cancel();
     }
@@ -921,9 +586,6 @@ export default {
     }
   },
   methods: {
-    /**
-     * Cấu hình lifecycle tab: đăng ký shortcut execute
-     */
     getTabLifecycleConfig() {
       let me = this;
       return {
@@ -949,38 +611,6 @@ export default {
         ],
         domEvents: [],
       };
-    },
-    registerIntellisense() {
-      let me = this;
-      if (
-        me._monacoInstance &&
-        me.currentConfigLayout.currentAPIMode === me.$tdEnum.APIMode.ProMode
-      ) {
-        me._registerProModeProviders(me._monacoInstance);
-      }
-    },
-    disposeIntellisense() {
-      let me = this;
-      if (me._proModeDisposables) {
-        me._proModeDisposables.forEach((d) => d?.dispose?.());
-        me._proModeDisposables = null;
-      }
-    },
-    _registerProModeProviders(monacoInstance) {
-      let me = this;
-      if (me._proModeDisposables) {
-        me._proModeDisposables.forEach((d) => d?.dispose?.());
-      }
-      me._proModeDisposables = [];
-
-      const completionDisposable =
-        registerTdApiPromodeCompletionProvider(monacoInstance);
-      me._proModeDisposables.push(completionDisposable);
-
-      const hoverDisposable = registerTdApiPromodeHoverProvider(monacoInstance);
-      me._proModeDisposables.push(hoverDisposable);
-
-      registerTdApiPromodeFormatProvider(monacoInstance);
     },
     changeToViewBodyRequest() {
       let me = this;
@@ -1018,18 +648,11 @@ export default {
         }
       }
     },
-    async saveCollectionToCache() {
-      // Deprecated: Use API calls instead
-    },
     async toggleCollection(collection) {
-      let me = this;
       if (collection) {
         collection.openingCollection = !collection.openingCollection;
       }
     },
-    /**
-     * Tải tất cả dữ liệu từ server và map vào cấu trúc allCollection
-     */
     async loadAllTestingData() {
       let me = this;
       me.isLoadingData = true;
@@ -1042,17 +665,14 @@ export default {
         let groups = groupsParams?.data?.data || [];
         let tests = testsParams?.data?.data || [];
 
-        // Build allCollection structure
-        // Map groups to collection objects
         let collections = groups.map((g) => ({
           name: g.name,
           collection_id: g.id,
-          openingCollection: false, // Default closed
+          openingCollection: false,
           requests: [],
           is_renaming: false,
         }));
 
-        // Assign tests to collections
         tests.forEach((t) => {
           let collection = collections.find(
             (c) => c.collection_id === t.group_id,
@@ -1069,7 +689,6 @@ export default {
           }
         });
 
-        // Preserve opening state if re-loading
         if (me.allCollection && me.allCollection.length > 0) {
           collections.forEach((newCol) => {
             let oldCol = me.allCollection.find(
@@ -1097,14 +716,11 @@ export default {
     async saveRequest() {
       let me = this;
       if (me.requestName && me.allCollection && me.allCollection.length > 0) {
-        // Find existing Request to update
         if (me.currentRequestId) {
-          // Tim xem request nay thuoc collection nao
           let currentCollection = me.allCollection.find((c) =>
             c.requests.find((r) => r.requestId == me.currentRequestId),
           );
           if (currentCollection) {
-            // Update logic
             let testData = {
               id: me.currentRequestId,
               request_name: me.requestName,
@@ -1125,7 +741,6 @@ export default {
             }
           }
         } else {
-          // nếu không tồn tại request thì show popup tạo mới
           TDDialogUtil.showPopup({
             dialogType: TDDialogEnum.TDAPISaveToCollectionPopup,
             ownerForm: this,
@@ -1138,16 +753,14 @@ export default {
     },
     async saveToCollection(collection) {
       let me = this;
-
       let testData = {
-        request_name: me.requestName || me.apiUrl, // Ensure name
+        request_name: me.requestName || me.apiUrl,
         group_id: collection.collection_id,
         method: me.httpMethod,
         end_point: me.apiUrl,
         headers_text: me.headersText,
         body_text: me.bodyText,
       };
-
       try {
         let response = await me.agentAPI.testingItem.create(testData);
         if (response && response.success && response.data?.success) {
@@ -1168,7 +781,7 @@ export default {
           );
           if (response && response.success && response.data?.success) {
             me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-            await me.loadAllTestingData(); // Reload to reflect changes
+            await me.loadAllTestingData();
           }
         } catch (e) {
           me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
@@ -1180,7 +793,6 @@ export default {
       if (collection) {
         collection.is_renaming = true;
         collection.temp_name = collection.name;
-        // Focus logic...
         this.$nextTick(() => {
           if (me.$refs && me.$refs[collection.temp_name]) {
             let refs = me.$refs[collection.temp_name];
@@ -1200,7 +812,6 @@ export default {
       if (collection) {
         delete collection.is_renaming;
         if (collection.temp_name && collection.temp_name !== collection.name) {
-          // Call API update
           try {
             let response = await me.agentAPI.testingGroup.update({
               id: collection.collection_id,
@@ -1231,370 +842,6 @@ export default {
         }
       }
     },
-
-    // ─── ProMode CRUD methods ──────────────────────────────────────────
-    async loadAllProModeData() {
-      let me = this;
-      me.isLoadingData = true;
-      try {
-        let [groupsParams, itemsParams] = await Promise.all([
-          me.agentAPI.proModeGroup.getAll(),
-          me.agentAPI.proModeItem.getAll(),
-        ]);
-
-        let groups = groupsParams?.data?.data || [];
-        let items = itemsParams?.data?.data || [];
-
-        let collections = groups.map((g) => ({
-          name: g.name,
-          collection_id: g.id,
-          openingCollection: false,
-          requests: [],
-          is_renaming: false,
-        }));
-
-        items.forEach((t) => {
-          let collection = collections.find(
-            (c) => c.collection_id === t.group_id,
-          );
-          if (collection) {
-            collection.requests.push({
-              requestName: t.request_name,
-              scriptCode: t.script_code,
-              requestId: t.id,
-            });
-          }
-        });
-
-        if (me.allProModeCollection && me.allProModeCollection.length > 0) {
-          collections.forEach((newCol) => {
-            let oldCol = me.allProModeCollection.find(
-              (c) => c.collection_id === newCol.collection_id,
-            );
-            if (oldCol) {
-              newCol.openingCollection = oldCol.openingCollection;
-            }
-          });
-        }
-
-        me.allProModeCollection = collections;
-      } catch (error) {
-        console.error("Lỗi tải dữ liệu promode:", error);
-        me.$tdUtility.showErrorNotFoundAgentServer();
-      } finally {
-        me.isLoadingData = false;
-      }
-    },
-    async addNewProModeCollection(collectionName) {
-      let me = this;
-      if (typeof collectionName == "string") {
-        me.newProModeCollectionName = collectionName;
-      }
-      if (me.newProModeCollectionName) {
-        try {
-          let response = await me.agentAPI.proModeGroup.create({
-            name: me.newProModeCollectionName,
-          });
-          if (response && response.success && response.data?.success) {
-            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-            me.newProModeCollectionName = "";
-            await me.loadAllProModeData();
-          }
-        } catch (error) {
-          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
-        }
-      }
-    },
-    applyProModeRequest(request) {
-      let me = this;
-      if (request) {
-        me.requestName = request.requestName;
-        me.proModeSecranioCode = request.scriptCode || "";
-        me.currentProModeRequestId = request.requestId;
-      }
-    },
-    createNewProModeRequest() {
-      let me = this;
-      me.requestName = "";
-      me.proModeSecranioCode = "";
-      me.currentProModeRequestId = null;
-    },
-    async saveProModeRequest() {
-      let me = this;
-      if (
-        me.requestName &&
-        me.allProModeCollection &&
-        me.allProModeCollection.length > 0
-      ) {
-        if (me.currentProModeRequestId) {
-          let currentCollection = me.allProModeCollection.find((c) =>
-            c.requests.find((r) => r.requestId == me.currentProModeRequestId),
-          );
-          if (currentCollection) {
-            let testData = {
-              id: me.currentProModeRequestId,
-              request_name: me.requestName,
-              group_id: currentCollection.collection_id,
-              script_code: me.proModeSecranioCode,
-            };
-            try {
-              let response = await me.agentAPI.proModeItem.update(testData);
-              if (response && response.success && response.data?.success) {
-                me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-                await me.loadAllProModeData();
-              }
-            } catch (e) {
-              me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
-            }
-          }
-        } else {
-          TDDialogUtil.showPopup({
-            dialogType: TDDialogEnum.TDAPISaveProModeToCollectionPopup,
-            ownerForm: this,
-            props: {
-              allCollection: me.allProModeCollection,
-            },
-          });
-        }
-      }
-    },
-    async saveToProModeCollection(collection) {
-      let me = this;
-      let testData = {
-        request_name: me.requestName || "Untitled Script",
-        group_id: collection.collection_id,
-        script_code: me.proModeSecranioCode,
-      };
-      try {
-        let response = await me.agentAPI.proModeItem.create(testData);
-        if (response && response.success && response.data?.success) {
-          me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-          me.currentProModeRequestId = response.data.data.id;
-          await me.loadAllProModeData();
-        }
-      } catch (e) {
-        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
-      }
-    },
-    async deleteProModeRequest(collectionId, request) {
-      let me = this;
-      if (request && request.requestId) {
-        try {
-          let response = await me.agentAPI.proModeItem.deleteById(
-            request.requestId,
-          );
-          if (response && response.success && response.data?.success) {
-            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-            if (me.currentProModeRequestId == request.requestId) {
-              me.currentProModeRequestId = null;
-            }
-            await me.loadAllProModeData();
-          }
-        } catch (e) {
-          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
-        }
-      }
-    },
-    enableRenameProModeCollection(collection) {
-      let me = this;
-      if (collection) {
-        collection.is_renaming = true;
-        collection.temp_name = collection.name;
-        this.$nextTick(() => {
-          if (me.$refs && me.$refs["pro_" + collection.temp_name]) {
-            let refs = me.$refs["pro_" + collection.temp_name];
-            if (refs) {
-              if (Array.isArray(refs)) {
-                refs[0].focus();
-              } else {
-                refs.focus();
-              }
-            }
-          }
-        });
-      }
-    },
-    async saveNewProModeCollectionName(collection) {
-      let me = this;
-      if (collection) {
-        delete collection.is_renaming;
-        if (collection.temp_name && collection.temp_name !== collection.name) {
-          try {
-            let response = await me.agentAPI.proModeGroup.update({
-              id: collection.collection_id,
-              name: collection.temp_name,
-            });
-            if (response && response.success && response.data?.success) {
-              me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-              await me.loadAllProModeData();
-            }
-          } catch (e) {
-            me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
-          }
-        }
-      }
-    },
-    copyAIDocsToClipboard() {
-      let me = this;
-      let prompt = me.buildAIDocsPrompt();
-      me.$tdUtility.copyToClipboard(prompt);
-    },
-    buildAIDocsPrompt() {
-      let lines = [];
-      lines.push("# API Testing ProMode Reference");
-      lines.push("");
-      lines.push("Available functions in APITesting ProMode tool:");
-      lines.push("");
-
-      API_ITEMS.forEach((item) => {
-        lines.push(`## ${item.label}`);
-        lines.push("");
-        if (item.documentation) {
-          lines.push(item.documentation.trim());
-        }
-        lines.push("");
-      });
-
-      lines.push("# End of Reference");
-
-      return lines.join("\n");
-    },
-    async deleteProModeCollection(collectionId) {
-      let me = this;
-      if (collectionId) {
-        try {
-          let response =
-            await me.agentAPI.proModeGroup.deleteById(collectionId);
-          if (response && response.success && response.data?.success) {
-            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-            await me.loadAllProModeData();
-          }
-        } catch (e) {
-          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
-        }
-      }
-    },
-
-    // ─── ProMode ZIP Import ──────────────────────────────────────────
-    async importProModeCollectionZip() {
-      let me = this;
-      if (
-        me.$refs.uploadAreaProMode &&
-        typeof me.$refs.uploadAreaProMode.getFileSelected == "function" &&
-        typeof me.$refs.uploadAreaProMode.clearFileSelected == "function"
-      ) {
-        let zip = new JSZip();
-        let files = me.$refs.uploadAreaProMode.getFileSelected();
-        me.$refs.uploadAreaProMode.clearFileSelected();
-        if (files && Array.isArray(files) && files.length > 0) {
-          let zipData = await zip.loadAsync(files[0]);
-          let newCollections = await me.buildProModeCollectionsFromZip(zipData);
-          await me.saveProModeImportCollection(newCollections);
-        }
-      }
-    },
-    async saveProModeImportCollection(newCollections) {
-      let me = this;
-      if (!newCollections || newCollections.length === 0) return;
-
-      let groups = [];
-      let items = [];
-
-      newCollections.forEach((col) => {
-        groups.push({
-          id: col.collection_id,
-          name: col.name,
-        });
-
-        if (col.requests && col.requests.length > 0) {
-          col.requests.forEach((req) => {
-            items.push({
-              id: req.requestId,
-              request_name: req.requestName,
-              group_id: col.collection_id,
-              script_code: req.scriptCode,
-            });
-          });
-        }
-      });
-
-      try {
-        let response = await me.agentAPI.importProModeBatch({
-          groups: groups,
-          items: items,
-        });
-        if (response && response.success && response.data?.success) {
-          me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-          await me.loadAllProModeData();
-        }
-      } catch (e) {
-        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
-      }
-    },
-    async buildProModeCollectionsFromZip(zip) {
-      let me = this;
-      let collections = {};
-      let textExtensions = [
-        ".txt",
-        ".js",
-        ".ts",
-        ".jsx",
-        ".tsx",
-        ".json",
-        ".md",
-        ".sh",
-        ".py",
-        ".sql",
-        ".html",
-        ".css",
-        ".xml",
-        ".yaml",
-        ".yml",
-        ".cs",
-        ".java",
-        ".go",
-        ".rb",
-        ".php",
-        ".vue",
-        ".env",
-        ".conf",
-        ".log",
-      ];
-
-      for (let file of Object.values(zip.files)) {
-        if (file.dir) continue;
-        let lowerName = file.name.toLowerCase();
-        if (!textExtensions.some((ext) => lowerName.endsWith(ext))) continue;
-
-        // bỏ root folder
-        let parts = file.name.split("/").filter(Boolean);
-        if (parts.length < 2) continue;
-
-        let collectionName = parts[1];
-        let fileName = parts.at(-1);
-        // bỏ mọi extension để lấy tên script
-        let scriptName = fileName.replace(/\.[^.]+$/, "");
-
-        let content = await file.async("string");
-
-        if (!collections[collectionName]) {
-          collections[collectionName] = {
-            name: collectionName,
-            collection_id: me.$tdUtility.newGuid(),
-            openingCollection: false,
-            requests: [],
-          };
-        }
-        collections[collectionName].requests.push({
-          requestName: scriptName,
-          scriptCode: content,
-          requestId: me.$tdUtility.newGuid(),
-        });
-      }
-
-      return Object.values(collections);
-    },
-
     async importCollectionZip() {
       let me = this;
       if (
@@ -1657,30 +904,10 @@ export default {
       let me = this;
       let collections = {};
       let textExtensions = [
-        ".txt",
-        ".js",
-        ".ts",
-        ".jsx",
-        ".tsx",
-        ".json",
-        ".md",
-        ".sh",
-        ".py",
-        ".sql",
-        ".html",
-        ".css",
-        ".xml",
-        ".yaml",
-        ".yml",
-        ".cs",
-        ".java",
-        ".go",
-        ".rb",
-        ".php",
-        ".vue",
-        ".env",
-        ".conf",
-        ".log",
+        ".txt", ".js", ".ts", ".jsx", ".tsx", ".json", ".md", ".sh",
+        ".py", ".sql", ".html", ".css", ".xml", ".yaml", ".yml",
+        ".cs", ".java", ".go", ".rb", ".php", ".vue", ".env",
+        ".conf", ".log",
       ];
 
       for (let file of Object.values(zip.files)) {
@@ -1688,12 +915,11 @@ export default {
         let lowerName = file.name.toLowerCase();
         if (!textExtensions.some((ext) => lowerName.endsWith(ext))) continue;
 
-        // bỏ root folder
         let parts = file.name.split("/").filter(Boolean);
         if (parts.length < 2) continue;
 
-        let collectionName = parts[1]; // Shopee
-        let fileName = parts.at(-1); // 01_xxx.txt
+        let collectionName = parts[1];
+        let fileName = parts.at(-1);
         let requestName = fileName.replace(/\.[^.]+$/, "");
 
         let content = await file.async("string");
@@ -1719,7 +945,6 @@ export default {
             requestId: me.$tdUtility.newGuid(),
           });
         } else {
-          // log lại để biết ông nào gây lỗi không parse được
           console.log("parse error" + content);
         }
       }
@@ -1754,7 +979,6 @@ export default {
         }
       }
     },
-
     async buildCollectionsFromPostman(file, me) {
       let contentTemp = await file.text();
       let content = JSON.parse(contentTemp);
@@ -1843,19 +1067,9 @@ export default {
 
       return headers;
     },
-    /**
-     * Hàm wrap tất cả các thể loại gửi request
-     */
     async handleSend() {
       let me = this;
-
-      if (me.currentConfigLayout.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
-        await me.handleSendRequestProMode();
-      } else if (
-        me.currentConfigLayout.currentAPIMode == me.$tdEnum.APIMode.Normal
-      ) {
-        await me.handleSendRequest();
-      }
+      await me.handleSendRequest();
     },
     async handleSendRequest() {
       let me = this;
@@ -1872,8 +1086,6 @@ export default {
       this.statusCode = null;
 
       try {
-        // let headers = this.parseHeaders(this.headersText);
-
         let requestData = {
           api_url: this.apiUrl,
           http_method: this.httpMethod,
@@ -1881,7 +1093,6 @@ export default {
           body_text: this.bodyText || null,
         };
 
-        // gọi API
         this.currentRequest = TDCURLUtil.fetchAgent(requestData);
 
         let response = await this.currentRequest.promise;
@@ -1891,11 +1102,9 @@ export default {
         this.statusCode = response.status;
         this.responseHeadersText = response.headers || null;
 
-        // Format response body
         if (typeof response.body === "object") {
           this.responseText = JSON.stringify(response.body, null, 2);
         } else if (typeof response.body === "string") {
-          // Try to parse as JSON if it looks like JSON
           try {
             let parsed = JSON.parse(response.body);
             this.responseText = JSON.stringify(parsed, null, 2);
@@ -1920,9 +1129,6 @@ export default {
       } finally {
         this.isLoading = false;
         this.currentRequest = null;
-        // setTimeout(() => {
-        //   this.isLoading = false;
-        // }, 2000); // 2000 milliseconds = 2 seconds
 
         let historyItem = me.buildHistoryItemForSave();
         await me.$refs.history.saveToHistory(historyItem);
@@ -1961,10 +1167,7 @@ export default {
         me.headersText = item.headersText;
         me.bodyText = item.bodyText;
         me.requestName = item.requestName;
-        // build luôn CURL
         me.curlContent = TDCURLUtil.stringifyCURL(me.getRequestObj());
-        // lúc apply lịch sử mà gọi luôn hơi tốn server :v
-        // await me.handleSendRequest();
         me.currentRequestId = null;
       }
     },
@@ -1981,7 +1184,7 @@ export default {
       let me = this;
       if (me.responseText) {
         let encoder = new TextEncoder();
-        let buffer = encoder.encode(me.responseText); // Uint8Array
+        let buffer = encoder.encode(me.responseText);
         let fileName = me.$tdUtility.createFileDownloadName(me.requestName, {
           ext: ".txt",
         });
@@ -2028,93 +1231,19 @@ export default {
       }
       return result;
     },
-    async handleSelectedAPIMode() {
-      let me = this;
-      await me.updateConfigLayout();
-    },
-    async handleSendRequestProMode() {
-      let me = this;
-
-      if (!me.proModeSecranioCode) {
-        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
-        return;
-      }
-
-      me.isLoading = true;
-      me.responseText = "";
-      me.statusCode = null;
-      me.responseTime = null;
-      me.startTime = performance.now();
-
-      try {
-        let injectedCode = TDCURLUtil.buildInjectCode(me.proModeSecranioCode);
-
-        // Thực thi script
-        let userFn = new Function(injectedCode);
-        let result = await userFn();
-
-        let endTime = performance.now();
-        me.responseTime = Math.round(endTime - me.startTime);
-        // luồng promode có thể gọi nhiều api, check lỗi thì check console
-        me.statusCode = 200;
-
-        // format output
-        if (typeof result === "object") {
-          me.responseText = JSON.stringify(result, null, 2);
-        } else if (typeof result === "string") {
-          try {
-            me.responseText = JSON.stringify(JSON.parse(result), null, 2);
-          } catch {
-            me.responseText = result;
-          }
-        } else if (typeof result !== "undefined") {
-          me.responseText = String(result);
-        } else {
-          me.responseText = "// Script executed successfully (no return)";
-        }
-
-        me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-      } catch (error) {
-        me.responseText = `ProMode Error: ${error.message}`;
-        me.$tdToast.error(error.message);
-      } finally {
-        me.isLoading = false;
-        if (me.proModeSecranioCode) {
-          let shortCode = me.proModeSecranioCode.slice(0, 100);
-          let historyItem = {
-            requestName: me.requestName || shortCode,
-            proModeSecranioCode: me.proModeSecranioCode,
-          };
-          await me.$refs.historyProMode.saveToHistory(historyItem);
-        }
-      }
-    },
-    handleSendRequestFromHistoryProMode(item) {
-      let me = this;
-      if (item && item.proModeSecranioCode) {
-        me.proModeSecranioCode = item.proModeSecranioCode;
-        me.requestName = item.requestName;
-      }
-      // không gọi api ngay mà để user gọi
-    },
     copyMockData() {
       let me = this;
-      if (me.currentConfigLayout.currentAPIMode == me.$tdEnum.APIMode.ProMode) {
-        console.log("chưa support pro mode copy mock");
-      } else {
-        if (me.responseText) {
-          let mockData = {};
-          // đặt dạng snake_case để khớp với kiểu dữ liệu bảng td_api_testing_log
-          mockData.request_name = me.requestName;
-          mockData.method = me.httpMethod;
-          mockData.api_url = me.apiUrl;
-          mockData.headers_text = me.headersText;
-          mockData.body_text = me.bodyText;
-          mockData.response_text = me.responseText;
-          mockData.response_headers_text = me.responseHeadersText;
-          mockData.status_code = me.statusCode;
-          me.$tdUtility.copyToClipboard(JSON.stringify(mockData));
-        }
+      if (me.responseText) {
+        let mockData = {};
+        mockData.request_name = me.requestName;
+        mockData.method = me.httpMethod;
+        mockData.api_url = me.apiUrl;
+        mockData.headers_text = me.headersText;
+        mockData.body_text = me.bodyText;
+        mockData.response_text = me.responseText;
+        mockData.response_headers_text = me.responseHeadersText;
+        mockData.status_code = me.statusCode;
+        me.$tdUtility.copyToClipboard(JSON.stringify(mockData));
       }
     },
   },
@@ -2139,32 +1268,16 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
-  .method-selection {
-    justify-content: space-between;
-    width: 100%;
-  }
   .td-api-input-area {
     margin-top: var(--padding);
-    // gap: var(--padding);
     flex: 1;
     .td-api-request {
       width: 100%;
       height: 100%;
-      .td-api-request-title {
-        width: 100%;
-        justify-content: space-between;
-        height: 40px;
-        align-items: center;
-      }
     }
     .td-api-response {
       width: 100%;
       height: 100%;
-      .td-api-response-title {
-        justify-content: space-between;
-        width: 100%;
-        height: 40px;
-      }
     }
   }
 }
@@ -2179,10 +1292,6 @@ export default {
   margin-top: var(--padding);
   gap: var(--padding);
 }
-
-.loader-without-response {
-  margin-right: 100px;
-}
 .td-header-collection {
   width: 100%;
   height: 30px;
@@ -2190,9 +1299,6 @@ export default {
   gap: var(--padding);
   .td-new-collection {
     flex: 1;
-  }
-  .td-plus-icon {
-    cursor: pointer;
   }
 }
 .response-loading {
@@ -2207,105 +1313,17 @@ export default {
   width: 100%;
   min-height: 0;
 }
-.td-api-request-save-collection {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 10vh;
+.td-collection-rename {
+  width: 100%;
 }
-.td-search-box {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  background-color: var(--bg-thirt-color);
-  border: 1px solid transparent;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border: 1px solid var(--focus-color);
-  }
-
-  .td-search-placeholder {
-    flex: 1;
-    font-size: 14px;
-  }
-
-  .td-search-shortcut {
-    display: flex;
-    gap: 2px;
-    span {
-      padding: 4px 6px;
-      background-color: var(--bg-layer-color);
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--text-color-secondary);
-    }
-  }
+.td-import-request-group {
+  gap: var(--padding);
+  margin-left: var(--padding);
 }
 .td-text-area-wrap {
   position: relative;
   width: 100%;
   height: 100%;
-  .td-top-right-btn {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    border: 1px solid var(--bg-layer-color);
-    padding: var(--padding);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    background-color: rgba(255, 255, 255, 0.206);
-  }
-  .td-top-right-btn:hover {
-    cursor: pointer;
-    background-color: var(--bg-main-color);
-    color: var(--focus-color);
-  }
-}
-body[data-theme="dark"] {
-  .td-top-right-btn:hover {
-    cursor: pointer;
-    background-color: var(--bg-layer-color);
-  }
-  .td-top-right-btn {
-    border: 1px solid var(--bg-main-color);
-  }
-  .td-top-right-btn div {
-    filter: invert(100);
-  }
-}
-.title-request {
-  margin-left: var(--padding);
-}
-.agent-url-label {
-  gap: var(--padding);
-  margin-bottom: var(--padding);
-}
-.td-api-upload-collection-area {
-  margin: var(--padding);
-  gap: var(--padding);
-}
-.td-collection-rename {
-  width: 100%;
-}
-
-.td-import-request-group {
-  gap: var(--padding);
-  margin-left: var(--padding);
-}
-.td-request-footer-btn {
-  cursor: pointer;
 }
 .td-header-options {
   gap: var(--padding);

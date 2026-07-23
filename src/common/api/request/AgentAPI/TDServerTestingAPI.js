@@ -39,6 +39,20 @@ class TDServerTestingAPI extends TDAgentAPI {
   async importProModeBatch(batchData) {
     return await this.post("/api_test/import_pro_mode_batch", batchData);
   }
+
+  /**
+   * Đọc nội dung 1 file từ máy local
+   */
+  async readFile(filePath) {
+    return await this.post("/file_ops/read_file", { file_path: filePath });
+  }
+
+  /**
+   * Đọc hàng loạt file trong 1 folder
+   */
+  async readFolder(folderPath) {
+    return await this.post("/file_ops/read_folder", { folder_path: folderPath });
+  }
 }
 
 export default TDServerTestingAPI;

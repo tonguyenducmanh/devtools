@@ -24,6 +24,10 @@ const ITEMS_CONFIG = [
   { label: "parseResponseMulti", insertText: "parseResponseMulti()", sortText: "2a", doc: "parseResponseMulti" },
   { label: "requestMulti", insertText: "await requestMulti()", sortText: "3", doc: "requestMulti" },
   { label: "requestMultiCURL", insertText: "await requestMultiCURL()", sortText: "4", doc: "requestMultiCURL" },
+  { label: "readFile", insertText: "await readFile()", sortText: "5", doc: "readFile" },
+  { label: "readFolder", insertText: "await readFolder()", sortText: "6", doc: "readFolder" },
+  { label: "convertJSONToPostgreSQL", insertText: "convertJSONToPostgreSQL()", sortText: "7", doc: "convertJSONToPostgreSQL" },
+  { label: "createMockResponse", insertText: "createMockResponse()", sortText: "8", doc: "createMockResponse" },
 ];
 
 export const API_ITEMS = ITEMS_CONFIG.map((item) => ({

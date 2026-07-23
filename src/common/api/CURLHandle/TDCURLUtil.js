@@ -1,5 +1,6 @@
 import * as insomniaCURL from "./insomnia/curl.ts";
 import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
+import { jsonToPostgreSQL } from "@/common/utils/TDJSONToPostgreSQLUtil.js";
 
 import * as curlReader from "./curlReader/index.ts";
 /**
@@ -134,7 +135,10 @@ class TDCURLUtil {
    */
   stringifyCURL(request) {
     let me = this;
-    if (!request?.apiUrl) throw new Error("apiUrl is required");
+    if (!request?.apiUrl) {
+      console.error("stringifyCURL: apiUrl is required");
+      return "";
+    }
 
     let lines = [];
     let escapeShell = function (value) {
@@ -372,6 +376,144 @@ class TDCURLUtil {
     }
   }
 
+  /**
+   * Đọc nội dung 1 file từ máy local qua backend agent
+   * @param {string} filePath - đường dẫn tuyệt đối đến file
+   * @returns {Promise<string>} nội dung file
+   */
+  async readFile(filePath) {
+    try {
+      let response = await new TDServerTestingAPI().readFile(filePath);
+      let data = response.data;
+      if (data && data.success) {
+        return data.data;
+      } else {
+        console.error("readFile error:", data?.message);
+        return null;
+      }
+    } catch (ex) {
+      console.error("readFile error:", ex.message);
+      return null;
+    }
+  }
+
+  /**
+   * Đọc hàng loạt file trong 1 folder qua backend agent
+   * @param {string} folderPath - đường dẫn tuyệt đối đến folder
+   * @returns {Promise<Array<{name: string, content: string}>>} danh sách file
+   */
+  async readFolder(folderPath) {
+    try {
+      let response = await new TDServerTestingAPI().readFolder(folderPath);
+      let data = response.data;
+      if (data && data.success) {
+        return data.data || [];
+      } else {
+        console.error("readFolder error:", data?.message);
+        return [];
+      }
+    } catch (ex) {
+      console.error("readFolder error:", ex.message);
+      return [];
+    }
+  }
+
+  /**
+   * Chuyển đổi JSON sang PostgreSQL script
+   * @param {Array|Object} jsonData - dữ liệu JSON cần convert
+   * @param {Object} config - { tableName, schemaName, primaryKeyField, enableCreateTable, enableDeleteScript }
+   * @returns {string} PostgreSQL script
+   */
+  convertJSONToPostgreSQL(jsonData, config) {
+    return jsonToPostgreSQL(jsonData, config);
+  }
+
+  /**
+   * Build mock objects từ response data để export JSON (dùng import thủ công ở máy khác).
+   * Không gọi API backend, chỉ xử lý local.
+   *
+   * @param {Array<Object>} responses - mảng response từ request() hoặc requestCURL(),
+   *   mỗi object chứa: { status, headers, body, request? }
+   *   request (optional): { method, url, headers, body } - nếu có sẽ tự điền endpoint/method
+   * @param {Object} options - tùy chọn (optional)
+   * @param {string} options.group_id - group_id cho mock (optional)
+   * @param {string} options.defaultStatusText - response text mặc định khi không có body
+   * @returns {Array<Object>} mảng mock objects sẵn sàng để copy JSON import
+   */
+  createMockResponse(responses, options = {}) {
+    if (!Array.isArray(responses) || responses.length === 0) {
+      console.error("createMockResponse: responses must be a non-empty array");
+      return [];
+    }
+
+    return responses.map((res, index) => {
+      let mock = {
+        request_name: options.request_name || `Mock ${index + 1}`,
+        group_id: options.group_id || "",
+        method: "GET",
+        end_point: "/",
+        headers_text: "",
+        body_text: "",
+        response_text: "",
+        response_headers_text: "",
+        status_code: res.status || 200,
+      };
+
+      // Nếu có request info, tự extract method/endpoint/body
+      if (res.request) {
+        let req = res.request;
+        mock.method = (req.method || "GET").toUpperCase();
+        // Extract endpoint từ URL
+        try {
+          let urlObj = new URL(req.url);
+          mock.end_point = urlObj.pathname;
+        } catch {
+          mock.end_point = req.url || "/";
+        }
+        // Request body
+        if (req.body) {
+          mock.body_text = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
+        }
+        // Request headers
+        if (req.headers) {
+          if (typeof req.headers === "string") {
+            mock.headers_text = req.headers;
+          } else if (typeof req.headers === "object") {
+            mock.headers_text = Object.entries(req.headers)
+              .map(([k, v]) => `${k}:${v}`)
+              .join("\n");
+          }
+        }
+      }
+
+      // Response body
+      if (res.body !== undefined && res.body !== null) {
+        if (typeof res.body === "string") {
+          try {
+            mock.response_text = JSON.stringify(JSON.parse(res.body), null, 2);
+          } catch {
+            mock.response_text = res.body;
+          }
+        } else {
+          mock.response_text = JSON.stringify(res.body, null, 2);
+        }
+      } else {
+        mock.response_text = options.defaultStatusText || "{}";
+      }
+
+      // Response headers
+      if (res.headers) {
+        if (typeof res.headers === "string") {
+          mock.response_headers_text = res.headers;
+        } else if (typeof res.headers === "object") {
+          mock.response_headers_text = JSON.stringify(res.headers, null, 2);
+        }
+      }
+
+      return mock;
+    });
+  }
+
   setGlobalInfoBeforeRequest(options) {
     let me = this;
     window.__tdAPI = window.__tdAPI ?? {};
@@ -385,6 +527,10 @@ class TDCURLUtil {
       requestMultiCURL: me.requestMultiCURL,
       parseCURL: me.parseCURL,
       fetchAgent: me.fetchAgent,
+      readFile: me.readFile,
+      readFolder: me.readFolder,
+      convertJSONToPostgreSQL: me.convertJSONToPostgreSQL,
+      createMockResponse: me.createMockResponse,
     };
     return window.__tdAPI.apiTesting;
   }
@@ -401,6 +547,10 @@ let parseResponse = window.__tdAPI.apiTesting.parseResponse;
 let parseResponseMulti = window.__tdAPI.apiTesting.parseResponseMulti;
 let requestMulti = window.__tdAPI.apiTesting.requestMulti;
 let requestMultiCURL = window.__tdAPI.apiTesting.requestMultiCURL;
+let readFile = window.__tdAPI.apiTesting.readFile;
+let readFolder = window.__tdAPI.apiTesting.readFolder;
+let convertJSONToPostgreSQL = window.__tdAPI.apiTesting.convertJSONToPostgreSQL;
+let createMockResponse = window.__tdAPI.apiTesting.createMockResponse;
 let result = 
 (async () => {
   ${secranioCode}

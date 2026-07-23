@@ -14,4 +14,7 @@ func InjectMockAPIRouter(app *http.ServeMux) {
 	// Common
 	app.HandleFunc("GET /mock_api/restart_mock_server", service.RestartMockServerFromClient)
 	app.HandleFunc("GET /mock_api/get_base_url", service.GetMockServerBaseUrl)
+
+	// Import batch
+	app.HandleFunc("POST /mock_api/import_batch", service.BatchImportMockAPIs)
 }

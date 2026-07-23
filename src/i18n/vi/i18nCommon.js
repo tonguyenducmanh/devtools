@@ -141,6 +141,7 @@ export default {
       MindMap: "Mind map",
       textManipulation: "Xử lý văn bản",
       APITesting: "API testing",
+      Automation: "Tự động hóa",
       APIMocking: "API mocking",
       remoteDesktopRDP: "Giao thức RDP",
       PostgreSQLTemplate: "Code mẫu PostgreSQL",

@@ -140,6 +140,7 @@ export default {
       MindMap: "Mind map",
       textManipulation: "Text manipulation",
       APITesting: "API testing",
+      Automation: "Automation",
       APIMocking: "API mocking",
       remoteDesktop: "Remote Desktop Protocol",
       PostgreSQLTemplate: "PostgreSQL Template",

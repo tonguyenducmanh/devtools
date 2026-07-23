@@ -49,4 +49,5 @@ export const EnumCacheConfig = {
   VectorMockGeneratorConfigLayout: 53,
   PostgreSQLBinPath: 54,
   AppDataMinerSchema: 55,
+  TDAutomationConfigLayout: 56,
 };

@@ -24,6 +24,13 @@ class TDServerMockAPI extends TDAgentAPI {
   async getMockBaseURL() {
     return await this.get("/mock_api/get_base_url");
   }
+
+  /**
+   * Import hàng loạt mock APIs
+   */
+  async importBatch(mocks) {
+    return await this.post("/mock_api/import_batch", { mocks });
+  }
 }
 
 export default TDServerMockAPI;
