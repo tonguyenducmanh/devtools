@@ -6,6 +6,8 @@ import * as curlReader from "@/common/api/CURLHandle/curlReader/index.ts";
 /**
  * Các method injectable cho Automation (window.__tdAPI.apiTesting).
  * Các method này được inject vào eval scope để user script sử dụng.
+ * file này có tài liệu đặc tả cho monaco editor ở
+ * @/monarch/apiTesting/docs/ và @/monarch/apiTesting/apiTypes.d.ts
  * Created by tdmanh 16/12/2025
  */
 class TDAutomationInject {
