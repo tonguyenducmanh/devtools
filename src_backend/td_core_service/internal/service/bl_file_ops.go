@@ -57,15 +57,6 @@ func ReadFileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// giới hạn kích thước file 10MB
-	if info.Size() > 10*1024*1024 {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"message": fmt.Sprintf("File quá lớn (%d bytes), giới hạn 10MB", info.Size()),
-		})
-		return
-	}
-
 	data, err := os.ReadFile(cleanPath)
 	if err != nil {
 		td_common.LogError(fmt.Sprintf("ReadFile - lỗi đọc file: %v", err))
@@ -136,8 +127,6 @@ func ReadFolderHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var results []folderFileItem
-	totalSize := int64(0)
-	maxTotalSize := int64(500 * 1024 * 1024) // 500MB tổng
 
 	for _, entry := range entries {
 		if entry.IsDir() {
@@ -150,20 +139,6 @@ func ReadFolderHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		fullPath := filepath.Join(cleanPath, entry.Name())
-		fileInfo, err := entry.Info()
-		if err != nil {
-			continue
-		}
-
-		// giới hạn mỗi file 50MB
-		if fileInfo.Size() > 50*1024*1024 {
-			continue
-		}
-
-		totalSize += fileInfo.Size()
-		if totalSize > maxTotalSize {
-			break
-		}
 
 		data, err := os.ReadFile(fullPath)
 		if err != nil {
