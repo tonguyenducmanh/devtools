@@ -15,16 +15,16 @@ class TDAutomation extends TDAutomationInject {
     let me = this;
     window.__tdAPI = window.__tdAPI ?? {};
 
-    let apiTesting = {
+    let automation = {
       agentURL: options?.agentURL ?? window.__env?.APITesting?.agentServer,
     };
 
     getInjectableMethods().forEach((name) => {
-      apiTesting[name] = me[name].bind(me);
+      automation[name] = me[name].bind(me);
     });
 
-    window.__tdAPI.apiTesting = apiTesting;
-    return window.__tdAPI.apiTesting;
+    window.__tdAPI.automation = automation;
+    return window.__tdAPI.automation;
   }
 
   /**
@@ -33,7 +33,7 @@ class TDAutomation extends TDAutomationInject {
    */
   buildInjectCode(scenarioCode) {
     let bindings = getInjectableMethods()
-      .map((name) => `let ${name} = window.__tdAPI.apiTesting.${name};`)
+      .map((name) => `let ${name} = window.__tdAPI.automation.${name};`)
       .join("\n");
 
     return `

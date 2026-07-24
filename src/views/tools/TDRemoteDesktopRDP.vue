@@ -583,7 +583,7 @@ export default {
         const { SessionBuilder, DesktopSize, Extension } = this._wasm;
         const canvas = this.$refs.rdpCanvas;
 
-        const agentUrl = window.__tdAPI?.apiTesting?.agentURL;
+        const agentUrl = window.__tdAPI?.automation?.agentURL;
         const proxyAddress =
           agentUrl.replace(/^http/, "ws").replace(/\/$/, "") + "/rdp/ws";
 

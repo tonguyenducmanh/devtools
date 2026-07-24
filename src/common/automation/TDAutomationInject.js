@@ -4,7 +4,7 @@ import { jsonToPostgreSQL } from "@/common/utils/TDJSONToPostgreSQLUtil.js";
 
 import * as curlReader from "@/common/api/CURLHandle/curlReader/index.ts";
 /**
- * Các method injectable cho Automation (window.__tdAPI.apiTesting).
+ * Các method injectable cho Automation (window.__tdAPI.automation).
  * Các method này được inject vào eval scope để user script sử dụng.
  * file này có tài liệu đặc tả cho monaco editor ở
  * @/monarch/apiTesting/docs/ và @/monarch/apiTesting/apiTypes.d.ts
