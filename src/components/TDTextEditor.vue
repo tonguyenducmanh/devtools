@@ -315,6 +315,7 @@ export default {
           readOnly: me.readOnly,
           automaticLayout: true,
           "semanticHighlighting.enabled": true,
+          fixedOverflowWidgets: true,
         };
         if (me.wrapText) {
           configObject.wordWrap = "on";
