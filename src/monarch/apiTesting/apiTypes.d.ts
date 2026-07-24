@@ -25,6 +25,9 @@ declare function readFolder(folderPath: string): Promise<Array<{ name: string; c
 /** Convert JSON data to PostgreSQL INSERT scripts. Returns a complete SQL string. */
 declare function convertJSONToPostgreSQL(data: any | any[], config: { tableName: string; schemaName?: string; primaryKeyField?: string; enableCreateTable?: boolean; enableDeleteScript?: boolean }): string;
 
+/** Parse a CURL command text into a structured request object. Returns { url, method, headers, headersText, body, bodyText } or null. */
+declare function parseCURL(curlText: string): { url: string; method: string; headers: Record<string, string>; headersText: string; body: any; bodyText: string } | null;
+
 /** Convert a request object to CURL command text. Returns the CURL string. */
 declare function stringifyCURL(request: { apiUrl: string; httpMethod?: string; headersText?: string; bodyText?: string }): string;
 
