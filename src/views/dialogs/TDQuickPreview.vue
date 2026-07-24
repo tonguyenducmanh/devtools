@@ -6,15 +6,6 @@
     :title="previewLabel"
     @close="handleClose"
   >
-    <template #header>
-      <TDComboBox
-        v-model="previewLanguage"
-        :options="langOptions"
-        :noMargin="true"
-        :isCapitalizeText="false"
-        :width="130"
-      />
-    </template>
     <div class="td-preview-editor">
       <TDTextEditor
         :modelValue="previewValue"

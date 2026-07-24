@@ -116,7 +116,7 @@ export default {
 }
 
 .td-popup-header {
-  padding: calc(var(--padding) * 2);
+  padding: var(--padding);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
