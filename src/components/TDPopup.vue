@@ -104,15 +104,15 @@ export default {
 .td-popup-container {
   background: var(--bg-main-color);
   border-radius: var(--border-radius);
-  max-width: 90vw;
-  max-height: 90vh;
+  max-width: calc(100vw - var(--padding) * 2);
+  max-height: calc(100vh - var(--padding) * 2);
   display: flex;
   flex-direction: column;
 }
 
 .td-popup-full-screen {
-  width: 90vw;
-  height: 95vh;
+  width: calc(100vw - var(--padding) * 2);
+  height: calc(100vh - var(--padding) * 2);
 }
 
 .td-popup-header {
