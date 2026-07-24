@@ -582,6 +582,72 @@ class TDAutomationInject {
     }
     throw lastError;
   }
+
+  /**
+   * Sinh UUID v4 ngẫu nhiên.
+   * @returns {string} UUID v4
+   */
+  uuid() {
+    if (crypto?.randomUUID) {
+      return crypto.randomUUID();
+    }
+
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+      let r = (Math.random() * 16) | 0;
+      let v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+
+  /**
+   * Sinh số nguyên ngẫu nhiên trong khoảng [min, max].
+   * @param {number} min - Giá trị nhỏ nhất
+   * @param {number} max - Giá trị lớn nhất
+   * @returns {number} Số nguyên ngẫu nhiên
+   */
+  randomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  /**
+   * Chuyển đổi ngày sang Unix timestamp (giây).
+   * @param {Date|string|number} input - Date object, chuỗi ngày, hoặc timestamp
+   * @returns {number} Unix timestamp theo giây
+   */
+  convertToUnixSecondTime(input) {
+    let date = input instanceof Date ? input : new Date(input);
+    return Math.floor(date.getTime() / 1000);
+  }
+
+  /**
+   * Chuyển đổi ngày sang Unix timestamp (millisecond).
+   * @param {Date|string|number} input - Date object, chuỗi ngày, hoặc timestamp
+   * @returns {number} Unix timestamp theo millisecond
+   */
+  convertToUnixMiliSecondTime(input) {
+    let date = input instanceof Date ? input : new Date(input);
+    return date.getTime();
+  }
+
+  /**
+   * Chuyển Unix timestamp (giây) sang chuỗi ngày đọc được.
+   * @param {number} timestamp - Unix timestamp theo giây
+   * @returns {string} Chuỗi ngày dạng "YYYY-MM-DD HH:mm:ss"
+   */
+  readUnixSecondTime(timestamp) {
+    return new Date(timestamp * 1000).toISOString().replace("T", " ").slice(0, 19);
+  }
+
+  /**
+   * Chuyển Unix timestamp (millisecond) sang chuỗi ngày đọc được.
+   * @param {number} timestamp - Unix timestamp theo millisecond
+   * @returns {string} Chuỗi ngày dạng "YYYY-MM-DD HH:mm:ss"
+   */
+  readUnixMiliSecondTime(timestamp) {
+    return new Date(timestamp).toISOString().replace("T", " ").slice(0, 19);
+  }
 }
 
 export default TDAutomationInject;

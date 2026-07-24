@@ -36,3 +36,21 @@ declare function delay(seconds: number): Promise<void>;
 
 /** Execute a function with automatic retry on failure. Returns the result on success, or throws the last error. */
 declare function retry<T>(fn: () => T | Promise<T>, options?: { attempts?: number; delaySec?: number; shouldRetry?: (error: any) => boolean }): Promise<T>;
+
+/** Generate a random UUID v4. */
+declare function uuid(): string;
+
+/** Generate a random integer in range [min, max]. */
+declare function randomInt(min: number, max: number): number;
+
+/** Convert a date to Unix timestamp in seconds. */
+declare function convertToUnixSecondTime(input: Date | string | number): number;
+
+/** Convert a date to Unix timestamp in milliseconds. */
+declare function convertToUnixMiliSecondTime(input: Date | string | number): number;
+
+/** Convert Unix timestamp (seconds) to readable date string "YYYY-MM-DD HH:mm:ss". */
+declare function readUnixSecondTime(timestamp: number): string;
+
+/** Convert Unix timestamp (milliseconds) to readable date string "YYYY-MM-DD HH:mm:ss". */
+declare function readUnixMiliSecondTime(timestamp: number): string;
