@@ -438,6 +438,24 @@ export default {
         freezeRow: "Freeze the first row when scrolling.",
       },
     },
+    excelToJSON: {
+      purpose: {
+        title: "What is Excel to JSON?",
+        content: "A tool to convert Excel files (.xlsx, .xls) to JSON data.",
+      },
+      howToUse: {
+        title: "How to Use",
+        upload: "Upload the Excel file to convert.",
+        result: "JSON result will display in the right panel.",
+        download: "Click the button to download JSON file.",
+      },
+      features: {
+        title: "Features",
+        multiSheet: "Support reading multiple sheets in one Excel file.",
+        outputFormat: "Choose output format: object (by sheet) or array (all sheets merged).",
+        trimValues: "Automatically remove extra whitespace from data.",
+      },
+    },
     jsonToModel: {
       purpose: {
         title: "What is JSON to Model?",

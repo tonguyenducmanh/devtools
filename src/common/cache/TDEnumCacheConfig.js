@@ -50,4 +50,5 @@ export const EnumCacheConfig = {
   PostgreSQLBinPath: 54,
   AppDataMinerSchema: 55,
   TDAutomationConfigLayout: 56,
+  ExcelToJSONConfigLayout: 57,
 };

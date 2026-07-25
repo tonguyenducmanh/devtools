@@ -304,4 +304,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache schema tables+columns của AppDataMiner",
   },
+  ExcelToJSONConfigLayout: {
+    KeyFormat: "ExcelToJSONConfigLayout",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool Excel to JSON",
+  },
 };

@@ -428,6 +428,24 @@ export default {
         freezeRow: "Cố định dòng đầu tiên khi cuộn.",
       },
     },
+    excelToJSON: {
+      purpose: {
+        title: "Excel to JSON là gì?",
+        content: "Công cụ chuyển đổi file Excel (.xlsx, .xls) sang dữ liệu JSON.",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        upload: "Upload file Excel cần chuyển đổi.",
+        result: "Kết quả JSON sẽ hiển thị ở panel bên phải.",
+        download: "Nhấn nút tải file JSON về máy.",
+      },
+      features: {
+        title: "Tính năng",
+        multiSheet: "Hỗ trợ đọc nhiều sheet trong một file Excel.",
+        outputFormat: "Chọn định dạng đầu ra: object (theo sheet) hoặc array (gộp tất cả).",
+        trimValues: "Tự động loại bỏ khoảng trắng thừa trong dữ liệu.",
+      },
+    },
     jsonToModel: {
       purpose: {
         title: "JSON to Model là gì?",

@@ -127,6 +127,16 @@ const sidebarConfig = [
         meta: { titleKey: "i18nCommon.feature.JSONToPostgreSQL" },
       },
       {
+        name: "jsontoexcel",
+        component: () => import("@/views/tools/TDJSONToExcel.vue"),
+        meta: { titleKey: "i18nCommon.feature.JSONToExcel" },
+      },
+      {
+        name: "exceltojson",
+        component: () => import("@/views/tools/TDExcelToJSON.vue"),
+        meta: { titleKey: "i18nCommon.feature.ExcelToJSON" },
+      },
+      {
         name: "jsontoonelinestring",
         component: () => import("@/views/tools/TDJSONToOneLineString.vue"),
         meta: { titleKey: "i18nCommon.feature.JSONToOneLineString" },
@@ -135,11 +145,6 @@ const sidebarConfig = [
         name: "jsontomodel",
         component: () => import("@/views/tools/TDJSONToModel.vue"),
         meta: { titleKey: "i18nCommon.feature.JSONToModel" },
-      },
-      {
-        name: "jsontoexcel",
-        component: () => import("@/views/tools/TDJSONToExcel.vue"),
-        meta: { titleKey: "i18nCommon.feature.JSONToExcel" },
       },
       {
         name: "jsonsortbykey",
