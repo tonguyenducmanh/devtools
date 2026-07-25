@@ -349,6 +349,28 @@ class TDAutomationInject {
   }
 
   /**
+   * Ghi nội dung vào 1 file trên máy local qua backend agent
+   * @param {string} filePath - đường dẫn tuyệt đối đến file cần ghi
+   * @param {string} content - nội dung cần ghi vào file
+   * @returns {Promise<string|null>} đường dẫn file đã ghi thành công, hoặc null nếu lỗi
+   */
+  async writeFile(filePath, content) {
+    try {
+      let response = await new TDServerTestingAPI().writeFile(filePath, content);
+      let data = response.data;
+      if (data && data.success) {
+        return data.data;
+      } else {
+        console.error("writeFile error:", data?.message);
+        return null;
+      }
+    } catch (ex) {
+      console.error("writeFile error:", ex.message);
+      return null;
+    }
+  }
+
+  /**
    * Chuyển đổi JSON sang PostgreSQL script
    * @param {Array|Object} jsonData - dữ liệu JSON cần convert
    * @param {Object} config - { tableName, schemaName, primaryKeyField, enableCreateTable, enableDeleteScript }

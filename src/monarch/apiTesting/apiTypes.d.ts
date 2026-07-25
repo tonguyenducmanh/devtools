@@ -19,6 +19,9 @@ declare function requestMultiCURL(curlStrings: string[]): Promise<Array<{ status
 /** Read the content of a local file via the agent server. Returns file content as string. */
 declare function readFile(filePath: string): Promise<string>;
 
+/** Write content to a local file via the agent server. Creates parent directories if needed. Returns the file path on success, or null on failure. */
+declare function writeFile(filePath: string, content: string): Promise<string | null>;
+
 /** Read all text files in a folder via the agent server. Returns array of { name, content }. */
 declare function readFolder(folderPath: string): Promise<Array<{ name: string; content: string }>>;
 

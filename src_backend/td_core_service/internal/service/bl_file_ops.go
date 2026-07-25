@@ -18,6 +18,11 @@ type readFolderRequest struct {
 	FolderPath string `json:"folder_path"`
 }
 
+type writeFileRequest struct {
+	FilePath string `json:"file_path"`
+	Content  string `json:"content"`
+}
+
 type folderFileItem struct {
 	Name    string `json:"name"`
 	Content string `json:"content"`
@@ -155,5 +160,47 @@ func ReadFolderHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
 		"data":    results,
+	})
+}
+
+// WriteFileHandler ghi nội dung vào 1 file trên máy local
+func WriteFileHandler(w http.ResponseWriter, r *http.Request) {
+	var req writeFileRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Dữ liệu không hợp lệ", http.StatusBadRequest)
+		return
+	}
+
+	if req.FilePath == "" {
+		http.Error(w, "file_path là bắt buộc", http.StatusBadRequest)
+		return
+	}
+
+	cleanPath := filepath.Clean(req.FilePath)
+
+	// tạo folder cha nếu chưa tồn tại
+	dir := filepath.Dir(cleanPath)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		td_common.LogError(fmt.Sprintf("WriteFile - lỗi tạo thư mục: %v", err))
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": fmt.Sprintf("Lỗi tạo thư mục: %v", err),
+		})
+		return
+	}
+
+	if err := os.WriteFile(cleanPath, []byte(req.Content), 0644); err != nil {
+		td_common.LogError(fmt.Sprintf("WriteFile - lỗi ghi file: %v", err))
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": fmt.Sprintf("Lỗi ghi file: %v", err),
+		})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"data":    cleanPath,
 	})
 }

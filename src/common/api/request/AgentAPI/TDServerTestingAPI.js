@@ -53,6 +53,16 @@ class TDServerTestingAPI extends TDAgentAPI {
   async readFolder(folderPath) {
     return await this.post("/file_ops/read_folder", { folder_path: folderPath });
   }
+
+  /**
+   * Ghi nội dung vào 1 file trên máy local
+   */
+  async writeFile(filePath, content) {
+    return await this.post("/file_ops/write_file", {
+      file_path: filePath,
+      content: content,
+    });
+  }
 }
 
 export default TDServerTestingAPI;
