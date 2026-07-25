@@ -144,6 +144,7 @@ export default {
 
       &::placeholder {
         color: var(--text-color-secondary);
+        opacity: var(--placeholder-opacity);
       }
     }
   }

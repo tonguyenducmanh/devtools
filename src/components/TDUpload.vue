@@ -29,11 +29,13 @@
     :class="{ 'td-upload-read-only': readOnly }"
   >
     <label
-      class="td-upload-button"
+      class="flex td-upload-button"
       :class="{ 'td-upload-btn-read-only': readOnly }"
       :style="borderRadiusStyle"
     >
-      {{ label ? label.capitalize() : $t("i18nCommon.uploadFile") }}
+      <span class="flex">
+        {{ label ? label.capitalize() : $t("i18nCommon.uploadFile") }}
+      </span>
       <input
         type="file"
         class="td-upload-input"
@@ -163,7 +165,7 @@ export default {
   align-items: center;
   border: 1px solid var(--border-color);
   width: 100%;
-  height: 100%;
+  height: var(--base-component-height);
   border-radius: var(--border-radius);
   background-color: var(--bg-main-color);
   color: var(--text-primary-color);
@@ -178,8 +180,9 @@ export default {
   border: 1px solid var(--border-color);
 }
 .td-upload-button {
-  padding: var(--padding);
+  box-sizing: border-box;
   cursor: pointer;
+  padding: calc(var(--padding-medium) - 1px);
   border-radius: var(--border-radius);
   background-color: var(--bg-layer-color);
 }

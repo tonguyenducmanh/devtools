@@ -8,11 +8,6 @@
             v-model="requestName"
             :noMargin="true"
             :placeHolder="$t('i18nCommon.apiTesting.requestName')"
-            :borderRadiusPosition="[
-              $tdEnum.BorderRadiusPosition.TopLeft,
-              $tdEnum.BorderRadiusPosition.BottomLeft,
-              $tdEnum.BorderRadiusPosition.BottomRight,
-            ]"
           ></TDInput>
         </div>
         <TDButton

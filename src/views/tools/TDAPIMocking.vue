@@ -930,7 +930,7 @@ export default {
 }
 .td-base-url {
   background-color: var(--bg-thirt-color);
-  height: 100%;
+  height: var(--base-component-height);
   box-sizing: border-box;
   width: fit-content;
   cursor: pointer;

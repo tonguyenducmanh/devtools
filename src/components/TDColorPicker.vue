@@ -181,6 +181,7 @@ export default {
 
   &::placeholder {
     color: var(--text-secondary-color);
+    opacity: var(--placeholder-opacity);
   }
 }
 

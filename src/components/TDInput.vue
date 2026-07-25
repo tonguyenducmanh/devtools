@@ -119,13 +119,15 @@ export default {
   input {
     border: 1px solid var(--border-color);
     width: 100%;
-    padding: var(--padding);
+    height: var(--base-component-height);
+    padding: 0 var(--padding);
     background-color: var(--bg-thirt-color);
     color: var(--text-primary-color);
     font-size: var(--font-size-medium);
   }
   input::placeholder {
     color: var(--text-secondary-color);
+    opacity: var(--placeholder-opacity);
   }
   input:focus {
     outline: none;

@@ -84,7 +84,7 @@ export default {
   align-items: center;
   justify-content: center;
   width: fit-content;
-  height: 35px;
+  height: var(--base-component-height);
   padding: var(--padding) var(--padding-x-medium);
   margin: var(--padding);
   background-color: var(--btn-color);
@@ -116,7 +116,7 @@ export default {
   box-sizing: border-box;
 }
 .td-button-icon {
-  padding: 0 var(--padding);
+  padding: 0 calc(var(--padding) / 2);
 }
 .td-button-secondary {
   background-color: var(--btn-secondary-color);

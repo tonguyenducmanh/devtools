@@ -606,6 +606,7 @@ export default {
 
   textarea::placeholder {
     color: var(--text-secondary-color);
+    opacity: var(--placeholder-opacity);
   }
 
   .td-textarea-nowrap-text {

@@ -188,6 +188,7 @@ export default {
     width: 100%;
     position: relative;
     .td-combobox-control {
+      height: var(--base-component-height);
       position: relative;
       display: flex;
       justify-content: space-between;
