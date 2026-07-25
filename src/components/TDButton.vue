@@ -116,7 +116,7 @@ export default {
   box-sizing: border-box;
 }
 .td-button-icon {
-  padding: 0 calc(var(--padding) / 2);
+  padding: 0 var(--padding);
 }
 .td-button-secondary {
   background-color: var(--btn-secondary-color);
