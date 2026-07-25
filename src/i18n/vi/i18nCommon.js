@@ -542,6 +542,7 @@ export default {
       save: "Lưu request",
       createNewRequest: "Tạo request mới",
       copyAIDocs: "Sao chép API reference cho AI prompt",
+      showAIDocs: "Tài liệu API Reference",
       beautify: "Làm đẹp",
       delete: "Xoá",
       add: "Thêm",

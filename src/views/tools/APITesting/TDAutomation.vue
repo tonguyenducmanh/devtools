@@ -67,10 +67,10 @@
         ></TDButton>
         <TDButton
           :noMargin="true"
-          @click="copyAIDocsToClipboard"
+          @click="showAIDocsPopup"
           :type="$tdEnum.buttonType.secondary"
-          iconClass="td-copy-icon"
-          v-tooltip="$t('i18nCommon.apiTesting.copyAIDocs')"
+          iconClass="td-book-icon"
+          v-tooltip="$t('i18nCommon.apiTesting.showAIDocs')"
         ></TDButton>
       </div>
       <!-- Content -->
@@ -742,10 +742,19 @@ export default {
         }
       }
     },
-    copyAIDocsToClipboard() {
+    showAIDocsPopup() {
       let me = this;
-      let prompt = me.buildAIDocsPrompt();
-      me.$tdUtility.copyToClipboard(prompt);
+      let markdown = me.buildAIDocsPrompt();
+      TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDQuickPreview,
+        ownerForm: me,
+        props: {},
+        param: {
+          value: markdown,
+          label: me.$t("i18nCommon.apiTesting.showAIDocs"),
+          language: "markdown",
+        },
+      });
     },
     buildAIDocsPrompt() {
       let lines = [];

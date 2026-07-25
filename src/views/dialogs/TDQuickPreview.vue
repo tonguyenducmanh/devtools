@@ -67,7 +67,7 @@ export default {
     };
   },
   methods: {
-    show({ value, label }) {
+    show({ value, label, language }) {
       this.previewLabel = label || "";
       let str;
       if (value !== null && value !== undefined && typeof value === "object") {
@@ -76,7 +76,7 @@ export default {
         str = value != null ? String(value) : "";
       }
       this.previewValue = str;
-      this.previewLanguage = this.detectLang(str);
+      this.previewLanguage = language || this.detectLang(str);
     },
     handleClose() {
       this.onClose?.();

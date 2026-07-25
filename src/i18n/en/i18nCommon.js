@@ -544,6 +544,7 @@ export default {
       save: "Save request",
       createNewRequest: "New request",
       copyAIDocs: "Copy API reference for AI prompt",
+      showAIDocs: "API Reference Documentation",
       beautify: "Beautify",
       delete: "Delete",
       add: "Add",
