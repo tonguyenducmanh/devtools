@@ -299,6 +299,8 @@ export default {
       outputAsArray: "Output as array",
       trimValues: "Trim whitespace",
       selectSheet: "Select sheet",
+      onlyExcelSupported: "Only Excel files are supported (.xlsx, .xls)",
+      defaultFileName: "data",
     },
     jsonToPostgreSQL: {
       useFileUpload: "Use file upload",

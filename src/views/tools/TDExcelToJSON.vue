@@ -189,7 +189,7 @@ export default {
         const file = files[0];
         const ext = file.name.split(".").pop().toLowerCase();
         if (!["xlsx", "xls"].includes(ext)) {
-          me.$tdToast.error("Chỉ hỗ trợ file Excel (.xlsx, .xls)");
+          me.$tdToast.error(me.$t("i18nCommon.excelToJSON.onlyExcelSupported"));
           return;
         }
         const buffer = await file.arrayBuffer();
@@ -308,7 +308,7 @@ export default {
       const blob = new Blob([me.outputJSON], { type: "application/json" });
       me.$tdUtility.createDownloadFileFromBlob(
         blob,
-        `${me.selectedSheet || "du-lieu"}.json`,
+        `${me.selectedSheet || me.$t("i18nCommon.excelToJSON.defaultFileName")}.json`,
       );
     },
   },

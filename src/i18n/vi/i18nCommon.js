@@ -299,6 +299,8 @@ export default {
       outputAsArray: "Đầu ra mảng (array)",
       trimValues: "Loại bỏ khoảng trắng",
       selectSheet: "Chọn sheet",
+      onlyExcelSupported: "Chỉ hỗ trợ file Excel (.xlsx, .xls)",
+      defaultFileName: "du-lieu",
     },
     jsonToPostgreSQL: {
       useFileUpload: "Sử dụng file",
