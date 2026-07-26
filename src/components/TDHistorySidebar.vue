@@ -29,6 +29,9 @@
         </template>
       </div>
     </div>
+    <div v-else class="td-history-empty">
+      <span>{{ $t('i18nCommon.history.emptyMessage') }}</span>
+    </div>
     <TDButton
       v-if="historyItems && historyItems.length > 0"
       @click="clearAllHistory"
@@ -96,6 +99,15 @@ export default {
 }
 .td-close-icon {
   cursor: pointer;
+}
+.td-history-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  color: var(--text-secondary-color);
+  font-style: italic;
 }
 .text-nowrap {
   max-width: 230px;

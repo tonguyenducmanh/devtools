@@ -248,20 +248,6 @@ const sidebarConfig = [
     ],
   },
   {
-    type: "route",
-    name: "TDBilingualWeb",
-    component: () => import("@/views/tools/TDBilingualWeb.vue"),
-    meta: {
-      titleKey: "i18nCommon.feature.BilingualWeb",
-    },
-  },
-  {
-    type: "route",
-    name: "TDHTMLPreview",
-    component: () => import("@/views/tools/TDHTMLPreview.vue"),
-    meta: { titleKey: "i18nCommon.feature.HTMLPreview" },
-  },
-  {
     type: "group",
     groupKey: "ai",
     groupTitleKey: "i18nCommon.group.ArtificialIntelligence",
@@ -279,6 +265,25 @@ const sidebarConfig = [
         meta: {
           titleKey: "i18nCommon.feature.vectorMockGenerator",
         },
+      },
+    ],
+  },
+  {
+    type: "group",
+    groupKey: "linhtinh",
+    groupTitleKey: "i18nCommon.group.Miscellaneous",
+    children: [
+      {
+        name: "TDBilingualWeb",
+        component: () => import("@/views/tools/TDBilingualWeb.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.BilingualWeb",
+        },
+      },
+      {
+        name: "TDHTMLPreview",
+        component: () => import("@/views/tools/TDHTMLPreview.vue"),
+        meta: { titleKey: "i18nCommon.feature.HTMLPreview" },
       },
     ],
   },

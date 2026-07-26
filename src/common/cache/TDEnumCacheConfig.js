@@ -51,4 +51,5 @@ export const EnumCacheConfig = {
   AppDataMinerSchema: 55,
   TDAutomationConfigLayout: 56,
   ExcelToJSONConfigLayout: 57,
+  HTMLPreviewConfigLayout: 58,
 };

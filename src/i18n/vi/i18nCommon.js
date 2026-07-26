@@ -22,6 +22,7 @@ export default {
       SampleCode: "Code mẫu",
       DateAndTime: "Ngày và giờ",
       Database: "Cơ sở dữ liệu",
+      Miscellaneous: "Linh tinh",
     },
     typeInput: "Nhập giá trị",
     edit: "Sửa",
@@ -60,6 +61,7 @@ export default {
       title: "Lịch sử",
       show: "Lịch sử",
       hide: "Ẩn lịch sử",
+      emptyMessage: "Lịch sử sẽ hiển thị ở đây",
     },
     tdheader: {
       toggleTheme: "Thay đổi chủ đề",

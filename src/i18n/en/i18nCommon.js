@@ -22,6 +22,7 @@ export default {
       SampleCode: "Sample code",
       DateAndTime: "Date time",
       Database: "Database",
+      Miscellaneous: "Miscellaneous",
     },
     typeInput: "Type value",
     edit: "Edit",
@@ -59,6 +60,7 @@ export default {
       title: "History",
       show: "History",
       hide: "Hide History",
+      emptyMessage: "History will appear here",
     },
     tdheader: {
       toggleTheme: "Change theme",

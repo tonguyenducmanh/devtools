@@ -310,4 +310,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool Excel to JSON",
   },
+  HTMLPreviewConfigLayout: {
+    KeyFormat: "HTMLPreviewConfigLayout",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool HTML Preview",
+  },
 };

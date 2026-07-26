@@ -1,81 +1,94 @@
 <template>
-  <div class="flex flex-col container">
-    <div class="flex history-wrapper">
-      <TDHistory
-        ref="history"
-        class="history-container"
-        titleKey="inputHtml"
-        :applyFunction="handlePreviewFromHistory"
-        :cacheKey="$tdEnum.cacheConfig.HTMLPreviewHistory"
-      ></TDHistory>
-    </div>
-    <div class="flex input-container">
-      <TDTextEditor
-        :placeHolder="$t('i18nCommon.htmlPreview.inputHTML')"
-        v-model="inputHtml"
-        height="100%"
-        :width="isFullscreenPreview ? '100%' : '50%'"
-      ></TDTextEditor>
-      <iframe
-        v-if="!isFullscreenPreview"
-        ref="previewFrame"
-        class="preview-frame"
-        sandbox="allow-scripts allow-modals allow-forms allow-popups allow-same-origin allow-top-navigation allow-downloads allow-pointer-lock allow-presentation"
-        :srcdoc="outputHtml"
-      ></iframe>
-    </div>
-    <div
-      class="preview-popup"
-      v-if="isFullscreenPreview && outputHtml && isShowPopupPreview"
-    >
-      <div class="popup-overlay">
-        <div class="popup-content">
+  <div class="flex td-html-preview-container">
+    <div class="flex flex-col flex-one overflow-hidden main-content">
+      <div class="flex input-container">
+        <TDTextEditor
+          :placeHolder="$t('i18nCommon.htmlPreview.inputHTML')"
+          v-model="inputHtml"
+          height="100%"
+          :width="isFullscreenPreview ? '100%' : '50%'"
+        ></TDTextEditor>
+        <iframe
+          v-if="!isFullscreenPreview"
+          ref="previewFrame"
+          class="preview-frame"
+          sandbox="allow-scripts allow-modals allow-forms allow-popups allow-same-origin allow-top-navigation allow-downloads allow-pointer-lock allow-presentation"
+          :srcdoc="outputHtml"
+        ></iframe>
+      </div>
+      <div
+        class="preview-popup"
+        v-if="isFullscreenPreview && outputHtml && isShowPopupPreview"
+      >
+        <div class="popup-overlay">
+          <div class="popup-content">
+            <TDButton
+              @click="closePopup"
+              :type="$tdEnum.buttonType.secondary"
+              :label="'✕'"
+              class="close-button"
+            ></TDButton>
+            <iframe
+              ref="popupFrame"
+              class="popup-frame"
+              sandbox="allow-scripts allow-modals allow-forms allow-popups allow-same-origin allow-top-navigation allow-downloads allow-pointer-lock allow-presentation"
+              :srcdoc="outputHtml"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+      <div class="flex button-container">
+        <div class="flex">
           <TDButton
-            @click="closePopup"
-            :type="$tdEnum.buttonType.secondary"
-            :label="'✕'"
-            class="close-button"
+            @click="handlePreview"
+            :label="$t('i18nCommon.htmlPreview.preview')"
           ></TDButton>
-          <iframe
-            ref="popupFrame"
-            class="popup-frame"
-            sandbox="allow-scripts allow-modals allow-forms allow-popups allow-same-origin allow-top-navigation allow-downloads allow-pointer-lock allow-presentation"
-            :srcdoc="outputHtml"
-          ></iframe>
+          <TDButton
+            @click="applyMock"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.example')"
+          ></TDButton>
+          <TDButton
+            @click="handleCopyEvent(inputHtml)"
+            :type="$tdEnum.buttonType.secondary"
+            :label="$t('i18nCommon.htmlPreview.copyHtml')"
+          ></TDButton>
+        </div>
+        <div class="flex">
+          <TDCheckbox
+            v-model="isFullscreenPreview"
+            :label="$t('i18nCommon.htmlPreview.fullscreenPreview')"
+          ></TDCheckbox>
         </div>
       </div>
     </div>
-    <div class="flex button-container">
-      <div class="flex">
-        <TDButton
-          @click="handlePreview"
-          :label="$t('i18nCommon.htmlPreview.preview')"
-        ></TDButton>
-        <TDButton
-          @click="applyMock"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.example')"
-        ></TDButton>
-        <TDButton
-          @click="handleCopyEvent(inputHtml)"
-          :type="$tdEnum.buttonType.secondary"
-          :label="$t('i18nCommon.htmlPreview.copyHtml')"
-        ></TDButton>
-      </div>
-      <div class="flex">
-        <TDCheckbox
-          v-model="isFullscreenPreview"
-          :label="$t('i18nCommon.htmlPreview.fullscreenPreview')"
-        ></TDCheckbox>
-      </div>
-    </div>
+    <TDSubSidebar
+      ref="subSidebar"
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
+      <template v-slot:main>
+        <div class="flex flex-col td-sidebar-content">
+          <TDHistorySidebar
+            ref="history"
+            :applyFunction="handlePreviewFromHistory"
+            titleKey="inputHtml"
+            :noMargin="true"
+            :cacheKey="$tdEnum.cacheConfig.HTMLPreviewHistory"
+          />
+        </div>
+      </template>
+    </TDSubSidebar>
   </div>
 </template>
 <script>
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
+import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 export default {
   extends: TDToolBase,
   name: "TDHTMLPreview",
+  components: { TDSubSidebar, TDHistorySidebar },
   created() {
     let me = this;
   },
@@ -135,6 +148,10 @@ export default {
   },
   data() {
     return {
+      keyCacheLayout: this.$tdEnum.cacheConfig.HTMLPreviewConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+      },
       inputHtml: null,
       outputHtml: null,
       isFullscreenPreview: true,
@@ -144,20 +161,28 @@ export default {
 };
 </script>
 <style scoped>
-.container {
+.td-html-preview-container {
   width: 100%;
   height: 100%;
+}
+.flex-one {
+  flex: 1;
+}
+.main-content {
+  height: 100%;
+  width: 100%;
+  justify-content: flex-start;
 }
 .input-container {
   flex: 1;
   column-gap: var(--padding);
-  width: 95%;
-}
-.history-wrapper {
-  width: 95%;
-}
-.history-container {
   width: 100%;
+}
+.td-sidebar-content {
+  height: 100%;
+  justify-content: flex-start;
+  width: 100%;
+  overflow: auto;
 }
 .preview-frame {
   width: 50%;
