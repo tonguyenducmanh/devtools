@@ -1,7 +1,7 @@
 {
   "name": "dev-tool",
   "productName": "dev-tool",
-  "version": "15.0.7",
+  "version": "15.0.8",
   "description": "tool tomanh",
   "main": ".vite/build/main.js",
   "scripts": {
