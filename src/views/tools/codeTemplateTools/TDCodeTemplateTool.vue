@@ -38,6 +38,7 @@
         >
           <div class="sidebar-input">
             <TDInput
+              :noMargin="true"
               v-model="templateFilter"
               :placeHolder="
                 $t('i18nTemplate.postgreSQLTemplate.search_template')
@@ -214,7 +215,7 @@ export default {
   width: 100%;
   box-sizing: border-box;
   display: flex;
-  margin-bottom: var(--padding);
+  margin: var(--padding);
 }
 .template-list {
   width: 100%;
