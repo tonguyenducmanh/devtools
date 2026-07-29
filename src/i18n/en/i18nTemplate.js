@@ -27,6 +27,7 @@ export default {
       query_table_data_type: "Get Column Data Type",
       query_running_queries: "View Running Queries",
       query_kill_process: "Find and Kill Process",
+      query_function_refcursor: "Get Function Refcursor",
       select_template: "Select template",
       search_template: "Search template",
       no_template_found: "No template found",

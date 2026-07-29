@@ -27,6 +27,7 @@ export default {
       query_table_data_type: "Xem kiểu dữ liệu cột",
       query_running_queries: "Xem câu lệnh đang chạy",
       query_kill_process: "Tìm và kill process",
+      query_function_refcursor: "Chạy function refcursor",
       select_template: "Chọn template",
       search_template: "Tìm template",
       no_template_found: "Không tìm thấy template",
