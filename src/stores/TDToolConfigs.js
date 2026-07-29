@@ -165,10 +165,10 @@ const sidebarConfig = [
         meta: { titleKey: "i18nCommon.feature.PostgreSQLTemplate" },
       },
       {
-        name: "apitestingtemplate",
+        name: "automationtemplate",
         component: () =>
-          import("@/views/tools/codeTemplateTools/TDCodeTemplateAPITesting.vue"),
-        meta: { titleKey: "i18nCommon.feature.APITestingTemplate" },
+          import("@/views/tools/codeTemplateTools/TDCodeTemplateAutomation.vue"),
+        meta: { titleKey: "i18nCommon.feature.AutomationTemplate" },
       },
       {
         name: "javadcripttemplate",

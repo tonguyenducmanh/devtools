@@ -12,7 +12,7 @@ import templates from "@/templates/apiTesting/templates.js";
 
 export default {
   extends: TDToolBase,
-  name: "TDCodeTemplateAPITesting",
+  name: "TDCodeTemplateAutomation",
   components: { TDCodeTemplateTool },
   created() {},
   computed: {},
