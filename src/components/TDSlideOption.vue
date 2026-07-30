@@ -225,7 +225,6 @@ export default {
     position: absolute;
     top: 0;
     left: 0;
-    background-color: var(--focus-color);
     border-radius: var(--border-radius);
     transition:
       transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
@@ -266,5 +265,11 @@ body[data-theme="dark"] .td-icon {
 
 .td-selected-icon {
   filter: invert(100);
+}
+body[data-theme="light"] .td-slide-background {
+  background-color: var(--focus-color);
+}
+body[data-theme="dark"] .td-slide-background {
+  background-color: var(--bg-hover-color);
 }
 </style>

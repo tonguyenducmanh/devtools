@@ -154,6 +154,9 @@ body[data-theme="light"] {
   }
 }
 body[data-theme="dark"] {
+  .td-button {
+    background-color: var(--bg-hover-color);
+  }
   .td-button-secondary {
     background-color: var(--bg-thirt-color);
   }
