@@ -31,7 +31,7 @@ export default {
 <style lang="scss" scoped>
 .td-loading {
   width: 100%;
-  height: 100%;
+  height: fit-content;
   align-items: center;
   justify-content: center;
   padding: var(--padding);
@@ -39,7 +39,7 @@ export default {
 
 .meme {
   width: 100%;
-  height: 100%;
+  height: fit-content;
   max-width: 500px;
   max-height: 500px;
   aspect-ratio: 249 / 140;
