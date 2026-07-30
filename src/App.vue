@@ -1,9 +1,7 @@
 <template>
   <div class="td-container">
     <transition name="td-fade-loading">
-      <div v-if="appLoading" class="flex td-loading-app">
-        <TDLoading />
-      </div>
+      <div v-if="appLoading" class="flex td-loading-app"></div>
     </transition>
     <div class="td-header-wrap">
       <TDHeader />
