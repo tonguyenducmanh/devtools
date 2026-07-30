@@ -1,5 +1,8 @@
 <template>
-  <div class="loader"></div>
+  <div class="flex flex-col td-loading">
+    <div v-if="showMeme" class="meme"></div>
+    <div v-else class="loader"></div>
+  </div>
 </template>
 
 <script>
@@ -11,12 +14,33 @@ export default {
   beforeUnmount() {},
   props: {},
   data() {
-    return {};
+    return {
+      showMeme: true,
+    };
   },
   methods: {},
 };
 </script>
 <style lang="scss" scoped>
+.td-loading {
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: var(--padding);
+}
+
+.meme {
+  width: 100%;
+  height: 100%;
+  max-width: 500px;
+  max-height: 500px;
+  aspect-ratio: 249 / 140;
+  background: url("@/assets/meme.gif") no-repeat center;
+  background-size: contain;
+  overflow: hidden;
+}
+
 .loader {
   width: 20px;
   aspect-ratio: 1;
