@@ -55,7 +55,7 @@ export default {
     // Có thể delay nhẹ để tránh giật UI (tuỳ chọn)
     setTimeout(() => {
       this.appLoading = false;
-    }, 500);
+    }, 200);
 
     // Set global app context for dialogs
     TDDialogUtil.setAppContext(this.$root.$.appContext);
@@ -136,19 +136,5 @@ export default {
     height: 32px;
     flex-shrink: 0;
   }
-}
-.td-fade-loading-enter-active,
-.td-fade-loading-leave-active {
-  transition: opacity 0.4s ease;
-}
-
-.td-fade-loading-enter-from,
-.td-fade-loading-leave-to {
-  opacity: 0;
-}
-
-.td-fade-loading-enter-to,
-.td-fade-loading-leave-from {
-  opacity: 1;
 }
 </style>

@@ -2,8 +2,11 @@
   <div class="flex td-welcome">
     <div class="flex flex-col wrap-container">
       <div class="container">
+        <transition v-if="isShowLoading" name="td-fade-loading">
+          <TDLoading />
+        </transition>
+        <div v-else class="main-line-title">{{ welcomeTitle }}</div>
         <TDDynamicBackgroundEffect />
-        <div class="main-line-title">{{ welcomeTitle }}</div>
         <p class="description">
           {{ displayText }}<span class="cursor">|</span>
         </p>
@@ -26,6 +29,7 @@ import TDWelcomeHelp from "@/views/helps/TDWelcomeHelp.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";
 import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
+import TDLoading from "../../components/TDLoading.vue";
 
 export default {
   name: "TDWelcome",
@@ -33,6 +37,7 @@ export default {
   components: { TDWelcomeHelp, TDSubSidebar, TDDynamicBackgroundEffect },
   data() {
     return {
+      loadingType: this.$tdEnum.LoadingType.Normal,
       keyCacheLayout: this.$tdEnum.cacheConfig.WelcomeLayout,
       languageList: Object.keys(this.$tdEnum.language).sort(),
       displayText: "",
@@ -48,6 +53,9 @@ export default {
     welcomeTitle() {
       let me = this;
       return me.$tdUtility.getAuthorApp() ?? me.$tdUtility.defaultTitleApp();
+    },
+    isShowLoading() {
+      return this.loadingType != this.$tdEnum.LoadingType.Normal;
     },
   },
   created() {},
@@ -85,10 +93,16 @@ export default {
         await sleep(80);
       }
     },
+    async processWhenMounted() {
+      let me = this;
+      me.loadingType =
+        await me.$tdUtility.getUserSettings("currentLoadingType");
+    },
   },
   mounted() {
     // Chạy hiệu ứng khi component vừa hiển thị
     this.runTypingEffect();
+    this.processWhenMounted();
   },
 };
 </script>
