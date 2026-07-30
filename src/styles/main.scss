@@ -59,10 +59,10 @@
 body[data-theme="light"] {
   --bg-main-color: #ffffff;
   --bg-layer-color: #f3f4f6;
+  --bg-hover-color: rgb(219, 37, 37);
   --bg-active-color: rgb(202, 212, 203);
   --bg-focus-color: #f8f1f7;
   --bg-thirt-color: #f6f6f7;
-  --bg-hover-color: unset;
   --text-color: #4b5563;
   --text-primary-color: rgb(0, 0, 0);
   --text-secondary-color: rgb(93, 93, 93);
@@ -87,11 +87,11 @@ body[data-theme="light"] {
 body[data-theme="dark"] {
   --bg-main-color: #000000;
   --bg-layer-color: rgb(14, 14, 14);
+  --bg-hover-color: rgb(174, 37, 37);
   --text-color: #e5e5e5;
   --bg-active-color: rgb(126, 126, 126);
   --bg-focus-color: #928990;
   --bg-thirt-color: #252525;
-  --bg-hover-color: unset;
   --text-primary-color: rgb(226, 227, 231);
   --text-secondary-color: #6a707e;
   --text-tertiary-color: rgb(217, 217, 217);
