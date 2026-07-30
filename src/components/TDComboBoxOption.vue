@@ -37,7 +37,7 @@ export default {
   cursor: pointer;
 
   &:hover {
-    background: var(--bg-layer-color);
+    background: var(--bg-hover-color);
   }
 
   &.selected {
