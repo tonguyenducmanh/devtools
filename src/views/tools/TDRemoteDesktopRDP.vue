@@ -183,7 +183,7 @@
                 ></div>
               </div>
               <div class="flex response-loading" v-if="isLoading">
-                <div class="loader"></div>
+                <TDLoading />
               </div>
               <div
                 v-else-if="connections.length === 0"

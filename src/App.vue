@@ -2,7 +2,7 @@
   <div class="td-container">
     <transition name="td-fade-loading">
       <div v-if="appLoading" class="flex td-loading-app">
-        <div class="loader"></div>
+        <TDLoading />
       </div>
     </transition>
     <div class="td-header-wrap">

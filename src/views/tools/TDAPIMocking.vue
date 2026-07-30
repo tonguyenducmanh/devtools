@@ -341,7 +341,7 @@
           <!-- danh sách các mock API được nhóm theo group_name -->
           <div class="td-collection">
             <div class="flex flex-col response-loading" v-if="isLoading">
-              <div class="loader"></div>
+              <TDLoading />
             </div>
             <div class="td-collection-body" v-else>
               <div

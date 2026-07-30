@@ -23,7 +23,7 @@
 
       <div class="td-bilingual-content">
         <div v-if="isLoading" class="td-loading-overlay">
-          <div class="loader"></div>
+          <TDLoading />
           <div class="loading-text">
             {{ $t("i18nCommon.bilingualWeb.fetching") }}
           </div>

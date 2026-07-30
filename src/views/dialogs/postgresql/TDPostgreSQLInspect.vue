@@ -136,7 +136,7 @@
       <div class="flex flex-one td-inspect-body">
         <!-- loading khi đang tìm kiếm -->
         <div v-if="isSearching" class="flex td-inspect-loading">
-          <div class="loader"></div>
+          <TDLoading />
         </div>
         <template v-else-if="results && results.length > 0">
           <!-- danh sách object tìm được (bên trái) -->
@@ -172,7 +172,7 @@
             :style="responseSectionSizeStyle"
           >
             <div v-if="isLoadingDDL" class="flex td-inspect-loading">
-              <div class="loader"></div>
+              <TDLoading />
             </div>
             <TDTextEditor
               v-else

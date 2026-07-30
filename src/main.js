@@ -5,6 +5,7 @@ import tdEnum from "@/common/TDEnum.js";
 import tdUtility from "@/common/TDUtility.js";
 import TDButton from "@/components/TDButton.vue";
 import TDTextEditor from "@/components/TDTextEditor.vue";
+import TDLoading from "@/components/TDLoading.vue";
 import TDInput from "@/components/TDInput.vue";
 import TDCheckbox from "@/components/TDCheckbox.vue";
 import TDColorPicker from "@/components/TDColorPicker.vue";
@@ -44,6 +45,7 @@ import "@/common/plugin/TDMonacoEditor.js";
   // add 1 vài component global
   currentApp.component("TDButton", TDButton);
   currentApp.component("TDTextEditor", TDTextEditor);
+  currentApp.component("TDLoading", TDLoading);
   currentApp.component("TDInput", TDInput);
   currentApp.component("TDCheckbox", TDCheckbox);
   currentApp.component("TDUpload", TDUpload);

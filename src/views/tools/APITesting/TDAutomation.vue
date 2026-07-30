@@ -180,7 +180,7 @@
           </div>
           <div class="td-collection">
             <div class="flex flex-col response-loading" v-if="isLoadingData">
-              <div class="loader"></div>
+              <TDLoading />
             </div>
             <div class="td-collection-body" v-else>
               <div
@@ -188,16 +188,11 @@
                 class="flex flex-col no-select td-collection-item"
                 :key="index"
               >
-                <div
-                  v-if="collection.is_renaming"
-                  class="td-collection-rename"
-                >
+                <div v-if="collection.is_renaming" class="td-collection-rename">
                   <TDInput
                     v-model="collection.temp_name"
                     :noMargin="true"
-                    :placeHolder="
-                      $t('i18nCommon.apiTesting.collectionRename')
-                    "
+                    :placeHolder="$t('i18nCommon.apiTesting.collectionRename')"
                     :ref="collection.temp_name"
                     @keyup.enter="saveNewCollectionName(collection)"
                     @clickOutSide="saveNewCollectionName(collection)"
@@ -248,8 +243,7 @@
                     class="flex td-collection-request-item"
                     :class="{
                       'td-collection-request-item-selected':
-                        request &&
-                        currentProModeRequestId == request.requestId,
+                        request && currentProModeRequestId == request.requestId,
                     }"
                     @click="applyProModeRequest(request)"
                   >
@@ -629,11 +623,7 @@ export default {
     },
     async saveProModeRequest() {
       let me = this;
-      if (
-        me.requestName &&
-        me.allCollection &&
-        me.allCollection.length > 0
-      ) {
+      if (me.requestName && me.allCollection && me.allCollection.length > 0) {
         if (me.currentProModeRequestId) {
           let currentCollection = me.allCollection.find((c) =>
             c.requests.find((r) => r.requestId == me.currentProModeRequestId),
@@ -849,10 +839,30 @@ export default {
       let me = this;
       let collections = {};
       let textExtensions = [
-        ".txt", ".js", ".ts", ".jsx", ".tsx", ".json", ".md", ".sh",
-        ".py", ".sql", ".html", ".css", ".xml", ".yaml", ".yml",
-        ".cs", ".java", ".go", ".rb", ".php", ".vue", ".env",
-        ".conf", ".log",
+        ".txt",
+        ".js",
+        ".ts",
+        ".jsx",
+        ".tsx",
+        ".json",
+        ".md",
+        ".sh",
+        ".py",
+        ".sql",
+        ".html",
+        ".css",
+        ".xml",
+        ".yaml",
+        ".yml",
+        ".cs",
+        ".java",
+        ".go",
+        ".rb",
+        ".php",
+        ".vue",
+        ".env",
+        ".conf",
+        ".log",
       ];
 
       for (let file of Object.values(zip.files)) {

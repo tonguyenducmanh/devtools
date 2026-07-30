@@ -27,7 +27,7 @@
         <span class="td-dblist-current">{{ currentConnLabel }}</span>
       </div>
       <div v-if="isSearching" class="flex td-dblist-loading">
-        <div class="loader"></div>
+        <TDLoading />
       </div>
       <div v-else-if="error" class="td-dblist-error">
         {{ error }}

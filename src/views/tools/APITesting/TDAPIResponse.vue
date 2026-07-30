@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col response-loading" v-if="isLoading">
-    <div class="loader"></div>
+    <TDLoading />
   </div>
   <div v-else class="td-text-area-wrap">
     <TDTextEditor

@@ -19,7 +19,7 @@
         </div>
       </div>
       <div v-if="isChecking" class="flex td-clone-loading">
-        <div class="loader"></div>
+        <TDLoading />
       </div>
       <div v-else-if="filteredConnections.length === 0" class="td-clone-empty">
         {{ $t("i18nCommon.postgreSQLQuery.cloneIntellisenseEmpty") }}

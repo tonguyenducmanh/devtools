@@ -27,7 +27,7 @@
           ></TDButton>
         </div>
         <div class="flex flex-col response-loading" v-if="isLoading">
-          <div class="loader"></div>
+          <TDLoading />
         </div>
         <TDTextEditor
           v-else

@@ -77,7 +77,7 @@
       <div class="td-pg-query-result" :style="resultSectionSizeStyle">
         <!-- loading spinner khi đang chạy query -->
         <div class="flex td-pg-result-loading" v-if="isRunning">
-          <div class="loader"></div>
+          <TDLoading />
         </div>
 
         <template v-else>
@@ -268,7 +268,7 @@
           <!-- danh sách group và connection -->
           <div class="td-collection">
             <div class="flex flex-col response-loading" v-if="isLoading">
-              <div class="loader"></div>
+              <TDLoading />
             </div>
             <div class="td-collection-body" v-else>
               <div
