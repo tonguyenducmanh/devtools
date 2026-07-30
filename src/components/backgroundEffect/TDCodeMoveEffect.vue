@@ -207,7 +207,7 @@ export default {
 
     getColor() {
       const isDark = document.body.getAttribute("data-theme") === "dark";
-      return isDark ? "51,161,111" : "30,30,30";
+      return isDark ? "221,250,66" : "30,30,30";
     },
 
     animate() {
