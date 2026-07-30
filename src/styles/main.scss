@@ -83,6 +83,11 @@ body[data-theme="light"] {
   --trail-cursor-color: #000000;
   --border-component-style: 1px solid #e6e7eb00;
   --checkbox-thumb-active-color: #000000;
+  --btn-primary-bg: var(--btn-color);
+  --btn-secondary-bg: var(--btn-secondary-color);
+  --btn-secondary-hover-bg: var(--btn-secondary-focus-color);
+  --btn-secondary-hover-border: transparent;
+  --td-slide-bg: var(--focus-color);
 }
 
 body[data-theme="dark"] {
@@ -112,6 +117,11 @@ body[data-theme="dark"] {
   --trail-cursor-color: #ddfa42;
   --border-component-style: 1px solid #666666;
   --checkbox-thumb-active-color: rgb(174, 37, 37);
+  --btn-primary-bg: var(--bg-hover-color);
+  --btn-secondary-bg: var(--bg-thirt-color);
+  --btn-secondary-hover-bg: #303130;
+  --btn-secondary-hover-border: var(--border-color);
+  --td-slide-bg: var(--bg-hover-color);
 }
 
 body {

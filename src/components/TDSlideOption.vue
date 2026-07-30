@@ -259,17 +259,11 @@ export default {
   align-items: stretch;
 }
 
-body[data-theme="dark"] .td-icon {
-  filter: invert(20);
+.td-selected-icon {
+  background-color: var(--selected-item-text-color);
 }
 
-.td-selected-icon {
-  filter: invert(100);
-}
-body[data-theme="light"] .td-slide-background {
-  background-color: var(--focus-color);
-}
-body[data-theme="dark"] .td-slide-background {
-  background-color: var(--bg-hover-color);
+.td-slide-background {
+  background-color: var(--td-slide-bg);
 }
 </style>

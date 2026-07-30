@@ -87,7 +87,7 @@ export default {
   height: var(--base-component-height);
   padding: var(--padding) var(--padding-x-medium);
   margin: var(--padding);
-  background-color: var(--btn-color);
+  background-color: var(--btn-primary-bg);
   color: var(--selected-item-text-color);
   border: none;
   cursor: pointer;
@@ -119,11 +119,12 @@ export default {
   padding: 0 var(--padding);
 }
 .td-button-secondary {
-  background-color: var(--btn-secondary-color);
+  background-color: var(--btn-secondary-bg);
   color: var(--btn-secondary-text-color);
 }
 .td-button-secondary:hover {
-  background-color: var(--btn-secondary-focus-color);
+  background-color: var(--btn-secondary-hover-bg);
+  border: 1px solid var(--btn-secondary-hover-border);
 }
 
 .td-button-secondary:active {
@@ -138,31 +139,6 @@ export default {
   cursor: not-allowed;
   .td-icon {
     cursor: not-allowed;
-  }
-}
-
-body[data-theme="light"] {
-  .td-button-icon {
-    .td-icon {
-      filter: brightness(0) invert(1);
-    }
-  }
-  .td-button-secondary {
-    .td-icon {
-      filter: brightness(0);
-    }
-  }
-}
-body[data-theme="dark"] {
-  .td-button {
-    background-color: var(--bg-hover-color);
-  }
-  .td-button-secondary {
-    background-color: var(--bg-thirt-color);
-  }
-  .td-button-secondary:hover {
-    border: 1px solid var(--border-color);
-    background-color: #303130;
   }
 }
 </style>

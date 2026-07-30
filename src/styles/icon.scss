@@ -1,52 +1,51 @@
 .td-icon {
   width: 20px;
   height: 20px;
-  background: url("@/assets/Sprite.svg") no-repeat;
+  background-color: currentColor;
+  -webkit-mask-image: url("@/assets/Sprite.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-image: url("@/assets/Sprite.svg");
+  mask-repeat: no-repeat;
   cursor: pointer;
-}
-body[data-theme="dark"] {
-  .td-icon {
-    filter: invert(100);
-  }
 }
 
 .td-close-icon {
-  background-position: -124px 0px;
+  mask-position: -124px 0px;
 }
 .td-search-icon {
-  background-position: -100px 0px;
+  mask-position: -100px 0px;
 }
 .td-plus-icon {
-  background-position: -148px 0px;
+  mask-position: -148px 0px;
 }
 
 .td-copy-icon {
-  background-position: -166px 0px;
+  mask-position: -166px 0px;
 }
 
 .td-json-icon {
-  background-position: -186px 0px;
+  mask-position: -186px 0px;
 }
 
 .td-edit-icon {
-  background-position: -205px 0px;
+  mask-position: -205px 0px;
 }
 
 .td-folder-icon {
-  background-position: -230px 0px;
+  mask-position: -230px 0px;
 }
 .td-history-icon {
-  background-position: -255px 0px;
+  mask-position: -255px 0px;
 }
 .td-setting-icon {
-  background-position: -280px 0px;
+  mask-position: -280px 0px;
 }
 .td-reload-icon {
-  background-position: -307px 0px;
+  mask-position: -307px 0px;
 }
 
 .td-github-icon {
-  background-position: -76px 0px;
+  mask-position: -76px 0px;
 
   &:hover {
     transform: scale(1.1);
@@ -54,141 +53,140 @@ body[data-theme="dark"] {
 }
 
 .td-help-icon {
-  background-position: 0px -20px;
+  mask-position: 0px -20px;
 }
 
 .td-camera-icon {
-  background-position: -26px -20px;
+  mask-position: -26px -20px;
 }
 
 .td-exit-full-screen-icon {
-  background-position: -50px -20px;
+  mask-position: -50px -20px;
 }
 
 .td-full-screen-icon {
-  background-position: -70px -20px;
+  mask-position: -70px -20px;
 }
 
 .td-command-code-icon {
-  background-position: -92px -20px;
+  mask-position: -92px -20px;
 }
 
 .td-connect-icon {
-  background-position: -120px -20px;
+  mask-position: -120px -20px;
 }
 
 .td-disconnect-icon {
-  background-position: -145px -20px;
+  mask-position: -145px -20px;
 }
 
 .td-pin-icon {
-  background-position: -170px -20px;
+  mask-position: -170px -20px;
 }
 
 .td-unpin-icon {
-  background-position: -195px -20px;
+  mask-position: -195px -20px;
 }
 
 .td-import-icon {
-  background-position: -225px -20px;
+  mask-position: -225px -20px;
 }
 
 .td-export-icon {
-  background-position: -250px -20px;
+  mask-position: -250px -20px;
 }
 
 .td-undo-icon {
-  background-position: -280px -20px;
+  mask-position: -280px -20px;
 }
 
 .td-redo-icon {
-  background-position: -305px -20px;
+  mask-position: -305px -20px;
 }
 
 .td-minus-icon {
-  background-position: -330px -20px;
+  mask-position: -330px -20px;
 }
 
 .td-add-node-child-icon {
-  background-position: -385px -20px;
+  mask-position: -385px -20px;
 }
 
 .td-add-node-icon {
-  background-position: -410px -20px;
+  mask-position: -410px -20px;
 }
 
 .td-delete-node-icon {
-  background-position: -360px -20px;
+  mask-position: -360px -20px;
 }
 
 .td-new-file-icon {
-  background-position: -0px -40px;
+  mask-position: -0px -40px;
 }
 
 .td-node-expand-icon {
-  background-position: -25px -40px;
+  mask-position: -25px -40px;
 }
 .td-node-collapse-icon {
-  background-position: -50px -40px;
+  mask-position: -50px -40px;
 }
 
 .td-center-icon {
-  background-position: -75px -40px;
+  mask-position: -75px -40px;
 }
 
 .td-node-merge-icon {
-  background-position: -95px -40px;
+  mask-position: -95px -40px;
 }
 
 .td-send-icon {
-  background-position: -115px -40px;
+  mask-position: -115px -40px;
 }
 
 .td-cancel-icon {
-  background-position: -135px -41px;
+  mask-position: -135px -41px;
 }
 
 .td-download-icon {
-  background-position: -155px -41px;
+  mask-position: -155px -41px;
 }
 
 .td-example-icon {
-  background-position: -181px -41px;
+  mask-position: -181px -41px;
 }
 
 .td-save-icon {
-  background-position: -205px -40px;
+  mask-position: -205px -40px;
 }
 
 .td-upload-icon {
-  background-position: -230px -40px;
+  mask-position: -230px -40px;
 }
 
 .td-postman-icon {
-  background-position: -255px -40px;
-  filter: unset !important;
+  mask-position: -255px -40px;
 }
 
 .td-dupplicate-icon {
-  background-position: -280px -42px;
+  mask-position: -280px -42px;
 }
 
 .td-database-icon {
-  background-position: -300px -40px;
+  mask-position: -300px -40px;
 }
 
 .td-format-icon {
-  background-position: -320px -40px;
+  mask-position: -320px -40px;
 }
 
 .td-test-icon {
-  background-position: -345px -40px;
+  mask-position: -345px -40px;
 }
 
 .td-book-icon {
-  background-position: -370px -40px;
+  mask-position: -370px -40px;
 }
 
 .td-random-icon {
-  background-position: -402px -42.5px;
+  mask-position: -402px -42.5px;
 }
