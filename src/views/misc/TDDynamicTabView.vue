@@ -933,6 +933,7 @@ export default {
 
   border: none;
   background: transparent;
+  color: var(--text-color);
 
   cursor: pointer;
 
@@ -945,6 +946,10 @@ export default {
     opacity 0.18s ease,
     transform 0.18s ease,
     background-color 0.15s ease;
+
+  .td-icon {
+    background-color: var(--text-color);
+  }
 }
 .td-tab-item:hover .td-tab-quick-btn {
   width: 40px;
@@ -979,12 +984,16 @@ export default {
   align-self: center;
   border: 1px solid var(--border-color);
   background-color: var(--bg-main-color);
-  color: var(--text-secondary-color);
+  color: var(--text-color);
   cursor: pointer;
   border-radius: var(--border-radius);
   transition:
     background-color 0.15s ease,
     color 0.15s ease;
+
+  .td-icon {
+    background-color: var(--text-color);
+  }
 }
 
 /* ── Content ── */
