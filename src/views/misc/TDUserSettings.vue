@@ -54,12 +54,13 @@
         ></TDCheckbox>
       </div>
       <div class="flex user-setting-item">
-        <TDCheckbox
-          :variant="$tdEnum.checkboxType.switch"
-          v-model="currentUserSetting.showLoadingMeme"
-          :label="$t('i18nUserSettings.settings.loadingMeme')"
+        <div>{{ $t("i18nUserSettings.settings.loadingType") }}</div>
+        <TDComboBox
+          :width="200"
+          v-model="currentUserSetting.currentLoadingType"
+          :options="loadingOption"
           :noMargin="true"
-        ></TDCheckbox>
+        />
       </div>
       <div class="flex user-setting-item">
         <div>{{ $t("i18nUserSettings.settings.language") }}</div>
@@ -121,6 +122,16 @@ export default {
       languageOption: [
         { value: "vi", label: me.$t("i18nGlobal.language.vi") },
         { value: "en", label: me.$t("i18nGlobal.language.en") },
+      ],
+      loadingOption: [
+        {
+          value: this.$tdEnum.LoadingType.Normal,
+          label: me.$t("i18nUserSettings.loadingType.Normal"),
+        },
+        {
+          value: this.$tdEnum.LoadingType.Meme,
+          label: me.$t("i18nUserSettings.loadingType.Meme"),
+        },
       ],
     };
   },

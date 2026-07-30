@@ -1,3 +1,5 @@
+import tdEnum from "@/common/TDEnum.js";
+
 /**
  * Config default toàn bộ thiết lập mặc định mà user có thể cấu hình bằng tay
  */
@@ -11,6 +13,6 @@ export function getUserSettingDefault() {
     showTabNumber: false,
     toastInHeader: false,
     showCursorTrail: false,
-    showLoadingMeme: true,
+    currentLoadingType: tdEnum.LoadingType.Normal,
   };
 }

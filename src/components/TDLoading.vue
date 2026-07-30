@@ -1,7 +1,10 @@
 <template>
   <div class="flex flex-col td-loading">
-    <div v-if="showMeme" class="meme"></div>
-    <div v-else class="loader"></div>
+    <div v-if="loadingType == $tdEnum.LoadingType.Meme" class="meme"></div>
+    <div
+      v-else-if="loadingType == $tdEnum.LoadingType.Normal"
+      class="loader"
+    ></div>
   </div>
 </template>
 
@@ -15,14 +18,12 @@ export default {
   props: {},
   data() {
     return {
-      showMeme: true,
+      loadingType: this.$tdEnum.LoadingType.Normal,
     };
   },
   async mounted() {
-    let showLoadingMeme = await this.$tdUtility.getUserSettings("showLoadingMeme");
-    if (showLoadingMeme === false) {
-      this.showMeme = false;
-    }
+    this.loadingType =
+      await this.$tdUtility.getUserSettings("currentLoadingType");
   },
   methods: {},
 };

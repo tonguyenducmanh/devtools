@@ -119,6 +119,10 @@ class TDEnum {
     Collection: 1,
     Setting: 2,
   };
+  LoadingType = {
+    Normal: 'normal',
+    Meme: 'meme',
+  };
   PostgreSQLQuerySidebarOption = {
     Help: 0,
     Setting: 1,
