@@ -11,5 +11,6 @@ export function getUserSettingDefault() {
     showTabNumber: false,
     toastInHeader: false,
     showCursorTrail: false,
+    showLoadingMeme: true,
   };
 }

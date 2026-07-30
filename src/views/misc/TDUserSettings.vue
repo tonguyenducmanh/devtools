@@ -54,6 +54,14 @@
         ></TDCheckbox>
       </div>
       <div class="flex user-setting-item">
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="currentUserSetting.showLoadingMeme"
+          :label="$t('i18nUserSettings.settings.loadingMeme')"
+          :noMargin="true"
+        ></TDCheckbox>
+      </div>
+      <div class="flex user-setting-item">
         <div>{{ $t("i18nUserSettings.settings.language") }}</div>
         <TDComboBox
           :width="200"

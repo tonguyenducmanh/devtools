@@ -11,6 +11,7 @@ export default {
       wrapTab: "Multi line tab in Multi tab mode",
       toastInHeader: "Show notifications in header",
       cursorTrail: "Cursor trail effect",
+      loadingMeme: "Loading meme",
     },
   },
 };

@@ -18,6 +18,12 @@ export default {
       showMeme: true,
     };
   },
+  async mounted() {
+    let showLoadingMeme = await this.$tdUtility.getUserSettings("showLoadingMeme");
+    if (showLoadingMeme === false) {
+      this.showMeme = false;
+    }
+  },
   methods: {},
 };
 </script>
