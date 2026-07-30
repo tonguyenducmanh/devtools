@@ -46,6 +46,14 @@
         ></TDCheckbox>
       </div>
       <div class="flex user-setting-item">
+        <TDCheckbox
+          :variant="$tdEnum.checkboxType.switch"
+          v-model="currentUserSetting.showCursorTrail"
+          :label="$t('i18nUserSettings.settings.cursorTrail')"
+          :noMargin="true"
+        ></TDCheckbox>
+      </div>
+      <div class="flex user-setting-item">
         <div>{{ $t("i18nUserSettings.settings.language") }}</div>
         <TDComboBox
           :width="200"

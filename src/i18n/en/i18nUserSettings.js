@@ -10,6 +10,7 @@ export default {
       language: "Language",
       wrapTab: "Multi line tab in Multi tab mode",
       toastInHeader: "Show notifications in header",
+      cursorTrail: "Cursor trail effect",
     },
   },
 };

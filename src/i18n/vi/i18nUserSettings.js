@@ -10,6 +10,7 @@ export default {
       language: "Ngôn ngữ",
       wrapTab: "Multi tab hiển thị nhiều dòng tab",
       toastInHeader: "Hiển thị thông báo trên thanh header",
+      cursorTrail: "Hiệu ứng đuôi chuột",
     },
   },
 };

@@ -10,5 +10,6 @@ export function getUserSettingDefault() {
     showSideBar: true,
     showTabNumber: false,
     toastInHeader: false,
+    showCursorTrail: false,
   };
 }
