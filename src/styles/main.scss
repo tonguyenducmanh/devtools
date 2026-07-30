@@ -82,6 +82,7 @@ body[data-theme="light"] {
   --border-hard-color: rgb(40, 38, 38);
   --trail-cursor-color: #000000;
   --border-component-style: 1px solid #e6e7eb00;
+  --checkbox-thumb-active-color: #000000;
 }
 
 body[data-theme="dark"] {
@@ -110,6 +111,7 @@ body[data-theme="dark"] {
   --border-hard-color: rgb(224, 224, 224);
   --trail-cursor-color: #ddfa42;
   --border-component-style: 1px solid #666666;
+  --checkbox-thumb-active-color: rgb(174, 37, 37);
 }
 
 body {

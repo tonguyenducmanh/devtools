@@ -220,7 +220,7 @@ export default {
 
       .td-switch-thumb {
         transform: translateX(24px);
-        background-color: var(--btn-color);
+        background-color: var(--checkbox-thumb-active-color);
         border-color: var(--btn-color);
       }
     }
