@@ -109,6 +109,8 @@ export default {
     height: 32px;
   }
   .td-content-wrap {
+    border-top: var(--border-component-style);
+    border-bottom: var(--border-component-style);
     padding: var(--padding);
     width: 100%;
     min-height: 0;

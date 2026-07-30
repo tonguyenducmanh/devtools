@@ -165,7 +165,7 @@ body[data-theme="dark"] .agreement {
 }
 body[data-theme="dark"] {
   .main-line-title {
-    color: #33a16f;
+    color: #ddfa42;
   }
   .main-line-title::before {
     background-color: var(--bg-layer-color);
@@ -199,7 +199,7 @@ body[data-theme="dark"] {
 
 body[data-theme="dark"] {
   .main-line-title {
-    color: #33a16f;
+    color: #ddfa42;
   }
   .agreement {
     color: var(--text-color-dark);

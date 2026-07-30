@@ -838,6 +838,7 @@ export default {
 
   &.td-tab-active {
     color: var(--text-color);
+    border: var(--border-component-style);
 
     .td-tab-bg {
       opacity: 1;
@@ -996,6 +997,7 @@ export default {
   overflow: hidden;
   background-color: var(--bg-main-color);
   border-radius: var(--border-radius);
+  border: var(--border-component-style);
 }
 
 .td-tab-pane {

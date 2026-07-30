@@ -81,11 +81,12 @@ body[data-theme="light"] {
   --tooltip-color: #616161;
   --border-hard-color: rgb(40, 38, 38);
   --trail-cursor-color: #000000;
+  --border-component-style: 1px solid #e6e7eb00;
 }
 
 body[data-theme="dark"] {
-  --bg-main-color: #302f30;
-  --bg-layer-color: #161616;
+  --bg-main-color: #000000;
+  --bg-layer-color: rgb(14, 14, 14);
   --text-color: #e5e5e5;
   --bg-active-color: rgb(126, 126, 126);
   --bg-focus-color: #928990;
@@ -108,6 +109,7 @@ body[data-theme="dark"] {
   --tooltip-color: #cccccc;
   --border-hard-color: rgb(224, 224, 224);
   --trail-cursor-color: #ddfa42;
+  --border-component-style: 1px solid #666666;
 }
 
 body {

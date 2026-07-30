@@ -148,7 +148,7 @@ export default {
     getParticleStyle() {
       const isDark = document.body.getAttribute("data-theme") === "dark";
       if (isDark) {
-        const baseColor = "#33a16f";
+        const baseColor = "#ddfa42";
         return {
           color: this.hexToRgba(baseColor, Math.random() * 0.3 + 0.4),
           glow: this.hexToRgba(baseColor, 0.5),
@@ -261,7 +261,7 @@ export default {
     drawConnections() {
       const maxDistance = 150;
       const isDark = document.body.getAttribute("data-theme") === "dark";
-      const baseColor = isDark ? "#33a16f" : "#000000";
+      const baseColor = isDark ? "#ddfa42" : "#000000";
       const lineColor = this.hexToRgba(baseColor, isDark ? 0.25 : 0.15);
 
       for (let i = 0; i < this.particles.length; i++) {

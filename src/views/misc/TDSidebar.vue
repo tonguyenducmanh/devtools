@@ -246,7 +246,7 @@ export default {
   padding: var(--padding);
   border-radius: var(--border-radius);
   animation: slideIn 0.3s ease-out forwards;
-
+  border: var(--border-component-style);
   .td-tool-group {
     flex: 1;
     overflow-y: auto;
