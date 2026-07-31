@@ -52,7 +52,7 @@ func runBackup() error {
 		return err
 	}
 
-	fileName := fmt.Sprintf("%s_backup_%s.db", dbBaseName(), time.Now().Format("2006-01-02_15-04-05"))
+	fileName := fmt.Sprintf("%s_backup_%s.db", dbBaseName(), time.Now().Format("2006-01-02"))
 	destPath := filepath.Join(dir, fileName)
 
 	// VACUUM INTO không ghi đè file đã tồn tại → xóa nếu có (phòng trường hợp trùng tên)
