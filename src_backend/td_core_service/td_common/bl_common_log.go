@@ -2,6 +2,8 @@ package td_common
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"runtime"
 	"slices"
 	"strings"
@@ -66,13 +68,20 @@ func logData(message string, level string) {
 		callerPlain = fmt.Sprintf("%s:%d · %s", shortFile, line, funcName)
 	}
 
-	if !td_config.GetConfigGlobal().LogConfig.LogConsole {
-		return
-	}
-
 	levelPlain, ok := levelLabels[level]
 	if !ok {
 		levelPlain = strings.ToUpper(level)
+	}
+
+	timePlain := time.Now().Format("2006-01-02 15:04:05.000")
+
+	// Ghi log ra file txt theo ngày (nếu được bật trong config)
+	if td_config.GetConfigGlobal().LogConfig.LogFile {
+		writeLogToFile(timePlain, levelPlain, callerPlain, message)
+	}
+
+	if !td_config.GetConfigGlobal().LogConfig.LogConsole {
+		return
 	}
 
 	var levelStyle lipgloss.Style
@@ -89,7 +98,6 @@ func logData(message string, level string) {
 		levelStyle = styleLevelDefault
 	}
 
-	timePlain := time.Now().Format("2006-01-02 15:04:05.000")
 	sep := styleSep.Render("│")
 
 	// Dòng 1: thời gian │ level │ nơi gọi
@@ -110,3 +118,34 @@ func LogInfo(message string)      { logData(message, "info") }
 func LogDebug(message string)     { logData(message, "debug") }
 func LogError(message string)     { logData(message, "error") }
 func LogException(message string) { logData(message, "exception") }
+
+// writeLogToFile ghi log (dạng plain text, không màu ANSI) ra file txt,
+// mỗi ngày 1 file: logs/<yyyy-MM-dd>.txt
+func writeLogToFile(timePlain, levelPlain, callerPlain, message string) {
+	dir := logFileDir()
+	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+		return
+	}
+
+	fileName := "devtool_log_" + time.Now().Format("2006-01-02") + ".txt"
+	path := filepath.Join(dir, fileName)
+
+	line := fmt.Sprintf("%s │ %s │ %s\n%s\n\n", timePlain, levelPlain, callerPlain, message)
+
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+
+	_, _ = f.WriteString(line)
+}
+
+// logFileDir trả về thư mục logs nằm cạnh file thực thi của app
+func logFileDir() string {
+	exe, err := os.Executable()
+	if err != nil {
+		return "logs"
+	}
+	return filepath.Join(filepath.Dir(exe), "logs")
+}

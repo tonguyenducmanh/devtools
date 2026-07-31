@@ -198,6 +198,16 @@ func dbPath() string {
 	return filepath.Join(dir, td_config.GetConfigGlobal().DatabaseName)
 }
 
+// GetDBPath trả về đường dẫn file database đang dùng
+func GetDBPath() string {
+	return dbPath()
+}
+
+// ExecutableDir trả về thư mục chứa file thực thi của app
+func ExecutableDir() string {
+	return executableDir()
+}
+
 func executableDir() string {
 	exe, err := os.Executable()
 	if err != nil {

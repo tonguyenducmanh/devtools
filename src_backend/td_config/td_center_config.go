@@ -12,6 +12,8 @@ type TDCenterConfig struct {
 	MockAPIConfig MockAPIConfig `json:"mock_api_config"`
 	// cấu hình log
 	LogConfig LogConfig `json:"log_config"`
+	// cấu hình cron job nền (backup db + ghi log)
+	CronJobConfig CronJobConfig `json:"cron_job_config"`
 	// cấu hình HTTP client dùng cho API testing (gọi nối từ backend)
 	HTTPClientConfig HTTPClientConfig `json:"http_client_config"`
 	// tên database của app
@@ -24,7 +26,22 @@ type TDCenterConfig struct {
 
 type LogConfig struct {
 	LogConsole bool     `json:"log_console"`
+	LogFile    bool     `json:"log_file"`
 	LevelLog   []string `json:"level_log"`
+}
+
+// CronJobConfig cấu hình các cron job chạy nền trong app
+type CronJobConfig struct {
+	// bật/tắt cron backup database định kỳ
+	EnableBackup bool `json:"enable_backup"`
+	// bật/tắt cron ghi log ra file txt
+	EnableLog bool `json:"enable_log"`
+	// chu kỳ chạy cron (phút)
+	IntervalMinutes int `json:"interval_minutes"`
+	// số bản backup giữ lại tối đa (các bản cũ hơn sẽ bị xóa)
+	KeepBackupCount int `json:"keep_backup_count"`
+	// số ngày giữ lại file log txt
+	KeepLogDays int `json:"keep_log_days"`
 }
 
 type APIConfig struct {
@@ -81,7 +98,15 @@ func DefaultConfig() TDCenterConfig {
 		},
 		LogConfig: LogConfig{
 			LogConsole: true,
+			LogFile:    true,
 			LevelLog:   []string{"info", "debug", "error", "exception"},
+		},
+		CronJobConfig: CronJobConfig{
+			EnableBackup:     true,
+			EnableLog:        true,
+			IntervalMinutes:  30,
+			KeepBackupCount:  30,
+			KeepLogDays:      30,
 		},
 		WebConfig: WebConfig{
 			Port:   1403,
