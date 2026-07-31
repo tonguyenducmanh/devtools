@@ -2,7 +2,11 @@
 <template>
   <teleport to="body">
     <div class="flex flex-col td-toast-container">
-      <transition-group name="td-toast" tag="div">
+      <transition-group
+        name="td-toast"
+        tag="div"
+        class="flex flex-col td-toast-wrapper"
+      >
         <div
           v-for="toast in toasts"
           :key="toast.id"
