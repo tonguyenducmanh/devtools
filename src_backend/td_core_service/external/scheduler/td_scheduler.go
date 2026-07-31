@@ -39,6 +39,7 @@ func StartScheduler() {
 // runAllJobs thực thi toàn bộ cron job theo cấu hình
 func runAllJobs() {
 	cfg := td_config.GetConfigGlobal().CronJobConfig
+	td_common.LogInfo("Cron job bắt đầu chạy định kỳ")
 
 	// Cron job 1: backup database ra folder riêng theo hệ điều hành
 	if cfg.EnableBackup {
@@ -47,9 +48,12 @@ func runAllJobs() {
 		}
 	}
 
-	// Cron job 2: dọn file log txt cũ (giữ KeepLogDays ngày gần nhất)
+	// Cron job 2: ghi log đang buffer ra file txt định kỳ + dọn file log cũ
 	if cfg.EnableLog {
+		// Drain buffer log trong bộ nhớ → ghi xuống file txt (chỉ 1 goroutine ghi file)
+		td_common.FlushLogFile()
 		cleanupOldLogFiles()
-		td_common.LogInfo("Cron job đã chạy định kỳ: hoàn tất backup database và ghi log")
 	}
+
+	td_common.LogInfo("Cron job đã chạy xong định kỳ")
 }

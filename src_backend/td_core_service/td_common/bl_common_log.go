@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"slices"
 	"strings"
+	"sync"
 	"td_config"
 	"time"
 
@@ -35,6 +36,24 @@ var (
 		"error":     "ERROR",
 		"exception": "EXCPT",
 	}
+)
+
+// ── File logger: ghi log ra file txt ĐỊNH KỲ (không ghi trực tiếp mỗi lần gọi) ──
+// Lý do: nếu mỗi lần gọi log lại mở file ghi ngay thì nhiều goroutine sẽ ghi đồng thời
+// vào cùng 1 file → khó kiểm soát. Thay vào đó chỉ append vào buffer (có mutex),
+// cron job (goroutine duy nhất) sẽ drain buffer và ghi xuống file định kỳ.
+
+var (
+	// buffer chứa các dòng log chưa ghi ra file
+	logBufferMu sync.Mutex
+	logBuffer   []string
+
+	// khoá riêng cho việc ghi file → đảm bảo chỉ 1 writer tại 1 thời điểm
+	logFileMu sync.Mutex
+
+	// ngưỡng an toàn: nếu buffer vượt quá số dòng này sẽ flush ngay
+	// (tránh tốn bộ nhớ khi cron chưa kịp chạy)
+	maxLogBufferLines = 5000
 )
 
 func logData(message string, level string) {
@@ -75,9 +94,11 @@ func logData(message string, level string) {
 
 	timePlain := time.Now().Format("2006-01-02 15:04:05.000")
 
-	// Ghi log ra file txt theo ngày (nếu được bật trong config)
+	// Buffer log lại để cron job ghi xuống file txt định kỳ
+	// (không mở file ghi ngay tại đây để tránh ghi đa luồng đồng thời)
 	if td_config.GetConfigGlobal().LogConfig.LogFile {
-		writeLogToFile(timePlain, levelPlain, callerPlain, message)
+		line := fmt.Sprintf("%s │ %s │ %s\n%s\n\n", timePlain, levelPlain, callerPlain, message)
+		appendLogBuffer(line)
 	}
 
 	if !td_config.GetConfigGlobal().LogConfig.LogConsole {
@@ -119,9 +140,45 @@ func LogDebug(message string)     { logData(message, "debug") }
 func LogError(message string)     { logData(message, "error") }
 func LogException(message string) { logData(message, "exception") }
 
-// writeLogToFile ghi log (dạng plain text, không màu ANSI) ra file txt,
-// mỗi ngày 1 file: logs/<yyyy-MM-dd>.txt
-func writeLogToFile(timePlain, levelPlain, callerPlain, message string) {
+// appendLogBuffer thêm 1 dòng log vào buffer trong bộ nhớ (thread-safe).
+// Nếu buffer vượt ngưỡng an toàn thì flush ngay để tránh tốn bộ nhớ.
+func appendLogBuffer(line string) {
+	logBufferMu.Lock()
+	logBuffer = append(logBuffer, line)
+	overflow := len(logBuffer) >= maxLogBufferLines
+	logBufferMu.Unlock()
+
+	if overflow {
+		FlushLogFile()
+	}
+}
+
+// FlushLogFile drain toàn bộ log trong buffer và ghi xuống file txt theo ngày.
+// Được gọi định kỳ bởi cron job. Thread-safe: buffer được drain dưới mutex,
+// còn việc ghi file được nối tiếp dưới logFileMu (chỉ 1 writer).
+func FlushLogFile() {
+	logBufferMu.Lock()
+	if len(logBuffer) == 0 {
+		logBufferMu.Unlock()
+		return
+	}
+	lines := logBuffer
+	logBuffer = nil
+	logBufferMu.Unlock()
+
+	writeLogLines(lines)
+}
+
+// writeLogLines ghi các dòng log (plain text, không màu ANSI) vào file txt,
+// mỗi ngày 1 file: logs/devtool_log_<yyyy-MM-dd>.txt
+func writeLogLines(lines []string) {
+	logFileMu.Lock()
+	defer logFileMu.Unlock()
+
+	if len(lines) == 0 {
+		return
+	}
+
 	dir := logFileDir()
 	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
 		return
@@ -130,15 +187,15 @@ func writeLogToFile(timePlain, levelPlain, callerPlain, message string) {
 	fileName := "devtool_log_" + time.Now().Format("2006-01-02") + ".txt"
 	path := filepath.Join(dir, fileName)
 
-	line := fmt.Sprintf("%s │ %s │ %s\n%s\n\n", timePlain, levelPlain, callerPlain, message)
-
 	f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}
 	defer f.Close()
 
-	_, _ = f.WriteString(line)
+	for _, line := range lines {
+		_, _ = f.WriteString(line)
+	}
 }
 
 // logFileDir trả về thư mục logs nằm cạnh file thực thi của app
