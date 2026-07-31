@@ -157,16 +157,18 @@ func appendLogBuffer(line string) {
 // Được gọi định kỳ bởi cron job. Thread-safe: buffer được drain dưới mutex,
 // còn việc ghi file được nối tiếp dưới logFileMu (chỉ 1 writer).
 func FlushLogFile() {
-	logBufferMu.Lock()
-	if len(logBuffer) == 0 {
+	if td_config.GetConfigGlobal().LogConfig.LogFile {
+		logBufferMu.Lock()
+		if len(logBuffer) == 0 {
+			logBufferMu.Unlock()
+			return
+		}
+		lines := logBuffer
+		logBuffer = nil
 		logBufferMu.Unlock()
-		return
-	}
-	lines := logBuffer
-	logBuffer = nil
-	logBufferMu.Unlock()
 
-	writeLogLines(lines)
+		writeLogLines(lines)
+	}
 }
 
 // writeLogLines ghi các dòng log (plain text, không màu ANSI) vào file txt,
