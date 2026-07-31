@@ -22,9 +22,6 @@ func StartScheduler() {
 
 	// Chạy ngầm trên goroutine riêng, không block main
 	go func() {
-		// Chạy 1 lần ngay khi khởi động
-		runAllJobs()
-
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
 
@@ -39,7 +36,6 @@ func StartScheduler() {
 // runAllJobs thực thi toàn bộ cron job theo cấu hình
 func runAllJobs() {
 	cfg := td_config.GetConfigGlobal().CronJobConfig
-	td_common.LogInfo("Cron job bắt đầu chạy định kỳ")
 
 	// Cron job 1: backup database ra folder riêng theo hệ điều hành
 	if cfg.EnableBackup {
@@ -55,5 +51,4 @@ func runAllJobs() {
 		cleanupOldLogFiles()
 	}
 
-	td_common.LogInfo("Cron job đã chạy xong định kỳ")
 }
