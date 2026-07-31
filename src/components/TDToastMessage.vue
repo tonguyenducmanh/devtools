@@ -1,7 +1,7 @@
 <!-- components/ToastContainer.vue -->
 <template>
   <teleport to="body">
-    <div class="td-toast-container">
+    <div class="flex flex-col td-toast-container">
       <transition-group name="td-toast" tag="div">
         <div
           v-for="toast in toasts"
@@ -128,13 +128,11 @@ export default {
 <style scoped>
 .td-toast-container {
   position: fixed;
-  top: 10px;
+  top: var(--padding);
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  gap: var(--padding);
   max-width: calc(100vw - 40px);
   pointer-events: none;
 }
@@ -155,7 +153,9 @@ export default {
   position: relative;
   overflow: hidden;
   pointer-events: auto;
-  margin-top: 10px;
+  margin-top: var(--padding);
+  box-sizing: border-box;
+  width: fit-content;
 }
 
 .td-toast-content {
