@@ -144,12 +144,9 @@ export default {
 .toast {
   cursor: pointer;
   background-color: var(--bg-main-color);
-  border-radius: calc(var(--border-radius) * 1.5);
-
-  box-shadow:
-    0 10px 25px rgba(0, 0, 0, 0.1),
-    0 4px 6px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-component);
+  box-shadow: var(--box-shadow);
+  border: 1px solid var(--btn-secondary-focus-color);
   padding: var(--padding);
   display: flex;
   align-items: center;
@@ -165,7 +162,7 @@ export default {
 .td-toast-content {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--padding);
   flex: 1;
 }
 
@@ -173,7 +170,6 @@ export default {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  margin-top: 2px;
 }
 
 .td-toast-success .td-toast-icon {
@@ -195,28 +191,6 @@ export default {
 .td-toast-message {
   flex: 1;
   min-width: 0;
-}
-
-.td-toast-close {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  color: #9ca3af;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 8px;
-}
-
-.td-toast-close:hover {
-  background: #f3f4f6;
-  color: #6b7280;
 }
 
 /* Animation transitions */
