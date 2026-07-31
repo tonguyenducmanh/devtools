@@ -135,7 +135,6 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  width: 350px;
   max-width: calc(100vw - 40px);
   pointer-events: none;
 }
@@ -149,11 +148,10 @@ export default {
     0 10px 25px rgba(0, 0, 0, 0.1),
     0 4px 6px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--border-color);
-  padding: 16px;
+  padding: var(--padding);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 60px;
   position: relative;
   overflow: hidden;
   pointer-events: auto;
