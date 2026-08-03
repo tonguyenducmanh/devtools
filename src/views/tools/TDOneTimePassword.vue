@@ -742,7 +742,6 @@ export default {
     }
     .otp-value {
       font-size: 30px;
-      color: var(--focus-color);
       font-weight: 700;
       cursor: pointer;
     }
@@ -752,11 +751,6 @@ export default {
   }
 }
 
-body[data-theme="dark"] {
-  .otp-value {
-    color: var(--text-color) !important;
-  }
-}
 .otp-header {
   width: 100%;
   .td-first-header {

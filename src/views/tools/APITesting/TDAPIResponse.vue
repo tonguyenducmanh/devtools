@@ -161,28 +161,6 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  .td-top-right-btn {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    border: 1px solid var(--bg-layer-color);
-    padding: var(--padding);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    background-color: rgba(255, 255, 255, 0.206);
-  }
-  .td-top-right-btn:hover {
-    cursor: pointer;
-    background-color: var(--bg-main-color);
-    color: var(--focus-color);
-  }
-}
-body[data-theme="dark"] .td-top-right-btn:hover {
-  cursor: pointer;
-  background-color: var(--bg-layer-color);
-}
-body[data-theme="dark"] .td-top-right-btn {
-  border: 1px solid var(--bg-main-color);
 }
 .td-header-options {
   width: 100%;

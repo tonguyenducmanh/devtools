@@ -125,9 +125,6 @@ export default {
   width: 95%;
   margin: var(--padding);
 }
-body[data-theme="dark"] .agreement {
-  color: var(--text-color-dark);
-}
 .language-buttons {
   display: flex;
   gap: 10px;
@@ -177,16 +174,6 @@ body[data-theme="dark"] .agreement {
   visibility: visible;
   z-index: 1;
 }
-body[data-theme="dark"] {
-  .main-line-title {
-    color: #ddfa42;
-  }
-  .main-line-title::before {
-    background-color: var(--bg-layer-color);
-    mix-blend-mode: lighten;
-  }
-}
-
 .description {
   font-family: var(--straight-font);
   font-size: 2cqw;
@@ -211,12 +198,4 @@ body[data-theme="dark"] {
   }
 }
 
-body[data-theme="dark"] {
-  .main-line-title {
-    color: #ddfa42;
-  }
-  .agreement {
-    color: var(--text-color-dark);
-  }
-}
 </style>
