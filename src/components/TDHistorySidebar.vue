@@ -13,9 +13,11 @@
           @click="addKeyword"
         ></TDButton>
         <TDComboBox
+          class="flex-one"
           v-model="searchOperator"
           :options="operatorOptions"
           :width="100"
+          :usingStylePercent="true"
           :noMargin="true"
         />
       </div>
