@@ -61,6 +61,7 @@ export default {
       show: "History",
       hide: "Hide History",
       emptyMessage: "History will appear here",
+      deleteAllWithCount: "Delete {0} history",
     },
     tdheader: {
       toggleTheme: "Change theme",

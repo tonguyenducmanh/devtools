@@ -62,6 +62,7 @@ export default {
       show: "Lịch sử",
       hide: "Ẩn lịch sử",
       emptyMessage: "Lịch sử sẽ hiển thị ở đây",
+      deleteAllWithCount: "Xóa {0} lịch sử",
     },
     tdheader: {
       toggleTheme: "Thay đổi chủ đề",

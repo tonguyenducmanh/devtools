@@ -30,13 +30,13 @@
       </div>
     </div>
     <div v-else class="td-history-empty">
-      <span>{{ $t('i18nCommon.history.emptyMessage') }}</span>
+      <span>{{ $t("i18nCommon.history.emptyMessage") }}</span>
     </div>
     <TDButton
       v-if="historyItems && historyItems.length > 0"
       @click="clearAllHistory"
       :type="$tdEnum.buttonType.secondary"
-      :label="$t('i18nCommon.deleteAll')"
+      :label="deleteAllLabel"
     ></TDButton>
   </div>
 </template>
@@ -64,7 +64,16 @@ export default {
   data() {
     return {};
   },
-  computed: {},
+  computed: {
+    deleteAllLabel() {
+      let me = this;
+      let total = me.historyItems?.length || 0;
+      if (total > 0) {
+        return me.$t("i18nCommon.history.deleteAllWithCount").format(total);
+      }
+      return me.$t("i18nCommon.deleteAll");
+    },
+  },
   methods: {},
 };
 </script>
@@ -106,8 +115,6 @@ export default {
   align-items: center;
   width: 100%;
   height: 100%;
-  color: var(--text-secondary-color);
-  font-style: italic;
 }
 .text-nowrap {
   max-width: 230px;
