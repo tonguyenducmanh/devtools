@@ -100,6 +100,7 @@ export default {
     if (this.debouncedSaveToHistory?.cancel) {
       this.debouncedSaveToHistory.cancel();
     }
+    this.saveToHistory();
   },
   data() {
     return {
