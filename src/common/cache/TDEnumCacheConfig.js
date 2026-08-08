@@ -53,4 +53,7 @@ export const EnumCacheConfig = {
   HTMLPreviewConfigLayout: 58,
   TextToQRCodeHistory: 59,
   BlankTextHistory: 60,
+  JSONToOneLineStringHistory: 61,
+  JSONToModelHistory: 62,
+  JSONSortByKeyHistory: 63,
 };

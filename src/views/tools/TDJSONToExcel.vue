@@ -71,6 +71,21 @@
           class="flex flex-col td-sub-sidebar"
           v-show="
             currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.History
+          "
+        >
+          <TDHistorySidebar
+            ref="history"
+            :applyFunction="handleApplyHistory"
+            titleKey="jsonSource"
+            :noMargin="true"
+            :cacheKey="$tdEnum.cacheConfig.JSONToExcelHistory"
+          />
+        </div>
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
             $tdEnum.ToolSidebarOption.Setting
           "
         >
@@ -115,10 +130,15 @@ import ExcelJS from "exceljs";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDJSONToExcelHelp from "@/views/helps/TDJSONToExcelHelp.vue";
+import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 export default {
   extends: TDToolBase,
   name: "TDJSONToExcel",
-  components: { TDSubSidebar, TDJSONToExcelHelp },
+  components: {
+    TDSubSidebar,
+    TDJSONToExcelHelp,
+    TDHistorySidebar,
+  },
   computed: {
     sidebarOptions() {
       let options = [];
@@ -131,6 +151,11 @@ export default {
         value: this.$tdEnum.ToolSidebarOption.Setting,
         label: this.$t("i18nCommon.sidebarOption.setting"),
         icon: "td-setting-icon",
+      });
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.History,
+        label: this.$t("i18nCommon.history.title"),
+        icon: "td-history-icon",
       });
       return options;
     },
@@ -258,11 +283,35 @@ export default {
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           me.fileName,
         );
+        await me.saveToHistory();
 
         me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
       } catch (error) {
         console.error("Convert excel error:", error);
         me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+      }
+    },
+    /**
+     * Lưu input JSON hiện tại vào lịch sử
+     */
+    async saveToHistory() {
+      let me = this;
+      if (me.$refs.history && me.jsonSource) {
+        let historyItem = {
+          jsonSource: me.jsonSource,
+        };
+        await me.$refs.history.saveToHistory(historyItem);
+      }
+    },
+    /**
+     * Áp dụng input từ lịch sử (chỉ set input, không tự tải file)
+     * @param {Object} item - Item lịch sử
+     */
+    handleApplyHistory(item) {
+      let me = this;
+      if (item && item.jsonSource) {
+        me.jsonSource = item.jsonSource;
+        me.currentConfigLayout.enableFileUpload = false;
       }
     },
   },

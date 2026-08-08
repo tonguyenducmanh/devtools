@@ -96,6 +96,21 @@
           class="flex flex-col td-sidebar-content"
           v-show="
             currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.History
+          "
+        >
+          <TDHistorySidebar
+            ref="history"
+            :applyFunction="handleApplyHistory"
+            titleKey="inputJSON"
+            :noMargin="true"
+            :cacheKey="$tdEnum.cacheConfig.JSONToPostgreSQLHistory"
+          />
+        </div>
+        <div
+          class="flex flex-col td-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
             $tdEnum.ToolSidebarOption.Setting
           "
         >
@@ -155,6 +170,7 @@
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDJSONToPostgreSQLHelp from "@/views/helps/TDJSONToPostgreSQLHelp.vue";
+import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 import {
   jsonToPostgreSQL,
   buildCreateTableScript,
@@ -166,7 +182,7 @@ import {
 export default {
   extends: TDToolBase,
   name: "TDJSONToPostgreSQL",
-  components: { TDSubSidebar, TDJSONToPostgreSQLHelp },
+  components: { TDSubSidebar, TDJSONToPostgreSQLHelp, TDHistorySidebar },
   watch: {
     tableName(oldVal, newVal) {
       if (oldVal != newVal) {
@@ -186,6 +202,11 @@ export default {
         value: this.$tdEnum.ToolSidebarOption.Setting,
         label: this.$t("i18nCommon.sidebarOption.setting"),
         icon: "td-setting-icon",
+      });
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.History,
+        label: this.$t("i18nCommon.history.title"),
+        icon: "td-history-icon",
       });
       return options;
     },
@@ -218,6 +239,7 @@ export default {
           config.enableDeleteScript = me.currentConfigLayout.enableDeleteScript;
           config.enableCreateTable = me.currentConfigLayout.enableCreateTable;
           me.outputSQL = jsonToPostgreSQL(source, config);
+          await me.saveToHistory();
           me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
         }
       } catch (error) {
@@ -259,6 +281,35 @@ export default {
           blob,
           `${me.tableName || "export"}.sql`,
         );
+      }
+    },
+    /**
+     * Lưu input JSON và cấu hình hiện tại vào lịch sử
+     */
+    async saveToHistory() {
+      let me = this;
+      if (me.$refs.history && me.inputJSON) {
+        let historyItem = {
+          inputJSON: me.inputJSON,
+          tableName: me.tableName,
+          schemaName: me.schemaName,
+          primaryKeyField: me.primaryKeyField,
+        };
+        await me.$refs.history.saveToHistory(historyItem);
+      }
+    },
+    /**
+     * Áp dụng input từ lịch sử
+     * @param {Object} item - Item lịch sử
+     */
+    async handleApplyHistory(item) {
+      let me = this;
+      if (item && item.inputJSON) {
+        me.inputJSON = item.inputJSON;
+        me.tableName = item.tableName;
+        me.schemaName = item.schemaName;
+        me.primaryKeyField = item.primaryKeyField;
+        await me.convertToPostgresSQL();
       }
     },
   },

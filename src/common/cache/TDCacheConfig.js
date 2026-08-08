@@ -322,4 +322,22 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử tool blank text",
   },
+  JSONToOneLineStringHistory: {
+    KeyFormat: "JSONToOneLineStringHistory",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử json convert thành 1 dòng string",
+  },
+  JSONToModelHistory: {
+    KeyFormat: "JSONToModelHistory",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử json convert thành model",
+  },
+  JSONSortByKeyHistory: {
+    KeyFormat: "JSONSortByKeyHistory",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử json sort by key",
+  },
 };

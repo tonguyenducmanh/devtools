@@ -54,6 +54,21 @@
           class="flex flex-col td-sidebar-content"
           v-show="
             currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.History
+          "
+        >
+          <TDHistorySidebar
+            ref="history"
+            :applyFunction="handleApplyHistory"
+            titleKey="inputJSON"
+            :noMargin="true"
+            :cacheKey="$tdEnum.cacheConfig.JSONSortByKeyHistory"
+          />
+        </div>
+        <div
+          class="flex flex-col td-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
             $tdEnum.ToolSidebarOption.Setting
           "
         >
@@ -73,11 +88,12 @@
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDJSONSortByKeyHelp from "@/views/helps/TDJSONSortByKeyHelp.vue";
+import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 
 export default {
   extends: TDToolBase,
   name: "TDJSONSortByKey",
-  components: { TDSubSidebar, TDJSONSortByKeyHelp },
+  components: { TDSubSidebar, TDJSONSortByKeyHelp, TDHistorySidebar },
   created() {},
   beforeUnmount() {},
   mounted() {},
@@ -94,6 +110,11 @@ export default {
         value: this.$tdEnum.ToolSidebarOption.Setting,
         label: this.$t("i18nCommon.sidebarOption.setting"),
         icon: "td-setting-icon",
+      });
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.History,
+        label: this.$t("i18nCommon.history.title"),
+        icon: "td-history-icon",
       });
       return options;
     },
@@ -124,6 +145,7 @@ export default {
         const parsed = JSON.parse(me.inputJSON.trim());
         const sorted = me.sortObject(parsed);
         me.inputJSON = JSON.stringify(sorted, null, 2);
+        me.saveToHistory();
         me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
       } catch (error) {
         console.error("Error in sortJSON:", error);
@@ -205,6 +227,29 @@ export default {
         null,
         2,
       );
+    },
+    /**
+     * Lưu input JSON hiện tại vào lịch sử
+     */
+    async saveToHistory() {
+      let me = this;
+      if (me.$refs.history && me.inputJSON) {
+        let historyItem = {
+          inputJSON: me.inputJSON,
+        };
+        await me.$refs.history.saveToHistory(historyItem);
+      }
+    },
+    /**
+     * Áp dụng input từ lịch sử
+     * @param {Object} item - Item lịch sử
+     */
+    handleApplyHistory(item) {
+      let me = this;
+      if (item && item.inputJSON) {
+        me.inputJSON = item.inputJSON;
+        me.sortJSON();
+      }
     },
   },
 

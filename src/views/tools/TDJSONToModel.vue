@@ -72,6 +72,21 @@
           class="flex flex-col td-sidebar-content"
           v-show="
             currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.History
+          "
+        >
+          <TDHistorySidebar
+            ref="history"
+            :applyFunction="handleApplyHistory"
+            titleKey="inputJSON"
+            :noMargin="true"
+            :cacheKey="$tdEnum.cacheConfig.JSONToModelHistory"
+          />
+        </div>
+        <div
+          class="flex flex-col td-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
             $tdEnum.ToolSidebarOption.Setting
           "
         >
@@ -180,6 +195,7 @@
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDJSONToModelHelp from "@/views/helps/TDJSONToModelHelp.vue";
+import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 
 const LANG = {
   CSharp: "csharp",
@@ -188,7 +204,7 @@ const LANG = {
 export default {
   extends: TDToolBase,
   name: "TDJSONToModel",
-  components: { TDSubSidebar, TDJSONToModelHelp },
+  components: { TDSubSidebar, TDJSONToModelHelp, TDHistorySidebar },
   created() {},
   beforeUnmount() {},
   mounted() {},
@@ -205,6 +221,11 @@ export default {
         value: this.$tdEnum.ToolSidebarOption.Setting,
         label: this.$t("i18nCommon.sidebarOption.setting"),
         icon: "td-setting-icon",
+      });
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.History,
+        label: this.$t("i18nCommon.history.title"),
+        icon: "td-history-icon",
       });
       return options;
     },
@@ -252,6 +273,7 @@ export default {
         } else {
           me.outputModel = me.buildGo(parsed, rootName);
         }
+        me.saveToHistory();
         me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
       } catch (error) {
         console.error("Error in convertToModel:", error);
@@ -562,6 +584,37 @@ export default {
     handleCopyEvent() {
       let me = this;
       me.$tdUtility.copyToClipboard(me.outputModel);
+    },
+    /**
+     * Lưu input JSON hiện tại vào lịch sử
+     */
+    async saveToHistory() {
+      let me = this;
+      if (me.$refs.history && me.inputJSON) {
+        let historyItem = {
+          inputJSON: me.inputJSON,
+          rootClassName: me.rootClassName,
+          selectedLanguage: me.selectedLanguage,
+        };
+        await me.$refs.history.saveToHistory(historyItem);
+      }
+    },
+    /**
+     * Áp dụng input từ lịch sử
+     * @param {Object} item - Item lịch sử
+     */
+    handleApplyHistory(item) {
+      let me = this;
+      if (item && item.inputJSON) {
+        me.inputJSON = item.inputJSON;
+        if (item.rootClassName) {
+          me.rootClassName = item.rootClassName;
+        }
+        if (item.selectedLanguage) {
+          me.selectedLanguage = item.selectedLanguage;
+        }
+        me.convertToModel();
+      }
     },
 
     async applyMock() {
