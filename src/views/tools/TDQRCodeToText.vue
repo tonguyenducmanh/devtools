@@ -67,6 +67,20 @@
           class="flex flex-col td-sub-sidebar"
           v-show="
             currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.History
+          "
+        >
+          <TDHistorySidebar
+            ref="history"
+            :applyFunction="handleApplyHistory"
+            :noMargin="true"
+            :cacheKey="$tdEnum.cacheConfig.QRCodeToTextHistory"
+          />
+        </div>
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
             $tdEnum.ToolSidebarOption.Setting
           "
         >
@@ -96,12 +110,13 @@
 <script>
 import TDCompress from "@/common/compress/TDCompress.js";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDQRCodeToTextHelp from "@/views/helps/TDQRCodeToTextHelp.vue";
 export default {
   extends: TDToolBase,
   name: "TDQRCodeToText",
-  components: { TDSubSidebar, TDQRCodeToTextHelp },
+  components: { TDSubSidebar, TDQRCodeToTextHelp, TDHistorySidebar },
   computed: {
     sidebarOptions() {
       let options = [];
@@ -114,6 +129,11 @@ export default {
         value: this.$tdEnum.ToolSidebarOption.Setting,
         label: this.$t("i18nCommon.sidebarOption.setting"),
         icon: "td-setting-icon",
+      });
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.History,
+        label: this.$t("i18nCommon.history.title"),
+        icon: "td-history-icon",
       });
       return options;
     },
@@ -192,6 +212,7 @@ export default {
             } else {
               me.textOutput = finalOutput;
             }
+            await me.saveToHistory(me.textOutput);
           }
           me.$tdToast.success(me.$t("i18nCommon.toastMessage.converted"));
         } catch (error) {
@@ -200,6 +221,32 @@ export default {
         } finally {
           me.isLoading = false;
         }
+      }
+    },
+
+    /**
+     * Lưu text đã đọc từ QR code vào lịch sử
+     * @param {string} text - Text đã đọc được
+     */
+    async saveToHistory(text) {
+      let me = this;
+      if (me.$refs.history && text) {
+        let historyItem = {
+          qrCodeToText: text,
+        };
+        await me.$refs.history.saveToHistory(historyItem);
+      }
+    },
+
+    /**
+     * Áp dụng text từ lịch sử
+     * @param {Object|string} item - Item lịch sử
+     */
+    handleApplyHistory(item) {
+      let me = this;
+      let text = typeof item === "string" ? item : item && item.qrCodeToText;
+      if (text) {
+        me.textOutput = text;
       }
     },
 

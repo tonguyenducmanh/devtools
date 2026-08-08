@@ -56,4 +56,5 @@ export const EnumCacheConfig = {
   JSONToOneLineStringHistory: 61,
   JSONToModelHistory: 62,
   JSONSortByKeyHistory: 63,
+  QRCodeToTextHistory: 64,
 };

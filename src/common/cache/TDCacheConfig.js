@@ -340,4 +340,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử json sort by key",
   },
+  QRCodeToTextHistory: {
+    KeyFormat: "QRCodeToTextHistory",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử tool QR code to text",
+  },
 };
