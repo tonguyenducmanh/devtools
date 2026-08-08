@@ -78,12 +78,24 @@
           : $t("i18nCommon.history.emptyMessage")
       }}</span>
     </div>
-    <TDButton
+    <div
       v-if="historyItems && historyItems.length > 0"
-      @click="clearAllHistory"
-      :type="$tdEnum.buttonType.secondary"
-      :label="deleteAllLabel"
-    ></TDButton>
+      class="flex td-history-filter-footer"
+    >
+      <TDButton
+        :noMargin="true"
+        :readOnly="!hasValidKeywords"
+        @click="clearAllSearch"
+        :type="$tdEnum.buttonType.secondary"
+        :label="$t('i18nCommon.history.filterClear')"
+      ></TDButton>
+      <TDButton
+        :noMargin="true"
+        @click="clearAllHistory"
+        :type="$tdEnum.buttonType.secondary"
+        :label="deleteAllLabel"
+      ></TDButton>
+    </div>
   </div>
 </template>
 
@@ -148,6 +160,10 @@ export default {
       let last = (me.keywords || [])[me.keywords.length - 1];
       return !!(last && last.value && last.value.trim().length > 0);
     },
+    hasValidKeywords() {
+      let me = this;
+      return me.getValidKeywords().length > 0;
+    },
     deleteAllLabel() {
       let me = this;
       let total = me.historyItems?.length || 0;
@@ -165,6 +181,11 @@ export default {
     removeKeyword(index) {
       let me = this;
       me.keywords.splice(index, 1);
+    },
+    clearAllSearch() {
+      let me = this;
+      me.keywords = [{ value: "" }];
+      me.searchOperator = OPERATOR.AND;
     },
     getValidKeywords() {
       let me = this;
@@ -256,6 +277,11 @@ export default {
   align-items: center;
   width: 100%;
   height: 100%;
+}
+.td-history-filter-footer {
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--padding);
 }
 .text-nowrap {
   max-width: 230px;

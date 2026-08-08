@@ -66,6 +66,7 @@ export default {
       filterAnd: "AND",
       filterOr: "OR",
       filterAdd: "Add search condition",
+      filterClear: "Clear search",
       filterEmptyResult: "No matching results",
     },
     tdheader: {

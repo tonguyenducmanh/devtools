@@ -67,6 +67,7 @@ export default {
       filterAnd: "And",
       filterOr: "Or",
       filterAdd: "Thêm điều kiện tìm",
+      filterClear: "Xóa tìm kiếm",
       filterEmptyResult: "Không có kết quả phù hợp",
     },
     tdheader: {
