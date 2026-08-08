@@ -63,6 +63,11 @@ export default {
       hide: "Ẩn lịch sử",
       emptyMessage: "Lịch sử sẽ hiển thị ở đây",
       deleteAllWithCount: "Xóa {0} lịch sử",
+      filterPlaceholder: "Nhập nội dung cần tìm...",
+      filterAnd: "And",
+      filterOr: "Or",
+      filterAdd: "Thêm điều kiện tìm",
+      filterEmptyResult: "Không có kết quả phù hợp",
     },
     tdheader: {
       toggleTheme: "Thay đổi chủ đề",

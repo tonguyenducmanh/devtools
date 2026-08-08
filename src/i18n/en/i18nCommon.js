@@ -62,6 +62,11 @@ export default {
       hide: "Hide History",
       emptyMessage: "History will appear here",
       deleteAllWithCount: "Delete {0} history",
+      filterPlaceholder: "Type content to search...",
+      filterAnd: "AND",
+      filterOr: "OR",
+      filterAdd: "Add search condition",
+      filterEmptyResult: "No matching results",
     },
     tdheader: {
       toggleTheme: "Change theme",
