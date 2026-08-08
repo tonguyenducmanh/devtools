@@ -1,5 +1,8 @@
 export default {
   i18nCommon: {
+    appName: {
+      storiesApp: "Chuyện với Mạnh",
+    },
     tabManager: {
       addNewTab: "Mở tab mới",
       closeTab: "Đóng tab này",

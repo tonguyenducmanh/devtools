@@ -21,6 +21,9 @@
           <span>{{ $t(`i18nCommon.${menuKey}.title`) }}</span>
         </div>
       </div>
+      <div class="td-menu-item td-stories-app-title" @click="goToStoriesApp">
+        {{ $t(`i18nCommon.appName.storiesApp`) }}
+      </div>
     </div>
 
     <div class="td-header-toast">
@@ -206,6 +209,13 @@ export default {
     goToWelcome() {
       this.exitTabMode();
     },
+    goToStoriesApp() {
+      let me = this;
+      let url = window.__env?.StoriesApp;
+      if (url) {
+        window.open(url, "_blank");
+      }
+    },
     userSettingsFunc() {
       this.openTab({
         titleKey: "i18nCommon.feature.userSettings",
@@ -351,6 +361,12 @@ export default {
     .td-header-toast--info {
       color: #3b82f6;
     }
+  }
+
+  .td-stories-app-title {
+    font-size: var(--font-size-medium-rare);
+    color: var(--text-color);
+    cursor: pointer;
   }
 }
 </style>

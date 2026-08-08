@@ -1,5 +1,8 @@
 export default {
   i18nCommon: {
+    appName: {
+      storiesApp: "Manh's stories",
+    },
     tabManager: {
       addNewTab: "Add new tab",
       closeTab: "Close this tab",
