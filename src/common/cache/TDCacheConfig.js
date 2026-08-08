@@ -220,12 +220,6 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool Remote Desktop RDP",
   },
-  MindMapConfigLayout: {
-    KeyFormat: "MindMapConfigLayout",
-    CacheLevel: tdEnum.cacheType.local,
-    ExpireTime: 0,
-    Note: "cache cấu hình layout tool Mind Map",
-  },
   BilingualWebConfigLayout: {
     KeyFormat: "BilingualWebConfigLayout",
     CacheLevel: tdEnum.cacheType.local,
@@ -315,5 +309,17 @@ export const TDCacheConfig = {
     CacheLevel: tdEnum.cacheType.local,
     ExpireTime: 0,
     Note: "cache cấu hình layout tool HTML Preview",
+  },
+  TextToQRCodeHistory: {
+    KeyFormat: "TextToQRCodeHistory",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử text to QR code",
+  },
+  BlankTextHistory: {
+    KeyFormat: "BlankTextHistory",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử tool blank text",
   },
 };

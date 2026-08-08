@@ -35,7 +35,6 @@ export const EnumCacheConfig = {
   WelcomeLayout: 39,
   RemoteDesktopConfigLayout: 40,
   JSONSortByKeyConfigLayout: 41,
-  MindMapConfigLayout: 42,
   MindMapHistory: 43,
   PostgreSQLTemplateConfigLayout: 44,
   BilingualWebConfigLayout: 45,
@@ -52,4 +51,6 @@ export const EnumCacheConfig = {
   TDAutomationConfigLayout: 56,
   ExcelToJSONConfigLayout: 57,
   HTMLPreviewConfigLayout: 58,
+  TextToQRCodeHistory: 59,
+  BlankTextHistory: 60,
 };

@@ -384,6 +384,12 @@ export default {
           me.debounceUpdateValToEditor();
         });
 
+        // Lắng nghe sự kiện thay đổi nội dung để notify cha biết khi đang gõ
+        // (chỉ emit event change, không ghi ngược lại v-model để tránh làm nhảy con trỏ)
+        me.editor.onDidChangeModelContent(function () {
+          me.$emit("change", me.editor.getValue());
+        });
+
         // cập nhật cursor position trên footer mỗi khi con trỏ di chuyển
         me.editor.onDidChangeCursorPosition(function (e) {
           me.updateFooterCursorPosition(e.position);

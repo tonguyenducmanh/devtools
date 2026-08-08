@@ -114,6 +114,21 @@
           class="flex flex-col td-sub-sidebar"
           v-show="
             currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.History
+          "
+        >
+          <TDHistorySidebar
+            ref="history"
+            :applyFunction="handleApplyHistory"
+            titleKey="textGenQR"
+            :noMargin="true"
+            :cacheKey="$tdEnum.cacheConfig.TextToQRCodeHistory"
+          />
+        </div>
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
             $tdEnum.ToolSidebarOption.Setting
           "
         >
@@ -181,10 +196,16 @@ import TDMockTextGenerate from "@/common/mock/TDMockTextGenerate.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDTextToQRCodeHelp from "@/views/helps/TDTextToQRCodeHelp.vue";
 import TDFullTabWrapper from "@/components/TDFullTabWrapper.vue";
+import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 export default {
   extends: TDToolBase,
   name: "TDTextToQRCode",
-  components: { TDSubSidebar, TDTextToQRCodeHelp, TDFullTabWrapper },
+  components: {
+    TDSubSidebar,
+    TDTextToQRCodeHelp,
+    TDFullTabWrapper,
+    TDHistorySidebar,
+  },
   created() {
     let me = this;
   },
@@ -260,7 +281,35 @@ export default {
       chunks.forEach((chunk) => {
         me.generateQRCodeJS(chunk);
       });
+      await me.saveToHistory(text);
       me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+    },
+
+    /**
+     * Lưu text đã generate QR code vào lịch sử
+     * @param {string} text - Text đã generate
+     */
+    async saveToHistory(text) {
+      let me = this;
+      if (me.$refs.history && text) {
+        let historyItem = {
+          textGenQR: text,
+        };
+        await me.$refs.history.saveToHistory(historyItem);
+      }
+    },
+
+    /**
+     * Áp dụng text từ lịch sử
+     * @param {Object|string} item - Item lịch sử
+     */
+    async handleApplyHistory(item) {
+      let me = this;
+      let text = typeof item === "string" ? item : item && item.textGenQR;
+      if (text) {
+        me.textGenQR = text;
+        await me.generateQRCode(text);
+      }
     },
 
     /**
@@ -426,6 +475,11 @@ export default {
         value: this.$tdEnum.ToolSidebarOption.Setting,
         label: this.$t("i18nCommon.sidebarOption.setting"),
         icon: "td-setting-icon",
+      });
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.History,
+        label: this.$t("i18nCommon.history.title"),
+        icon: "td-history-icon",
       });
       return options;
     },

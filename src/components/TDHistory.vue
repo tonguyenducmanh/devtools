@@ -106,6 +106,14 @@ export default {
       type: Boolean,
       default: false, // Mặc định không append duplicate
     },
+    /**
+     * Số lượng lịch sử tối đa lưu trữ
+     * Để trống mặc định dùng window.__env.textToQRConfig.maxHistoryLength
+     */
+    maxHistoryLength: {
+      type: Number,
+      default: 0,
+    },
     noMargin: {
       type: Boolean,
       default: false,
@@ -273,7 +281,10 @@ export default {
         }
         history.push(me.buildHistoryItem(newHistory, source));
         // Giới hạn số lượng lịch sử lưu trữ
-        if (history.length > window.__env.textToQRConfig.maxHistoryLength) {
+        let maxHistoryLength =
+          me.maxHistoryLength ||
+          window.__env.textToQRConfig.maxHistoryLength;
+        if (history.length > maxHistoryLength) {
           history.shift(); // Xóa item cũ nhất
         }
         await me.$tdCache.set(me.cacheKey, history);
