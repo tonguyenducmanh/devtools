@@ -10,6 +10,7 @@ class TDAppStartup {
    */
   async initialize() {
     let userSetting = await utility.getUserSettings();
+    utility.userSettings = userSetting;
     let setConfig = TDAutomation.setGlobalInfoBeforeRequest({
       agentURL: userSetting["agentURL"],
     });

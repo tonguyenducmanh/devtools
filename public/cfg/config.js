@@ -18,18 +18,7 @@
     url: "https://github.com/tonguyenducmanh/devtools",
     releasesUrl: "https://github.com/tonguyenducmanh/devtools/releases",
   };
-  window.__env.oneTimePasswordAuthen = {
-    showDecodedInfo: false,
-    autoSave: true,
-  };
   window.__env.APITesting = {
     agentServer: "http://localhost:7777",
-  };
-  window.__env.quoteConfig = {
-    showQuote: true,
-  };
-  window.__env.eventGlobal = {
-    logCopy: true,
-    logCopyDelay: 500,
   };
 })(this);

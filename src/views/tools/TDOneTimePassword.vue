@@ -172,8 +172,47 @@
       v-model="currentConfigLayout.isShowSidebar"
       @toggleSidebar="toggleSidebar"
     >
+      <template v-slot:menu>
+        <div class="td-sidebar-menu">
+          <TDSlideOption
+            :showIcon="true"
+            v-model="currentConfigLayout.currentSidebarOption"
+            :options="sidebarOptions"
+            :noMargin="true"
+            @change="updateConfigLayout"
+          />
+        </div>
+      </template>
       <template v-slot:main>
-        <TDOneTimePasswordHelp />
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.Help
+          "
+        >
+          <TDOneTimePasswordHelp />
+        </div>
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.ToolSidebarOption.Setting
+          "
+        >
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="currentConfigLayout.showDecodedInfo"
+            :label="$t('i18nCommon.oneTimePassword.settings.showDecodedInfo')"
+            @change="updateConfigLayout"
+          ></TDCheckbox>
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="currentConfigLayout.autoSave"
+            :label="$t('i18nCommon.oneTimePassword.settings.autoSave')"
+            @change="updateConfigLayout"
+          ></TDCheckbox>
+        </div>
       </template>
     </TDSubSidebar>
   </div>
@@ -187,16 +226,31 @@ import { toRaw } from "vue";
 import googleAuthen from "@/common/proto/googleAuth.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
+import TDSlideOption from "@/components/TDSlideOption.vue";
 import TDOneTimePasswordHelp from "@/views/helps/TDOneTimePasswordHelp.vue";
 export default {
   extends: TDToolBase,
   name: "TDOneTimePassword",
-  components: { TDSubSidebar, TDOneTimePasswordHelp },
+  components: { TDSubSidebar, TDSlideOption, TDOneTimePasswordHelp },
   created() {
     let me = this;
     me.processWhenMounted();
   },
   computed: {
+    sidebarOptions() {
+      let options = [];
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Help,
+        label: this.$t("i18nCommon.sidebarOption.help"),
+        icon: "td-help-icon",
+      });
+      options.push({
+        value: this.$tdEnum.ToolSidebarOption.Setting,
+        label: this.$t("i18nCommon.sidebarOption.setting"),
+        icon: "td-setting-icon",
+      });
+      return options;
+    },
     optShowList() {
       let me = this;
       let allOTPVisible = [];
@@ -228,8 +282,8 @@ export default {
       let result = false;
       if (
         me.decodedData &&
-        window.__env.oneTimePasswordAuthen &&
-        window.__env.oneTimePasswordAuthen.showDecodedInfo
+        me.currentConfigLayout &&
+        me.currentConfigLayout.showDecodedInfo
       ) {
         result = true;
       }
@@ -255,8 +309,8 @@ export default {
       let result = false;
       if (
         me.decodedData &&
-        window.__env.oneTimePasswordAuthen &&
-        window.__env.oneTimePasswordAuthen.autoSave
+        me.currentConfigLayout &&
+        me.currentConfigLayout.autoSave
       ) {
         result = true;
       }
@@ -639,7 +693,10 @@ export default {
     return {
       keyCacheLayout: this.$tdEnum.cacheConfig.OneTimePasswordConfigLayout,
       currentConfigLayout: {
-        isShowSidebar: false,
+        isShowSidebar: true,
+        currentSidebarOption: this.$tdEnum.ToolSidebarOption.Help,
+        showDecodedInfo: false,
+        autoSave: true,
       },
       filterOtp: null,
       migrationURL: null,
@@ -781,6 +838,12 @@ export default {
       }
     }
   }
+}
+.td-sub-sidebar {
+  height: 100%;
+  justify-content: flex-start;
+  width: 100%;
+  overflow: auto;
 }
 .footer-section {
   margin-top: var(--padding);

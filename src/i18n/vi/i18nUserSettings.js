@@ -12,6 +12,8 @@ export default {
       toastInHeader: "Hiển thị thông báo trên thanh header",
       cursorTrail: "Hiệu ứng đuôi chuột",
       loadingType: "Loại loading",
+      logCopy: "Ghi log sự kiện copy",
+      logCopyDelay: "Độ trễ log copy (ms)",
     },
     loadingType: {
       Normal: "Bình thường",

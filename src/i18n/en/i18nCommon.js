@@ -429,6 +429,10 @@ export default {
       urlPlaceholder:
         "Google authenticator migration URL example: otpauth-migration://offline?data=CjcKFFkwYrPBscVsQXM",
       decodeData: "Google authenticator decoded data",
+      settings: {
+        showDecodedInfo: "Show decoded info",
+        autoSave: "Auto save",
+      },
       remove: {
         filter: "Enter exact auth name to remove, enter {0} to remove all",
         button: "Remove",

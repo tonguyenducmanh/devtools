@@ -428,6 +428,10 @@ export default {
       urlPlaceholder:
         "Đường dẫn migration của Google authenticator, ví dụ: otpauth-migration://offline?data=CjcKFFkwYrPBscVsQXM",
       decodeData: "Dữ liệu giải mã từ Google authenticator",
+      settings: {
+        showDecodedInfo: "Hiện thông tin giải mã",
+        autoSave: "Tự động lưu",
+      },
       remove: {
         filter: "Nhập chính xác tên xác thực để xóa, nhập {0} để xóa tất cả",
         button: "Xóa",

@@ -326,7 +326,6 @@ export default {
     display: flex;
     align-items: center;
     overflow: hidden;
-
     .td-header-toast-item {
       font-size: 12px;
       padding: 2px 8px;
