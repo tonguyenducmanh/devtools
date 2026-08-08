@@ -94,7 +94,7 @@ export default {
   name: "TDBlankText",
   components: { TDSubSidebar, TDSlideOption, TDHistorySidebar },
   created() {
-    this.debouncedSaveToHistory = _.debounce(this.saveToHistory, 5000);
+    this.debouncedSaveToHistory = _.debounce(this.saveToHistory, 3000);
   },
   beforeUnmount() {
     if (this.debouncedSaveToHistory?.cancel) {
