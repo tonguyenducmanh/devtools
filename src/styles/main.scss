@@ -130,14 +130,6 @@ body {
     "Courier New", monospace;
   --straight-font: "CormorantGaramond";
 }
-@font-face {
-  font-family: "Playfair";
-  src: url("../assets/font/CormorantGaramond-VariableFont_wght.ttf")
-    format("woff");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
 a {
   color: inherit; /* blue colors for links too */
   text-decoration: inherit; /* no underline */
