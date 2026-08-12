@@ -68,8 +68,8 @@ export default {
     async runTypingEffect() {
       const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-      // 1. Gõ chữ sai "Wherever"
-      const typoText = "Wherever";
+      // 1. Gõ chữ sai "WYSIWYG"
+      const typoText = "WYSIWYG";
       for (let i = 0; i <= typoText.length; i++) {
         this.displayText = typoText.slice(0, i);
         await sleep(150);
@@ -77,7 +77,7 @@ export default {
 
       await sleep(800); // Tạm dừng để người dùng thấy lỗi
 
-      // 2. Xóa ngược lại 6 ký tự (xóa "erver", còn lại "Wh")
+      // 2. Xóa ngược lại 6 ký tự
       for (let i = 0; i < 6; i++) {
         this.displayText = this.displayText.slice(0, -1);
         await sleep(100);
@@ -85,9 +85,9 @@ export default {
 
       await sleep(300); // Khựng lại một chút trước khi gõ đúng
 
-      // 3. Gõ phần còn lại của "Whatever you code, code with all your heart"
+      // 3. Gõ phần còn lại của "What you see is what you get"
       // Bắt đầu gõ từ ký tự thứ 3 của fullText (chữ 'a' trong 'Whatever')
-      const fullText = "Whatever you code, code with all your heart";
+      const fullText = "What you see is what you get";
       for (let i = this.displayText.length; i < fullText.length; i++) {
         this.displayText += fullText.charAt(i);
         await sleep(80);
@@ -197,5 +197,4 @@ export default {
     opacity: 0;
   }
 }
-
 </style>
