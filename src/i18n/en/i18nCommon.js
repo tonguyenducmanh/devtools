@@ -16,7 +16,7 @@ export default {
       API: "API intergate",
       JSON: "JSON building",
       Image: "Image handle",
-      Text: "Text transfrom",
+      Text: "Text",
       ArtificialIntelligence: "AI tooling",
       RemoteDesktop: "Remote Desktop",
       SampleCode: "Sample code",

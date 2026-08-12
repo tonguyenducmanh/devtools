@@ -109,12 +109,45 @@ const sidebarConfig = [
     ],
   },
   {
-    type: "route",
-    name: "TDBlankText",
-    component: () => import("@/views/tools/TDBlankText.vue"),
-    meta: {
-      titleKey: "i18nCommon.feature.blanktext",
-    },
+    type: "group",
+    groupKey: "text",
+    groupTitleKey: "i18nCommon.group.Text",
+    children: [
+      {
+        name: "TDBlankText",
+        component: () => import("@/views/tools/TDBlankText.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.blanktext",
+        },
+      },
+      {
+        name: "comparecode",
+        component: () => import("@/views/tools/TDCompareCode.vue"),
+        meta: { titleKey: "i18nCommon.feature.compareCode" },
+      },
+      {
+        name: "codeformatter",
+        component: () => import("@/views/tools/TDCodeFormatter.vue"),
+        meta: { titleKey: "i18nCommon.feature.CodeFormatter" },
+      },
+      {
+        name: "TDTextCompress",
+        component: () => import("@/views/tools/TDTextCompress.vue"),
+        meta: { titleKey: "i18nCommon.feature.textCompress" },
+      },
+      {
+        name: "TDTextManipulation",
+        component: () => import("@/views/tools/TDTextManipulation.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.textManipulation",
+        },
+      },
+      {
+        name: "textgenerator",
+        component: () => import("@/views/tools/TDTextGenerator.vue"),
+        meta: { titleKey: "i18nCommon.feature.textgenerator" },
+      },
+    ],
   },
   {
     type: "group",
@@ -191,12 +224,6 @@ const sidebarConfig = [
     ],
   },
   {
-    type: "route",
-    name: "comparecode",
-    component: () => import("@/views/tools/TDCompareCode.vue"),
-    meta: { titleKey: "i18nCommon.feature.compareCode" },
-  },
-  {
     type: "group",
     groupKey: "image",
     groupTitleKey: "i18nCommon.group.Image",
@@ -215,35 +242,6 @@ const sidebarConfig = [
         name: "colorpicker",
         component: () => import("@/views/tools/TDColorPickerFromImage.vue"),
         meta: { titleKey: "i18nCommon.feature.colorPicker" },
-      },
-    ],
-  },
-  {
-    type: "group",
-    groupKey: "text",
-    groupTitleKey: "i18nCommon.group.Text",
-    children: [
-      {
-        name: "codeformatter",
-        component: () => import("@/views/tools/TDCodeFormatter.vue"),
-        meta: { titleKey: "i18nCommon.feature.CodeFormatter" },
-      },
-      {
-        name: "TDTextCompress",
-        component: () => import("@/views/tools/TDTextCompress.vue"),
-        meta: { titleKey: "i18nCommon.feature.textCompress" },
-      },
-      {
-        name: "TDTextManipulation",
-        component: () => import("@/views/tools/TDTextManipulation.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.textManipulation",
-        },
-      },
-      {
-        name: "textgenerator",
-        component: () => import("@/views/tools/TDTextGenerator.vue"),
-        meta: { titleKey: "i18nCommon.feature.textgenerator" },
       },
     ],
   },

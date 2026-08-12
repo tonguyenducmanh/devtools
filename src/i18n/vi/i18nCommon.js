@@ -16,7 +16,7 @@ export default {
       API: "Tích hợp API",
       JSON: "Xử lý JSON",
       Image: "Xử lý ảnh",
-      Text: "Xử lý văn bản",
+      Text: "Văn bản",
       ArtificialIntelligence: "Tích hợp AI",
       RemoteDesktop: "Máy tính từ xa",
       SampleCode: "Code mẫu",
