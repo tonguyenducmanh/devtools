@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/"
+    style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="Tools-App" serif:id="Tools App">
+        <g id="Background" transform="matrix(0.011143,0,0,0.010571,5.804,5.077429)">
+            <path
+                d="M1274,-153L1274,1037C1274,1191.536 1154.97,1317 1008.359,1317L-210.359,1317C-356.97,1317 -476,1191.536 -476,1037L-476,-153C-476,-307.536 -356.97,-433 -210.359,-433L1008.359,-433C1154.97,-433 1274,-307.536 1274,-153Z" />
+        </g>
+        <g transform="matrix(0.007443,0,0,0.007061,-7.381866,5.563807)">
+            <g transform="matrix(2144.324042,0,0,2144.324042,3038.03027,1347.237043)">
+            </g>
+            <text x="1697.828px" y="1347.237px"
+                style="font-family:'ArialRoundedMTBold', 'Arial Rounded MT Bold', sans-serif;font-size:2144.324px;fill:white;">T</text>
+        </g>
+    </g>
+    <g id="Stories-App" serif:id="Stories App" transform="matrix(1,0,0,1,19.875,-0)">
+        <g id="Background1" serif:id="Background" transform="matrix(0.011143,0,0,0.010571,5.804,5.077429)">
+            <path
+                d="M1274,-153L1274,1037C1274,1191.536 1154.97,1317 1008.359,1317L-210.359,1317C-356.97,1317 -476,1191.536 -476,1037L-476,-153C-476,-307.536 -356.97,-433 -210.359,-433L1008.359,-433C1154.97,-433 1274,-307.536 1274,-153Z" />
+        </g>
+        <g transform="matrix(0.007443,0,0,0.007061,-7.775407,5.656222)">
+            <g transform="matrix(2144.324042,0,0,2144.324042,3128.075127,1347.237043)">
+            </g>
+            <text x="1697.828px" y="1347.237px"
+                style="font-family:'ArialRoundedMTBold', 'Arial Rounded MT Bold', sans-serif;font-size:2144.324px;fill:white;">S</text>
+        </g>
+    </g>
+    <g id="Graphics-App" serif:id="Graphics App" transform="matrix(1,0,0,1,39.75,-0)">
+        <g id="Background2" serif:id="Background" transform="matrix(0.011143,0,0,0.010571,5.804,5.077429)">
+            <path
+                d="M1274,-153L1274,1037C1274,1191.536 1154.97,1317 1008.359,1317L-210.359,1317C-356.97,1317 -476,1191.536 -476,1037L-476,-153C-476,-307.536 -356.97,-433 -210.359,-433L1008.359,-433C1154.97,-433 1274,-307.536 1274,-153Z" />
+        </g>
+        <g transform="matrix(0.007443,0,0,0.007061,-8.617038,5.656222)">
+            <g transform="matrix(2144.324042,0,0,2144.324042,3396.115632,1347.237043)">
+            </g>
+            <text x="1697.828px" y="1347.237px"
+                style="font-family:'ArialRoundedMTBold', 'Arial Rounded MT Bold', sans-serif;font-size:2144.324px;fill:white;">G</text>
+        </g>
+    </g>
+</svg>

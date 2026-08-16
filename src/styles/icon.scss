@@ -9,6 +9,24 @@
   cursor: pointer;
 }
 
+.td-logo {
+  width: 20px;
+  height: 20px;
+  background: url("@/assets/LogoApps.svg") no-repeat;
+  background-size: 60px 60px;
+  cursor: pointer;
+}
+
+.td-logo-tool-app {
+  background-position: 0px 0px;
+}
+.td-logo-stories-app {
+  background-position: -20px 0px;
+}
+.td-logo-graphic-app {
+  background-position: -40px 0px;
+}
+
 .td-close-icon {
   mask-position: -124px 0px;
 }

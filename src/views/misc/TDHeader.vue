@@ -1,7 +1,7 @@
 <template>
   <div class="flex td-header-container">
     <div class="td-app-name">
-      <div class="td-logo" @click="goToWelcome"></div>
+      <div class="td-logo td-logo-tool-app" @click="goToWelcome"></div>
       <div
         class="td-app-title"
         @click="goToWelcome"
@@ -302,13 +302,6 @@ export default {
     display: flex;
     align-items: center;
     gap: var(--padding);
-    .td-logo {
-      width: 20px;
-      height: 20px;
-      background: url(@/assets/favicon.ico);
-      background-size: cover;
-      cursor: pointer;
-    }
     .td-app-title {
       font-size: 14px;
       font-weight: 700;
