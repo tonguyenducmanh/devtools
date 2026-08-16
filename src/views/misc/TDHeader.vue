@@ -1,11 +1,7 @@
 <template>
   <div class="flex td-header-container">
     <div class="td-app-name">
-      <div
-        class="td-app-brand"
-        @mouseenter="openFlyout('logo', $event)"
-        @mouseleave="scheduleCloseFlyout()"
-      >
+      <div class="td-app-brand" @click="reloadAppFunc">
         <div class="td-logo td-logo-tool-app"></div>
         <div class="td-app-title">
           {{ appName }}
@@ -25,20 +21,31 @@
       </div>
     </div>
 
-    <div class="td-header-toast">
+    <div class="td-header-right">
+      <div class="td-header-toast">
+        <div
+          v-if="currentHeaderToast"
+          :class="[
+            'td-header-toast-item',
+            `td-header-toast--${currentHeaderToast.type}`,
+          ]"
+          @click="removeHeaderToast(currentHeaderToast.id)"
+        >
+          {{ currentHeaderToast.message }}
+        </div>
+      </div>
+
       <div
-        v-if="currentHeaderToast"
-        :class="[
-          'td-header-toast-item',
-          `td-header-toast--${currentHeaderToast.type}`,
-        ]"
-        @click="removeHeaderToast(currentHeaderToast.id)"
+        class="td-menu-item"
+        :class="{ 'td-menu-item--active': activeKeyFlyOut === 'logo' }"
+        @mouseenter="openFlyout('logo', $event)"
+        @mouseleave="scheduleCloseFlyout()"
       >
-        {{ currentHeaderToast.message }}
+        {{ $t("i18nCommon.feature.allApps") }}
       </div>
     </div>
 
-    <!-- Flyout danh sách ứng dụng: mở xuống dưới khi hover logo -->
+    <!-- Flyout danh sách ứng dụng: mở xuống dưới khi hover "Danh sách ứng dụng" bên phải header -->
     <TDFlyoutPanel
       :show="activeKeyFlyOut === 'logo'"
       :anchorElFlyout="anchorElFlyout"
@@ -47,7 +54,6 @@
       @mouseenter="cancelCloseFlyOut"
       @mouseleave="scheduleCloseFlyout()"
     >
-      <div class="td-flyout-title">{{ $t("i18nCommon.feature.allApps") }}</div>
       <div
         v-for="item in logoItems"
         :key="item.key"
@@ -362,6 +368,13 @@ export default {
     display: flex;
     align-items: center;
     gap: var(--padding);
+  }
+
+  .td-header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--padding);
+    margin-left: auto;
   }
 
   .td-header-toast {
