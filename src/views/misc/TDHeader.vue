@@ -1,13 +1,15 @@
 <template>
   <div class="flex td-header-container">
     <div class="td-app-name">
-      <div class="td-logo td-logo-tool-app" @click="goToWelcome"></div>
       <div
-        class="td-app-title"
-        @click="goToWelcome"
-        v-tooltip="$t('i18nCommon.feature.welcome')"
+        class="td-app-brand"
+        @mouseenter="openFlyout('logo', $event)"
+        @mouseleave="scheduleCloseFlyout()"
       >
-        {{ appName }}
+        <div class="td-logo td-logo-tool-app"></div>
+        <div class="td-app-title">
+          {{ appName }}
+        </div>
       </div>
       <div class="td-header-menu">
         <div
@@ -36,9 +38,36 @@
       </div>
     </div>
 
+    <!-- Flyout danh sách ứng dụng: mở xuống dưới khi hover logo -->
+    <TDFlyoutPanel
+      :show="activeKeyFlyOut === 'logo'"
+      :anchorElFlyout="anchorElFlyout"
+      placement="bottom"
+      panelClass="td-app-list-flyout"
+      @mouseenter="cancelCloseFlyOut"
+      @mouseleave="scheduleCloseFlyout()"
+    >
+      <div class="td-flyout-title">{{ $t("i18nCommon.feature.allApps") }}</div>
+      <div
+        v-for="item in logoItems"
+        :key="item.key"
+        class="td-flyout-item"
+        :class="{ 'td-flyout-item--logo': item.logoClass }"
+        v-tooltip="item.tooltip"
+        @click="item.action"
+      >
+        <div
+          v-if="item.logoClass"
+          class="td-logo"
+          :class="item.logoClass"
+        ></div>
+        <span>{{ item.labelKey ? $t(item.labelKey) : item.label }}</span>
+      </div>
+    </TDFlyoutPanel>
+
     <!-- Flyout Menu: mở xuống dưới (placement="bottom") -->
     <TDFlyoutPanel
-      :show="!!activeKeyFlyOut"
+      :show="!!activeKeyFlyOut && activeKeyFlyOut !== 'logo'"
       :anchorElFlyout="anchorElFlyout"
       placement="bottom"
       panelClass="td-header-flyout"
@@ -49,7 +78,7 @@
         v-for="item in currentMenuItems"
         :key="item.key"
         class="td-flyout-item"
-        v-tooltip="item.tooltip"
+                v-tooltip="item.tooltip"
         @click="item.action"
       >
         {{ $t(item.labelKey) }}
@@ -71,7 +100,7 @@ export default {
   name: "TDHeader",
   components: { TDFlyoutPanel },
   setup() {
-    const { openTab, exitTabMode } = useTabManager();
+    const { openTab } = useTabManager();
     const {
       activeKeyFlyOut,
       anchorElFlyout,
@@ -82,7 +111,6 @@ export default {
     } = useFlyout();
     return {
       openTab,
-      exitTabMode,
       activeKeyFlyOut,
       anchorElFlyout,
       openFlyout,
@@ -94,6 +122,7 @@ export default {
   data() {
     return {
       menuConfig: {},
+      logoItems: [],
       headerToastIdCounter: 0,
       currentHeaderToast: null,
       headerToastTimer: null,
@@ -113,6 +142,20 @@ export default {
       TDEnumEventBus.headerToastShow,
       this.onHeaderToastShow,
     );
+    this.logoItems = [
+      {
+        key: "tool",
+        logoClass: "td-logo-tool-app",
+        label: window.__env?.appName ?? "Tools",
+        action: () => this.openOtherApp(window.location.href),
+      },
+      ...(window.__env?.otherApps ?? []).map((app) => ({
+        key: app.key,
+        labelKey: `i18nCommon.feature.${app.key}App`,
+        logoClass: `td-logo-${app.key}-app`,
+        action: () => this.openOtherApp(app.url),
+      })),
+    ];
     this.menuConfig = {
       settings: [
         {
@@ -203,8 +246,9 @@ export default {
       this.$tdUtility.copyToClipboard(formatted);
       this.closeFlyout();
     },
-    goToWelcome() {
-      this.exitTabMode();
+    openOtherApp(url) {
+      window.open(url, "_blank");
+      this.closeFlyout();
     },
     userSettingsFunc() {
       this.openTab({
@@ -302,10 +346,15 @@ export default {
     display: flex;
     align-items: center;
     gap: var(--padding);
+    .td-app-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--padding);
+      cursor: pointer;
+    }
     .td-app-title {
       font-size: 14px;
       font-weight: 700;
-      cursor: pointer;
     }
   }
 

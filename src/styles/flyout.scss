@@ -97,6 +97,19 @@
   min-width: 160px;
 }
 
+/* ============ App list dropdown (hover logo): nội dung riêng ============ */
+.td-app-list-flyout {
+  min-width: 180px;
+}
+
+.td-flyout-title {
+  padding: 8px 12px 4px;
+  font-size: var(--font-size-small);
+  font-weight: 700;
+  color: var(--text-color);
+  opacity: 0.6;
+}
+
 /* ============ Query action flyout (TDPostgreSQLQuery): nội dung riêng ============ */
 .td-query-action-flyout {
   min-width: 200px;
@@ -116,6 +129,11 @@
   &:hover {
     background-color: var(--bg-hover-color);
   }
+}
+
+.td-flyout-item--logo {
+  font-weight: 700;
+  color: var(--text-color);
 }
 
 /* ============ Sidebar group flyout: nội dung riêng ============ */
