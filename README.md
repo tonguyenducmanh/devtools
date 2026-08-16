@@ -49,7 +49,7 @@ chmod 777 ./build_all.sh
 
 Các dịch vụ backend được cấu hình hoặc mặc định thông qua `config/config.json`.
 
-Cấu hình dành riêng cho Frontend có thể tìm thấy tại: `public/cfg/config.js`
+Cấu hình dành riêng cho Frontend có thể tìm thấy tại: `src/cfg/config.js` (được bundle vào entry chunk khi build, không cần config realtime).
 
 ### Lưu trữ Dữ liệu (SQLite)
 

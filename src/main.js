@@ -1,4 +1,5 @@
 import { createApp } from "vue";
+import "@/cfg/config.js";
 import App from "@/App.vue";
 import cache from "@/common/cache/TDCache.js";
 import tdEnum from "@/common/TDEnum.js";
