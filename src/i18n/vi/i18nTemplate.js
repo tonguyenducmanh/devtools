@@ -45,6 +45,7 @@ export default {
       inspect_list_databases: "Xem danh sách database",
       inspect_list_schemas: "Xem danh sách schema",
       explain_analyze: "Phân tích câu query",
+      query_all_tables_with_column: "Tìm bảng chứa cột",
     },
   },
 };

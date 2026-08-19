@@ -45,6 +45,7 @@ export default {
       inspect_list_databases: "List Databases",
       inspect_list_schemas: "List Schemas",
       explain_analyze: "Explain Analyze",
+      query_all_tables_with_column: "Find Tables with Column",
     },
   },
 };
