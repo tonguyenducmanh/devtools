@@ -20,8 +20,8 @@ window.__env.githubSource = {
   releasesUrl: "https://github.com/tonguyenducmanh/devtools/releases",
 };
 window.__env.otherApps = [
-  { key: "stories", url: "https://stories.tomanh.com" },
   { key: "graphics", url: "https://graphic.tomanh.com" },
+  { key: "stories", url: "https://stories.tomanh.com" },
 ];
 window.__env.APITesting = {
   agentServer: "http://localhost:7777",
