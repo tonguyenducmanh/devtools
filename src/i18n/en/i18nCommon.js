@@ -126,8 +126,6 @@ export default {
       blanktext: "Blank text",
       AppDataMiner: "App data miner",
       allApps: "All applications",
-      storiesApp: "Stories",
-      graphicsApp: "Graphics",
       cosinSimilarity: "Cosine Similarity",
       vectorMockGenerator: "Mock Embedding Generator",
       oneTimePassword: "OTP gen",

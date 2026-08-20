@@ -34,42 +34,7 @@
           {{ currentHeaderToast.message }}
         </div>
       </div>
-
-      <div
-        class="td-menu-item"
-        :class="{ 'td-menu-item--active': activeKeyFlyOut === 'logo' }"
-        @mouseenter="openFlyout('logo', $event)"
-        @mouseleave="scheduleCloseFlyout()"
-      >
-        {{ $t("i18nCommon.feature.allApps") }}
-      </div>
     </div>
-
-    <!-- Flyout danh sách ứng dụng: mở xuống dưới khi hover "Danh sách ứng dụng" bên phải header -->
-    <TDFlyoutPanel
-      :show="activeKeyFlyOut === 'logo'"
-      :anchorElFlyout="anchorElFlyout"
-      placement="bottom"
-      panelClass="td-app-list-flyout"
-      @mouseenter="cancelCloseFlyOut"
-      @mouseleave="scheduleCloseFlyout()"
-    >
-      <div
-        v-for="item in logoItems"
-        :key="item.key"
-        class="td-flyout-item"
-        :class="{ 'td-flyout-item--logo': item.logoClass }"
-        v-tooltip="item.tooltip"
-        @click="item.action"
-      >
-        <div
-          v-if="item.logoClass"
-          class="td-logo"
-          :class="item.logoClass"
-        ></div>
-        <span>{{ item.labelKey ? $t(item.labelKey) : item.label }}</span>
-      </div>
-    </TDFlyoutPanel>
 
     <!-- Flyout Menu: mở xuống dưới (placement="bottom") -->
     <TDFlyoutPanel
@@ -155,12 +120,6 @@ export default {
         label: window.__env?.appName ?? "Tools",
         action: () => this.openOtherApp(window.location.href),
       },
-      ...(window.__env?.otherApps ?? []).map((app) => ({
-        key: app.key,
-        labelKey: `i18nCommon.feature.${app.key}App`,
-        logoClass: `td-logo-${app.key}-app`,
-        action: () => this.openOtherApp(app.url),
-      })),
     ];
     this.menuConfig = {
       settings: [
@@ -406,12 +365,6 @@ export default {
     .td-header-toast--info {
       color: #3b82f6;
     }
-  }
-
-  .td-stories-app-title {
-    font-size: var(--font-size-medium-rare);
-    color: var(--text-color);
-    cursor: pointer;
   }
 }
 </style>

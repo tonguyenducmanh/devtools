@@ -127,8 +127,6 @@ export default {
       blanktext: "Văn bản trống",
       AppDataMiner: "Dữ liệu ứng dụng",
       allApps: "Danh sách ứng dụng",
-      storiesApp: "Stories",
-      graphicsApp: "Graphics",
       cosinSimilarity: "Độ tương đồng",
       vectorMockGenerator: "Tạo Embedding giả",
       oneTimePassword: "Tạo mã OTP",
