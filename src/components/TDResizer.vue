@@ -66,8 +66,8 @@ export default {
           ? e.touches[0].clientX
           : e.clientX
         : e.touches
-        ? e.touches[0].clientY
-        : e.clientY;
+          ? e.touches[0].clientY
+          : e.clientY;
 
       // Thêm event listeners
       document.addEventListener("mousemove", this.onDrag);
@@ -93,8 +93,8 @@ export default {
           ? e.touches[0].clientX
           : e.clientX
         : e.touches
-        ? e.touches[0].clientY
-        : e.clientY;
+          ? e.touches[0].clientY
+          : e.clientY;
 
       // Lấy container cha
       const container = this.$el.parentElement;
@@ -174,7 +174,7 @@ export default {
 
 .direction-horizontal .td-resizer-line {
   width: 2px;
-  height: 40px;
+  height: 100px;
   background: var(--border-color);
   border-radius: 2px;
   transition: all 0.2s ease;
@@ -198,7 +198,7 @@ export default {
 }
 
 .direction-vertical .td-resizer-line {
-  width: 40px;
+  width: 100px;
   height: 2px;
   background: var(--border-color);
   border-radius: 2px;
@@ -208,17 +208,17 @@ export default {
 /* Hover states */
 .td-resizer:hover .td-resizer-line,
 .td-resizer.dragging .td-resizer-line {
-  background: var(--focus-color);
+  background: var(--bg-hover-color);
 }
 
 .direction-horizontal:hover .td-resizer-line,
 .direction-horizontal.dragging .td-resizer-line {
-  height: 60px;
+  height: 150px;
 }
 
 .direction-vertical:hover .td-resizer-line,
 .direction-vertical.dragging .td-resizer-line {
-  width: 60px;
+  width: 150px;
 }
 
 /* Active dragging state */

@@ -34,7 +34,7 @@
         }
       }
       .td-collection-header:hover {
-        background-color: var(--bg-layer-color);
+        background-color: var(--bg-hover-color);
       }
       .td-collection-content {
         justify-content: flex-start;
@@ -55,7 +55,7 @@
   border-radius: var(--border-radius-component);
 }
 .td-collection-request-item:hover {
-  background-color: var(--bg-layer-color);
+  background-color: var(--bg-hover-color);
 }
 .td-collection-request-item-selected {
   background-color: var(--bg-layer-color);
