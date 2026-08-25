@@ -151,6 +151,7 @@ class TDEnum {
     { label: "Synthwave84", value: "synthwave84" },
     { label: "Tokyo Night", value: "tokyo-night" },
     { label: "Dracula", value: "dracula" },
+    { label: "Blender", value: "blender" },
   ];
 }
 
