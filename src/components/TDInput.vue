@@ -129,6 +129,9 @@ export default {
     color: var(--text-secondary-color);
     opacity: var(--placeholder-opacity);
   }
+  input:hover {
+    border: 1px solid var(--focus-color);
+  }
   input:focus {
     outline: none;
     border: 1px solid var(--focus-color);

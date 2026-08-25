@@ -199,7 +199,7 @@ export default {
       background: var(--bg-thirt-color);
 
       &:hover {
-        border-color: var(--btn-color);
+        border-color: var(--focus-color);
       }
 
       &.readOnly {

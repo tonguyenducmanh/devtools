@@ -595,6 +595,10 @@ export default {
     overflow-y: auto;
   }
 
+  textarea:hover {
+    border: 1px solid var(--focus-color);
+  }
+
   textarea:focus {
     outline: none;
     border: 1px solid var(--focus-color);
