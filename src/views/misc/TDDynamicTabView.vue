@@ -6,40 +6,22 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
     <!-- Tab bar: chỉ hiện khi có tab và không ở zen mode -->
     <Transition name="td-tabbar">
       <div v-if="isTabMode && !zenMode" class="flex td-tab-wrap">
-        <div
-          class="td-tab-bar"
-          :class="{ 'td-tab-bar-wrap': wrapTab }"
-          ref="tabBarRef"
-          @dragover.prevent="onDragOver"
-          @drop.prevent="onDrop"
-          @dragleave="onDragLeave"
-        >
-          <div
-            v-for="(tab, index) in tabs"
-            :key="tab.id"
-            class="td-tab-item"
-            :class="{
-              'td-tab-active': activeTabId === tab.id,
-              'td-tab-dragging': draggingId === tab.id,
-              'td-tab-drag-over':
-                dragOverIndex === index && draggingId !== tab.id,
-              'td-tab-shift-right': shouldShiftRight(index),
-              'td-tab-shift-left': shouldShiftLeft(index),
-            }"
-            :draggable="true"
-            @dragstart="onDragStart($event, tab.id, index)"
-            @dragend="onDragEnd"
-            @click="activateTab(tab.id)"
-            @contextmenu.prevent="openContextMenu($event, tab)"
-            @click.middle="closeTab(tab.id)"
-            v-tooltip="getTabTitle(tab)"
-          >
+        <div class="td-tab-bar" :class="{ 'td-tab-bar-wrap': wrapTab }" ref="tabBarRef" @dragover.prevent="onDragOver"
+          @drop.prevent="onDrop" @dragleave="onDragLeave">
+          <div v-for="(tab, index) in tabs" :key="tab.id" class="td-tab-item" :class="{
+            'td-tab-active': activeTabId === tab.id,
+            'td-tab-dragging': draggingId === tab.id,
+            'td-tab-drag-over':
+              dragOverIndex === index && draggingId !== tab.id,
+            'td-tab-shift-right': shouldShiftRight(index),
+            'td-tab-shift-left': shouldShiftLeft(index),
+          }" :draggable="true" @dragstart="onDragStart($event, tab.id, index)" @dragend="onDragEnd"
+            @click="activateTab(tab.id)" @contextmenu.prevent="openContextMenu($event, tab)"
+            @click.middle="closeTab(tab.id)" v-tooltip="getTabTitle(tab)">
             <div class="td-tab-bg"></div>
 
-            <div
-              v-if="dragOverIndex === index && draggingId !== tab.id"
-              class="td-drop-indicator td-drop-indicator-before"
-            ></div>
+            <div v-if="dragOverIndex === index && draggingId !== tab.id"
+              class="td-drop-indicator td-drop-indicator-before"></div>
 
             <span v-if="showTabNumber" class="td-tab-number">
               {{ index + 1 }}.
@@ -50,38 +32,23 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
             </span>
 
             <button class="flex td-tab-quick-btn">
-              <span
-                class="td-icon td-dupplicate-icon"
-                v-tooltip="$t('i18nCommon.tabManager.duplicateTab')"
-                @click.stop="duplicateTab(tab.id)"
-              ></span>
-              <span
-                class="td-icon td-close-icon"
-                v-tooltip="$t('i18nCommon.tabManager.closeTab')"
-                @click.stop="closeTab(tab.id)"
-              ></span>
+              <span class="td-icon td-dupplicate-icon" v-tooltip="$t('i18nCommon.tabManager.duplicateTab')"
+                @click.stop="duplicateTab(tab.id)"></span>
+              <span class="td-icon td-close-icon" v-tooltip="$t('i18nCommon.tabManager.closeTab')"
+                @click.stop="closeTab(tab.id)"></span>
             </button>
           </div>
 
-          <div
-            class="td-tab-drop-sentinel"
-            :class="{
-              'td-tab-drop-sentinel-active': dragOverIndex === tabs.length,
-            }"
-          >
-            <div
-              v-if="dragOverIndex === tabs.length && draggingId !== null"
-              class="td-drop-indicator td-drop-indicator-end"
-            ></div>
+          <div class="td-tab-drop-sentinel" :class="{
+            'td-tab-drop-sentinel-active': dragOverIndex === tabs.length,
+          }">
+            <div v-if="dragOverIndex === tabs.length && draggingId !== null"
+              class="td-drop-indicator td-drop-indicator-end"></div>
           </div>
         </div>
 
         <!-- Nút đóng tất cả -->
-        <button
-          class="td-tab-exit-btn"
-          @click="exitTabMode"
-          v-tooltip="$t('i18nCommon.tabManager.closeAllTabs')"
-        >
+        <button class="td-tab-exit-btn" @click="exitTabMode" v-tooltip="$t('i18nCommon.tabManager.closeAllTabs')">
           <span class="td-icon td-close-icon"> </span>
         </button>
       </div>
@@ -90,47 +57,22 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
     <!-- Content area -->
     <div class="td-tab-content" :class="{ 'td-zen-active': zenMode }">
       <!-- Zen mode toolbar -->
-      <div
-        v-if="zenMode"
-        class="td-zen-toolbar"
-        :class="{ 'td-zen-toolbar-pinned': zenToolbarPinned }"
-      >
-        <div
-          v-if="!zenToolbarPinned"
-          class="flex toolbar-btn"
-          @click="pinZenToolbar"
-          v-tooltip="$t('i18nCommon.remoteDesktop.pin')"
-        >
+      <div v-if="zenMode" class="td-zen-toolbar" :class="{ 'td-zen-toolbar-pinned': zenToolbarPinned }">
+        <div v-if="!zenToolbarPinned" class="flex toolbar-btn" @click="pinZenToolbar"
+          v-tooltip="$t('i18nCommon.remoteDesktop.pin')">
           <span class="td-icon td-pin-icon"></span>
         </div>
-        <div
-          v-else
-          class="flex toolbar-btn"
-          @click="unpinZenToolbar"
-          v-tooltip="$t('i18nCommon.remoteDesktop.unpin')"
-        >
+        <div v-else class="flex toolbar-btn" @click="unpinZenToolbar" v-tooltip="$t('i18nCommon.remoteDesktop.unpin')">
           <span class="td-icon td-unpin-icon"></span>
         </div>
-        <div
-          class="flex toolbar-btn"
-          @click="zenPrevTab"
-          v-tooltip="$t('i18nCommon.tabManager.tabPrevious')"
-        >
+        <div class="flex toolbar-btn" @click="zenPrevTab" v-tooltip="$t('i18nCommon.tabManager.tabPrevious')">
           <TDArrow :arrowDirection="tdEnum.Direction.left" />
         </div>
-        <div
-          class="flex toolbar-btn"
-          @click="zenNextTab"
-          v-tooltip="$t('i18nCommon.tabManager.tabNext')"
-        >
+        <div class="flex toolbar-btn" @click="zenNextTab" v-tooltip="$t('i18nCommon.tabManager.tabNext')">
           <TDArrow :arrowDirection="tdEnum.Direction.right" />
         </div>
         <span class="td-zen-toolbar-separator"></span>
-        <div
-          class="flex toolbar-btn"
-          @click="exitZenMode"
-          v-tooltip="$t('i18nCommon.tdheader.exitZenMode')"
-        >
+        <div class="flex toolbar-btn" @click="exitZenMode" v-tooltip="$t('i18nCommon.tdheader.exitZenMode')">
           <span class="td-icon td-center-icon"></span>
         </div>
       </div>
@@ -138,15 +80,8 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
       <!-- Tab mode: render sẵn tất cả bằng v-show -->
       <template v-if="isTabMode">
         <KeepAlive>
-          <component
-            v-if="activeTab"
-            :ref="setTabRef"
-            :is="activeTab.resolvedComponent"
-            :key="activeTab.id"
-            :tabId="activeTab.id"
-            class="td-tab-pane"
-            @updateTabTitle="(payload) => onTabTitleUpdate(payload)"
-          />
+          <component v-if="activeTab" :ref="setTabRef" :is="activeTab.resolvedComponent" :key="activeTab.id"
+            :tabId="activeTab.id" class="td-tab-pane" @updateTabTitle="(payload) => onTabTitleUpdate(payload)" />
         </KeepAlive>
       </template>
 
@@ -159,32 +94,23 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
       <div v-if="showTabPreview && isTabMode" class="td-tab-preview-overlay">
         <div class="td-tab-preview-container">
           <div class="td-tab-preview-grid">
-            <div
-              v-for="(tab, index) in tabs"
-              :key="tab.id"
-              class="text-nowrap td-tab-preview-item"
-              :class="{ 'td-tab-preview-item--active': previewIndex === index }"
-              @click="selectTabFromPreview(tab.id)"
-              @mouseenter="previewIndex = index"
-            >
+            <div v-for="(tab, index) in tabs" :key="tab.id" class="text-nowrap td-tab-preview-item"
+              :class="{ 'td-tab-preview-item--active': previewIndex === index }" @click="selectTabFromPreview(tab.id)"
+              @mouseenter="previewIndex = index">
               {{ getTabLabel(tab) }}
             </div>
           </div>
           <div class="td-tab-preview-footer">
             <div class="td-tab-preview-footer__grid">
-              <div
-                v-for="item in tabShortcuts"
-                :key="item.key"
-                class="td-tab-preview-footer__item"
-              >
+              <div v-for="item in tabShortcuts" :key="item.key" class="td-tab-preview-footer__item">
                 <span class="td-tab-preview-footer__keys">
                   <kbd v-for="part in item.presentKey" :key="part">{{
                     part
-                  }}</kbd>
+                    }}</kbd>
                 </span>
                 <span class="td-tab-preview-footer__label">{{
                   $t(item.labelKey)
-                }}</span>
+                  }}</span>
               </div>
             </div>
             <!-- /__grid -->
@@ -745,16 +671,19 @@ export default {
     max-height 0.2s ease,
     opacity 0.2s ease;
 }
+
 .td-tabbar-leave-active {
   transition:
     max-height 0.15s ease,
     opacity 0.15s ease;
 }
+
 .td-tabbar-enter-from,
 .td-tabbar-leave-to {
   max-height: 0;
   opacity: 0;
 }
+
 .td-tabbar-enter-to,
 .td-tabbar-leave-from {
   max-height: 48px;
@@ -812,37 +741,37 @@ export default {
   .td-tab-bg {
     position: absolute;
     inset: 0;
-
-    background: var(--bg-main-color);
-
+    background: var(--focus-color);
     border-radius: inherit;
-
     opacity: 0;
     transform: scale(0.92);
-
     transition:
       opacity 0.22s ease,
       transform 0.22s ease;
-
     z-index: 0;
   }
 
-  > *:not(.td-tab-bg) {
+  >*:not(.td-tab-bg) {
     position: relative;
     z-index: 1;
   }
 
   &:hover {
     color: var(--text-color);
+    border-color: var(--focus-color);
   }
 
   &.td-tab-active {
-    color: var(--text-color);
+    color: var(--selected-item-text-color);
     border: var(--border-component-style);
 
     .td-tab-bg {
       opacity: 1;
       transform: scale(1);
+    }
+
+    .td-icon {
+      background-color: var(--selected-item-text-color);
     }
   }
 
@@ -888,6 +817,7 @@ export default {
     opacity: 0.7;
     transform: scaleY(0.9);
   }
+
   to {
     opacity: 1;
     transform: scaleY(1.05);
@@ -914,12 +844,16 @@ export default {
   font-size: var(--font-size-medium-rare);
   transition: transform 0.2s ease;
 }
+
 .td-tab-item:hover {
   background-color: var(--border-color);
+  border: 1px solid var(--focus-color);
 }
+
 .td-tab-item:hover .td-tab-label {
   transform: translateX(-2px);
 }
+
 /* ── Close button ── */
 .td-tab-quick-btn {
   width: 0;
@@ -928,19 +862,13 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-
   height: 16px;
-
   border: none;
   background: transparent;
   color: var(--text-color);
-
   cursor: pointer;
-
   opacity: 0;
-
   transform: translateX(8px) scale(0.8);
-
   transition:
     width 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
     opacity 0.18s ease,
@@ -951,13 +879,17 @@ export default {
     background-color: var(--text-color);
   }
 }
+
 .td-tab-item:hover .td-tab-quick-btn {
   width: 40px;
+
   .td-icon {
     opacity: 0.5;
   }
+
   transform: translateX(0) scale(1);
 }
+
 .td-tab-quick-btn:hover {
   transform: scale(1.15);
   opacity: 1 !important;
@@ -969,8 +901,10 @@ export default {
   .td-icon:hover {
     opacity: 1 !important;
   }
+
   transform: scale(1.15);
 }
+
 /* ── Exit button ── */
 .td-tab-exit-btn {
   display: flex;
@@ -993,6 +927,15 @@ export default {
 
   .td-icon {
     background-color: var(--text-color);
+  }
+
+  &:hover {
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
+
+    .td-icon {
+      background-color: var(--selected-item-text-color);
+    }
   }
 }
 
@@ -1076,6 +1019,7 @@ export default {
     justify-content: center;
     border-radius: var(--border-radius);
     cursor: pointer;
+
     &:hover {
       background-color: var(--bg-main-color);
       border: 1px solid var(--border-color);
@@ -1095,6 +1039,7 @@ export default {
   justify-content: center;
   pointer-events: none;
 }
+
 .td-tab-preview-container {
   background: var(--bg-main-color);
   border: 1px solid var(--border-color);
@@ -1106,6 +1051,7 @@ export default {
   width: max-content;
   max-width: 90vw;
 }
+
 .td-tab-preview-grid {
   display: grid;
   /*
@@ -1115,6 +1061,7 @@ export default {
   grid-template-columns: repeat(2, minmax(max-content, 1fr));
   gap: var(--padding);
 }
+
 .td-tab-preview-item {
   padding: var(--padding);
   border-radius: var(--border-radius-component);
@@ -1128,16 +1075,19 @@ export default {
     background 0.12s ease,
     border-color 0.12s ease;
 }
+
 .td-tab-preview-item:hover {
   background: var(--border-color);
   border-color: var(--text-secondary-color);
 }
+
 .td-tab-preview-item--active {
   background: var(--focus-color) !important;
   color: var(--selected-item-text-color);
   font-weight: 600;
   border-color: var(--focus-color) !important;
 }
+
 .td-tab-preview-footer {
   margin-top: var(--padding);
   padding-top: var(--padding);
@@ -1146,6 +1096,7 @@ export default {
   display: flex;
   justify-content: center;
 }
+
 .td-tab-preview-footer__grid {
   /* inline-grid: tự co width vừa đủ nội dung, không ép full width */
   display: inline-grid;
@@ -1153,23 +1104,27 @@ export default {
   gap: 4px 16px;
   align-items: center;
 }
+
 .td-tab-preview-footer__item {
   display: flex;
   align-items: center;
   gap: var(--padding);
   white-space: nowrap;
 }
+
 .td-tab-preview-footer__keys {
   display: flex;
   align-items: center;
   gap: 2px;
   flex-shrink: 0;
 }
+
 .td-tab-preview-footer__label {
   font-size: 11px;
   color: var(--text-secondary-color);
   white-space: nowrap;
 }
+
 .td-tab-preview-footer kbd {
   display: inline-flex;
   align-items: center;
