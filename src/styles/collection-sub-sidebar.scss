@@ -55,10 +55,12 @@
   border-radius: var(--border-radius-component);
 }
 .td-collection-request-item:hover {
-  background-color: var(--bg-hover-color);
+  background-color: var(--focus-color);
+  color: var(--selected-item-text-color);
 }
 .td-collection-request-item-selected {
-  background-color: var(--bg-layer-color);
+  background-color: var(--focus-color);
+  color: var(--selected-item-text-color);
   font-weight: 600;
 }
 
@@ -83,7 +85,7 @@
   gap: var(--padding);
   opacity: 0;
   transition: opacity 0.2s;
-  background-color: var(--bg-layer-color);
+  background-color: var(--focus-color);
 }
 
 .td-collection-request-item:hover .td-collection-item-edit-btn {

@@ -239,10 +239,13 @@ export default {
   transition: background-color 0.2s;
 }
 .template-item:hover {
-  background-color: var(--bg-layer-color);
+  background-color: var(--focus-color);
+  color: var(--selected-item-text-color);
 }
 .template-item-selected {
   font-weight: 600;
+  background-color: var(--focus-color);
+  color: var(--selected-item-text-color);
 }
 .no-template {
   padding: var(--padding);
