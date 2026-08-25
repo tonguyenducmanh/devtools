@@ -115,10 +115,7 @@ export default {
     let me = this;
     return {
       currentUserSetting: getUserSettingDefault(),
-      themeOption: [
-        { value: "light", label: me.$t("i18nUserSettings.themeSetting.light") },
-        { value: "dark", label: me.$t("i18nUserSettings.themeSetting.dark") },
-      ],
+      themeOption: me.$tdEnum.monacoThemeList,
       languageOption: [
         { value: "vi", label: me.$t("i18nGlobal.language.vi") },
         { value: "en", label: me.$t("i18nGlobal.language.en") },

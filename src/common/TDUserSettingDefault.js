@@ -5,7 +5,7 @@ import tdEnum from "@/common/TDEnum.js";
  */
 export function getUserSettingDefault() {
   return {
-    theme: "light",
+    theme: "github-light",
     currentLanguage: "vi",
     agentURL: window.__env?.APITesting?.agentServer,
     wrapTab: true,

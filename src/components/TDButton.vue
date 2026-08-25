@@ -96,7 +96,7 @@ export default {
   overflow-wrap: normal; /* Allows breaking long words */
   word-break: keep-all; /* For wider browser support */
   white-space: nowrap; /* Ensure wrapping is enabled */
-  border: 1px solid transparent;
+  border: 1px solid var(--border-color);
 }
 .td-button-small {
   height: 25px;

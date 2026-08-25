@@ -282,6 +282,7 @@ export default {
   justify-content: flex-end;
   align-items: center;
   gap: var(--padding);
+  margin-bottom: var(--padding);
 }
 .text-nowrap {
   max-width: 230px;

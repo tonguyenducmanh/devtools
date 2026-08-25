@@ -35,6 +35,7 @@
 
 <script>
 import * as monaco from "monaco-editor";
+import { registerAllMonacoThemes } from "@/monarch/TDMonacoTheme.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDCompareCodeHelp from "@/views/helps/TDCompareCodeHelp.vue";
@@ -69,8 +70,9 @@ export default {
         let me = this;
         me.currentTheme = await me.$tdUtility.getUserSettings("theme");
         monaco.languages.register({ id: me.language });
+        registerAllMonacoThemes(monaco);
         let configObject = {
-          theme: me.currentTheme == me.$tdEnum.theme.dark ? "vs-dark" : "vs",
+          theme: me.currentTheme,
           fontSize: 16,
           originalEditable: true,
           automaticLayout: true,

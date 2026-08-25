@@ -76,7 +76,6 @@ import * as monaco from "monaco-editor";
 import {
   registerAllMonacoThemes,
   getMonacoSyntaxRules,
-  monacoThemeColorMap,
 } from "@/monarch/TDMonacoTheme.js";
 import { IQuickInputService } from "monaco-editor/esm/vs/platform/quickinput/common/quickInput.js";
 import { StandaloneServices } from "monaco-editor/esm/vs/editor/standalone/browser/standaloneServices.js";
@@ -261,15 +260,6 @@ export default {
     },
 
     /**
-     * lấy theme mặc định dựa theo app theme
-     */
-    getDefaultMonacoTheme() {
-      return this.currentTheme == this.$tdEnum.theme.dark
-        ? "catppuccin-dark"
-        : "catppuccin-light";
-    },
-
-    /**
      * áp dụng theme monaco và lưu vào cache
      */
     async selectMonacoTheme(themeName) {
@@ -278,8 +268,8 @@ export default {
       if (me.editor) {
         monaco.editor.setTheme(themeName);
       }
-      me._applyMonacoThemeCssVars(themeName);
-      await me.$tdUtility.setMonacoTheme(themeName);
+      me.$tdUtility.setTheme(themeName);
+      await me.$tdUtility.saveUserSettings("theme", themeName);
     },
 
     /**
@@ -295,11 +285,9 @@ export default {
         // đăng ký toàn bộ theme monaco một lần
         registerAllMonacoThemes(monaco);
 
-        // load theme từ cache, nếu null thì dùng default theo app theme
-        let cachedTheme = await me.$tdUtility.getMonacoTheme();
-        me.monacoThemeName = cachedTheme || me.getDefaultMonacoTheme();
+        // dùng theme hiện tại từ user settings
+        me.monacoThemeName = me.currentTheme;
         monaco.editor.setTheme(me.monacoThemeName);
-        me._applyMonacoThemeCssVars(me.monacoThemeName);
 
         me.editorModel = monaco.editor.createModel(
           me.getDefaultModelValueForEditor(),
@@ -421,20 +409,6 @@ export default {
       if (position) {
         this.footerCursorText = `Ln ${position.lineNumber}, Col ${position.column}`;
       }
-    },
-
-    /**
-     * Set CSS vars --td-monaco-footer-bg / --td-monaco-footer-fg lên :root
-     * theo theme đang được chọn — tất cả instance footer đều cập nhật theo
-     */
-    _applyMonacoThemeCssVars(themeName) {
-      const colors = monacoThemeColorMap[themeName];
-      if (!colors) return;
-      const root = document.documentElement;
-      root.style.setProperty("--td-monaco-footer-bg", colors.bg);
-      root.style.setProperty("--td-monaco-footer-fg", colors.fg);
-      root.style.setProperty("--td-monaco-text-active", colors.activeFg);
-      root.style.setProperty("--td-monaco-text-inactive", colors.inactiveFg);
     },
 
     unmountEditor() {

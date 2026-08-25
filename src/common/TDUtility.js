@@ -3,6 +3,7 @@ import i18nData from "@/i18n/i18nData.js";
 import cache from "@/common/cache/TDCache.js";
 import enumeration from "@/common/TDEnum.js";
 import { getUserSettingDefault } from "@/common/TDUserSettingDefault.js";
+import { getAppVarsByTheme, getThemeBase } from "@/monarch/TDMonacoTheme.js";
 /**
  * các method TDutility dùng cho toàn bộ frontend
  * tất cả các file vue đều inject sẵn class này vào dùng
@@ -221,11 +222,36 @@ class TDUtility {
   }
 
   /**
-   * thiết lập chủ đề giao diện ứng dụng
-   * @param {string} currentTheme
+   * backward compatibility: map giá trị theme cũ sang tên Monaco theme mới
    */
-  setTheme(currentTheme) {
-    document.body.setAttribute("data-theme", currentTheme);
+  _resolveLegacyTheme(themeName) {
+    let legacyMap = {
+      light: "github-light",
+      dark: "github-dark",
+    };
+    return legacyMap[themeName] || themeName;
+  }
+
+  /**
+   * thiết lập chủ đề giao diện ứng dụng theo tên theme (ví dụ: "catppuccin-dark")
+   * Apply toàn bộ CSS vars từ appVars lên :root và set data-theme trên body
+   * @param {string} themeName tên theme từ TDMonacoTheme
+   */
+  setTheme(themeName) {
+    themeName = this._resolveLegacyTheme(themeName);
+    let appVars = getAppVarsByTheme(themeName);
+    if (appVars) {
+      let root = document.documentElement;
+      for (let varName in appVars) {
+        if (Object.prototype.hasOwnProperty.call(appVars, varName)) {
+          root.style.setProperty(varName, appVars[varName]);
+        }
+      }
+    }
+    let base = getThemeBase(themeName);
+    let dataTheme = base === "vs-dark" ? "dark" : "light";
+    document.body.setAttribute("data-theme", dataTheme);
+    document.documentElement.setAttribute("data-theme", dataTheme);
   }
 
   /**
@@ -445,6 +471,11 @@ class TDUtility {
     let cacheData = await cache.get(enumeration.cacheConfig.UserSettings);
     if (cacheData) {
       currentUserSetting = Object.assign(currentUserSetting, cacheData);
+    }
+    if (currentUserSetting.theme) {
+      currentUserSetting.theme = this._resolveLegacyTheme(
+        currentUserSetting.theme,
+      );
     }
     if (key) {
       return currentUserSetting[key];
