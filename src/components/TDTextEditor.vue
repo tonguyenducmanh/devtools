@@ -471,8 +471,14 @@ export default {
     height: 100%;
     margin: 0;
     border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-component);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+
+    &:hover {
+      border-color: var(--focus-color);
+    }
 
     // Monaco mount point — chiếm hết chiều cao còn lại
     .td-monaco-editor-wrap {
