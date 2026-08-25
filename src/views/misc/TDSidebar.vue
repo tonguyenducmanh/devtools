@@ -281,11 +281,13 @@ export default {
   }
 
   &:hover .td-item-content {
-    background-color: var(--bg-hover-color);
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
   }
 
   &--active .td-item-content {
-    background-color: var(--bg-hover-color);
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
   }
 
   // Nút pin chỉ hiện khi hover vào item

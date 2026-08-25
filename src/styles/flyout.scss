@@ -85,11 +85,13 @@
   transition: background-color 0.15s ease;
 
   &:hover {
-    background-color: var(--bg-hover-color);
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
   }
 
   &--active {
-    background-color: var(--bg-hover-color);
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
   }
 }
 /* ============ Header dropdown: nội dung riêng ============ */
@@ -122,7 +124,8 @@
   border-radius: var(--border-radius-component);
 
   &:hover {
-    background-color: var(--bg-hover-color);
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
   }
 }
 
@@ -145,7 +148,8 @@
   border-radius: var(--border-radius-component);
 
   &:hover {
-    background-color: var(--bg-hover-color);
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
     .td-flyout-pin-btn {
       opacity: 1;
     }
@@ -163,6 +167,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
+  border-radius: var(--border-radius-component);
+
+  &:hover {
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
+  }
 }
 
 .td-flyout-pin-btn {
