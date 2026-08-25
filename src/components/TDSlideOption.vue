@@ -27,7 +27,6 @@
           class="td-icon"
           :class="{
             [option.icon]: option.icon,
-            'td-selected-icon': option.value == modelValue,
           }"
           v-tooltip="option.label"
         ></div>
@@ -259,7 +258,7 @@ export default {
   align-items: stretch;
 }
 
-.td-selected-icon {
+.td-slide-item-selected .td-icon {
   background-color: var(--selected-item-text-color);
 }
 
