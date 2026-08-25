@@ -165,12 +165,10 @@ export default {
   border-radius: 4px;
   font-size: 11px;
   font-weight: 500;
-  color: var(--text-color-secondary);
 }
 
 .td-shortcut-label {
   font-size: var(--font-size-medium-rare);
-  color: var(--text-secondary-color);
 }
 
 .td-footer-actions {
@@ -181,7 +179,6 @@ export default {
 
 .td-footer-title {
   font-size: var(--font-size-medium-rare);
-  color: var(--text-secondary-color);
 }
 
 /* 
