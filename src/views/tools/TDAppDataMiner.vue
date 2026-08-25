@@ -21,21 +21,6 @@
             ></TDButton>
           </div>
         </template>
-        <template v-else-if="isClipboardMode">
-          <div class="flex td-data-btn">
-            <TDButton
-              @click="loadClipboardHistory"
-              :label="$t('i18nCommon.AppDataMiner.getData')"
-              :noMargin="true"
-            ></TDButton>
-            <TDButton
-              @click="deleteClipboardHistory"
-              :type="$tdEnum.buttonType.secondary"
-              :label="$t('i18nCommon.AppDataMiner.deleteClipboard')"
-              :noMargin="true"
-            ></TDButton>
-          </div>
-        </template>
       </div>
     </div>
     <div class="flex td-script-query" v-if="isServerAgentMode">
@@ -60,7 +45,6 @@
         :noMargin="true"
         :emptyCellText="'null'"
         :hoverable="false"
-        :enableLogCopyData="false"
       >
       </TDTableViewer>
     </div>
@@ -78,7 +62,6 @@ import {
 import { registerSqliteFormatProvider } from "@/monarch/sqlite/sqliteFormatProvider.js";
 
 const DATA_SOURCE_TYPE = {
-  Clipboard: 1,
   ServerAgent: 2,
 };
 
@@ -93,12 +76,8 @@ export default {
       agentAPI: null,
       currentTableDatas: [],
       scriptQuery: null,
-      dataSourceType: DATA_SOURCE_TYPE.Clipboard,
+      dataSourceType: DATA_SOURCE_TYPE.ServerAgent,
       dataSourceOptions: [
-        {
-          value: DATA_SOURCE_TYPE.Clipboard,
-          label: this.$t("i18nCommon.AppDataMiner.dataSourceClipboard"),
-        },
         {
           value: DATA_SOURCE_TYPE.ServerAgent,
           label: this.$t("i18nCommon.AppDataMiner.dataSourceServerAgent"),
@@ -113,14 +92,10 @@ export default {
   async mounted() {
     this.agentAPI = new TDServerAppDataMiner();
     registerSqliteLanguage();
-    this.loadClipboardHistory();
   },
   computed: {
     isServerAgentMode() {
       return this.dataSourceType === DATA_SOURCE_TYPE.ServerAgent;
-    },
-    isClipboardMode() {
-      return this.dataSourceType === DATA_SOURCE_TYPE.Clipboard;
     },
     monacoOptions() {
       let me = this;
@@ -415,47 +390,9 @@ export default {
       let me = this;
       me.currentTableDatas = [];
       me.scriptQuery = null;
-      if (me.isClipboardMode) {
-        await me.loadClipboardHistory();
-      } else {
+      if (me.isServerAgentMode) {
         await me.loadSchemaMetadata();
       }
-    },
-
-    /**
-     * Load lịch sử clipboard từ cache
-     */
-    async loadClipboardHistory() {
-      let me = this;
-      me.currentTableDatas = [];
-      try {
-        let history = await me.$tdCache.get(
-          me.$tdEnum.cacheConfig.CopyTextHistory
-        );
-        if (!history) {
-          history = [];
-        }
-        if (typeof history === "string") {
-          try {
-            history = JSON.parse(history);
-          } catch {
-            history = [];
-          }
-        }
-        if (Array.isArray(history)) {
-          me.currentTableDatas = history.map((text) => ({
-            content: text,
-          }));
-        }
-        me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-      } catch (error) {
-        console.error("Lỗi tải lịch sử clipboard:", error);
-      }
-    },
-    async deleteClipboardHistory() {
-      let me = this;
-      await me.$tdCache.remove(me.$tdEnum.cacheConfig.CopyTextHistory);
-      await me.loadClipboardHistory();
     },
 
     /**

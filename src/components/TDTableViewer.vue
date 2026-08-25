@@ -434,10 +434,6 @@ export default {
       type: Boolean,
       default: false,
     },
-    enableLogCopyData: {
-      type: Boolean,
-      default: true,
-    },
 
     // Virtual Scroll
     virtualScroll: {
@@ -912,15 +908,11 @@ export default {
       if (data !== null && typeof data === "object") {
         data = JSON.stringify(data);
       }
-      this.$tdUtility.copyToClipboard(data, true, this.enableLogCopyData);
+      this.$tdUtility.copyToClipboard(data);
     },
 
     copyRow(row) {
-      this.$tdUtility.copyToClipboard(
-        JSON.stringify(row),
-        true,
-        this.enableLogCopyData,
-      );
+      this.$tdUtility.copyToClipboard(JSON.stringify(row));
     },
 
     onRowPreview(row) {

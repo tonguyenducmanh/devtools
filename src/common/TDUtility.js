@@ -10,10 +10,7 @@ import { getAppVarsByTheme, getThemeBase } from "@/monarch/TDMonacoTheme.js";
  * Created by tdmanh 19.09.2024
  */
 class TDUtility {
-  constructor() {
-    this.copyQueue = [];
-    this.batchTimeout = null;
-  }
+  constructor() {}
   /**
    * lấy ra version hiện tại của app được cấu hình khi build
    */
@@ -180,8 +177,7 @@ class TDUtility {
    * @param {string} value văn bản cần copy
    * @param {boolean} showNoti có bắn noti kết quả không
    */
-  copyToClipboard(value, showNoti = true, logEvent = true) {
-    let me = this;
+  copyToClipboard(value, showNoti = true) {
     let copySucess = true;
     try {
       navigator.clipboard.writeText(value);
@@ -195,13 +191,6 @@ class TDUtility {
       } else {
         toast.error(i18nData.global.t("i18nCommon.toastMessage.cannotCopy"));
       }
-    }
-    try {
-      if (logEvent) {
-        this.handleCopyTextToEvent(value);
-      }
-    } catch (error) {
-      console.log("Coy event to log error", error);
     }
   }
 
@@ -516,76 +505,6 @@ class TDUtility {
     return Math.floor(diff / oneDay);
   }
 
-  /**
-   * handle sự kiện copy text
-   */
-  handleCopyEvent(event) {
-    try {
-      if (event instanceof ClipboardEvent && event.type === "copy") {
-        let logEntry = document.getSelection().toString();
-        this.handleCopyTextToEvent(logEntry);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  handleCopyTextToEvent(textCopy) {
-    try {
-      let userSetting = this.userSettings || {};
-      let enableLog = userSetting.logCopy !== false;
-      let logDelay = userSetting.logCopyDelay ?? 2000;
-      if (textCopy && enableLog) {
-        // Đưa vào hàng chờ (Queue)
-        this.copyQueue.push(textCopy);
-
-        // Thiết lập Batching: Chờ 2 giây nếu không có hành động copy mới thì mới lưu
-        if (this.batchTimeout) clearTimeout(this.batchTimeout);
-
-        this.batchTimeout = setTimeout(async () => {
-          await this.flushCopyQueue();
-        }, logDelay);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async flushCopyQueue() {
-    try {
-      if (this.copyQueue.length === 0) return;
-      const me = this;
-      const MAX_LOGS = 1000; // Giới hạn 1000 bản ghi
-
-      // Lấy dữ liệu cũ từ cache
-      let history = await cache.get(enumeration.cacheConfig.CopyTextHistory);
-      if (history) {
-        if (!Array.isArray(history)) {
-          // Nếu history là mảng, không cần xử lý gì thêm
-          history = JSON.parse(history);
-        }
-      } else {
-        history = [];
-      }
-      // Gộp queue mới vào lịch sử (history)
-      history = [...history, ...this.copyQueue];
-
-      if (history.length > MAX_LOGS) {
-        history = history.slice(-MAX_LOGS);
-      }
-
-      // Lưu lại vào cache
-      await cache.set(
-        enumeration.cacheConfig.CopyTextHistory,
-        JSON.stringify(history),
-      );
-
-      // Xóa sạch queue sau khi đã lưu thành công
-      this.copyQueue = [];
-    } catch (error) {
-      console.error("Lỗi khi lưu cache clipboard data:", error);
-    }
-  }
 }
 const instance = new TDUtility();
 export default instance;

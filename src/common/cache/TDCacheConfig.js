@@ -244,12 +244,6 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử dịch trang web song ngữ",
   },
-  CopyTextHistory: {
-    KeyFormat: "CopyTextHistory",
-    CacheLevel: tdEnum.cacheType.indexedDB,
-    ExpireTime: 0,
-    Note: "lịch sử copy văn bản vào clip board",
-  },
   BlankTextConfigLayout: {
     KeyFormat: "BlankTextConfigLayout",
     CacheLevel: tdEnum.cacheType.local,

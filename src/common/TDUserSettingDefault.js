@@ -14,7 +14,5 @@ export function getUserSettingDefault() {
     toastInHeader: false,
     showCursorTrail: false,
     currentLoadingType: tdEnum.LoadingType.Normal,
-    logCopy: true,
-    logCopyDelay: 500,
   };
 }

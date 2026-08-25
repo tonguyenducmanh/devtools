@@ -40,16 +40,6 @@
             :noMargin="true"
           />
         </div>
-        <div class="flex user-setting-item">
-          <div>{{ $t("i18nUserSettings.settings.logCopyDelay") }}</div>
-          <div class="input-setting">
-            <TDInput
-              v-model="currentUserSetting.logCopyDelay"
-              :noMargin="true"
-              :placeHolder="$t('i18nUserSettings.settings.logCopyDelay')"
-            />
-          </div>
-        </div>
       </div>
       <div class="divide"></div>
       <div class="flex flex-col setting-group">
@@ -82,14 +72,6 @@
             :variant="$tdEnum.checkboxType.switch"
             v-model="currentUserSetting.showCursorTrail"
             :label="$t('i18nUserSettings.settings.cursorTrail')"
-            :noMargin="true"
-          ></TDCheckbox>
-        </div>
-        <div class="flex user-setting-item">
-          <TDCheckbox
-            :variant="$tdEnum.checkboxType.switch"
-            v-model="currentUserSetting.logCopy"
-            :label="$t('i18nUserSettings.settings.logCopy')"
             :noMargin="true"
           ></TDCheckbox>
         </div>

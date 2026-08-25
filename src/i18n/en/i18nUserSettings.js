@@ -12,8 +12,6 @@ export default {
       toastInHeader: "Show notifications in header",
       cursorTrail: "Cursor trail effect",
       loadingType: "Loading type",
-      logCopy: "Log copy events",
-      logCopyDelay: "Copy log delay (ms)",
     },
     loadingType: {
       Normal: "Normal",
