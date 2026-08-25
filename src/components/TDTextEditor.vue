@@ -77,8 +77,6 @@ import {
   registerAllMonacoThemes,
   getMonacoSyntaxRules,
 } from "@/monarch/TDMonacoTheme.js";
-import { IQuickInputService } from "monaco-editor/esm/vs/platform/quickinput/common/quickInput.js";
-import { StandaloneServices } from "monaco-editor/esm/vs/editor/standalone/browser/standaloneServices.js";
 import _ from "@/common/TDCommonFunction.js";
 import eventBus from "@/common/event/TDEventBus.js";
 import { TDEnumEventBus } from "@/common/event/TDEnumEventBus.js";
@@ -271,19 +269,6 @@ export default {
     },
 
     /**
-     * áp dụng theme monaco và lưu vào cache
-     */
-    async selectMonacoTheme(themeName) {
-      let me = this;
-      me.monacoThemeName = themeName;
-      if (me.editor) {
-        monaco.editor.setTheme(themeName);
-      }
-      me.$tdUtility.setTheme(themeName);
-      await me.$tdUtility.saveUserSettings("theme", themeName);
-    },
-
-    /**
      * Bật chế độ highlight synctax (chuyển sang sử dụng monaco editor)
      * Thì sẽ gọi 1 số api của thư viện để update syntax, theme, ...
      */
@@ -327,53 +312,6 @@ export default {
         }
 
         me.editor = monaco.editor.create(me.$refs.textareaWrap, configObject);
-
-        // đăng ký command đổi theme (context menu + keyboard)
-        me.editor.addAction({
-          id: "td-change-monaco-theme",
-          label: me.$t("i18nCommon.changeMonacoTheme"),
-          contextMenuGroupId: "change_theme",
-          contextMenuOrder: 1,
-          keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
-          run: function () {
-            try {
-              var quickInputService =
-                StandaloneServices.get(IQuickInputService);
-              var quickPick = quickInputService.createQuickPick();
-              quickPick.items = me.$tdEnum.monacoThemeList.map(function (t) {
-                return { label: t.label, id: t.value };
-              });
-              quickPick.activeItems = quickPick.items.filter(function (i) {
-                return i.id === me.monacoThemeName;
-              });
-              quickPick.canSelectMany = false;
-              quickPick.onDidAccept(function () {
-                var selected = quickPick.selectedItems[0];
-                if (selected) {
-                  me.selectMonacoTheme(selected.id);
-                }
-                quickPick.dispose();
-              });
-              quickPick.onDidHide(function () {
-                quickPick.dispose();
-              });
-              quickPick.show();
-            } catch (_e) {
-              var input = window.prompt(
-                "Enter theme name\n" +
-                  me.$tdEnum.monacoThemeList
-                    .map(function (t) {
-                      return t.value;
-                    })
-                    .join(", "),
-                me.monacoThemeName,
-              );
-              if (input && input.trim()) {
-                me.selectMonacoTheme(input.trim());
-              }
-            }
-          },
-        });
 
         // Lắng nghe sự kiện phím tắt từ cấu hình cha truyền xuống
         if (me.monacoOptions && typeof me.monacoOptions.onInit === "function") {
