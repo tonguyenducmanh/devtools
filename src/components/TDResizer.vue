@@ -214,11 +214,13 @@ export default {
 .direction-horizontal:hover .td-resizer-line,
 .direction-horizontal.dragging .td-resizer-line {
   height: 150px;
+  background: var(--focus-color);
 }
 
 .direction-vertical:hover .td-resizer-line,
 .direction-vertical.dragging .td-resizer-line {
   width: 150px;
+  background: var(--focus-color);
 }
 
 /* Active dragging state */
