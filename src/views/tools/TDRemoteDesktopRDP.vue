@@ -2,172 +2,81 @@
   <div class="flex container">
     <div class="main-tool">
       <div class="rdp-container">
-        <TDFullTabWrapper
-          v-model="isFullTab"
-          :alwaysShowToolbar="true"
-          fullScreenBgColor="#000"
-          class="rdp-wrapper"
-        >
+        <TDFullTabWrapper v-model="isFullTab" :alwaysShowToolbar="true" fullScreenBgColor="#000" class="rdp-wrapper">
           <template #toolbar-left>
-            <div
-              v-tooltip="$t('i18nCommon.remoteDesktop.screenshot')"
-              class="flex toolbar-btn"
-              @click="takeScreenshot"
-            >
+            <div v-tooltip="$t('i18nCommon.remoteDesktop.screenshot')" class="flex toolbar-btn" @click="takeScreenshot">
               <span class="td-icon td-camera-icon"></span>
             </div>
-            <div
-              v-tooltip="$t('i18nCommon.remoteDesktop.ctrlAltDel')"
-              class="flex toolbar-btn"
-              @click="sendCtrlAltDel"
-              :class="{ 'toolbar-btn-disabled': !isConnected }"
-            >
+            <div v-tooltip="$t('i18nCommon.remoteDesktop.ctrlAltDel')" class="flex toolbar-btn" @click="sendCtrlAltDel"
+              :class="{ 'toolbar-btn-disabled': !isConnected }">
               <span class="td-icon td-command-code-icon"></span>
             </div>
           </template>
           <template #toolbar-right>
             <div class="flex" style="margin-left: 16px">
-              <div
-                v-if="!isConnected && !isConnecting"
-                v-tooltip="$t('i18nCommon.remoteDesktop.connect')"
-                class="flex toolbar-btn"
-                @click="handleConnect"
-              >
+              <div v-if="!isConnected && !isConnecting" v-tooltip="$t('i18nCommon.remoteDesktop.connect')"
+                class="flex toolbar-btn" @click="handleConnect">
                 <span class="td-icon td-connect-icon"></span>
               </div>
-              <div
-                v-else
-                v-tooltip="$t('i18nCommon.remoteDesktop.disconnect')"
-                class="flex toolbar-btn"
-                @click="handleDisconnect"
-              >
+              <div v-else v-tooltip="$t('i18nCommon.remoteDesktop.disconnect')" class="flex toolbar-btn"
+                @click="handleDisconnect">
                 <span class="td-icon td-disconnect-icon"></span>
               </div>
             </div>
           </template>
 
           <div class="rdp-canvas-container">
-            <TDDynamicBackgroundEffect
-              :class="{ 'td-dynamic-effect-canvas': isHideEffectBackground }"
-            />
+            <TDDynamicBackgroundEffect :class="{ 'td-dynamic-effect-canvas': isHideEffectBackground }" />
 
-            <canvas
-              ref="rdpCanvas"
-              class="rdp-canvas"
-              :class="{
-                'rdp-canvas-cursor-none':
-                  currentConfigLayout.enableServerPointer && isConnected,
-              }"
-              :width="canvasWidth"
-              :height="canvasHeight"
-              tabindex="0"
-              @keydown="onCanvasKeydown"
-              @keyup="onCanvasKeyup"
-              @mousemove="onCanvasMousemove"
-              @mousedown="onCanvasMousedown"
-              @mouseup="onCanvasMouseup"
-              @wheel.prevent="onCanvasWheel"
-              @contextmenu.prevent="onCanvasContextmenu"
-            />
+            <canvas ref="rdpCanvas" class="rdp-canvas" :class="{
+              'rdp-canvas-cursor-none':
+                currentConfigLayout.enableServerPointer && isConnected,
+            }" :width="canvasWidth" :height="canvasHeight" tabindex="0" @keydown="onCanvasKeydown"
+              @keyup="onCanvasKeyup" @mousemove="onCanvasMousemove" @mousedown="onCanvasMousedown"
+              @mouseup="onCanvasMouseup" @wheel.prevent="onCanvasWheel" @contextmenu.prevent="onCanvasContextmenu" />
           </div>
         </TDFullTabWrapper>
 
         <!-- Log panel -->
-        <div
-          v-if="currentConfigLayout.showLog"
-          ref="logPanel"
-          class="rdp-log-panel"
-        >
-          <div
-            v-for="(entry, idx) in logEntries"
-            :key="idx"
-            class="rdp-log-entry"
-            :class="`rdp-log-${entry.type}`"
-          >
-            <span class="rdp-log-time">{{ entry.time }}</span
-            >{{ entry.message }}
+        <div v-if="currentConfigLayout.showLog" ref="logPanel" class="rdp-log-panel">
+          <div v-for="(entry, idx) in logEntries" :key="idx" class="rdp-log-entry" :class="`rdp-log-${entry.type}`">
+            <span class="rdp-log-time">{{ entry.time }}</span>{{ entry.message }}
           </div>
         </div>
       </div>
     </div>
-    <TDSubSidebar
-      v-model="currentConfigLayout.isShowSidebar"
-      @toggleSidebar="toggleSidebar"
-    >
+    <TDSubSidebar v-model="currentConfigLayout.isShowSidebar" @toggleSidebar="toggleSidebar">
       <template v-slot:menu>
         <div class="td-sidebar-menu">
-          <TDSlideOption
-            :showIcon="true"
-            v-model="currentConfigLayout.currentSidebarOption"
-            :options="sidebarOptions"
-            :noMargin="true"
-            @change="updateConfigLayout"
-          />
+          <TDSlideOption :showIcon="true" v-model="currentConfigLayout.currentSidebarOption" :options="sidebarOptions"
+            :noMargin="true" @change="updateConfigLayout" />
         </div>
       </template>
       <template v-slot:main>
-        <div
-          class="flex flex-col td-sub-sidebar"
-          v-show="
-            currentConfigLayout.currentSidebarOption ==
-            $tdEnum.RemoteDesktopSidebarOption.Help
-          "
-        >
+        <div class="flex flex-col td-sub-sidebar" v-show="currentConfigLayout.currentSidebarOption ==
+          $tdEnum.RemoteDesktopSidebarOption.Help
+          ">
           <TDRemoteDesktopRDPHelp />
         </div>
-        <div
-          class="flex flex-col td-sub-sidebar"
-          v-show="
-            currentConfigLayout.currentSidebarOption ==
-            $tdEnum.RemoteDesktopSidebarOption.Collection
-          "
-        >
+        <div class="flex flex-col td-sub-sidebar" v-show="currentConfigLayout.currentSidebarOption ==
+          $tdEnum.RemoteDesktopSidebarOption.Collection
+          ">
           <div class="td-rdp-collection">
             <div class="flex flex-col td-collection-header">
               <div class="td-connection-form">
-                <TDInput
-                  v-model="connectionName"
-                  :placeHolder="
-                    $t('i18nCommon.remoteDesktop.connectionNamePlaceholder')
-                  "
-                  :noMargin="true"
-                  class="rdp-connection-input"
-                />
-                <TDInput
-                  v-model="host"
-                  :placeHolder="$t('i18nCommon.remoteDesktop.hostPlaceholder')"
-                  :noMargin="true"
-                  class="rdp-connection-input"
-                />
-                <TDInput
-                  v-model="username"
-                  :placeHolder="
-                    $t('i18nCommon.remoteDesktop.usernamePlaceholder')
-                  "
-                  :noMargin="true"
-                  class="rdp-connection-input"
-                />
-                <TDInput
-                  v-model="password"
-                  :placeHolder="
-                    $t('i18nCommon.remoteDesktop.passwordPlaceholder')
-                  "
-                  :inputType="'password'"
-                  :noMargin="true"
-                  class="rdp-connection-input"
-                />
+                <TDInput v-model="connectionName" :placeHolder="$t('i18nCommon.remoteDesktop.connectionNamePlaceholder')
+                  " :noMargin="true" class="rdp-connection-input" />
+                <TDInput v-model="host" :placeHolder="$t('i18nCommon.remoteDesktop.hostPlaceholder')" :noMargin="true"
+                  class="rdp-connection-input" />
+                <TDInput v-model="username" :placeHolder="$t('i18nCommon.remoteDesktop.usernamePlaceholder')
+                  " :noMargin="true" class="rdp-connection-input" />
+                <TDInput v-model="password" :placeHolder="$t('i18nCommon.remoteDesktop.passwordPlaceholder')
+                  " :inputType="'password'" :noMargin="true" class="rdp-connection-input" />
                 <div class="td-connection-actions">
-                  <TDButton
-                    :noMargin="true"
-                    @click="saveConnection"
-                    :label="$t('i18nCommon.remoteDesktop.saveConnection')"
-                  />
-                  <TDButton
-                    :noMargin="true"
-                    :type="$tdEnum.buttonType.secondary"
-                    @click="createNewConnection"
-                    :label="$t('i18nCommon.remoteDesktop.newConnection')"
-                  />
+                  <TDButton :noMargin="true" @click="saveConnection"
+                    :label="$t('i18nCommon.remoteDesktop.saveConnection')" />
+                  <TDButton :noMargin="true" :type="$tdEnum.buttonType.secondary" @click="createNewConnection"
+                    :label="$t('i18nCommon.remoteDesktop.newConnection')" />
                 </div>
               </div>
             </div>
@@ -175,94 +84,48 @@
               <div class="flex td-connection-list-header">
                 <span class="td-connection-list-title">{{
                   $t("i18nCommon.remoteDesktop.collection.title")
-                }}</span>
-                <div
-                  @click="loadConnections"
-                  class="td-icon td-reload-icon"
-                  v-tooltip="$t('i18nCommon.remoteDesktop.collection.reload')"
-                ></div>
+                  }}</span>
+                <div @click="loadConnections" class="td-icon td-reload-icon"
+                  v-tooltip="$t('i18nCommon.remoteDesktop.collection.reload')"></div>
               </div>
               <div class="flex response-loading" v-if="isLoading">
                 <TDLoading />
               </div>
-              <div
-                v-else-if="connections.length === 0"
-                class="td-no-connections"
-              >
+              <div v-else-if="connections.length === 0" class="td-no-connections">
                 {{ $t("i18nCommon.remoteDesktop.collection.noConnections") }}
               </div>
-              <div
-                v-else
-                v-for="(conn, index) in connections"
-                :key="index"
-                class="td-connection-item"
-                :class="{
-                  'td-connection-item-selected':
-                    currentConnectionId === conn.id,
-                }"
-                @click="loadConnection(conn)"
-              >
+              <div v-else v-for="(conn, index) in connections" :key="index" class="td-connection-item" :class="{
+                'td-connection-item-selected':
+                  currentConnectionId === conn.id,
+              }" @click="loadConnection(conn)">
                 <div class="td-connection-info">
                   <span class="td-connection-name">{{
                     conn.connection_name
-                  }}</span>
+                    }}</span>
                   <span class="td-connection-host">{{ conn.host }}</span>
                 </div>
-                <div
-                  class="td-icon td-close-icon"
-                  @click.stop="deleteConnection(conn)"
-                  v-tooltip="$t('i18nCommon.remoteDesktop.deleteConnection')"
-                ></div>
+                <div class="td-icon td-close-icon" @click.stop="deleteConnection(conn)"
+                  v-tooltip="$t('i18nCommon.remoteDesktop.deleteConnection')"></div>
               </div>
             </div>
           </div>
         </div>
-        <div
-          class="flex flex-col td-sub-sidebar"
-          v-show="
-            currentConfigLayout.currentSidebarOption ==
-            $tdEnum.RemoteDesktopSidebarOption.Setting
-          "
-        >
+        <div class="flex flex-col td-sub-sidebar" v-show="currentConfigLayout.currentSidebarOption ==
+          $tdEnum.RemoteDesktopSidebarOption.Setting
+          ">
           <div class="flex flex-col td-rdp-setting">
-            <TDComboBox
-              v-model="selectedResolution"
-              :options="resolutionOptions"
-              :noMargin="true"
-              :isEditable="false"
-              :width="100"
-              :usingStylePercent="true"
-            ></TDComboBox>
-            <TDComboBox
-              v-model="selectedScaleFactor"
-              :options="scaleFactorOptions"
-              :noMargin="true"
-              :isEditable="false"
-              :width="100"
-              :usingStylePercent="true"
-              :label="$t('i18nCommon.remoteDesktop.scaleFactor')"
-            ></TDComboBox>
-            <TDCheckbox
-              :noMargin="true"
-              :variant="$tdEnum.checkboxType.switch"
+            <TDComboBox v-model="selectedResolution" :options="resolutionOptions" :noMargin="true" :isEditable="false"
+              :width="100" :usingStylePercent="true"></TDComboBox>
+            <TDComboBox v-model="selectedScaleFactor" :options="scaleFactorOptions" :noMargin="true" :isEditable="false"
+              :width="100" :usingStylePercent="true" :label="$t('i18nCommon.remoteDesktop.scaleFactor')"></TDComboBox>
+            <TDCheckbox :noMargin="true" :variant="$tdEnum.checkboxType.switch"
               v-model="currentConfigLayout.enableServerPointer"
-              :label="$t('i18nCommon.remoteDesktop.enableServerPointer')"
-              @change="updateConfigLayout"
-            ></TDCheckbox>
-            <TDCheckbox
-              :noMargin="true"
-              :variant="$tdEnum.checkboxType.switch"
-              v-model="currentConfigLayout.showLog"
-              :label="$t('i18nCommon.remoteDesktop.showLog')"
-              @change="updateConfigLayout"
-            ></TDCheckbox>
-            <TDCheckbox
-              :noMargin="true"
-              :variant="$tdEnum.checkboxType.switch"
+              :label="$t('i18nCommon.remoteDesktop.enableServerPointer')" @change="updateConfigLayout"></TDCheckbox>
+            <TDCheckbox :noMargin="true" :variant="$tdEnum.checkboxType.switch" v-model="currentConfigLayout.showLog"
+              :label="$t('i18nCommon.remoteDesktop.showLog')" @change="updateConfigLayout"></TDCheckbox>
+            <TDCheckbox :noMargin="true" :variant="$tdEnum.checkboxType.switch"
               v-model="currentConfigLayout.enableAudioPlayback"
-              :label="$t('i18nCommon.remoteDesktop.enableAudioPlayback')"
-              @change="updateConfigLayout"
-            ></TDCheckbox>
+              :label="$t('i18nCommon.remoteDesktop.enableAudioPlayback')" @change="updateConfigLayout"></TDCheckbox>
           </div>
         </div>
       </template>
@@ -620,7 +483,7 @@ export default {
 
         builder.setCursorStyleCallbackContext(canvas);
         // không set curor ở đây để đảm bảo khi di chuột vào canvas thì hiển thị icon cursor của IronRDP thay vì cursor style của trình duyệt
-        builder.setCursorStyleCallback((style) => {});
+        builder.setCursorStyleCallback((style) => { });
 
         builder.remoteClipboardChangedCallback((clipboardData) => {
           try {
@@ -766,12 +629,12 @@ export default {
           const kind = e.kind ? e.kind() : "Unknown";
           const bt = e.backtrace ? e.backtrace() : "";
           return `[${kindNames[kind] || kind}] ${bt}`;
-        } catch (_) {}
+        } catch (_) { }
       }
       return e?.message || e?.toString() || String(e);
     },
 
-    setupInputHandlers() {},
+    setupInputHandlers() { },
 
     onCanvasKeydown(e) {
       e.preventDefault();
@@ -792,7 +655,7 @@ export default {
         const tx = new InputTransaction();
         tx.addEvent(event);
         this.session.applyInputs(tx);
-      } catch (_) {}
+      } catch (_) { }
     },
 
     async syncClipboardToRemoteAndPaste(vScancode) {
@@ -816,7 +679,7 @@ export default {
         const tx = new InputTransaction();
         tx.addEvent(event);
         this.session.applyInputs(tx);
-      } catch (_) {}
+      } catch (_) { }
     },
 
     onCanvasKeyup(e) {
@@ -831,7 +694,7 @@ export default {
         const tx = new InputTransaction();
         tx.addEvent(event);
         this.session.applyInputs(tx);
-      } catch (_) {}
+      } catch (_) { }
     },
 
     onCanvasMousemove(e) {
@@ -848,7 +711,7 @@ export default {
         const tx = new InputTransaction();
         tx.addEvent(event);
         this.session.applyInputs(tx);
-      } catch (_) {}
+      } catch (_) { }
     },
 
     onCanvasMousedown(e) {
@@ -861,7 +724,7 @@ export default {
         const tx = new InputTransaction();
         tx.addEvent(event);
         this.session.applyInputs(tx);
-      } catch (_) {}
+      } catch (_) { }
     },
 
     onCanvasMouseup(e) {
@@ -873,7 +736,7 @@ export default {
         const tx = new InputTransaction();
         tx.addEvent(event);
         this.session.applyInputs(tx);
-      } catch (_) {}
+      } catch (_) { }
     },
 
     onCanvasWheel(e) {
@@ -895,7 +758,7 @@ export default {
           tx.addEvent(event);
           this.session.applyInputs(tx);
         }
-      } catch (_) {}
+      } catch (_) { }
     },
 
     onCanvasContextmenu(e) {
@@ -1092,14 +955,17 @@ export default {
   width: 100%;
   overflow: auto;
 }
+
 .td-rdp-setting {
   gap: var(--padding);
   margin-top: var(--padding);
   width: 100%;
+
   .td-combobox {
     width: 100%;
   }
 }
+
 .td-rdp-collection {
   width: 100%;
   display: flex;
@@ -1160,11 +1026,13 @@ export default {
 }
 
 .td-connection-item:hover {
-  background-color: var(--bg-layer-color);
+  background-color: var(--bg-focus-color);
+  color: var(--selected-item-text-color);
 }
 
 .td-connection-item-selected {
-  background-color: var(--bg-layer-color);
+  background-color: var(--bg-focus-color);
+  color: var(--selected-item-text-color);
   font-weight: 600;
 }
 
@@ -1184,7 +1052,7 @@ export default {
 
 .td-connection-host {
   font-size: 12px;
-  color: #6e7681;
+  color: var(--text-color);
 }
 
 .response-loading {

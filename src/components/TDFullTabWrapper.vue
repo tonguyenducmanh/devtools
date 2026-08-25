@@ -1,51 +1,40 @@
 <template>
   <div class="td-full-tab-wrapper" :class="{ 'td-full-tab-wrapper-active': modelValue }" :style="wrapperStyle">
-    <div class="fullscreen-toolbar" :class="{ 'toolbar-pinned': isToolbarPinned }" v-if="modelValue || alwaysShowToolbar">
+    <div class="fullscreen-toolbar" :class="{ 'toolbar-pinned': isToolbarPinned }"
+      v-if="modelValue || alwaysShowToolbar">
       <template v-if="!hidePin">
         <template v-if="isToolbarPinned">
-          <div
-            v-tooltip="unpinTooltip || $t('i18nCommon.remoteDesktop.unpin')"
-            class="flex toolbar-btn"
-            @click="unpinToolbar"
-          >
+          <div v-tooltip="unpinTooltip || $t('i18nCommon.remoteDesktop.unpin')" class="flex toolbar-btn"
+            @click="unpinToolbar">
             <span class="td-icon td-unpin-icon"></span>
           </div>
         </template>
         <template v-else>
-          <div
-            v-tooltip="pinTooltip || $t('i18nCommon.remoteDesktop.pin')"
-            class="flex toolbar-btn"
-            @click="pinToolbar"
-          >
+          <div v-tooltip="pinTooltip || $t('i18nCommon.remoteDesktop.pin')" class="flex toolbar-btn"
+            @click="pinToolbar">
             <span class="td-icon td-pin-icon"></span>
           </div>
         </template>
       </template>
-      
+
       <div class="flex td-toolbar-utility-area">
         <slot name="toolbar-left"></slot>
         <template v-if="modelValue">
-          <div
-            v-tooltip="exitFullScreenTooltip || $t('i18nCommon.remoteDesktop.closeFullTab')"
-            class="flex toolbar-btn"
-            @click="toggleFullScreen"
-          >
+          <div v-tooltip="exitFullScreenTooltip || $t('i18nCommon.remoteDesktop.closeFullTab')" class="flex toolbar-btn"
+            @click="toggleFullScreen">
             <span class="td-icon td-exit-full-screen-icon"></span>
           </div>
         </template>
         <template v-else>
-          <div
-            v-tooltip="fullScreenTooltip || $t('i18nCommon.remoteDesktop.fullTab')"
-            class="flex toolbar-btn"
-            @click="toggleFullScreen"
-          >
+          <div v-tooltip="fullScreenTooltip || $t('i18nCommon.remoteDesktop.fullTab')" class="flex toolbar-btn"
+            @click="toggleFullScreen">
             <span class="td-icon td-full-screen-icon"></span>
           </div>
         </template>
         <slot name="toolbar-right"></slot>
       </div>
     </div>
-    
+
     <div class="td-full-tab-content">
       <slot></slot>
     </div>
@@ -189,8 +178,11 @@ export default {
     justify-content: center;
     border-radius: var(--border-radius);
     cursor: pointer;
+
     &:hover {
-      background-color: var(--bg-main-color);
+      background-color: var(--bg-focus-color);
+      color: var(--selected-item-text-color);
+
       border: 1px solid var(--border-color);
     }
   }
