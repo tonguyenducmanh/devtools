@@ -179,7 +179,7 @@ export default {
 }
 
 .td-toggle-button:hover {
-  border-color: var(--btn-color);
+  border-color: var(--focus-color);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   opacity: 1;
 }
