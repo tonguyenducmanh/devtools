@@ -385,65 +385,23 @@
 
         <!-- tab SQL Save: danh sách query đã lưu -->
         <div
-          class="flex flex-col td-sidebar-content"
+          class="td-sidebar-content"
           v-show="
             currentConfigLayout.currentSidebarOption ===
             $tdEnum.PostgreSQLQuerySidebarOption.SQLSave
           "
         >
-          <!-- header: input tên query + nút save + nút reload -->
-          <div class="flex td-header-collection">
-            <div class="td-new-collection">
-              <TDInput
-                v-model="newQueryName"
-                :noMargin="true"
-                :placeHolder="$t('i18nCommon.postgreSQLQuery.queryName')"
-              />
-            </div>
-            <TDButton
-              :noMargin="true"
-              @click="saveCurrentQuery"
-              :type="$tdEnum.buttonType.secondary"
-              iconClass="td-save-icon"
-              v-tooltip="$t('i18nCommon.postgreSQLQuery.saveQuery')"
-            />
-            <TDButton
-              :noMargin="true"
-              @click="loadSavedQueries"
-              :type="$tdEnum.buttonType.secondary"
-              iconClass="td-reload-icon"
-              v-tooltip="$t('i18nCommon.postgreSQLQuery.refreshData')"
-            />
-          </div>
-          <!-- danh sách saved queries -->
-          <div class="td-collection">
-            <div class="td-collection-body">
-              <div
-                v-for="(q, qi) in allSavedQueries"
-                :key="qi"
-                class="flex td-collection-request-item"
-                :class="{
-                  'td-collection-request-item-selected':
-                    currentSavedQueryId === q.id,
-                }"
-                @click="loadSavedQuery(q)"
-              >
-                <span class="text-nowrap flex-one td-sql-text">
-                  <div v-tooltip="q.query_name">{{ q.query_name }}</div>
-                </span>
-                <span class="td-collection-item-edit-btn">
-                  <div
-                    class="td-icon td-close-icon"
-                    v-tooltip="$t('i18nCommon.postgreSQLQuery.deleteQuery')"
-                    @click.stop="deleteSavedQuery(q.id)"
-                  ></div>
-                </span>
-              </div>
-              <div v-if="!allSavedQueries.length" class="td-empty-hint">
-                {{ $t("i18nCommon.noDataAvailable") }}
-              </div>
-            </div>
-          </div>
+          <TDHistorySidebar
+            ref="savedQueryHistory"
+            :applyFunction="applySavedQueryFromHistory"
+            titleKey="query_name"
+            :noMargin="true"
+            :positionRelative="false"
+            :cacheKey="$tdEnum.cacheConfig.PostgreSQLSavedQuery"
+            :historyContainerStyleEnum="
+              $tdEnum.AbsolutePositionStyle.Top100Left
+            "
+          />
         </div>
       </template>
     </TDSubSidebar>
@@ -459,6 +417,7 @@ import TDPostgreSQLQueryHelp from "@/views/helps/TDPostgreSQLQueryHelp.vue";
 import TDServerPostgreSQLAPI from "@/common/api/request/AgentAPI/TDServerPostgreSQLAPI.js";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDCache from "@/common/cache/TDCache.js";
+import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 import { pgQueries } from "@/templates/postgresqlToolQuery/templates.js";
 import TDPostgreSQLIntellisenseMixin from "./TDPostgreSQLIntellisenseMixin.js";
 import { registerPgsqlFormatProvider } from "@/monarch/pgsql/pgsqlFormatProvider.js";
@@ -485,6 +444,7 @@ export default {
     TDSubSidebar,
     TDArrow,
     TDPostgreSQLQueryHelp,
+    TDHistorySidebar,
     TDDynamicBackgroundEffect,
     TDFlyoutPanel,
   },
@@ -535,12 +495,7 @@ export default {
       openGroups: {}, // Trạng thái đóng/mở của từng nhóm
       newGroupName: "", // Tên nhóm mới khi tạo
 
-      // ── Saved Queries ────────────────────────────────────────────────
-      allSavedQueries: [],
-      newQueryName: "",
-      currentSavedQueryId: null,
-
-      // ── Editor ───────────────────────────────────────────────────────
+      // ── Editor ───────────────────────────────────────────────────
       sqlText: "",
 
       // ── Results ──────────────────────────────────────────────────────
@@ -1147,7 +1102,6 @@ export default {
         await Promise.all([
           me.loadGroups(),
           me.loadConnections(),
-          me.loadSavedQueries(),
         ]);
       } catch (error) {
         console.error("Lỗi tải dữ liệu:", error);
@@ -1185,18 +1139,6 @@ export default {
       let data = response?.data?.data ?? [];
       if (Array.isArray(data)) {
         me.allConnections.splice(0, me.allConnections.length, ...data);
-      }
-    },
-
-    /**
-     * Tải danh sách saved queries
-     */
-    async loadSavedQueries() {
-      let me = this;
-      let response = await me.agentAPI.savedQuery.getAll();
-      let data = response?.data?.data ?? [];
-      if (Array.isArray(data)) {
-        me.allSavedQueries.splice(0, me.allSavedQueries.length, ...data);
       }
     },
 
@@ -1510,7 +1452,7 @@ export default {
     },
 
     /**
-     * Lưu query hiện tại (tên mặc định là nội dung query nếu user không nhập)
+     * Lưu query hiện tại vào history
      */
     async saveCurrentQuery() {
       let me = this;
@@ -1522,19 +1464,15 @@ export default {
         );
         return;
       }
-      let queryName = me.newQueryName || me.sqlText;
-      queryName = (queryName || "").substring(0, 100);
+      let queryName = me.sqlText.substring(0, 100);
       try {
-        let response = await me.agentAPI.savedQuery.create({
+        let historyItem = {
+          id: me.$tdUtility.newGuid(),
           query_name: queryName,
           connection_id: me.selectedConnectionId ?? "",
           query_text: me.sqlText,
-        });
-        if (response?.data?.success) {
-          me.currentSavedQueryId = response.data.data?.id;
-          me.newQueryName = "";
-          await me.loadSavedQueries();
-        }
+        };
+        await me.$refs.savedQueryHistory.saveToHistory(historyItem);
       } catch {
         me.$tdToast.error(me.$t("i18nCommon.postgreSQLQuery.saveQueryErr"));
       }
@@ -1648,33 +1586,16 @@ export default {
     },
 
     /**
-     * Load nội dung saved query vào editor
+     * Apply saved query từ history sidebar vào editor
      */
-    loadSavedQuery(query) {
+    applySavedQueryFromHistory(item) {
       let me = this;
-      me.currentSavedQueryId = query.id;
-      me.sqlText = query.query_text ?? "";
-      if (query.connection_id) {
-        me.selectedConnectionId = query.connection_id;
-      }
-    },
-
-    /**
-     * Xoá saved query
-     */
-    async deleteSavedQuery(id) {
-      let me = this;
-      try {
-        let response = await me.agentAPI.savedQuery.deleteById(id);
-        if (response?.data?.success) {
-          me.$tdToast.success(
-            me.$t("i18nCommon.postgreSQLQuery.deleteQuerySuccess"),
-          );
-          if (me.currentSavedQueryId === id) me.currentSavedQueryId = null;
-          await me.loadSavedQueries();
+      if (item && item.source) {
+        let query = item.source;
+        me.sqlText = query.query_text ?? "";
+        if (query.connection_id) {
+          me.selectedConnectionId = query.connection_id;
         }
-      } catch {
-        me.$tdToast.error(me.$t("i18nCommon.postgreSQLQuery.deleteQueryErr"));
       }
     },
 
@@ -1962,12 +1883,6 @@ export default {
   width: 100%;
 }
 
-.td-empty-hint {
-  text-align: center;
-  color: var(--text-secondary-color);
-  font-size: var(--font-size-small);
-  padding: var(--padding);
-}
 .td-collection-rename {
   width: 100%;
 }

@@ -43,6 +43,7 @@ export const EnumCacheConfig = {
   PostgreSQLQueryConfigLayout: 49,
   PostgreSQLQueryHistory: 50,
   PostgreSQLLastConnectionId: 51,
+  PostgreSQLSavedQuery: 65,
   MonacoTheme: 52,
   VectorMockGeneratorConfigLayout: 53,
   PostgreSQLBinPath: 54,

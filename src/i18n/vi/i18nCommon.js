@@ -574,7 +574,7 @@ export default {
     },
     APIMocking: {
       ImportPlaceHolder:
-        "Nhập từ tool API testing hoặc từ bảng td_api_testing_log ở tool Dữ liệu ứng dụng",
+        "Nhập từ tool API testing",
       APIMockBaseURL: "Base URL mock server được trả về từ agent",
       importMock: "Nhập mock",
       tooltipImportMock:
@@ -830,7 +830,6 @@ export default {
       connectionName: "Tên kết nối",
       connectionString: "Chuỗi kết nối",
       groupName: "Tên nhóm",
-      queryName: "Tên query",
       sqlContent: "Nội dung script SQL",
       autoSaveQueryAfterExec: "Tự động lưu query",
       loadFunctionIntellisense: "Load gợi ý cả function",

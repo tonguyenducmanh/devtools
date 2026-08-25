@@ -1,4 +1,4 @@
-// file này chứa toàn bộ các method CRUD liên quan tới PostgreSQL connection, group và saved query
+// file này chứa toàn bộ các method CRUD liên quan tới PostgreSQL connection và group
 
 package postgresql
 
@@ -50,21 +50,5 @@ func GetPostgreSQLConnectionController() *service.TDBLBase[model.TDPostgreSQLCon
 		AfterInsert: afterInsertConnection,
 		AfterUpdate: afterUpdateConnection,
 		BeforeDelete: beforeDeleteConnection,
-	}
-}
-
-// --- Custom Create cho PostgreSQL Saved Query (ghi bất đồng bộ qua buffer) ---
-
-func savedQueryCustomCreate(req *model.TDPostgreSQLSavedQuery, r *http.Request) error {
-	pgdb.PushPostgreSQLSavedQuery(req)
-	return nil
-}
-
-// GetPostgreSQLSavedQueryController trả về controller quản lý saved query
-func GetPostgreSQLSavedQueryController() *service.TDBLBase[model.TDPostgreSQLSavedQuery] {
-	return &service.TDBLBase[model.TDPostgreSQLSavedQuery]{
-		PathPrefix:   "postgresql_saved_query",
-		Repo:         database.TDDLBase[model.TDPostgreSQLSavedQuery]{},
-		CustomCreate: savedQueryCustomCreate,
 	}
 }

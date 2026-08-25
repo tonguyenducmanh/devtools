@@ -11,7 +11,6 @@ class TDServerPostgreSQLAPI extends TDAgentAPI {
       "postgresql_connection_group",
     );
     this.connection = new TDAgentAPI(baseUrl, "postgresql_connection");
-    this.savedQuery = new TDAgentAPI(baseUrl, "postgresql_saved_query");
   }
 
   /**

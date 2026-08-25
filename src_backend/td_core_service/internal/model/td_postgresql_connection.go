@@ -22,15 +22,3 @@ type TDPostgreSQLConnection struct {
 func (m TDPostgreSQLConnection) TableName() string {
 	return "td_postgresql_connection"
 }
-
-// model cho saved SQL query
-type TDPostgreSQLSavedQuery struct {
-	TDBaseModel
-	QueryName    string `json:"query_name"`
-	ConnectionID string `json:"connection_id"`
-	QueryText    string `json:"query_text"`
-}
-
-func (q TDPostgreSQLSavedQuery) TableName() string {
-	return "td_postgresql_saved_query"
-}

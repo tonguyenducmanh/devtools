@@ -54,18 +54,6 @@ func InitDatabase() {
 			created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 			modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
-		// td_api_testing_log
-		`CREATE TABLE IF NOT EXISTS td_api_testing_log (
-			id TEXT PRIMARY KEY NOT NULL,
-			api_url TEXT NOT NULL,
-			method TEXT,
-			headers_text TEXT,
-			body_text TEXT,
-			response_text TEXT,
-			response_headers_text TEXT,
-			status_code INTEGER,
-			created_date DATETIME DEFAULT CURRENT_TIMESTAMP
-		);`,
 		// td_api_testing_group
 		`CREATE TABLE IF NOT EXISTS td_api_testing_group (
 			id TEXT PRIMARY KEY NOT NULL,
@@ -116,15 +104,6 @@ func InitDatabase() {
 			created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 			modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
-		// td_postgresql_saved_query
-		`CREATE TABLE IF NOT EXISTS td_postgresql_saved_query (
-			id TEXT PRIMARY KEY NOT NULL,
-			query_name TEXT NOT NULL,
-			connection_id TEXT,
-			query_text TEXT,
-			created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-			modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
-		);`,
 	}
 
 	// Danh sách các script migration (ALTER TABLE) cho các bảng đã tồn tại
@@ -132,7 +111,6 @@ func InitDatabase() {
 		"ALTER TABLE td_api_mock ADD COLUMN headers_text TEXT",
 		"ALTER TABLE td_api_mock ADD COLUMN response_headers_text TEXT",
 		"ALTER TABLE td_api_mock ADD COLUMN status_code INTEGER DEFAULT 0",
-		"ALTER TABLE td_api_testing_log ADD COLUMN response_headers_text TEXT",
 	}
 
 	// Chạy tất cả script tạo bảng

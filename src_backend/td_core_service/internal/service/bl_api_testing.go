@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"strings"
 
-	"td_core_service/internal/database"
 	"td_core_service/internal/model"
 	"td_config"
 	"td_core_service/td_common"
@@ -92,20 +91,11 @@ func executeRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingRespons
 	// Ép kiểu headers về JSON string như code cũ
 	headerJson, _ := json.Marshal(resp.Header)
 
-	// log dữ liệu vào db
-	logDataCallAPIToDatabase(reqData, string(respBody), string(headerJson), resp.StatusCode)
-
 	return &model.TDAPITestingResponse{
 		Status:  resp.StatusCode,
 		Headers: string(headerJson),
 		Body:    string(respBody),
 	}, nil
-}
-
-// log dữ liệu vào db
-func logDataCallAPIToDatabase(reqData model.TDAPITestingParam, responseText string, responseHeadersText string, statusCode int) {
-	id := td_common.GenUUID()
-	database.LogDataCallAPIToDatabase(reqData, responseText, responseHeadersText, statusCode, id)
 }
 
 // parse header được stringify từ frontend

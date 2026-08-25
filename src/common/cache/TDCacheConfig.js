@@ -268,6 +268,12 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache kết nối database gần nhất thao tác",
   },
+  PostgreSQLSavedQuery: {
+    KeyFormat: "PostgreSQLSavedQuery",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "danh sách saved query PostgreSQL",
+  },
   MonacoTheme: {
     KeyFormat: "MonacoTheme",
     CacheLevel: tdEnum.cacheType.local,
