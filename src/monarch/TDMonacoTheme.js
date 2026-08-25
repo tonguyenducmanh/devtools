@@ -939,7 +939,7 @@ const THEMES = [
       "--focus-color": "#a6e22e",
       "--btn-color": "#f8f8f2",
       "--btn-secondary-color": "#3e3d32",
-      "--btn-secondary-text-color": "#66d9ef",
+      "--btn-secondary-text-color": "var(--focus-color)",
       "--btn-secondary-focus-color": "#4e4d42",
       "--btn-primary-bg": "#a6e22e",
       "--selected-item-text-color": "var(--bg-thirt-color)",
