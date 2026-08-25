@@ -5,7 +5,8 @@
         <transition v-if="isShowLoading" name="td-fade-loading">
           <TDLoading />
         </transition>
-        <div v-else class="main-line-title">{{ welcomeTitle }}</div>
+        <div v-else class="dependency-img">
+        </div>
         <TDDynamicBackgroundEffect />
         <p class="description">
           {{ displayText }}<span class="cursor">|</span>
@@ -13,10 +14,7 @@
       </div>
       <p class="agreement">{{ $t("i18nCommon.agreement") }}</p>
     </div>
-    <TDSubSidebar
-      v-model="currentConfigLayout.isShowSidebar"
-      @toggleSidebar="toggleSidebar"
-    >
+    <TDSubSidebar v-model="currentConfigLayout.isShowSidebar" @toggleSidebar="toggleSidebar">
       <template v-slot:main>
         <TDWelcomeHelp />
       </template>
@@ -58,7 +56,7 @@ export default {
       return this.loadingType != this.$tdEnum.LoadingType.Normal;
     },
   },
-  created() {},
+  created() { },
   methods: {
     async toggleSidebar() {
       let me = this;
@@ -114,46 +112,29 @@ export default {
   position: relative;
   overflow: hidden;
 }
+
 /* Giữ nguyên các style cũ của bạn */
 .wrap-container {
   height: 100%;
   flex: 1;
 }
+
 .agreement {
   color: var(--text-color-light);
   text-align: center;
   width: 95%;
   margin: var(--padding);
 }
-.language-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 30px;
-}
 
-.language-btn {
-  padding: 8px 16px;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  background: var(--btn-secondary-color);
-  color: var(--btn-secondary-text-color);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-
-  &:hover {
-    background: var(--btn-secondary-focus-color);
-    transform: translateY(-2px);
-  }
-
-  &.active {
-    border-color: var(--btn-color);
-    background-color: var(--btn-color);
-    color: white;
-  }
+.dependency-img {
+  width: 100%;
+  height: fit-content;
+  max-width: 500px;
+  max-height: 500px;
+  aspect-ratio: 249 / 140;
+  background: url("@/assets/dependency.jpg") no-repeat center;
+  background-size: contain;
+  overflow: hidden;
 }
 
 .container {
@@ -165,15 +146,7 @@ export default {
   height: 100%;
   flex: 1;
 }
-.main-line-title {
-  font-size: 10cqw;
-  font-family: var(--straight-font);
-  font-weight: 600;
-  position: relative;
-  opacity: 1;
-  visibility: visible;
-  z-index: 1;
-}
+
 .description {
   font-family: var(--straight-font);
   font-size: 2cqw;
@@ -189,10 +162,12 @@ export default {
 }
 
 @keyframes blink {
+
   from,
   to {
     opacity: 1;
   }
+
   50% {
     opacity: 0;
   }
