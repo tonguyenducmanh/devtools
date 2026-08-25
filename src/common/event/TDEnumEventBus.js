@@ -10,4 +10,7 @@ export const TDEnumEventBus = {
 
   // Zen mode state change (broadcast current zen mode)
   zenModeState: "zenModeState",
+
+  // Theme changed (preview or apply)
+  themeChanged: "themeChanged",
 };

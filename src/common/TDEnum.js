@@ -120,8 +120,8 @@ class TDEnum {
     Setting: 2,
   };
   LoadingType = {
-    Normal: 'normal',
-    Meme: 'meme',
+    Normal: "normal",
+    Meme: "meme",
   };
   PostgreSQLQuerySidebarOption = {
     Help: 0,
@@ -135,6 +135,8 @@ class TDEnum {
   };
   // danh sách theme monaco editor
   monacoThemeList = [
+    { label: "Blender", value: "blender" },
+    { label: "Monokai", value: "monokai" },
     { label: "VS", value: "vs" },
     { label: "VS Dark", value: "vs-dark" },
     { label: "GitHub Light", value: "github-light" },
@@ -147,11 +149,9 @@ class TDEnum {
     { label: "Gruvbox Dark", value: "gruvbox-dark" },
     { label: "Catppuccin Latte", value: "catppuccin-light" },
     { label: "Catppuccin Mocha", value: "catppuccin-dark" },
-    { label: "Monokai", value: "monokai" },
     { label: "Synthwave84", value: "synthwave84" },
     { label: "Tokyo Night", value: "tokyo-night" },
     { label: "Dracula", value: "dracula" },
-    { label: "Blender", value: "blender" },
   ];
 }
 

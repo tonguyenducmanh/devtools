@@ -111,6 +111,9 @@ export default {
     settings: {
       title: "Thiết lập",
     },
+    theme: {
+      title: "Chủ đề",
+    },
     utilities: {
       title: "Tiện ích",
       getCurrentDate: "Lấy ngày hiện tại",

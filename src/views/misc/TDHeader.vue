@@ -8,14 +8,9 @@
         </div>
       </div>
       <div class="td-header-menu">
-        <div
-          v-for="(items, menuKey) in menuConfig"
-          :key="menuKey"
-          class="td-menu-item"
-          :class="{ 'td-menu-item--active': activeKeyFlyOut === menuKey }"
-          @mouseenter="openFlyout(menuKey, $event)"
-          @mouseleave="scheduleCloseFlyout()"
-        >
+        <div v-for="(items, menuKey) in menuConfig" :key="menuKey" class="td-menu-item"
+          :class="{ 'td-menu-item--active': activeKeyFlyOut === menuKey }" @mouseenter="openFlyout(menuKey, $event)"
+          @mouseleave="scheduleCloseFlyout()">
           <span>{{ $t(`i18nCommon.${menuKey}.title`) }}</span>
         </div>
       </div>
@@ -23,37 +18,33 @@
 
     <div class="td-header-right">
       <div class="td-header-toast">
-        <div
-          v-if="currentHeaderToast"
-          :class="[
-            'td-header-toast-item',
-            `td-header-toast--${currentHeaderToast.type}`,
-          ]"
-          @click="removeHeaderToast(currentHeaderToast.id)"
-        >
+        <div v-if="currentHeaderToast" :class="[
+          'td-header-toast-item',
+          `td-header-toast--${currentHeaderToast.type}`,
+        ]" @click="removeHeaderToast(currentHeaderToast.id)">
           {{ currentHeaderToast.message }}
         </div>
       </div>
     </div>
 
     <!-- Flyout Menu: mở xuống dưới (placement="bottom") -->
-    <TDFlyoutPanel
-      :show="!!activeKeyFlyOut && activeKeyFlyOut !== 'logo'"
-      :anchorElFlyout="anchorElFlyout"
-      placement="bottom"
-      panelClass="td-header-flyout"
-      @mouseenter="cancelCloseFlyOut"
-      @mouseleave="scheduleCloseFlyout()"
-    >
-      <div
-        v-for="item in currentMenuItems"
-        :key="item.key"
-        class="td-flyout-item"
-                v-tooltip="item.tooltip"
-        @click="item.action"
-      >
-        {{ $t(item.labelKey) }}
-      </div>
+    <TDFlyoutPanel :show="!!activeKeyFlyOut && activeKeyFlyOut !== 'logo'" :anchorElFlyout="anchorElFlyout"
+      placement="bottom" panelClass="td-header-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="onFlyoutPanelLeave">
+      <template v-if="activeKeyFlyOut === 'theme'">
+        <div class="td-flyout-theme-list">
+          <div v-for="item in themeItems" :key="item.value" class="td-flyout-item td-flyout-theme-item"
+            :class="{ 'td-flyout-theme-item--active': item.value === savedTheme }"
+            @mouseenter="previewTheme(item.value)" @mouseleave="revertTheme" @click="applyTheme(item.value)">
+            {{ item.label }}
+          </div>
+        </div>
+      </template>
+      <template v-else>
+        <div v-for="item in currentMenuItems" :key="item.key" class="td-flyout-item" v-tooltip="item.tooltip"
+          @click="item.action">
+          {{ $t(item.labelKey) }}
+        </div>
+      </template>
     </TDFlyoutPanel>
   </div>
 </template>
@@ -98,6 +89,8 @@ export default {
       currentHeaderToast: null,
       headerToastTimer: null,
       headerToastUnsubscribe: null,
+      savedTheme: null,
+      themeItems: this.$tdEnum.monacoThemeList,
     };
   },
   computed: {
@@ -108,11 +101,19 @@ export default {
       return this.menuConfig[this.activeKeyFlyOut] ?? [];
     },
   },
+  watch: {
+    activeKeyFlyOut(newVal, oldVal) {
+      if (oldVal === "theme" && newVal !== "theme") {
+        this.revertTheme();
+      }
+    },
+  },
   mounted() {
     this.headerToastUnsubscribe = eventBus.on(
       TDEnumEventBus.headerToastShow,
       this.onHeaderToastShow,
     );
+    this.loadCurrentTheme();
     this.logoItems = [
       {
         key: "tool",
@@ -186,6 +187,8 @@ export default {
           action: this.downloadAgentFunc,
         },
       ],
+      theme: [],
+
     };
   },
   beforeUnmount() {
@@ -194,6 +197,30 @@ export default {
     }
   },
   methods: {
+    async loadCurrentTheme() {
+      this.savedTheme = await this.$tdUtility.getUserSettings("theme");
+    },
+    previewTheme(themeName) {
+      this.$tdUtility.setTheme(themeName);
+      eventBus.emit(TDEnumEventBus.themeChanged, themeName);
+    },
+    revertTheme() {
+      if (this.savedTheme) {
+        this.$tdUtility.setTheme(this.savedTheme);
+        eventBus.emit(TDEnumEventBus.themeChanged, this.savedTheme);
+      }
+    },
+    async applyTheme(themeName) {
+      this.savedTheme = themeName;
+      this.$tdUtility.setTheme(themeName);
+      eventBus.emit(TDEnumEventBus.themeChanged, themeName);
+      await this.$tdUtility.saveUserSettings("theme", themeName);
+      this.closeFlyout();
+    },
+    onFlyoutPanelLeave() {
+      this.revertTheme();
+      this.scheduleCloseFlyout();
+    },
     genUUIDFunc() {
       let me = this;
       me.$tdUtility.copyToClipboard(me.$tdUtility.newGuid());
@@ -311,12 +338,14 @@ export default {
     display: flex;
     align-items: center;
     gap: var(--padding);
+
     .td-app-brand {
       display: flex;
       align-items: center;
       gap: var(--padding);
       cursor: pointer;
     }
+
     .td-app-title {
       font-size: 14px;
       font-weight: 700;
@@ -340,6 +369,7 @@ export default {
     display: flex;
     align-items: center;
     overflow: hidden;
+
     .td-header-toast-item {
       font-size: 12px;
       padding: 2px 8px;
@@ -366,5 +396,10 @@ export default {
       color: #3b82f6;
     }
   }
+}
+
+.td-flyout-theme-list {
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
 }
 </style>

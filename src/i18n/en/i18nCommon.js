@@ -110,6 +110,9 @@ export default {
     settings: {
       title: "Settings",
     },
+    theme: {
+      title: "Theme",
+    },
     utilities: {
       title: "Utilities",
       getCurrentDate: "Get current date",

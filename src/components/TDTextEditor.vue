@@ -80,6 +80,8 @@ import {
 import { IQuickInputService } from "monaco-editor/esm/vs/platform/quickinput/common/quickInput.js";
 import { StandaloneServices } from "monaco-editor/esm/vs/editor/standalone/browser/standaloneServices.js";
 import _ from "@/common/TDCommonFunction.js";
+import eventBus from "@/common/event/TDEventBus.js";
+import { TDEnumEventBus } from "@/common/event/TDEnumEventBus.js";
 
 export default {
   name: "TDTextEditor",
@@ -93,6 +95,12 @@ export default {
   },
   mounted() {
     this.updateHighlight();
+    this._unsubscribeTheme = eventBus.on(TDEnumEventBus.themeChanged, (themeName) => {
+      this.monacoThemeName = themeName;
+      if (this.editor) {
+        monaco.editor.setTheme(themeName);
+      }
+    });
   },
   activated() {
     // Khi tab được reactivate (KeepAlive), layout Monaco cần được refresh
@@ -101,6 +109,9 @@ export default {
     });
   },
   beforeUnmount() {
+    if (this._unsubscribeTheme) {
+      this._unsubscribeTheme();
+    }
     if (this.debounceUpdateEditorVal?.cancel) {
       this.debounceUpdateEditorVal.cancel();
     }
