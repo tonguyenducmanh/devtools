@@ -160,7 +160,7 @@ export default {
 }
 .td-sidebar-menu {
   width: 100%;
-  background-color: var(--bg-layer-color);
+  // background-color: var(--bg-layer-color);
   border-radius: var(--border-radius);
 }
 
