@@ -180,7 +180,7 @@ export default {
     cursor: pointer;
 
     &:hover {
-      background-color: var(--bg-focus-color);
+      background-color: var(--focus-color);
       color: var(--selected-item-text-color);
 
       border: 1px solid var(--border-color);

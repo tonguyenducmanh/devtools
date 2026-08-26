@@ -106,11 +106,11 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
                 <span class="td-tab-preview-footer__keys">
                   <kbd v-for="part in item.presentKey" :key="part">{{
                     part
-                  }}</kbd>
+                    }}</kbd>
                 </span>
                 <span class="td-tab-preview-footer__label">{{
                   $t(item.labelKey)
-                }}</span>
+                  }}</span>
               </div>
             </div>
             <!-- /__grid -->
@@ -1021,7 +1021,7 @@ export default {
     cursor: pointer;
 
     &:hover {
-      background-color: var(--bg-focus-color);
+      background-color: var(--focus-color);
       color: var(--selected-item-text-color);
       border: 1px solid var(--border-color);
     }
