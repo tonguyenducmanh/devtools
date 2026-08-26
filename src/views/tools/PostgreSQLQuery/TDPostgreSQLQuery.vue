@@ -1588,10 +1588,9 @@ export default {
     /**
      * Apply saved query từ history sidebar vào editor
      */
-    applySavedQueryFromHistory(item) {
+    applySavedQueryFromHistory(query) {
       let me = this;
-      if (item && item.source) {
-        let query = item.source;
+      if (query) {
         me.sqlText = query.query_text ?? "";
         if (query.connection_id) {
           me.selectedConnectionId = query.connection_id;
