@@ -84,7 +84,7 @@
               <div class="flex td-connection-list-header">
                 <span class="td-connection-list-title">{{
                   $t("i18nCommon.remoteDesktop.collection.title")
-                  }}</span>
+                }}</span>
                 <div @click="loadConnections" class="td-icon td-reload-icon"
                   v-tooltip="$t('i18nCommon.remoteDesktop.collection.reload')"></div>
               </div>
@@ -101,7 +101,7 @@
                 <div class="td-connection-info">
                   <span class="td-connection-name">{{
                     conn.connection_name
-                    }}</span>
+                  }}</span>
                   <span class="td-connection-host">{{ conn.host }}</span>
                 </div>
                 <div class="td-icon td-close-icon" @click.stop="deleteConnection(conn)"
@@ -1026,12 +1026,12 @@ export default {
 }
 
 .td-connection-item:hover {
-  background-color: var(--bg-focus-color);
+  background-color: var(--focus-color);
   color: var(--selected-item-text-color);
 }
 
 .td-connection-item-selected {
-  background-color: var(--bg-focus-color);
+  background-color: var(--focus-color);
   color: var(--selected-item-text-color);
   font-weight: 600;
 }
