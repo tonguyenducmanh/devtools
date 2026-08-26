@@ -76,6 +76,7 @@ export default {
       zenMode: "Zen Mode",
       exitZenMode: "Exit Focus Mode",
       showAllShortcut: "Show all shortcut",
+      themeTooltip: "Hover to preview theme, click to apply",
     },
     splitHorizontal: "Split horizontal",
     deleteAll: "Delete all history",

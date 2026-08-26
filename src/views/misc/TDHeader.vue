@@ -31,10 +31,11 @@
     <TDFlyoutPanel :show="!!activeKeyFlyOut && activeKeyFlyOut !== 'logo'" :anchorElFlyout="anchorElFlyout"
       placement="bottom" panelClass="td-header-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="onFlyoutPanelLeave">
       <template v-if="activeKeyFlyOut === 'theme'">
-        <div class="td-flyout-theme-list">
+        <div class="td-flyout-theme-list" v-tooltip="$t('i18nCommon.tdheader.themeTooltip')">
           <div v-for="item in themeItems" :key="item.value" class="td-flyout-item td-flyout-theme-item"
             :class="{ 'td-flyout-theme-item--active': item.value === savedTheme }"
-            @mouseenter="previewTheme(item.value)" @mouseleave="revertTheme" @click="applyTheme(item.value)">
+            @mouseenter="debouncedPreviewTheme(item.value)" @mouseleave="onThemeItemLeave"
+            @click="applyTheme(item.value)">
             {{ item.label }}
           </div>
         </div>
@@ -57,6 +58,7 @@ import { useFlyout } from "@/common/plugin/TDUseFlyout.js";
 import eventBus from "@/common/event/TDEventBus.js";
 import { TDEnumEventBus } from "@/common/event/TDEnumEventBus.js";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
+import TDCommonFunction from "@/common/TDCommonFunction.js";
 
 export default {
   name: "TDHeader",
@@ -109,6 +111,7 @@ export default {
     },
   },
   mounted() {
+    this.debouncedPreviewTheme = TDCommonFunction.debounce(this.previewTheme, 300);
     this.headerToastUnsubscribe = eventBus.on(
       TDEnumEventBus.headerToastShow,
       this.onHeaderToastShow,
@@ -192,6 +195,9 @@ export default {
     };
   },
   beforeUnmount() {
+    if (this.debouncedPreviewTheme?.cancel) {
+      this.debouncedPreviewTheme.cancel();
+    }
     if (this.headerToastUnsubscribe) {
       this.headerToastUnsubscribe();
     }
@@ -210,6 +216,12 @@ export default {
         eventBus.emit(TDEnumEventBus.themeChanged, this.savedTheme);
       }
     },
+    onThemeItemLeave() {
+      if (this.debouncedPreviewTheme?.cancel) {
+        this.debouncedPreviewTheme.cancel();
+      }
+      this.revertTheme();
+    },
     async applyTheme(themeName) {
       this.savedTheme = themeName;
       this.$tdUtility.setTheme(themeName);
@@ -218,6 +230,9 @@ export default {
       this.closeFlyout();
     },
     onFlyoutPanelLeave() {
+      if (this.debouncedPreviewTheme?.cancel) {
+        this.debouncedPreviewTheme.cancel();
+      }
       this.revertTheme();
       this.scheduleCloseFlyout();
     },

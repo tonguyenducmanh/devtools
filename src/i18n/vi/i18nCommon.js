@@ -77,6 +77,7 @@ export default {
       zenMode: "Chế độ Zen",
       exitZenMode: "Thoát chế độ tập trung",
       showAllShortcut: "Danh sách phím tắt",
+      themeTooltip: "Di chuột để xem trước chủ đề, click để áp dụng",
     },
     splitHorizontal: "Chia ngang",
     deleteAll: "Xóa tất cả lịch sử",
