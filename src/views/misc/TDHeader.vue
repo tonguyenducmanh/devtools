@@ -9,7 +9,7 @@
       </div>
       <div class="td-header-menu">
         <div v-for="(items, menuKey) in menuConfig" :key="menuKey" class="td-menu-item"
-          :class="{ 'td-menu-item--active': activeKeyFlyOut === menuKey }" @mouseenter="openFlyout(menuKey, $event)"
+          :class="{ 'td-menu-item--active': activeKeyFlyOut === menuKey }" @click="openFlyout(menuKey, $event)"
           @mouseleave="scheduleCloseFlyout()">
           <span>{{ $t(`i18nCommon.${menuKey}.title`) }}</span>
         </div>
@@ -167,6 +167,9 @@ export default {
           action: this.getCurrentDateTimeFunc,
         },
       ],
+      theme: [
+        // chỗ này sẽ được build động sau
+      ],
       help: [
         {
           key: "pingAgent",
@@ -190,8 +193,6 @@ export default {
           action: this.downloadAgentFunc,
         },
       ],
-      theme: [],
-
     };
   },
   beforeUnmount() {
