@@ -1,12 +1,9 @@
 <template>
-  <div
-    class="td-slide-group"
-    :class="{
-      'layout-horizontal': layout === $tdEnum.coordinateAxes.horizontal,
-      'layout-vertical': layout === $tdEnum.coordinateAxes.vertical,
-      'td-slide-group-no-margin': noMargin,
-    }"
-  >
+  <div class="td-slide-group" :class="{
+    'layout-horizontal': layout === $tdEnum.coordinateAxes.horizontal,
+    'layout-vertical': layout === $tdEnum.coordinateAxes.vertical,
+    'td-slide-group-no-margin': noMargin,
+  }">
     <div class="td-slide-group-label" v-if="label">
       {{ label.capitalize() }}
     </div>
@@ -14,22 +11,12 @@
       <!-- Background slider cho selected item -->
       <div class="td-slide-background" :style="sliderStyle"></div>
 
-      <div
-        class="td-slide-item"
-        :class="{ 'td-slide-item-selected': option.value == modelValue }"
-        v-for="(option, index) in options"
-        :key="index"
-        :ref="(el) => setItemRef(el, index)"
-        @click="changeSlideVal(option.value)"
-      >
-        <div
-          v-if="showIcon"
-          class="td-icon"
-          :class="{
-            [option.icon]: option.icon,
-          }"
-          v-tooltip="option.label"
-        ></div>
+      <div class="td-slide-item" :class="{ 'td-slide-item-selected': option.value == modelValue }"
+        v-for="(option, index) in options" :key="index" :ref="(el) => setItemRef(el, index)"
+        @click="changeSlideVal(option.value)">
+        <div v-if="showIcon" class="td-icon" :class="{
+          [option.icon]: option.icon,
+        }" v-tooltip="option.label"></div>
         <span v-else>{{ option.label }}</span>
       </div>
     </div>
@@ -195,7 +182,7 @@ export default {
     margin-right: var(--padding);
   }
 
-  > div {
+  >div {
     margin-right: var(--padding-medium);
 
     &:last-child {
@@ -217,7 +204,6 @@ export default {
 .td-slide-group-area {
   position: relative;
   border-radius: var(--border-radius);
-  // border: 1px solid var(--border-color);
   padding: 0;
 
   .td-slide-background {
@@ -235,11 +221,19 @@ export default {
 
   .td-slide-item {
     position: relative;
+    box-sizing: border-box;
     cursor: pointer;
     padding: calc(var(--padding) / 2) var(--padding);
     border-radius: var(--border-radius);
     z-index: 1;
     transition: color 0.2s ease;
+
+    border: 1px solid transparent;
+
+    &:hover {
+      border-color: var(--focus-color);
+      border: 1px solid var(--border-color);
+    }
   }
 
   .td-slide-item-selected {

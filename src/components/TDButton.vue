@@ -1,17 +1,11 @@
 <template>
-  <button
-    @click="debounceHandleClick"
-    class="td-button noselect"
-    :class="{
-      'td-button-secondary': type == $tdEnum.buttonType.secondary,
-      'td-button-readonly': readOnly,
-      'td-button-no-margin': noMargin,
-      'td-button-icon': iconClass,
-      'td-button-small': isSmallButton,
-    }"
-    :disabled="readOnly"
-    :style="borderRadiusStyle"
-  >
+  <button @click="debounceHandleClick" class="td-button noselect" :class="{
+    'td-button-secondary': type == $tdEnum.buttonType.secondary,
+    'td-button-readonly': readOnly,
+    'td-button-no-margin': noMargin,
+    'td-button-icon': iconClass,
+    'td-button-small': isSmallButton,
+  }" :disabled="readOnly" :style="borderRadiusStyle">
     <span v-if="iconClass" class="td-icon" :class="iconClass"></span>
     <span v-else>
       {{ label.capitalize() }}
@@ -30,7 +24,7 @@ export default {
   created() {
     this.debounceHandleClick = _.debounce(this.handleClick, 300);
   },
-  mounted() {},
+  mounted() { },
   emits: ["click"],
   beforeUnmount() {
     if (this.debounceHandleClick?.cancel) {
@@ -93,17 +87,23 @@ export default {
   cursor: pointer;
   font-size: 16px;
   transition: all 0.2s ease;
-  overflow-wrap: normal; /* Allows breaking long words */
-  word-break: keep-all; /* For wider browser support */
-  white-space: nowrap; /* Ensure wrapping is enabled */
+  overflow-wrap: normal;
+  /* Allows breaking long words */
+  word-break: keep-all;
+  /* For wider browser support */
+  white-space: nowrap;
+  /* Ensure wrapping is enabled */
   border: 1px solid var(--border-color);
 }
+
 .td-button-small {
   height: 25px;
 }
+
 .td-button-no-margin {
   margin: unset;
 }
+
 .td-button:hover {
   background-color: var(--focus-color);
 }
@@ -111,25 +111,30 @@ export default {
 .td-button:active {
   background-color: var(--focus-color);
 }
+
 .td-button:focus {
   border: 1px solid var(--focus-color);
   box-sizing: border-box;
 }
+
 .td-button-icon {
   padding: 0 var(--padding);
 }
+
 .td-button-secondary {
   background-color: var(--btn-secondary-bg);
   color: var(--btn-secondary-text-color);
 }
+
 .td-button-secondary:hover {
   background-color: var(--btn-secondary-hover-bg);
-  border: 1px solid var(--btn-secondary-hover-border);
+  border: 1px solid var(--focus-color);
 }
 
 .td-button-secondary:active {
   background-color: var(--btn-secondary-focus-color);
 }
+
 .td-button-secondary:focus {
   border: 1px solid var(--btn-secondary-focus-color);
 }
@@ -137,6 +142,7 @@ export default {
 .td-button-readonly {
   opacity: 0.5;
   cursor: not-allowed;
+
   .td-icon {
     cursor: not-allowed;
   }
