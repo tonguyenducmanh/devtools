@@ -94,6 +94,8 @@ export default {
   white-space: nowrap;
   /* Ensure wrapping is enabled */
   border: 1px solid var(--border-color);
+  box-sizing: border-box;
+
 }
 
 .td-button-small {
@@ -106,6 +108,7 @@ export default {
 
 .td-button:hover {
   background-color: var(--focus-color);
+  border: 1px solid transparent;
 }
 
 .td-button:active {
@@ -114,7 +117,6 @@ export default {
 
 .td-button:focus {
   border: 1px solid var(--focus-color);
-  box-sizing: border-box;
 }
 
 .td-button-icon {
