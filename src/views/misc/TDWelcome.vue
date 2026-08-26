@@ -5,8 +5,7 @@
         <transition v-if="isShowLoading" name="td-fade-loading">
           <TDLoading />
         </transition>
-        <div v-else class="dependency-img">
-        </div>
+        <div v-else class="main-line-title">{{ welcomeTitle }}</div>
         <TDDynamicBackgroundEffect />
         <p class="description">
           {{ displayText }}<span class="cursor">|</span>
@@ -126,16 +125,6 @@ export default {
   margin: var(--padding);
 }
 
-.dependency-img {
-  width: 100%;
-  height: fit-content;
-  max-width: 500px;
-  max-height: 500px;
-  aspect-ratio: 249 / 140;
-  background: url("@/assets/dependency.jpg") no-repeat center;
-  background-size: contain;
-  overflow: hidden;
-}
 
 .container {
   display: flex;
@@ -146,6 +135,16 @@ export default {
   width: 100%;
   height: 100%;
   flex: 1;
+}
+
+.main-line-title {
+  font-size: 10cqw;
+  font-family: var(--straight-font);
+  font-weight: 600;
+  position: relative;
+  opacity: 1;
+  visibility: visible;
+  z-index: 1;
 }
 
 .description {

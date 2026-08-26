@@ -44,7 +44,7 @@ export default {
   max-width: 500px;
   max-height: 500px;
   aspect-ratio: 249 / 140;
-  background: url("@/assets/meme.gif") no-repeat center;
+  background: url("@/assets/dependency.jpg") no-repeat center;
   background-size: contain;
   overflow: hidden;
 }
