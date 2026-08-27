@@ -116,8 +116,8 @@ export default {
     settings: {
       title: "Settings",
     },
-    theme: {
-      title: "Theme",
+    appearance: {
+      title: "Appearance",
     },
     utilities: {
       title: "Utilities",

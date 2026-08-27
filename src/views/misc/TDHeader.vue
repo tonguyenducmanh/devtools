@@ -30,7 +30,7 @@
     <!-- Flyout Menu: mở xuống dưới (placement="bottom") -->
     <TDFlyoutPanel :show="!!activeKeyFlyOut && activeKeyFlyOut !== 'logo'" :anchorElFlyout="anchorElFlyout"
       placement="bottom" panelClass="td-header-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="onFlyoutPanelLeave">
-      <template v-if="activeKeyFlyOut === 'theme'">
+      <template v-if="activeKeyFlyOut === 'appearance'">
         <div class="td-theme-category-list">
           <div class="td-flyout-item td-theme-category-item"
             :class="{ 'td-theme-category-item--active': activeSubKey === 'theme' }"
@@ -58,7 +58,7 @@
     </TDFlyoutPanel>
 
     <!-- Sub Flyout: danh sách con của menu nhiều category -->
-    <TDFlyoutPanel v-if="activeKeyFlyOut === 'theme'" :show="!!activeSubKey" :anchorElFlyout="subAnchorEl"
+    <TDFlyoutPanel v-if="activeKeyFlyOut === 'appearance'" :show="!!activeSubKey" :anchorElFlyout="subAnchorEl"
       placement="right" panelClass="td-theme-sub-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="closeSub">
       <template v-if="activeSubKey === 'theme'">
         <div class="td-flyout-theme-list" v-tooltip="$t('i18nCommon.tdheader.themeTooltip')">
@@ -160,7 +160,7 @@ export default {
   },
   watch: {
     activeKeyFlyOut(newVal, oldVal) {
-      if (oldVal === "theme" && newVal !== "theme") {
+      if (oldVal === "appearance" && newVal !== "appearance") {
         this.revertTheme();
       }
       // Reset sub-flyout cho bất kỳ menu nào khi mở/re-mở để không dính
@@ -226,7 +226,7 @@ export default {
           action: this.getCurrentDateTimeFunc,
         },
       ],
-      theme: [
+      appearance: [
         // chỗ này sẽ được build động sau
       ],
       help: [

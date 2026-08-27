@@ -117,8 +117,8 @@ export default {
     settings: {
       title: "Thiết lập",
     },
-    theme: {
-      title: "Chủ đề",
+    appearance: {
+      title: "Giao diện",
     },
     utilities: {
       title: "Tiện ích",
