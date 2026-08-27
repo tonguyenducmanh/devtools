@@ -508,6 +508,7 @@ export default {
 .td-theme-category-item {
   &.td-theme-category-item--active {
     background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
   }
 }
 
