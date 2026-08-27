@@ -179,6 +179,10 @@ class TDEnum {
       labelKey: "i18nUserSettings.backgroundEffect.wireframeCube3D",
       value: "wireframeCube3D",
     },
+    {
+      labelKey: "i18nUserSettings.backgroundEffect.sphereGlobe",
+      value: "sphereGlobe",
+    },
   ];
 }
 

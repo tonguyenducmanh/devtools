@@ -25,6 +25,7 @@ export default {
       neonWave: "Neon Wave",
       cellularAutomata: "Cellular Automata",
       wireframeCube3D: "3D Cube Wireframe",
+      sphereGlobe: "Quả địa cầu",
     },
   },
 };
