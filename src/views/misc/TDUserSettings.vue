@@ -203,7 +203,6 @@ export default {
         .input-setting {
           width: 200px;
         }
-        height: 100%;
       }
     }
   }
