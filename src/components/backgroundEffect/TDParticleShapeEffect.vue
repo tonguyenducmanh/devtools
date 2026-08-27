@@ -3,6 +3,8 @@
 </template>
 
 <script>
+import { getThemeEffectColors } from "./TDThemeEffectColors.js";
+
 export default {
   name: "TDParticleShapeEffect",
   data() {
@@ -42,9 +44,9 @@ export default {
       this.themeObserver = new MutationObserver(() => {
         this.updateParticleColors();
       });
-      this.themeObserver.observe(document.body, {
+      this.themeObserver.observe(document.documentElement, {
         attributes: true,
-        attributeFilter: ["data-theme"],
+        attributeFilter: ["style"],
       });
     },
 
@@ -146,29 +148,32 @@ export default {
     },
 
     getParticleStyle() {
-      const isDark = document.body.getAttribute("data-theme") === "dark";
-      if (isDark) {
-        const baseColor = "#ddfa42";
-        return {
-          color: this.hexToRgba(baseColor, Math.random() * 0.3 + 0.4),
-          glow: this.hexToRgba(baseColor, 0.5),
-          shadowBlur: 8,
-        };
-      } else {
-        const baseColor = "#000000";
-        return {
-          color: this.hexToRgba(baseColor, Math.random() * 0.2 + 0.3),
-          glow: this.hexToRgba(baseColor, 0.3),
-          shadowBlur: 3,
-        };
-      }
+      const { isDark, rgb } = getThemeEffectColors();
+      const baseColor = rgb.trail;
+      return isDark
+        ? {
+            color: this.hexToRgba(baseColor, Math.random() * 0.3 + 0.4),
+            glow: this.hexToRgba(baseColor, 0.5),
+            shadowBlur: 8,
+          }
+        : {
+            color: this.hexToRgba(baseColor, Math.random() * 0.2 + 0.3),
+            glow: this.hexToRgba(baseColor, 0.3),
+            shadowBlur: 3,
+          };
     },
 
     hexToRgba(hex, alpha) {
       let r = 0,
         g = 0,
         b = 0;
-      if (hex.length === 4) {
+
+      if (String(hex).indexOf(",") !== -1) {
+        const parts = String(hex).split(",").map(Number);
+        r = parts[0] || 0;
+        g = parts[1] || 0;
+        b = parts[2] || 0;
+      } else if (hex.length === 4) {
         r = parseInt(hex[1] + hex[1], 16);
         g = parseInt(hex[2] + hex[2], 16);
         b = parseInt(hex[3] + hex[3], 16);
@@ -260,8 +265,8 @@ export default {
 
     drawConnections() {
       const maxDistance = 150;
-      const isDark = document.body.getAttribute("data-theme") === "dark";
-      const baseColor = isDark ? "#ddfa42" : "#000000";
+      const { isDark, rgb } = getThemeEffectColors();
+      const baseColor = rgb.trail;
       const lineColor = this.hexToRgba(baseColor, isDark ? 0.25 : 0.15);
 
       for (let i = 0; i < this.particles.length; i++) {

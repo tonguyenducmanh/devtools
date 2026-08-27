@@ -3,6 +3,8 @@
 </template>
 
 <script>
+import { getThemeEffectColors } from "./TDThemeEffectColors.js";
+
 export default {
   name: "TDCodeMoveEffect",
   data() {
@@ -111,9 +113,9 @@ export default {
   methods: {
     initThemeObserver() {
       this.themeObserver = new MutationObserver(() => {});
-      this.themeObserver.observe(document.body, {
+      this.themeObserver.observe(document.documentElement, {
         attributes: true,
-        attributeFilter: ["data-theme"],
+        attributeFilter: ["style"],
       });
     },
 
@@ -206,8 +208,7 @@ export default {
     },
 
     getColor() {
-      const isDark = document.body.getAttribute("data-theme") === "dark";
-      return isDark ? "221,250,66" : "30,30,30";
+      return getThemeEffectColors().rgb.trail;
     },
 
     animate() {

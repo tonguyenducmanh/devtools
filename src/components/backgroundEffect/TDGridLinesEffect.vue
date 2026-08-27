@@ -3,6 +3,8 @@
 </template>
 
 <script>
+import { getThemeEffectColors } from "./TDThemeEffectColors.js";
+
 export default {
   name: "TDGridLinesEffect",
   data() {
@@ -19,13 +21,6 @@ export default {
       gridSize: 30, // Khoảng cách giữa các ô lưới
       dots: [], // Danh sách các điểm chạy trên lưới
       maxDots: 50, // Số lượng hạt tối đa chạy trên màn hình
-
-      // Bộ 3 màu theo yêu cầu: Trắng, Đen, Xám
-      colors: {
-        white: "255, 255, 255",
-        black: "0, 0, 0",
-        gray: "136, 136, 136",
-      },
     };
   },
   mounted() {
@@ -44,9 +39,9 @@ export default {
         // Tái tạo lại các hạt khi đổi theme để cập nhật màu sắc phù hợp
         this.createDots();
       });
-      this.themeObserver.observe(document.body, {
+      this.themeObserver.observe(document.documentElement, {
         attributes: true,
-        attributeFilter: ["data-theme"],
+        attributeFilter: ["style"],
       });
     },
 
@@ -100,16 +95,16 @@ export default {
     },
 
     generateDot() {
-      const isDark = document.body.getAttribute("data-theme") === "dark";
-
+      const { isDark, rgb } = getThemeEffectColors();
       const colorPool = isDark
-        ? [this.colors.white, this.colors.gray]
-        : [this.colors.black, this.colors.gray];
+        ? [rgb.trail, rgb.secondary]
+        : [rgb.trail, rgb.secondary];
 
       if (Math.random() > 0.85) {
-        colorPool.push(isDark ? this.colors.black : this.colors.white);
+        colorPool.push(isDark ? rgb.bg : rgb.bg);
       }
 
+      // Loại bỏ trùng lặp màu khi primary === bg (theme sáng ít tương phản)
       const randomColor =
         colorPool[Math.floor(Math.random() * colorPool.length)];
 
@@ -139,11 +134,11 @@ export default {
     },
 
     drawGrid() {
-      const isDark = document.body.getAttribute("data-theme") === "dark";
+      const { isDark, rgb } = getThemeEffectColors();
       // Đường lưới xám mờ tinh tế
       this.ctx.strokeStyle = isDark
-        ? `rgba(${this.colors.gray}, 0.08)`
-        : `rgba(${this.colors.gray}, 0.15)`;
+        ? `rgba(${rgb.trail}, 0.08)`
+        : `rgba(${rgb.trail}, 0.15)`;
       this.ctx.lineWidth = 0.5;
 
       // Vẽ các đường dọc

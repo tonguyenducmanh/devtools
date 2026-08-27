@@ -3,6 +3,8 @@
 </template>
 
 <script>
+import { getThemeEffectColors } from "./TDThemeEffectColors.js";
+
 export default {
   name: "TDPixelTunnelEffect",
   data() {
@@ -18,13 +20,6 @@ export default {
       // ── Config ──
       pixels: [],
       maxPixels: 60, // Số lượng hạt pixel hiển thị cùng lúc
-
-      // Bộ 3 màu chủ đạo
-      colors: {
-        white: "255, 255, 255",
-        black: "0, 0, 0",
-        gray: "150, 150, 150",
-      },
     };
   },
   mounted() {
@@ -43,9 +38,9 @@ export default {
         // Làm mới mảng pixel để cập nhật màu sắc theo theme mới nhanh chóng
         this.pixels = [];
       });
-      this.themeObserver.observe(document.body, {
+      this.themeObserver.observe(document.documentElement, {
         attributes: true,
-        attributeFilter: ["data-theme"],
+        attributeFilter: ["style"],
       });
     },
 
@@ -92,15 +87,15 @@ export default {
     },
 
     generatePixel() {
-      const isDark = document.body.getAttribute("data-theme") === "dark";
+      const { isDark, rgb } = getThemeEffectColors();
 
-      // Chọn màu ngẫu nhiên từ bộ 3 màu dựa theo độ tương phản của theme
+      // Chọn màu ngẫu nhiên dựa theo độ tương phản của theme
       const colorPool = isDark
-        ? [this.colors.white, this.colors.gray]
-        : [this.colors.black, this.colors.gray];
+        ? [rgb.trail, rgb.secondary]
+        : [rgb.trail, rgb.secondary];
 
       if (Math.random() > 0.8) {
-        colorPool.push(isDark ? this.colors.black : this.colors.white);
+        colorPool.push(rgb.bg);
       }
       const randomColor =
         colorPool[Math.floor(Math.random() * colorPool.length)];

@@ -3,6 +3,8 @@
 </template>
 
 <script>
+import { getThemeEffectColors } from "./TDThemeEffectColors.js";
+
 export default {
   name: "TDRetro3DGridEffect",
   data() {
@@ -24,12 +26,6 @@ export default {
       // Hạt/Vệt sáng chạy dọc trên các đường lưới
       lightStreaks: [],
       maxStreaks: 15,
-
-      colors: {
-        white: "255, 255, 255",
-        black: "0, 0, 0",
-        gray: "120, 120, 120",
-      },
     };
   },
   mounted() {
@@ -47,9 +43,9 @@ export default {
       this.themeObserver = new MutationObserver(() => {
         this.lightStreaks = [];
       });
-      this.themeObserver.observe(document.body, {
+      this.themeObserver.observe(document.documentElement, {
         attributes: true,
-        attributeFilter: ["data-theme"],
+        attributeFilter: ["style"],
       });
     },
 
@@ -109,9 +105,9 @@ export default {
     animate() {
       this.ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
 
-      const isDark = document.body.getAttribute("data-theme") === "dark";
-      const mainColor = isDark ? this.colors.white : this.colors.black;
-      const subColor = this.colors.gray;
+      const { isDark, rgb } = getThemeEffectColors();
+      const mainColor = rgb.trail;
+      const subColor = rgb.trail;
 
       const centerX = this.displayWidth / 2;
       const horizon = this.displayHeight * this.horizonY;
