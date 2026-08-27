@@ -34,6 +34,10 @@ export default {
       trail: "Cursor trail",
       ring: "Cursor ring",
       sparkles: "Sparkles",
+      pyramid: "3D Pyramid",
+      star: "Spinning stars",
+      confetti: "Confetti",
+      hexagon: "Hexagons",
     },
   },
 };

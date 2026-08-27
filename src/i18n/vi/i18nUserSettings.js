@@ -21,11 +21,11 @@ export default {
     },
     backgroundEffect: {
       shuffle: "Luân phiên (Ngẫu nhiên)",
-      gridLines: "Grid Lines",
-      particleShape: "Particle Shape",
-      neonWave: "Neon Wave",
-      cellularAutomata: "Cellular Automata",
-      wireframeCube3D: "3D Cube Wireframe",
+      gridLines: "Lưới",
+      particleShape: "Hạt chuyển động",
+      neonWave: "Sóng neon",
+      cellularAutomata: "Tự động hóa tế bào",
+      wireframeCube3D: "Khối 3D",
       sphereGlobe: "Quả địa cầu",
     },
     cursorEffect: {
@@ -34,6 +34,10 @@ export default {
       trail: "Đuôi chuột",
       ring: "Vòng theo chuột",
       sparkles: "Phát lấp lánh",
+      pyramid: "Kim tự tháp 3D",
+      star: "Sao xoay",
+      confetti: "Vụn giấy",
+      hexagon: "Hình lục giác",
     },
   },
 };

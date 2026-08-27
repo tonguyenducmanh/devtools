@@ -1,6 +1,10 @@
 import TDCursorTrailEffect from "@/views/cursorEffect/effects/TDCursorTrailEffect.vue";
 import TDCursorRingEffect from "@/views/cursorEffect/effects/TDCursorRingEffect.vue";
 import TDCursorSparklesEffect from "@/views/cursorEffect/effects/TDCursorSparklesEffect.vue";
+import TDCursorPyramidEffect from "@/views/cursorEffect/effects/TDCursorPyramidEffect.vue";
+import TDCursorStarEffect from "@/views/cursorEffect/effects/TDCursorStarEffect.vue";
+import TDCursorConfettiEffect from "@/views/cursorEffect/effects/TDCursorConfettiEffect.vue";
+import TDCursorHexagonEffect from "@/views/cursorEffect/effects/TDCursorHexagonEffect.vue";
 
 /**
  * Map giá trị cursorEffect (xem TDEnum.cursorEffectList) sang component hiệu ứng chuột.
@@ -10,6 +14,10 @@ export const cursorEffectMap = {
   trail: TDCursorTrailEffect,
   ring: TDCursorRingEffect,
   sparkles: TDCursorSparklesEffect,
+  pyramid: TDCursorPyramidEffect,
+  star: TDCursorStarEffect,
+  confetti: TDCursorConfettiEffect,
+  hexagon: TDCursorHexagonEffect,
 };
 
 /**

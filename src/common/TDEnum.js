@@ -206,6 +206,22 @@ class TDEnum {
       labelKey: "i18nUserSettings.cursorEffect.sparkles",
       value: "sparkles",
     },
+    {
+      labelKey: "i18nUserSettings.cursorEffect.pyramid",
+      value: "pyramid",
+    },
+    {
+      labelKey: "i18nUserSettings.cursorEffect.star",
+      value: "star",
+    },
+    {
+      labelKey: "i18nUserSettings.cursorEffect.confetti",
+      value: "confetti",
+    },
+    {
+      labelKey: "i18nUserSettings.cursorEffect.hexagon",
+      value: "hexagon",
+    },
   ];
 }
 
