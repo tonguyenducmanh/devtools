@@ -11,6 +11,7 @@ export default {
       wrapTab: "Multi line tab in Multi tab mode",
       toastInHeader: "Show notifications in header",
       cursorTrail: "Cursor trail effect",
+      cursorEffect: "Cursor effect",
       loadingType: "Loading type",
       backgroundEffect: "Background effect",
     },
@@ -26,6 +27,13 @@ export default {
       cellularAutomata: "Cellular Automata",
       wireframeCube3D: "3D Cube Wireframe",
       sphereGlobe: "Globe",
+    },
+    cursorEffect: {
+      off: "Off",
+      shuffle: "Rotate (Random)",
+      trail: "Cursor trail",
+      ring: "Cursor ring",
+      sparkles: "Sparkles",
     },
   },
 };

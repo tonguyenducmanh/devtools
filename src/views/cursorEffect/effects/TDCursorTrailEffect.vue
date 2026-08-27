@@ -63,10 +63,7 @@ export default {
       this.rafId = requestAnimationFrame(this.updateTrail);
     },
   },
-  async mounted() {
-    let showCursorTrail =
-      await this.$tdUtility.getUserSettings("showCursorTrail");
-    if (showCursorTrail === false) return;
+  mounted() {
     this.mousePos = {
       x: window.innerWidth / 2,
       y: window.innerHeight / 2,

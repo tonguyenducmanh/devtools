@@ -32,6 +32,15 @@
           />
         </div>
         <div class="flex user-setting-item">
+          <div>{{ $t("i18nUserSettings.settings.cursorEffect") }}</div>
+          <TDComboBox
+            :width="200"
+            v-model="currentUserSetting.cursorEffect"
+            :options="cursorEffectOption"
+            :noMargin="true"
+          />
+        </div>
+        <div class="flex user-setting-item">
           <div>{{ $t("i18nUserSettings.settings.loadingType") }}</div>
           <TDComboBox
             :width="200"
@@ -73,14 +82,6 @@
             :variant="$tdEnum.checkboxType.switch"
             v-model="currentUserSetting.toastInHeader"
             :label="$t('i18nUserSettings.settings.toastInHeader')"
-            :noMargin="true"
-          ></TDCheckbox>
-        </div>
-        <div class="flex user-setting-item">
-          <TDCheckbox
-            :variant="$tdEnum.checkboxType.switch"
-            v-model="currentUserSetting.showCursorTrail"
-            :label="$t('i18nUserSettings.settings.cursorTrail')"
             :noMargin="true"
           ></TDCheckbox>
         </div>
@@ -126,6 +127,12 @@ export default {
   computed: {
     backgroundEffectOption() {
       return this.$tdEnum.backgroundEffectList.map((item) => ({
+        label: this.$t(item.labelKey),
+        value: item.value,
+      }));
+    },
+    cursorEffectOption() {
+      return this.$tdEnum.cursorEffectList.map((item) => ({
         label: this.$t(item.labelKey),
         value: item.value,
       }));

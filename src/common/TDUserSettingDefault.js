@@ -12,7 +12,7 @@ export function getUserSettingDefault() {
     showSideBar: true,
     showTabNumber: false,
     toastInHeader: false,
-    showCursorTrail: false,
+    cursorEffect: "off",
     backgroundEffect: "shuffle",
     currentLoadingType: tdEnum.LoadingType.Normal,
   };

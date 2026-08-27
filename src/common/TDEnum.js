@@ -184,6 +184,29 @@ class TDEnum {
       value: "sphereGlobe",
     },
   ];
+  // danh sách hiệu ứng chuột
+  cursorEffectList = [
+    {
+      labelKey: "i18nUserSettings.cursorEffect.off",
+      value: "off",
+    },
+    {
+      labelKey: "i18nUserSettings.cursorEffect.shuffle",
+      value: "shuffle",
+    },
+    {
+      labelKey: "i18nUserSettings.cursorEffect.trail",
+      value: "trail",
+    },
+    {
+      labelKey: "i18nUserSettings.cursorEffect.ring",
+      value: "ring",
+    },
+    {
+      labelKey: "i18nUserSettings.cursorEffect.sparkles",
+      value: "sparkles",
+    },
+  ];
 }
 
 export default new TDEnum();

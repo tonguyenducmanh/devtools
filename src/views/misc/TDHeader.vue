@@ -42,6 +42,11 @@
             @mouseenter="openSub('backgroundEffect', $event)" @click="openSub('backgroundEffect', $event)">
             {{ $t("i18nCommon.tdheader.backgroundEffects") }}
           </div>
+          <div class="td-flyout-item td-theme-category-item"
+            :class="{ 'td-theme-category-item--active': activeSubKey === 'cursorEffect' }"
+            @mouseenter="openSub('cursorEffect', $event)" @click="openSub('cursorEffect', $event)">
+            {{ $t("i18nCommon.tdheader.cursorEffects") }}
+          </div>
         </div>
       </template>
       <template v-else>
@@ -68,6 +73,14 @@
         <div class="td-flyout-theme-list" v-tooltip="$t('i18nCommon.tdheader.backgroundEffectTooltip')">
           <div v-for="item in backgroundEffectItems" :key="item.value" class="td-flyout-item td-flyout-theme-item"
             @click="applyBackgroundEffect(item.value)">
+            {{ item.label }}
+          </div>
+        </div>
+      </template>
+      <template v-else-if="activeSubKey === 'cursorEffect'">
+        <div class="td-flyout-theme-list" v-tooltip="$t('i18nCommon.tdheader.cursorEffectTooltip')">
+          <div v-for="item in cursorEffectItems" :key="item.value" class="td-flyout-item td-flyout-theme-item"
+            @click="applyCursorEffect(item.value)">
             {{ item.label }}
           </div>
         </div>
@@ -120,6 +133,7 @@ export default {
       savedTheme: null,
       themeItems: this.$tdEnum.monacoThemeList,
       savedBackgroundEffect: null,
+      savedCursorEffect: null,
       activeSubKey: null,
       subAnchorEl: null,
     };
@@ -133,6 +147,12 @@ export default {
     },
     backgroundEffectItems() {
       return this.$tdEnum.backgroundEffectList.map((item) => ({
+        label: this.$t(item.labelKey),
+        value: item.value,
+      }));
+    },
+    cursorEffectItems() {
+      return this.$tdEnum.cursorEffectList.map((item) => ({
         label: this.$t(item.labelKey),
         value: item.value,
       }));
@@ -247,6 +267,8 @@ export default {
       this.savedTheme = await this.$tdUtility.getUserSettings("theme");
       this.savedBackgroundEffect =
         (await this.$tdUtility.getUserSettings("backgroundEffect")) ?? "shuffle";
+      this.savedCursorEffect =
+        (await this.$tdUtility.getUserSettings("cursorEffect")) ?? "off";
     },
     previewTheme(themeName) {
       this.$tdUtility.setTheme(themeName);
@@ -276,6 +298,13 @@ export default {
       await this.$tdUtility.saveUserSettings("backgroundEffect", effectValue);
       // Áp dụng tức thì cho mọi background effect đang mount
       eventBus.emit(TDEnumEventBus.backgroundEffectChanged, effectValue);
+      this.closeFlyout();
+    },
+    async applyCursorEffect(effectValue) {
+      this.savedCursorEffect = effectValue;
+      await this.$tdUtility.saveUserSettings("cursorEffect", effectValue);
+      // Áp dụng tức thì cho hiệu ứng chuột đang mount
+      eventBus.emit(TDEnumEventBus.cursorEffectChanged, effectValue);
       this.closeFlyout();
     },
     openSub(type, event) {

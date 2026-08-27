@@ -17,7 +17,7 @@
     <div class="td-footer-wrap">
       <TDFooterApp />
     </div>
-    <TDCursorTrailEffect />
+    <TDDynamicCursorEffect />
   </div>
 </template>
 
@@ -29,7 +29,7 @@ import TDDynamicTabView from "@/views/misc/TDDynamicTabView.vue";
 import TDDialogUtil from "@/common/TDDialogUtil.js";
 import "@/common/TDPrototype.js";
 import TDAppStartup from "@/common/TDAppStartup.js";
-import TDCursorTrailEffect from "@/views/backgroundEffect/effects/TDCursorTrailEffect.vue";
+import TDDynamicCursorEffect from "@/views/cursorEffect/TDDynamicCursorEffect.vue";
 
 export default {
   components: {
@@ -37,7 +37,7 @@ export default {
     TDFooterApp,
     TDSidebar,
     TDDynamicTabView,
-    TDCursorTrailEffect,
+    TDDynamicCursorEffect,
   },
   created() {
     let me = this;
