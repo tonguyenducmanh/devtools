@@ -161,7 +161,7 @@ import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDSlideOption from "@/components/TDSlideOption.vue";
 import TDBilingualWebHelp from "@/views/helps/TDBilingualWebHelp.vue";
 import TDToolbar from "@/components/TDToolbar.vue";
-import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";
+import TDDynamicBackgroundEffect from "@/views/backgroundEffect/TDDynamicBackgroundEffect.vue";
 import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 
 export default {

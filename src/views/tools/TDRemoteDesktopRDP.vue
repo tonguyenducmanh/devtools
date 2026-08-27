@@ -138,7 +138,7 @@ import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDRemoteDesktopRDPHelp from "@/views/helps/TDRemoteDesktopRDPHelp.vue";
 import TDServerRDPAPI from "@/common/api/request/AgentAPI/TDServerRDPAPI.js";
-import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";
+import TDDynamicBackgroundEffect from "@/views/backgroundEffect/TDDynamicBackgroundEffect.vue";
 import TDFullTabWrapper from "@/components/TDFullTabWrapper.vue";
 
 export default {

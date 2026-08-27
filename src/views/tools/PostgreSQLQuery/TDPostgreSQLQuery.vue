@@ -423,7 +423,7 @@ import TDPostgreSQLIntellisenseMixin from "./TDPostgreSQLIntellisenseMixin.js";
 import { registerPgsqlFormatProvider } from "@/monarch/pgsql/pgsqlFormatProvider.js";
 import { TDShortcutActionEnum } from "@/common/TDShortcutAction.js";
 import TDDatabaseConnectionMixin from "@/mixins/TDDatabaseConnectionMixin.js";
-import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";
+import TDDynamicBackgroundEffect from "@/views/backgroundEffect/TDDynamicBackgroundEffect.vue";
 import TDDotNetWasmMixin from "@/mixins/TDDotNetWasmMixin.js";
 import TDFlyoutPanel from "@/components/TDFlyoutPanel.vue";
 import { useFlyout } from "@/common/plugin/TDUseFlyout.js";

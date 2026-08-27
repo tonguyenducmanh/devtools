@@ -24,7 +24,7 @@
 <script>
 import TDWelcomeHelp from "@/views/helps/TDWelcomeHelp.vue";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
-import TDDynamicBackgroundEffect from "@/components/TDDynamicBackgroundEffect.vue";
+import TDDynamicBackgroundEffect from "@/views/backgroundEffect/TDDynamicBackgroundEffect.vue";
 import TDLayoutConfigMixin from "@/mixins/TDLayoutConfigMixin.js";
 import TDLoading from "../../components/TDLoading.vue";
 

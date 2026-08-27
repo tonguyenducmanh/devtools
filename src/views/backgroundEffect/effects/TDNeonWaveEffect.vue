@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { getThemeEffectColors } from "./TDThemeEffectColors.js";
+import { getThemeEffectColors } from "../helpers/TDThemeEffectColors.js";
 
 export default {
   name: "TDNeonWaveEffect",

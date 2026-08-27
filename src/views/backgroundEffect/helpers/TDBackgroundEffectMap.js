@@ -1,8 +1,8 @@
-import TDGridLinesEffect from "@/components/backgroundEffect/TDGridLinesEffect.vue";
-import TDParticleShapeEffect from "@/components/backgroundEffect/TDParticleShapeEffect.vue";
-import TDNeonWaveEffect from "@/components/backgroundEffect/TDNeonWaveEffect.vue";
-import TDCellularAutomataEffect from "@/components/backgroundEffect/TDCellularAutomataEffect.vue";
-import TDWireframeCube3DEffect from "@/components/backgroundEffect/TDWireframeCube3DEffect.vue";
+import TDGridLinesEffect from "@/views/backgroundEffect/effects/TDGridLinesEffect.vue";
+import TDParticleShapeEffect from "@/views/backgroundEffect/effects/TDParticleShapeEffect.vue";
+import TDNeonWaveEffect from "@/views/backgroundEffect/effects/TDNeonWaveEffect.vue";
+import TDCellularAutomataEffect from "@/views/backgroundEffect/effects/TDCellularAutomataEffect.vue";
+import TDWireframeCube3DEffect from "@/views/backgroundEffect/effects/TDWireframeCube3DEffect.vue";
 
 /**
  * Map giá trị backgroundEffect (xem TDEnum.backgroundEffectList) sang component hiệu ứng.

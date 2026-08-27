@@ -8,7 +8,7 @@ import {
   backgroundEffectMap,
   backgroundEffectComponents,
   BACKGROUND_EFFECT_SHUFFLE,
-} from "@/common/TDBackgroundEffectMap.js";
+} from "@/views/backgroundEffect/helpers/TDBackgroundEffectMap.js";
 import eventBus from "@/common/event/TDEventBus.js";
 import { TDEnumEventBus } from "@/common/event/TDEnumEventBus.js";
 

@@ -29,7 +29,7 @@ import TDDynamicTabView from "@/views/misc/TDDynamicTabView.vue";
 import TDDialogUtil from "@/common/TDDialogUtil.js";
 import "@/common/TDPrototype.js";
 import TDAppStartup from "@/common/TDAppStartup.js";
-import TDCursorTrailEffect from "@/components/backgroundEffect/TDCursorTrailEffect.vue";
+import TDCursorTrailEffect from "@/views/backgroundEffect/effects/TDCursorTrailEffect.vue";
 
 export default {
   components: {
