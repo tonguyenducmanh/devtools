@@ -10,7 +10,6 @@ import TDGridLinesEffect from "./backgroundEffect/TDGridLinesEffect.vue";
 import TDParticleShapeEffect from "./backgroundEffect/TDParticleShapeEffect.vue";
 import TDRetro3DGridEffect from "./backgroundEffect/TDRetro3DGridEffect.vue";
 import TDNeonWaveEffect from "./backgroundEffect/TDNeonWaveEffect.vue";
-import TDGeometryFlowEffect from "./backgroundEffect/TDGeometryFlowEffect.vue";
 
 defineOptions({
   name: "TDDynamicBackgroundEffect",
@@ -22,7 +21,6 @@ const effects = shallowRef([
   TDParticleShapeEffect,
   TDRetro3DGridEffect,
   TDNeonWaveEffect,
-  TDGeometryFlowEffect,
 ]);
 
 // 3. Mỗi lần mount chọn ngẫu nhiên 1 effect, không cần settimeout/interval
