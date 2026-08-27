@@ -23,6 +23,15 @@
           />
         </div>
         <div class="flex user-setting-item">
+          <div>{{ $t("i18nUserSettings.settings.backgroundEffect") }}</div>
+          <TDComboBox
+            :width="200"
+            v-model="currentUserSetting.backgroundEffect"
+            :options="backgroundEffectOption"
+            :noMargin="true"
+          />
+        </div>
+        <div class="flex user-setting-item">
           <div>{{ $t("i18nUserSettings.settings.loadingType") }}</div>
           <TDComboBox
             :width="200"
@@ -113,6 +122,14 @@ export default {
         },
       ],
     };
+  },
+  computed: {
+    backgroundEffectOption() {
+      return this.$tdEnum.backgroundEffectList.map((item) => ({
+        label: this.$t(item.labelKey),
+        value: item.value,
+      }));
+    },
   },
   created() {
     let me = this;

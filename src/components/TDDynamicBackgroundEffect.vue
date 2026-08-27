@@ -3,30 +3,65 @@
 </template>
 
 <script setup>
-import { shallowRef } from "vue";
-
-// 1. Import các components
-import TDGridLinesEffect from "./backgroundEffect/TDGridLinesEffect.vue";
-import TDParticleShapeEffect from "./backgroundEffect/TDParticleShapeEffect.vue";
-import TDNeonWaveEffect from "./backgroundEffect/TDNeonWaveEffect.vue";
-import TDCellularAutomataEffect from "./backgroundEffect/TDCellularAutomataEffect.vue";
-import TDWireframeCube3DEffect from "./backgroundEffect/TDWireframeCube3DEffect.vue";
+import { shallowRef, onMounted, onBeforeUnmount, getCurrentInstance } from "vue";
+import {
+  backgroundEffectMap,
+  backgroundEffectComponents,
+  BACKGROUND_EFFECT_SHUFFLE,
+} from "@/common/TDBackgroundEffectMap.js";
+import eventBus from "@/common/event/TDEventBus.js";
+import { TDEnumEventBus } from "@/common/event/TDEnumEventBus.js";
 
 defineOptions({
   name: "TDDynamicBackgroundEffect",
 });
 
-// 2. Sử dụng shallowRef để tối ưu hiệu năng, tránh Vue scan deep reactive vào component
-const effects = shallowRef([
-  TDGridLinesEffect,
-  TDParticleShapeEffect,
-  TDNeonWaveEffect,
-  TDCellularAutomataEffect,
-  TDWireframeCube3DEffect,
-]);
+const tdUtility = getCurrentInstance()?.proxy?.$tdUtility;
+const currentComponent = shallowRef(null);
 
-// 3. Mỗi lần mount chọn ngẫu nhiên 1 effect, không cần settimeout/interval
-const currentComponent = effects.value[
-  Math.floor(Math.random() * effects.value.length)
-];
+function pickRandomEffect() {
+  return backgroundEffectComponents[
+    Math.floor(Math.random() * backgroundEffectComponents.length)
+  ];
+}
+
+function applyEffect(value) {
+  if (value === BACKGROUND_EFFECT_SHUFFLE) {
+    currentComponent.value = pickRandomEffect();
+  } else {
+    currentComponent.value = backgroundEffectMap[value] || pickRandomEffect();
+  }
+}
+
+let unsubscribe = null;
+
+onMounted(async () => {
+  let saved = null;
+  if (tdUtility?.getUserSettings) {
+    try {
+      saved = await tdUtility.getUserSettings("backgroundEffect");
+    } catch (e) {
+      // ignore
+    }
+  }
+  const mode = saved || BACKGROUND_EFFECT_SHUFFLE;
+
+  // Luân phiên: mỗi lần mount chọn ngẫu nhiên 1 hiệu ứng (không đổi theo thời gian)
+  applyEffect(mode);
+
+  // Lắng nghe để đổi hiệu ứng tức thì khi chọn trên header
+  unsubscribe = eventBus.on(
+    TDEnumEventBus.backgroundEffectChanged,
+    (value) => {
+      applyEffect(value);
+    },
+  );
+});
+
+onBeforeUnmount(() => {
+  if (unsubscribe) {
+    unsubscribe();
+    unsubscribe = null;
+  }
+});
 </script>

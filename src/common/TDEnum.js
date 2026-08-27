@@ -153,6 +153,33 @@ class TDEnum {
     { label: "Tokyo Night", value: "tokyo-night" },
     { label: "Dracula", value: "dracula" },
   ];
+  // danh sách hiệu ứng nền
+  backgroundEffectList = [
+    {
+      labelKey: "i18nUserSettings.backgroundEffect.shuffle",
+      value: "shuffle",
+    },
+    {
+      labelKey: "i18nUserSettings.backgroundEffect.gridLines",
+      value: "gridLines",
+    },
+    {
+      labelKey: "i18nUserSettings.backgroundEffect.particleShape",
+      value: "particleShape",
+    },
+    {
+      labelKey: "i18nUserSettings.backgroundEffect.neonWave",
+      value: "neonWave",
+    },
+    {
+      labelKey: "i18nUserSettings.backgroundEffect.cellularAutomata",
+      value: "cellularAutomata",
+    },
+    {
+      labelKey: "i18nUserSettings.backgroundEffect.wireframeCube3D",
+      value: "wireframeCube3D",
+    },
+  ];
 }
 
 export default new TDEnum();

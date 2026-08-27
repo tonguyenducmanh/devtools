@@ -12,10 +12,19 @@ export default {
       toastInHeader: "Hiển thị thông báo trên thanh header",
       cursorTrail: "Hiệu ứng đuôi chuột",
       loadingType: "Loại loading",
+      backgroundEffect: "Hiệu ứng nền",
     },
     loadingType: {
       Normal: "Bình thường",
       Meme: "Meme",
+    },
+    backgroundEffect: {
+      shuffle: "Luân phiên (Ngẫu nhiên)",
+      gridLines: "Grid Lines",
+      particleShape: "Particle Shape",
+      neonWave: "Neon Wave",
+      cellularAutomata: "Cellular Automata",
+      wireframeCube3D: "3D Cube Wireframe",
     },
   },
 };

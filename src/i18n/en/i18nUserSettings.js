@@ -12,10 +12,19 @@ export default {
       toastInHeader: "Show notifications in header",
       cursorTrail: "Cursor trail effect",
       loadingType: "Loading type",
+      backgroundEffect: "Background effect",
     },
     loadingType: {
       Normal: "Normal",
       Meme: "Meme",
+    },
+    backgroundEffect: {
+      shuffle: "Rotate (Random)",
+      gridLines: "Grid Lines",
+      particleShape: "Particle Shape",
+      neonWave: "Neon Wave",
+      cellularAutomata: "Cellular Automata",
+      wireframeCube3D: "3D Cube Wireframe",
     },
   },
 };

@@ -13,4 +13,7 @@ export const TDEnumEventBus = {
 
   // Theme changed (preview or apply)
   themeChanged: "themeChanged",
+
+  // Background effect changed (apply)
+  backgroundEffectChanged: "backgroundEffectChanged",
 };

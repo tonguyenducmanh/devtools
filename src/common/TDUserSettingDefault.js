@@ -13,6 +13,7 @@ export function getUserSettingDefault() {
     showTabNumber: false,
     toastInHeader: false,
     showCursorTrail: false,
+    backgroundEffect: "shuffle",
     currentLoadingType: tdEnum.LoadingType.Normal,
   };
 }

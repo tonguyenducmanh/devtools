@@ -31,12 +31,16 @@
     <TDFlyoutPanel :show="!!activeKeyFlyOut && activeKeyFlyOut !== 'logo'" :anchorElFlyout="anchorElFlyout"
       placement="bottom" panelClass="td-header-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="onFlyoutPanelLeave">
       <template v-if="activeKeyFlyOut === 'theme'">
-        <div class="td-flyout-theme-list" v-tooltip="$t('i18nCommon.tdheader.themeTooltip')">
-          <div v-for="item in themeItems" :key="item.value" class="td-flyout-item td-flyout-theme-item"
-            :class="{ 'td-flyout-theme-item--active': item.value === savedTheme }"
-            @mouseenter="debouncedPreviewTheme(item.value)" @mouseleave="onThemeItemLeave"
-            @click="applyTheme(item.value)">
-            {{ item.label }}
+        <div class="td-theme-category-list">
+          <div class="td-flyout-item td-theme-category-item"
+            :class="{ 'td-theme-category-item--active': activeSubKey === 'theme' }"
+            @mouseenter="openSub('theme', $event)" @click="openSub('theme', $event)">
+            {{ $t("i18nCommon.tdheader.themes") }}
+          </div>
+          <div class="td-flyout-item td-theme-category-item"
+            :class="{ 'td-theme-category-item--active': activeSubKey === 'backgroundEffect' }"
+            @mouseenter="openSub('backgroundEffect', $event)" @click="openSub('backgroundEffect', $event)">
+            {{ $t("i18nCommon.tdheader.backgroundEffects") }}
           </div>
         </div>
       </template>
@@ -44,6 +48,28 @@
         <div v-for="item in currentMenuItems" :key="item.key" class="td-flyout-item" v-tooltip="item.tooltip"
           @click="item.action">
           {{ $t(item.labelKey) }}
+        </div>
+      </template>
+    </TDFlyoutPanel>
+
+    <!-- Sub Flyout: danh sách con của menu nhiều category -->
+    <TDFlyoutPanel v-if="activeKeyFlyOut === 'theme'" :show="!!activeSubKey" :anchorElFlyout="subAnchorEl"
+      placement="right" panelClass="td-theme-sub-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="closeSub">
+      <template v-if="activeSubKey === 'theme'">
+        <div class="td-flyout-theme-list" v-tooltip="$t('i18nCommon.tdheader.themeTooltip')">
+          <div v-for="item in themeItems" :key="item.value" class="td-flyout-item td-flyout-theme-item"
+            @mouseenter="debouncedPreviewTheme(item.value)" @mouseleave="onThemeItemLeave"
+            @click="applyTheme(item.value)">
+            {{ item.label }}
+          </div>
+        </div>
+      </template>
+      <template v-else-if="activeSubKey === 'backgroundEffect'">
+        <div class="td-flyout-theme-list" v-tooltip="$t('i18nCommon.tdheader.backgroundEffectTooltip')">
+          <div v-for="item in backgroundEffectItems" :key="item.value" class="td-flyout-item td-flyout-theme-item"
+            @click="applyBackgroundEffect(item.value)">
+            {{ item.label }}
+          </div>
         </div>
       </template>
     </TDFlyoutPanel>
@@ -93,6 +119,9 @@ export default {
       headerToastUnsubscribe: null,
       savedTheme: null,
       themeItems: this.$tdEnum.monacoThemeList,
+      savedBackgroundEffect: null,
+      activeSubKey: null,
+      subAnchorEl: null,
     };
   },
   computed: {
@@ -102,12 +131,22 @@ export default {
     currentMenuItems() {
       return this.menuConfig[this.activeKeyFlyOut] ?? [];
     },
+    backgroundEffectItems() {
+      return this.$tdEnum.backgroundEffectList.map((item) => ({
+        label: this.$t(item.labelKey),
+        value: item.value,
+      }));
+    },
   },
   watch: {
     activeKeyFlyOut(newVal, oldVal) {
       if (oldVal === "theme" && newVal !== "theme") {
         this.revertTheme();
       }
+      // Reset sub-flyout cho bất kỳ menu nào khi mở/re-mở để không dính
+      // anchor/state cũ (tránh lệch vị trí khi menu có nhiều category)
+      this.activeSubKey = null;
+      this.subAnchorEl = null;
     },
   },
   mounted() {
@@ -206,6 +245,8 @@ export default {
   methods: {
     async loadCurrentTheme() {
       this.savedTheme = await this.$tdUtility.getUserSettings("theme");
+      this.savedBackgroundEffect =
+        (await this.$tdUtility.getUserSettings("backgroundEffect")) ?? "shuffle";
     },
     previewTheme(themeName) {
       this.$tdUtility.setTheme(themeName);
@@ -229,6 +270,23 @@ export default {
       eventBus.emit(TDEnumEventBus.themeChanged, themeName);
       await this.$tdUtility.saveUserSettings("theme", themeName);
       this.closeFlyout();
+    },
+    async applyBackgroundEffect(effectValue) {
+      this.savedBackgroundEffect = effectValue;
+      await this.$tdUtility.saveUserSettings("backgroundEffect", effectValue);
+      // Áp dụng tức thì cho mọi background effect đang mount
+      eventBus.emit(TDEnumEventBus.backgroundEffectChanged, effectValue);
+      this.closeFlyout();
+    },
+    openSub(type, event) {
+      this.subAnchorEl = event?.currentTarget ?? this.subAnchorEl;
+      this.activeSubKey = type;
+      this.cancelCloseFlyOut();
+    },
+    closeSub() {
+      this.activeSubKey = null;
+      this.revertTheme();
+      this.subAnchorEl = null;
     },
     onFlyoutPanelLeave() {
       if (this.debouncedPreviewTheme?.cancel) {
@@ -414,8 +472,23 @@ export default {
   }
 }
 
+.td-theme-category-list {
+  min-width: 180px;
+}
+
+.td-theme-category-item {
+  &.td-theme-category-item--active {
+    background-color: var(--focus-color);
+  }
+}
+
 .td-flyout-theme-list {
   max-height: calc(100vh - 48px);
   overflow-y: auto;
+  min-width: 180px;
+}
+
+.td-flyout-theme-item {
+  padding-left: 12px;
 }
 </style>
