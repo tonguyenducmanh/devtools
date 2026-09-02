@@ -20,6 +20,7 @@ export default {
       Meme: "Meme",
     },
     backgroundEffect: {
+      off: "Tắt",
       shuffle: "Luân phiên (Ngẫu nhiên)",
       gridLines: "Lưới",
       particleShape: "Hạt chuyển động",

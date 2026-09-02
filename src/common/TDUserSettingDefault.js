@@ -13,7 +13,7 @@ export function getUserSettingDefault() {
     showTabNumber: false,
     toastInHeader: false,
     cursorEffect: "off",
-    backgroundEffect: "sphereGlobe",
+    backgroundEffect: "off",
     currentLoadingType: tdEnum.LoadingType.Normal,
   };
 }

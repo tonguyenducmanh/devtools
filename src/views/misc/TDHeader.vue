@@ -266,7 +266,7 @@ export default {
     async loadCurrentTheme() {
       this.savedTheme = await this.$tdUtility.getUserSettings("theme");
       this.savedBackgroundEffect =
-        (await this.$tdUtility.getUserSettings("backgroundEffect")) ?? "shuffle";
+        (await this.$tdUtility.getUserSettings("backgroundEffect")) ?? "off";
       this.savedCursorEffect =
         (await this.$tdUtility.getUserSettings("cursorEffect")) ?? "off";
     },

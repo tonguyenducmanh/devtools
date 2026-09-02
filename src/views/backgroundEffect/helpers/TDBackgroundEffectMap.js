@@ -24,6 +24,11 @@ export const backgroundEffectMap = {
 export const BACKGROUND_EFFECT_SHUFFLE = "shuffle";
 
 /**
+ * Giá trị đặc biệt: tắt hiệu ứng nền (không render gì)
+ */
+export const BACKGROUND_EFFECT_OFF = "off";
+
+/**
  * Danh sách các component hiệu ứng (chỉ các hiệu ứng đơn, không tính shuffle)
  */
 export const backgroundEffectComponents = Object.values(backgroundEffectMap);

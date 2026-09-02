@@ -20,6 +20,7 @@ export default {
       Meme: "Meme",
     },
     backgroundEffect: {
+      off: "Off",
       shuffle: "Rotate (Random)",
       gridLines: "Grid Lines",
       particleShape: "Particle Shape",

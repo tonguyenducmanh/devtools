@@ -156,6 +156,10 @@ class TDEnum {
   // danh sách hiệu ứng nền
   backgroundEffectList = [
     {
+      labelKey: "i18nUserSettings.backgroundEffect.off",
+      value: "off",
+    },
+    {
       labelKey: "i18nUserSettings.backgroundEffect.shuffle",
       value: "shuffle",
     },

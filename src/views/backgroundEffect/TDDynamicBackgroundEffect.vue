@@ -8,6 +8,7 @@ import {
   backgroundEffectMap,
   backgroundEffectComponents,
   BACKGROUND_EFFECT_SHUFFLE,
+  BACKGROUND_EFFECT_OFF,
 } from "@/views/backgroundEffect/helpers/TDBackgroundEffectMap.js";
 import eventBus from "@/common/event/TDEventBus.js";
 import { TDEnumEventBus } from "@/common/event/TDEnumEventBus.js";
@@ -26,7 +27,9 @@ function pickRandomEffect() {
 }
 
 function applyEffect(value) {
-  if (value === BACKGROUND_EFFECT_SHUFFLE) {
+  if (value === BACKGROUND_EFFECT_OFF) {
+    currentComponent.value = null;
+  } else if (value === BACKGROUND_EFFECT_SHUFFLE) {
     currentComponent.value = pickRandomEffect();
   } else {
     currentComponent.value = backgroundEffectMap[value] || pickRandomEffect();
@@ -44,7 +47,7 @@ onMounted(async () => {
       // ignore
     }
   }
-  const mode = saved || BACKGROUND_EFFECT_SHUFFLE;
+  const mode = saved || BACKGROUND_EFFECT_OFF;
 
   // Luân phiên: mỗi lần mount chọn ngẫu nhiên 1 hiệu ứng (không đổi theo thời gian)
   applyEffect(mode);
