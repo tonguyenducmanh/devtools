@@ -143,7 +143,7 @@
                   :class="{ 'td-table-cell-active': activeCellKey === getCellKey(row, '__td_index__') }"
                   :style="indexStickyStyle"
                   @click="copyRow(row)"
-                  @contextmenu.prevent="onIndexContextMenu(row, $event)"
+                  @contextmenu.prevent="onRowContextMenu(row, null, $event)"
                 >
                   <div>
                     {{ rowIndex + 1 }}
@@ -163,7 +163,7 @@
                     },
                   ]"
                   :style="getColumnStyle(column)"
-                  @contextmenu.prevent="onCellContextMenu(row, column, $event)"
+                  @contextmenu.prevent="onRowContextMenu(row, column, $event)"
                 >
                   <slot
                     :name="`cell-${column.key}`"
@@ -896,52 +896,48 @@ export default {
       this.$emit("selection-change", this.selectedRows);
     },
 
-    onCellContextMenu(row, column, event) {
-      this.activeCellKey = this.getCellKey(row, column.key);
+    // Context menu đồng nhất cho MỌI cell trong row (kể cả STT):
+    // right-click vào td nào cũng cho cùng danh sách tùy chọn.
+    onRowContextMenu(row, column, event) {
+      const cellKey = column ? column.key : "__td_index__";
+      this.activeCellKey = this.getCellKey(row, cellKey);
       this.scheduleClearActiveCell();
       this.$tdContextMenu.open(event, [
         {
           key: "copyCell",
-          label: this.$t("i18nCommon.copy"),
+          label: this.$t("i18nCommon.copyCell"),
           action: () => this.handleDataSelected(row, column),
         },
         {
-          key: "viewFullData",
-          label: this.$t("i18nCommon.viewFullData"),
-          action: () => this.onCellPreview(row, column),
-        },
-        {
-          key: "viewRecord",
-          label: this.$t("i18nCommon.viewRecord"),
-          action: () => this.onRecordView(row),
-        },
-      ]);
-    },
-
-    onIndexContextMenu(row, event) {
-      this.activeCellKey = this.getCellKey(row, "__td_index__");
-      this.scheduleClearActiveCell();
-      this.$tdContextMenu.open(event, [
-        {
           key: "copyRow",
-          label: this.$t("i18nCommon.copy"),
+          label: this.$t("i18nCommon.copyRow"),
           action: () => this.copyRow(row),
         },
         {
-          key: "viewFullRow",
-          label: this.$t("i18nCommon.viewFullData"),
+          key: "copyTable",
+          label: this.$t("i18nCommon.copyTable"),
+          action: () => this.copyTable(),
+        },
+        {
+          key: "viewCell",
+          label: this.$t("i18nCommon.viewCell"),
+          action: () => this.onCellPreview(row, column),
+        },
+        {
+          key: "viewRow",
+          label: this.$t("i18nCommon.viewRow"),
           action: () => this.onRowPreview(row),
         },
         {
-          key: "viewRecord",
-          label: this.$t("i18nCommon.viewRecord"),
-          action: () => this.onRecordView(row),
+          key: "viewTable",
+          label: this.$t("i18nCommon.viewTable"),
+          action: () => this.onTablePreview(),
         },
       ]);
     },
 
     handleDataSelected(row, column) {
-      let data = this.formatCellValue(row, column);
+      let data = column ? this.formatCellValue(row, column) : row;
       if (data !== null && typeof data === "object") {
         data = JSON.stringify(data);
       }
@@ -950,6 +946,10 @@ export default {
 
     copyRow(row) {
       this.$tdUtility.copyToClipboard(JSON.stringify(row));
+    },
+
+    copyTable() {
+      this.$tdUtility.copyToClipboard(JSON.stringify(this.tableData));
     },
 
     onRowPreview(row) {
@@ -961,9 +961,18 @@ export default {
       });
     },
 
+    onTablePreview() {
+      TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDQuickPreview,
+        ownerForm: this,
+        props: {},
+        param: { value: this.tableData, label: this.$t("i18nCommon.tableData") },
+      });
+    },
+
     onCellPreview(row, column) {
-      const value = this.getCellValue(row, column.key);
-      const label = column.label || column.key;
+      const value = column ? this.getCellValue(row, column.key) : row;
+      const label = column ? column.label || column.key : this.$t("i18nCommon.rowData");
       TDDialogUtil.showPopup({
         dialogType: TDDialogEnum.TDQuickPreview,
         ownerForm: this,
