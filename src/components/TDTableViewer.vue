@@ -1196,6 +1196,18 @@ export default {
       cursor: pointer;
     }
 
+    // Hover vào cell thường → hiển thị focus border cho cell đó (KHÔNG áp dụng cho cell index)
+    .td-table-cell:hover:not(.td-table-cell-index) {
+      outline: 1px solid var(--focus-color);
+      outline-offset: -1px;
+    }
+
+    // Hover vào cell index (STT đầu dòng) → hiển thị focus border cho cả dòng
+    .td-table-body .td-table-row:has(.td-table-cell-index:hover) .td-table-cell {
+      outline: 1px solid var(--focus-color);
+      outline-offset: -1px;
+    }
+
     .td-table-body {
       .td-table-row {
         border-bottom: 1px solid var(--border-color);
