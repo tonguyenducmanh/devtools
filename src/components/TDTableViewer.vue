@@ -140,6 +140,7 @@
                 <td
                   v-if="showIndex"
                   class="td-table-cell td-table-cell-index td-table-cell-sticky"
+                  :class="{ 'td-table-cell-active': activeCellKey === getCellKey(row, '__td_index__') }"
                   :style="indexStickyStyle"
                   @click="copyRow(row)"
                   @contextmenu.prevent="onIndexContextMenu(row, $event)"
@@ -154,7 +155,13 @@
                   v-for="(column, colIndex) in computedColumns"
                   :key="`cell-${rowIndex}-${colIndex}`"
                   class="td-table-cell"
-                  :class="[getColumnClass(column)]"
+                  :class="[
+                    getColumnClass(column),
+                    {
+                      'td-table-cell-active':
+                        activeCellKey === getCellKey(row, column.key),
+                    },
+                  ]"
                   :style="getColumnStyle(column)"
                   @contextmenu.prevent="onCellContextMenu(row, column, $event)"
                 >
@@ -256,6 +263,10 @@
               </td>
               <td
                 class="td-record-cell td-record-cell-value"
+                :class="{
+                  'td-record-cell-active':
+                    activeRecordColKey === col.key,
+                }"
                 @contextmenu.prevent="onRecordCellContextMenu(col, $event)"
               >
                 {{ formatCellValue(currentRecord, col) }}
@@ -475,6 +486,8 @@ export default {
       // record view mode
       viewMode: "table",
       currentRecord: null,
+      activeCellKey: null, // key của cell đang được mở context menu (right-click)
+      activeRecordColKey: null, // key của record cell đang mở context menu (right-click)
     };
   },
 
@@ -840,6 +853,7 @@ export default {
     },
 
     handleRowClick(row, index) {
+      this.activeCellKey = null;
       this.$emit("row-click", row, index);
     },
 
@@ -857,6 +871,25 @@ export default {
       this.$emit("selection-change", this.selectedRows);
     },
 
+    getCellKey(row, columnKey) {
+      const rowKeyVal = row[this.rowKey];
+      return `${rowKeyVal !== undefined ? rowKeyVal : this.processedData.indexOf(row)}-${columnKey}`;
+    },
+
+    // Sau khi mở context menu, click chuột tiếp theo bất kỳ (click-away/select)
+    // sẽ xóa highlight của cell đang active.
+    scheduleClearActiveCell(extra = null) {
+      const clear = () => {
+        this.activeCellKey = null;
+        this.activeRecordColKey = null;
+        if (typeof extra === "function") extra();
+        document.removeEventListener("pointerdown", clear);
+        document.removeEventListener("scroll", clear, true);
+      };
+      document.addEventListener("pointerdown", clear);
+      document.addEventListener("scroll", clear, true);
+    },
+
     selectAll() {
       this.selectedRows = [...this.tableData];
       this.$emit("update:modelValue", this.selectedRows);
@@ -864,6 +897,8 @@ export default {
     },
 
     onCellContextMenu(row, column, event) {
+      this.activeCellKey = this.getCellKey(row, column.key);
+      this.scheduleClearActiveCell();
       this.$tdContextMenu.open(event, [
         {
           key: "copyCell",
@@ -884,6 +919,8 @@ export default {
     },
 
     onIndexContextMenu(row, event) {
+      this.activeCellKey = this.getCellKey(row, "__td_index__");
+      this.scheduleClearActiveCell();
       this.$tdContextMenu.open(event, [
         {
           key: "copyRow",
@@ -961,6 +998,10 @@ export default {
     },
 
     onRecordCellContextMenu(column, event) {
+      this.activeRecordColKey = column.key;
+      this.scheduleClearActiveCell(() => {
+        this.activeRecordColKey = null;
+      });
       this.$tdContextMenu.open(event, [
         {
           key: "copyCell",
@@ -1191,21 +1232,35 @@ export default {
       }
     }
 
-    .td-table-cell:hover {
-      background-color: var(--bg-layer-color);
+    // Chỉ hover trên body (không áp dụng cho th header theo chuẩn tdheader)
+    .td-table-body .td-table-cell:hover {
+      background-color: var(--focus-color);
+      color: var(--selected-item-text-color);
       cursor: pointer;
+
+      .td-table-cell-content {
+        color: var(--selected-item-text-color);
+      }
     }
 
-    // Hover vào cell thường → hiển thị focus border cho cell đó (KHÔNG áp dụng cho cell index)
-    .td-table-cell:hover:not(.td-table-cell-index) {
-      outline: 1px solid var(--focus-color);
-      outline-offset: -1px;
+    // Cell đang được mở context menu (right-click) → highlight theo chuẩn chung
+    .td-table-body .td-table-cell-active {
+      background-color: var(--focus-color);
+      color: var(--selected-item-text-color);
+
+      .td-table-cell-content {
+        color: var(--selected-item-text-color);
+      }
     }
 
-    // Hover vào cell index (STT đầu dòng) → hiển thị focus border cho cả dòng
+    // Hover vào cell index (STT đầu dòng) → đổi background + màu chữ cả dòng như tdheader
     .td-table-body .td-table-row:has(.td-table-cell-index:hover) .td-table-cell {
-      outline: 1px solid var(--focus-color);
-      outline-offset: -1px;
+      background-color: var(--focus-color);
+      color: var(--selected-item-text-color);
+
+      .td-table-cell-content {
+        color: var(--selected-item-text-color);
+      }
     }
 
     .td-table-body {
@@ -1429,6 +1484,11 @@ export default {
         font-size: var(--font-size-medium);
         color: var(--text-primary-color);
         font-family: var(--main-font);
+      }
+
+      &-active {
+        background-color: var(--focus-color);
+        color: var(--selected-item-text-color);
       }
     }
   }
