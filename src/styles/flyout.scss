@@ -127,6 +127,11 @@
     background-color: var(--focus-color);
     color: var(--selected-item-text-color);
   }
+
+  &--active {
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
+  }
 }
 
 .td-flyout-item--logo {

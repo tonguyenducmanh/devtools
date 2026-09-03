@@ -22,58 +22,22 @@
     <!-- Flyout Menu: mở xuống dưới (placement="bottom") -->
     <TDFlyoutPanel :show="!!activeKeyFlyOut && activeKeyFlyOut !== 'logo'" :anchorElFlyout="anchorElFlyout"
       placement="bottom" panelClass="td-header-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="onFlyoutPanelLeave">
-      <template v-if="activeKeyFlyOut === 'appearance'">
-        <div class="td-theme-category-list">
-          <div class="td-flyout-item td-theme-category-item"
-            :class="{ 'td-theme-category-item--active': activeSubKey === 'theme' }"
-            @mouseenter="openSub('theme', $event)" @click="openSub('theme', $event)">
-            {{ $t("i18nCommon.tdheader.themes") }}
-          </div>
-          <div class="td-flyout-item td-theme-category-item"
-            :class="{ 'td-theme-category-item--active': activeSubKey === 'backgroundEffect' }"
-            @mouseenter="openSub('backgroundEffect', $event)" @click="openSub('backgroundEffect', $event)">
-            {{ $t("i18nCommon.tdheader.backgroundEffects") }}
-          </div>
-          <div class="td-flyout-item td-theme-category-item"
-            :class="{ 'td-theme-category-item--active': activeSubKey === 'cursorEffect' }"
-            @mouseenter="openSub('cursorEffect', $event)" @click="openSub('cursorEffect', $event)">
-            {{ $t("i18nCommon.tdheader.cursorEffects") }}
-          </div>
-        </div>
-      </template>
-      <template v-else>
-        <div v-for="item in currentMenuItems" :key="item.key" class="td-flyout-item" v-tooltip="item.tooltip"
-          @click="item.action">
-          {{ $t(item.labelKey) }}
-        </div>
-      </template>
+      <div v-for="item in currentMenuItems" :key="item.key" class="td-flyout-item"
+        :class="{ 'td-flyout-item--active': item.children ? activeSubKey === item.key : false }" v-tooltip="item.tooltip"
+        @mouseenter="onMenuItemEnter(item, $event)" @click="onMenuItemClick(item, $event)">
+        {{ $t(item.labelKey) }}
+      </div>
     </TDFlyoutPanel>
 
-    <!-- Sub Flyout: danh sách con của menu nhiều category -->
-    <TDFlyoutPanel v-if="activeKeyFlyOut === 'appearance'" :show="!!activeSubKey" :anchorElFlyout="subAnchorEl"
-      placement="right" panelClass="td-theme-sub-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="closeSub">
-      <template v-if="activeSubKey === 'theme'">
-        <div class="td-flyout-theme-list" v-tooltip="$t('i18nCommon.tdheader.themeTooltip')">
-          <div v-for="item in themeItems" :key="item.value" class="td-flyout-item td-flyout-theme-item"
-            @mouseenter="debouncedPreviewTheme(item.value)" @mouseleave="onThemeItemLeave"
-            @click="applyTheme(item.value)">
-            {{ item.label }}
-          </div>
-        </div>
-      </template>
-      <template v-else-if="activeSubKey === 'backgroundEffect'">
-        <div class="td-flyout-theme-list" v-tooltip="$t('i18nCommon.tdheader.backgroundEffectTooltip')">
-          <div v-for="item in backgroundEffectItems" :key="item.value" class="td-flyout-item td-flyout-theme-item"
-            @click="applyBackgroundEffect(item.value)">
-            {{ item.label }}
-          </div>
-        </div>
-      </template>
-      <template v-else-if="activeSubKey === 'cursorEffect'">
-        <div class="td-flyout-theme-list" v-tooltip="$t('i18nCommon.tdheader.cursorEffectTooltip')">
-          <div v-for="item in cursorEffectItems" :key="item.value" class="td-flyout-item td-flyout-theme-item"
-            @click="applyCursorEffect(item.value)">
-            {{ item.label }}
+    <!-- Sub Flyout: menu con của item có children (panel luôn mount, chỉ ẩn/hiện) -->
+    <TDFlyoutPanel :show="!!activeSubItem" :anchorElFlyout="subAnchorEl" placement="right"
+      panelClass="td-theme-sub-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="closeSub">
+      <template v-if="activeSubItem">
+        <div class="td-flyout-theme-list" v-tooltip="$t(activeSubItem.tooltipKey)">
+          <div v-for="child in activeSubItem.children" :key="child.value" class="td-flyout-item td-flyout-theme-item"
+            @mouseenter="onSubItemEnter(activeSubItem, child)" @mouseleave="onSubItemLeave(activeSubItem)"
+            @click="onSubItemClick(activeSubItem, child)">
+            {{ child.label }}
           </div>
         </div>
       </template>
@@ -116,7 +80,6 @@ export default {
   },
   data() {
     return {
-      menuConfig: {},
       logoItems: [],
       savedTheme: null,
       themeItems: this.$tdEnum.monacoThemeList,
@@ -129,6 +92,99 @@ export default {
   computed: {
     appName() {
       return window.__env.appName;
+    },
+    menuConfig() {
+      return {
+        settings: [
+          {
+            key: "userSettings",
+            labelKey: "i18nCommon.feature.userSettings",
+            action: this.userSettingsFunc,
+          },
+          {
+            key: "appDataMiner",
+            labelKey: "i18nCommon.feature.AppDataMiner",
+            action: this.appDataMinerFunc,
+          },
+        ],
+        view: [
+          {
+            key: "showAllShortcut",
+            labelKey: "i18nCommon.tdheader.showAllShortcut",
+            action: this.showAllShortcutPopup,
+          },
+        ],
+        utilities: [
+          {
+            key: "genUUID",
+            labelKey: "i18nCommon.help.genUUID",
+            action: this.genUUIDFunc,
+          },
+          {
+            key: "getCurrentDate",
+            labelKey: "i18nCommon.utilities.getCurrentDate",
+            action: this.getCurrentDateFunc,
+          },
+          {
+            key: "getCurrentDateTime",
+            labelKey: "i18nCommon.utilities.getCurrentDateTime",
+            action: this.getCurrentDateTimeFunc,
+          },
+        ],
+        appearance: [
+          {
+            key: "theme",
+            labelKey: "i18nCommon.tdheader.themes",
+            tooltipKey: "i18nCommon.tdheader.themeTooltip",
+            children: this.themeItems,
+            onChildHover: (value) => this.debouncedPreviewTheme?.(value),
+            onChildLeave: () => this.onThemeItemLeave(),
+            onChildClick: (value) => this.applyTheme(value),
+          },
+          {
+            key: "backgroundEffect",
+            labelKey: "i18nCommon.tdheader.backgroundEffects",
+            tooltipKey: "i18nCommon.tdheader.backgroundEffectTooltip",
+            children: this.backgroundEffectItems,
+            onChildClick: (value) => this.applyBackgroundEffect(value),
+          },
+          {
+            key: "cursorEffect",
+            labelKey: "i18nCommon.tdheader.cursorEffects",
+            tooltipKey: "i18nCommon.tdheader.cursorEffectTooltip",
+            children: this.cursorEffectItems,
+            onChildClick: (value) => this.applyCursorEffect(value),
+          },
+          {
+            key: "zenMode",
+            labelKey: "i18nCommon.tdheader.zenMode",
+            action: this.toggleZenMode,
+          },
+        ],
+        help: [
+          {
+            key: "pingAgent",
+            labelKey: "i18nCommon.apiTesting.pingAgent",
+            action: this.pingAgentFunc,
+          },
+          {
+            key: "reloadApp",
+            labelKey: "i18nCommon.help.reloadApp",
+            action: this.reloadAppFunc,
+          },
+          {
+            key: "goToSource",
+            labelKey: "i18nCommon.tdheader.goToSource",
+            action: this.goToSourceFunc,
+          },
+          {
+            key: "downloadAgent",
+            labelKey: "i18nCommon.feature.agentDownload.title",
+            tooltip: this.$t("i18nCommon.apiTesting.toolTipDownloadAgent"),
+            action: this.downloadAgentFunc,
+          },
+        ],
+      };
     },
     currentMenuItems() {
       return this.menuConfig[this.activeKeyFlyOut] ?? [];
@@ -144,6 +200,12 @@ export default {
         label: this.$t(item.labelKey),
         value: item.value,
       }));
+    },
+    activeSubItem() {
+      return (
+        this.currentMenuItems.find((item) => item.key === this.activeSubKey) ||
+        null
+      );
     },
   },
   watch: {
@@ -168,75 +230,6 @@ export default {
         action: () => this.openOtherApp(window.location.href),
       },
     ];
-    this.menuConfig = {
-      settings: [
-        {
-          key: "userSettings",
-          labelKey: "i18nCommon.feature.userSettings",
-          action: this.userSettingsFunc,
-        },
-        {
-          key: "appDataMiner",
-          labelKey: "i18nCommon.feature.AppDataMiner",
-          action: this.appDataMinerFunc,
-        },
-      ],
-      view: [
-        {
-          key: "zenMode",
-          labelKey: "i18nCommon.tdheader.zenMode",
-          action: this.toggleZenMode,
-        },
-        {
-          key: "showAllShortcut",
-          labelKey: "i18nCommon.tdheader.showAllShortcut",
-          action: this.showAllShortcutPopup,
-        },
-      ],
-      utilities: [
-        {
-          key: "genUUID",
-          labelKey: "i18nCommon.help.genUUID",
-          action: this.genUUIDFunc,
-        },
-        {
-          key: "getCurrentDate",
-          labelKey: "i18nCommon.utilities.getCurrentDate",
-          action: this.getCurrentDateFunc,
-        },
-        {
-          key: "getCurrentDateTime",
-          labelKey: "i18nCommon.utilities.getCurrentDateTime",
-          action: this.getCurrentDateTimeFunc,
-        },
-      ],
-      appearance: [
-        // chỗ này sẽ được build động sau
-      ],
-      help: [
-        {
-          key: "pingAgent",
-          labelKey: "i18nCommon.apiTesting.pingAgent",
-          action: this.pingAgentFunc,
-        },
-        {
-          key: "reloadApp",
-          labelKey: "i18nCommon.help.reloadApp",
-          action: this.reloadAppFunc,
-        },
-        {
-          key: "goToSource",
-          labelKey: "i18nCommon.tdheader.goToSource",
-          action: this.goToSourceFunc,
-        },
-        {
-          key: "downloadAgent",
-          labelKey: "i18nCommon.feature.agentDownload.title",
-          tooltip: this.$t("i18nCommon.apiTesting.toolTipDownloadAgent"),
-          action: this.downloadAgentFunc,
-        },
-      ],
-    };
   },
   beforeUnmount() {
     if (this.debouncedPreviewTheme?.cancel) {
@@ -297,6 +290,35 @@ export default {
       this.activeSubKey = null;
       this.revertTheme();
       this.subAnchorEl = null;
+    },
+    onMenuItemEnter(item, event) {
+      if (item.children) {
+        this.openSub(item.key, event);
+      } else {
+        this.closeSub();
+      }
+    },
+    onMenuItemClick(item, event) {
+      if (item.children) {
+        this.openSub(item.key, event ?? {});
+      } else if (item.action) {
+        item.action();
+      }
+    },
+    onSubItemEnter(item, child) {
+      if (item.onChildHover) {
+        item.onChildHover(child.value);
+      }
+    },
+    onSubItemLeave(item) {
+      if (item.onChildLeave) {
+        item.onChildLeave();
+      }
+    },
+    onSubItemClick(item, child) {
+      if (item.onChildClick) {
+        item.onChildClick(child.value);
+      }
     },
     onFlyoutPanelLeave() {
       if (this.debouncedPreviewTheme?.cancel) {
@@ -423,17 +445,6 @@ export default {
     align-items: center;
     gap: var(--padding);
     margin-left: auto;
-  }
-}
-
-.td-theme-category-list {
-  min-width: 180px;
-}
-
-.td-theme-category-item {
-  &.td-theme-category-item--active {
-    background-color: var(--focus-color);
-    color: var(--selected-item-text-color);
   }
 }
 
