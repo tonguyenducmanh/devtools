@@ -10,8 +10,6 @@ export function getUserSettingDefault() {
     agentURL: window.__env?.APITesting?.agentServer,
     wrapTab: true,
     showSideBar: true,
-    showTabNumber: false,
-    toastInHeader: false,
     cursorEffect: "off",
     backgroundEffect: "off",
     currentLoadingType: tdEnum.LoadingType.Normal,

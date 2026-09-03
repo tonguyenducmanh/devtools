@@ -1,13 +1,10 @@
 import { createApp } from "vue";
 import ToastContainer from "@/components/TDToastMessage.vue";
-import eventBus from "@/common/event/TDEventBus.js";
-import { TDEnumEventBus } from "@/common/event/TDEnumEventBus.js";
 
 class ToastManager {
   constructor() {
     this.toastInstance = null;
     this.container = null;
-    this.useHeaderToast = true;
     this.init();
   }
 
@@ -29,11 +26,6 @@ class ToastManager {
       message: options.message || "",
       duration: options.duration || 1500,
     };
-
-    if (this.useHeaderToast) {
-      eventBus.emit(TDEnumEventBus.headerToastShow, config);
-      return;
-    }
 
     if (!this.toastInstance) {
       console.error("Toast instance not initialized");
@@ -116,9 +108,6 @@ export const toast = {
     toastManager.info(title, message, duration),
   remove: (id) => toastManager.remove(id),
   clear: () => toastManager.clear(),
-  setUseHeaderToast: (value) => {
-    toastManager.useHeaderToast = value;
-  },
 };
 
 // Plugin cho Vue 3

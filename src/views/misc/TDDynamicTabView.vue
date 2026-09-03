@@ -23,10 +23,6 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
             <div v-if="dragOverIndex === index && draggingId !== tab.id"
               class="td-drop-indicator td-drop-indicator-before"></div>
 
-            <span v-if="showTabNumber" class="td-tab-number">
-              {{ index + 1 }}.
-            </span>
-
             <span class="td-tab-label">
               {{ getTabLabel(tab) }}
             </span>
@@ -173,7 +169,6 @@ export default {
   data() {
     return {
       wrapTab: true,
-      showTabNumber: false,
       zenToolbarPinned: false,
     };
   },
@@ -191,7 +186,6 @@ export default {
     async processWhenMouted() {
       let me = this;
       me.wrapTab = await me.$tdUtility.getUserSettings("wrapTab");
-      me.showTabNumber = await me.$tdUtility.getUserSettings("showTabNumber");
       appState.zenMode =
         (await me.$tdUtility.getUserSettings("zenMode")) || false;
     },
@@ -835,11 +829,6 @@ export default {
 }
 
 /* ── Tab label ── */
-.td-tab-number {
-  color: var(--border-hard-color);
-  font-size: var(--font-size-small);
-}
-
 .td-tab-label {
   font-size: var(--font-size-medium-rare);
   transition: transform 0.2s ease;

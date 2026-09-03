@@ -17,14 +17,6 @@
     </div>
 
     <div class="td-header-right">
-      <div class="td-header-toast">
-        <div v-if="currentHeaderToast" :class="[
-          'td-header-toast-item',
-          `td-header-toast--${currentHeaderToast.type}`,
-        ]" @click="removeHeaderToast(currentHeaderToast.id)">
-          {{ currentHeaderToast.message }}
-        </div>
-      </div>
     </div>
 
     <!-- Flyout Menu: mở xuống dưới (placement="bottom") -->
@@ -126,10 +118,6 @@ export default {
     return {
       menuConfig: {},
       logoItems: [],
-      headerToastIdCounter: 0,
-      currentHeaderToast: null,
-      headerToastTimer: null,
-      headerToastUnsubscribe: null,
       savedTheme: null,
       themeItems: this.$tdEnum.monacoThemeList,
       savedBackgroundEffect: null,
@@ -171,10 +159,6 @@ export default {
   },
   mounted() {
     this.debouncedPreviewTheme = TDCommonFunction.debounce(this.previewTheme, 300);
-    this.headerToastUnsubscribe = eventBus.on(
-      TDEnumEventBus.headerToastShow,
-      this.onHeaderToastShow,
-    );
     this.loadCurrentTheme();
     this.logoItems = [
       {
@@ -257,9 +241,6 @@ export default {
   beforeUnmount() {
     if (this.debouncedPreviewTheme?.cancel) {
       this.debouncedPreviewTheme.cancel();
-    }
-    if (this.headerToastUnsubscribe) {
-      this.headerToastUnsubscribe();
     }
   },
   methods: {
@@ -401,30 +382,6 @@ export default {
       this.$tdUtility.reloadApp();
       this.closeFlyout();
     },
-    onHeaderToastShow(data) {
-      this.addHeaderToast(data);
-    },
-    addHeaderToast(config) {
-      if (this.headerToastTimer) {
-        clearTimeout(this.headerToastTimer);
-      }
-      const id = ++this.headerToastIdCounter;
-      this.currentHeaderToast = {
-        id,
-        type: config.type || "info",
-        message: config.message || "",
-        duration: config.duration || 1500,
-      };
-      this.headerToastTimer = setTimeout(() => {
-        this.removeHeaderToast(id);
-      }, this.currentHeaderToast.duration);
-    },
-    removeHeaderToast(id) {
-      if (this.currentHeaderToast && this.currentHeaderToast.id === id) {
-        this.currentHeaderToast = null;
-        this.headerToastTimer = null;
-      }
-    },
   },
 };
 </script>
@@ -466,38 +423,6 @@ export default {
     align-items: center;
     gap: var(--padding);
     margin-left: auto;
-  }
-
-  .td-header-toast {
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-
-    .td-header-toast-item {
-      font-size: 12px;
-      padding: 2px 8px;
-      cursor: pointer;
-      white-space: nowrap;
-      max-width: 300px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .td-header-toast--success {
-      color: #10b981;
-    }
-
-    .td-header-toast--error {
-      color: #ef4444;
-    }
-
-    .td-header-toast--warning {
-      color: #d97706;
-    }
-
-    .td-header-toast--info {
-      color: #3b82f6;
-    }
   }
 }
 
