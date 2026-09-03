@@ -307,6 +307,7 @@
 </template>
 
 <script>
+import ExcelJS from "exceljs";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import tdEnum from "@/common/TDEnum.js";
 import TDArrow from "@/components/TDArrow.vue";
@@ -933,6 +934,11 @@ export default {
           label: this.$t("i18nCommon.viewTable"),
           action: () => this.onTablePreview(),
         },
+        {
+          key: "exportExcel",
+          label: this.$t("i18nCommon.exportExcel"),
+          action: () => this.exportToExcel(),
+        },
       ]);
     },
 
@@ -968,6 +974,68 @@ export default {
         props: {},
         param: { value: this.tableData, label: this.$t("i18nCommon.tableData") },
       });
+    },
+
+    // Xuất toàn bộ bảng ra file Excel
+    async exportToExcel() {
+      let me = this;
+      try {
+        const rows = me.processedData;
+        if (!rows || rows.length === 0) return;
+        const headers = me.computedColumns.map((c) => c.label || c.key);
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Sheet1", {
+          views: [{ state: "frozen", ySplit: 1 }],
+        });
+
+        const headerRow = worksheet.addRow(headers);
+        headerRow.eachCell((cell) => (cell.font = { bold: true }));
+
+        rows.forEach((row) => {
+          const values = me.computedColumns.map((c) => {
+            let v = me.getCellValue(row, c.key);
+            if (v !== null && typeof v === "object") {
+              v = JSON.stringify(v);
+            }
+            return v;
+          });
+          worksheet.addRow(values);
+        });
+
+        // Tự động chỉnh độ rộng cột
+        worksheet.columns.forEach((col, i) => {
+          const maxLen = Math.max(
+            headers[i]?.length || 0,
+            ...worksheet
+              .getColumn(i + 1)
+              .values.slice(2)
+              .map((v) => (v != null ? String(v).length : 0)),
+          );
+          col.width = maxLen + 2;
+        });
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        me.$tdUtility.createDownloadFileFromBuffer(
+          buffer,
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          me.getExcelFileName(),
+        );
+        me.$tdToast?.success(me.$t("i18nCommon.toastMessage.success"));
+      } catch (error) {
+        console.error("Export excel error:", error);
+        me.$tdToast?.error(me.$t("i18nCommon.toastMessage.error"));
+      }
+    },
+
+    getExcelFileName() {
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      return `table-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(
+        now.getDate(),
+      )}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(
+        now.getSeconds(),
+      )}.xlsx`;
     },
 
     onCellPreview(row, column) {

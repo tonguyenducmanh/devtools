@@ -36,6 +36,7 @@ export default {
     viewCell: "View cell content as JSON",
     viewRow: "View row content as JSON",
     viewTable: "View entire table content as JSON",
+    exportExcel: "Export table content to Excel",
     clickTocopyRow: "Click to copy row {0}",
     clickTocopyCell: "Click to copy this cell",
     viewFullData: "View as JSON Object",

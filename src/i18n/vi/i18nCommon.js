@@ -36,6 +36,7 @@ export default {
     viewCell: "Xem nội dung ô theo JSON",
     viewRow: "Xem nội dung dòng theo JSON",
     viewTable: "Xem toàn bộ bảng theo JSON",
+    exportExcel: "Xuất nội dung bảng ra Excel",
     clickTocopyRow: "Click để sao chép dòng {0}",
     clickTocopyCell: "Click để sao chép ô này",
     viewFullData: "Xem theo object JSON",
