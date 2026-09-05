@@ -466,7 +466,7 @@ export default {
       fail: "Fail",
       error: "Have error",
       applyMockSuccess: "Apply mock success",
-      notFoundAgentServer: "Not found server agent",
+      notFoundAgentServer: "Failed to connect to the agent, please click Help and download the agent",
       cannotCopy:
         "Unable to copy using browser API, please check if HTTP is insecure.",
       required: " is required",

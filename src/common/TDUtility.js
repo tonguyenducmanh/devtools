@@ -329,6 +329,7 @@ class TDUtility {
   showErrorNotFoundAgentServer() {
     toast.error(
       i18nData.global.t("i18nCommon.toastMessage.notFoundAgentServer"),
+      5000,
     );
   }
 

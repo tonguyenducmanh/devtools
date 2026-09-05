@@ -465,7 +465,7 @@ export default {
       fail: "Thất bại",
       error: "Đã có lỗi xảy ra",
       applyMockSuccess: "Đã áp dụng ví dụ",
-      notFoundAgentServer: "Không tìm thấy server agent",
+      notFoundAgentServer: "Kết nối tới agent thất bại, vui lòng bấm vào trợ giúp và tải agent",
       cannotCopy:
         "Không thể copy được bằng api của trình duyệt, vui lòng kiểm tra xem có phải http insecure không",
       required: " là bắt buộc",
