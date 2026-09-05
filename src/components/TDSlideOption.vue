@@ -204,7 +204,7 @@ export default {
 .td-slide-group-area {
   position: relative;
   border-radius: var(--border-radius);
-  // gap: var(--padding);
+  gap: 2px;
   padding: 0;
 
   .td-slide-background {
