@@ -6,32 +6,8 @@
         <div v-for="toast in toasts" :key="toast.id" :class="['toast', `td-toast-${toast.type}`]"
           @click="removeToast(toast.id)">
           <div class="td-toast-content">
-            <div class="td-toast-icon">
-              <svg v-if="toast.type === 'success'" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clip-rule="evenodd" />
-              </svg>
-              <svg v-else-if="toast.type === 'error'" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clip-rule="evenodd" />
-              </svg>
-              <svg v-else-if="toast.type === 'warning'" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                  clip-rule="evenodd" />
-              </svg>
-              <svg v-else viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                  clip-rule="evenodd" />
-              </svg>
-            </div>
-            <div class="td-toast-message">
-              <div v-if="toast.message" class="td-toast-text">
-                {{ toast.message }}
-              </div>
+            <div v-if="toast.message" class="td-toast-message">
+              {{ toast.message }}
             </div>
           </div>
         </div>
@@ -134,30 +110,27 @@ export default {
 .td-toast-content {
   display: flex;
   align-items: center;
-  gap: var(--padding);
   flex: 1;
 }
 
-.td-toast-icon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
+.td-toast-success {
+  border-color: #10b981;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
 }
 
-.td-toast-success .td-toast-icon {
-  color: #10b981;
+.td-toast-error {
+  border-color: #ef4444;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
 }
 
-.td-toast-error .td-toast-icon {
-  color: #ef4444;
+.td-toast-warning {
+  border-color: #f59e0b;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
 }
 
-.td-toast-warning .td-toast-icon {
-  color: #f59e0b;
-}
-
-.td-toast-info .td-toast-icon {
-  color: #3b82f6;
+.td-toast-info {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
 }
 
 .td-toast-message {
