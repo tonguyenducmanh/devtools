@@ -1,36 +1,20 @@
 <template>
   <teleport to="body">
     <div v-if="visible" class="td-popup-overlay" @click.self="onOverlayClick">
-      <div
-        ref="popupEl"
-        class="flex flex-col td-popup-container"
-        :style="computeStyle"
-        :class="{ 'td-popup-fullscreen-mode': isFullscreen }"
-      >
-        <div
-          v-if="showHeader"
-          class="td-popup-header"
-          :class="{ 'td-popup-draggable': draggable && !isFullscreen }"
-          @mousedown="startDrag"
-        >
+      <div ref="popupEl" class="flex flex-col td-popup-container" :style="computeStyle"
+        :class="{ 'td-popup-fullscreen-mode': isFullscreen }">
+        <div v-if="showHeader" class="td-popup-header" :class="{ 'td-popup-draggable': draggable && !isFullscreen }"
+          v-tooltip="draggable && !isFullscreen ? $t('i18nCommon.popup.drag') : ''" @mousedown="startDrag">
           <div class="td-popup-title">{{ title }}</div>
           <div class="td-popup-header-extra">
             <slot name="header" />
-            <button
-              v-if="showFullScreenHeaderIcon"
-              class="td-popup-close"
+            <button v-if="showFullScreenHeaderIcon" class="td-popup-close"
               v-tooltip="isFullscreen ? $t('i18nCommon.popup.exitFullscreen') : $t('i18nCommon.popup.fullscreen')"
-              @click="toggleFullscreen"
-            >
-              <div class="td-icon"
-                :class="isFullscreen ? 'td-exit-full-screen-icon' : 'td-full-screen-icon'"></div>
+              @click="toggleFullscreen">
+              <div class="td-icon" :class="isFullscreen ? 'td-exit-full-screen-icon' : 'td-full-screen-icon'"></div>
             </button>
-            <button
-              v-if="showCloseHeaderIcon"
-              class="td-popup-close"
-              v-tooltip="$t('i18nCommon.popup.close')"
-              @click="emitClose"
-            >
+            <button v-if="showCloseHeaderIcon" class="td-popup-close" v-tooltip="$t('i18nCommon.popup.close')"
+              @click="emitClose">
               <div class="td-icon td-close-icon"></div>
             </button>
           </div>
@@ -41,14 +25,22 @@
         </div>
 
         <template v-if="resizable && !isFullscreen">
-          <div class="td-popup-resize td-popup-resize-n" data-dir="n" @mousedown="onResizeStart"></div>
-          <div class="td-popup-resize td-popup-resize-s" data-dir="s" @mousedown="onResizeStart"></div>
-          <div class="td-popup-resize td-popup-resize-e" data-dir="e" @mousedown="onResizeStart"></div>
-          <div class="td-popup-resize td-popup-resize-w" data-dir="w" @mousedown="onResizeStart"></div>
-          <div class="td-popup-resize td-popup-resize-ne" data-dir="ne" @mousedown="onResizeStart"></div>
-          <div class="td-popup-resize td-popup-resize-nw" data-dir="nw" @mousedown="onResizeStart"></div>
-          <div class="td-popup-resize td-popup-resize-se" data-dir="se" @mousedown="onResizeStart"></div>
-          <div class="td-popup-resize td-popup-resize-sw" data-dir="sw" @mousedown="onResizeStart"></div>
+          <div class="td-popup-resize td-popup-resize-n" data-dir="n" v-tooltip="$t('i18nCommon.popup.resizeN')"
+            @mousedown="onResizeStart"></div>
+          <div class="td-popup-resize td-popup-resize-s" data-dir="s" v-tooltip="$t('i18nCommon.popup.resizeS')"
+            @mousedown="onResizeStart"></div>
+          <div class="td-popup-resize td-popup-resize-e" data-dir="e" v-tooltip="$t('i18nCommon.popup.resizeE')"
+            @mousedown="onResizeStart"></div>
+          <div class="td-popup-resize td-popup-resize-w" data-dir="w" v-tooltip="$t('i18nCommon.popup.resizeW')"
+            @mousedown="onResizeStart"></div>
+          <div class="td-popup-resize td-popup-resize-ne" data-dir="ne" v-tooltip="$t('i18nCommon.popup.resizeNE')"
+            @mousedown="onResizeStart"></div>
+          <div class="td-popup-resize td-popup-resize-nw" data-dir="nw" v-tooltip="$t('i18nCommon.popup.resizeNW')"
+            @mousedown="onResizeStart"></div>
+          <div class="td-popup-resize td-popup-resize-se" data-dir="se" v-tooltip="$t('i18nCommon.popup.resizeSE')"
+            @mousedown="onResizeStart"></div>
+          <div class="td-popup-resize td-popup-resize-sw" data-dir="sw" v-tooltip="$t('i18nCommon.popup.resizeSW')"
+            @mousedown="onResizeStart"></div>
         </template>
       </div>
     </div>
@@ -327,6 +319,7 @@ export default {
   cursor: pointer;
   filter: grayscale(100);
 }
+
 .td-popup-close:hover {
   border: 1px solid var(--border-color);
   filter: grayscale(0);
@@ -337,6 +330,7 @@ export default {
   position: absolute;
   z-index: 5;
 }
+
 .td-popup-resize-n,
 .td-popup-resize-s {
   left: 8px;
@@ -344,12 +338,15 @@ export default {
   height: 6px;
   cursor: ns-resize;
 }
+
 .td-popup-resize-n {
   top: -3px;
 }
+
 .td-popup-resize-s {
   bottom: -3px;
 }
+
 .td-popup-resize-e,
 .td-popup-resize-w {
   top: 8px;
@@ -357,36 +354,44 @@ export default {
   width: 6px;
   cursor: ew-resize;
 }
+
 .td-popup-resize-e {
   right: -3px;
 }
+
 .td-popup-resize-w {
   left: -3px;
 }
+
 .td-popup-resize-ne,
 .td-popup-resize-sw {
   width: 14px;
   height: 14px;
   cursor: nesw-resize;
 }
+
 .td-popup-resize-nw,
 .td-popup-resize-se {
   width: 14px;
   height: 14px;
   cursor: nwse-resize;
 }
+
 .td-popup-resize-nw {
   top: -5px;
   left: -5px;
 }
+
 .td-popup-resize-ne {
   top: -5px;
   right: -5px;
 }
+
 .td-popup-resize-sw {
   bottom: -5px;
   left: -5px;
 }
+
 .td-popup-resize-se {
   bottom: -5px;
   right: -5px;
