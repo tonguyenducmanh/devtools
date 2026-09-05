@@ -1,7 +1,6 @@
 import TDGridLinesEffect from "@/views/backgroundEffect/effects/TDGridLinesEffect.vue";
 import TDParticleShapeEffect from "@/views/backgroundEffect/effects/TDParticleShapeEffect.vue";
 import TDNeonWaveEffect from "@/views/backgroundEffect/effects/TDNeonWaveEffect.vue";
-import TDWireframeCube3DEffect from "@/views/backgroundEffect/effects/TDWireframeCube3DEffect.vue";
 
 /**
  * Map giá trị backgroundEffect (xem TDEnum.backgroundEffectList) sang component hiệu ứng.
@@ -11,7 +10,6 @@ export const backgroundEffectMap = {
   gridLines: TDGridLinesEffect,
   particleShape: TDParticleShapeEffect,
   neonWave: TDNeonWaveEffect,
-  wireframeCube3D: TDWireframeCube3DEffect,
 };
 
 /**

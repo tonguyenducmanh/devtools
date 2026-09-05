@@ -175,10 +175,6 @@ class TDEnum {
       labelKey: "i18nUserSettings.backgroundEffect.neonWave",
       value: "neonWave",
     },
-    {
-      labelKey: "i18nUserSettings.backgroundEffect.wireframeCube3D",
-      value: "wireframeCube3D",
-    },
   ];
   // danh sách hiệu ứng chuột
   cursorEffectList = [

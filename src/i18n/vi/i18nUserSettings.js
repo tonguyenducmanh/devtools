@@ -24,7 +24,6 @@ export default {
       gridLines: "Lưới",
       particleShape: "Hạt chuyển động",
       neonWave: "Sóng neon",
-      wireframeCube3D: "Khối 3D",
     },
     cursorEffect: {
       off: "Tắt",
