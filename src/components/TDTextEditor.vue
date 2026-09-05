@@ -77,6 +77,7 @@ import {
   registerAllMonacoThemes,
   getMonacoSyntaxRules,
 } from "@/monarch/TDMonacoTheme.js";
+import { getMonacoActionsByLanguage } from "@/monarch/TDMonacoActionConfig.js";
 import _ from "@/common/TDCommonFunction.js";
 import eventBus from "@/common/event/TDEventBus.js";
 import { TDEnumEventBus } from "@/common/event/TDEnumEventBus.js";
@@ -201,6 +202,7 @@ export default {
       value: null,
       monacoThemeName: null,
       footerCursorText: "Ln 1, Col 1",
+      monacoActionDisposables: [],
     };
   },
   watch: {
@@ -220,6 +222,8 @@ export default {
     language(value, oldVal) {
       if (this.editor && value && oldVal && value != oldVal) {
         monaco.editor.setModelLanguage(this.editorModel, value);
+        // language đổi dynamic: gỡ action cũ và đăng ký lại action theo language mới
+        this.applyMonacoActions();
       }
     },
   },
@@ -313,6 +317,9 @@ export default {
 
         me.editor = monaco.editor.create(me.$refs.textareaWrap, configObject);
 
+        // Đăng ký custom action theo language (context menu, keybinding, ...)
+        me.applyMonacoActions();
+
         // Lắng nghe sự kiện phím tắt từ cấu hình cha truyền xuống
         if (me.monacoOptions && typeof me.monacoOptions.onInit === "function") {
           me.monacoOptions.onInit(me.editor, monaco);
@@ -360,8 +367,48 @@ export default {
       }
     },
 
+    /**
+     * Gỡ bỏ toàn bộ custom action đã đăng ký trên editor hiện tại
+     */
+    disposeMonacoActions() {
+      let me = this;
+      if (me.monacoActionDisposables && me.monacoActionDisposables.length) {
+        me.monacoActionDisposables.forEach((disposable) => {
+          try {
+            disposable.dispose();
+          } catch (_) {}
+        });
+      }
+      me.monacoActionDisposables = [];
+    },
+
+    /**
+     * Đăng ký lại custom action theo language hiện tại
+     * (luôn gỡ action cũ trước để tránh trùng khi đổi language dynamic)
+     */
+    applyMonacoActions() {
+      let me = this;
+      me.disposeMonacoActions();
+      if (!me.editor) return;
+
+      const actions = getMonacoActionsByLanguage(me.language, {
+        onSuccess: (sortedText) => {
+          me.$emit("update:modelValue", sortedText);
+          me.$tdToast?.success(me.$t("i18nCommon.toastMessage.success"));
+        },
+        onError: () => {
+          me.$tdToast?.error(me.$t("i18nCommon.toastMessage.error"));
+        },
+      });
+      me.monacoActionDisposables = actions.map((action) => {
+        const descriptor = { ...action, label: me.$t(action.labelKey) };
+        return me.editor.addAction(descriptor);
+      });
+    },
+
     unmountEditor() {
       let me = this;
+      me.disposeMonacoActions();
       if (me.editor) {
         // Gỡ bỏ layout listener
         if (me._layoutChangeDisposable) {

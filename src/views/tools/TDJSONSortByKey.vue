@@ -89,6 +89,7 @@ import TDSubSidebar from "@/components/TDSubSidebar.vue";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDJSONSortByKeyHelp from "@/views/helps/TDJSONSortByKeyHelp.vue";
 import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
+import { sortObjectByKey } from "@/monarch/TDMonacoActionConfig.js";
 
 export default {
   extends: TDToolBase,
@@ -121,21 +122,6 @@ export default {
   },
 
   methods: {
-    sortObject(obj) {
-      if (Array.isArray(obj)) {
-        return obj.map(this.sortObject);
-      }
-      if (obj !== null && typeof obj === "object") {
-        return Object.keys(obj)
-          .sort((a, b) => a.localeCompare(b))
-          .reduce((acc, key) => {
-            acc[key] = this.sortObject(obj[key]);
-            return acc;
-          }, {});
-      }
-      return obj;
-    },
-
     sortJSON() {
       let me = this;
       try {
@@ -143,7 +129,7 @@ export default {
           return;
         }
         const parsed = JSON.parse(me.inputJSON.trim());
-        const sorted = me.sortObject(parsed);
+        const sorted = sortObjectByKey(parsed);
         me.inputJSON = JSON.stringify(sorted, null, 2);
         me.saveToHistory();
         me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));

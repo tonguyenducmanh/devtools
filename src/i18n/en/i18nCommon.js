@@ -721,6 +721,9 @@ export default {
       copy: "Copy",
       example: "Example",
     },
+    TDTextEditor: {
+      sortByKey: "Sort JSON by key",
+    },
     blanktext: {
       selectLanguage: "Select language",
       placeholder: "Enter text content...",

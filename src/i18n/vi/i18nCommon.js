@@ -719,6 +719,9 @@ export default {
       copy: "Sao chép",
       example: "Ví dụ",
     },
+    TDTextEditor: {
+      sortByKey: "JSON sắp xếp theo key",
+    },
     blanktext: {
       selectLanguage: "Chọn ngôn ngữ",
       placeholder: "Nhập nội dung văn bản...",
