@@ -204,6 +204,7 @@ export default {
 .td-slide-group-area {
   position: relative;
   border-radius: var(--border-radius);
+  // gap: var(--padding);
   padding: 0;
 
   .td-slide-background {
@@ -231,8 +232,7 @@ export default {
     border: 1px solid transparent;
 
     &:hover {
-      border-color: var(--focus-color);
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--focus-color);
     }
   }
 
