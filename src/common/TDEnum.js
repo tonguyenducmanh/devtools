@@ -176,16 +176,8 @@ class TDEnum {
       value: "neonWave",
     },
     {
-      labelKey: "i18nUserSettings.backgroundEffect.cellularAutomata",
-      value: "cellularAutomata",
-    },
-    {
       labelKey: "i18nUserSettings.backgroundEffect.wireframeCube3D",
       value: "wireframeCube3D",
-    },
-    {
-      labelKey: "i18nUserSettings.backgroundEffect.sphereGlobe",
-      value: "sphereGlobe",
     },
   ];
   // danh sách hiệu ứng chuột

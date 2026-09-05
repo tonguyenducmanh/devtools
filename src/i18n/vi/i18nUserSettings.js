@@ -24,9 +24,7 @@ export default {
       gridLines: "Lưới",
       particleShape: "Hạt chuyển động",
       neonWave: "Sóng neon",
-      cellularAutomata: "Tự động hóa tế bào",
       wireframeCube3D: "Khối 3D",
-      sphereGlobe: "Quả địa cầu",
     },
     cursorEffect: {
       off: "Tắt",

@@ -24,9 +24,7 @@ export default {
       gridLines: "Grid Lines",
       particleShape: "Particle Shape",
       neonWave: "Neon Wave",
-      cellularAutomata: "Cellular Automata",
       wireframeCube3D: "3D Cube Wireframe",
-      sphereGlobe: "Globe",
     },
     cursorEffect: {
       off: "Off",
