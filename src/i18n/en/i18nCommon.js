@@ -588,8 +588,7 @@ export default {
       NeedRequestName: "Need request name before save",
     },
     APIMocking: {
-      ImportPlaceHolder:
-        "Import data from the API testing tool",
+      ImportPlaceHolder: "Import data from the API testing tool",
       APIMockBaseURL: "Mock server base URL response from agent",
       importMock: "Import mock",
       tooltipImportMock:
@@ -721,13 +720,6 @@ export default {
       sort: "Sort",
       copy: "Copy",
       example: "Example",
-      helpTitle: "JSON Sort by Key Tool",
-      helpHowToUse: "How to use",
-      helpHowToUseContent:
-        "Enter a JSON object or array in the input field and click Sort. All keys will be sorted alphabetically using localeCompare.",
-      helpExample: "Example",
-      helpExampleInput: '{\n  "z_key": "last",\n  "a_key": "first"\n}',
-      helpExampleOutput: '{\n  "a_key": "first",\n  "z_key": "last"\n}',
     },
     blanktext: {
       selectLanguage: "Select language",

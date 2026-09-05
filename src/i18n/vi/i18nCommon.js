@@ -586,8 +586,7 @@ export default {
       NeedRequestName: "Cần điền tên request trước khi lưu",
     },
     APIMocking: {
-      ImportPlaceHolder:
-        "Nhập từ tool API testing",
+      ImportPlaceHolder: "Nhập từ tool API testing",
       APIMockBaseURL: "Base URL mock server được trả về từ agent",
       importMock: "Nhập mock",
       tooltipImportMock:
@@ -719,13 +718,6 @@ export default {
       sort: "Sắp xếp",
       copy: "Sao chép",
       example: "Ví dụ",
-      helpTitle: "Công cụ sắp xếp JSON theo key",
-      helpHowToUse: "Cách sử dụng",
-      helpHowToUseContent:
-        "Nhập một JSON object hoặc array vào ô nhập liệu và bấm Sắp xếp. Tất cả các key sẽ được sắp xếp theo thứ tự bảng chữ cái sử dụng localeCompare.",
-      helpExample: "Ví dụ",
-      helpExampleInput: '{\n  "z_key": "last",\n  "a_key": "first"\n}',
-      helpExampleOutput: '{\n  "a_key": "first",\n  "z_key": "last"\n}',
     },
     blanktext: {
       selectLanguage: "Chọn ngôn ngữ",

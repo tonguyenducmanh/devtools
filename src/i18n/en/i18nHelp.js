@@ -237,7 +237,8 @@ export default {
       },
       howToUse: {
         title: "How to Use",
-        setDimensions: "Choose vector dimensions (default 128) and N-Gram size (default 3).",
+        setDimensions:
+          "Choose vector dimensions (default 128) and N-Gram size (default 3).",
         enterText: "Enter text in the Text Input field.",
         generate: "Click Generate Vector to create the embedding vector.",
         copy: "Copy the result vector (JSON) and paste it into the Cosine Similarity tool for comparison.",
@@ -452,7 +453,8 @@ export default {
       features: {
         title: "Features",
         multiSheet: "Support reading multiple sheets in one Excel file.",
-        outputFormat: "Choose output format: object (by sheet) or array (all sheets merged).",
+        outputFormat:
+          "Choose output format: object (by sheet) or array (all sheets merged).",
         trimValues: "Automatically remove extra whitespace from data.",
       },
     },
@@ -474,6 +476,24 @@ export default {
         namespace: "Customize namespace/class name.",
         options:
           "Many options: PascalCase, nullable, JsonProperty, record type...",
+      },
+    },
+    jsonSortByKey: {
+      purpose: {
+        title: "What is JSON Sort by Key?",
+        content:
+          "A tool to sort the keys of a JSON object alphabetically using localeCompare for easier reading and comparison.",
+      },
+      howToUse: {
+        title: "How to Use",
+        input: "Paste a JSON object or array into the input field.",
+        sort: "Click Sort to arrange all keys alphabetically.",
+      },
+      features: {
+        title: "Features",
+        recursive: "Sort keys recursively in nested objects and arrays.",
+        example: "Use the Example button to load a sample JSON.",
+        history: "Sort history is saved and can be reused.",
       },
     },
     remoteDesktop: {

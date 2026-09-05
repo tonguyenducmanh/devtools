@@ -233,7 +233,8 @@ export default {
       },
       howToUse: {
         title: "Cách sử dụng",
-        setDimensions: "Chọn số chiều vector (mặc định 128) và kích thước N-Gram (mặc định 3).",
+        setDimensions:
+          "Chọn số chiều vector (mặc định 128) và kích thước N-Gram (mặc định 3).",
         enterText: "Nhập văn bản vào ô Text Input.",
         generate: "Nhấn Generate Vector để tạo vector embedding.",
         copy: "Copy vector kết quả (dạng JSON) và dán vào tool Cosine Similarity để so sánh.",
@@ -431,7 +432,8 @@ export default {
     excelToJSON: {
       purpose: {
         title: "Excel to JSON là gì?",
-        content: "Công cụ chuyển đổi file Excel (.xlsx, .xls) sang dữ liệu JSON.",
+        content:
+          "Công cụ chuyển đổi file Excel (.xlsx, .xls) sang dữ liệu JSON.",
       },
       howToUse: {
         title: "Cách sử dụng",
@@ -442,7 +444,8 @@ export default {
       features: {
         title: "Tính năng",
         multiSheet: "Hỗ trợ đọc nhiều sheet trong một file Excel.",
-        outputFormat: "Chọn định dạng đầu ra: object (theo sheet) hoặc array (gộp tất cả).",
+        outputFormat:
+          "Chọn định dạng đầu ra: object (theo sheet) hoặc array (gộp tất cả).",
         trimValues: "Tự động loại bỏ khoảng trắng thừa trong dữ liệu.",
       },
     },
@@ -464,6 +467,24 @@ export default {
         namespace: "Tùy chỉnh namespace/class name.",
         options:
           "Nhiều tùy chọn: PascalCase, nullable, JsonProperty, record type...",
+      },
+    },
+    jsonSortByKey: {
+      purpose: {
+        title: "Sắp xếp JSON theo key là gì?",
+        content:
+          "Công cụ sắp xếp các key của JSON object theo thứ tự bảng chữ cái sử dụng localeCompare, giúp dữ liệu dễ đọc và dễ so sánh hơn.",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        input: "Dán JSON object hoặc array vào ô nhập liệu.",
+        sort: "Nhấn Sort để sắp xếp tất cả các key theo thứ tự bảng chữ cái.",
+      },
+      features: {
+        title: "Tính năng",
+        recursive: "Sắp xếp key đệ quy trong các object và array lồng nhau.",
+        example: "Dùng nút Example để tải JSON mẫu.",
+        history: "Lịch sử sắp xếp được lưu lại để sử dụng lại.",
       },
     },
     remoteDesktop: {
