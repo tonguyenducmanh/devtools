@@ -1,5 +1,10 @@
 export default {
   i18nCommon: {
+    popup: {
+      fullscreen: "Fullscreen",
+      exitFullscreen: "Exit fullscreen",
+      close: "Close",
+    },
     tabManager: {
       addNewTab: "Add new tab",
       closeTab: "Close this tab",

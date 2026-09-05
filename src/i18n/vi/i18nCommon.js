@@ -1,5 +1,10 @@
 export default {
   i18nCommon: {
+    popup: {
+      fullscreen: "Toàn màn hình",
+      exitFullscreen: "Thoát toàn màn hình",
+      close: "Đóng",
+    },
     tabManager: {
       addNewTab: "Mở tab mới",
       closeTab: "Đóng tab này",
