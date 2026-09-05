@@ -1,51 +1,26 @@
 <template>
   <!-- Trigger vô hình ở mép trái, fixed riêng không bị ảnh hưởng bởi transform -->
-  <div
-    v-if="zenMode"
-    class="td-sidebar-zen-trigger"
-    @mouseenter="onZenMouseEnter"
-    @mouseleave="onZenMouseLeave"
-  ></div>
-  <div
-    class="td-sidebar-container"
-    :class="{ 'td-sidebar-container-collapsed': !showSideBar }"
-  >
-    <div
-      v-if="showSideBar || zenMode"
-      class="td-sidebar"
-      :class="{
-        'td-sidebar--zen': zenMode,
-        'td-sidebar--zen-hover': zenHover,
-      }"
-      @mouseenter="onZenMouseEnter"
-      @mouseleave="onZenMouseLeave"
-    >
+  <div v-if="zenMode" class="td-sidebar-zen-trigger" @mouseenter="onZenMouseEnter" @mouseleave="onZenMouseLeave"></div>
+  <div class="td-sidebar-container" :class="{ 'td-sidebar-container-collapsed': !showSideBar }"
+    v-click-outside="closeFlyout">
+    <div v-if="showSideBar || zenMode" class="td-sidebar" :class="{
+      'td-sidebar--zen': zenMode,
+      'td-sidebar--zen-hover': zenHover,
+    }" @mouseenter="onZenMouseEnter" @mouseleave="onZenMouseLeave">
       <div class="td-tool-group">
         <template v-for="(item, index) in sidebarItems" :key="index">
           <!-- Group item: hover → flyout -->
-          <div
-            v-if="item.type === 'group'"
-            class="td-sidebar-item"
-            :class="{
-              'td-sidebar-item--active': activeKeyFlyOut === item.groupKey,
-            }"
-            @mouseenter="openFlyout(item.groupKey, $event)"
-            @mouseleave="scheduleCloseFlyout()"
-          >
-            <div
-              class="flex no-select td-item-content"
-              @click="onOpenGroup(item)"
-            >
+          <div v-if="item.type === 'group'" class="td-sidebar-item" :class="{
+            'td-sidebar-item--active': activeKeyFlyOut === item.groupKey,
+          }" @mouseenter="openFlyout(item.groupKey, $event)" @mouseleave="scheduleCloseFlyout()">
+            <div class="flex no-select td-item-content" @click="onOpenGroup(item)">
               <span>{{ $t(item.groupTitleKey) }}</span>
             </div>
           </div>
 
           <!-- Standalone route item: link + nút pin -->
           <div v-else class="td-sidebar-item td-sidebar-item--route">
-            <div
-              class="no-select td-item-content flex"
-              @click="onOpenRouteTab(item.route)"
-            >
+            <div class="no-select td-item-content flex" @click="onOpenRouteTab(item.route)">
               <span>{{ $t(item.route.meta.titleKey) }}</span>
             </div>
           </div>
@@ -53,37 +28,17 @@
       </div>
     </div>
 
-    <TDToggleArea
-      v-if="!zenMode"
-      :collapsed="!showSideBar"
-      edge="left"
-      v-tooltip="
-        showSideBar
-          ? $t('i18nCommon.sidebar.hide')
-          : $t('i18nCommon.sidebar.show')
-      "
-      @toggle="toggleSidebar"
-    />
+    <TDToggleArea v-if="!zenMode" :collapsed="!showSideBar" edge="left" v-tooltip="showSideBar
+        ? $t('i18nCommon.sidebar.hide')
+        : $t('i18nCommon.sidebar.show')
+      " @toggle="toggleSidebar" />
 
     <!-- Flyout: mở sang phải (placement="right"), tự lật sang trái nếu sát mép phải màn hình -->
-    <TDFlyoutPanel
-      :show="!!activeKeyFlyOut"
-      :anchorElFlyout="anchorElFlyout"
-      placement="right"
-      panelClass="td-sidebar-group-flyout"
-      @mouseenter="cancelCloseFlyOut"
-      @mouseleave="scheduleCloseFlyout()"
-    >
-      <div
-        v-for="child in activeChildren"
-        :key="child.name"
-        class="no-select td-sidebar-flyout-row"
-      >
-        <div
-          class="td-sidebar-flyout-item"
-          @click="onOpenGroupChildTab(activeItem, child)"
-        >
-          {{ $t(child.meta.titleKey) }}
+    <TDFlyoutPanel :show="!!activeKeyFlyOut" :anchorElFlyout="anchorElFlyout" placement="right"
+      panelClass="td-sidebar-group-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="scheduleCloseFlyout()">
+      <div v-for="row in sidebarFlyoutRows" :key="row.child.meta.titleKey" class="no-select td-sidebar-flyout-row">
+        <div class="td-sidebar-flyout-item" @click="onOpenGroupChildTab(row.item, row.child)">
+          {{ $t(row.child.meta.titleKey) }}
         </div>
       </div>
     </TDFlyoutPanel>
@@ -144,8 +99,12 @@ export default {
         ) ?? null
       );
     },
-    activeChildren() {
-      return this.activeItem?.children ?? [];
+    // Chụp item tại thời điểm render. Nếu dùng activeItem trực tiếp trong
+    // handler click, click-outside có thể đóng flyout trước khi handler chạy
+    // làm activeItem thành null và gây lỗi.
+    sidebarFlyoutRows() {
+      const item = this.activeItem;
+      return (item?.children ?? []).map((child) => ({ item, child }));
     },
   },
 
@@ -227,9 +186,11 @@ export default {
   height: 100%;
   margin-right: var(--padding);
 }
+
 .td-sidebar-container-collapsed {
   margin-right: unset;
 }
+
 .td-sidebar {
   position: relative;
   width: 210px;
@@ -247,6 +208,7 @@ export default {
   border-radius: var(--border-radius);
   animation: slideIn 0.3s ease-out forwards;
   border: var(--border-component-style);
+
   .td-tool-group {
     flex: 1;
     overflow-y: auto;
@@ -329,6 +291,7 @@ export default {
   .td-tool-group {
     overflow: hidden;
     scrollbar-width: none;
+
     &::-webkit-scrollbar {
       display: none;
     }
@@ -343,6 +306,7 @@ export default {
     .td-tool-group {
       overflow-y: auto;
       scrollbar-width: thin;
+
       &::-webkit-scrollbar {
         display: block;
       }

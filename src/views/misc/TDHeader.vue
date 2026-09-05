@@ -1,5 +1,5 @@
 <template>
-  <div class="flex td-header-container">
+  <div class="flex td-header-container" v-click-outside="closeFlyout">
     <div class="td-app-name">
       <div class="td-app-brand" @click="reloadAppFunc">
         <div class="td-logo td-logo-tool-app"></div>
@@ -23,8 +23,8 @@
     <TDFlyoutPanel :show="!!activeKeyFlyOut && activeKeyFlyOut !== 'logo'" :anchorElFlyout="anchorElFlyout"
       placement="bottom" panelClass="td-header-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="onFlyoutPanelLeave">
       <div v-for="item in currentMenuItems" :key="item.key" class="td-flyout-item"
-        :class="{ 'td-flyout-item--active': item.children ? activeSubKey === item.key : false }" v-tooltip="item.tooltip"
-        @mouseenter="onMenuItemEnter(item, $event)" @click="onMenuItemClick(item, $event)">
+        :class="{ 'td-flyout-item--active': item.children ? activeSubKey === item.key : false }"
+        v-tooltip="item.tooltip" @mouseenter="onMenuItemEnter(item, $event)" @click="onMenuItemClick(item, $event)">
         {{ $t(item.labelKey) }}
       </div>
     </TDFlyoutPanel>
@@ -34,10 +34,10 @@
       panelClass="td-theme-sub-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="closeSub">
       <template v-if="activeSubItem">
         <div class="td-flyout-theme-list" v-tooltip="$t(activeSubItem.tooltipKey)">
-          <div v-for="child in activeSubItem.children" :key="child.value" class="td-flyout-item td-flyout-theme-item"
-            @mouseenter="onSubItemEnter(activeSubItem, child)" @mouseleave="onSubItemLeave(activeSubItem)"
-            @click="onSubItemClick(activeSubItem, child)">
-            {{ child.label }}
+          <div v-for="row in subMenuFlyoutRows" :key="row.child.value" class="td-flyout-item td-flyout-theme-item"
+            @mouseenter="onSubItemEnter(row.item, row.child)" @mouseleave="onSubItemLeave(row.item)"
+            @click="onSubItemClick(row.item, row.child)">
+            {{ row.child.label }}
           </div>
         </div>
       </template>
@@ -205,6 +205,13 @@ export default {
         null
       );
     },
+    // Chụp item tại thời điểm render. Nếu dùng activeSubItem trực tiếp trong
+    // handler click, click-outside có thể đóng flyout trước khi handler chạy
+    // làm activeSubItem thành null và gây lỗi (vd: cannot read onChildClick).
+    subMenuFlyoutRows() {
+      const item = this.activeSubItem;
+      return (item?.children ?? []).map((child) => ({ item, child }));
+    },
   },
   watch: {
     activeKeyFlyOut(newVal, oldVal) {
@@ -304,17 +311,17 @@ export default {
       }
     },
     onSubItemEnter(item, child) {
-      if (item.onChildHover) {
+      if (item?.onChildHover) {
         item.onChildHover(child.value);
       }
     },
     onSubItemLeave(item) {
-      if (item.onChildLeave) {
+      if (item?.onChildLeave) {
         item.onChildLeave();
       }
     },
     onSubItemClick(item, child) {
-      if (item.onChildClick) {
+      if (item?.onChildClick) {
         item.onChildClick(child.value);
       }
     },

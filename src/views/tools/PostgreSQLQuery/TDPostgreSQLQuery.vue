@@ -1,72 +1,37 @@
 <template>
   <!-- container chính: chia làm 2 phần (main + sidebar) -->
-  <div class="flex td-pg-query-container">
+  <div class="flex td-pg-query-container" v-click-outside="closeFlyout">
     <div class="flex flex-col td-pg-query-main">
       <!-- header toolbar: menu flyout ở trái, nút Run Query ở phải -->
       <div class="flex flex-start td-tool-header-menu-group">
         <div class="flex flex-one flex-wrap td-header-menu-group">
           <!-- từng menu item (Code Complete, Edit, Export, Explore, Help) -->
-          <div
-            v-for="(items, menuKey) in menuConfig"
-            :key="menuKey"
-            class="td-menu-item"
-            :class="{ 'td-menu-item--active': activeKeyFlyOut === menuKey }"
-            @mouseenter="openFlyout(menuKey, $event)"
-            @mouseleave="scheduleCloseFlyout()"
-          >
+          <div v-for="(items, menuKey) in menuConfig" :key="menuKey" class="td-menu-item"
+            :class="{ 'td-menu-item--active': activeKeyFlyOut === menuKey }" @click="openFlyout(menuKey, $event)"
+            @mouseleave="scheduleCloseFlyout()">
             <span>{{ $t(`i18nCommon.postgreSQLQuery.${menuKey}`) }}</span>
           </div>
         </div>
         <!-- nút chạy query -->
-        <TDButton
-          :noMargin="true"
-          @click="handleRunQuery"
-          iconClass="td-send-icon"
-          :isSmallButton="true"
-          v-tooltip="$t('i18nCommon.postgreSQLQuery.runQuery')"
-        ></TDButton>
+        <TDButton :noMargin="true" @click="handleRunQuery" iconClass="td-send-icon" :isSmallButton="true"
+          v-tooltip="$t('i18nCommon.postgreSQLQuery.runQuery')"></TDButton>
         <!-- flyout panel chứa danh sách action theo menu đang active -->
-        <TDFlyoutPanel
-          :show="!!activeKeyFlyOut"
-          :anchorElFlyout="anchorElFlyout"
-          placement="bottom"
-          panel-class="td-query-action-flyout"
-          @mouseenter="cancelCloseFlyOut"
-          @mouseleave="scheduleCloseFlyout()"
-        >
-          <div
-            v-for="action in currentMenuItems"
-            :key="action.key"
-            class="td-flyout-item"
-            :class="{ 'td-toolbar-btn-disabled': action.disabled }"
-            v-tooltip="action.tooltip"
-            @click="onActionClick(action)"
-          >
+        <TDFlyoutPanel :show="!!activeKeyFlyOut" :anchorElFlyout="anchorElFlyout" placement="bottom"
+          panel-class="td-query-action-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="scheduleCloseFlyout()">
+          <div v-for="action in currentMenuItems" :key="action.key" class="td-flyout-item"
+            :class="{ 'td-toolbar-btn-disabled': action.disabled }" v-tooltip="action.tooltip"
+            @click="onActionClick(action)">
             <span>{{ action.label }}</span>
           </div>
         </TDFlyoutPanel>
       </div>
       <!-- editor SQL Monaco (chiếm phần trên, có thể kéo resize) -->
-      <div
-        class="flex flex-one td-pg-query-editor"
-        :style="editorSectionSizeStyle"
-      >
-        <TDTextEditor
-          ref="sqlEditor"
-          v-model="sqlText"
-          language="pgsql"
-          :enableHighlight="true"
-          :wrapText="currentConfigLayout.wrapText"
-          :placeHolder="$t('i18nCommon.postgreSQLQuery.sqlEditorPlaceholder')"
-          :label="$t('i18nCommon.postgreSQLQuery.sqlEditorLabel')"
-          :isLabelTop="true"
-          height="100%"
-          width="100%"
-          :monacoOptions="monacoOptions"
-          @keydown.ctrl.enter.prevent="handleRunQuery"
-          @keydown.meta.enter.prevent="handleRunQuery"
-          :showCursorTextFooter="true"
-        >
+      <div class="flex flex-one td-pg-query-editor" :style="editorSectionSizeStyle">
+        <TDTextEditor ref="sqlEditor" v-model="sqlText" language="pgsql" :enableHighlight="true"
+          :wrapText="currentConfigLayout.wrapText" :placeHolder="$t('i18nCommon.postgreSQLQuery.sqlEditorPlaceholder')"
+          :label="$t('i18nCommon.postgreSQLQuery.sqlEditorLabel')" :isLabelTop="true" height="100%" width="100%"
+          :monacoOptions="monacoOptions" @keydown.ctrl.enter.prevent="handleRunQuery"
+          @keydown.meta.enter.prevent="handleRunQuery" :showCursorTextFooter="true">
         </TDTextEditor>
       </div>
 
@@ -92,49 +57,27 @@
           <!-- kết quả query (hỗ trợ multi-statement với tabs) -->
           <div v-else class="flex flex-col td-pg-result-body">
             <!-- tabs chuyển đổi giữa các result (khi query có nhiều câu lệnh) -->
-            <div
-              class="flex td-pg-result-tabs-wrap"
-              v-if="hasMultipleResultStatement"
-            >
+            <div class="flex td-pg-result-tabs-wrap" v-if="hasMultipleResultStatement">
               <div class="flex td-pg-result-tabs">
-                <div
-                  v-for="(result, index) in queryResults"
-                  :key="getResultTabKey(result, index)"
-                  class="text-nowrap td-pg-result-tab-item"
-                  :class="{
+                <div v-for="(result, index) in queryResults" :key="getResultTabKey(result, index)"
+                  class="text-nowrap td-pg-result-tab-item" :class="{
                     'td-pg-result-tab-item-active': activeResultIndex === index,
-                  }"
-                  @click="activateResultTab(index)"
-                >
+                  }" @click="activateResultTab(index)">
                   {{ getResultTabLabel(result, index) }}
                 </div>
               </div>
             </div>
             <div class="flex flex-col flex-one td-pg-result-content">
               <!-- bảng hiển thị dữ liệu SELECT (dùng KeepAlive để giữ cache) -->
-              <div
-                v-if="activeQueryResult && activeQueryResult.is_select"
-                class="td-pg-result-table"
-              >
+              <div v-if="activeQueryResult && activeQueryResult.is_select" class="td-pg-result-table">
                 <KeepAlive>
-                  <TDTableViewer
-                    :key="activeResultCacheKey"
-                    :tableData="activeQueryResult.rows"
-                    :columns="activeTableColumns"
-                    :noMargin="true"
-                    :stickyHeader="true"
-                    :showIndex="true"
-                    :usingFooterHelp="true"
-                    :showFooter="true"
-                    maxHeight="100%"
-                  />
+                  <TDTableViewer :key="activeResultCacheKey" :tableData="activeQueryResult.rows"
+                    :columns="activeTableColumns" :noMargin="true" :stickyHeader="true" :showIndex="true"
+                    :usingFooterHelp="true" :showFooter="true" maxHeight="100%" />
                 </KeepAlive>
               </div>
               <!-- hiển thị số dòng bị ảnh hưởng (INSERT/UPDATE/DELETE) -->
-              <div
-                v-if="activeQueryResult && !activeQueryResult.is_select"
-                class="flex td-pg-result-affected"
-              >
+              <div v-if="activeQueryResult && !activeQueryResult.is_select" class="flex td-pg-result-affected">
                 <TDDynamicBackgroundEffect />
                 <span>
                   {{ $t("i18nCommon.postgreSQLQuery.rowsAffected") }}:
@@ -148,122 +91,63 @@
     </div>
 
     <!-- sidebar phải: chứa các tab Help / Setting / Connection / SQL Save -->
-    <TDSubSidebar
-      ref="subSidebar"
-      v-model="currentConfigLayout.isShowSidebar"
-      @toggleSidebar="toggleSidebar"
-    >
+    <TDSubSidebar ref="subSidebar" v-model="currentConfigLayout.isShowSidebar" @toggleSidebar="toggleSidebar">
       <!-- thanh menu trên sidebar (slide option để chuyển tab) -->
       <template v-slot:menu>
         <div class="td-sidebar-menu">
-          <TDSlideOption
-            :showIcon="true"
-            v-if="sidebarOptions && sidebarOptions.length > 1"
-            v-model="currentConfigLayout.currentSidebarOption"
-            :options="sidebarOptions"
-            :noMargin="true"
-            @change="updateConfigLayout"
-          />
+          <TDSlideOption :showIcon="true" v-if="sidebarOptions && sidebarOptions.length > 1"
+            v-model="currentConfigLayout.currentSidebarOption" :options="sidebarOptions" :noMargin="true"
+            @change="updateConfigLayout" />
         </div>
       </template>
 
       <template v-slot:main>
         <!-- tab Help: hướng dẫn sử dụng -->
-        <div
-          class="td-sidebar-content"
-          v-show="
-            currentConfigLayout.currentSidebarOption ===
-            $tdEnum.PostgreSQLQuerySidebarOption.Help
-          "
-        >
+        <div class="td-sidebar-content" v-show="currentConfigLayout.currentSidebarOption ===
+          $tdEnum.PostgreSQLQuerySidebarOption.Help
+          ">
           <TDPostgreSQLQueryHelp />
         </div>
 
         <!-- tab Setting: cấu hình editor, intellisense, giới hạn kết quả -->
-        <div
-          class="td-sidebar-content"
-          v-show="
-            currentConfigLayout.currentSidebarOption ===
-            $tdEnum.PostgreSQLQuerySidebarOption.Setting
-          "
-        >
-          <TDCheckbox
-            :variant="$tdEnum.checkboxType.switch"
-            v-model="currentConfigLayout.wrapText"
-            :label="$t('i18nCommon.APIMocking.wrapText')"
-            @change="updateConfigLayout"
-          />
-          <TDCheckbox
-            :variant="$tdEnum.checkboxType.switch"
-            v-model="currentConfigLayout.autoSaveQueryAfterExec"
-            :label="$t('i18nCommon.postgreSQLQuery.autoSaveQueryAfterExec')"
-            @change="updateConfigLayout"
-          />
-          <TDCheckbox
-            :variant="$tdEnum.checkboxType.switch"
-            v-model="currentConfigLayout.loadFunctionIntellisense"
-            :label="$t('i18nCommon.postgreSQLQuery.loadFunctionIntellisense')"
-            @change="updateConfigLayout"
-          />
-          <TDCheckbox
-            :variant="$tdEnum.checkboxType.switch"
-            v-model="currentConfigLayout.limitResults"
+        <div class="td-sidebar-content" v-show="currentConfigLayout.currentSidebarOption ===
+          $tdEnum.PostgreSQLQuerySidebarOption.Setting
+          ">
+          <TDCheckbox :variant="$tdEnum.checkboxType.switch" v-model="currentConfigLayout.wrapText"
+            :label="$t('i18nCommon.APIMocking.wrapText')" @change="updateConfigLayout" />
+          <TDCheckbox :variant="$tdEnum.checkboxType.switch" v-model="currentConfigLayout.autoSaveQueryAfterExec"
+            :label="$t('i18nCommon.postgreSQLQuery.autoSaveQueryAfterExec')" @change="updateConfigLayout" />
+          <TDCheckbox :variant="$tdEnum.checkboxType.switch" v-model="currentConfigLayout.loadFunctionIntellisense"
+            :label="$t('i18nCommon.postgreSQLQuery.loadFunctionIntellisense')" @change="updateConfigLayout" />
+          <TDCheckbox :variant="$tdEnum.checkboxType.switch" v-model="currentConfigLayout.limitResults"
             :label="$t('i18nCommon.postgreSQLQuery.resultLimit')"
-            v-tooltip="$t('i18nCommon.postgreSQLQuery.resultLimitDesc')"
-            @change="updateConfigLayout"
-          />
-          <div
-            class="td-query-config"
-            v-show="currentConfigLayout.limitResults"
-          >
-            <TDInput
-              :noMargin="true"
-              inputType="number"
-              :modelValue="currentConfigLayout.defaultQueryLimit"
-              :label="$t('i18nCommon.postgreSQLQuery.defaultQueryLimit')"
-              :isLabelTop="false"
-              v-tooltip="$t('i18nCommon.postgreSQLQuery.defaultQueryLimitDesc')"
-              @update:modelValue="
+            v-tooltip="$t('i18nCommon.postgreSQLQuery.resultLimitDesc')" @change="updateConfigLayout" />
+          <div class="td-query-config" v-show="currentConfigLayout.limitResults">
+            <TDInput :noMargin="true" inputType="number" :modelValue="currentConfigLayout.defaultQueryLimit"
+              :label="$t('i18nCommon.postgreSQLQuery.defaultQueryLimit')" :isLabelTop="false"
+              v-tooltip="$t('i18nCommon.postgreSQLQuery.defaultQueryLimitDesc')" @update:modelValue="
                 (v) => {
                   currentConfigLayout.defaultQueryLimit = Number(v);
                   updateConfigLayout();
                 }
-              "
-            />
+              " />
           </div>
         </div>
 
         <!-- tab Connection: danh sách kết nối database được nhóm theo group -->
-        <div
-          class="flex flex-col td-sidebar-content"
-          v-show="
-            currentConfigLayout.currentSidebarOption ===
-            $tdEnum.PostgreSQLQuerySidebarOption.Connection
-          "
-        >
+        <div class="flex flex-col td-sidebar-content" v-show="currentConfigLayout.currentSidebarOption ===
+          $tdEnum.PostgreSQLQuerySidebarOption.Connection
+          ">
           <!-- header: input tạo group mới + nút add group + nút reload -->
           <div class="flex td-header-collection">
             <div class="td-new-collection">
-              <TDInput
-                v-model="newGroupName"
-                :noMargin="true"
-                :placeHolder="$t('i18nCommon.postgreSQLQuery.groupName')"
-              />
+              <TDInput v-model="newGroupName" :noMargin="true"
+                :placeHolder="$t('i18nCommon.postgreSQLQuery.groupName')" />
             </div>
-            <TDButton
-              :noMargin="true"
-              @click="addNewGroup"
-              :type="$tdEnum.buttonType.secondary"
-              iconClass="td-plus-icon"
-              v-tooltip="$t('i18nCommon.postgreSQLQuery.addGroup')"
-            />
-            <TDButton
-              :noMargin="true"
-              @click="loadAllData"
-              :type="$tdEnum.buttonType.secondary"
-              iconClass="td-reload-icon"
-              v-tooltip="$t('i18nCommon.postgreSQLQuery.refreshData')"
-            />
+            <TDButton :noMargin="true" @click="addNewGroup" :type="$tdEnum.buttonType.secondary"
+              iconClass="td-plus-icon" v-tooltip="$t('i18nCommon.postgreSQLQuery.addGroup')" />
+            <TDButton :noMargin="true" @click="loadAllData" :type="$tdEnum.buttonType.secondary"
+              iconClass="td-reload-icon" v-tooltip="$t('i18nCommon.postgreSQLQuery.refreshData')" />
           </div>
           <!-- danh sách group và connection -->
           <div class="td-collection">
@@ -271,41 +155,23 @@
               <TDLoading />
             </div>
             <div class="td-collection-body" v-else>
-              <div
-                v-for="(group, index) in groupedConnections"
-                class="flex flex-col no-select td-collection-item"
-                :key="index"
-              >
+              <div v-for="(group, index) in groupedConnections" class="flex flex-col no-select td-collection-item"
+                :key="index">
                 <!-- chế độ rename group -->
                 <div v-if="group.is_renaming" class="td-collection-rename">
-                  <TDInput
-                    v-model="group.temp_name"
-                    :noMargin="true"
-                    :placeHolder="$t('i18nCommon.apiTesting.collectionRename')"
-                    :ref="group.temp_name"
-                    @keyup.enter="saveNewCollectionName(group)"
-                    @clickOutSide="saveNewCollectionName(group)"
-                  >
+                  <TDInput v-model="group.temp_name" :noMargin="true"
+                    :placeHolder="$t('i18nCommon.apiTesting.collectionRename')" :ref="group.temp_name"
+                    @keyup.enter="saveNewCollectionName(group)" @clickOutSide="saveNewCollectionName(group)">
                   </TDInput>
                 </div>
                 <!-- header group (click để expand/collapse) -->
-                <div
-                  v-else
-                  class="flex td-collection-header"
-                  @click="toggleGroup(group.id || '__ungrouped__')"
-                >
+                <div v-else class="flex td-collection-header" @click="toggleGroup(group.id || '__ungrouped__')">
                   <div class="flex text-nowrap td-collection-header-left">
                     <!-- mũi tên chỉ trạng thái expand/collapse -->
-                    <TDArrow
-                      :openProp="openGroups[group.id || '__ungrouped__']"
-                      :arrowOpenDirection="$tdEnum.Direction.bottom"
-                      :arrowDirection="$tdEnum.Direction.right"
-                    />
-                    <div
-                      v-tooltip="
-                        group.name || $t('i18nCommon.postgreSQLQuery.ungrouped')
-                      "
-                    >
+                    <TDArrow :openProp="openGroups[group.id || '__ungrouped__']"
+                      :arrowOpenDirection="$tdEnum.Direction.bottom" :arrowDirection="$tdEnum.Direction.right" />
+                    <div v-tooltip="group.name || $t('i18nCommon.postgreSQLQuery.ungrouped')
+                      ">
                       {{
                         group.name || $t("i18nCommon.postgreSQLQuery.ungrouped")
                       }}
@@ -313,49 +179,28 @@
                   </div>
                   <!-- nút edit/add/delete group (chỉ hiện khi hover) -->
                   <div class="flex td-collection-edit-btn" v-if="group.id">
-                    <div
-                      class="td-icon td-edit-icon"
-                      v-tooltip="$t('i18nCommon.edit')"
-                      @click.stop="enableRenameCollection(group)"
-                    ></div>
-                    <div
-                      v-tooltip="$t('i18nCommon.postgreSQLQuery.addConnection')"
-                      class="td-icon td-plus-icon"
-                      @click.stop="openAddConnectionPopup(group.id)"
-                    ></div>
-                    <div
-                      v-tooltip="$t('i18nCommon.postgreSQLQuery.deleteGroup')"
-                      class="td-icon td-close-icon"
-                      @click.stop="deleteGroup(group.id)"
-                    ></div>
+                    <div class="td-icon td-edit-icon" v-tooltip="$t('i18nCommon.edit')"
+                      @click.stop="enableRenameCollection(group)"></div>
+                    <div v-tooltip="$t('i18nCommon.postgreSQLQuery.addConnection')" class="td-icon td-plus-icon"
+                      @click.stop="openAddConnectionPopup(group.id)"></div>
+                    <div v-tooltip="$t('i18nCommon.postgreSQLQuery.deleteGroup')" class="td-icon td-close-icon"
+                      @click.stop="deleteGroup(group.id)"></div>
                   </div>
                   <div class="flex td-collection-edit-btn" v-else>
-                    <div
-                      v-tooltip="$t('i18nCommon.postgreSQLQuery.addConnection')"
-                      class="td-icon td-plus-icon"
-                      @click.stop="openAddConnectionPopup('')"
-                    ></div>
+                    <div v-tooltip="$t('i18nCommon.postgreSQLQuery.addConnection')" class="td-icon td-plus-icon"
+                      @click.stop="openAddConnectionPopup('')"></div>
                   </div>
                 </div>
                 <!-- danh sách connection trong group -->
-                <div
-                  v-if="
-                    openGroups[group.id || '__ungrouped__'] &&
-                    group.items &&
-                    group.items.length > 0
-                  "
-                  class="flex flex-col td-collection-content"
-                >
-                  <div
-                    v-for="(conn, ci) in group.items"
-                    :key="ci"
-                    class="flex td-collection-request-item"
-                    :class="{
-                      'td-collection-request-item-selected':
-                        selectedConnectionId === conn.id,
-                    }"
-                    @click="selectConnection(conn)"
-                  >
+                <div v-if="
+                  openGroups[group.id || '__ungrouped__'] &&
+                  group.items &&
+                  group.items.length > 0
+                " class="flex flex-col td-collection-content">
+                  <div v-for="(conn, ci) in group.items" :key="ci" class="flex td-collection-request-item" :class="{
+                    'td-collection-request-item-selected':
+                      selectedConnectionId === conn.id,
+                  }" @click="selectConnection(conn)">
                     <span class="text-nowrap">
                       <div v-tooltip="conn.connection_name">
                         {{ conn.connection_name }}
@@ -363,18 +208,10 @@
                     </span>
                     <!-- nút edit/delete connection (chỉ hiện khi hover) -->
                     <span class="td-collection-item-edit-btn">
-                      <div
-                        class="td-icon td-edit-icon"
-                        v-tooltip="$t('i18nCommon.edit')"
-                        @click.stop="openEditConnectionPopup(conn)"
-                      ></div>
-                      <div
-                        class="td-icon td-close-icon"
-                        v-tooltip="
-                          $t('i18nCommon.postgreSQLQuery.deleteConnection')
-                        "
-                        @click.stop="deleteConnection(conn.id)"
-                      ></div>
+                      <div class="td-icon td-edit-icon" v-tooltip="$t('i18nCommon.edit')"
+                        @click.stop="openEditConnectionPopup(conn)"></div>
+                      <div class="td-icon td-close-icon" v-tooltip="$t('i18nCommon.postgreSQLQuery.deleteConnection')
+                        " @click.stop="deleteConnection(conn.id)"></div>
                     </span>
                   </div>
                 </div>
@@ -384,24 +221,13 @@
         </div>
 
         <!-- tab SQL Save: danh sách query đã lưu -->
-        <div
-          class="td-sidebar-content"
-          v-show="
-            currentConfigLayout.currentSidebarOption ===
-            $tdEnum.PostgreSQLQuerySidebarOption.SQLSave
-          "
-        >
-          <TDHistorySidebar
-            ref="savedQueryHistory"
-            :applyFunction="applySavedQueryFromHistory"
-            titleKey="query_name"
-            :noMargin="true"
-            :positionRelative="false"
-            :cacheKey="$tdEnum.cacheConfig.PostgreSQLSavedQuery"
-            :historyContainerStyleEnum="
-              $tdEnum.AbsolutePositionStyle.Top100Left
-            "
-          />
+        <div class="td-sidebar-content" v-show="currentConfigLayout.currentSidebarOption ===
+          $tdEnum.PostgreSQLQuerySidebarOption.SQLSave
+          ">
+          <TDHistorySidebar ref="savedQueryHistory" :applyFunction="applySavedQueryFromHistory" titleKey="query_name"
+            :noMargin="true" :positionRelative="false" :cacheKey="$tdEnum.cacheConfig.PostgreSQLSavedQuery"
+            :historyContainerStyleEnum="$tdEnum.AbsolutePositionStyle.Top100Left
+              " />
         </div>
       </template>
     </TDSubSidebar>
@@ -528,7 +354,7 @@ export default {
   /**
    * Dọn dẹp khi component bị huỷ (đã xử lý qua onTabLeave → disposeIntellisense)
    */
-  beforeUnmount() {},
+  beforeUnmount() { },
 
   computed: {
     /**
@@ -1078,7 +904,7 @@ export default {
         } else {
           labelTab = `${index + 1} command`;
         }
-      } catch (error) {}
+      } catch (error) { }
       return labelTab;
     },
 
@@ -1459,8 +1285,8 @@ export default {
       if (!me.sqlText?.trim()) {
         me.$tdToast.warning(
           me.$t("i18nCommon.postgreSQLQuery.sqlContent") +
-            " " +
-            me.$t("i18nCommon.toastMessage.required"),
+          " " +
+          me.$t("i18nCommon.toastMessage.required"),
         );
         return;
       }
@@ -1765,12 +1591,15 @@ export default {
   width: 100%;
   display: flex;
   flex-direction: column;
+
   .td-pg-result-body {
     width: 100%;
     height: 100%;
     gap: var(--padding);
+
     .td-pg-result-tabs-wrap {
       width: 100%;
+
       .td-pg-result-tabs {
         width: 100%;
         overflow-x: auto;
@@ -1791,12 +1620,15 @@ export default {
           cursor: pointer;
           background: var(--bg-layer-color);
         }
+
         .td-pg-result-tab-item:hover {
           background: var(--border-color);
         }
+
         .td-pg-result-tab-item-active {
           background: var(--bg-main-color);
         }
+
         .td-pg-result-tab-item-active:hover {
           background: var(--bg-main-color);
         }
@@ -1806,6 +1638,7 @@ export default {
     .td-pg-result-content {
       width: 100%;
       min-height: 0;
+
       .td-pg-result-table {
         height: 100%;
         width: 100%;
@@ -1890,6 +1723,7 @@ export default {
   width: 100%;
   align-items: center;
   justify-content: space-between;
+
   .td-header-menu-group {
     justify-content: flex-start;
     overflow-x: auto;
@@ -1899,6 +1733,7 @@ export default {
     }
   }
 }
+
 .td-query-config {
   padding: var(--padding);
 }
