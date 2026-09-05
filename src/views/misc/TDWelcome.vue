@@ -6,10 +6,12 @@
           <TDLoading />
         </transition>
         <div v-else class="main-line-title">{{ welcomeTitle }}</div>
+        <transition name="td-tip" mode="out-in">
+          <p :key="tipIndex" class="no-select tip-text" v-tooltip="$t('i18nTip.nextTip')" @click="nextTip">
+            {{ currentTip }}
+          </p>
+        </transition>
         <TDDynamicBackgroundEffect />
-        <p class="description">
-          {{ displayText }}<span class="cursor">|</span>
-        </p>
       </div>
       <p class="agreement">{{ $t("i18nCommon.agreement") }}</p>
     </div>
@@ -37,7 +39,8 @@ export default {
       loadingType: this.$tdEnum.LoadingType.Normal,
       keyCacheLayout: this.$tdEnum.cacheConfig.WelcomeLayout,
       languageList: Object.keys(this.$tdEnum.language).sort(),
-      displayText: "",
+      tipIndex: 0,
+      tipTimer: null,
       currentConfigLayout: {
         isShowSidebar: false,
       },
@@ -54,6 +57,18 @@ export default {
     isShowLoading() {
       return this.loadingType != this.$tdEnum.LoadingType.Normal;
     },
+    /**
+     * danh sách tip hướng dẫn sử dụng app
+     */
+    tipsList() {
+      return this.$t("i18nTip.list") ?? [];
+    },
+    /**
+     * tip đang hiển thị
+     */
+    currentTip() {
+      return this.tipsList[this.tipIndex] ?? "";
+    },
   },
   created() { },
   methods: {
@@ -61,34 +76,27 @@ export default {
       let me = this;
       await me.updateConfigLayout();
     },
-    // Logic tạo hiệu ứng gõ chữ
-    async runTypingEffect() {
-      const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-      // 1. Gõ chữ sai "WYSIWYG"
-      const typoText = "WYSIWYG";
-      for (let i = 0; i <= typoText.length; i++) {
-        this.displayText = typoText.slice(0, i);
-        await sleep(150);
-      }
-
-      await sleep(800); // Tạm dừng để người dùng thấy lỗi
-
-      // 2. Xóa ngược lại 6 ký tự
-      for (let i = 0; i < 6; i++) {
-        this.displayText = this.displayText.slice(0, -1);
-        await sleep(100);
-      }
-
-      await sleep(300); // Khựng lại một chút trước khi gõ đúng
-
-      // 3. Gõ phần còn lại của "What you see is what you get"
-      // Bắt đầu gõ từ ký tự thứ 3 của fullText (chữ 'a' trong 'Whatever')
-      const fullText = "What you see is what you get";
-      for (let i = this.displayText.length; i < fullText.length; i++) {
-        this.displayText += fullText.charAt(i);
-        await sleep(80);
-      }
+    /**
+     * tự động chuyển sang tip tiếp theo
+     */
+    autoNextTip() {
+      let len = this.tipsList.length;
+      if (!len) return;
+      this.tipIndex = (this.tipIndex + 1) % len;
+    },
+    /**
+     * bấm vào tip: clear interval cũ, chuyển tip và tạo interval mới để reset thời gian tự chuyển
+     */
+    nextTip() {
+      this.autoNextTip();
+      this.startTipTimer();
+    },
+    /**
+     * clear interval cũ và tạo interval mới
+     */
+    startTipTimer() {
+      clearInterval(this.tipTimer);
+      this.tipTimer = setInterval(this.autoNextTip, 10000);
     },
     async processWhenMounted() {
       let me = this;
@@ -97,9 +105,11 @@ export default {
     },
   },
   mounted() {
-    // Chạy hiệu ứng khi component vừa hiển thị
-    this.runTypingEffect();
     this.processWhenMounted();
+    this.startTipTimer();
+  },
+  beforeUnmount() {
+    clearInterval(this.tipTimer);
   },
 };
 </script>
@@ -147,29 +157,37 @@ export default {
   z-index: 1;
 }
 
-.description {
-  font-family: var(--straight-font);
-  font-size: 2cqw;
-  min-height: 50px;
+.tip-text {
+  // font-size: var(--font-size-medium);
+  padding: var(--padding) calc(var(--padding) * 2);
+  max-width: 60%;
+  height: 2.5em;
+  text-align: center;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+
 }
 
-/* Thêm style cho con trỏ nhấp nháy */
-.cursor {
-  display: inline-block;
-  margin-left: 5px;
-  color: var(--btn-color);
-  animation: blink 1s step-end infinite;
+/* transition chuyển tip kiểu loading game Zelda Breath of the Wild */
+.td-tip-enter-active {
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
 }
 
-@keyframes blink {
+.td-tip-leave-active {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
 
-  from,
-  to {
-    opacity: 1;
-  }
+.td-tip-enter-from {
+  opacity: 0;
+  transform: translateY(12px);
+}
 
-  50% {
-    opacity: 0;
-  }
+.td-tip-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 </style>

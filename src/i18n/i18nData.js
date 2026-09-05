@@ -96,12 +96,14 @@ export async function loadLocale(locale) {
     let userSettings = await import(`@/i18n/${locale}/i18nUserSettings.js`);
     let helps = await import(`@/i18n/${locale}/i18nHelp.js`);
     let templates = await import(`@/i18n/${locale}/i18nTemplate.js`);
+    let tips = await import(`@/i18n/${locale}/i18nTip.js`);
     state.messages[locale] = {
       ...i18nGlobal,
       ...msgs.default,
       ...userSettings.default,
       ...helps.default,
       ...templates.default,
+      ...tips.default,
     };
   }
   // Gán giá trị thông qua .value vì đây là computed setter
