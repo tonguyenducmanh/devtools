@@ -95,23 +95,16 @@ export default {
     },
     menuConfig() {
       return {
-        settings: [
-          {
-            key: "userSettings",
-            labelKey: "i18nCommon.feature.userSettings",
-            action: this.userSettingsFunc,
-          },
-          {
-            key: "appDataMiner",
-            labelKey: "i18nCommon.feature.AppDataMiner",
-            action: this.appDataMinerFunc,
-          },
-        ],
         view: [
           {
             key: "showAllShortcut",
             labelKey: "i18nCommon.tdheader.showAllShortcut",
             action: this.showAllShortcutPopup,
+          },
+          {
+            key: "appDataMiner",
+            labelKey: "i18nCommon.feature.AppDataMiner",
+            action: this.appDataMinerFunc,
           },
         ],
         utilities: [
@@ -162,6 +155,11 @@ export default {
           },
         ],
         help: [
+          {
+            key: "userSettings",
+            labelKey: "i18nCommon.feature.userSettings",
+            action: this.userSettingsFunc,
+          },
           {
             key: "pingAgent",
             labelKey: "i18nCommon.apiTesting.pingAgent",
