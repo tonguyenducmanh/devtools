@@ -50,7 +50,22 @@ function createJSONSortByKeyAction(ctx = {}) {
         const parsed = JSON.parse(raw.trim());
         const sorted = sortObjectByKey(parsed);
         const sortedText = JSON.stringify(sorted, null, 2);
-        editor.setValue(sortedText);
+
+        // Dùng executeEdits thay vì setValue để giữ undo stack (setValue sẽ reset undo)
+        const model = editor.getModel();
+        if (model) {
+          editor.pushUndoStop();
+          editor.executeEdits("sort-json-keys", [
+            {
+              range: model.getFullModelRange(),
+              text: sortedText,
+              forceMoveMarkers: true,
+            },
+          ]);
+          editor.pushUndoStop();
+        } else {
+          editor.setValue(sortedText);
+        }
         ctx.onSuccess?.(sortedText);
       } catch (error) {
         ctx.onError?.(error);
