@@ -14,17 +14,15 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.apiMocking.howToUse.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.apiMocking.howToUse.createMock") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.apiMocking.howToUse.configure") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.apiMocking.howToUse.saveMock") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.apiMocking.howToUse.createMock") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.apiMocking.howToUse.configure") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.apiMocking.howToUse.saveMock") }}
+        </p>
       </div>
 
       <div class="help-section">

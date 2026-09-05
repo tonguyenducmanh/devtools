@@ -14,17 +14,15 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.base64ToImage.howToUse.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.base64ToImage.howToUse.paste") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.base64ToImage.howToUse.convert") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.base64ToImage.howToUse.download") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.base64ToImage.howToUse.paste") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.base64ToImage.howToUse.convert") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.base64ToImage.howToUse.download") }}
+        </p>
       </div>
 
       <div class="help-section">

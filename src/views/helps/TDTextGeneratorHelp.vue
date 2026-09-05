@@ -14,31 +14,27 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.textGenerator.howToUse.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.textGenerator.howToUse.selectType") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.textGenerator.howToUse.enterCount") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.textGenerator.howToUse.generate") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.textGenerator.howToUse.selectType") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.textGenerator.howToUse.enterCount") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.textGenerator.howToUse.generate") }}
+        </p>
       </div>
 
       <div class="help-section">
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.textGenerator.generationTypes.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.textGenerator.generationTypes.word") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.textGenerator.generationTypes.paragraph") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.textGenerator.generationTypes.word") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.textGenerator.generationTypes.paragraph") }}
+        </p>
       </div>
     </div>
   </div>

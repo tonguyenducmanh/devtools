@@ -14,17 +14,15 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.codeFormatter.howToUse.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.codeFormatter.howToUse.select") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.codeFormatter.howToUse.paste") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.codeFormatter.howToUse.format") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.codeFormatter.howToUse.select") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.codeFormatter.howToUse.paste") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.codeFormatter.howToUse.format") }}
+        </p>
       </div>
 
       <div class="help-section">

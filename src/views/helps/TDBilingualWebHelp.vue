@@ -14,37 +14,33 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.bilingualWeb.howToUse.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.bilingualWeb.howToUse.input") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.bilingualWeb.howToUse.fetch") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.bilingualWeb.howToUse.wait") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.bilingualWeb.howToUse.input") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.bilingualWeb.howToUse.fetch") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.bilingualWeb.howToUse.wait") }}
+        </p>
       </div>
 
       <div class="help-section">
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.bilingualWeb.options.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.bilingualWeb.options.delay") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.bilingualWeb.options.tags") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.bilingualWeb.options.classes") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.bilingualWeb.options.ids") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.bilingualWeb.options.delay") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.bilingualWeb.options.tags") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.bilingualWeb.options.classes") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.bilingualWeb.options.ids") }}
+        </p>
       </div>
     </div>
   </div>
@@ -55,4 +51,3 @@ export default {
   name: "TDBilingualWebHelp",
 };
 </script>
-

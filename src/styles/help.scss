@@ -26,23 +26,6 @@
   margin-bottom: var(--padding-medium);
 }
 
-.section-list {
-  gap: var(--padding);
-  margin-bottom: var(--padding-medium);
-}
-
-.section-item {
-  width: 100%;
-  font-size: var(--font-size-medium-rare);
-  line-height: 1.6;
-  color: var(--text-color);
-  padding: var(--padding-medium) var(--padding-x-medium);
-  border-left: 2px solid var(--border-color);
-  margin-bottom: 2px;
-  background: var(--bg-layer-color);
-  border-radius: 0 var(--border-radius-component) var(--border-radius-component) 0;
-}
-
 .section-note {
   font-size: var(--font-size-small);
   color: var(--text-color);

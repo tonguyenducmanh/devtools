@@ -14,17 +14,15 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.imageToBase64.howToUse.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.imageToBase64.howToUse.select") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.imageToBase64.howToUse.preview") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.imageToBase64.howToUse.copy") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.imageToBase64.howToUse.select") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.imageToBase64.howToUse.preview") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.imageToBase64.howToUse.copy") }}
+        </p>
       </div>
 
       <div class="help-section">
@@ -44,4 +42,3 @@ export default {
   name: "TDImageToBase64Help",
 };
 </script>
-

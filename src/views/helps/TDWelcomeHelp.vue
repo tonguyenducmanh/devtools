@@ -14,14 +14,12 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.welcome.quickStart.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.welcome.quickStart.selectTool") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.welcome.quickStart.searchTool") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.welcome.quickStart.selectTool") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.welcome.quickStart.searchTool") }}
+        </p>
         <p class="section-note">{{ $t("i18nHelp.welcome.quickStart.note") }}</p>
       </div>
 
@@ -35,17 +33,15 @@
         <p class="section-text">
           {{ $t("i18nHelp.welcome.multiTab.rightClick") }}
         </p>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.welcome.multiTab.duplicateTab") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.welcome.multiTab.closeTab") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.welcome.multiTab.closeAllTabs") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.welcome.multiTab.duplicateTab") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.welcome.multiTab.closeTab") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.welcome.multiTab.closeAllTabs") }}
+        </p>
         <p class="section-text">
           {{ $t("i18nHelp.welcome.multiTab.dragReorder") }}
         </p>
@@ -55,14 +51,12 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.welcome.agent.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.welcome.agent.webOnly") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.welcome.agent.needAgent") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.welcome.agent.webOnly") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.welcome.agent.needAgent") }}
+        </p>
         <p class="section-text">
           {{ $t("i18nHelp.welcome.agent.downloadAgent") }}
         </p>

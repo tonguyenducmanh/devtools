@@ -14,40 +14,36 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.textManipulation.howToUse.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.textManipulation.howToUse.input") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.textManipulation.howToUse.expression") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.textManipulation.howToUse.execute") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.textManipulation.howToUse.input") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.textManipulation.howToUse.expression") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.textManipulation.howToUse.execute") }}
+        </p>
       </div>
 
       <div class="help-section">
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.textManipulation.expressions.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.textManipulation.expressions.variable") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.textManipulation.expressions.upper") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.textManipulation.expressions.lower") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.textManipulation.expressions.snake") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.textManipulation.expressions.trim") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.textManipulation.expressions.variable") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.textManipulation.expressions.upper") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.textManipulation.expressions.lower") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.textManipulation.expressions.snake") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.textManipulation.expressions.trim") }}
+        </p>
       </div>
     </div>
   </div>

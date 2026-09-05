@@ -14,34 +14,30 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.excelToJSON.howToUse.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.excelToJSON.howToUse.upload") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.excelToJSON.howToUse.result") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.excelToJSON.howToUse.download") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.excelToJSON.howToUse.upload") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.excelToJSON.howToUse.result") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.excelToJSON.howToUse.download") }}
+        </p>
       </div>
 
       <div class="help-section">
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.excelToJSON.features.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.excelToJSON.features.multiSheet") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.excelToJSON.features.outputFormat") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.excelToJSON.features.trimValues") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.excelToJSON.features.multiSheet") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.excelToJSON.features.outputFormat") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.excelToJSON.features.trimValues") }}
+        </p>
       </div>
     </div>
   </div>

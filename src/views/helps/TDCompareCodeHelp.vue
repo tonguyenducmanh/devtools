@@ -14,25 +14,21 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.compareCode.supportedFormats.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.compareCode.supportedFormats.list") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.compareCode.supportedFormats.list") }}
+        </p>
       </div>
 
       <div class="help-section">
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.compareCode.features.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.compareCode.features.highlight") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.compareCode.features.wrapText") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.compareCode.features.highlight") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.compareCode.features.wrapText") }}
+        </p>
       </div>
     </div>
   </div>

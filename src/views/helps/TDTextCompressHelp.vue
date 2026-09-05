@@ -14,31 +14,27 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.textCompress.howToUse.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.textCompress.howToUse.compress") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.textCompress.howToUse.decompress") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.textCompress.howToUse.compress") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.textCompress.howToUse.decompress") }}
+        </p>
       </div>
 
       <div class="help-section">
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.textCompress.algorithms.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.textCompress.algorithms.gzip") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.textCompress.algorithms.deflate") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.textCompress.algorithms.deflateRaw") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.textCompress.algorithms.gzip") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.textCompress.algorithms.deflate") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.textCompress.algorithms.deflateRaw") }}
+        </p>
       </div>
     </div>
   </div>

@@ -14,31 +14,27 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.qrCodeToText.howToUse.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.qrCodeToText.howToUse.upload") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.qrCodeToText.howToUse.scan") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.qrCodeToText.howToUse.copy") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.qrCodeToText.howToUse.upload") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.qrCodeToText.howToUse.scan") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.qrCodeToText.howToUse.copy") }}
+        </p>
       </div>
 
       <div class="help-section">
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.qrCodeToText.features.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.qrCodeToText.features.compress") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.qrCodeToText.features.header") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.qrCodeToText.features.compress") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.qrCodeToText.features.header") }}
+        </p>
       </div>
     </div>
   </div>

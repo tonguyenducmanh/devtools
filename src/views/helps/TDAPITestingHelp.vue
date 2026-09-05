@@ -14,31 +14,27 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.apiTesting.modes.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.apiTesting.modes.normal") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.apiTesting.modes.proMode") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.apiTesting.modes.normal") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.apiTesting.modes.proMode") }}
+        </p>
       </div>
 
       <div class="help-section">
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.apiTesting.features.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.apiTesting.features.collection") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.apiTesting.features.history") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.apiTesting.features.import") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.apiTesting.features.collection") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.apiTesting.features.history") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.apiTesting.features.import") }}
+        </p>
       </div>
 
       <div class="help-section">
@@ -57,23 +53,23 @@
         <p class="section-text">
           {{ $t("i18nHelp.apiTesting.proModeHelp.builtinFunctions") }}
         </p>
-        <div class="flex flex-col section-list">
-          <div class="section-item section-code">
-            <code>{{ $t("i18nHelp.apiTesting.proModeHelp.requestCURL") }}</code>
-          </div>
-          <div class="section-item section-code">
-            <code>{{ $t("i18nHelp.apiTesting.proModeHelp.request") }}</code>
-          </div>
-          <div class="section-item section-code">
-            <code>{{ $t("i18nHelp.apiTesting.proModeHelp.parseResponse") }}</code>
-          </div>
-          <div class="section-item section-code">
-            <code>{{ $t("i18nHelp.apiTesting.proModeHelp.requestMulti") }}</code>
-          </div>
-          <div class="section-item section-code">
-            <code>{{ $t("i18nHelp.apiTesting.proModeHelp.requestMultiCURL") }}</code>
-          </div>
-        </div>
+        <p class="section-text">
+          <code>{{ $t("i18nHelp.apiTesting.proModeHelp.requestCURL") }}</code>
+        </p>
+        <p class="section-text">
+          <code>{{ $t("i18nHelp.apiTesting.proModeHelp.request") }}</code>
+        </p>
+        <p class="section-text">
+          <code>{{ $t("i18nHelp.apiTesting.proModeHelp.parseResponse") }}</code>
+        </p>
+        <p class="section-text">
+          <code>{{ $t("i18nHelp.apiTesting.proModeHelp.requestMulti") }}</code>
+        </p>
+        <p class="section-text">
+          <code>{{
+            $t("i18nHelp.apiTesting.proModeHelp.requestMultiCURL")
+          }}</code>
+        </p>
         <p class="section-note">
           {{ triggerIntelliSenseText }}
         </p>
@@ -93,8 +89,7 @@ export default {
     triggerIntelliSenseText() {
       let shortcuts = TDShortcutAction.getActiveShortcuts();
       let intelliSenseShortcut = shortcuts.find(
-        (s) =>
-          s.labelKey === "i18nCommon.shortKeyAction.showIntelliSense",
+        (s) => s.labelKey === "i18nCommon.shortKeyAction.showIntelliSense",
       );
       let shortcutText = "";
       if (intelliSenseShortcut?.presentKey) {
@@ -107,4 +102,3 @@ export default {
   },
 };
 </script>
-

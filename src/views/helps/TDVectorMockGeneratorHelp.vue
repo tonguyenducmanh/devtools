@@ -14,17 +14,15 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.vectorMockGenerator.howToUse.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.vectorMockGenerator.howToUse.setDimensions") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.vectorMockGenerator.howToUse.enterText") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.vectorMockGenerator.howToUse.generate") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.vectorMockGenerator.howToUse.setDimensions") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.vectorMockGenerator.howToUse.enterText") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.vectorMockGenerator.howToUse.generate") }}
+        </p>
       </div>
 
       <div class="help-section">

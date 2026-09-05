@@ -14,17 +14,15 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.cosinSimilarity.howToUse.title") }}
         </h3>
-        <div class="flex flex-col section-list">
-          <div class="section-item">
-            {{ $t("i18nHelp.cosinSimilarity.howToUse.enterFirst") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.cosinSimilarity.howToUse.enterSecond") }}
-          </div>
-          <div class="section-item">
-            {{ $t("i18nHelp.cosinSimilarity.howToUse.calculate") }}
-          </div>
-        </div>
+        <p class="section-text">
+          {{ $t("i18nHelp.cosinSimilarity.howToUse.enterFirst") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.cosinSimilarity.howToUse.enterSecond") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.cosinSimilarity.howToUse.calculate") }}
+        </p>
       </div>
 
       <div class="help-section">
