@@ -8,6 +8,6 @@ export default {
       "Bạn có thể sắp xếp nhanh key của object JSON trong text editor bằng cách chuột phải chọn JSON sắp xếp theo key",
       "Khi đang gõ câu query SQL, bạn có thể đặt con trỏ chuột vào tên bảng, tên view, tên function và ấn F12 để mở nhanh DLL của object đó",
     ],
-    nextTip: "Tip tiếp theo",
+    nextTip: "Click để xem tip tiếp theo",
   },
 };

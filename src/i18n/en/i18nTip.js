@@ -8,6 +8,6 @@ export default {
       "You can quickly sort the keys of a JSON object in the text editor by right-clicking and selecting JSON sort by key",
       "While typing an SQL query, you can place the cursor on a table, view, or function name and press F12 to quickly open that object's DLL",
     ],
-    nextTip: "Next tip",
+    nextTip: "Click to see the next tip",
   },
 };
