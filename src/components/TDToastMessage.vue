@@ -94,7 +94,7 @@ export default {
   background-color: var(--bg-main-color);
   border-radius: var(--border-radius-component);
   box-shadow: var(--box-shadow);
-  border: 1px solid var(--btn-secondary-focus-color);
+  border: 1px solid var(--focus-color);
   padding: var(--padding);
   display: flex;
   align-items: center;
@@ -114,23 +114,23 @@ export default {
 }
 
 .td-toast-success {
-  border-color: #10b981;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+  /* border-color: #10b981;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15); */
 }
 
 .td-toast-error {
-  border-color: #ef4444;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+  /* border-color: #ef4444;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15); */
 }
 
 .td-toast-warning {
-  border-color: #f59e0b;
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+  /* border-color: #f59e0b;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15); */
 }
 
 .td-toast-info {
-  border-color: #3b82f6;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+  /* border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15); */
 }
 
 .td-toast-message {
