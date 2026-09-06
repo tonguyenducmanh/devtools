@@ -136,6 +136,7 @@ export default {
 .td-toast-message {
   flex: 1;
   min-width: 0;
+  text-align: center;
 }
 
 /* Animation transitions */
