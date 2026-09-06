@@ -129,7 +129,7 @@ export default {
 }
 
 .agreement {
-  color: var(--text-color-light);
+  // color: var(--text-color-light);
   text-align: center;
   width: 95%;
   margin: var(--padding);
