@@ -54,17 +54,20 @@
           <div class="td-pg-result-empty" v-else-if="!hasQueryResults">
             <TDDynamicBackgroundEffect />
           </div>
-          <!-- kết quả query (hỗ trợ multi-statement với tabs) -->
-          <div v-else class="flex flex-col td-pg-result-body">
-            <!-- tabs chuyển đổi giữa các result (khi query có nhiều câu lệnh) -->
-            <div class="flex td-pg-result-tabs-wrap" v-if="hasMultipleResultStatement">
+          <!-- kết quả query (list danh sách bên trái + preview bên phải) -->
+          <div v-else class="flex td-pg-result-body">
+            <!-- danh sách toàn bộ kết quả (virtual scroll, hiển thị khi có nhiều câu lệnh) -->
+            <div class="flex td-pg-result-tabs-wrap" v-if="hasMultipleResultStatement" :style="resultListWidthStyle">
               <div class="flex td-pg-result-tabs">
-                <div v-for="(result, index) in queryResults" :key="getResultTabKey(result, index)"
-                  class="text-nowrap td-pg-result-tab-item" :class="{
-                    'td-pg-result-tab-item-active': activeResultIndex === index,
-                  }" @click="activateResultTab(index)">
-                  {{ getResultTabLabel(result, index) }}
-                </div>
+                <TDVirtualScroll :items="queryResults" :itemHeight="20" :gap="4" :bufferSize="3">
+                  <template #default="{ item, index }">
+                    <div class="text-nowrap td-pg-result-tab-item" :class="{
+                      'td-pg-result-tab-item-active': activeResultIndex === index,
+                    }" @click="activateResultTab(index)">
+                      {{ getResultTabLabel(item, index) }}
+                    </div>
+                  </template>
+                </TDVirtualScroll>
               </div>
             </div>
             <div class="flex flex-col flex-one td-pg-result-content">
@@ -520,6 +523,15 @@ export default {
     hasMultipleResultStatement() {
       let me = this;
       return me.queryResults && me.queryResults.length > 1;
+    },
+    /**
+     * Độ rộng danh sách result: tự tính theo item dài nhất (label/tên bảng)
+     */
+    resultListWidthStyle() {
+      let maxLen = (this.queryResults || []).reduce((max, item, index) => {
+        return Math.max(max, (this.getResultTabLabel(item, index) || "").length);
+      }, 1);
+      return { width: Math.min(Math.max(maxLen * 7.5 + 28, 90), 340) + "px" };
     },
     /**
      * Cấu hình Monaco Editor: actions, keybindings, context menu
@@ -1598,12 +1610,14 @@ export default {
     gap: var(--padding);
 
     .td-pg-result-tabs-wrap {
-      width: 100%;
+      height: 100%;
 
       .td-pg-result-tabs {
         width: 100%;
-        overflow-x: auto;
-        overflow-y: hidden;
+        height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        flex-direction: column;
         align-items: center;
         justify-content: flex-start;
         gap: var(--padding);
@@ -1637,7 +1651,9 @@ export default {
 
     .td-pg-result-content {
       width: 100%;
+      height: 100%;
       min-height: 0;
+      min-width: 0;
 
       .td-pg-result-table {
         height: 100%;
