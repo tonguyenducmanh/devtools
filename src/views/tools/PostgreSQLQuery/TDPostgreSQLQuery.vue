@@ -1694,7 +1694,6 @@ export default {
   position: relative;
   padding: var(--padding);
   color: var(--text-secondary-color);
-  font-size: var(--font-size-medium);
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
 
@@ -1711,7 +1710,6 @@ export default {
   align-items: center;
   justify-content: center;
   color: var(--text-secondary-color);
-  font-size: var(--font-size-small);
   position: relative;
 }
 
