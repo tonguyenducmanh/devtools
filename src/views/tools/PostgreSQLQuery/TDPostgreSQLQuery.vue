@@ -59,11 +59,11 @@
             <!-- danh sách toàn bộ kết quả (virtual scroll, hiển thị khi có nhiều câu lệnh) -->
             <div class="flex td-pg-result-tabs-wrap" v-if="hasMultipleResultStatement" :style="resultListWidthStyle">
               <div class="flex td-pg-result-tabs">
-                <TDVirtualScroll :items="queryResults" :itemHeight="20" :gap="4" :bufferSize="3">
+                <TDVirtualScroll :items="queryResults" :itemHeight="20" :gap="6" :bufferSize="3">
                   <template #default="{ item, index }">
                     <div class="text-nowrap td-pg-result-tab-item" :class="{
                       'td-pg-result-tab-item-active': activeResultIndex === index,
-                    }" @click="activateResultTab(index)">
+                    }" v-tooltip="getResultTabLabel(item, index)" @click="activateResultTab(index)">
                       {{ getResultTabLabel(item, index) }}
                     </div>
                   </template>
@@ -1626,6 +1626,7 @@ export default {
         padding: calc(var(--padding) / 2);
 
         .td-pg-result-tab-item {
+          width: 100%;
           flex-shrink: 0;
           font-size: var(--font-size-small);
           color: var(--text-secondary-color);
@@ -1636,15 +1637,18 @@ export default {
         }
 
         .td-pg-result-tab-item:hover {
-          background: var(--border-color);
+          background-color: var(--focus-color);
+          color: var(--selected-item-text-color);
         }
 
         .td-pg-result-tab-item-active {
-          background: var(--bg-main-color);
+          background-color: var(--focus-color);
+          color: var(--selected-item-text-color);
         }
 
         .td-pg-result-tab-item-active:hover {
-          background: var(--bg-main-color);
+          background-color: var(--focus-color);
+          color: var(--selected-item-text-color);
         }
       }
     }
