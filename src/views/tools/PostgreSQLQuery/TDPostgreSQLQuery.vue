@@ -82,7 +82,7 @@
               <!-- hiển thị số dòng bị ảnh hưởng (INSERT/UPDATE/DELETE) -->
               <div v-if="activeQueryResult && !activeQueryResult.is_select" class="flex td-pg-result-affected">
                 <TDDynamicBackgroundEffect />
-                <span>
+                <span class="td-effected-text">
                   {{ $t("i18nCommon.postgreSQLQuery.rowsAffected") }}:
                   {{ activeQueryResult.rows_affected || 0 }}
                 </span>
@@ -1695,6 +1695,14 @@ export default {
   padding: var(--padding);
   color: var(--text-secondary-color);
   font-size: var(--font-size-medium);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+
+  .td-effected-text {
+    z-index: 1;
+    background-color: var(--bg-main-color);
+    padding: var(--padding);
+  }
 }
 
 .td-pg-result-empty {
