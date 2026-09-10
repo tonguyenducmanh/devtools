@@ -1621,9 +1621,9 @@ export default {
         align-items: center;
         justify-content: flex-start;
         gap: var(--padding);
-        background-color: var(--bg-layer-color);
         border-radius: var(--border-radius);
         padding: calc(var(--padding) / 2);
+        border: 1px solid var(--border-color);
 
         .td-pg-result-tab-item {
           width: 100%;
@@ -1633,7 +1633,6 @@ export default {
           border-radius: var(--border-radius-component);
           padding: calc(var(--padding) / 2);
           cursor: pointer;
-          background: var(--bg-layer-color);
         }
 
         .td-pg-result-tab-item:hover {
