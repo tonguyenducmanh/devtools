@@ -51,10 +51,23 @@ indexes AS (
     SELECT 1 FROM pg_constraint con
     WHERE con.conrelid = t.oid AND con.conindid = ix.indexrelid
   )
+),
+trigger_def AS (
+  SELECT string_agg(
+    'DROP TRIGGER IF EXISTS ' || quote_ident(tg.tgname) || ' ON ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ';' || E'\n'
+    || pg_get_triggerdef(tg.oid) || ';',
+    E'\n'
+  ) AS trg_def
+  FROM input inp
+  JOIN pg_class c ON c.relname = inp.table_name
+  JOIN pg_namespace n ON n.nspname = inp.schema_name AND c.relnamespace = n.oid
+  JOIN pg_trigger tg ON tg.tgrelid = c.oid
+  WHERE NOT tg.tgisinternal
 )
 SELECT
   (SELECT '-- Create table script' || E'\n' || def FROM table_def)
   || COALESCE(E'\n\n' || (SELECT '-- Foreign keys' || E'\n' || fk_def FROM foreign_keys WHERE fk_def IS NOT NULL), '')
   || COALESCE(E'\n\n' || (SELECT '-- Indexes' || E'\n' || idx_def FROM indexes WHERE idx_def IS NOT NULL), '')
+  || COALESCE(E'\n\n' || (SELECT '-- Triggers' || E'\n' || trg_def FROM trigger_def WHERE trg_def IS NOT NULL), '')
   AS ddl
 LIMIT 1;
