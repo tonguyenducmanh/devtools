@@ -1,0 +1,16 @@
+SELECT
+  n.nspname AS function_schema,
+  p.proname AS function_name,
+  pg_get_function_arguments(p.oid) AS function_arguments,
+  t.typname AS return_type,
+  p.oid AS function_oid
+FROM
+  pg_proc p
+  JOIN pg_namespace n ON p.pronamespace = n.oid
+  JOIN pg_type t ON p.prorettype = t.oid
+WHERE
+  n.nspname IN ('pg_catalog', 'information_schema')
+  AND p.prokind IN ('f', 'a', 'w')
+ORDER BY
+  n.nspname,
+  p.proname

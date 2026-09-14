@@ -79,11 +79,14 @@ export default {
           functions: functionsResult,
         };
 
+        // Merge với built-in data (pg_catalog + information_schema) nếu đã cache
+        let mergedData = await me.mergeWithBuiltinIntellisense(intellisenseData);
+
         // Lưu vào IndexedDB để lần sau load nhanh hơn, rồi áp dụng lên Monaco
         await TDCache.set(cacheKey, intellisenseData, {
           id: me.selectedConnectionId,
         });
-        await me.applyMonacoIntellisense(intellisenseData);
+        await me.applyMonacoIntellisense(mergedData);
 
         me.$tdToast.success(
           me.$t("i18nCommon.postgreSQLQuery.intellisenseLoaded"),
@@ -282,9 +285,207 @@ export default {
           id: me.selectedConnectionId,
         });
         if (cached) {
-          await me.applyMonacoIntellisense(cached);
+          let merged = await me.mergeWithBuiltinIntellisense(cached);
+          await me.applyMonacoIntellisense(merged);
         }
       } catch {}
+    },
+
+    /**
+     * Tải dữ liệu built-in PostgreSQL (pg_catalog + information_schema)
+     * từ database hiện tại, cache 1 lần duy nhất (dùng chung cho mọi kết nối).
+     */
+    async handleLoadBuiltinIntellisense() {
+      let me = this;
+      if (!me.selectedConnectionId) return;
+      me.isLoadingBuiltinIntellisense = true;
+      try {
+        let defaultQueryLimit = 5000;
+        let limitResults = false;
+
+        // ── Bước 1: Đếm tổng số bảng built-in ──────────────────────────
+        let totalRows = 0;
+        let countResponse = await me.agentAPI.executeQuery(
+          me.selectedConnectionId,
+          pgQueries.pg_get_builtin_tables_count,
+          1,
+        );
+        const countResult =
+          countResponse?.data?.data?.results?.[0] ||
+          countResponse?.data?.data ||
+          null;
+        if (countResponse?.data?.success && countResult?.rows?.length > 0) {
+          totalRows = parseInt(countResult.rows[0].total || 0, 10);
+        }
+
+        // ── Bước 2: Tải builtin tables theo trang ──────────────────────
+        let allTableRows = [];
+        for (let offset = 0; offset < totalRows; offset += defaultQueryLimit) {
+          let pagingQuery = `${pgQueries.pg_get_builtin_tables_paging} LIMIT ${defaultQueryLimit} OFFSET ${offset};`;
+          let pagingResponse = await me.agentAPI.executeQuery(
+            me.selectedConnectionId,
+            pagingQuery,
+            defaultQueryLimit,
+            !limitResults,
+          );
+          const pagingResult =
+            pagingResponse?.data?.data?.results?.[0] ||
+            pagingResponse?.data?.data ||
+            null;
+          if (pagingResponse?.data?.success && pagingResult?.rows) {
+            allTableRows.push(...pagingResult.rows);
+          } else {
+            break;
+          }
+        }
+
+        let tablesResult = {
+          columns: [
+            "table_schema",
+            "table_name",
+            "table_type",
+            "column_name",
+            "data_type",
+            "ordinal_position",
+          ],
+          rows: allTableRows,
+        };
+
+        // ── Bước 3: Đếm + tải builtin functions ────────────────────────
+        let allFunctionRows = [];
+        let funcCountResponse = await me.agentAPI.executeQuery(
+          me.selectedConnectionId,
+          pgQueries.pg_get_builtin_functions_count,
+          defaultQueryLimit,
+          !limitResults,
+        );
+        let totalFuncRows = 0;
+        const funcCountResult =
+          funcCountResponse?.data?.data?.results?.[0] ||
+          funcCountResponse?.data?.data ||
+          null;
+        if (
+          funcCountResponse?.data?.success &&
+          funcCountResult?.rows?.length > 0
+        ) {
+          totalFuncRows = parseInt(funcCountResult.rows[0].total || 0, 10);
+        }
+
+        for (
+          let offset = 0;
+          offset < totalFuncRows;
+          offset += defaultQueryLimit
+        ) {
+          let funcPagingQuery = `${pgQueries.pg_get_builtin_functions_paging} LIMIT ${defaultQueryLimit} OFFSET ${offset};`;
+          let funcPagingResponse = await me.agentAPI.executeQuery(
+            me.selectedConnectionId,
+            funcPagingQuery,
+            defaultQueryLimit,
+            !limitResults,
+          );
+          const funcPagingResult =
+            funcPagingResponse?.data?.data?.results?.[0] ||
+            funcPagingResponse?.data?.data ||
+            null;
+          if (funcPagingResponse?.data?.success && funcPagingResult?.rows) {
+            allFunctionRows.push(...funcPagingResult.rows);
+          } else {
+            break;
+          }
+        }
+
+        let functionsResult = {
+          columns: [
+            "function_schema",
+            "function_name",
+            "function_arguments",
+            "return_type",
+            "function_oid",
+          ],
+          rows: allFunctionRows,
+        };
+
+        // ── Bước 4: Cache vào global key (không theo connection) ────────
+        let builtinData = {
+          tables: tablesResult,
+          functions: functionsResult,
+        };
+        const builtinCacheKey =
+          me.$tdEnum.cacheConfig.PostgreSQLBuiltinIntellisense;
+        await TDCache.set(builtinCacheKey, builtinData);
+
+        // ── Bước 5: Merge với intellisense connection hiện tại & apply ─
+        const connCacheKey = me.$tdEnum.cacheConfig.PostgreSQLQueryHistory;
+        let connData = await TDCache.get(connCacheKey, {
+          id: me.selectedConnectionId,
+        });
+        let merged = me.mergeIntellisenseData(connData || {}, builtinData);
+        await me.applyMonacoIntellisense(merged);
+
+        me.$tdToast.success(
+          me.$t("i18nCommon.postgreSQLQuery.builtinIntellisenseLoaded"),
+        );
+      } catch (error) {
+        console.error("Load builtin intellisense error:", error);
+        me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+      } finally {
+        me.isLoadingBuiltinIntellisense = false;
+      }
+    },
+
+    /**
+     * Merge dữ liệu intellisense connection với dữ liệu built-in đã cache.
+     */
+    async mergeWithBuiltinIntellisense(connData) {
+      let me = this;
+      try {
+        const builtinCacheKey =
+          me.$tdEnum.cacheConfig.PostgreSQLBuiltinIntellisense;
+        let builtinData = await TDCache.get(builtinCacheKey);
+        if (!builtinData) return connData;
+        return me.mergeIntellisenseData(connData, builtinData);
+      } catch {
+        return connData;
+      }
+    },
+
+    /**
+     * Hợp nhất 2 bộ dữ liệu intellisense: connectionData + builtinData.
+     * - keywords: giữ nguyên từ connection (builtin không có keywords)
+     * - tables: gộp rows, giữ nguyên columns
+     * - functions: gộp rows, giữ nguyên columns
+     */
+    mergeIntellisenseData(connectionData, builtinData) {
+      let merged = { ...connectionData };
+
+      // merge tables
+      if (builtinData?.tables?.rows?.length) {
+        let connTables = connectionData?.tables || {
+          columns: builtinData.tables.columns,
+          rows: [],
+        };
+        merged.tables = {
+          columns: connTables.columns || builtinData.tables.columns,
+          rows: [...(connTables.rows || []), ...builtinData.tables.rows],
+        };
+      }
+
+      // merge functions
+      if (builtinData?.functions?.rows?.length) {
+        let connFunctions = connectionData?.functions || {
+          columns: builtinData.functions.columns,
+          rows: [],
+        };
+        merged.functions = {
+          columns: connFunctions.columns || builtinData.functions.columns,
+          rows: [
+            ...(connFunctions.rows || []),
+            ...builtinData.functions.rows,
+          ],
+        };
+      }
+
+      return merged;
     },
 
     /**
@@ -446,6 +647,9 @@ export default {
         const functionRows = data?.functions?.rows ?? [];
         const functionSuggestions = []; // dùng cho context không có dấu chấm
         const functionsBySchema = new Map(); // schema -> function items, dùng cho context có dấu chấm
+        // Schema mặc định của PostgreSQL (pg_catalog, information_schema) luôn nằm trong search path,
+        // nên gợi ý hàm ở các schema này không cần chèn schema prefix phía trước.
+        const defaultSchemas = new Set(["pg_catalog", "information_schema"]);
 
         functionRows.forEach((row) => {
           const schema = row.function_schema;
@@ -467,6 +671,9 @@ export default {
             fnName,
             argsStr,
           );
+          // Hàm built-in không cần schema prefix khi gõ không có dấu chấm
+          const isDefaultSchema = defaultSchemas.has(String(schema).toLowerCase());
+          const noDotSnippet = isDefaultSchema ? pureSnippet : fullSnippet;
 
           // Item dùng cho context schema prefix (vd: "sme."), ưu tiên sort cao hơn
           if (!functionsBySchema.has(schema)) functionsBySchema.set(schema, []);
@@ -484,7 +691,7 @@ export default {
           functionSuggestions.push({
             label: fnName,
             kind: monaco.languages.CompletionItemKind.Function,
-            insertText: fullSnippet,
+            insertText: noDotSnippet,
             insertTextRules:
               monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             detail: `fn ${schema}.${fnName}(${argsStr}) \u2192 ${returnType}`,
