@@ -262,6 +262,12 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "cache intellisense PostgreSQL theo connection id",
   },
+  PostgreSQLBuiltinIntellisense: {
+    KeyFormat: "PostgreSQLBuiltinIntellisense",
+    CacheLevel: tdEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "cache gợi ý built-in PostgreSQL (pg_catalog + information_schema), dùng chung cho mọi kết nối",
+  },
   PostgreSQLLastConnectionId: {
     KeyFormat: "PostgreSQLLastConnectionId",
     CacheLevel: tdEnum.cacheType.indexedDB,

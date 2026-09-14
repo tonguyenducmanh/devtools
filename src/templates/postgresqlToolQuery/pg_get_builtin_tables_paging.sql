@@ -1,0 +1,17 @@
+SELECT
+  t.table_schema,
+  t.table_name,
+  t.table_type,
+  c.column_name,
+  c.data_type,
+  c.ordinal_position
+FROM
+  information_schema.tables t
+  JOIN information_schema.columns c ON t.table_name = c.table_name
+  AND t.table_schema = c.table_schema
+WHERE
+  t.table_schema IN ('pg_catalog', 'information_schema')
+ORDER BY
+  t.table_schema,
+  t.table_name,
+  c.ordinal_position

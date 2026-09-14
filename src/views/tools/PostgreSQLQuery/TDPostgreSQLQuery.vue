@@ -335,6 +335,7 @@ export default {
       isRunning: false, // Đang chạy query
       isLoading: false, // Đang tải connections
       isLoadingIntellisense: false, // Đang tải intellisense data
+      isLoadingBuiltinIntellisense: false, // Đang tải gợi ý built-in PostgreSQL
 
       // ── Intellisense ─────────────────────────────────────────────────
       intellisenseDisposable: null,
@@ -387,6 +388,14 @@ export default {
             label: me.$t("i18nCommon.postgreSQLQuery.cloneIntellisense"),
             disabled: !me.selectedConnectionId,
             run: me.handleCloneIntellisense,
+          },
+          {
+            key: "loadBuiltinIntellisense",
+            label: me.isLoadingBuiltinIntellisense
+              ? me.$t("i18nCommon.postgreSQLQuery.builtinIntellisenseLoading")
+              : me.$t("i18nCommon.postgreSQLQuery.loadBuiltinIntellisense"),
+            disabled: !me.selectedConnectionId || me.isLoadingBuiltinIntellisense,
+            run: me.handleLoadBuiltinIntellisense,
           },
         ],
         // Nhóm Edit: format SQL, gen UUID, lưu query, thêm connection
