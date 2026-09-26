@@ -1,7 +1,7 @@
 export const config = /*json-start*/{
   "mainAssemblyName": "Tools.NetWrapper.dll",
   "resources": {
-    "hash": "sha256-vdCcp3QxnhXl1bAmRpglw+cFrkX0QUH76mv2k6/TZXg=",
+    "hash": "sha256-hTy8PMfr/jXg1rqEaL2FKjxDkhgqLE8mBWDm8Kx7uLQ=",
     "jsModuleNative": [
       {
         "name": "dotnet.native.js"
@@ -89,7 +89,7 @@ export const config = /*json-start*/{
       {
         "virtualPath": "Tools.NetWrapper.wasm",
         "name": "Tools.NetWrapper.wasm",
-        "hash": "sha256-T1+PdPe2rAI1KiTbxGjsGVu2ILxiVjLhYRDmImxoY/E="
+        "hash": "sha256-l5mFho303VOBAlerBhn6OYr+cnIzRqelwl4M6Y+zkPs="
       }
     ]
   },
