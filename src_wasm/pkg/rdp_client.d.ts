@@ -285,8 +285,8 @@ export interface InitOutput {
     readonly __wbg_extension_free: (a: number, b: number) => void;
     readonly extension_create: (a: number, b: number, c: any) => number;
     readonly wasm_bindgen__closure__destroy__h27bbb12dc250a040: (a: number, b: number) => void;
-    readonly wasm_bindgen__closure__destroy__h4902aa6ab54064fd: (a: number, b: number) => void;
     readonly wasm_bindgen__closure__destroy__hbd8edc3b244f76a1: (a: number, b: number) => void;
+    readonly wasm_bindgen__closure__destroy__h4902aa6ab54064fd: (a: number, b: number) => void;
     readonly wasm_bindgen__convert__closures_____invoke__h7ad44b095560d45a: (a: number, b: number, c: any) => [number, number];
     readonly wasm_bindgen__convert__closures_____invoke__h37a49abe06ac8872: (a: number, b: number, c: any, d: any) => void;
     readonly wasm_bindgen__convert__closures_____invoke__h61f1eaa0a9dbd34c: (a: number, b: number, c: any) => void;
