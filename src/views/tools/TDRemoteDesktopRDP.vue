@@ -1554,15 +1554,28 @@ export default {
   margin-bottom: var(--padding);
 }
 
+.td-connection-host {
+  font-size: 12px;
+  color: var(--text-color);
+}
+
 .td-connection-item:hover {
   background-color: var(--focus-color);
   color: var(--selected-item-text-color);
+
+  .td-connection-host {
+    color: var(--selected-item-text-color);
+  }
 }
 
 .td-connection-item-selected {
   background-color: var(--focus-color);
   color: var(--selected-item-text-color);
   font-weight: 600;
+
+  .td-connection-host {
+    color: var(--selected-item-text-color);
+  }
 }
 
 .td-connection-info {
@@ -1579,10 +1592,6 @@ export default {
   white-space: nowrap;
 }
 
-.td-connection-host {
-  font-size: 12px;
-  color: var(--text-color);
-}
 
 .response-loading {
   width: 100%;
