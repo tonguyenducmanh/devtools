@@ -124,8 +124,11 @@
             <TDCheckbox :noMargin="true" :variant="$tdEnum.checkboxType.switch" v-model="currentConfigLayout.showLog"
               :label="$t('i18nCommon.remoteDesktop.showLog')" @change="updateConfigLayout"></TDCheckbox>
             <TDCheckbox :noMargin="true" :variant="$tdEnum.checkboxType.switch"
-              v-model="currentConfigLayout.enableAudioPlayback"
-              :label="$t('i18nCommon.remoteDesktop.enableAudioPlayback')" @change="updateConfigLayout"></TDCheckbox>
+              v-model="currentConfigLayout.lowBandwidthMode"
+              :label="$t('i18nCommon.remoteDesktop.lowBandwidthMode')" @change="updateConfigLayout"></TDCheckbox>
+            <TDCheckbox :noMargin="true" :variant="$tdEnum.checkboxType.switch"
+              v-model="currentConfigLayout.sendBrowserTimezone"
+              :label="$t('i18nCommon.remoteDesktop.sendBrowserTimezone')" @change="updateConfigLayout"></TDCheckbox>
           </div>
         </div>
       </template>
@@ -140,6 +143,31 @@ import TDRemoteDesktopRDPHelp from "@/views/helps/TDRemoteDesktopRDPHelp.vue";
 import TDServerRDPAPI from "@/common/api/request/AgentAPI/TDServerRDPAPI.js";
 import TDDynamicBackgroundEffect from "@/views/backgroundEffect/TDDynamicBackgroundEffect.vue";
 import TDFullTabWrapper from "@/components/TDFullTabWrapper.vue";
+
+// Bit values of the Rust `PerformanceFlags` bitflags, sent to the backend as a bitmask.
+const PERF_FLAG_DISABLE_WALLPAPER = 0x00000001;
+const PERF_FLAG_DISABLE_FULLWINDOWDRAG = 0x00000002;
+const PERF_FLAG_DISABLE_MENUANIMATIONS = 0x00000004;
+const PERF_FLAG_DISABLE_THEMING = 0x00000008;
+const PERF_FLAG_DISABLE_CURSOR_SHADOW = 0x00000020;
+const PERF_FLAG_DISABLE_CURSORSETTINGS = 0x00000040;
+const PERF_FLAG_ENABLE_FONT_SMOOTHING = 0x00000080;
+const PERF_FLAG_DISABLE_DESKTOP_COMPOSITION = 0x00000100;
+
+// Matches IronRDP's own default, so behaviour is unchanged when low bandwidth mode is off.
+const PERF_FLAG_BASE =
+  PERF_FLAG_DISABLE_FULLWINDOWDRAG |
+  PERF_FLAG_DISABLE_MENUANIMATIONS |
+  PERF_FLAG_ENABLE_FONT_SMOOTHING;
+
+// Stops the server from sending wallpaper, theming, font smoothing and cursor
+// effects. Cuts bandwidth and CPU noticeably on a slow link.
+const PERF_FLAG_LOW_BANDWIDTH =
+  PERF_FLAG_DISABLE_WALLPAPER |
+  PERF_FLAG_DISABLE_THEMING |
+  PERF_FLAG_DISABLE_CURSOR_SHADOW |
+  PERF_FLAG_DISABLE_CURSORSETTINGS |
+  PERF_FLAG_DISABLE_DESKTOP_COMPOSITION;
 
 export default {
   name: "TDRemoteDesktop",
@@ -160,8 +188,9 @@ export default {
         showLog: false,
         resolution: "1920x1080",
         scaleFactor: 100,
-        enableAudioPlayback: false,
         enableServerPointer: true,
+        lowBandwidthMode: false,
+        sendBrowserTimezone: true,
       },
       isHideEffectBackground: false,
       host: "",
@@ -295,6 +324,31 @@ export default {
   },
 
   methods: {
+    buildPerformanceFlags() {
+      let me = this;
+      let flags = PERF_FLAG_BASE;
+      if (me.currentConfigLayout.lowBandwidthMode) {
+        flags |= PERF_FLAG_LOW_BANDWIDTH;
+      }
+      return flags >>> 0;
+    },
+
+    // `Date#getTimezoneOffset()` already matches the MS-RDPBCGR bias convention:
+    // minutes of UTC minus local, so a client ahead of UTC sends a negative value.
+    buildTimezoneInfo() {
+      let offsetMinutes = new Date().getTimezoneOffset();
+      let timeZone = "GMT";
+      try {
+        timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "GMT";
+      } catch (e) { }
+      let tz = timeZone.replace(/[^A-Za-z0-9_/+-]/g, "_");
+      return {
+        bias: offsetMinutes,
+        standard_name: tz,
+        daylight_name: tz,
+      };
+    },
+
     addLog(message, type = "info") {
       const time = new Date().toLocaleTimeString("en-US", { hour12: false });
       this.logEntries.push({ time, message, type });
@@ -483,12 +537,17 @@ export default {
             "pointer_software_rendering",
             this.currentConfigLayout.enableServerPointer,
           ),
-          new Extension(
-            "enable_audio_playback",
-            this.currentConfigLayout.enableAudioPlayback,
-          ),
           new Extension("desktop_scale_factor", this.selectedScaleFactor),
+          new Extension(
+            "performance_flags",
+            this.buildPerformanceFlags(),
+          ),
         ];
+        if (this.currentConfigLayout.sendBrowserTimezone) {
+          tuningExtensions.push(
+            new Extension("timezone_info", this.buildTimezoneInfo()),
+          );
+        }
         tuningExtensions.forEach((ext) => builder.extension(ext));
 
         builder.setCursorStyleCallbackContext(canvas);
