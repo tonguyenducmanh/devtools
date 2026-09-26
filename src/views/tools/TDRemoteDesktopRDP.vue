@@ -16,7 +16,7 @@
               <TDUpload ref="uploadInput" :multiple="true" iconClass="td-icon td-upload-icon" :hideBorder="true"
                 :readOnly="!isConnected" @selected="sendFilesToRemote" />
             </div>
-            <div v-tooltip="$t('i18nCommon.remoteDesktop.receiveFiles')" class="flex toolbar-btn"
+            <div v-tooltip="$t('i18nCommon.remoteDesktop.receiveFiles')" class="flex toolbar-btn rdp-download-btn"
               @click="openReceiveFilesDialog" :class="{ 'toolbar-btn-disabled': !isConnected }">
               <span class="td-icon td-download-icon"></span>
               <span v-if="incomingFiles.length > 0" class="td-file-badge">{{
@@ -136,8 +136,8 @@
             <TDCheckbox :noMargin="true" :variant="$tdEnum.checkboxType.switch" v-model="currentConfigLayout.showLog"
               :label="$t('i18nCommon.remoteDesktop.showLog')" @change="updateConfigLayout"></TDCheckbox>
             <TDCheckbox :noMargin="true" :variant="$tdEnum.checkboxType.switch"
-              v-model="currentConfigLayout.lowBandwidthMode"
-              :label="$t('i18nCommon.remoteDesktop.lowBandwidthMode')" @change="updateConfigLayout"></TDCheckbox>
+              v-model="currentConfigLayout.lowBandwidthMode" :label="$t('i18nCommon.remoteDesktop.lowBandwidthMode')"
+              @change="updateConfigLayout"></TDCheckbox>
             <TDCheckbox :noMargin="true" :variant="$tdEnum.checkboxType.switch"
               v-model="currentConfigLayout.sendBrowserTimezone"
               :label="$t('i18nCommon.remoteDesktop.sendBrowserTimezone')" @change="updateConfigLayout"></TDCheckbox>
@@ -350,7 +350,12 @@ export default {
   },
 
   beforeUnmount() {
-    this.handleDisconnect();
+    let me = this;
+    me.handleDisconnect();
+    me.closeRemoteFilesDialog();
+    // Danh sách file chỉ bị xoá khi component bị huỷ. Đóng popup hay ngắt kết
+    // nối đều giữ nguyên danh sách.
+    me.clearIncomingFiles();
   },
 
   methods: {
@@ -721,8 +726,9 @@ export default {
       me.activeDownloads.clear();
       me.uploadFileHandles.clear();
       me.remoteClipDataLocks.clear();
-      // Giữ danh sách file đã nhận khi ngắt kết nối, chỉ xoá khi đóng popup.
-      // clipDataId phải bỏ vì lock clipboard phía máy remote không còn tồn tại.
+      // Giữ danh sách file đã nhận khi ngắt kết nối. Chỉ xoá khi component bị
+      // huỷ (beforeUnmount). clipDataId phải bỏ vì lock clipboard phía máy remote
+      // không còn tồn tại.
       me.incomingFileClipDataId = null;
     },
 
@@ -891,14 +897,15 @@ export default {
         ownerForm: me,
         param: {
           getFiles: () => me.incomingFiles,
+          // Popup đã đóng: chỉ nhả handle để mở lại được, không xoá danh sách.
+          onDialogClosed: () => {
+            me.remoteFilesDialogId = null;
+          },
           onDownloadFile: (index) => me.downloadIncomingFileAt(index),
           onDownloadAllFiles: () => me.downloadAllIncomingFiles(),
           onRemoveFile: (index) => me.removeIncomingFile(index),
           onClearFiles: () => me.clearIncomingFiles(),
         },
-        // Mọi cách đóng popup (nút X, bấm nền ngoài, phím Esc) đều đi qua đây.
-        // Chỉ khi đóng popup thì danh sách file mới bị xoá.
-        callback: () => me.onRemoteFilesDialogClosed(),
       });
     },
 
@@ -906,18 +913,7 @@ export default {
       let me = this;
       if (!me.remoteFilesDialogId) return;
       TDDialogUtil.closeById(me.remoteFilesDialogId);
-      me.onRemoteFilesDialogClosed();
-    },
-
-    /**
-     * Popup đã đóng: xoá danh sách file chờ. Được gọi cho cả hai đường đóng:
-     * người dùng bấm X / bấm nền / Esc (qua callback của showPopup), và đóng
-     * bằng code.
-     */
-    onRemoteFilesDialogClosed() {
-      let me = this;
       me.remoteFilesDialogId = null;
-      me.clearIncomingFiles();
     },
 
     /**
@@ -1427,6 +1423,31 @@ export default {
 
 .rdp-canvas-cursor-none {
   cursor: none;
+}
+
+/* Badge kiểu app icon iOS: tròn, góc trên phải, lệch ra ngoài icon */
+.rdp-download-btn {
+  position: relative;
+}
+
+.td-file-badge {
+  position: absolute;
+  top: -1px;
+  right: -6px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 2px;
+  border-radius: 8px;
+  background-color: #e5484d;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 16px;
+  text-align: center;
+  white-space: nowrap;
+  /* Viền màu nền để tách badge khỏi icon bên dưới */
+  box-shadow: 0 0 0 1.5px var(--bg-layer-color);
+  pointer-events: none;
 }
 
 .rdp-canvas {
