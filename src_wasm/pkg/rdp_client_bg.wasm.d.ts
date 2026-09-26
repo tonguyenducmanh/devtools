@@ -1,19 +1,12 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
-export const __wbg_rdpfile_free: (a: number, b: number) => void;
-export const rdpfile_create: () => number;
-export const rdpfile_getInt: (a: number, b: number, c: number) => number;
-export const rdpfile_getStr: (a: number, b: number, c: number) => [number, number];
-export const rdpfile_insertInt: (a: number, b: number, c: number, d: number) => void;
-export const rdpfile_insertStr: (a: number, b: number, c: number, d: number, e: number) => void;
-export const rdpfile_parse: (a: number, b: number, c: number) => void;
-export const rdpfile_write: (a: number) => [number, number];
 export const __wbg_clipboarddata_free: (a: number, b: number) => void;
 export const __wbg_clipboarditem_free: (a: number, b: number) => void;
 export const __wbg_deviceevent_free: (a: number, b: number) => void;
 export const __wbg_inputtransaction_free: (a: number, b: number) => void;
 export const __wbg_ironerror_free: (a: number, b: number) => void;
+export const __wbg_rdpfile_free: (a: number, b: number) => void;
 export const __wbg_session_free: (a: number, b: number) => void;
 export const __wbg_sessionbuilder_free: (a: number, b: number) => void;
 export const __wbg_sessionterminationinfo_free: (a: number, b: number) => void;
@@ -37,6 +30,13 @@ export const inputtransaction_create: () => number;
 export const ironerror_backtrace: (a: number) => [number, number];
 export const ironerror_kind: (a: number) => number;
 export const ironerror_rdcleanpathDetails: (a: number) => number;
+export const rdpfile_create: () => number;
+export const rdpfile_getInt: (a: number, b: number, c: number) => number;
+export const rdpfile_getStr: (a: number, b: number, c: number) => [number, number];
+export const rdpfile_insertInt: (a: number, b: number, c: number, d: number) => void;
+export const rdpfile_insertStr: (a: number, b: number, c: number, d: number, e: number) => void;
+export const rdpfile_parse: (a: number, b: number, c: number) => void;
+export const rdpfile_write: (a: number) => [number, number];
 export const session_applyInputs: (a: number, b: number) => [number, number];
 export const session_desktopSize: (a: number) => number;
 export const session_invokeExtension: (a: number, b: number) => [number, number, number];
