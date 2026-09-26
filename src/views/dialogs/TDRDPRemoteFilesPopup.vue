@@ -85,6 +85,7 @@ export default {
   data() {
     return {
       getFiles: null,
+      onDialogClosed: null,
       onDownloadFile: null,
       onDownloadAllFiles: null,
       onRemoveFile: null,
@@ -103,10 +104,20 @@ export default {
     },
   },
 
+  beforeUnmount() {
+    // Bắt mọi cách đóng (nút X, bấm nền, phím Esc, đóng bằng code) vì không
+    // đường nào chắc chắn đều đi qua callback. Chỉ báo lại trạng thái, không
+    // đụng danh sách file.
+    if (typeof this.onDialogClosed === "function") {
+      this.onDialogClosed();
+    }
+  },
+
   methods: {
     show(param) {
       if (!param) return;
       this.getFiles = param.getFiles || null;
+      this.onDialogClosed = param.onDialogClosed || null;
       this.onDownloadFile = param.onDownloadFile || null;
       this.onDownloadAllFiles = param.onDownloadAllFiles || null;
       this.onRemoveFile = param.onRemoveFile || null;
