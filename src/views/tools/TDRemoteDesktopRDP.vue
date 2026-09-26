@@ -470,16 +470,26 @@ export default {
         builder.desktopSize(desktopSize);
         builder.renderCanvas(canvas);
         builder.extension(enableCredsspExt);
-        builder.setDesktopScaleFactor(this.selectedScaleFactor);
-        builder.setEnableAudioPlayback(
-          this.currentConfigLayout.enableAudioPlayback,
-        );
-        builder.setEnableServerPointer(
-          this.currentConfigLayout.enableServerPointer,
-        );
-        builder.setPointerSoftwareRendering(
-          this.currentConfigLayout.enableServerPointer,
-        );
+
+        // RDP-specific options are passed through the extension mechanism
+        // (SessionBuilder::extension) to keep the iron-remote-desktop API
+        // protocol-agnostic. The backend interprets each ident.
+        const tuningExtensions = [
+          new Extension(
+            "enable_server_pointer",
+            this.currentConfigLayout.enableServerPointer,
+          ),
+          new Extension(
+            "pointer_software_rendering",
+            this.currentConfigLayout.enableServerPointer,
+          ),
+          new Extension(
+            "enable_audio_playback",
+            this.currentConfigLayout.enableAudioPlayback,
+          ),
+          new Extension("desktop_scale_factor", this.selectedScaleFactor),
+        ];
+        tuningExtensions.forEach((ext) => builder.extension(ext));
 
         builder.setCursorStyleCallbackContext(canvas);
         // không set curor ở đây để đảm bảo khi di chuột vào canvas thì hiển thị icon cursor của IronRDP thay vì cursor style của trình duyệt
