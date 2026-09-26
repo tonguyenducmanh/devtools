@@ -18,6 +18,7 @@ export const TDDialogEnum = {
   TDPostgreSQLRestorePopup: 12,
   TDPostgreSQLClonePopup: 13,
   TDAPISaveProModeToCollectionPopup: 14,
+  TDRDPRemoteFilesPopup: 15,
 };
 
 /**
@@ -53,6 +54,8 @@ const DialogComponentMap = {
     import("@/views/dialogs/postgresql/TDPostgreSQLClonePopup.vue"),
   [TDDialogEnum.TDAPISaveProModeToCollectionPopup]: () =>
     import("@/views/dialogs/TDAPISaveProModeToCollectionPopup.vue"),
+  [TDDialogEnum.TDRDPRemoteFilesPopup]: () =>
+    import("@/views/dialogs/TDRDPRemoteFilesPopup.vue"),
 };
 
 class TDDialogUtil {

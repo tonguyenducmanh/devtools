@@ -11,6 +11,18 @@
               :class="{ 'toolbar-btn-disabled': !isConnected }">
               <span class="td-icon td-command-code-icon"></span>
             </div>
+            <div v-tooltip="$t('i18nCommon.remoteDesktop.sendFilesToRemote')" class="flex toolbar-btn"
+              :class="{ 'toolbar-btn-disabled': !isConnected }">
+              <TDUpload ref="uploadInput" :multiple="true" iconClass="td-icon td-upload-icon" :hideBorder="true"
+                :readOnly="!isConnected" @selected="sendFilesToRemote" />
+            </div>
+            <div v-tooltip="$t('i18nCommon.remoteDesktop.receiveFiles')" class="flex toolbar-btn"
+              @click="openReceiveFilesDialog" :class="{ 'toolbar-btn-disabled': !isConnected }">
+              <span class="td-icon td-download-icon"></span>
+              <span v-if="incomingFiles.length > 0" class="td-file-badge">{{
+                incomingFiles.length
+              }}</span>
+            </div>
           </template>
           <template #toolbar-right>
             <div class="flex" style="margin-left: 16px">
@@ -143,6 +155,7 @@ import TDRemoteDesktopRDPHelp from "@/views/helps/TDRemoteDesktopRDPHelp.vue";
 import TDServerRDPAPI from "@/common/api/request/AgentAPI/TDServerRDPAPI.js";
 import TDDynamicBackgroundEffect from "@/views/backgroundEffect/TDDynamicBackgroundEffect.vue";
 import TDFullTabWrapper from "@/components/TDFullTabWrapper.vue";
+import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 
 // Bit values of the Rust `PerformanceFlags` bitflags, sent to the backend as a bitmask.
 const PERF_FLAG_DISABLE_WALLPAPER = 0x00000001;
@@ -168,6 +181,14 @@ const PERF_FLAG_LOW_BANDWIDTH =
   PERF_FLAG_DISABLE_CURSOR_SHADOW |
   PERF_FLAG_DISABLE_CURSORSETTINGS |
   PERF_FLAG_DISABLE_DESKTOP_COMPOSITION;
+
+// [MS-RDPECLIP] 2.2.5.3 FileContentsFlags
+const RDP_FILE_CONTENTS_FLAG_SIZE = 0x1;
+const RDP_FILE_CONTENTS_FLAG_RANGE = 0x2;
+
+// Keep in sync with the reference web client. A FileContentsRequest is a single
+// PDU, so chunks that are too large may not fit the server's limit.
+const RDP_FILE_CHUNK_SIZE = 64 * 1024;
 
 export default {
   name: "TDRemoteDesktop",
@@ -209,6 +230,15 @@ export default {
       connectionName: "",
       isLoading: false,
       agentAPI: null,
+      remoteFilesDialogId: null,
+      // File transfer state. `clipDataId` is the remote clipboard lock id and must
+      // be sent with every FileContentsRequest, otherwise the transfer never completes.
+      nextFileStreamId: 1,
+      incomingFiles: [],
+      incomingFileClipDataId: null,
+      activeDownloads: new Map(),
+      uploadFileHandles: new Map(),
+      remoteClipDataLocks: new Set(),
       resolutions: [
         { value: "800x600", label: "800x600", width: 800, height: 600 },
         { value: "1024x768", label: "1024x768", width: 1024, height: 768 },
@@ -550,6 +580,54 @@ export default {
         }
         tuningExtensions.forEach((ext) => builder.extension(ext));
 
+        // File transfer runs over the clipboard channel (MS-RDPECLIP). The callbacks are
+        // registered on the builder, the operations are invoked on the live session.
+        builder.extension(
+          new Extension("files_available_callback", (files, clipDataId) => {
+            this.onRemoteFilesAvailable(files, clipDataId);
+          }),
+        );
+        builder.extension(
+          new Extension("file_contents_request_callback", (request) => {
+            this.onRemoteFileContentsRequest(request);
+          }),
+        );
+        builder.extension(
+          new Extension("file_contents_response_callback", (response) => {
+            this.onRemoteFileContentsResponse(response);
+          }),
+        );
+        builder.extension(
+          new Extension("lock_callback", (dataId) => {
+            this.remoteClipDataLocks.add(dataId);
+          }),
+        );
+        builder.extension(
+          new Extension("unlock_callback", (dataId) => {
+            this.remoteClipDataLocks.delete(dataId);
+          }),
+        );
+        builder.extension(
+          new Extension("locks_expired_callback", (clipDataIds) => {
+            this.onRemoteLocksExpired(clipDataIds);
+          }),
+        );
+        builder.extension(
+          new Extension("format_list_response_callback", (ok) => {
+            if (ok) {
+              this.addLog(
+                this.$t("i18nCommon.remoteDesktop.uploadListAccepted"),
+                "success",
+              );
+            } else {
+              this.addLog(
+                this.$t("i18nCommon.remoteDesktop.uploadListRejected"),
+                "error",
+              );
+            }
+          }),
+        );
+
         builder.setCursorStyleCallbackContext(canvas);
         // không set curor ở đây để đảm bảo khi di chuột vào canvas thì hiển thị icon cursor của IronRDP thay vì cursor style của trình duyệt
         builder.setCursorStyleCallback((style) => { });
@@ -636,9 +714,16 @@ export default {
     },
 
     cleanup() {
+      let me = this;
       this.session = null;
       this.isConnected = false;
       this.isConnecting = false;
+      me.activeDownloads.clear();
+      me.uploadFileHandles.clear();
+      me.remoteClipDataLocks.clear();
+      // Giữ danh sách file đã nhận khi ngắt kết nối, chỉ xoá khi đóng popup.
+      // clipDataId phải bỏ vì lock clipboard phía máy remote không còn tồn tại.
+      me.incomingFileClipDataId = null;
     },
 
     toggleFullTab() {
@@ -680,6 +765,360 @@ export default {
           "Failed to send Ctrl+Alt+Del: " + this.formatError(e),
           "error",
         );
+      }
+    },
+
+    // ─────────────────────────── File transfer (MS-RDPECLIP) ───────────────────────────
+
+    /**
+     * Gửi file từ máy ngoài lên máy trong.
+     * Advertise qua FormatList, sau đó máy trong sẽ paste và yêu cầu từng chunk.
+     */
+    sendFilesToRemote(files) {
+      let me = this;
+      if (!me.session || !files || files.length === 0) return;
+      try {
+        let fileInfos = Array.from(files).map((file) => ({
+          name: file.name,
+          size: file.size,
+          lastModified: file.lastModified || 0,
+        }));
+        me.session.invokeExtension(
+          new me._wasm.Extension("initiate_file_copy", fileInfos),
+        );
+        me.uploadFileHandles.clear();
+        Array.from(files).forEach((file, index) => {
+          me.uploadFileHandles.set(index, file);
+        });
+        me.addLog(
+          `${me.$t("i18nCommon.remoteDesktop.sentFileList")} ${fileInfos.length}`,
+          "info",
+        );
+      } catch (e) {
+        me.addLog(
+          `${me.$t("i18nCommon.remoteDesktop.uploadInitFailed")}: ${me.formatError(e)}`,
+          "error",
+        );
+      }
+    },
+
+    /**
+     * Máy trong yêu cầu nội dung file (upload). Đọc đúng chunk được hỏi rồi trả lời.
+     * flags: SIZE (0x1) trả về 8 byte LE u64, RANGE (0x2) trả về byte range.
+     */
+    async onRemoteFileContentsRequest(request) {
+      let me = this;
+      let file = me.uploadFileHandles.get(request.index);
+      if (!file) {
+        me.session.invokeExtension(
+          new me._wasm.Extension("submit_file_contents", {
+            stream_id: request.streamId,
+            is_error: true,
+            data: new Uint8Array(0),
+          }),
+        );
+        return;
+      }
+      try {
+        let data;
+        if (request.flags & RDP_FILE_CONTENTS_FLAG_SIZE) {
+          // SIZE: position phải 0 và size phải 8, nội dung là 8 byte LE u64.
+          let sizeBuffer = new ArrayBuffer(8);
+          new DataView(sizeBuffer).setBigUint64(0, BigInt(file.size), true);
+          data = new Uint8Array(sizeBuffer);
+        } else {
+          let chunk = file.slice(
+            request.position,
+            request.position + request.size,
+          );
+          data = new Uint8Array(await chunk.arrayBuffer());
+        }
+        me.session.invokeExtension(
+          new me._wasm.Extension("submit_file_contents", {
+            stream_id: request.streamId,
+            is_error: false,
+            data: data,
+          }),
+        );
+      } catch (e) {
+        me.session.invokeExtension(
+          new me._wasm.Extension("submit_file_contents", {
+            stream_id: request.streamId,
+            is_error: true,
+            data: new Uint8Array(0),
+          }),
+        );
+        me.addLog(
+          `${me.$t("i18nCommon.remoteDesktop.uploadChunkFailed")}: ${me.formatError(e)}`,
+          "error",
+        );
+      }
+    },
+
+    /**
+     * Máy trong đưa ra danh sách file muốn gửi. Chỉ lưu vào danh sách chờ và hiện
+     * badge đếm trên nút toolbar, không tự mở popup cho tới khi người dùng bấm nút.
+     */
+    onRemoteFilesAvailable(files, clipDataId) {
+      let me = this;
+      let list = Array.from(files || []);
+      if (list.length === 0) return;
+      // Giữ luôn index gốc của máy trong. Bỏ entry thư mục sẽ làm lệch index,
+      // mà file_index phải trỏ đúng vị trí trong danh sách gốc phía máy trong.
+      let received = list
+        .map((f, remoteIndex) => ({ ...f, remoteIndex: remoteIndex }))
+        .filter((f) => !f.isDirectory);
+      // Gán lại mảng để danh sách mới thay thế hoàn toàn danh sách cũ.
+      me.incomingFiles = received;
+      me.incomingFileClipDataId =
+        clipDataId === undefined ? null : clipDataId;
+      me.addLog(
+        `${me.$t("i18nCommon.remoteDesktop.receivedFileList")} ${received.length}`,
+        "info",
+      );
+    },
+
+    /**
+     * Bấm nút tải về: mở popup danh sách và bắt đầu tải luôn, không bắt thêm
+     * thao tác chọn từng file.
+     */
+    async openReceiveFilesDialog() {
+      let me = this;
+      if (!me.isConnected) return;
+      if (me.remoteFilesDialogId) return;
+      me.remoteFilesDialogId = await TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDRDPRemoteFilesPopup,
+        ownerForm: me,
+        param: {
+          getFiles: () => me.incomingFiles,
+          onDownloadFile: (index) => me.downloadIncomingFileAt(index),
+          onDownloadAllFiles: () => me.downloadAllIncomingFiles(),
+          onRemoveFile: (index) => me.removeIncomingFile(index),
+          onClearFiles: () => me.clearIncomingFiles(),
+        },
+        // Mọi cách đóng popup (nút X, bấm nền ngoài, phím Esc) đều đi qua đây.
+        // Chỉ khi đóng popup thì danh sách file mới bị xoá.
+        callback: () => me.onRemoteFilesDialogClosed(),
+      });
+    },
+
+    closeRemoteFilesDialog() {
+      let me = this;
+      if (!me.remoteFilesDialogId) return;
+      TDDialogUtil.closeById(me.remoteFilesDialogId);
+      me.onRemoteFilesDialogClosed();
+    },
+
+    /**
+     * Popup đã đóng: xoá danh sách file chờ. Được gọi cho cả hai đường đóng:
+     * người dùng bấm X / bấm nền / Esc (qua callback của showPopup), và đóng
+     * bằng code.
+     */
+    onRemoteFilesDialogClosed() {
+      let me = this;
+      me.remoteFilesDialogId = null;
+      me.clearIncomingFiles();
+    },
+
+    /**
+     * Bắt đầu tải 1 file: hỏi size trước (SIZE), rồi mới kéo từng chunk (RANGE).
+     * Không hỏi SIZE thì không biết khi nào dừng.
+     */
+    startFileDownload(file, fileIndex, clipDataId) {
+      let me = this;
+      let streamId = me.nextFileStreamId;
+      me.nextFileStreamId = (me.nextFileStreamId + 1) >>> 0;
+      if (me.nextFileStreamId === 0) me.nextFileStreamId = 1;
+      // Giữ clipDataId trong state để việc xóa danh sách trên UI không làm hỏng
+      // các download đang chạy dở.
+      me.activeDownloads.set(streamId, {
+        fileIndex: fileIndex,
+        file: file,
+        fileName: file.name,
+        clipDataId: clipDataId === null ? undefined : clipDataId,
+        totalSize: 0,
+        receivedBytes: 0,
+        chunks: [],
+      });
+      me.session.invokeExtension(
+        new me._wasm.Extension("request_file_contents", {
+          stream_id: streamId,
+          file_index: fileIndex,
+          flags: RDP_FILE_CONTENTS_FLAG_SIZE,
+          position: 0,
+          size: 8,
+          clip_data_id: clipDataId === null ? undefined : clipDataId,
+        }),
+      );
+    },
+
+    /**
+     * Tải toàn bộ file trong danh sách. Danh sách chỉ bị xoá khi người dùng bấm
+     * xoá, nên bấm nhiều lần vẫn tải lại được, không có trạng thái chặn.
+     */
+    downloadAllIncomingFiles() {
+      let me = this;
+      if (!me.session || me.incomingFiles.length === 0) return;
+      me.incomingFiles.forEach((file) => {
+        me.startFileDownload(file, file.remoteIndex, me.incomingFileClipDataId);
+      });
+      me.addLog(
+        `${me.$t("i18nCommon.remoteDesktop.downloading")} ${me.incomingFiles.length}`,
+        "info",
+      );
+    },
+
+    /**
+     * Tải đúng 1 file theo vị trí trong danh sách (người dùng bấm vào dòng đó).
+     */
+    downloadIncomingFileAt(index) {
+      let me = this;
+      if (!me.session) return;
+      let file = me.incomingFiles[index];
+      if (!file) return;
+      me.startFileDownload(file, file.remoteIndex, me.incomingFileClipDataId);
+      me.addLog(
+        `${me.$t("i18nCommon.remoteDesktop.downloading")} ${file.name}`,
+        "info",
+      );
+    },
+
+    /**
+     * Nhận chunk từ máy trong: đáp ứng SIZE request, hoặc gom RANGE chunk cho tới
+     * khi đủ rồi ghép thành Blob và gọi save xuống đĩa.
+     */
+    onRemoteFileContentsResponse(response) {
+      let me = this;
+      let state = me.activeDownloads.get(response.streamId);
+      if (!state) return;
+
+      if (response.isError) {
+        me.activeDownloads.delete(response.streamId);
+        me.addLog(
+          `${me.$t("i18nCommon.remoteDesktop.downloadFailed")}: ${state.fileName}`,
+          "error",
+        );
+        return;
+      }
+
+      let data = new Uint8Array(response.data);
+
+      if (state.totalSize === 0) {
+        // Đây là kết quả của SIZE request: 8 byte LE u64 là tổng dung lượng file.
+        let view = new DataView(
+          data.buffer,
+          data.byteOffset,
+          data.byteLength,
+        );
+        state.totalSize = Number(view.getBigUint64(0, true));
+        if (state.totalSize === 0) {
+          // File rỗng: xong ngay, không cần kéo chunk nào.
+          me.finishFileDownload(response.streamId, state);
+          return;
+        }
+        me.requestNextFileChunk(response.streamId, state);
+        return;
+      }
+
+      state.chunks.push(data);
+      state.receivedBytes += data.length;
+      if (state.receivedBytes >= state.totalSize) {
+        me.finishFileDownload(response.streamId, state);
+      } else {
+        me.requestNextFileChunk(response.streamId, state);
+      }
+    },
+
+    requestNextFileChunk(streamId, state) {
+      let me = this;
+      let position = state.receivedBytes;
+      let size = Math.min(RDP_FILE_CHUNK_SIZE, state.totalSize - position);
+      me.session.invokeExtension(
+        new me._wasm.Extension("request_file_contents", {
+          stream_id: streamId,
+          file_index: state.fileIndex,
+          flags: RDP_FILE_CONTENTS_FLAG_RANGE,
+          position: position,
+          size: size,
+          clip_data_id: state.clipDataId,
+        }),
+      );
+    },
+
+    finishFileDownload(streamId, state) {
+      let me = this;
+      me.activeDownloads.delete(streamId);
+      let fileName = me.$tdUtility.createFileDownloadName(state.fileName, {
+        fallback: "rdp-file",
+      });
+      let blob = new Blob(state.chunks, { type: "application/octet-stream" });
+      me.$tdUtility.createDownloadFileFromBlob(blob, fileName);
+      me.addLog(
+        `${me.$t("i18nCommon.remoteDesktop.downloaded")} ${fileName}`,
+        "success",
+      );
+      // Giữ file trong danh sách, chỉ đánh dấu đã tải. Người dùng tự xoá khi
+      // không cần nữa, tránh mất danh sách vì tải tự động.
+      state.file.downloaded = true;
+    },
+
+    /**
+     * Xoá 1 file khỏi danh sách chờ (người dùng bấm nút xoá trên popup).
+     */
+    removeIncomingFile(index) {
+      let me = this;
+      if (index < 0 || index >= me.incomingFiles.length) return;
+      me.incomingFiles.splice(index, 1);
+      me.syncIncomingFileClipDataId();
+    },
+
+    /**
+     * Xoá toàn bộ danh sách chờ. Không đụng download đang chạy dở vì chúng đã giữ
+     * clipDataId riêng trong state.
+     */
+    clearIncomingFiles() {
+      let me = this;
+      // Dùng splice thay vì gán mảng mới, để mọi tham chiếu đang giữ tới danh sách
+      // (popup, download đang chạy) thấy thay đổi ngay.
+      me.incomingFiles.splice(0, me.incomingFiles.length);
+      me.incomingFileClipDataId = null;
+    },
+
+    /**
+     * clipDataId là lock của clipboard phía máy remote, hết ý nghĩa khi danh sách
+     * đã rỗng.
+     */
+    syncIncomingFileClipDataId() {
+      let me = this;
+      if (me.incomingFiles.length === 0) {
+        me.incomingFileClipDataId = null;
+      }
+    },
+
+    /**
+     * Lock clipboard phía máy trong hết hạn: huỷ toàn bộ download đang dắt,
+     * nếu không chúng sẽ treo vĩnh viễn.
+     */
+    onRemoteLocksExpired(clipDataIds) {
+      let me = this;
+      let expired = new Set(Array.from(clipDataIds || []));
+      expired.forEach((dataId) => {
+        me.remoteClipDataLocks.delete(dataId);
+      });
+      me.activeDownloads.forEach((state, streamId) => {
+        me.activeDownloads.delete(streamId);
+        me.addLog(
+          `${me.$t("i18nCommon.remoteDesktop.downloadAborted")} ${state.fileName}`,
+          "warn",
+        );
+      });
+      // Danh sách đang chỉ dùng được khi lock của nó còn hiệu lực. Lock hết hạn
+      // thì các file ấy không lấy được nữa, đóng popup để danh sách được xoá.
+      if (
+        me.incomingFileClipDataId !== null &&
+        expired.has(me.incomingFileClipDataId)
+      ) {
+        me.closeRemoteFilesDialog();
       }
     },
 

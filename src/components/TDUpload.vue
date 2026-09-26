@@ -2,6 +2,7 @@
   <!-- Icon-only mode: dùng TDButton trigger input file ẩn -->
   <div v-if="iconClass" class="td-upload-icon-wrap">
     <TDButton
+      :class="{ 'td-upload-hide-border': hideBorder }"
       :iconClass="iconClass"
       :readOnly="readOnly"
       :type="$tdEnum.buttonType.secondary"
@@ -26,7 +27,7 @@
       'max-width': maxWidth,
       ...borderRadiusStyle,
     }"
-    :class="{ 'td-upload-read-only': readOnly }"
+    :class="{ 'td-upload-read-only': readOnly, 'td-upload-hide-border': hideBorder }"
   >
     <label
       class="flex td-upload-button"
@@ -94,6 +95,14 @@ export default {
     iconClass: {
       type: String,
       default: "",
+    },
+    /**
+     * Bỏ nền và viền của component. Dùng khi đặt TDUpload trong toolbar hoặc
+     * trên nền trong suốt, để không lạc lõng với các control xung quanh.
+     */
+    hideBorder: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -212,5 +221,31 @@ export default {
 /* ── Icon-only mode ───────────────────────────────────────── */
 .td-upload-icon-wrap {
   display: contents;
+}
+
+/* Bỏ nền và viền, bật bằng prop hideBorder */
+.td-upload-hide-border {
+  border: none;
+  background: transparent;
+}
+
+/* Chế độ icon-only: nút lấp hết ô cho khớp nút trong toolbar, và kế thừa màu
+   chữ từ toolbar-btn. TDButton tự đặt color để tương phản với nền
+   --btn-primary-bg; bỏ nền đi thì phải bỏ luôn color, nếu không icon sẽ sai
+   màu và biến mất khi hover.
+   Selector 2 class để đè được .td-button của TDButton. */
+.td-upload-icon-wrap .td-upload-hide-border {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  &:hover {
+    border: none;
+    background: transparent;
+    color: inherit;
+  }
 }
 </style>
