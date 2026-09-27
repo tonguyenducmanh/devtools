@@ -10,6 +10,7 @@
 
     <div class="td-combobox-wraper">
       <div
+        ref="control"
         class="td-combobox-control"
         :class="{ readOnly }"
         :style="styleCombo"
@@ -20,12 +21,21 @@
         </span>
         <TDArrow :openProp="open" />
       </div>
-      <div
-        v-if="open"
-        ref="dropdown"
-        class="td-combobox-dropdown"
-        :class="{ 'td-combobox-droptop': isDropTop }"
-      >
+    </div>
+
+    <!--
+      Danh sách option nằm ở body (TDFlyoutPanel dùng Teleport) chứ không nằm
+      trong ô control, nhờ vậy không bị cắt bởi overflow hay bị chìm dưới
+      1 component cha (panel monaco, form data, sidebar, popup...)
+    -->
+    <TDFlyoutPanel
+      :show="open"
+      :anchorElFlyout="controlEl"
+      :placement="isDropTop ? 'top' : 'auto'"
+      :minWidth="controlWidth"
+      panelClass="td-combobox-flyout"
+    >
+      <div ref="dropdown" class="td-combobox-dropdown">
         <TDComboBoxOption
           v-for="(option, index) in options"
           :key="index"
@@ -39,17 +49,18 @@
           </slot>
         </TDComboBoxOption>
       </div>
-    </div>
+    </TDFlyoutPanel>
   </div>
 </template>
 
 <script>
 import TDComboBoxOption from "./TDComboBoxOption.vue";
 import TDArrow from "./TDArrow.vue";
+import TDFlyoutPanel from "./TDFlyoutPanel.vue";
 import TDStylePremitiveMixin from "@/mixins/TDStylePremitiveMixin.js";
 export default {
   name: "TDComboBox",
-  components: { TDComboBoxOption, TDArrow },
+  components: { TDComboBoxOption, TDArrow, TDFlyoutPanel },
   mixins: [TDStylePremitiveMixin],
 
   props: {
@@ -99,6 +110,7 @@ export default {
       default: true,
     },
     isDropTop: {
+      // ưu tiên mở lên trên ô control, panel vẫn tự đảo hướng nếu không đủ chỗ
       type: Boolean,
       default: false,
     },
@@ -107,21 +119,16 @@ export default {
   data() {
     return {
       open: false,
+      // ô control, dùng làm điểm neo cho flyout panel định vị danh sách option
+      controlEl: null,
+      // bề rộng ô control, danh sách option không được hẹp hơn giá trị này
+      controlWidth: 0,
     };
   },
   watch: {
     open(val) {
       if (val) {
-        this.$nextTick(() => {
-          const dropdown = this.$refs.dropdown;
-          if (!dropdown) return;
-          const selectedEl = dropdown.querySelector(
-            ".td-combobox-option.selected",
-          );
-          if (selectedEl) {
-            selectedEl.scrollIntoView({ block: "start", inline: "nearest" });
-          }
-        });
+        this.$nextTick(this.scrollSelectedToVisible);
       }
     },
   },
@@ -156,6 +163,11 @@ export default {
   methods: {
     toggle() {
       if (this.readOnly) return;
+      if (!this.open) {
+        // Đo ô control trước khi mở để panel có sẵn điểm neo và bề rộng tối
+        // thiểu ngay ở lần hiển thị đầu tiên, không phải đợi render lần hai
+        this.syncControlInfo();
+      }
       this.open = !this.open;
     },
     select(value) {
@@ -163,8 +175,37 @@ export default {
       this.$emit("selected", value);
       this.open = false;
     },
-    closeCombo() {
+    closeCombo(event) {
+      // Danh sách option đã bị Teleport ra body nên không còn nằm trong
+      // .td-combobox, vì vậy phải tự loại nó ra. Click trong danh sách thì để
+      // select() tự đóng, giữ đúng hành vi cũ (bấm option disabled không đóng)
+      if (event?.target?.closest?.(".td-combobox-dropdown")) return;
       this.open = false;
+    },
+    /**
+     * Đo lại ô control ngay trước khi mở, vì độ rộng của nó có thể vừa thay
+     * đổi (vd: combo box dùng width theo % trong 1 hàng co giãn)
+     */
+    syncControlInfo() {
+      const control = this.$refs.control;
+      if (!control) return;
+      this.controlEl = control;
+      this.controlWidth = control.getBoundingClientRect().width;
+    },
+    /**
+     * Cuộn option đang chọn vào vùng nhìn thấy của danh sách.
+     * Tự set scrollTop thay vì scrollIntoView vì scrollIntoView cuộn cả
+     * các vùng scroll cha, dễ làm cả cửa sổ app bị nhảy theo
+     */
+    scrollSelectedToVisible() {
+      const dropdown = this.$refs.dropdown;
+      if (!dropdown) return;
+      const selectedEl = dropdown.querySelector(".td-combobox-option.selected");
+      if (!selectedEl) return;
+      dropdown.scrollTop = Math.max(
+        0,
+        selectedEl.offsetTop - dropdown.clientHeight + selectedEl.offsetHeight,
+      );
     },
   },
 };
@@ -213,37 +254,6 @@ export default {
         white-space: nowrap; /* Không cho xuống dòng */
       }
     }
-    .td-combobox-dropdown {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      z-index: 10;
-      width: 100%;
-      min-width: 100%; /* Ít nhất phải bằng chiều rộng ô input */
-      width: max-content; /* Tự mở rộng theo nội dung dài nhất */
-      max-width: 300px; /* (Tùy chọn) Giới hạn tối đa để không tràn màn hình */
-      max-height: 300px;
-      overflow-y: auto;
-      margin-top: 4px;
-      border: 1px solid var(--border-color);
-      background: var(--bg-main-color);
-      border-radius: var(--border-radius-component);
-      .td-dropdown-item:first-child {
-        border-radius: var(--border-radius-component)
-          var(--border-radius-component) 0 0;
-      }
-      .td-dropdown-item:last-child {
-        border-radius: 0 0 var(--border-radius-component)
-          var(--border-radius-component);
-      }
-    }
-    .td-combobox-droptop {
-      top: unset;
-      bottom: 100%;
-      margin-top: unset;
-      margin-bottom: 4px;
-    }
-
     .arrow {
       width: 12px;
       height: 8px;
@@ -258,5 +268,27 @@ export default {
 }
 .td-combobox-no-margin {
   margin: unset;
+}
+
+/* Danh sách option được Teleport ra body nên không còn nằm trong .td-combobox,
+   vì vậy style của nó phải để cùng cấp, không nest bên trong .td-combobox.
+   Viền/background của danh sách do .td-combobox-flyout trong flyout.scss lo. */
+.td-combobox-dropdown {
+  /* 100% giờ tính theo bề rộng của .td-combobox-flyout (panel được đặt
+     min-width = bề rộng ô control), nên danh sách luôn rộng bằng ô control
+     dù nội dung option có ngắn hơn */
+  min-width: 100%;
+  width: max-content; /* Tự mở rộng theo nội dung dài nhất */
+  max-width: 300px; /* Giới hạn tối đa để không tràn màn hình */
+  max-height: 300px;
+  overflow-y: auto;
+  .td-dropdown-item:first-child {
+    border-radius: var(--border-radius-component) var(--border-radius-component)
+      0 0;
+  }
+  .td-dropdown-item:last-child {
+    border-radius: 0 0 var(--border-radius-component)
+      var(--border-radius-component);
+  }
 }
 </style>

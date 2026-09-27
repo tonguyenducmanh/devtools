@@ -49,6 +49,12 @@ export default {
       type: Number,
       default: 1000,
     },
+    // chiều rộng tối thiểu của panel, dùng khi panel phải rộng ít nhất bằng
+    // ô trigger (vd: combo box). 0 = không đặt.
+    minWidth: {
+      type: Number,
+      default: 0,
+    },
     // class riêng theo nơi sử dụng (vd: 'td-header-flyout', 'td-sidebar-group-flyout')
     panelClass: {
       type: [String, Array, Object],
@@ -67,6 +73,14 @@ export default {
     // Transition đổi hướng theo placement thực tế đã resolve (kể cả khi auto-flip)
     transitionName() {
       return `td-flyout-${this.resolvedPlacement}`;
+    },
+    // style tĩnh, ghép vào panelStyle ở mọi lần định vị để không bị mất
+    staticStyle() {
+      return {
+        position: "fixed",
+        zIndex: this.zIndex,
+        minWidth: this.minWidth ? `${this.minWidth}px` : null,
+      };
     },
   },
   watch: {
@@ -93,11 +107,10 @@ export default {
     // xong nội dung thật rồi mới đo kích thước chính xác để tính toạ độ.
     _preparePosition() {
       this.panelStyle = {
-        position: "fixed",
+        ...this.staticStyle,
         top: "0px",
         left: "0px",
         visibility: "hidden",
-        zIndex: this.zIndex,
       };
       this.$nextTick(this.position);
     },
@@ -166,11 +179,10 @@ export default {
 
       this.resolvedPlacement = placement;
       this.panelStyle = {
-        position: "fixed",
+        ...this.staticStyle,
         top: `${top}px`,
         left: `${left}px`,
         visibility: "visible",
-        zIndex: this.zIndex,
       };
     },
 

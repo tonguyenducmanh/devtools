@@ -94,6 +94,18 @@
     color: var(--selected-item-text-color);
   }
 }
+
+/* ============ Combo box flyout (TDComboBox): nội dung riêng ============ */
+.td-flyout-panel.td-combobox-flyout {
+  /* panel mặc định có padding 4px, combo box tự lo phần danh sách option
+     nên bỏ padding để viền panel khớp đúng danh sách */
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-component);
+  background: var(--bg-main-color);
+  box-shadow: none;
+}
+
 /* ============ Header dropdown: nội dung riêng ============ */
 .td-header-flyout {
   min-width: 160px;
