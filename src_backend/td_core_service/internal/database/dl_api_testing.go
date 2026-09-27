@@ -51,7 +51,7 @@ func BatchImportTestingData(batch *model.TDAPITestingImportBatch) error {
 
 	// 2. Insert Items
 	if len(batch.Items) > 0 {
-		sqlItem := `INSERT INTO td_api_testing (id, request_name, group_id, method, end_point, headers_text, body_text) VALUES (?, ?, ?, ?, ?, ?, ?)`
+		sqlItem := `INSERT INTO td_api_testing (id, request_name, group_id, method, end_point, headers_text, body_text, body_type, form_data_text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 		stmtItem, err := tx.Prepare(sqlItem)
 		if err != nil {
 			tx.Rollback()
@@ -60,7 +60,7 @@ func BatchImportTestingData(batch *model.TDAPITestingImportBatch) error {
 		defer stmtItem.Close()
 
 		for _, item := range batch.Items {
-			_, err = stmtItem.Exec(item.ID, item.RequestName, item.GroupID, item.Method, item.Endpoint, item.HeadersText, item.BodyText)
+			_, err = stmtItem.Exec(item.ID, item.RequestName, item.GroupID, item.Method, item.Endpoint, item.HeadersText, item.BodyText, item.BodyType, item.FormDataText)
 			if err != nil {
 				tx.Rollback()
 				return err

@@ -28,11 +28,11 @@ declare function readFolder(folderPath: string): Promise<Array<{ name: string; c
 /** Convert JSON data to PostgreSQL INSERT scripts. Returns a complete SQL string. */
 declare function convertJSONToPostgreSQL(data: any | any[], config: { tableName: string; schemaName?: string; primaryKeyField?: string; enableCreateTable?: boolean; enableDeleteScript?: boolean }): string;
 
-/** Parse a CURL command text into a structured request object. Returns { url, method, headers, headersText, body, bodyText } or null. */
-declare function parseCURL(curlText: string): { url: string; method: string; headers: Record<string, string>; headersText: string; body: any; bodyText: string } | null;
+/** Parse a CURL command text into a structured request object. Returns { url, method, headers, headersText, body, bodyText, formData } or null. */
+declare function parseCURL(curlText: string): { url: string; method: string; headers: Record<string, string>; headersText: string; body: any; bodyText: string; formData?: { key: string; value: string; type: string; fileName: string }[] } | null;
 
 /** Convert a request object to CURL command text. Returns the CURL string. */
-declare function stringifyCURL(request: { apiUrl: string; httpMethod?: string; headersText?: string; bodyText?: string }): string;
+declare function stringifyCURL(request: { apiUrl: string; httpMethod?: string; headersText?: string; bodyText?: string; formData?: { key: string; value?: string; type?: string; fileName?: string }[] }): string;
 
 /** Build mock API response objects from request/response pairs. Returns array of mock objects. */
 declare function createMockResponse(items: { request: any; response: { status: number; headers: Record<string, string>; body: any } } | Array<{ request: any; response: { status: number; headers: Record<string, string>; body: any } }>, options?: { group_id?: string; request_name?: string }): any[];

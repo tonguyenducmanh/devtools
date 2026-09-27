@@ -51,6 +51,8 @@ func InitDatabase() {
 			end_point TEXT NOT NULL,
 			headers_text TEXT,
 			body_text TEXT,
+			body_type TEXT DEFAULT 'json',
+			form_data_text TEXT,
 			created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
 			modified_date DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
@@ -111,6 +113,8 @@ func InitDatabase() {
 		"ALTER TABLE td_api_mock ADD COLUMN headers_text TEXT",
 		"ALTER TABLE td_api_mock ADD COLUMN response_headers_text TEXT",
 		"ALTER TABLE td_api_mock ADD COLUMN status_code INTEGER DEFAULT 0",
+		"ALTER TABLE td_api_testing ADD COLUMN body_type TEXT DEFAULT 'json'",
+		"ALTER TABLE td_api_testing ADD COLUMN form_data_text TEXT",
 	}
 
 	// Chạy tất cả script tạo bảng

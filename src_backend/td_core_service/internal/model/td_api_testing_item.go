@@ -9,6 +9,11 @@ type TDAPITestingItem struct {
 	Endpoint    string `json:"end_point"`
 	HeadersText string `json:"headers_text"`
 	BodyText    string `json:"body_text"`
+	// BodyType là kiểu body: json hoặc form_data
+	BodyType string `json:"body_type"`
+	// FormDataText là danh sách field của body form_data, lưu dạng json
+	// không lưu nội dung file (base64) vì quá nặng, chỉ lưu tên file và kiểu
+	FormDataText string `json:"form_data_text"`
 }
 
 func (m TDAPITestingItem) TableName() string {

@@ -4,10 +4,13 @@ package service
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"strings"
 
 	"td_core_service/internal/model"
@@ -60,16 +63,21 @@ func Execute(w http.ResponseWriter, r *http.Request) {
  * thực hiện gọi nối api cho frontend
  */
 func executeRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingResponse, error) {
-	// Tạo request
-	req, err := http.NewRequest(strings.ToUpper(reqData.HttpMethod), reqData.ApiURL, bytes.NewBufferString(reqData.BodyText))
+	// Tạo request, body dạng nào phụ thuộc vào body_type do frontend gửi lên
+	req, err := buildRequest(reqData)
 	if err != nil {
 		td_common.LogError(fmt.Sprintf("Tạo request thất bại: %v", err))
 		return nil, err
 	}
 
 	// Thêm headers
+	// Với form data thì content-type đã có sẵn boundary do multipart sinh ra,
+	// nên bỏ qua content-type frontend gửi lên để không phá boundary
 	headers := parseHeaders(reqData.HeadersText)
 	for k, v := range headers {
+		if reqData.IsFormData() && strings.EqualFold(k, "Content-Type") {
+			continue
+		}
 		req.Header.Set(k, v)
 	}
 
@@ -96,6 +104,129 @@ func executeRequest(reqData model.TDAPITestingParam) (*model.TDAPITestingRespons
 		Headers: string(headerJson),
 		Body:    string(respBody),
 	}, nil
+}
+
+/**
+ * buildRequest tạo http request theo kiểu body của frontend gửi lên
+ */
+func buildRequest(reqData model.TDAPITestingParam) (*http.Request, error) {
+	if reqData.IsFormData() {
+		return buildFormDataRequest(reqData)
+	}
+	return buildTextRequest(reqData)
+}
+
+/**
+ * buildTextRequest tạo http request với body dạng text (json, ...)
+ */
+func buildTextRequest(reqData model.TDAPITestingParam) (*http.Request, error) {
+	return http.NewRequest(strings.ToUpper(reqData.HttpMethod), reqData.ApiURL, bytes.NewBufferString(reqData.BodyText))
+}
+
+/**
+ * buildFormDataRequest tạo http request với body dạng multipart/form-data
+ */
+func buildFormDataRequest(reqData model.TDAPITestingParam) (*http.Request, error) {
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
+
+	for _, field := range reqData.FormData {
+		if err := writeFormField(writer, field); err != nil {
+			td_common.LogError(fmt.Sprintf("Ghi field %s thất bại: %v", field.Key, err))
+			return nil, err
+		}
+	}
+
+	// đóng writer để ghi boundary xuống buffer
+	if err := writer.Close(); err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(strings.ToUpper(reqData.HttpMethod), reqData.ApiURL, &body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	return req, nil
+}
+
+/**
+ * writeFormField ghi 1 field của body form data, field dạng text hoặc file
+ */
+func writeFormField(writer *multipart.Writer, field model.TDAPITestingFormField) error {
+	// field không có key thì bỏ qua
+	if strings.TrimSpace(field.Key) == "" {
+		return nil
+	}
+
+	// field dạng text
+	if !field.IsFile() {
+		return writer.WriteField(field.Key, field.Value)
+	}
+
+	// field dạng file, nội dung file do frontend encode base64 gửi lên
+	content, err := decodeFileContent(field.FileContent)
+	if err != nil {
+		return err
+	}
+	fileName := field.FileName
+	if fileName == "" {
+		fileName = field.Key
+	}
+	part, err := createFormFilePart(writer, field.Key, fileName, field.FileContentType)
+	if err != nil {
+		return err
+	}
+	_, err = part.Write(content)
+	return err
+}
+
+/**
+ * createFormFilePart tạo part cho field dạng file, tự set content-type theo file
+ * vì hàm CreateFormFile của thư viện luôn dùng application/octet-stream
+ */
+func createFormFilePart(writer *multipart.Writer, fieldKey string, fileName string, fileContentType string) (io.Writer, error) {
+	header := make(textproto.MIMEHeader)
+	header.Set("Content-Disposition", fmt.Sprintf(
+		`form-data; name="%s"; filename="%s"`,
+		escapeQuotes(fieldKey),
+		escapeQuotes(fileName),
+	))
+	// không có content type thì dùng mặc định như thư viện multipart
+	if fileContentType == "" {
+		fileContentType = "application/octet-stream"
+	}
+	header.Set("Content-Type", fileContentType)
+	return writer.CreatePart(header)
+}
+
+/**
+ * escapeQuotes escape dấu nháy và dấu gạch chéo trong tên field/tên file,
+ * giống cách thư viện multipart xử lý khi tạo part
+ */
+func escapeQuotes(text string) string {
+	text = strings.ReplaceAll(text, "\\", "\\\\")
+	return strings.ReplaceAll(text, `"`, `\"`)
+}
+
+/**
+ * decodeFileContent giải mã nội dung file base64 do frontend gửi lên,
+ * có chấp nhận cả định dạng data uri kiểu data:image/png;base64,...
+ */
+func decodeFileContent(fileContent string) ([]byte, error) {
+	if fileContent == "" {
+		return []byte{}, nil
+	}
+	// bỏ tiền tố data uri nếu frontend gửi theo dạng đó
+	if index := strings.Index(fileContent, ";base64,"); index != -1 {
+		fileContent = fileContent[index+len(";base64,"):]
+	}
+	content, err := base64.StdEncoding.DecodeString(fileContent)
+	if err != nil {
+		return nil, fmt.Errorf("nội dung file không phải base64 hợp lệ: %v", err)
+	}
+	return content, nil
 }
 
 // parse header được stringify từ frontend

@@ -1,6 +1,7 @@
 import * as insomniaCURL from "@/common/api/CURLHandle/insomnia/curl.ts";
 import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
 import { jsonToPostgreSQL } from "@/common/utils/TDJSONToPostgreSQLUtil.js";
+import tdEnum from "@/common/TDEnum.js";
 
 import * as curlReader from "@/common/api/CURLHandle/curlReader/index.ts";
 /**
@@ -55,6 +56,27 @@ class TDAutomationInject {
         }
         return parseSuccess;
       };
+      // build ra danh sách field khi body dạng multipart/form-data
+      let buildFormData = function (dataParse, result) {
+        if (!dataParse.body || !Array.isArray(dataParse.body.params)) {
+          return;
+        }
+        // body.params có 2 nguồn: -F (multipart) hoặc -d kèm content-type
+        // application/x-www-form-urlencoded, chỉ lấy đúng case multipart
+        let mimeType = dataParse.body.mimeType ?? "";
+        if (
+          mimeType.includes("x-www-form-urlencoded") ||
+          dataParse.body.params.length === 0
+        ) {
+          return;
+        }
+        result.formData = dataParse.body.params.map((param) => ({
+          key: param.name ?? "",
+          value: param.value ?? "",
+          type: param.type ?? tdEnum.APIFormDataType.text,
+          fileName: param.fileName ?? param.filename ?? "",
+        }));
+      };
       let data = insomniaCURL.convert(curlText);
       dataParse = Array.isArray(data) ? data[0] : data;
       if (dataParse) {
@@ -64,6 +86,7 @@ class TDAutomationInject {
           body: dataParse.body.text,
         };
         buildHeaderText(dataParse, result, "name");
+        buildFormData(dataParse, result);
         buildSuccess = buildBody(result);
       }
       if (!buildSuccess) {
@@ -88,18 +111,39 @@ class TDAutomationInject {
   }
 
   /**
+   * Build payload gửi lên agent từ kết quả parseCURL,
+   * body dạng form data thì lấy từ form_data, các trường còn lại giữ nguyên
+   */
+  buildRequestDataFromCURL(parsed) {
+    return {
+      api_url: parsed.url,
+      http_method: parsed.method || "GET",
+      headers_text: parsed.headersText || "",
+      body_type: parsed.formData
+        ? tdEnum.APIBodyType.formData
+        : tdEnum.APIBodyType.json,
+      body_text: parsed.formData ? null : parsed.bodyText || null,
+      // curl chỉ có đường dẫn file nên không đọc được nội dung file
+      form_data: parsed.formData
+        ? parsed.formData.map((field) => ({
+            key: field.key,
+            value: field.value,
+            type: field.type,
+            file_name: field.fileName,
+          }))
+        : null,
+    };
+  }
+
+  /**
    * Hàm chính thực hiện việc gọi API thông qua CURL
    */
   async requestCURL(curlText) {
     try {
       let parsed = this.parseCURL(curlText);
-      let requestData = {
-        api_url: parsed.url,
-        http_method: parsed.method || "GET",
-        headers_text: parsed.headersText || "",
-        body_text: parsed.bodyText || null,
-      };
-      let res = await new TDServerTestingAPI().executeRequest(requestData);
+      let res = await new TDServerTestingAPI().executeRequest(
+        this.buildRequestDataFromCURL(parsed),
+      );
       let data = await res.data;
       return {
         status: data.status,
@@ -133,13 +177,7 @@ class TDAutomationInject {
       }
 
       let requests = curlTexts.map((curlText) => {
-        let parsed = this.parseCURL(curlText);
-        return {
-          api_url: parsed.url,
-          http_method: parsed.method || "GET",
-          headers_text: parsed.headersText || "",
-          body_text: parsed.bodyText || null,
-        };
+        return this.buildRequestDataFromCURL(this.parseCURL(curlText));
       });
 
       let res = await new TDServerTestingAPI().executeParallel(requests);
@@ -403,18 +441,38 @@ class TDAutomationInject {
     }
 
     // headers
+    // có key formData (kể cả rỗng) nghĩa là body dạng form data, curl tự sinh
+    // content-type kèm boundary nên bỏ qua content-type trong headersText
+    let isFormData = Array.isArray(request.formData);
     if (request.headersText) {
       request.headersText
         .split("\n")
         .map((h) => h.trim())
         .filter(Boolean)
         .forEach((header) => {
+          if (isFormData && header.toLowerCase().startsWith("content-type:")) {
+            return;
+          }
           lines.push(`--header '${escapeShell(header)}'`);
         });
     }
 
     // body
-    if (request.bodyText && request.bodyText.trim() !== "") {
+    if (isFormData) {
+      request.formData.forEach((field) => {
+        if (!field.key) return;
+        // field dạng file thì trỏ tới file trên máy
+        if (field.type == tdEnum.APIFormDataType.file && field.fileName) {
+          lines.push(
+            `--form '${escapeShell(`${field.key}=@${field.fileName}`)}'`,
+          );
+        } else {
+          lines.push(
+            `--form '${escapeShell(`${field.key}=${field.value ?? ""}`)}'`,
+          );
+        }
+      });
+    } else if (request.bodyText && request.bodyText.trim() !== "") {
       lines.push(`--data '${escapeShell(request.bodyText)}'`);
     }
     let curlContent = lines.join(" \\\n");
