@@ -5,98 +5,203 @@
       <div class="flex td-api-header-group">
         <div class="flex flex-one">
           <!-- chọn kiểu body: json hay form data, đổi kiểu thì mở luôn panel tương ứng -->
-          <TDComboBox :width="100" :modelValue="currentBodyType" :options="bodyTypeOptions" :noMargin="true"
-            :isCapitalizeText="false" :borderRadiusPosition="[
+          <TDComboBox
+            :width="100"
+            :modelValue="currentBodyType"
+            :options="bodyTypeOptions"
+            :noMargin="true"
+            :isCapitalizeText="false"
+            :borderRadiusPosition="[
               $tdEnum.BorderRadiusPosition.TopLeft,
               $tdEnum.BorderRadiusPosition.BottomLeft,
-            ]" @update:modelValue="changeBodyType" v-tooltip="$t('i18nCommon.apiTesting.bodyTypeTooltip')" />
-          <TDInput v-model="requestName" :noMargin="true" :placeHolder="$t('i18nCommon.apiTesting.requestName')"
+            ]"
+            @update:modelValue="changeBodyType"
+            v-tooltip="$t('i18nCommon.apiTesting.bodyTypeTooltip')"
+          />
+          <TDInput
+            v-model="requestName"
+            :noMargin="true"
+            :placeHolder="$t('i18nCommon.apiTesting.requestName')"
             :borderRadiusPosition="[
               $tdEnum.BorderRadiusPosition.TopRight,
               $tdEnum.BorderRadiusPosition.BottomRight,
-            ]"></TDInput>
+            ]"
+          ></TDInput>
         </div>
-        <TDButton v-if="isLoading" :noMargin="true" @click="handleCancelRequest" :type="$tdEnum.buttonType.secondary"
-          iconClass="td-cancel-icon" v-tooltip="$t('i18nCommon.apiTesting.cancel')" />
-        <TDButton v-else :noMargin="true" @click="handleSend" iconClass="td-send-icon"
-          v-tooltip="$t('i18nCommon.apiTesting.send')"></TDButton>
-        <TDButton :noMargin="true" @click="handleDownloadReponse" :type="$tdEnum.buttonType.secondary"
-          iconClass="td-download-icon" v-tooltip="$t('i18nCommon.apiTesting.downloadReponse')"></TDButton>
-        <TDButton @click="copyCURLFromNormalMode" :type="$tdEnum.buttonType.secondary" :noMargin="true"
-          :readOnly="!(apiUrl && httpMethod) || isLoading" iconClass="td-export-icon"
-          v-tooltip="$t('i18nCommon.apiTesting.copyCURLFromAPI')"></TDButton>
-        <TDButton v-if="currentRequestId" :readOnly="isLoadingData" @click="createNewRequest"
-          :type="$tdEnum.buttonType.secondary" :noMargin="true" iconClass="td-new-file-icon"
-          v-tooltip="$t('i18nCommon.apiTesting.createNewRequest')"></TDButton>
-        <TDButton :readOnly="isLoadingData || !requestName" @click="saveRequest" :type="$tdEnum.buttonType.secondary"
-          :noMargin="true" iconClass="td-save-icon" v-tooltip="$t('i18nCommon.apiTesting.save')"></TDButton>
+        <TDButton
+          v-if="isLoading"
+          :noMargin="true"
+          @click="handleCancelRequest"
+          :type="$tdEnum.buttonType.secondary"
+          iconClass="td-cancel-icon"
+          v-tooltip="$t('i18nCommon.apiTesting.cancel')"
+        />
+        <TDButton
+          v-else
+          :noMargin="true"
+          @click="handleSend"
+          iconClass="td-send-icon"
+          v-tooltip="$t('i18nCommon.apiTesting.send')"
+        ></TDButton>
+        <TDButton
+          :noMargin="true"
+          @click="handleDownloadReponse"
+          :type="$tdEnum.buttonType.secondary"
+          iconClass="td-download-icon"
+          v-tooltip="$t('i18nCommon.apiTesting.downloadReponse')"
+        ></TDButton>
+        <TDButton
+          @click="copyCURLFromNormalMode"
+          :type="$tdEnum.buttonType.secondary"
+          :noMargin="true"
+          :readOnly="!(apiUrl && httpMethod) || isLoading"
+          iconClass="td-export-icon"
+          v-tooltip="$t('i18nCommon.apiTesting.copyCURLFromAPI')"
+        ></TDButton>
+        <TDButton
+          v-if="currentRequestId"
+          :readOnly="isLoadingData"
+          @click="createNewRequest"
+          :type="$tdEnum.buttonType.secondary"
+          :noMargin="true"
+          iconClass="td-new-file-icon"
+          v-tooltip="$t('i18nCommon.apiTesting.createNewRequest')"
+        ></TDButton>
+        <TDButton
+          :readOnly="isLoadingData || !requestName"
+          @click="saveRequest"
+          :type="$tdEnum.buttonType.secondary"
+          :noMargin="true"
+          iconClass="td-save-icon"
+          v-tooltip="$t('i18nCommon.apiTesting.save')"
+        ></TDButton>
       </div>
       <!-- Content -->
       <div class="td-api-content">
         <div class="flex td-api-info-btn">
           <div class="flex flex-one">
-            <TDComboBox :width="100" v-model="httpMethod" :options="methodOptions"
-              :customStyle="customStyleComboMethodAPI" :noMargin="true" :borderRadiusPosition="[
+            <TDComboBox
+              :width="100"
+              v-model="httpMethod"
+              :options="methodOptions"
+              :customStyle="customStyleComboMethodAPI"
+              :noMargin="true"
+              :borderRadiusPosition="[
                 $tdEnum.BorderRadiusPosition.TopLeft,
                 $tdEnum.BorderRadiusPosition.BottomLeft,
-              ]" />
-            <TDInput v-model="apiUrl" :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')" :noMargin="true"
+              ]"
+            />
+            <TDInput
+              v-model="apiUrl"
+              :placeHolder="$t('i18nCommon.apiTesting.urlPlaceholder')"
+              :noMargin="true"
               :borderRadiusPosition="[
                 $tdEnum.BorderRadiusPosition.TopRight,
                 $tdEnum.BorderRadiusPosition.BottomRight,
-              ]"></TDInput>
+              ]"
+            ></TDInput>
             <div class="flex td-import-request-group">
-              <TDButton @click="openFormImportCURL" :type="$tdEnum.buttonType.secondary" :noMargin="true"
-                :readOnly="isLoading" iconClass="td-import-icon" v-tooltip="$t('i18nCommon.apiTesting.CURL')">
+              <TDButton
+                @click="openFormImportCURL"
+                :type="$tdEnum.buttonType.secondary"
+                :noMargin="true"
+                :readOnly="isLoading"
+                iconClass="td-import-icon"
+                v-tooltip="$t('i18nCommon.apiTesting.CURL')"
+              >
               </TDButton>
-              <TDButton :noMargin="true" :readOnly="!responseText" @click="copyMockData"
-                :type="$tdEnum.buttonType.secondary" iconClass="td-copy-icon"
-                v-tooltip="$t('i18nCommon.apiTesting.copyMockData')"></TDButton>
-              <TDUpload v-tooltip="{
-                text: $t('i18nCommon.apiTesting.importCollectionZipTooltip'),
-                maxWidth: '500px',
-              }" iconClass="td-upload-icon" :accept="'.zip'" @change="importCollectionZip" ref="uploadArea"
-                :isShowSelect="false" />
-              <TDUpload v-tooltip="{
-                text: $t(
-                  'i18nCommon.apiTesting.importCollectionPostmanTooltip',
-                ),
-                maxWidth: '500px',
-              }" :accept="'.json'" iconClass="td-postman-icon" @change="importCollectionPostman"
-                ref="uploadAreaPostman" :isShowSelect="false" :multiple="true" />
+              <TDButton
+                :noMargin="true"
+                :readOnly="!responseText"
+                @click="copyMockData"
+                :type="$tdEnum.buttonType.secondary"
+                iconClass="td-copy-icon"
+                v-tooltip="$t('i18nCommon.apiTesting.copyMockData')"
+              ></TDButton>
+              <TDUpload
+                v-tooltip="{
+                  text: $t('i18nCommon.apiTesting.importCollectionZipTooltip'),
+                  maxWidth: '500px',
+                }"
+                iconClass="td-upload-icon"
+                :accept="'.zip'"
+                @change="importCollectionZip"
+                ref="uploadArea"
+                :isShowSelect="false"
+              />
+              <TDUpload
+                v-tooltip="{
+                  text: $t(
+                    'i18nCommon.apiTesting.importCollectionPostmanTooltip',
+                  ),
+                  maxWidth: '500px',
+                }"
+                :accept="'.json'"
+                iconClass="td-postman-icon"
+                @change="importCollectionPostman"
+                ref="uploadAreaPostman"
+                :isShowSelect="false"
+                :multiple="true"
+              />
             </div>
           </div>
         </div>
-        <div class="flex td-api-input-area" :class="{ 'flex-col': currentConfigLayout.splitHorizontal }">
-          <div class="flex flex-col td-api-request" :style="requestSectionSizeStyle">
-            <TDTextEditor v-if="
-              currentConfigLayout.currentAPIInfoOption ==
-              $tdEnum.APIInfoOption.header
-            " :isShowHeader="true" v-model="headersText" :enableHighlight="true" language="text/plan"
-              :wrapText="currentConfigLayout.wrapText" :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
-              :label="$t('i18nCommon.APIMocking.request')">
+        <div
+          class="flex td-api-input-area"
+          :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
+        >
+          <div
+            class="flex flex-col td-api-request"
+            :style="requestSectionSizeStyle"
+          >
+            <TDTextEditor
+              v-if="
+                currentConfigLayout.currentAPIInfoOption ==
+                $tdEnum.APIInfoOption.header
+              "
+              :isShowHeader="true"
+              v-model="headersText"
+              :enableHighlight="true"
+              language="text/plan"
+              :wrapText="currentConfigLayout.wrapText"
+              :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
+              :label="$t('i18nCommon.APIMocking.request')"
+            >
               <template v-slot:header-main>
                 <div class="flex td-header-options">
                   <span class="td-header-option active">{{
                     $t("i18nCommon.apiTesting.changeToViewHeader")
                   }}</span>
-                  <span class="td-header-option" @click="changeToViewBodyPanel"
-                    v-tooltip="$t('i18nCommon.apiTesting.clickToViewBody')">{{
-                      $t("i18nCommon.apiTesting.changeToViewBody") }}</span>
+                  <span
+                    class="td-header-option"
+                    @click="changeToViewBodyPanel"
+                    v-tooltip="$t('i18nCommon.apiTesting.clickToViewBody')"
+                    >{{ $t("i18nCommon.apiTesting.changeToViewBody") }}</span
+                  >
                 </div>
               </template>
             </TDTextEditor>
-            <TDTextEditor v-else-if="
-              currentConfigLayout.currentAPIInfoOption ==
-              $tdEnum.APIInfoOption.body
-            " :isShowHeader="true" v-model="bodyText" :wrapText="currentConfigLayout.wrapText" :enableHighlight="true"
-              language="json" :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
-              :label="$t('i18nCommon.APIMocking.request')">
+            <TDTextEditor
+              v-else-if="
+                currentConfigLayout.currentAPIInfoOption ==
+                $tdEnum.APIInfoOption.body
+              "
+              :isShowHeader="true"
+              v-model="bodyText"
+              :wrapText="currentConfigLayout.wrapText"
+              :enableHighlight="true"
+              language="json"
+              :placeHolder="$t('i18nCommon.apiTesting.bodyPlaceholder')"
+              :label="$t('i18nCommon.APIMocking.request')"
+            >
               <template v-slot:header-main>
                 <div class="flex td-header-options">
-                  <span class="td-header-option" @click="changeToViewHeaderRequest"
-                    v-tooltip="$t('i18nCommon.apiTesting.clickToViewHeader')">{{
-                      $t("i18nCommon.apiTesting.changeToViewHeader") }}</span>
+                  <span
+                    class="td-header-option"
+                    @click="changeToViewHeaderRequest"
+                    v-tooltip="$t('i18nCommon.apiTesting.clickToViewHeader')"
+                    >{{ $t("i18nCommon.apiTesting.changeToViewHeader") }}</span
+                  >
                   <span class="td-header-option active">{{
                     $t("i18nCommon.apiTesting.changeToViewBody")
                   }}</span>
@@ -105,39 +210,76 @@
             </TDTextEditor>
             <div v-else class="td-form-data">
               <div class="td-form-data-header no-select">
-                <span class="td-header-option" @click="changeToViewHeaderRequest"
-                  v-tooltip="$t('i18nCommon.apiTesting.clickToViewHeader')">{{
-                    $t("i18nCommon.apiTesting.changeToViewHeader")
-                  }}</span>
+                <span
+                  class="td-header-option"
+                  @click="changeToViewHeaderRequest"
+                  v-tooltip="$t('i18nCommon.apiTesting.clickToViewHeader')"
+                  >{{ $t("i18nCommon.apiTesting.changeToViewHeader") }}</span
+                >
                 <span class="td-header-option active">{{
                   $t("i18nCommon.apiTesting.changeToViewBody")
                 }}</span>
               </div>
               <div class="td-form-data-body">
-                <div v-for="(field, indexField) in formData" :key="indexField" class="td-form-data-row">
-                  <TDInput class="td-form-data-column" v-model="field.key" :noMargin="true"
-                    :placeHolder="$t('i18nCommon.apiTesting.formDataKey')" />
-                  <TDInput v-if="field.type == $tdEnum.APIFormDataType.text" class="td-form-data-column"
-                    v-model="field.value" :noMargin="true" :placeHolder="$t('i18nCommon.apiTesting.formDataValue')" />
+                <div
+                  v-for="(field, indexField) in formData"
+                  :key="indexField"
+                  class="td-form-data-row"
+                >
+                  <TDInput
+                    class="td-form-data-column"
+                    v-model="field.key"
+                    :noMargin="true"
+                    :placeHolder="$t('i18nCommon.apiTesting.formDataKey')"
+                  />
+                  <TDInput
+                    v-if="field.type == $tdEnum.APIFormDataType.text"
+                    class="td-form-data-column"
+                    v-model="field.value"
+                    :noMargin="true"
+                    :placeHolder="$t('i18nCommon.apiTesting.formDataValue')"
+                  />
                   <div v-else class="td-form-data-column td-form-data-file">
-                    <span class="flex-one text-nowrap" :class="{
-                      'td-form-data-file-name-saved': !field.fileContent,
-                    }" v-tooltip="field.fileName">{{
-                      field.fileName ||
-                      $t("i18nCommon.apiTesting.formDataFile")
-                    }}</span>
-                    <TDUpload iconClass="td-upload-icon" :hideBorder="true" @selected="
-                      (files) => handleSelectFileFormField(field, files)
-                    " v-tooltip="$t('i18nCommon.uploadFile')" />
+                    <span
+                      class="flex-one text-nowrap"
+                      :class="{
+                        'td-form-data-file-name-saved': !field.fileContent,
+                      }"
+                      v-tooltip="field.fileName"
+                      >{{
+                        field.fileName ||
+                        $t("i18nCommon.apiTesting.formDataFile")
+                      }}</span
+                    >
+                    <TDUpload
+                      iconClass="td-upload-icon"
+                      :hideBorder="true"
+                      @selected="
+                        (files) => handleSelectFileFormField(field, files)
+                      "
+                      v-tooltip="$t('i18nCommon.uploadFile')"
+                    />
                   </div>
-                  <TDComboBox class="td-form-data-column" :noMargin="true" :width="100" :usingStylePercent="true"
-                    :isCapitalizeText="false" :options="formDataTypeOptions" :modelValue="field.type"
+                  <TDComboBox
+                    class="td-form-data-column"
+                    :noMargin="true"
+                    :width="100"
+                    :usingStylePercent="true"
+                    :isCapitalizeText="false"
+                    :options="formDataTypeOptions"
+                    :modelValue="field.type"
                     @update:modelValue="
                       (typeValue) => changeTypeFormField(field, typeValue)
-                    " />
+                    "
+                  />
                   <div class="td-form-data-column td-form-data-action">
-                    <TDButton :noMargin="true" :type="$tdEnum.buttonType.secondary" iconClass="td-close-icon"
-                      @click="removeFormField(field)" v-tooltip="$t('i18nCommon.apiTesting.delete')" />
+                    <TDButton
+                      :noMargin="true"
+                      :type="$tdEnum.buttonType.secondary"
+                      iconClass="td-close-icon"
+                      @click="removeFormField(field)"
+                      v-tooltip="$t('i18nCommon.apiTesting.delete')"
+                    />
                   </div>
                 </div>
                 <div class="td-form-data-empty" v-if="formData.length == 0">
@@ -145,103 +287,191 @@
                 </div>
               </div>
               <div class="td-form-data-footer">
-                <TDButton :noMargin="true" :type="$tdEnum.buttonType.secondary" iconClass="td-plus-icon"
-                  @click="addFormField" v-tooltip="$t('i18nCommon.apiTesting.add')" />
-                <span class="flex-one text-nowrap td-form-data-info">{{ formDataInfo }}</span>
-                <TDButton :noMargin="true" :type="$tdEnum.buttonType.secondary" iconClass="td-close-icon"
-                  :readOnly="formData.length == 0" @click="removeAllFormFields"
-                  v-tooltip="$t('i18nCommon.apiTesting.formDataDeleteAll')" />
+                <TDButton
+                  :noMargin="true"
+                  :type="$tdEnum.buttonType.secondary"
+                  iconClass="td-plus-icon"
+                  @click="addFormField"
+                  v-tooltip="$t('i18nCommon.apiTesting.add')"
+                />
+                <span class="flex-one text-nowrap td-form-data-info">{{
+                  formDataInfo
+                }}</span>
+                <TDButton
+                  :noMargin="true"
+                  :type="$tdEnum.buttonType.secondary"
+                  iconClass="td-close-icon"
+                  :readOnly="formData.length == 0"
+                  @click="removeAllFormFields"
+                  v-tooltip="$t('i18nCommon.apiTesting.formDataDeleteAll')"
+                />
               </div>
             </div>
           </div>
-          <TDResizer v-if="currentConfigLayout.showReponse" :direction="currentConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
-            " @resize="handleResize" />
-          <div v-if="currentConfigLayout.showReponse" class="flex flex-col td-api-response"
-            :style="responseSectionSizeStyle">
-            <TDAPIResponse :statusCode="statusCode" :responseTime="responseTime" :isLoading="isLoading"
-              :responseText="responseText" :responseHeadersText="responseHeadersText"
-              :currentConfigLayout="currentConfigLayout" />
+          <TDResizer
+            v-if="currentConfigLayout.showReponse"
+            :direction="
+              currentConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
+            "
+            @resize="handleResize"
+          />
+          <div
+            v-if="currentConfigLayout.showReponse"
+            class="flex flex-col td-api-response"
+            :style="responseSectionSizeStyle"
+          >
+            <TDAPIResponse
+              :statusCode="statusCode"
+              :responseTime="responseTime"
+              :isLoading="isLoading"
+              :responseText="responseText"
+              :responseHeadersText="responseHeadersText"
+              :currentConfigLayout="currentConfigLayout"
+            />
           </div>
         </div>
       </div>
     </div>
     <!-- Sidebar -->
-    <TDSubSidebar ref="subSidebar" v-model="currentConfigLayout.isShowSidebar" @toggleSidebar="toggleSidebar">
+    <TDSubSidebar
+      ref="subSidebar"
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:menu>
         <div class="td-sidebar-menu">
-          <TDSlideOption :showIcon="true" v-if="sidebarOptions && sidebarOptions.length > 1"
-            v-model="currentConfigLayout.currentSidebarOption" :options="sidebarOptions" :noMargin="true"
-            @change="updateConfigLayout" />
+          <TDSlideOption
+            :showIcon="true"
+            v-if="sidebarOptions && sidebarOptions.length > 1"
+            v-model="currentConfigLayout.currentSidebarOption"
+            :options="sidebarOptions"
+            :noMargin="true"
+            @change="updateConfigLayout"
+          />
         </div>
       </template>
       <template v-slot:main>
         <!-- Help -->
-        <div class="td-sidebar-content" v-show="currentConfigLayout.currentSidebarOption ==
-          $tdEnum.APISidebarOption.Help
-          ">
+        <div
+          class="td-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.APISidebarOption.Help
+          "
+        >
           <TDAPITestingHelp />
         </div>
         <!-- Collection -->
-        <div class="flex flex-col td-sidebar-content" v-show="currentConfigLayout.currentSidebarOption ==
-          $tdEnum.APISidebarOption.Collection
-          ">
+        <div
+          class="flex flex-col td-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.APISidebarOption.Collection
+          "
+        >
           <div class="flex td-header-collection">
             <div class="td-new-collection">
-              <TDInput v-model="newCollectionName" :noMargin="true"
-                :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')" />
+              <TDInput
+                v-model="newCollectionName"
+                :noMargin="true"
+                :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
+              />
             </div>
-            <TDButton :noMargin="true" @click="addNewCollection" :type="$tdEnum.buttonType.secondary"
-              iconClass="td-plus-icon" v-tooltip="$t('i18nCommon.apiTesting.add')" />
-            <TDButton :noMargin="true" @click="loadAllTestingData" :type="$tdEnum.buttonType.secondary"
-              iconClass="td-reload-icon" v-tooltip="$t('i18nCommon.APIMocking.refresh')" />
+            <TDButton
+              :noMargin="true"
+              @click="addNewCollection"
+              :type="$tdEnum.buttonType.secondary"
+              iconClass="td-plus-icon"
+              v-tooltip="$t('i18nCommon.apiTesting.add')"
+            />
+            <TDButton
+              :noMargin="true"
+              @click="loadAllTestingData"
+              :type="$tdEnum.buttonType.secondary"
+              iconClass="td-reload-icon"
+              v-tooltip="$t('i18nCommon.APIMocking.refresh')"
+            />
           </div>
           <div class="td-collection">
             <div class="flex flex-col response-loading" v-if="isLoadingData">
               <TDLoading />
             </div>
             <div class="td-collection-body" v-else>
-              <div v-for="(collection, index) in allCollection" class="flex flex-col no-select td-collection-item"
-                :key="index">
+              <div
+                v-for="(collection, index) in allCollection"
+                class="flex flex-col no-select td-collection-item"
+                :key="index"
+              >
                 <div v-if="collection.is_renaming" class="td-collection-rename">
-                  <TDInput v-model="collection.temp_name" :noMargin="true"
-                    :placeHolder="$t('i18nCommon.apiTesting.collectionRename')" :ref="collection.temp_name"
-                    @keyup.enter="saveNewCollectionName(collection)" @clickOutSide="saveNewCollectionName(collection)">
+                  <TDInput
+                    v-model="collection.temp_name"
+                    :noMargin="true"
+                    :placeHolder="$t('i18nCommon.apiTesting.collectionRename')"
+                    :ref="collection.temp_name"
+                    @keyup.enter="saveNewCollectionName(collection)"
+                    @clickOutSide="saveNewCollectionName(collection)"
+                  >
                   </TDInput>
                 </div>
-                <div v-else class="flex td-collection-header" @click="toggleCollection(collection)">
+                <div
+                  v-else
+                  class="flex td-collection-header"
+                  @click="toggleCollection(collection)"
+                >
                   <div class="flex text-nowrap td-collection-header-left">
-                    <TDArrow :openProp="collection.openingCollection" :arrowOpenDirection="$tdEnum.Direction.bottom"
-                      :arrowDirection="$tdEnum.Direction.right" />
+                    <TDArrow
+                      :openProp="collection.openingCollection"
+                      :arrowOpenDirection="$tdEnum.Direction.bottom"
+                      :arrowDirection="$tdEnum.Direction.right"
+                    />
                     <div class="" v-tooltip="collection.name">
                       {{ collection.name }}
                     </div>
                   </div>
                   <div class="flex td-collection-edit-btn">
-                    <div class="td-icon td-edit-icon" v-tooltip="$t('i18nCommon.edit')"
-                      @click.stop="enableRenameCollection(collection)"></div>
-                    <div v-tooltip="$t('i18nCommon.apiTesting.delete')" class="td-icon td-close-icon"
-                      @click.stop="deleteCollection(collection.collection_id)"></div>
+                    <div
+                      class="td-icon td-edit-icon"
+                      v-tooltip="$t('i18nCommon.edit')"
+                      @click.stop="enableRenameCollection(collection)"
+                    ></div>
+                    <div
+                      v-tooltip="$t('i18nCommon.apiTesting.delete')"
+                      class="td-icon td-close-icon"
+                      @click.stop="deleteCollection(collection.collection_id)"
+                    ></div>
                   </div>
                 </div>
-                <div v-if="
-                  collection.openingCollection &&
-                  collection.requests &&
-                  collection.requests.length > 0
-                " class="flex flex-col td-collection-content">
-                  <div v-for="(request, indexRequest) in collection.requests" :key="indexRequest"
-                    class="flex td-collection-request-item" :class="{
+                <div
+                  v-if="
+                    collection.openingCollection &&
+                    collection.requests &&
+                    collection.requests.length > 0
+                  "
+                  class="flex flex-col td-collection-content"
+                >
+                  <div
+                    v-for="(request, indexRequest) in collection.requests"
+                    :key="indexRequest"
+                    class="flex td-collection-request-item"
+                    :class="{
                       'td-collection-request-item-selected':
                         request && currentRequestId == request.requestId,
-                    }" @click="applyRequest(request)">
+                    }"
+                    @click="applyRequest(request)"
+                  >
                     <span class="text-nowrap">
                       <div v-tooltip="request.requestName">
                         {{ request.requestName }}
                       </div>
                     </span>
                     <span class="td-collection-item-edit-btn">
-                      <div class="td-icon td-close-icon" v-tooltip="$t('i18nCommon.apiTesting.delete')" @click.stop="
-                        deleteRequest(collection.collection_id, request)
-                        "></div>
+                      <div
+                        class="td-icon td-close-icon"
+                        v-tooltip="$t('i18nCommon.apiTesting.delete')"
+                        @click.stop="
+                          deleteRequest(collection.collection_id, request)
+                        "
+                      ></div>
                     </span>
                   </div>
                 </div>
@@ -250,24 +480,51 @@
           </div>
         </div>
         <!-- Settings -->
-        <div class="td-sidebar-content" v-show="currentConfigLayout.currentSidebarOption ==
-          $tdEnum.APISidebarOption.Setting
-          ">
-          <TDCheckbox :variant="$tdEnum.checkboxType.switch" v-model="currentConfigLayout.wrapText"
-            :label="$t('i18nCommon.apiTesting.wrapText')" @change="updateConfigLayout"></TDCheckbox>
-          <TDCheckbox :variant="$tdEnum.checkboxType.switch" v-model="currentConfigLayout.showReponse"
-            :label="$t('i18nCommon.apiTesting.showReponse')" @change="updateConfigLayout"></TDCheckbox>
-          <TDCheckbox :variant="$tdEnum.checkboxType.switch" v-model="currentConfigLayout.splitHorizontal"
-            :label="$t('i18nCommon.splitHorizontal')" @change="updateConfigLayout"></TDCheckbox>
+        <div
+          class="td-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.APISidebarOption.Setting
+          "
+        >
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="currentConfigLayout.wrapText"
+            :label="$t('i18nCommon.apiTesting.wrapText')"
+            @change="updateConfigLayout"
+          ></TDCheckbox>
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="currentConfigLayout.showReponse"
+            :label="$t('i18nCommon.apiTesting.showReponse')"
+            @change="updateConfigLayout"
+          ></TDCheckbox>
+          <TDCheckbox
+            :variant="$tdEnum.checkboxType.switch"
+            v-model="currentConfigLayout.splitHorizontal"
+            :label="$t('i18nCommon.splitHorizontal')"
+            @change="updateConfigLayout"
+          ></TDCheckbox>
         </div>
         <!-- History -->
-        <div class="td-sidebar-content" v-show="currentConfigLayout.currentSidebarOption ==
-          $tdEnum.APISidebarOption.History
-          ">
-          <TDHistorySidebar ref="history" :applyFunction="handleSendRequestFromHistory" titleKey="requestName"
-            :noMargin="true" :positionRelative="false" :cacheKey="$tdEnum.cacheConfig.APIHistory"
-            :historyContainerStyleEnum="$tdEnum.AbsolutePositionStyle.Top100Left
-              "></TDHistorySidebar>
+        <div
+          class="td-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.APISidebarOption.History
+          "
+        >
+          <TDHistorySidebar
+            ref="history"
+            :applyFunction="handleSendRequestFromHistory"
+            titleKey="requestName"
+            :noMargin="true"
+            :positionRelative="false"
+            :cacheKey="$tdEnum.cacheConfig.APIHistory"
+            :historyContainerStyleEnum="
+              $tdEnum.AbsolutePositionStyle.Top100Left
+            "
+          ></TDHistorySidebar>
         </div>
       </template>
     </TDSubSidebar>
@@ -474,10 +731,9 @@ export default {
       let countFile = me.formData.filter(
         (item) => item.type == me.$tdEnum.APIFormDataType.file,
       ).length;
-      return me.$t("i18nCommon.apiTesting.formDataInfo").format(
-        me.formData.length - countFile,
-        countFile,
-      );
+      return me
+        .$t("i18nCommon.apiTesting.formDataInfo")
+        .format(me.formData.length - countFile, countFile);
     },
   },
   beforeUnmount() {
@@ -1555,9 +1811,12 @@ export default {
   font-family: "Consolas", "Monaco", monospace;
   background-color: var(--td-monaco-footer-bg);
   color: var(--td-monaco-footer-fg);
-  border-bottom: 1px solid color-mix(in srgb,
+  border-bottom: 1px solid
+    color-mix(
+      in srgb,
       var(--td-monaco-footer-bg) 70%,
-      var(--td-monaco-footer-fg) 30%);
+      var(--td-monaco-footer-fg) 30%
+    );
 }
 
 .td-form-data-body {
@@ -1623,9 +1882,12 @@ export default {
   align-items: center;
   padding: var(--padding-medium) var(--padding);
   // màu viền giống .td-monaco-footer của TDTextEditor
-  border-top: 1px solid color-mix(in srgb,
+  border-top: 1px solid
+    color-mix(
+      in srgb,
       var(--td-monaco-footer-bg) 70%,
-      var(--td-monaco-footer-fg) 30%);
+      var(--td-monaco-footer-fg) 30%
+    );
 }
 
 // số field text và file, canh phải để không dính vào nút xoá toàn bộ
