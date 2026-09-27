@@ -49,10 +49,26 @@ class TDEnum {
   };
   /**
    * Thông tin info của câu lệnh
+   * body: body dạng json, bodyFormData: body dạng multipart form data
    */
   APIInfoOption = {
     header: 1,
     body: 2,
+    bodyFormData: 3,
+  };
+  /**
+   * Kiểu body của request api testing, dùng để gửi lên backend
+   */
+  APIBodyType = {
+    json: "json",
+    formData: "form_data",
+  };
+  /**
+   * Kiểu của 1 field trong body multipart form data
+   */
+  APIFormDataType = {
+    text: "text",
+    file: "file",
   };
   /**
    * Các hướng mũi tên
