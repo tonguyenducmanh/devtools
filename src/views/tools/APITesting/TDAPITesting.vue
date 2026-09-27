@@ -289,6 +289,7 @@
               <div class="td-form-data-footer">
                 <TDButton
                   :noMargin="true"
+                  :isSmallButton="true"
                   :type="$tdEnum.buttonType.secondary"
                   iconClass="td-plus-icon"
                   @click="addFormField"
@@ -298,6 +299,7 @@
                   formDataInfo
                 }}</span>
                 <TDButton
+                  :isSmallButton="true"
                   :noMargin="true"
                   :type="$tdEnum.buttonType.secondary"
                   iconClass="td-close-icon"
