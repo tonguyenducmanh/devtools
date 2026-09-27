@@ -4,7 +4,10 @@ import vue from "@vitejs/plugin-vue";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import packageJson from "./package.json";
 
-const APP_VERSION = packageJson.version;
+// Version của app: ưu tiên biến môi trường VERSION (khi build với
+// VERSION=1.2.3 ./build_all.sh), không có thì lấy version trong package.json.
+// Biến này được gắn vào binary Go qua ldflags nên version UI và BE luôn khớp.
+const APP_VERSION = process.env.VERSION || packageJson.version;
 
 export default defineConfig({
   plugins: [

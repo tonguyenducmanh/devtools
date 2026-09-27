@@ -19,6 +19,7 @@ class TDAgentAPI extends TDBaseAPI {
 
   /**
    * Health check
+   * BE trả về trạng thái service kèm version của BE đang chạy
    */
   async heathCheck() {
     return await this.get("/");

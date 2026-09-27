@@ -4,18 +4,15 @@ set -e
 echo "--- Bắt đầu quy trình daemon ---"
 ROOT_DIR=$(pwd)
 
-# ĐỌC VERSION TỪ PACKAGE.JSON
-PACKAGE_JSON_PATH="$ROOT_DIR/package.json"
+# ĐỌC VERSION TỪ PACKAGE.JSON (giống cách Vite lấy version cho UI)
+. "$ROOT_DIR/scripts/td_version.sh"
 
-if [ ! -f "$PACKAGE_JSON_PATH" ]; then
-    echo "Lỗi: Không tìm thấy file package.json tại $ROOT_DIR"
-    exit 1
-fi
-
-# đọc ra version hiện tại
-VERSION=$(node -e "echo(require('$PACKAGE_JSON_PATH').version);" 2>/dev/null || node -e "console.log(require('$PACKAGE_JSON_PATH').version);")
+VERSION=$(td_get_version)
 
 echo "Phiên bản hiện tại: $VERSION"
+
+# gắn version vào binary Go, API health check sẽ trả về version này cho UI
+LDFLAGS=$(td_get_go_ldflags "$VERSION")
 
 # Cấu hình đường dẫn
 DAEMON_DIR="$ROOT_DIR/src_backend/td_app/cmd/daemon_app"
@@ -33,15 +30,15 @@ cd "$DAEMON_DIR"
 
 echo "Building for Mac Apple Silicon..."
 GOOS=darwin GOARCH=arm64  \
-go build -o "$OUTPUT_DIR/$OUTPUT_NAME-mac-arm-$VERSION" .
+go build -ldflags "$LDFLAGS" -o "$OUTPUT_DIR/$OUTPUT_NAME-mac-arm-$VERSION" .
 
 echo "Building for Linux..."
 GOOS=linux GOARCH=amd64  \
-go build -o "$OUTPUT_DIR/$OUTPUT_NAME-linux-$VERSION" .
+go build -ldflags "$LDFLAGS" -o "$OUTPUT_DIR/$OUTPUT_NAME-linux-$VERSION" .
 
 echo "Building for Windows..."
 GOOS=windows GOARCH=amd64  \
-go build -o "$OUTPUT_DIR/$OUTPUT_NAME-window-$VERSION.exe" .
+go build -ldflags "$LDFLAGS" -o "$OUTPUT_DIR/$OUTPUT_NAME-window-$VERSION.exe" .
 
 # Trở về thư mục gốc để xóa dist an toàn
 cd "$ROOT_DIR"

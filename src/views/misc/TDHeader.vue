@@ -381,17 +381,46 @@ export default {
       this.closeFlyout();
     },
     async pingAgentFunc() {
+      let me = this;
       try {
-        const res = await new TDAgentAPI().heathCheck();
-        if (res?.success && res?.data) {
-          this.$tdToast.success(res.data);
+        let res = await new TDAgentAPI().heathCheck();
+        if (res?.success) {
+          me.$tdToast.success(me.buildPingAgentMessage(res.data), 5000);
         } else {
-          this.$tdToast.success(res);
+          me.$tdToast.error(me.$t("i18nCommon.tdheader.pingAgentFailed"), 5000);
         }
       } catch {
-        this.$tdUtility.showErrorNotFoundAgentServer();
+        me.$tdUtility.showErrorNotFoundAgentServer();
       }
       this.closeFlyout();
+    },
+    /**
+     * Ghép nội dung hiển thị sau khi ping server: trạng thái + version UI + version BE
+     * BE cũ chỉ trả về text thuần thì chỉ hiện text đó, không có version để hiện
+     */
+    buildPingAgentMessage(healthData) {
+      let me = this;
+      if (typeof healthData == "string") {
+        return healthData || me.$t("i18nCommon.tdheader.pingAgentSuccess");
+      }
+      let parts = [];
+      if (healthData?.message) {
+        parts.push(healthData.message);
+      }
+      // version UI lấy từ bản thân app, version BE do API trả về
+      let uiVersion = me.$tdUtility.getAppVersion();
+      let beVersion = healthData?.beVersion;
+      if (uiVersion) {
+        parts.push(`${me.$t("i18nCommon.tdheader.uiVersion")}: ${uiVersion}`);
+      }
+      if (beVersion) {
+        parts.push(
+          `${me.$t("i18nCommon.tdheader.serverVersion")}: ${beVersion}`,
+        );
+      }
+      return parts.length > 0
+        ? parts.join(" · ")
+        : me.$t("i18nCommon.tdheader.pingAgentSuccess");
     },
     toggleZenMode() {
       eventBus.emit(TDEnumEventBus.zenModeToggle);
