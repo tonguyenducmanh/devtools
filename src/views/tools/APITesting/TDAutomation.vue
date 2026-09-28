@@ -140,7 +140,7 @@
             $tdEnum.APISidebarOption.Help
           "
         >
-          <TDAPITestingHelp />
+          <TDAutomationHelp />
         </div>
         <!-- Collection -->
         <div
@@ -327,7 +327,7 @@ import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDServerTestingAPI from "@/common/api/request/AgentAPI/TDServerTestingAPI.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
-import TDAPITestingHelp from "@/views/helps/TDAPITestingHelp.vue";
+import TDAutomationHelp from "@/views/helps/TDAutomationHelp.vue";
 import { registerTdApiPromodeLanguage } from "@/monarch/apiTesting/tdApiPromodeLanguage.js";
 import { registerTdApiPromodeFormatProvider } from "@/monarch/apiTesting/tdApiPromodeFormatProvider.js";
 import { registerTdApiPromodeCompletionProvider } from "@/monarch/apiTesting/tdApiPromodeCompletionProvider.js";
@@ -343,7 +343,7 @@ export default {
     TDArrow,
     TDAPIResponse,
     TDHistorySidebar,
-    TDAPITestingHelp,
+    TDAutomationHelp,
   },
 
   data() {
