@@ -277,41 +277,64 @@ export default {
       purpose: {
         title: "What is API Testing?",
         content:
-          "A tool to call APIs bypass CORS, SSL. Supports 2 modes: Normal Mode and Pro Mode (run JavaScript scripts).",
+          "A tool to call APIs bypass CORS, SSL. Full configuration of Headers and Body in JSON or Form Data.",
       },
-      modes: {
-        title: "Modes",
-        normal:
-          "Normal Mode - Call single API with Header and Body configuration.",
-        proMode:
-          "Pro Mode - Write JavaScript scripts to call multiple APIs in a scenario.",
+      howToUse: {
+        title: "How to Use",
+        createRequest:
+          "Select HTTP method, enter endpoint and configure Headers and Body (JSON or Form Data).",
+        importCURL:
+          "Click the Import CURL button to fill the request from an existing curl command.",
+        sendRequest:
+          "Click Send to call the API, the response is shown in the Response panel.",
+        copyCURL:
+          "Click Copy CURL to get the curl command of the current request, ready to run in the Automation tool.",
+        copyMockData:
+          "Click Copy mock to get the request and response data of the API that was just called, then import it into the API Mocking tool to build mock data.",
       },
       features: {
         title: "Features",
         collection: "Store and manage created requests by groups.",
         history: "History of called requests, support quick re-call.",
         import: "Support import from Postman (JSON) or ZIP CURL collection.",
+        automationNote:
+          "Use the Automation tool to run multiple APIs through a JavaScript script.",
       },
       requirement: {
         title: "Requirements",
         note: "This tool requires downloading and running the Agent app (desktop application) as backend. Please click Help menu in the header to download Agent.",
       },
-      proModeHelp: {
-        title: "Pro Mode - Built-in Functions",
-        builtinFunctions:
-          "Pro Mode provides built-in functions that are automatically available in your script:",
-        requestCURL:
-          "requestCURL(curlString) - Call API using CURL via Agent server. Async, must use await.",
-        request:
-          "request({method, url, headers, body}) - Call HTTP directly without CURL.",
-        parseResponse:
-          "parseResponse(response) - Parse JSON from response of request() or requestCURL().",
-        requestMulti:
-          "requestMulti(requests[]) - Send multiple requests in parallel with explicit parameters.",
-        requestMultiCURL:
-          "requestMultiCURL(curlTexts[]) - Send multiple CURLs in parallel on backend.",
-        triggerIntelliSense:
-          "Press {0} to trigger intellisense suggestions for the built-in functions.",
+    },
+    automation: {
+      purpose: {
+        title: "What is the Automation Tool?",
+        content:
+          "A tool to write JavaScript scenarios that automate API workflows: login to get a token, call many APIs, read or write local files. The scenario runs inside the app, while every API call and file operation goes through the Agent app.",
+      },
+      howToUse: {
+        title: "How to Use",
+        writeScript:
+          "Enter a script name then write the JavaScript scenario in the editor on the left.",
+        runScript:
+          "Click Send to run the scenario, the elapsed time and the result are shown in the Response panel.",
+        returnValue:
+          "The value returned at the end of the scenario (return) is shown in the Response panel, so return whatever data you want to inspect.",
+        apiDocs:
+          "The built-in functions are available in your script without any import, click the API Reference button in the header to read the full documentation with examples.",
+        intelliSenseNote:
+          "Async functions must be awaited before using their result.",
+      },
+      features: {
+        title: "Features",
+        collection:
+          "Store and manage scripts by collections, rename or delete them when no longer needed.",
+        history: "History of executed scripts, support quick reopening.",
+        import:
+          "Support importing many scripts from a single zip file, each file in the zip is one script.",
+      },
+      requirement: {
+        title: "Requirements",
+        note: "This tool requires downloading and running the Agent app (desktop application) as backend. Please click Help menu in the header to download Agent.",
       },
     },
     qrCodeToText: {

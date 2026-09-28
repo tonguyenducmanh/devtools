@@ -273,40 +273,64 @@ export default {
       purpose: {
         title: "Test API là gì?",
         content:
-          "Công cụ gọi API bypass CORS, SSL. Hỗ trợ 2 chế độ: Normal Mode và Pro Mode (chạy script JavaScript).",
+          "Công cụ gọi API bypass CORS, SSL. Cấu hình đầy đủ Header và Body dạng JSON hoặc Form Data.",
       },
-      modes: {
-        title: "Các chế độ",
-        normal: "Normal Mode - Gọi API đơn lẻ với cấu hình Header và Body.",
-        proMode:
-          "Pro Mode - Viết script JavaScript để gọi hàng loạt API theo kịch bản.",
+      howToUse: {
+        title: "Cách sử dụng",
+        createRequest:
+          "Chọn HTTP method, nhập endpoint, cấu hình Header và Body (JSON hoặc Form Data).",
+        importCURL:
+          "Nhấn nút Nhập CURL để điền nhanh thông tin request từ lệnh curl có sẵn.",
+        sendRequest:
+          "Nhấn nút Gửi để gọi API, kết quả trả về hiển thị ở panel Response.",
+        copyCURL:
+          "Nhấn nút Sao chép CURL để lấy lệnh curl của request đang cấu hình, dùng để chạy trong tool Automation.",
+        copyMockData:
+          "Nhấn nút Sao chép mock để lấy dữ liệu request và response của api vừa gọi, nhập vào tool API Mocking để dựng mock data.",
       },
       features: {
         title: "Tính năng",
         collection: "Lưu trữ và quản lý các request đã tạo theo nhóm.",
         history: "Lịch sử các request đã gọi, hỗ trợ gọi lại nhanh.",
         import: "Hỗ trợ import từ Postman (JSON) hoặc ZIP collection CURL.",
+        automationNote:
+          "Muốn chạy nhiều API theo kịch bản JavaScript thì dùng tool Automation.",
       },
       requirement: {
         title: "Yêu cầu",
         note: "Công cụ này cần tải và chạy app Agent (ứng dụng desktop) để làm backend. Vui lòng bấm menu Trợ giúp ở header để tải Agent.",
       },
-      proModeHelp: {
-        title: "Pro Mode - Hàm dựng sẵn",
-        builtinFunctions:
-          "Pro Mode cung cấp các hàm dựng sẵn, tự động có sẵn trong script của bạn:",
-        requestCURL:
-          "requestCURL(curlString) - Gọi API bằng CURL qua Agent server. Async, phải gọi với await.",
-        request:
-          "request({method, url, headers, body}) - Gọi HTTP trực tiếp, không cần CURL.",
-        parseResponse:
-          "parseResponse(response) - Parse JSON từ response của request() hoặc requestCURL().",
-        requestMulti:
-          "requestMulti(requests[]) - Gửi nhiều request song song với tham số rõ ràng.",
-        requestMultiCURL:
-          "requestMultiCURL(curlTexts[]) - Gửi nhiều CURL song song trên backend.",
-        triggerIntelliSense:
-          "Nhấn {0} để hiển thị gợi ý intellisense cho các hàm dựng sẵn.",
+    },
+    automation: {
+      purpose: {
+        title: "Công cụ Automation là gì?",
+        content:
+          "Công cụ viết kịch bản JavaScript để tự động hoá quy trình gọi API: đăng nhập lấy token, gọi hàng loạt API, đọc hoặc ghi file trên máy. Kịch bản chạy ngay trong ứng dụng, các lệnh gọi API và đọc ghi file đều đi qua app Agent.",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        writeScript:
+          "Nhập tên script rồi viết kịch bản JavaScript trong ô editor bên trái.",
+        runScript:
+          "Nhấn nút Gửi để chạy kịch bản, thời gian chạy và kết quả hiển thị ở panel Response.",
+        returnValue:
+          "Giá trị cuối cùng trả về của kịch bản (return) được hiển thị ở panel Response, muốn xem dữ liệu nào thì return dữ liệu đó.",
+        apiDocs:
+          "Các hàm dựng sẵn trong script không cần import, hãy bấm nút Tài liệu API Reference ở header để xem tài liệu chi tiết kèm ví dụ sử dụng.",
+        intelliSenseNote:
+          "Các hàm bất đồng bộ thì phải dùng await trước khi lấy kết quả.",
+      },
+      features: {
+        title: "Tính năng",
+        collection:
+          "Lưu trữ và quản lý các script theo từng collection, đổi tên hoặc xoá khi không dùng.",
+        history: "Lịch sử các script đã chạy, hỗ trợ mở lại nhanh.",
+        import:
+          "Hỗ trợ import nhiều script từ 1 file zip, mỗi file trong zip là 1 script.",
+      },
+      requirement: {
+        title: "Yêu cầu",
+        note: "Công cụ này cần tải và chạy app Agent (ứng dụng desktop) để làm backend. Vui lòng bấm menu Trợ giúp ở header để tải Agent.",
       },
     },
     qrCodeToText: {
