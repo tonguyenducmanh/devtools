@@ -71,7 +71,7 @@
 </template>
 <script>
 import TDAPIResponseStatus from "./TDAPIResponseStatus.vue";
-import TDAPIPanelSwitcher from "@/components/TDAPIPanelSwitcher.vue";
+import TDAPIPanelSwitcher from "@/views/tools/APITesting/TDAPIPanelSwitcher.vue";
 export default {
   name: "TDAPIResponse",
   data() {
