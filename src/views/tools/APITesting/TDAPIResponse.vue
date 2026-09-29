@@ -18,28 +18,21 @@
       :wrapText="currentConfigLayout.wrapText"
     >
       <template v-slot:header-main>
-        <div class="flex td-header-options">
-          <div class="flex td-header-options-left">
-            <span
-              class="td-header-option"
-              @click="changeToViewHeaderResponse"
-              v-tooltip="$t('i18nCommon.apiTesting.clickToViewHeaderResponse')"
-              >{{
-                $t("i18nCommon.apiTesting.changeToViewHeaderResponse")
-              }}</span
-            >
-            <span class="td-header-option active">{{
-              $t("i18nCommon.apiTesting.changeToViewBodyResponse")
-            }}</span>
-          </div>
-          <div class="flex td-header-options-right">
+        <TDAPIPanelSwitcher
+          :currentOption="currentConfigLayout.currentAPIResponseInfoOption"
+          :headerOption="$tdEnum.APIInfoOption.header"
+          :bodyOption="$tdEnum.APIInfoOption.body"
+          :isResponse="true"
+          @change="changeToViewResponsePanel"
+        >
+          <template v-slot:right>
             <TDAPIResponseStatus
               class="flex"
               :statusCode="statusCode"
               :responseTime="responseTime"
             />
-          </div>
-        </div>
+          </template>
+        </TDAPIPanelSwitcher>
       </template>
     </TDTextEditor>
     <TDTextEditor
@@ -57,40 +50,34 @@
       :wrapText="currentConfigLayout.wrapText"
     >
       <template v-slot:header-main>
-        <div class="flex td-header-options">
-          <div class="flex td-header-options-left">
-            <span class="td-header-option active">{{
-              $t("i18nCommon.apiTesting.changeToViewHeaderResponse")
-            }}</span>
-            <span
-              class="td-header-option"
-              @click="changeToViewBodyResponse"
-              v-tooltip="$t('i18nCommon.apiTesting.clickToViewBodyResponse')"
-            >
-              {{ $t("i18nCommon.apiTesting.changeToViewBodyResponse") }}
-            </span>
-          </div>
-
-          <div class="flex td-header-options-right">
+        <TDAPIPanelSwitcher
+          :currentOption="currentConfigLayout.currentAPIResponseInfoOption"
+          :headerOption="$tdEnum.APIInfoOption.header"
+          :bodyOption="$tdEnum.APIInfoOption.body"
+          :isResponse="true"
+          @change="changeToViewResponsePanel"
+        >
+          <template v-slot:right>
             <TDAPIResponseStatus
               class="flex"
               :statusCode="statusCode"
               :responseTime="responseTime"
             />
-          </div>
-        </div>
+          </template>
+        </TDAPIPanelSwitcher>
       </template>
     </TDTextEditor>
   </div>
 </template>
 <script>
 import TDAPIResponseStatus from "./TDAPIResponseStatus.vue";
+import TDAPIPanelSwitcher from "@/components/TDAPIPanelSwitcher.vue";
 export default {
   name: "TDAPIResponse",
   data() {
     return {};
   },
-  components: { TDAPIResponseStatus },
+  components: { TDAPIResponseStatus, TDAPIPanelSwitcher },
   props: {
     responseTime: {
       type: Number,
@@ -137,13 +124,8 @@ export default {
     },
   },
   methods: {
-    changeToViewHeaderResponse() {
-      this.currentConfigLayout.currentAPIResponseInfoOption =
-        this.$tdEnum.APIInfoOption.header;
-    },
-    changeToViewBodyResponse() {
-      this.currentConfigLayout.currentAPIResponseInfoOption =
-        this.$tdEnum.APIInfoOption.body;
+    changeToViewResponsePanel(option) {
+      this.currentConfigLayout.currentAPIResponseInfoOption = option;
     },
   },
 };
@@ -161,24 +143,5 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-}
-.td-header-options {
-  width: 100%;
-  justify-content: space-between;
-  gap: var(--padding);
-}
-.td-header-options-left,
-.td-header-options-right {
-  align-items: center;
-  gap: var(--padding);
-}
-.td-header-option {
-  cursor: pointer;
-  color: var(--td-monaco-text-inactive);
-  transition: color 0.15s;
-}
-.td-header-option.active {
-  color: var(--td-monaco-text-active);
-  font-weight: 600;
 }
 </style>
