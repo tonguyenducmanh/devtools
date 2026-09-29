@@ -72,7 +72,7 @@
         <div class="flex flex-one">
           <!-- combo chọn method http -->
           <TDComboBox
-            :width="120"
+            :width="100"
             v-model="httpMethod"
             :options="methodOptions"
             :customStyle="customStyleComboMethodAPI"
