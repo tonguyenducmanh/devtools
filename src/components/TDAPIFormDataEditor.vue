@@ -4,61 +4,78 @@
       <slot name="header"></slot>
     </div>
     <div class="td-form-data-body">
-      <div
-        v-for="(field, indexField) in formData"
-        :key="indexField"
-        class="td-form-data-row"
-      >
-        <TDInput
-          class="td-form-data-column"
-          v-model="field.key"
-          :noMargin="true"
-          :placeHolder="$t('i18nCommon.apiTesting.formDataKey')"
-        />
-        <TDInput
-          v-if="field.type == $tdEnum.APIFormDataType.text"
-          class="td-form-data-column"
-          v-model="field.value"
-          :noMargin="true"
-          :placeHolder="$t('i18nCommon.apiTesting.formDataValue')"
-        />
-        <div v-else class="td-form-data-column td-form-data-file">
-          <span
-            class="flex-one text-nowrap"
-            :class="{ 'td-form-data-file-name-saved': !field.fileContent }"
-            v-tooltip="field.fileName"
-            >{{
-              field.fileName || $t("i18nCommon.apiTesting.formDataFile")
-            }}</span
-          >
-          <TDUpload
-            iconClass="td-upload-icon"
-            :hideBorder="true"
-            @selected="(files) => selectFile(field, files)"
-            v-tooltip="$t('i18nCommon.uploadFile')"
+      <div class="td-form-data-columns" v-if="formData.length > 0">
+        <!-- cột key, bề rộng kéo được, 1 resizer duy nhất ở giữa 2 cột -->
+        <div class="td-form-data-key-col" :style="keySizeStyle">
+          <TDInput
+            v-for="(field, indexField) in formData"
+            :key="'key-' + indexField"
+            v-model="field.key"
+            :noMargin="true"
+            :placeHolder="$t('i18nCommon.apiTesting.formDataKey')"
           />
         </div>
-        <TDComboBox
-          class="td-form-data-column"
-          :noMargin="true"
-          :width="100"
-          :usingStylePercent="true"
-          :isCapitalizeText="false"
-          :options="formDataTypeOptions"
-          :modelValue="field.type"
-          @update:modelValue="(typeValue) => changeType(field, typeValue)"
+        <TDResizer
+          direction="horizontal"
+          :minSize="10"
+          :maxSize="70"
+          @resize="handleResizeKey"
         />
-        <div class="td-form-data-column td-form-data-action">
-          <TDButton
-            :noMargin="true"
-            :type="$tdEnum.buttonType.secondary"
-            iconClass="td-close-icon"
-            @click="removeField(indexField)"
-            v-tooltip="$t('i18nCommon.apiTesting.delete')"
-          />
+        <!-- cột value, mỗi dòng gồm value, combo kiểu field và nút xoá -->
+        <div class="td-form-data-value-col">
+          <div
+            v-for="(field, indexField) in formData"
+            :key="'value-' + indexField"
+            class="td-form-data-row"
+          >
+            <TDInput
+              v-if="field.type == $tdEnum.APIFormDataType.text"
+              class="td-form-data-value"
+              v-model="field.value"
+              :noMargin="true"
+              :placeHolder="$t('i18nCommon.apiTesting.formDataValue')"
+            />
+            <div v-else class="td-form-data-value td-form-data-file">
+              <span
+                class="flex-one text-nowrap"
+                :class="{
+                  'td-form-data-file-name-saved': !field.fileContent,
+                }"
+                v-tooltip="field.fileName"
+                >{{
+                  field.fileName || $t("i18nCommon.apiTesting.formDataFile")
+                }}</span
+              >
+              <TDUpload
+                iconClass="td-upload-icon"
+                :hideBorder="true"
+                @selected="(files) => selectFile(field, files)"
+                v-tooltip="$t('i18nCommon.uploadFile')"
+              />
+            </div>
+            <TDComboBox
+              class="td-form-data-type"
+              :noMargin="true"
+              :width="100"
+              :usingStylePercent="true"
+              :isCapitalizeText="false"
+              :options="formDataTypeOptions"
+              :modelValue="field.type"
+              @update:modelValue="(typeValue) => changeType(field, typeValue)"
+            />
+            <div class="td-form-data-action">
+              <TDButton
+                :noMargin="true"
+                :type="$tdEnum.buttonType.secondary"
+                iconClass="td-close-icon"
+                @click="removeField(indexField)"
+                v-tooltip="$t('i18nCommon.apiTesting.delete')"
+              />
+            </div>
+          </div>
         </div>
       </div>
-      <div class="td-form-data-empty" v-if="formData.length == 0">
+      <div class="td-form-data-empty" v-else>
         {{ $t("i18nCommon.apiTesting.formDataEmpty") }}
       </div>
     </div>
@@ -94,6 +111,12 @@
  */
 export default {
   name: "TDAPIFormDataEditor",
+  data() {
+    return {
+      // bề rộng cột key, phần còn lại là của value, kéo cột giữa để đổi
+      keySize: 40,
+    };
+  },
   props: {
     // danh sách field, 2 bên dùng chung cùng 1 cấu trúc field
     modelValue: {
@@ -111,6 +134,10 @@ export default {
     // danh sách field do 2 bên dùng chung, thao tác trực tiếp trên list này
     formData() {
       return this.modelValue;
+    },
+    // bề rộng cột key, TDInput nhận style gắn thẳng vào ô
+    keySizeStyle() {
+      return { width: `${this.keySize}%` };
     },
     // 2 kiểu của 1 field form data, dùng cho combo box chọn text hoặc file
     formDataTypeOptions() {
@@ -137,6 +164,14 @@ export default {
     },
   },
   methods: {
+    /**
+     * Kéo cột giữa để đổi bề rộng giữa key và value,
+     * mọi dòng dùng chung 1 tỉ lệ nên đặt ở component
+     * @param {object} sizes do TDResizer trả về
+     */
+    handleResizeKey(sizes) {
+      this.keySize = sizes.leftSize;
+    },
     /**
      * Tạo mới 1 field, mặc định là dạng text
      */
@@ -241,20 +276,46 @@ export default {
   padding: var(--padding);
   display: flex;
   flex-direction: column;
+}
+
+// 2 cột key và value, 1 resizer duy nhất nằm giữa
+.td-form-data-columns {
+  display: flex;
+  gap: var(--padding-medium);
+}
+
+// cột key chiếm tỉ lệ %, các ô cao đúng bằng 1 dòng của cột value
+.td-form-data-key-col {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding);
+}
+
+// cột value chiếm phần còn lại, chiều cao mỗi dòng khớp cột key
+.td-form-data-value-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
   gap: var(--padding);
 }
 
 .td-form-data-row {
-  display: grid;
-  // key, value, kiểu field, nút xoá
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 100px auto;
-  gap: var(--padding);
+  display: flex;
   align-items: center;
+  gap: var(--padding);
 }
 
-// grid item mặc định min-width auto, thêm min-width 0 để input co lại đúng cột
-.td-form-data-column {
+// phần còn lại của dòng là value, min-width 0 để input co lại đúng cột
+.td-form-data-value {
+  flex: 1;
   min-width: 0;
+}
+
+// combo box kiểu field giữ nguyên bề rộng
+.td-form-data-type {
+  flex: 0 0 100px;
 }
 
 // ô chọn file: dùng grid để nút upload chỉ chiếm đúng bề rộng icon,
@@ -280,6 +341,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 .td-form-data-empty {
