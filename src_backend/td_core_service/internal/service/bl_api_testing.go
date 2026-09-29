@@ -154,7 +154,7 @@ func buildFormDataRequest(reqData model.TDAPITestingParam) (*http.Request, error
 /**
  * writeFormField ghi 1 field của body form data, field dạng text hoặc file
  */
-func writeFormField(writer *multipart.Writer, field model.TDAPITestingFormField) error {
+func writeFormField(writer *multipart.Writer, field model.TDAPIFormField) error {
 	// field không có key thì bỏ qua
 	if strings.TrimSpace(field.Key) == "" {
 		return nil

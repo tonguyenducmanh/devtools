@@ -14,9 +14,6 @@ import (
 	"td_core_service/td_common"
 )
 
-// maxFormDataValueSize giới hạn kích thước value của 1 field text khi đọc từ request
-const maxFormDataValueSize = 8 << 20 // 8MB
-
 // formDataRequest là các field đọc được từ body multipart của 1 request
 type formDataRequest struct {
 	Fields []model.TDAPIFormField
@@ -70,7 +67,7 @@ func readFormDataPart(part *multipart.Part) *model.TDAPIFormField {
 	}
 
 	// field dạng text
-	value, err := io.ReadAll(io.LimitReader(part, maxFormDataValueSize))
+	value, err := io.ReadAll(part)
 	if err != nil {
 		return nil
 	}
@@ -99,38 +96,24 @@ func formDataEquivalent(fields []model.TDAPIFormField, mockFormDataText string) 
 // vì thứ tự part multipart không ảnh hưởng tới ý nghĩa của request
 func equivalentFormFields(requestFields []model.TDAPIFormField, mockFields []model.TDAPIFormFieldSaved) bool {
 	// field không có key thì không tham gia đối chiếu, giống lúc dựng request
-	if countValidFormFields(requestFields) != countValidSavedFormFields(mockFields) {
-		return false
+	countRequest := 0
+	for _, field := range requestFields {
+		if strings.TrimSpace(field.Key) != "" {
+			countRequest++
+		}
 	}
+
+	countMock := 0
 	for _, mockField := range mockFields {
 		if strings.TrimSpace(mockField.Key) == "" {
 			continue
 		}
+		countMock++
 		if !findMatchingRequestField(requestFields, mockField) {
 			return false
 		}
 	}
-	return true
-}
-
-func countValidFormFields(fields []model.TDAPIFormField) int {
-	count := 0
-	for _, field := range fields {
-		if strings.TrimSpace(field.Key) != "" {
-			count++
-		}
-	}
-	return count
-}
-
-func countValidSavedFormFields(fields []model.TDAPIFormFieldSaved) int {
-	count := 0
-	for _, field := range fields {
-		if strings.TrimSpace(field.Key) != "" {
-			count++
-		}
-	}
-	return count
+	return countRequest == countMock
 }
 
 // findMatchingRequestField tìm trong các field của request có field khớp với field của mock
