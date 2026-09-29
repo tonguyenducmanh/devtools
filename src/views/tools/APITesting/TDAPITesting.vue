@@ -449,8 +449,8 @@ import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDAPITestingHelp from "@/views/helps/TDAPITestingHelp.vue";
 import _ from "@/common/TDCommonFunction.js";
 import { TDShortcutActionEnum } from "@/common/TDShortcutAction.js";
-import TDAPIFormDataEditor from "@/components/TDAPIFormDataEditor.vue";
-import TDAPIPanelSwitcher from "@/components/TDAPIPanelSwitcher.vue";
+import TDAPIFormDataEditor from "@/views/tools/APITesting/TDAPIFormDataEditor.vue";
+import TDAPIPanelSwitcher from "@/views/tools/APITesting/TDAPIPanelSwitcher.vue";
 import TDAPIFormDataMixin from "@/mixins/TDAPIFormDataMixin.js";
 export default {
   extends: TDToolBase,

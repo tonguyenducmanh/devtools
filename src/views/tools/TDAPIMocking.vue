@@ -437,8 +437,8 @@ import TDAutomation from "@/common/automation/TDAutomation.js";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDAPIMockingHelp from "@/views/helps/TDAPIMockingHelp.vue";
-import TDAPIFormDataEditor from "@/components/TDAPIFormDataEditor.vue";
-import TDAPIPanelSwitcher from "@/components/TDAPIPanelSwitcher.vue";
+import TDAPIFormDataEditor from "@/views/tools/APITesting/TDAPIFormDataEditor.vue";
+import TDAPIPanelSwitcher from "@/views/tools/APITesting/TDAPIPanelSwitcher.vue";
 import TDAPIFormDataMixin from "@/mixins/TDAPIFormDataMixin.js";
 export default {
   extends: TDToolBase,
