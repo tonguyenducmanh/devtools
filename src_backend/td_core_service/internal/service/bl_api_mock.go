@@ -164,7 +164,11 @@ func handleMockRequest(w http.ResponseWriter, r *http.Request, mocks []model.TDA
 	}
 	defer r.Body.Close()
 
-	selectedMock, notFoundBody := findMatchingMockBodyGroupByEndpoint(mocks, bodyBytes)
+	// request gửi body multipart thì parse ra danh sách field để đối chiếu với mock dạng form data,
+	// parse lỗi thì coi như không đọc được form data, chỉ còn đối chiếu được mock dạng json
+	formDataRequest := parseFormDataRequest(r, bodyBytes)
+
+	selectedMock, notFoundBody := findMatchingMockBodyGroupByEndpoint(mocks, formDataRequest, bodyBytes)
 	if notFoundBody {
 		msg := "404 Not Found - API endpoint mock có tồn tại nhưng không tìm được body mock tương ứng"
 		BuildNotFoundResponse(w, r, &msg)
@@ -261,23 +265,39 @@ func writeMockResponseHeaders(w http.ResponseWriter, mock *model.TDAPIMockItem) 
 	}
 }
 
-// Tìm mock phù hợp dựa trên request body, các body này có chung endpoint api
-func findMatchingMockBodyGroupByEndpoint(mocks []model.TDAPIMockItem, BodyText []byte) (*model.TDAPIMockItem, bool) {
-	BodyTextStr := string(BodyText)
+// Tìm mock phù hợp dựa trên body của request, các mock này có chung endpoint api.
+// formDataRequest là các field đọc được từ body multipart, nil nếu request không gửi multipart
+func findMatchingMockBodyGroupByEndpoint(
+	mocks []model.TDAPIMockItem,
+	formDataRequest *formDataRequest,
+	requestBody []byte,
+) (*model.TDAPIMockItem, bool) {
+	bodyText := string(requestBody)
 
-	// Trường hợp 1: Tìm mock có BodyText khớp chính xác (so sánh JSON)
+	// Trường hợp 1: Tìm mock có body khớp chính xác (json hoặc form data)
 	for i := range mocks {
+		if mocks[i].IsFormData() {
+			// chỉ đối chiếu được khi request cũng gửi body multipart
+			if formDataRequest == nil {
+				continue
+			}
+			if formDataEquivalent(formDataRequest.Fields, mocks[i].FormDataText) {
+				td_common.LogInfo(fmt.Sprintf("Đã tìm được form data tương ứng với mock: %s - endpoint: %s", mocks[i].RequestName, mocks[i].Endpoint))
+				return &mocks[i], false
+			}
+			continue
+		}
 		if mocks[i].BodyText != "" {
-			if td_common.JSONEquivalent(mocks[i].BodyText, BodyTextStr) {
+			if td_common.JSONEquivalent(mocks[i].BodyText, bodyText) {
 				td_common.LogInfo(fmt.Sprintf("Đã tìm được body tương ứng với mock: %s - endpoint: %s", mocks[i].RequestName, mocks[i].Endpoint))
 				return &mocks[i], false
 			}
 		}
 	}
 	if td_config.GetConfigGlobal().MockAPIConfig.EnableMockNotCareBody {
-		// Trường hợp 2: Tìm mock có BodyText trống hoặc null (dùng làm default)
+		// Trường hợp 2: Tìm mock không khai báo body (dùng làm default)
 		for i := range mocks {
-			if mocks[i].BodyText == "" || mocks[i].BodyText == "null" {
+			if !mocks[i].HasBody() {
 				td_common.LogInfo(fmt.Sprintf("Đã sử dụng default mock: %s - endpoint: %s", mocks[i].RequestName, mocks[i].Endpoint))
 				return &mocks[i], false
 			}

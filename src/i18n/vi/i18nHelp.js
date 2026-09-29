@@ -255,7 +255,7 @@ export default {
       howToUse: {
         title: "Cách sử dụng",
         createMock:
-          "Chọn HTTP method, nhập endpoint và cấu hình request/response.",
+          "Chọn HTTP method, nhập endpoint và cấu hình request/response. Body của request có thể chọn kiểu JSON hoặc Form Data ở combo box trên cùng.",
         configure: "Sử dụng panel bên phải để quản lý các mock API đã tạo.",
         saveMock: "Nhấn Save để lưu mock API, sau đó có thể copy CURL để gọi.",
       },

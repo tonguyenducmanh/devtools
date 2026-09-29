@@ -8,6 +8,7 @@ Accepts a single item or an array of items. Each item has `{ request, response }
 - **CURL string** — e.g. `"curl 'https://api.example.com/users'"` (parsed via `parseCURL`)
 - **Object `{ method, url, headers, body }`** — from `request()` or `requestMulti()`
 - **Object `{ apiUrl, httpMethod, headersText, bodyText }`** — internal format
+- **Object `{ apiUrl, httpMethod, headersText, bodyText, formData }`** — internal format, body dạng multipart form data
 
 `response` is `{ status, headers, body }` — from `request()`, `requestCURL()`, `requestMulti()`, or `requestMultiCURL()`.
 
@@ -19,10 +20,20 @@ Accepts a single item or an array of items. Each item has `{ request, response }
   "method": "GET",
   "api_url": "https://api.example.com/users",
   "headers_text": "",
+  "body_type": "json",
   "body_text": "",
+  "form_data_text": "",
   "response_text": "{ ... }",
   "response_headers_text": "",
   "status_code": 200
+}
+```
+
+Body dạng multipart form data sẽ ra `body_type: "form_data"`, `body_text: ""` và `form_data_text` là JSON của danh sách field:
+```json
+{
+  "body_type": "form_data",
+  "form_data_text": "[{\"key\":\"avatar\",\"value\":\"\",\"type\":\"file\",\"fileName\":\"a.png\",\"fileContentType\":\"image/png\"}]"
 }
 ```
 
