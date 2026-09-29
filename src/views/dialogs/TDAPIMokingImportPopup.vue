@@ -73,6 +73,17 @@ export default {
   "method": "GET",
   "response_text": "{\\"data\\": []}",
   "status_code": 200
+}
+
+// Mock có body dạng multipart form data:
+{
+  "request_name": "Upload Avatar",
+  "end_point": "/api/upload",
+  "method": "POST",
+  "body_type": "form_data",
+  "form_data_text": "[{\\"key\\":\\"name\\",\\"value\\":\\"tom\\",\\"type\\":\\"text\\"}]",
+  "response_text": "{\\"success\\": true}",
+  "status_code": 200
 }`;
     },
   },
@@ -143,7 +154,12 @@ export default {
       }
 
       me.ownerForm.headersText = mockData.headers_text || "";
+      // mock dạng form data lưu body_text = null, chỉ có danh sách field form data
       me.ownerForm.bodyText = mockData.body_text || "";
+      me.ownerForm.formData = me.ownerForm.parseFormDataFromText(
+        mockData.form_data_text,
+      );
+      me.ownerForm.applyBodyTypeOption(mockData.body_type);
       me.ownerForm.responseText = mockData.response_text || "";
       me.ownerForm.responseHeadersText =
         mockData.response_headers_text || "";
@@ -170,13 +186,21 @@ export default {
           }
         }
 
+        // có form_data_text thì coi như body dạng form data, không có thì mặc định json
+        let isFormData =
+          m.body_type == me.$tdEnum.APIBodyType.formData || !!m.form_data_text;
+
         return {
           request_name: m.request_name || "Untitled Mock",
           group_id: m.group_id || me.ownerForm.groupId || "",
           method: (m.method || "GET").toUpperCase(),
           end_point: endpoint,
           headers_text: m.headers_text || "",
-          body_text: m.body_text || "",
+          body_type: isFormData
+            ? me.$tdEnum.APIBodyType.formData
+            : me.$tdEnum.APIBodyType.json,
+          body_text: isFormData ? null : m.body_text || "",
+          form_data_text: isFormData ? m.form_data_text : null,
           response_text: m.response_text || "",
           response_headers_text: m.response_headers_text || "",
           status_code: m.status_code || 200,

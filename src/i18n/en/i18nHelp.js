@@ -259,7 +259,7 @@ export default {
       howToUse: {
         title: "How to Use",
         createMock:
-          "Select HTTP method, enter endpoint and configure request/response.",
+          "Select HTTP method, enter endpoint and configure request/response. The request body can be JSON or Form Data, chosen from the combo box at the top.",
         configure: "Use the right panel to manage created mock APIs.",
         saveMock: "Press Save to save mock API, then copy CURL to call it.",
       },

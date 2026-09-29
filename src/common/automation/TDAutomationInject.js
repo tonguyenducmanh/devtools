@@ -394,7 +394,10 @@ class TDAutomationInject {
    */
   async writeFile(filePath, content) {
     try {
-      let response = await new TDServerTestingAPI().writeFile(filePath, content);
+      let response = await new TDServerTestingAPI().writeFile(
+        filePath,
+        content,
+      );
       let data = response.data;
       if (data && data.success) {
         return data.data;
@@ -515,7 +518,9 @@ class TDAutomationInject {
         method: "GET",
         api_url: "",
         headers_text: "",
+        body_type: tdEnum.APIBodyType.json,
         body_text: "",
+        form_data_text: "",
         response_text: "",
         response_headers_text: "",
         status_code: 200,
@@ -548,7 +553,10 @@ class TDAutomationInject {
             mock.method = (parsed.method || "GET").toUpperCase();
             mock.api_url = parsed.url || "";
             mock.headers_text = parsed.headersText || "";
-            mock.body_text = parsed.bodyText || "";
+            this.applyBodyToMock(mock, {
+              bodyText: parsed.bodyText,
+              formData: parsed.formData,
+            });
           }
         } else if (typeof reqInput === "object") {
           // Object format - support both { method, url, headers, body } and { apiUrl, httpMethod, headersText, bodyText }
@@ -570,15 +578,22 @@ class TDAutomationInject {
           } else if (reqInput.headersText) {
             mock.headers_text = reqInput.headersText;
           }
-          // Body
+          // Body, hỗ trợ cả form data lấy từ getRequestObj() của tool API
+          let formData = Array.isArray(reqInput.formData)
+            ? reqInput.formData
+            : Array.isArray(reqInput.form_data)
+              ? reqInput.form_data
+              : null;
+          let bodyText = null;
           if (reqInput.body !== undefined && reqInput.body !== null) {
-            mock.body_text =
+            bodyText =
               typeof reqInput.body === "string"
                 ? reqInput.body
                 : JSON.stringify(reqInput.body);
           } else if (reqInput.bodyText) {
-            mock.body_text = reqInput.bodyText;
+            bodyText = reqInput.bodyText;
           }
+          this.applyBodyToMock(mock, { bodyText, formData });
         }
       }
 
@@ -626,6 +641,33 @@ class TDAutomationInject {
 
       return mock;
     });
+  }
+
+  /**
+   * Gán body vào mock, tự chọn body_type dựa trên việc có form data hay không.
+   * form_data_text lưu danh sách field dạng json, không lưu nội dung file
+   * @param {Object} mock - mock object đang build
+   * @param {Object} body - { bodyText, formData }
+   */
+  applyBodyToMock(mock, body) {
+    let formData = body?.formData;
+    if (Array.isArray(formData)) {
+      mock.body_type = tdEnum.APIBodyType.formData;
+      mock.body_text = "";
+      mock.form_data_text = JSON.stringify(
+        formData.map((field) => ({
+          key: field.key ?? "",
+          value: field.value ?? "",
+          type: field.type ?? tdEnum.APIFormDataType.text,
+          fileName: field.fileName ?? "",
+          fileContentType: field.fileContentType ?? "",
+        })),
+      );
+      return;
+    }
+    mock.body_type = tdEnum.APIBodyType.json;
+    mock.body_text = body?.bodyText ?? "";
+    mock.form_data_text = "";
   }
 
   /**
