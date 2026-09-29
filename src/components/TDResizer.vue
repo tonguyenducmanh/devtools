@@ -153,9 +153,12 @@ export default {
   background: transparent;
   z-index: 5;
   flex-shrink: 0;
+  /* kéo dài hết chiều ngang vị trí để thanh kéo luôn tràn hết panel,
+  nhiều nơi parent dùng align-items: center nên không set sẽ bị co lại */
+  align-self: stretch;
 }
 
-/* Horizontal resizer */
+/* Horizontal resizer - thanh dọc, kéo theo chiều ngang */
 .direction-horizontal {
   width: 8px;
   cursor: col-resize;
@@ -174,13 +177,12 @@ export default {
 
 .direction-horizontal .td-resizer-line {
   width: 2px;
-  height: 100px;
+  height: 100%;
   background: var(--border-color);
   border-radius: 2px;
-  transition: all 0.2s ease;
 }
 
-/* Vertical resizer */
+/* Vertical resizer - thanh ngang, kéo theo chiều dọc */
 .direction-vertical {
   height: 8px;
   cursor: row-resize;
@@ -198,28 +200,15 @@ export default {
 }
 
 .direction-vertical .td-resizer-line {
-  width: 100px;
+  width: 100%;
   height: 2px;
   background: var(--border-color);
   border-radius: 2px;
-  transition: all 0.2s ease;
 }
 
-/* Hover states */
+/* Hover states - chỉ đổi màu, không đổi kích thước */
 .td-resizer:hover .td-resizer-line,
 .td-resizer.dragging .td-resizer-line {
-  background: var(--bg-hover-color);
-}
-
-.direction-horizontal:hover .td-resizer-line,
-.direction-horizontal.dragging .td-resizer-line {
-  height: 150px;
-  background: var(--focus-color);
-}
-
-.direction-vertical:hover .td-resizer-line,
-.direction-vertical.dragging .td-resizer-line {
-  width: 150px;
   background: var(--focus-color);
 }
 
