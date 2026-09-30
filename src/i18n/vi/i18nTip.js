@@ -7,6 +7,8 @@ export default {
       "Một số tool cần sử dụng agent backend để có thể chạy được, ấn vào trợ giúp trên header ứng dụng và chọn tải agent",
       "Bạn có thể sắp xếp nhanh key của object JSON trong text editor bằng cách chuột phải chọn JSON sắp xếp theo key",
       "Khi đang gõ câu query SQL, bạn có thể đặt con trỏ chuột vào tên bảng, tên view, tên function và ấn F12 để mở nhanh DLL của object đó",
+      "Tool Window RDP truyền file hai chiều: chọn file trên máy tính rồi chuột phải trong máy remote chọn paste để gửi lên, nút tải về trên thanh công cụ dùng để lưu file máy remote gửi sang",
+      "Tool API testing gửi được cả body dạng JSON và Form Data, đổi kiểu body bằng combo box ở header, kiểu Form Data còn cho phép gửi kèm file",
     ],
     nextTip: "Click để xem tip tiếp theo",
   },
