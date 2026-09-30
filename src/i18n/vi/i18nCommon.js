@@ -188,7 +188,7 @@ export default {
       APITesting: "API testing",
       Automation: "Tự động hóa",
       APIMocking: "API mocking",
-      remoteDesktopRDP: "Giao thức RDP",
+      remoteDesktopRDP: "Window RDP",
       PostgreSQLTemplate: "Code mẫu PostgreSQL",
       CSharpTemplate: "Code mẫu C#",
       JavaScriptTemplate: "Code mẫu JavaScript",

@@ -187,7 +187,7 @@ export default {
       APITesting: "API testing",
       Automation: "Automation",
       APIMocking: "API mocking",
-      remoteDesktop: "Remote Desktop Protocol",
+      remoteDesktopRDP: "Window RDP",
       PostgreSQLTemplate: "PostgreSQL Template",
       CSharpTemplate: "C# template",
       JavaScriptTemplate: "JavaScript template",

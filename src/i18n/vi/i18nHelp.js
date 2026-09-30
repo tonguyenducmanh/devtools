@@ -513,9 +513,9 @@ export default {
     },
     remoteDesktop: {
       purpose: {
-        title: "Máy tính từ xa RDP là gì?",
+        title: "Window RDP là gì?",
         content:
-          "Công cụ kết nối máy tính từ xa qua giao thức RDP (Remote Desktop Protocol). Sử dụng IronRDP WebAssembly để kết nối trực tiếp từ trình duyệt.",
+          "Window RDP là công cụ kết nối máy tính từ xa qua giao thức RDP (Remote Desktop Protocol). Sử dụng IronRDP WebAssembly để kết nối trực tiếp từ trình duyệt.",
       },
       howToUse: {
         title: "Cách sử dụng",
