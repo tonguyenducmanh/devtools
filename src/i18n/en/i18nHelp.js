@@ -521,9 +521,9 @@ export default {
     },
     remoteDesktop: {
       purpose: {
-        title: "What is Remote Desktop RDP?",
+        title: "What is Window RDP?",
         content:
-          "A tool to connect to remote computers via RDP (Remote Desktop Protocol). Uses IronRDP WebAssembly to connect directly from the browser.",
+          "Window RDP is a tool to connect to remote computers via RDP (Remote Desktop Protocol). Uses IronRDP WebAssembly to connect directly from the browser.",
       },
       howToUse: {
         title: "How to Use",
