@@ -3,7 +3,7 @@
     :visible="true"
     :showHeader="true"
     @close="handleClose"
-    width="600px"
+    width="900px"
     height="440px"
     :title="$t('i18nCommon.remoteDesktop.receiveFiles')"
   >
@@ -16,20 +16,32 @@
           v-for="(file, idx) in files"
           :key="file.remoteIndex"
           class="td-remote-files-item"
-          v-tooltip="$t('i18nCommon.remoteDesktop.downloadThisFile')"
+          :class="{ 'td-remote-files-item-busy': isFileDownloading(file) }"
+          v-tooltip="getFileTooltip(file)"
           @click="downloadFile(idx)"
         >
           <div class="td-icon td-download-icon"></div>
           <div class="flex-one td-remote-files-info">
-            <div class="td-remote-files-name">
+            <div class="text-nowrap">
               {{ file.path ? file.path + "\\" + file.name : file.name }}
             </div>
-            <div class="td-remote-files-meta">
-              <span>{{ formatFileSize(file.size) }}</span>
-              <span v-if="file.downloaded" class="td-remote-files-done">
-                {{ $t("i18nCommon.remoteDesktop.fileDownloaded") }}
+            <div class="flex td-remote-files-meta">
+              <span class="td-remote-files-size">{{
+                formatFileSize(file.size)
+              }}</span>
+              <span
+                v-if="isFileDownloading(file)"
+                class="td-remote-files-progress text-nowrap"
+              >
+                {{ formatFileProgress(file) }}
               </span>
             </div>
+            <progress
+              v-if="isFileDownloading(file)"
+              class="td-remote-files-progress-bar"
+              :value="progressValue(file)"
+              :max="file.totalSize || 1"
+            ></progress>
           </div>
           <button
             class="td-remote-files-remove"
@@ -40,10 +52,27 @@
           </button>
         </div>
       </div>
-      <div class="td-remote-files-footer">
-        <div class="flex-one td-remote-files-hint">
-          {{ $t("i18nCommon.remoteDesktop.receiveFilesHint") }}
+      <div
+        v-if="transferStats.activeCount > 0"
+        class="flex td-remote-files-total"
+      >
+        <div class="flex td-remote-files-total-text">
+          <span class="flex-one text-nowrap">{{
+            $t("i18nCommon.remoteDesktop.downloadingFiles").format(
+              transferStats.activeCount,
+            )
+          }}</span>
+          <span class="text-nowrap td-remote-files-progress">{{
+            formatFileProgress(transferStats)
+          }}</span>
         </div>
+        <progress
+          class="td-remote-files-progress-bar"
+          :value="progressValue(transferStats)"
+          :max="transferStats.totalSize || 1"
+        ></progress>
+      </div>
+      <div class="flex td-remote-files-footer">
         <TDButton
           :noMargin="true"
           :readOnly="files.length === 0"
@@ -85,6 +114,7 @@ export default {
   data() {
     return {
       getFiles: null,
+      getDownloadStats: null,
       onDialogClosed: null,
       onDownloadFile: null,
       onDownloadAllFiles: null,
@@ -102,6 +132,23 @@ export default {
     files() {
       return typeof this.getFiles === "function" ? this.getFiles() : [];
     },
+
+    /**
+     * Tổng tiến trình của các download đang chạy. Cha tự tính từ activeDownloads
+     * nên computed này tự cập nhật sau mỗi chunk về, không cần state riêng ở popup.
+     * Cùng hình dạng với 1 dòng file để dùng chung formatFileProgress.
+     */
+    transferStats() {
+      let stats =
+        typeof this.getDownloadStats === "function"
+          ? this.getDownloadStats()
+          : null;
+      return {
+        activeCount: stats?.activeCount || 0,
+        receivedBytes: stats?.receivedBytes || 0,
+        totalSize: stats?.totalSize || 0,
+      };
+    },
   },
 
   beforeUnmount() {
@@ -117,6 +164,7 @@ export default {
     show(param) {
       if (!param) return;
       this.getFiles = param.getFiles || null;
+      this.getDownloadStats = param.getDownloadStats || null;
       this.onDialogClosed = param.onDialogClosed || null;
       this.onDownloadFile = param.onDownloadFile || null;
       this.onDownloadAllFiles = param.onDownloadAllFiles || null;
@@ -152,11 +200,48 @@ export default {
       }
     },
 
+    isFileDownloading(file) {
+      return !!(file && file.downloading);
+    },
+
+    getFileTooltip(file) {
+      return this.isFileDownloading(file)
+        ? this.$t("i18nCommon.remoteDesktop.fileDownloading")
+        : this.$t("i18nCommon.remoteDesktop.downloadThisFile");
+    },
+
+    /**
+     * Value cho thẻ <progress>. Chưa biết tổng dung lượng (đang chờ trả lời
+     * SIZE) thì trả undefined để Vue gỡ hẳn attribute value: chỉ khi thiếu
+     * value thì <progress> mới chạy kiểu không xác định, còn value="0" max="0"
+     * là determinate và sẽ đứng chết ở 0%.
+     */
+    progressValue(source) {
+      return source?.totalSize ? source.receivedBytes : undefined;
+    },
+
+    /**
+     * "45% · 120.0 MB / 265.4 MB". Chưa biết tổng dung lượng (đang chờ trả lời
+     * SIZE) thì để trống, thanh <progress> tự chạy kiểu không xác định.
+     *
+     * Phần trăm tính lúc render từ receivedBytes/totalSize thay vì lưu vào file,
+     * không phải ghi thêm field mỗi lần có chunk về.
+     */
+    formatFileProgress(file) {
+      if (!file || !file.totalSize) return "";
+      let percent = Math.floor((file.receivedBytes / file.totalSize) * 100);
+      return `${percent}% · ${this.formatFileSize(
+        file.receivedBytes,
+      )} / ${this.formatFileSize(file.totalSize)}`;
+    },
+
     formatFileSize(bytes) {
       if (!bytes) return "0 B";
       let units = ["B", "KB", "MB", "GB", "TB"];
       let i = Math.floor(Math.log(bytes) / Math.log(1024));
-      return (bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1) + " " + units[i];
+      return (
+        (bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1) + " " + units[i]
+      );
     },
   },
 };
@@ -173,25 +258,51 @@ export default {
   width: 100%;
   min-height: 0;
   overflow-y: auto;
-  padding: 8px var(--padding);
+  padding: var(--padding);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--padding);
 }
 
+/* Dòng file theo mẫu .otp-item của TDOneTimePassword: nền trong suốt, viền
+   mỏng. Tên file không in đậm, phân cấp thị giác đến từ dòng phụ nhỏ hơn và
+   màu secondary, giống .td-connection-name của chính tool RDP. */
 .td-remote-files-item {
   display: flex;
   align-items: center;
   gap: var(--padding);
-  padding: 6px var(--padding);
+  padding: var(--padding);
   border-radius: var(--border-radius);
-  background-color: var(--bg-layer-color);
+  border: 1px solid var(--border-color);
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
     background-color: var(--focus-color);
     color: var(--selected-item-text-color);
+
+    .td-remote-files-size,
+    .td-remote-files-progress {
+      color: var(--selected-item-text-color);
+    }
+  }
+}
+
+/* File đang tải thì không bấm lại được nữa, trỏ chuột cũng không cần là con trỏ tay */
+.td-remote-files-item-busy {
+  cursor: default;
+
+  &:hover {
+    background-color: transparent;
+    color: inherit;
+
+    .td-remote-files-size {
+      color: var(--text-secondary-color);
+    }
+
+    .td-remote-files-progress {
+      color: var(--focus-color);
+    }
   }
 }
 
@@ -199,30 +310,70 @@ export default {
   min-width: 0;
 }
 
-.td-remote-files-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* Dòng dưới: dung lượng bên trái, tiến trình đã tải / tổng bên phải */
+.td-remote-files-meta {
+  justify-content: space-between;
+  gap: var(--padding);
+  font-size: var(--font-size-small);
 }
 
-.td-remote-files-meta {
-  display: flex;
-  gap: 8px;
-  font-size: 12px;
+.td-remote-files-size {
   color: var(--text-secondary-color);
 }
 
-/* Cùng màu với phần metadata, để dòng file không đổi giao diện sau khi tải */
-.td-remote-files-done {
-  color: inherit;
+.td-remote-files-progress {
+  color: var(--focus-color);
+}
+
+/* Thanh tiến trình dùng thẻ <progress> native, giống hệt phần progress của
+   TDOneTimePassword nên không cần vẽ tay, không cần cả keyframes. */
+.td-remote-files-progress-bar {
+  width: 100%;
+  height: var(--padding);
+  margin-top: var(--padding-medium);
+  border: none;
+  border-radius: var(--border-radius-component);
+  appearance: none;
+  overflow: hidden;
+
+  &::-webkit-progress-bar {
+    background-color: var(--bg-layer-color);
+    border-radius: var(--border-radius-component);
+  }
+
+  &::-webkit-progress-value {
+    background-color: var(--focus-color);
+    border-radius: var(--border-radius-component);
+  }
+
+  &::-moz-progress-bar {
+    background-color: var(--focus-color);
+    border-radius: var(--border-radius-component);
+  }
+}
+
+/* Khối tổng ở chân popup, chỉ hiện khi đang có download */
+.td-remote-files-total {
+  width: 100%;
+  gap: var(--padding);
+  padding: var(--padding);
+  border-top: 1px solid var(--border-color);
+}
+
+.td-remote-files-total-text {
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding);
+  font-size: var(--font-size-small);
+  color: var(--text-secondary-color);
 }
 
 .td-remote-files-remove {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 2px;
-  border-radius: var(--border-radius);
+  padding: var(--padding-medium);
+  border-radius: var(--border-radius-component);
   opacity: 0.6;
   transition: all 0.2s ease;
 
@@ -234,21 +385,16 @@ export default {
 }
 
 .td-remote-files-empty {
-  padding: 32px var(--padding);
+  padding: var(--padding-large) var(--padding);
   text-align: center;
   color: var(--text-secondary-color);
 }
 
 .td-remote-files-footer {
-  display: flex;
-  align-items: center;
+  width: 100%;
+  justify-content: space-between;
   gap: var(--padding);
-  padding: 8px var(--padding);
+  padding: var(--padding);
   border-top: 1px solid var(--border-color);
-}
-
-.td-remote-files-hint {
-  font-size: 12px;
-  color: var(--text-secondary-color);
 }
 </style>

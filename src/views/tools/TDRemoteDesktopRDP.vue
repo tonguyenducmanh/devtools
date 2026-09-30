@@ -723,6 +723,11 @@ export default {
       this.session = null;
       this.isConnected = false;
       this.isConnecting = false;
+      // Tắt tiến trình trước khi xoá state. Nếu không popup sẽ kẹt ở trạng thái
+      // "đang tải" dù đã không còn phiên nào chạy nữa.
+      me.activeDownloads.forEach((state) => {
+        me.stopFileDownloading(state.file);
+      });
       me.activeDownloads.clear();
       me.uploadFileHandles.clear();
       me.remoteClipDataLocks.clear();
@@ -905,6 +910,7 @@ export default {
           onDownloadAllFiles: () => me.downloadAllIncomingFiles(),
           onRemoveFile: (index) => me.removeIncomingFile(index),
           onClearFiles: () => me.clearIncomingFiles(),
+          getDownloadStats: () => me.getDownloadTransferStats(),
         },
       });
     },
@@ -936,6 +942,10 @@ export default {
         receivedBytes: 0,
         chunks: [],
       });
+      // Bật trạng thái đang tải ngay, chưa cần đợi byte nào về. File vài trăm
+      // MB kéo hàng chục giây, không có dấu hiệu gì thì người dùng tưởng bấm
+      // nhầm rồi bấm lại.
+      me.markFileDownloading(file, 0, 0);
       me.session.invokeExtension(
         new me._wasm.Extension("request_file_contents", {
           stream_id: streamId,
@@ -949,6 +959,49 @@ export default {
     },
 
     /**
+     * Ghi tiến trình lên chính object file để popup hiển thị, thay vì để popup
+     * tự tra activeDownloads: object file đã nằm sẵn trong incomingFiles nên
+     * đổi 1 field là UI tự render lại đúng dòng đang tải.
+     *
+     * totalSize = 0 nghĩa là chưa biết tổng dung lượng (đang chờ trả lời SIZE),
+     * lúc đó thẻ <progress> của popup tự chạy kiểu không xác định.
+     */
+    markFileDownloading(file, receivedBytes, totalSize) {
+      if (!file) return;
+      file.downloading = true;
+      file.receivedBytes = receivedBytes;
+      file.totalSize = totalSize;
+    },
+
+    /**
+     * Tắt tiến trình của 1 file khi nó không còn chạy nữa (xong, lỗi, huỷ hoặc
+     * mất kết nối). Bắt buộc gọi ở mọi nhánh kết thúc, nếu không dòng file sẽ
+     * kẹt ở trạng thái "đang tải" mãi.
+     */
+    stopFileDownloading(file) {
+      if (!file) return;
+      file.downloading = false;
+    },
+
+    /**
+     * Tổng hợp tiến trình của mọi download đang chạy cho thanh tiến trình tổng
+     * ở footer popup. Đọc Map reactive mỗi lần render nên tự cập nhật theo từng
+     * chunk về, không cần state riêng.
+     */
+    getDownloadTransferStats() {
+      let me = this;
+      let activeCount = 0;
+      let receivedBytes = 0;
+      let totalSize = 0;
+      me.activeDownloads.forEach((state) => {
+        activeCount++;
+        receivedBytes += state.receivedBytes;
+        totalSize += state.totalSize;
+      });
+      return { activeCount, receivedBytes, totalSize };
+    },
+
+    /**
      * Tải toàn bộ file trong danh sách. Danh sách chỉ bị xoá khi người dùng bấm
      * xoá, nên bấm nhiều lần vẫn tải lại được, không có trạng thái chặn.
      */
@@ -956,6 +1009,9 @@ export default {
       let me = this;
       if (!me.session || me.incomingFiles.length === 0) return;
       me.incomingFiles.forEach((file) => {
+        // File đang tải thì bỏ qua: tạo stream thứ hai cho cùng một file sẽ
+        // khiến 2 stream cùng ghi ra cùng tên, file tải về bị hỏng.
+        if (file.downloading) return;
         me.startFileDownload(file, file.remoteIndex, me.incomingFileClipDataId);
       });
       me.addLog(
@@ -972,6 +1028,9 @@ export default {
       if (!me.session) return;
       let file = me.incomingFiles[index];
       if (!file) return;
+      // Đang tải rồi thì bấm lại cũng vô ích, sẽ tạo stream thứ hai cùng ghi ra
+      // cùng một tên file và làm hỏng file tải về.
+      if (file.downloading) return;
       me.startFileDownload(file, file.remoteIndex, me.incomingFileClipDataId);
       me.addLog(
         `${me.$t("i18nCommon.remoteDesktop.downloading")} ${file.name}`,
@@ -990,6 +1049,7 @@ export default {
 
       if (response.isError) {
         me.activeDownloads.delete(response.streamId);
+        me.stopFileDownloading(state.file);
         me.addLog(
           `${me.$t("i18nCommon.remoteDesktop.downloadFailed")}: ${state.fileName}`,
           "error",
@@ -1007,6 +1067,7 @@ export default {
           data.byteLength,
         );
         state.totalSize = Number(view.getBigUint64(0, true));
+        me.markFileDownloading(state.file, 0, state.totalSize);
         if (state.totalSize === 0) {
           // File rỗng: xong ngay, không cần kéo chunk nào.
           me.finishFileDownload(response.streamId, state);
@@ -1018,6 +1079,7 @@ export default {
 
       state.chunks.push(data);
       state.receivedBytes += data.length;
+      me.markFileDownloading(state.file, state.receivedBytes, state.totalSize);
       if (state.receivedBytes >= state.totalSize) {
         me.finishFileDownload(response.streamId, state);
       } else {
@@ -1053,9 +1115,11 @@ export default {
         `${me.$t("i18nCommon.remoteDesktop.downloaded")} ${fileName}`,
         "success",
       );
-      // Giữ file trong danh sách, chỉ đánh dấu đã tải. Người dùng tự xoá khi
-      // không cần nữa, tránh mất danh sách vì tải tự động.
-      state.file.downloaded = true;
+      // Giữ file trong danh sách sau khi tải xong, người dùng tự xoá khi không
+      // cần nữa, tránh mất danh sách vì tải tự động. Không đánh dấu "đã tải"
+      // trên file: bấm tải lại lần sau phải thấy tiến trình chạy, chứ không
+      // phải nhãn "đã tải" đứng yên che mất tiến trình.
+      me.stopFileDownloading(state.file);
     },
 
     /**
@@ -1103,6 +1167,7 @@ export default {
       });
       me.activeDownloads.forEach((state, streamId) => {
         me.activeDownloads.delete(streamId);
+        me.stopFileDownloading(state.file);
         me.addLog(
           `${me.$t("i18nCommon.remoteDesktop.downloadAborted")} ${state.fileName}`,
           "warn",
