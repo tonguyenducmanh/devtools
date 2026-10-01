@@ -2,22 +2,48 @@
   <div class="flex container">
     <div class="main-tool">
       <div class="rdp-container">
-        <TDFullTabWrapper v-model="isFullTab" :alwaysShowToolbar="true" fullScreenBgColor="#000" class="rdp-wrapper">
+        <TDFullTabWrapper
+          v-model="isFullTab"
+          :alwaysShowToolbar="true"
+          fullScreenBgColor="#000"
+          class="rdp-wrapper"
+        >
           <template #toolbar-left>
-            <div v-tooltip="$t('i18nCommon.remoteDesktop.screenshot')" class="flex toolbar-btn" @click="takeScreenshot">
+            <div
+              v-tooltip="$t('i18nCommon.remoteDesktop.screenshot')"
+              class="flex toolbar-btn"
+              @click="takeScreenshot"
+            >
               <span class="td-icon td-camera-icon"></span>
             </div>
-            <div v-tooltip="$t('i18nCommon.remoteDesktop.ctrlAltDel')" class="flex toolbar-btn" @click="sendCtrlAltDel"
-              :class="{ 'toolbar-btn-disabled': !isConnected }">
+            <div
+              v-tooltip="$t('i18nCommon.remoteDesktop.ctrlAltDel')"
+              class="flex toolbar-btn"
+              @click="sendCtrlAltDel"
+              :class="{ 'toolbar-btn-disabled': !isConnected }"
+            >
               <span class="td-icon td-command-code-icon"></span>
             </div>
-            <div v-tooltip="$t('i18nCommon.remoteDesktop.sendFilesToRemote')" class="flex toolbar-btn"
-              :class="{ 'toolbar-btn-disabled': !isConnected }">
-              <TDUpload ref="uploadInput" :multiple="true" iconClass="td-icon td-upload-icon" :hideBorder="true"
-                :readOnly="!isConnected" @selected="sendFilesToRemote" />
+            <div
+              v-tooltip="$t('i18nCommon.remoteDesktop.sendFilesToRemote')"
+              class="flex toolbar-btn"
+              :class="{ 'toolbar-btn-disabled': !isConnected }"
+            >
+              <TDUpload
+                ref="uploadInput"
+                :multiple="true"
+                iconClass="td-icon td-upload-icon"
+                :hideBorder="true"
+                :readOnly="!isConnected"
+                @selected="sendFilesToRemote"
+              />
             </div>
-            <div v-tooltip="$t('i18nCommon.remoteDesktop.receiveFiles')" class="flex toolbar-btn rdp-download-btn"
-              @click="openReceiveFilesDialog" :class="{ 'toolbar-btn-disabled': !isConnected }">
+            <div
+              v-tooltip="$t('i18nCommon.remoteDesktop.receiveFiles')"
+              class="flex toolbar-btn rdp-download-btn"
+              @click="openReceiveFilesDialog"
+              :class="{ 'toolbar-btn-disabled': !isConnected }"
+            >
               <span class="td-icon td-download-icon"></span>
               <span v-if="incomingFiles.length > 0" class="td-file-badge">{{
                 incomingFiles.length
@@ -26,69 +52,147 @@
           </template>
           <template #toolbar-right>
             <div class="flex" style="margin-left: 16px">
-              <div v-if="!isConnected && !isConnecting" v-tooltip="$t('i18nCommon.remoteDesktop.connect')"
-                class="flex toolbar-btn" @click="handleConnect">
+              <div
+                v-if="!isConnected && !isConnecting"
+                v-tooltip="$t('i18nCommon.remoteDesktop.connect')"
+                class="flex toolbar-btn"
+                @click="handleConnect"
+              >
                 <span class="td-icon td-connect-icon"></span>
               </div>
-              <div v-else v-tooltip="$t('i18nCommon.remoteDesktop.disconnect')" class="flex toolbar-btn"
-                @click="handleDisconnect">
+              <div
+                v-else
+                v-tooltip="$t('i18nCommon.remoteDesktop.disconnect')"
+                class="flex toolbar-btn"
+                @click="handleDisconnect"
+              >
                 <span class="td-icon td-disconnect-icon"></span>
               </div>
             </div>
           </template>
 
           <div class="rdp-canvas-container">
-            <TDDynamicBackgroundEffect :class="{ 'td-dynamic-effect-canvas': isHideEffectBackground }" />
+            <TDDynamicBackgroundEffect
+              :class="{ 'td-dynamic-effect-canvas': isHideEffectBackground }"
+            />
 
-            <canvas ref="rdpCanvas" class="rdp-canvas" :class="{
-              'rdp-canvas-cursor-none':
-                currentConfigLayout.enableServerPointer && isConnected,
-            }" :width="canvasWidth" :height="canvasHeight" tabindex="0" @keydown="onCanvasKeydown"
-              @keyup="onCanvasKeyup" @mousemove="onCanvasMousemove" @mousedown="onCanvasMousedown"
-              @mouseup="onCanvasMouseup" @wheel.prevent="onCanvasWheel" @contextmenu.prevent="onCanvasContextmenu" />
+            <canvas
+              ref="rdpCanvas"
+              class="rdp-canvas"
+              :class="{
+                'rdp-canvas-cursor-none':
+                  currentConfigLayout.enableServerPointer && isConnected,
+              }"
+              :width="canvasWidth"
+              :height="canvasHeight"
+              tabindex="0"
+              @keydown="onCanvasKeydown"
+              @keyup="onCanvasKeyup"
+              @mousemove="onCanvasMousemove"
+              @mousedown="onCanvasMousedown"
+              @mouseup="onCanvasMouseup"
+              @wheel.prevent="onCanvasWheel"
+              @contextmenu.prevent="onCanvasContextmenu"
+            />
           </div>
         </TDFullTabWrapper>
 
         <!-- Log panel -->
-        <div v-if="currentConfigLayout.showLog" ref="logPanel" class="rdp-log-panel">
-          <div v-for="(entry, idx) in logEntries" :key="idx" class="rdp-log-entry" :class="`rdp-log-${entry.type}`">
-            <span class="rdp-log-time">{{ entry.time }}</span>{{ entry.message }}
+        <div
+          v-if="currentConfigLayout.showLog"
+          ref="logPanel"
+          class="rdp-log-panel"
+        >
+          <div
+            v-for="(entry, idx) in logEntries"
+            :key="idx"
+            class="rdp-log-entry"
+            :class="`rdp-log-${entry.type}`"
+          >
+            <span class="rdp-log-time">{{ entry.time }}</span
+            >{{ entry.message }}
           </div>
         </div>
       </div>
     </div>
-    <TDSubSidebar v-model="currentConfigLayout.isShowSidebar" @toggleSidebar="toggleSidebar">
+    <TDSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <template v-slot:menu>
         <div class="td-sidebar-menu">
-          <TDSlideOption :showIcon="true" v-model="currentConfigLayout.currentSidebarOption" :options="sidebarOptions"
-            :noMargin="true" @change="updateConfigLayout" />
+          <TDSlideOption
+            :showIcon="true"
+            v-model="currentConfigLayout.currentSidebarOption"
+            :options="sidebarOptions"
+            :noMargin="true"
+            @change="updateConfigLayout"
+          />
         </div>
       </template>
       <template v-slot:main>
-        <div class="flex flex-col td-sub-sidebar" v-show="currentConfigLayout.currentSidebarOption ==
-          $tdEnum.RemoteDesktopSidebarOption.Help
-          ">
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.RemoteDesktopSidebarOption.Help
+          "
+        >
           <TDRemoteDesktopRDPHelp />
         </div>
-        <div class="flex flex-col td-sub-sidebar" v-show="currentConfigLayout.currentSidebarOption ==
-          $tdEnum.RemoteDesktopSidebarOption.Collection
-          ">
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.RemoteDesktopSidebarOption.Collection
+          "
+        >
           <div class="td-rdp-collection">
             <div class="flex flex-col td-collection-header">
               <div class="td-connection-form">
-                <TDInput v-model="connectionName" :placeHolder="$t('i18nCommon.remoteDesktop.connectionNamePlaceholder')
-                  " :noMargin="true" class="rdp-connection-input" />
-                <TDInput v-model="host" :placeHolder="$t('i18nCommon.remoteDesktop.hostPlaceholder')" :noMargin="true"
-                  class="rdp-connection-input" />
-                <TDInput v-model="username" :placeHolder="$t('i18nCommon.remoteDesktop.usernamePlaceholder')
-                  " :noMargin="true" class="rdp-connection-input" />
-                <TDInput v-model="password" :placeHolder="$t('i18nCommon.remoteDesktop.passwordPlaceholder')
-                  " :inputType="'password'" :noMargin="true" class="rdp-connection-input" />
+                <TDInput
+                  v-model="connectionName"
+                  :placeHolder="
+                    $t('i18nCommon.remoteDesktop.connectionNamePlaceholder')
+                  "
+                  :noMargin="true"
+                  class="rdp-connection-input"
+                />
+                <TDInput
+                  v-model="host"
+                  :placeHolder="$t('i18nCommon.remoteDesktop.hostPlaceholder')"
+                  :noMargin="true"
+                  class="rdp-connection-input"
+                />
+                <TDInput
+                  v-model="username"
+                  :placeHolder="
+                    $t('i18nCommon.remoteDesktop.usernamePlaceholder')
+                  "
+                  :noMargin="true"
+                  class="rdp-connection-input"
+                />
+                <TDInput
+                  v-model="password"
+                  :placeHolder="
+                    $t('i18nCommon.remoteDesktop.passwordPlaceholder')
+                  "
+                  :inputType="'password'"
+                  :noMargin="true"
+                  class="rdp-connection-input"
+                />
                 <div class="td-connection-actions">
-                  <TDButton :noMargin="true" @click="saveConnection"
-                    :label="$t('i18nCommon.remoteDesktop.saveConnection')" />
-                  <TDButton :noMargin="true" :type="$tdEnum.buttonType.secondary" @click="createNewConnection"
-                    :label="$t('i18nCommon.remoteDesktop.newConnection')" />
+                  <TDButton
+                    :noMargin="true"
+                    @click="saveConnection"
+                    :label="$t('i18nCommon.remoteDesktop.saveConnection')"
+                  />
+                  <TDButton
+                    :noMargin="true"
+                    :type="$tdEnum.buttonType.secondary"
+                    @click="createNewConnection"
+                    :label="$t('i18nCommon.remoteDesktop.newConnection')"
+                  />
                 </div>
               </div>
             </div>
@@ -97,50 +201,100 @@
                 <span class="td-connection-list-title">{{
                   $t("i18nCommon.remoteDesktop.collection.title")
                 }}</span>
-                <div @click="loadConnections" class="td-icon td-reload-icon"
-                  v-tooltip="$t('i18nCommon.remoteDesktop.collection.reload')"></div>
+                <div
+                  @click="loadConnections"
+                  class="td-icon td-reload-icon"
+                  v-tooltip="$t('i18nCommon.remoteDesktop.collection.reload')"
+                ></div>
               </div>
               <div class="flex response-loading" v-if="isLoading">
                 <TDLoading />
               </div>
-              <div v-else-if="connections.length === 0" class="td-no-connections">
+              <div
+                v-else-if="connections.length === 0"
+                class="td-no-connections"
+              >
                 {{ $t("i18nCommon.remoteDesktop.collection.noConnections") }}
               </div>
-              <div v-else v-for="(conn, index) in connections" :key="index" class="td-connection-item" :class="{
-                'td-connection-item-selected':
-                  currentConnectionId === conn.id,
-              }" @click="loadConnection(conn)">
+              <div
+                v-else
+                v-for="(conn, index) in connections"
+                :key="index"
+                class="td-connection-item"
+                :class="{
+                  'td-connection-item-selected':
+                    currentConnectionId === conn.id,
+                }"
+                @click="loadConnection(conn)"
+              >
                 <div class="td-connection-info">
                   <span class="td-connection-name">{{
                     conn.connection_name
                   }}</span>
                   <span class="td-connection-host">{{ conn.host }}</span>
                 </div>
-                <div class="td-icon td-close-icon" @click.stop="deleteConnection(conn)"
-                  v-tooltip="$t('i18nCommon.remoteDesktop.deleteConnection')"></div>
+                <div
+                  class="td-icon td-close-icon"
+                  @click.stop="deleteConnection(conn)"
+                  v-tooltip="$t('i18nCommon.remoteDesktop.deleteConnection')"
+                ></div>
               </div>
             </div>
           </div>
         </div>
-        <div class="flex flex-col td-sub-sidebar" v-show="currentConfigLayout.currentSidebarOption ==
-          $tdEnum.RemoteDesktopSidebarOption.Setting
-          ">
+        <div
+          class="flex flex-col td-sub-sidebar"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tdEnum.RemoteDesktopSidebarOption.Setting
+          "
+        >
           <div class="flex flex-col td-rdp-setting">
-            <TDComboBox v-model="selectedResolution" :options="resolutionOptions" :noMargin="true" :isEditable="false"
-              :width="100" :usingStylePercent="true"></TDComboBox>
-            <TDComboBox v-model="selectedScaleFactor" :options="scaleFactorOptions" :noMargin="true" :isEditable="false"
-              :width="100" :usingStylePercent="true" :label="$t('i18nCommon.remoteDesktop.scaleFactor')"></TDComboBox>
-            <TDCheckbox :noMargin="true" :variant="$tdEnum.checkboxType.switch"
+            <TDComboBox
+              v-model="selectedResolution"
+              :options="resolutionOptions"
+              :noMargin="true"
+              :isEditable="false"
+              :width="100"
+              :usingStylePercent="true"
+            ></TDComboBox>
+            <TDComboBox
+              v-model="selectedScaleFactor"
+              :options="scaleFactorOptions"
+              :noMargin="true"
+              :isEditable="false"
+              :width="100"
+              :usingStylePercent="true"
+              :label="$t('i18nCommon.remoteDesktop.scaleFactor')"
+            ></TDComboBox>
+            <TDCheckbox
+              :noMargin="true"
+              :variant="$tdEnum.checkboxType.switch"
               v-model="currentConfigLayout.enableServerPointer"
-              :label="$t('i18nCommon.remoteDesktop.enableServerPointer')" @change="updateConfigLayout"></TDCheckbox>
-            <TDCheckbox :noMargin="true" :variant="$tdEnum.checkboxType.switch" v-model="currentConfigLayout.showLog"
-              :label="$t('i18nCommon.remoteDesktop.showLog')" @change="updateConfigLayout"></TDCheckbox>
-            <TDCheckbox :noMargin="true" :variant="$tdEnum.checkboxType.switch"
-              v-model="currentConfigLayout.lowBandwidthMode" :label="$t('i18nCommon.remoteDesktop.lowBandwidthMode')"
-              @change="updateConfigLayout"></TDCheckbox>
-            <TDCheckbox :noMargin="true" :variant="$tdEnum.checkboxType.switch"
+              :label="$t('i18nCommon.remoteDesktop.enableServerPointer')"
+              @change="updateConfigLayout"
+            ></TDCheckbox>
+            <TDCheckbox
+              :noMargin="true"
+              :variant="$tdEnum.checkboxType.switch"
+              v-model="currentConfigLayout.showLog"
+              :label="$t('i18nCommon.remoteDesktop.showLog')"
+              @change="updateConfigLayout"
+            ></TDCheckbox>
+            <TDCheckbox
+              :noMargin="true"
+              :variant="$tdEnum.checkboxType.switch"
+              v-model="currentConfigLayout.lowBandwidthMode"
+              :label="$t('i18nCommon.remoteDesktop.lowBandwidthMode')"
+              @change="updateConfigLayout"
+            ></TDCheckbox>
+            <TDCheckbox
+              :noMargin="true"
+              :variant="$tdEnum.checkboxType.switch"
               v-model="currentConfigLayout.sendBrowserTimezone"
-              :label="$t('i18nCommon.remoteDesktop.sendBrowserTimezone')" @change="updateConfigLayout"></TDCheckbox>
+              :label="$t('i18nCommon.remoteDesktop.sendBrowserTimezone')"
+              @change="updateConfigLayout"
+            ></TDCheckbox>
           </div>
         </div>
       </template>
@@ -375,7 +529,7 @@ export default {
       let timeZone = "GMT";
       try {
         timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "GMT";
-      } catch (e) { }
+      } catch (e) {}
       let tz = timeZone.replace(/[^A-Za-z0-9_/+-]/g, "_");
       return {
         bias: offsetMinutes,
@@ -573,10 +727,7 @@ export default {
             this.currentConfigLayout.enableServerPointer,
           ),
           new Extension("desktop_scale_factor", this.selectedScaleFactor),
-          new Extension(
-            "performance_flags",
-            this.buildPerformanceFlags(),
-          ),
+          new Extension("performance_flags", this.buildPerformanceFlags()),
         ];
         if (this.currentConfigLayout.sendBrowserTimezone) {
           tuningExtensions.push(
@@ -634,19 +785,19 @@ export default {
         );
 
         // Máy remote chủ động hỏi clipboard máy ngoài (đường dẫn của thao tác
-      // paste). Bắt buộc phải đăng ký callback này: nếu không có callback,
-      // thư viện gửi format list RỖNG lên máy remote, tức báo cho remote biết
-      // clipboard máy ngoài đang rỗng. Remote sẽ cập nhật clipboard theo danh
-      // sách rỗng đó và xoá mất nội dung người dùng vừa Ctrl+C trong máy
-      // remote, nên bấm Ctrl+V không dán được gì. Callback trả lời bằng
-      // clipboard thật của máy ngoài.
-      builder.forceClipboardUpdateCallback(() => {
-        this.pushLocalClipboardToRemote();
-      });
+        // paste). Bắt buộc phải đăng ký callback này: nếu không có callback,
+        // thư viện gửi format list RỖNG lên máy remote, tức báo cho remote biết
+        // clipboard máy ngoài đang rỗng. Remote sẽ cập nhật clipboard theo danh
+        // sách rỗng đó và xoá mất nội dung người dùng vừa Ctrl+C trong máy
+        // remote, nên bấm Ctrl+V không dán được gì. Callback trả lời bằng
+        // clipboard thật của máy ngoài.
+        builder.forceClipboardUpdateCallback(() => {
+          this.pushLocalClipboardToRemote();
+        });
 
-      builder.setCursorStyleCallbackContext(canvas);
+        builder.setCursorStyleCallbackContext(canvas);
         // không set curor ở đây để đảm bảo khi di chuột vào canvas thì hiển thị icon cursor của IronRDP thay vì cursor style của trình duyệt
-        builder.setCursorStyleCallback((style) => { });
+        builder.setCursorStyleCallback((style) => {});
 
         builder.remoteClipboardChangedCallback((clipboardData) => {
           try {
@@ -892,8 +1043,7 @@ export default {
         .filter((f) => !f.isDirectory);
       // Gán lại mảng để danh sách mới thay thế hoàn toàn danh sách cũ.
       me.incomingFiles = received;
-      me.incomingFileClipDataId =
-        clipDataId === undefined ? null : clipDataId;
+      me.incomingFileClipDataId = clipDataId === undefined ? null : clipDataId;
       me.addLog(
         `${me.$t("i18nCommon.remoteDesktop.receivedFileList")} ${received.length}`,
         "info",
@@ -1054,11 +1204,7 @@ export default {
 
       if (state.totalSize === 0) {
         // Đây là kết quả của SIZE request: 8 byte LE u64 là tổng dung lượng file.
-        let view = new DataView(
-          data.buffer,
-          data.byteOffset,
-          data.byteLength,
-        );
+        let view = new DataView(data.buffer, data.byteOffset, data.byteLength);
         state.totalSize = Number(view.getBigUint64(0, true));
         me.markFileDownloading(state.file, 0, state.totalSize);
         if (state.totalSize === 0) {
@@ -1191,12 +1337,12 @@ export default {
           const kind = e.kind ? e.kind() : "Unknown";
           const bt = e.backtrace ? e.backtrace() : "";
           return `[${kindNames[kind] || kind}] ${bt}`;
-        } catch (_) { }
+        } catch (_) {}
       }
       return e?.message || e?.toString() || String(e);
     },
 
-    setupInputHandlers() { },
+    setupInputHandlers() {},
 
     onCanvasKeydown(e) {
       e.preventDefault();
@@ -1217,7 +1363,7 @@ export default {
         const tx = new InputTransaction();
         tx.addEvent(event);
         this.session.applyInputs(tx);
-      } catch (_) { }
+      } catch (_) {}
     },
 
     /**
@@ -1256,7 +1402,7 @@ export default {
         const tx = new InputTransaction();
         tx.addEvent(event);
         this.session.applyInputs(tx);
-      } catch (_) { }
+      } catch (_) {}
     },
 
     onCanvasKeyup(e) {
@@ -1271,7 +1417,7 @@ export default {
         const tx = new InputTransaction();
         tx.addEvent(event);
         this.session.applyInputs(tx);
-      } catch (_) { }
+      } catch (_) {}
     },
 
     onCanvasMousemove(e) {
@@ -1288,7 +1434,7 @@ export default {
         const tx = new InputTransaction();
         tx.addEvent(event);
         this.session.applyInputs(tx);
-      } catch (_) { }
+      } catch (_) {}
     },
 
     onCanvasMousedown(e) {
@@ -1301,7 +1447,7 @@ export default {
         const tx = new InputTransaction();
         tx.addEvent(event);
         this.session.applyInputs(tx);
-      } catch (_) { }
+      } catch (_) {}
     },
 
     onCanvasMouseup(e) {
@@ -1313,7 +1459,7 @@ export default {
         const tx = new InputTransaction();
         tx.addEvent(event);
         this.session.applyInputs(tx);
-      } catch (_) { }
+      } catch (_) {}
     },
 
     onCanvasWheel(e) {
@@ -1335,7 +1481,7 @@ export default {
           tx.addEvent(event);
           this.session.applyInputs(tx);
         }
-      } catch (_) { }
+      } catch (_) {}
     },
 
     onCanvasContextmenu(e) {
@@ -1664,7 +1810,6 @@ export default {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 
 .response-loading {
   width: 100%;

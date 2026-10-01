@@ -178,12 +178,19 @@ export default {
     justify-content: center;
     border-radius: var(--border-radius);
     cursor: pointer;
+    /*
+     * Viền trong suốt sẵn ở trạng thái thường, hover chỉ đổi màu viền chứ không
+     * thêm viền mới. Nếu không, hover làm padding box nhỏ lại 1px mỗi cạnh, và
+     * mọi phần tử position:absolute bên trong (vd badge đếm số file) neo theo
+     * padding box nên bị lệch vị trí.
+     */
+    border: 1px solid transparent;
 
     &:hover {
       background-color: var(--focus-color);
       color: var(--selected-item-text-color);
 
-      border: 1px solid var(--border-color);
+      border-color: var(--border-color);
     }
   }
 
