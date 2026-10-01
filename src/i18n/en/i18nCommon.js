@@ -828,7 +828,6 @@ export default {
       sendFilesToRemote: "Upload files from your computer to the remote machine, then right-click inside the remote machine and choose paste",
       receiveFiles: "Download files received from the remote machine to your computer",
       fileDownloading: "Downloading, please wait",
-      downloadingFiles: "Downloading {0} file(s)",
       downloadThisFile: "Click to download this file",
       downloadAll: "Download all",
       removeFile: "Remove file from the list",

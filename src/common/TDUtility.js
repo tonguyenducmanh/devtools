@@ -178,20 +178,25 @@ class TDUtility {
    * @param {boolean} showNoti có bắn noti kết quả không
    */
   copyToClipboard(value, showNoti = true) {
-    let copySucess = true;
-    try {
-      navigator.clipboard.writeText(value);
-    } catch (error) {
-      copySucess = false;
-      console.log(error);
-    }
-    if (showNoti) {
-      if (copySucess) {
-        toast.success(i18nData.global.t("i18nCommon.toastMessage.copy"));
-      } else {
-        toast.error(i18nData.global.t("i18nCommon.toastMessage.cannotCopy"));
-      }
-    }
+    // navigator.clipboard.writeText trả về Promise nên try/catch không bắt
+    // được lỗi async. Gọi không await thì lỗi thành unhandled rejection và cờ
+    // copySucess luôn true, khiến toast báo "đã copy" cả khi thực tế copy hỏng
+    // (thiếu quyền clipboard).
+    navigator.clipboard
+      .writeText(value)
+      .then(() => {
+        if (showNoti) {
+          toast.success(i18nData.global.t("i18nCommon.toastMessage.copy"));
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        if (showNoti) {
+          toast.error(
+            i18nData.global.t("i18nCommon.toastMessage.cannotCopy"),
+          );
+        }
+      });
   }
 
   /**

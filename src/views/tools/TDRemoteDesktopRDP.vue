@@ -633,7 +633,18 @@ export default {
           }),
         );
 
-        builder.setCursorStyleCallbackContext(canvas);
+        // Máy remote chủ động hỏi clipboard máy ngoài (đường dẫn của thao tác
+      // paste). Bắt buộc phải đăng ký callback này: nếu không có callback,
+      // thư viện gửi format list RỖNG lên máy remote, tức báo cho remote biết
+      // clipboard máy ngoài đang rỗng. Remote sẽ cập nhật clipboard theo danh
+      // sách rỗng đó và xoá mất nội dung người dùng vừa Ctrl+C trong máy
+      // remote, nên bấm Ctrl+V không dán được gì. Callback trả lời bằng
+      // clipboard thật của máy ngoài.
+      builder.forceClipboardUpdateCallback(() => {
+        this.pushLocalClipboardToRemote();
+      });
+
+      builder.setCursorStyleCallbackContext(canvas);
         // không set curor ở đây để đảm bảo khi di chuột vào canvas thì hiển thị icon cursor của IronRDP thay vì cursor style của trình duyệt
         builder.setCursorStyleCallback((style) => { });
 
@@ -910,7 +921,6 @@ export default {
           onDownloadAllFiles: () => me.downloadAllIncomingFiles(),
           onRemoveFile: (index) => me.removeIncomingFile(index),
           onClearFiles: () => me.clearIncomingFiles(),
-          getDownloadStats: () => me.getDownloadTransferStats(),
         },
       });
     },
@@ -984,34 +994,17 @@ export default {
     },
 
     /**
-     * Tổng hợp tiến trình của mọi download đang chạy cho thanh tiến trình tổng
-     * ở footer popup. Đọc Map reactive mỗi lần render nên tự cập nhật theo từng
-     * chunk về, không cần state riêng.
-     */
-    getDownloadTransferStats() {
-      let me = this;
-      let activeCount = 0;
-      let receivedBytes = 0;
-      let totalSize = 0;
-      me.activeDownloads.forEach((state) => {
-        activeCount++;
-        receivedBytes += state.receivedBytes;
-        totalSize += state.totalSize;
-      });
-      return { activeCount, receivedBytes, totalSize };
-    },
-
-    /**
      * Tải toàn bộ file trong danh sách. Danh sách chỉ bị xoá khi người dùng bấm
      * xoá, nên bấm nhiều lần vẫn tải lại được, không có trạng thái chặn.
      */
     downloadAllIncomingFiles() {
       let me = this;
       if (!me.session || me.incomingFiles.length === 0) return;
-      me.incomingFiles.forEach((file) => {
-        // File đang tải thì bỏ qua: tạo stream thứ hai cho cùng một file sẽ
-        // khiến 2 stream cùng ghi ra cùng tên, file tải về bị hỏng.
-        if (file.downloading) return;
+      // File đang tải thì bỏ qua: tạo stream thứ hai cho cùng một file sẽ khiến
+      // 2 stream cùng ghi ra cùng tên, file tải về bị hỏng.
+      let targets = me.incomingFiles.filter((file) => !file.downloading);
+      if (targets.length === 0) return;
+      targets.forEach((file) => {
         me.startFileDownload(file, file.remoteIndex, me.incomingFileClipDataId);
       });
       me.addLog(
@@ -1227,18 +1220,33 @@ export default {
       } catch (_) { }
     },
 
-    async syncClipboardToRemoteAndPaste(vScancode) {
+    /**
+     * Đẩy clipboard của máy ngoài lên máy remote. Dùng chung cho bấm Ctrl+V và
+     * cho forceClipboardUpdateCallback của thư viện.
+     *
+     * Trả về false khi không đọc được clipboard (thiếu quyền) hoặc clipboard
+     * rỗng. Quan trọng: hỏng thì phải im lặng, tuyệt đối không gửi danh sách
+     * format rỗng, vì sẽ xoá nội dung clipboard đang có ở máy remote.
+     */
+    async pushLocalClipboardToRemote() {
+      let me = this;
+      if (!me.session) return false;
       try {
         const text = await navigator.clipboard.readText();
-        if (text) {
-          const { ClipboardData } = this._wasm;
-          const content = new ClipboardData();
-          content.addText("text/plain", text);
-          await this.session.onClipboardPaste(content);
-        }
+        if (!text) return false;
+        const { ClipboardData } = me._wasm;
+        const content = new ClipboardData();
+        content.addText("text/plain", text);
+        await me.session.onClipboardPaste(content);
+        return true;
       } catch (err) {
-        this.addLog("Could not read local clipboard: " + err, "warn");
+        me.addLog("Could not read local clipboard: " + err, "warn");
+        return false;
       }
+    },
+
+    async syncClipboardToRemoteAndPaste(vScancode) {
+      await this.pushLocalClipboardToRemote();
 
       // After syncing, send the V keydown to remote
       if (!this.session) return;
