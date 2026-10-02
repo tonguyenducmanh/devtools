@@ -8,35 +8,69 @@
         </div>
       </div>
       <div class="td-header-menu">
-        <div v-for="(items, menuKey) in menuConfig" :key="menuKey" class="td-menu-item"
-          :class="{ 'td-menu-item--active': activeKeyFlyOut === menuKey }" @click="openFlyout(menuKey, $event)"
-          @mouseleave="scheduleCloseFlyout()">
+        <div
+          v-for="(items, menuKey) in menuConfig"
+          :key="menuKey"
+          class="td-menu-item"
+          :class="{ 'td-menu-item--active': activeKeyFlyOut === menuKey }"
+          @click="openFlyout(menuKey, $event)"
+          @mouseleave="scheduleCloseFlyout()"
+        >
           <span>{{ $t(`i18nCommon.${menuKey}.title`) }}</span>
         </div>
       </div>
     </div>
 
-    <div class="td-header-right">
-    </div>
+    <div class="td-header-right"></div>
 
     <!-- Flyout Menu: mở xuống dưới (placement="bottom") -->
-    <TDFlyoutPanel :show="!!activeKeyFlyOut && activeKeyFlyOut !== 'logo'" :anchorElFlyout="anchorElFlyout"
-      placement="bottom" panelClass="td-header-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="onFlyoutPanelLeave">
-      <div v-for="item in currentMenuItems" :key="item.key" class="td-flyout-item"
-        :class="{ 'td-flyout-item--active': item.children ? activeSubKey === item.key : false }"
-        v-tooltip="item.tooltip" @mouseenter="onMenuItemEnter(item, $event)" @click="onMenuItemClick(item, $event)">
+    <TDFlyoutPanel
+      :show="!!activeKeyFlyOut && activeKeyFlyOut !== 'logo'"
+      :anchorElFlyout="anchorElFlyout"
+      placement="bottom"
+      panelClass="td-header-flyout"
+      @mouseenter="cancelCloseFlyOut"
+      @mouseleave="onFlyoutPanelLeave"
+    >
+      <div
+        v-for="item in currentMenuItems"
+        :key="item.key"
+        class="td-flyout-item"
+        :class="{
+          'td-flyout-item--active': item.children
+            ? activeSubKey === item.key
+            : false,
+        }"
+        v-tooltip="item.tooltip"
+        @mouseenter="onMenuItemEnter(item, $event)"
+        @click="onMenuItemClick(item, $event)"
+      >
         {{ $t(item.labelKey) }}
       </div>
     </TDFlyoutPanel>
 
     <!-- Sub Flyout: menu con của item có children (panel luôn mount, chỉ ẩn/hiện) -->
-    <TDFlyoutPanel :show="!!activeSubItem" :anchorElFlyout="subAnchorEl" placement="right"
-      panelClass="td-theme-sub-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="closeSub">
+    <TDFlyoutPanel
+      :show="!!activeSubItem"
+      :anchorElFlyout="subAnchorEl"
+      placement="right"
+      panelClass="td-theme-sub-flyout"
+      @mouseenter="cancelCloseFlyOut"
+      @mouseleave="closeSub"
+    >
       <template v-if="activeSubItem">
-        <div class="td-flyout-theme-list" v-tooltip="$t(activeSubItem.tooltipKey)">
-          <div v-for="row in subMenuFlyoutRows" :key="row.child.value" class="td-flyout-item td-flyout-theme-item"
-            @mouseenter="onSubItemEnter(row.item, row.child)" @mouseleave="onSubItemLeave(row.item)"
-            @click="onSubItemClick(row.item, row.child)">
+        <div
+          class="td-flyout-theme-list"
+          v-tooltip="$t(activeSubItem.tooltipKey)"
+        >
+          <div
+            v-for="row in subMenuFlyoutRows"
+            :key="row.child.value"
+            class="td-flyout-item td-flyout-theme-item"
+            @mouseenter="onSubItemEnter(row.item, row.child)"
+            @mouseleave="onSubItemLeave(row.item)"
+            @click="onSubItemClick(row.item, row.child)"
+          >
             {{ row.child.label }}
           </div>
         </div>
@@ -54,10 +88,12 @@ import eventBus from "@/common/event/TDEventBus.js";
 import { TDEnumEventBus } from "@/common/event/TDEnumEventBus.js";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import TDCommonFunction from "@/common/TDCommonFunction.js";
+import TDTipsMixin from "@/mixins/TDTipsMixin.js";
 
 export default {
   name: "TDHeader",
   components: { TDFlyoutPanel },
+  mixins: [TDTipsMixin],
   setup() {
     const { openTab } = useTabManager();
     const {
@@ -156,6 +192,12 @@ export default {
         ],
         help: [
           {
+            key: "downloadAgent",
+            labelKey: "i18nCommon.feature.agentDownload.title",
+            tooltip: this.$t("i18nCommon.apiTesting.toolTipDownloadAgent"),
+            action: this.downloadAgentFunc,
+          },
+          {
             key: "userSettings",
             labelKey: "i18nCommon.feature.userSettings",
             action: this.userSettingsFunc,
@@ -175,11 +217,13 @@ export default {
             labelKey: "i18nCommon.tdheader.goToSource",
             action: this.goToSourceFunc,
           },
+
           {
-            key: "downloadAgent",
-            labelKey: "i18nCommon.feature.agentDownload.title",
-            tooltip: this.$t("i18nCommon.apiTesting.toolTipDownloadAgent"),
-            action: this.downloadAgentFunc,
+            // Màn welcome chỉ hiện khi chưa mở tab nào, nên đặt thêm ở menu trợ giúp
+            // để xem toàn bộ tip được dù khi đang mở tool
+            key: "showAllTips",
+            labelKey: "i18nTip.viewAllTips",
+            action: this.showAllTipsPopup,
           },
         ],
       };
@@ -225,7 +269,10 @@ export default {
     },
   },
   mounted() {
-    this.debouncedPreviewTheme = TDCommonFunction.debounce(this.previewTheme, 300);
+    this.debouncedPreviewTheme = TDCommonFunction.debounce(
+      this.previewTheme,
+      300,
+    );
     this.loadCurrentTheme();
     this.logoItems = [
       {
@@ -432,6 +479,10 @@ export default {
         ownerForm: this,
         props: {},
       });
+      this.closeFlyout();
+    },
+    showAllTipsPopup() {
+      this.showAllTips();
       this.closeFlyout();
     },
     reloadAppFunc() {
