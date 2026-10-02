@@ -2,8 +2,8 @@
  * Logic chung cho danh sách tip hướng dẫn dùng app (i18nTip.list):
  * - màn welcome chỉ xoay từng tip để quảng bá, người dùng không có cách đọc hết,
  *   nên có thêm popup xem toàn bộ tip
- * - popup xem toàn bộ dùng ở cả màn welcome và menu View trên header, vì màn
- *   welcome chỉ hiện khi chưa mở tab nào
+ * - popup xem toàn bộ dùng ở cả màn welcome và menu trợ giúp trên header, vì
+ *   màn welcome chỉ hiện khi chưa mở tab nào
  */
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 
@@ -13,27 +13,17 @@ import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 const TIP_AUTO_NEXT_DELAY = 10000;
 
 /**
- * Gom danh sách tip thành nội dung markdown đánh số theo thứ tự.
- * Danh sách lấy thẳng từ i18n nên thêm tip mới không phải sửa thêm chỗ khác.
+ * Gom danh sách tip thành nội dung hiển thị trong popup xem tất cả.
+ * Popup đã có số dòng và tiêu đề riêng nên nội dung chỉ giữ mỗi tip một dòng,
+ * không đánh số lại. Danh sách lấy thẳng từ i18n nên thêm tip mới không phải
+ * sửa thêm chỗ khác.
  *
  * @param {string[]} tips - danh sách tip
- * @param {string} title - tiêu đề đặt ở đầu nội dung
- * @returns {string} nội dung markdown
+ * @returns {string} nội dung hiển thị
  */
-function buildTipsMarkdown(tips, title = "") {
+function buildTipsContent(tips) {
   let list = (Array.isArray(tips) ? tips : []).filter((tip) => !!tip);
-  let lines = [];
-
-  if (title) {
-    lines.push(`# ${title}`);
-    lines.push("");
-  }
-
-  list.forEach((tip, index) => {
-    lines.push(`${index + 1}. ${tip}`);
-  });
-
-  return lines.join("\n").trim();
+  return list.join("\n");
 }
 
 export default {
@@ -89,18 +79,17 @@ export default {
     },
     /**
      * Mở popup xem toàn bộ tip. Dùng chung TDQuickPreview với phần xem tài liệu
-     * của tool automation: nội dung markdown nên đọc và copy đều thoải mái.
+     * của tool automation: hiển thị trong editor nên đọc và copy đều thoải mái.
      */
     showAllTips() {
       let me = this;
-      let title = me.$t("i18nTip.viewAllTips");
       TDDialogUtil.showPopup({
         dialogType: TDDialogEnum.TDQuickPreview,
         ownerForm: me,
         props: {},
         param: {
-          value: buildTipsMarkdown(me.tipsList, title),
-          label: title,
+          value: buildTipsContent(me.tipsList),
+          label: me.$t("i18nTip.viewAllTips"),
           language: "markdown",
         },
       });
