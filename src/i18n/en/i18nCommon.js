@@ -17,6 +17,9 @@ export default {
     tabManager: {
       addNewTab: "Add new tab",
       closeTab: "Close this tab",
+      closeOtherTabs: "Close other tabs",
+      closeTabsToRight: "Close tabs to the right",
+      closeTabsToLeft: "Close tabs to the left",
       closeAllTabs: "Close all tabs",
       openInDynamicTab: "Open in dynamic tab",
       duplicateTab: "Dupplicate tab",
