@@ -12,5 +12,6 @@ export default {
       "Chuột phải vào tên tab đang mở để nhân bản, đóng tab đó, đóng các tab khác, đóng các tab bên phải hoặc đóng các tab bên trái",
     ],
     nextTip: "Click để xem tip tiếp theo",
+    viewAllTips: "Xem tất cả tip",
   },
 };

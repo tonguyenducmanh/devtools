@@ -12,5 +12,6 @@ export default {
       "Right-click the name of an open tab to duplicate it, close that tab, close other tabs, close the tabs to the right, or close the tabs to the left",
     ],
     nextTip: "Click to see the next tip",
+    viewAllTips: "View all tips",
   },
 };
