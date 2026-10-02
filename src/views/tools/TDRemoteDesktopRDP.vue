@@ -910,7 +910,6 @@ export default {
           onDownloadAllFiles: () => me.downloadAllIncomingFiles(),
           onRemoveFile: (index) => me.removeIncomingFile(index),
           onClearFiles: () => me.clearIncomingFiles(),
-          getDownloadStats: () => me.getDownloadTransferStats(),
         },
       });
     },
@@ -981,24 +980,6 @@ export default {
     stopFileDownloading(file) {
       if (!file) return;
       file.downloading = false;
-    },
-
-    /**
-     * Tổng hợp tiến trình của mọi download đang chạy cho thanh tiến trình tổng
-     * ở footer popup. Đọc Map reactive mỗi lần render nên tự cập nhật theo từng
-     * chunk về, không cần state riêng.
-     */
-    getDownloadTransferStats() {
-      let me = this;
-      let activeCount = 0;
-      let receivedBytes = 0;
-      let totalSize = 0;
-      me.activeDownloads.forEach((state) => {
-        activeCount++;
-        receivedBytes += state.receivedBytes;
-        totalSize += state.totalSize;
-      });
-      return { activeCount, receivedBytes, totalSize };
     },
 
     /**

@@ -183,7 +183,11 @@ export default {
       background-color: var(--focus-color);
       color: var(--selected-item-text-color);
 
-      border: 1px solid var(--border-color);
+      // Viền hover vẽ bằng inset box-shadow chứ không phải border.
+      // Thêm border sẽ làm padding box lùi vào 1px, mọi child position:absolute
+      // đều neo theo padding box (ví dụ badge đếm file trên nút tải file của tool
+      // remote desktop) nên badge sẽ dịch 1px mỗi lần rê chuột vào nút.
+      box-shadow: inset 0 0 0 1px var(--border-color);
     }
   }
 
