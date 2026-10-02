@@ -192,6 +192,7 @@ export default {
       CSharpTemplate: "C# template",
       JavaScriptTemplate: "JavaScript template",
       PowerShellTemplate: "PowerShell template",
+      GitTemplate: "Git template",
       AutomationTemplate: "Automation template",
       BilingualWeb: "Bilingual Web",
       agentDownload: {

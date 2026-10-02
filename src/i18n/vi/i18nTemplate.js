@@ -19,6 +19,11 @@ export default {
     PowerShellTemplate: {
       PullCodeFromRepo: "pull code từ nhiều repo",
     },
+    gitTemplate: {
+      reset_to_commit: "Rollback về 1 commit",
+      undo_last_commit: "Undo commit gần nhất",
+      cherry_pick_to_branch: "Cherry-pick sang nhánh khác",
+    },
     postgreSQLTemplate: {
       query_all_info_table: "Xem danh sách cột",
       query_function_contain: "Tìm trong nội dung function",
