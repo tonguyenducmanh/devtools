@@ -33,9 +33,17 @@
           @click="selectConnection(idx)"
           v-tooltip="$t('i18nCommon.postgreSQLQuery.cloneIntellisenseTooltip')"
         >
-          <span class="text-nowrap">{{
+          <span class="text-nowrap td-clone-item-name">{{
             conn.connection_name || conn.connection_string
           }}</span>
+          <!-- nút xoá cache gợi ý của database này (chỉ hiện khi hover) -->
+          <span class="td-clone-item-delete-btn">
+            <div
+              class="td-icon td-close-icon"
+              v-tooltip="$t('i18nCommon.postgreSQLQuery.deleteIntellisenseCacheTooltip')"
+              @click.stop="deleteIntellisenseCache(conn)"
+            ></div>
+          </span>
         </div>
       </div>
     </div>
@@ -147,6 +155,41 @@ export default {
         this.isCloning = false;
       }
     },
+
+    /**
+     * Xoá cache gợi ý của 1 database trong danh sách, sau đó bỏ luôn khỏi danh sách
+     * vì database đó không còn cache để dùng làm nguồn nữa.
+     */
+    async deleteIntellisenseCache(conn) {
+      if (!conn?.id) return;
+      const cacheKey = this.$tdEnum.cacheConfig.PostgreSQLQueryHistory;
+      // ưu tiên xoá qua tool chính để dọn luôn dữ liệu intellisense đang nạp trong editor
+      let isDeleted = await this.ownerForm?.handleDeleteIntellisenseCache?.(
+        conn.id,
+      );
+      if (isDeleted === undefined) {
+        try {
+          await TDCache.remove(cacheKey, { id: conn.id });
+          this.$tdToast.success(
+            this.$t(
+              "i18nCommon.postgreSQLQuery.deleteIntellisenseCacheSuccess",
+            ),
+          );
+          isDeleted = true;
+        } catch {
+          this.$tdToast.error(
+            this.$t("i18nCommon.postgreSQLQuery.deleteIntellisenseCacheErr"),
+          );
+          return;
+        }
+      }
+      if (!isDeleted) return;
+
+      this.allCachedConnections = this.allCachedConnections.filter(
+        (c) => c.id !== conn.id,
+      );
+      this.activeIndex = -1;
+    },
   },
 };
 </script>
@@ -195,12 +238,30 @@ export default {
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
+  gap: var(--padding);
   min-height: 44px;
   width: 100%;
   padding: var(--padding);
   border-radius: var(--border-radius);
   flex-shrink: 0;
+
+  &-name {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &-delete-btn {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  &:hover &-delete-btn {
+    opacity: 1;
+  }
 
   &:hover {
     background-color: var(--bg-layer-color);
