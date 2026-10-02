@@ -52,26 +52,6 @@
           </button>
         </div>
       </div>
-      <div
-        v-if="transferStats.activeCount > 0"
-        class="flex td-remote-files-total"
-      >
-        <div class="flex td-remote-files-total-text">
-          <span class="flex-one text-nowrap">{{
-            $t("i18nCommon.remoteDesktop.downloadingFiles").format(
-              transferStats.activeCount,
-            )
-          }}</span>
-          <span class="text-nowrap td-remote-files-progress">{{
-            formatFileProgress(transferStats)
-          }}</span>
-        </div>
-        <progress
-          class="td-remote-files-progress-bar"
-          :value="progressValue(transferStats)"
-          :max="transferStats.totalSize || 1"
-        ></progress>
-      </div>
       <div class="flex td-remote-files-footer">
         <TDButton
           :noMargin="true"
@@ -114,7 +94,6 @@ export default {
   data() {
     return {
       getFiles: null,
-      getDownloadStats: null,
       onDialogClosed: null,
       onDownloadFile: null,
       onDownloadAllFiles: null,
@@ -132,23 +111,6 @@ export default {
     files() {
       return typeof this.getFiles === "function" ? this.getFiles() : [];
     },
-
-    /**
-     * Tổng tiến trình của các download đang chạy. Cha tự tính từ activeDownloads
-     * nên computed này tự cập nhật sau mỗi chunk về, không cần state riêng ở popup.
-     * Cùng hình dạng với 1 dòng file để dùng chung formatFileProgress.
-     */
-    transferStats() {
-      let stats =
-        typeof this.getDownloadStats === "function"
-          ? this.getDownloadStats()
-          : null;
-      return {
-        activeCount: stats?.activeCount || 0,
-        receivedBytes: stats?.receivedBytes || 0,
-        totalSize: stats?.totalSize || 0,
-      };
-    },
   },
 
   beforeUnmount() {
@@ -164,7 +126,6 @@ export default {
     show(param) {
       if (!param) return;
       this.getFiles = param.getFiles || null;
-      this.getDownloadStats = param.getDownloadStats || null;
       this.onDialogClosed = param.onDialogClosed || null;
       this.onDownloadFile = param.onDownloadFile || null;
       this.onDownloadAllFiles = param.onDownloadAllFiles || null;
@@ -350,22 +311,6 @@ export default {
     background-color: var(--focus-color);
     border-radius: var(--border-radius-component);
   }
-}
-
-/* Khối tổng ở chân popup, chỉ hiện khi đang có download */
-.td-remote-files-total {
-  width: 100%;
-  gap: var(--padding);
-  padding: var(--padding);
-  border-top: 1px solid var(--border-color);
-}
-
-.td-remote-files-total-text {
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--padding);
-  font-size: var(--font-size-small);
-  color: var(--text-secondary-color);
 }
 
 .td-remote-files-remove {

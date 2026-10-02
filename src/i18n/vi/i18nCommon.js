@@ -828,7 +828,6 @@ export default {
       sendFilesToRemote: "Tải file từ máy tính của bạn lên máy remote, rồi chuột phải ở trong máy remote chọn paste",
       receiveFiles: "Tải file đã nhận từ máy remote về máy tính của bạn",
       fileDownloading: "Đang tải, vui lòng đợi",
-      downloadingFiles: "Đang tải {0} file",
       downloadThisFile: "Bấm để tải file này",
       downloadAll: "Tải tất cả",
       removeFile: "Xoá file khỏi danh sách",
