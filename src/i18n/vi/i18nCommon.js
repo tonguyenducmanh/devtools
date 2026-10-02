@@ -926,6 +926,11 @@ export default {
       cloneIntellisenseNoCache: "Không tìm thấy cache gợi ý cho database này",
       cloneIntellisenseSuccess: "Đã sao chép gợi ý từ {0} thành công",
       cloneIntellisenseError: "Lỗi sao chép gợi ý",
+      deleteIntellisenseCache: "Xóa cache gợi ý đã lưu của database này",
+      deleteIntellisenseCacheTooltip:
+        "Nhấn để xóa cache gợi ý của database này",
+      deleteIntellisenseCacheSuccess: "Đã xóa cache gợi ý thành công",
+      deleteIntellisenseCacheErr: "Lỗi xóa cache gợi ý",
       createGroupSuccess: "Tạo nhóm thành công",
       createGroupErr: "Lỗi tạo nhóm",
       deleteGroupSuccess: "Xóa nhóm thành công",

@@ -5,6 +5,7 @@ import { pgQueries } from "@/templates/postgresqlToolQuery/templates.js";
 import {
   registerPgsqlLanguage,
   updatePgsqlIntellisenseData,
+  clearPgsqlIntellisenseData,
 } from "@/monarch/pgsql/pgsqlLanguage.js";
 
 export default {
@@ -289,6 +290,45 @@ export default {
           await me.applyMonacoIntellisense(merged);
         }
       } catch {}
+    },
+
+    /**
+     * Xoá cache gợi ý của 1 connection.
+     * Nếu xoá đúng connection đang chọn thì dọn luôn dữ liệu đang nạp trong Monaco
+     * để gợi ý cũ không còn hiển thị.
+     * @param {string|number} connectionId id connection cần xoá cache
+     */
+    async handleDeleteIntellisenseCache(connectionId) {
+      let me = this;
+      if (!connectionId) {
+        me.$tdToast.warning(
+          me.$t("i18nCommon.postgreSQLQuery.noConnectionSelected"),
+        );
+        return false;
+      }
+      try {
+        const cacheKey = me.$tdEnum.cacheConfig.PostgreSQLQueryHistory;
+        await TDCache.remove(cacheKey, { id: connectionId });
+
+        // nếu đang xoá cache của connection đang dùng thì reset luôn intellisense trong editor
+        if (connectionId === me.selectedConnectionId) {
+          me.disposeIntellisense();
+          me._inspectLookup = null;
+          me._pgKeywordSet = new Set();
+          clearPgsqlIntellisenseData();
+        }
+
+        me.$tdToast.success(
+          me.$t("i18nCommon.postgreSQLQuery.deleteIntellisenseCacheSuccess"),
+        );
+        return true;
+      } catch (error) {
+        console.error("Delete intellisense cache error:", error);
+        me.$tdToast.error(
+          me.$t("i18nCommon.postgreSQLQuery.deleteIntellisenseCacheErr"),
+        );
+        return false;
+      }
     },
 
     /**

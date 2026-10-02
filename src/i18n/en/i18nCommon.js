@@ -931,6 +931,12 @@ export default {
       cloneIntellisenseNoCache: "No intellisense cache found for this database",
       cloneIntellisenseSuccess: "Intellisense cloned from {name} successfully",
       cloneIntellisenseError: "Error cloning intellisense",
+      deleteIntellisenseCache:
+        "Delete this database's saved intellisense cache",
+      deleteIntellisenseCacheTooltip:
+        "Click to delete the intellisense cache of this database",
+      deleteIntellisenseCacheSuccess: "Intellisense cache deleted successfully",
+      deleteIntellisenseCacheErr: "Error deleting intellisense cache",
       createGroupSuccess: "Group created successfully",
       createGroupErr: "Error creating group",
       deleteGroupSuccess: "Group deleted successfully",
