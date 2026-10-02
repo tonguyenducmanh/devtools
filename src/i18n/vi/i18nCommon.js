@@ -193,6 +193,7 @@ export default {
       CSharpTemplate: "Code mẫu C#",
       JavaScriptTemplate: "Code mẫu JavaScript",
       PowerShellTemplate: "Code mẫu PowerShell",
+      GitTemplate: "Code mẫu Git",
       AutomationTemplate: "Code mẫu tự động hóa",
       BilingualWeb: "Web song ngữ",
       agentDownload: {

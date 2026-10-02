@@ -221,6 +221,12 @@ const sidebarConfig = [
           import("@/views/tools/codeTemplateTools/TDCodeTemplatePowerShell.vue"),
         meta: { titleKey: "i18nCommon.feature.PowerShellTemplate" },
       },
+      {
+        name: "gittemplate",
+        component: () =>
+          import("@/views/tools/codeTemplateTools/TDCodeTemplateGit.vue"),
+        meta: { titleKey: "i18nCommon.feature.GitTemplate" },
+      },
     ],
   },
   {
