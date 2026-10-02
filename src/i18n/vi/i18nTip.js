@@ -9,6 +9,7 @@ export default {
       "Khi đang gõ câu query SQL, bạn có thể đặt con trỏ chuột vào tên bảng, tên view, tên function và ấn F12 để mở nhanh DLL của object đó",
       "Tool Window RDP truyền file hai chiều: chọn file trên máy tính rồi chuột phải trong máy remote chọn paste để gửi lên, nút tải về trên thanh công cụ dùng để lưu file máy remote gửi sang",
       "Tool API testing gửi được cả body dạng JSON và Form Data, đổi kiểu body bằng combo box ở header, kiểu Form Data còn cho phép gửi kèm file",
+      "Chuột phải vào tên tab đang mở để nhân bản, đóng tab đó, đóng các tab khác, đóng các tab bên phải hoặc đóng các tab bên trái",
     ],
     nextTip: "Click để xem tip tiếp theo",
   },
