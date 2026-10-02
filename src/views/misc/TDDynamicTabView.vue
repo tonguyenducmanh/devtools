@@ -255,6 +255,7 @@ export default {
       state,
       activateTab,
       closeTab,
+      closeTabs,
       exitTabMode,
       setTabTitle,
       duplicateTab,
@@ -331,21 +332,62 @@ export default {
 
     // ── Context menu ── dùng plugin thay vì tự quản lý state
     function openContextMenu(event, tab) {
+      const tabList = tabs.value;
+      const index = tabList.findIndex((t) => t.id === tab.id);
+      if (index === -1) return;
+
       activateTab(tab.id); // highlight tab đang được right-click
+
+      // các tab bên trái / bên phải / tất cả tab còn lại so với tab vừa click
+      const leftIds = tabList.slice(0, index).map((t) => t.id);
+      const rightIds = tabList.slice(index + 1).map((t) => t.id);
+      const otherIds = tabList.filter((t) => t.id !== tab.id).map((t) => t.id);
+
+      const tabLabel = (key) =>
+        i18nData.global.t(`i18nCommon.tabManager.${key}`);
+
+      // chỉ hiện item khi thực sự có tab tương ứng, tránh hiện item bấm vào không làm gì
+      const bulkItems = [
+        {
+          ids: otherIds,
+          item: {
+            key: "closeOthers",
+            label: tabLabel("closeOtherTabs"),
+            action: () => closeTabs(otherIds),
+          },
+        },
+        {
+          ids: rightIds,
+          item: {
+            key: "closeRight",
+            label: tabLabel("closeTabsToRight"),
+            action: () => closeTabs(rightIds),
+          },
+        },
+        {
+          ids: leftIds,
+          item: {
+            key: "closeLeft",
+            label: tabLabel("closeTabsToLeft"),
+            action: () => closeTabs(leftIds),
+          },
+        },
+      ]
+        .filter((group) => group.ids.length > 0)
+        .map((group) => group.item);
 
       tdContextMenu.open(event, [
         {
-          icon: "td-dupplicate-icon",
           key: "duplicate",
-          label: i18nData.global.t("i18nCommon.tabManager.duplicateTab"),
+          label: tabLabel("duplicateTab"),
           action: () => duplicateTab(tab.id),
         },
         {
-          icon: "td-close-icon",
           key: "close",
-          label: i18nData.global.t("i18nCommon.tabManager.closeTab"),
+          label: tabLabel("closeTab"),
           action: () => closeTab(tab.id),
         },
+        ...bulkItems,
       ]);
     }
 

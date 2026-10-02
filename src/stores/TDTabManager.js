@@ -86,15 +86,47 @@ export function useTabManager() {
    * đóng 1 tab theo id
    */
   function closeTab(id) {
-    const idx = state.tabs.findIndex((t) => t.id === id);
-    if (idx === -1) return;
+    closeTabs([id]);
+  }
 
-    const wasActive = state.activeTabId === id;
-    state.tabs.splice(idx, 1);
+  /**
+   * Đóng nhiều tab cùng lúc theo danh sách id.
+   * Nếu tab đang active nằm trong danh sách đóng thì chuyển sang tab còn lại
+   * gần nhất (ưu tiên tab bên trái, không có thì lấy tab bên phải) — giống hành vi
+   * của closeTab nhưng chỉ set active 1 lần cho cả lô.
+   * @param {string[]} ids - danh sách id tab cần đóng
+   */
+  function closeTabs(ids) {
+    if (!Array.isArray(ids) || ids.length === 0) return;
+    const idSet = new Set(ids);
+    if (!state.tabs.some((t) => idSet.has(t.id))) return;
 
-    if (wasActive) {
-      const next = state.tabs[idx - 1] ?? state.tabs[idx] ?? null;
-      state.activeTabId = next?.id ?? null;
+    const activeIndex = state.tabs.findIndex((t) => t.id === state.activeTabId);
+    const activeWillBeClosed = idSet.has(state.activeTabId);
+
+    // chốt lại tab sẽ được active sau khi đóng, tìm trong danh sách cũ
+    let nextActiveId = null;
+    if (activeWillBeClosed) {
+      for (let i = activeIndex - 1; i >= 0; i--) {
+        if (!idSet.has(state.tabs[i].id)) {
+          nextActiveId = state.tabs[i].id;
+          break;
+        }
+      }
+      if (!nextActiveId) {
+        for (let i = activeIndex + 1; i < state.tabs.length; i++) {
+          if (!idSet.has(state.tabs[i].id)) {
+            nextActiveId = state.tabs[i].id;
+            break;
+          }
+        }
+      }
+    }
+
+    state.tabs = state.tabs.filter((t) => !idSet.has(t.id));
+
+    if (activeWillBeClosed) {
+      state.activeTabId = nextActiveId;
     }
   }
 
@@ -161,6 +193,7 @@ export function useTabManager() {
     state,
     openTab,
     closeTab,
+    closeTabs,
     activateTab,
     exitTabMode,
     setTabTitle,

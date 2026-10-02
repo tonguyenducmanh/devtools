@@ -17,6 +17,9 @@ export default {
     tabManager: {
       addNewTab: "Mở tab mới",
       closeTab: "Đóng tab này",
+      closeOtherTabs: "Đóng các tab khác",
+      closeTabsToRight: "Đóng các tab bên phải",
+      closeTabsToLeft: "Đóng các tab bên trái",
       closeAllTabs: "Đóng tất cả các tab",
       openInDynamicTab: "Mở trong tab động",
       duplicateTab: "Nhân bản tab",
