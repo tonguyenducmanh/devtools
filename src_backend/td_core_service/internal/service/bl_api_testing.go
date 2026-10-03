@@ -13,8 +13,8 @@ import (
 	"net/textproto"
 	"strings"
 
-	"td_core_service/internal/model"
 	"td_config"
+	"td_core_service/internal/model"
 	"td_core_service/td_common"
 )
 
@@ -26,11 +26,11 @@ func buildHTTPClient() *http.Client {
 	cfg := td_config.GetConfigGlobal().HTTPClientConfig
 	return &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
-			MaxIdleConns:          cfg.MaxIdleConns,
-			MaxIdleConnsPerHost:   cfg.MaxIdleConnsPerHost,
-			IdleConnTimeout:       cfg.IdleConnTimeout,
-			TLSHandshakeTimeout:   cfg.TLSHandshakeTimeout,
+			TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},
+			MaxIdleConns:        cfg.MaxIdleConns,
+			MaxIdleConnsPerHost: cfg.MaxIdleConnsPerHost,
+			IdleConnTimeout:     cfg.IdleConnTimeout,
+			TLSHandshakeTimeout: cfg.TLSHandshakeTimeout,
 		},
 		Timeout: cfg.ClientTimeout,
 	}

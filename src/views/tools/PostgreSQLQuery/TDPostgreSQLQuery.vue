@@ -137,90 +137,26 @@
           </div>
         </div>
 
-        <!-- tab Connection: danh sách kết nối database được nhóm theo group -->
+        <!-- tab Connection: danh sách kết nối database được nhóm theo group.
+             Dùng chung component collection với các tool khác, backend trả về cây đã gom sẵn -->
         <div class="flex flex-col td-sidebar-content" v-show="currentConfigLayout.currentSidebarOption ===
           $tdEnum.PostgreSQLQuerySidebarOption.Connection
           ">
-          <!-- header: input tạo group mới + nút add group + nút reload -->
-          <div class="flex td-header-collection">
-            <div class="td-new-collection">
-              <TDInput v-model="newGroupName" :noMargin="true"
-                :placeHolder="$t('i18nCommon.postgreSQLQuery.groupName')" />
-            </div>
-            <TDButton :noMargin="true" @click="addNewGroup" :type="$tdEnum.buttonType.secondary"
-              iconClass="td-plus-icon" v-tooltip="$t('i18nCommon.postgreSQLQuery.addGroup')" />
-            <TDButton :noMargin="true" @click="loadAllData" :type="$tdEnum.buttonType.secondary"
-              iconClass="td-reload-icon" v-tooltip="$t('i18nCommon.postgreSQLQuery.refreshData')" />
-          </div>
-          <!-- danh sách group và connection -->
-          <div class="td-collection">
-            <div class="flex flex-col response-loading" v-if="isLoading">
-              <TDLoading />
-            </div>
-            <div class="td-collection-body" v-else>
-              <div v-for="(group, index) in groupedConnections" class="flex flex-col no-select td-collection-item"
-                :key="index">
-                <!-- chế độ rename group -->
-                <div v-if="group.is_renaming" class="td-collection-rename">
-                  <TDInput v-model="group.temp_name" :noMargin="true"
-                    :placeHolder="$t('i18nCommon.apiTesting.collectionRename')" :ref="group.temp_name"
-                    @keyup.enter="saveNewCollectionName(group)" @clickOutSide="saveNewCollectionName(group)">
-                  </TDInput>
-                </div>
-                <!-- header group (click để expand/collapse) -->
-                <div v-else class="flex td-collection-header" @click="toggleGroup(group.id || '__ungrouped__')">
-                  <div class="flex text-nowrap td-collection-header-left">
-                    <!-- mũi tên chỉ trạng thái expand/collapse -->
-                    <TDArrow :openProp="openGroups[group.id || '__ungrouped__']"
-                      :arrowOpenDirection="$tdEnum.Direction.bottom" :arrowDirection="$tdEnum.Direction.right" />
-                    <div v-tooltip="group.name || $t('i18nCommon.postgreSQLQuery.ungrouped')
-                      ">
-                      {{
-                        group.name || $t("i18nCommon.postgreSQLQuery.ungrouped")
-                      }}
-                    </div>
-                  </div>
-                  <!-- nút edit/add/delete group (chỉ hiện khi hover) -->
-                  <div class="flex td-collection-edit-btn" v-if="group.id">
-                    <div class="td-icon td-edit-icon" v-tooltip="$t('i18nCommon.edit')"
-                      @click.stop="enableRenameCollection(group)"></div>
-                    <div v-tooltip="$t('i18nCommon.postgreSQLQuery.addConnection')" class="td-icon td-plus-icon"
-                      @click.stop="openAddConnectionPopup(group.id)"></div>
-                    <div v-tooltip="$t('i18nCommon.postgreSQLQuery.deleteGroup')" class="td-icon td-close-icon"
-                      @click.stop="deleteGroup(group.id)"></div>
-                  </div>
-                  <div class="flex td-collection-edit-btn" v-else>
-                    <div v-tooltip="$t('i18nCommon.postgreSQLQuery.addConnection')" class="td-icon td-plus-icon"
-                      @click.stop="openAddConnectionPopup('')"></div>
-                  </div>
-                </div>
-                <!-- danh sách connection trong group -->
-                <div v-if="
-                  openGroups[group.id || '__ungrouped__'] &&
-                  group.items &&
-                  group.items.length > 0
-                " class="flex flex-col td-collection-content">
-                  <div v-for="(conn, ci) in group.items" :key="ci" class="flex td-collection-request-item" :class="{
-                    'td-collection-request-item-selected':
-                      selectedConnectionId === conn.id,
-                  }" @click="selectConnection(conn)">
-                    <span class="text-nowrap">
-                      <div v-tooltip="conn.connection_name">
-                        {{ conn.connection_name }}
-                      </div>
-                    </span>
-                    <!-- nút edit/delete connection (chỉ hiện khi hover) -->
-                    <span class="td-collection-item-edit-btn">
-                      <div class="td-icon td-edit-icon" v-tooltip="$t('i18nCommon.edit')"
-                        @click.stop="openEditConnectionPopup(conn)"></div>
-                      <div class="td-icon td-close-icon" v-tooltip="$t('i18nCommon.postgreSQLQuery.deleteConnection')
-                        " @click.stop="deleteConnection(conn.id)"></div>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <TDCollectionList
+            :groups="collectionGroups"
+            :selectedItemId="selectedConnectionId"
+            :isLoading="isLoadingCollection"
+            itemNameKey="connection_name"
+            :defaultOpen="true"
+            @refresh="loadCollection"
+            @add-group="handleAddCollectionGroup"
+            @rename-group="renameCollectionGroup"
+            @delete-group="deleteCollectionGroup"
+            @add-item="openAddConnectionPopup"
+            @select-item="selectConnection"
+            @edit-item="openEditConnectionPopup"
+            @delete-item="handleDeleteConnection"
+          />
         </div>
 
         <!-- tab SQL Save: danh sách query đã lưu -->
@@ -240,7 +176,8 @@
 <script>
 import { format as sqlFormat } from "sql-formatter";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
-import TDArrow from "@/components/TDArrow.vue";
+import TDCollectionList from "@/components/TDCollectionList.vue";
+import TDCollectionMixin from "@/mixins/TDCollectionMixin.js";
 import TDToolBase from "@/views/tools/base/TDToolBase.vue";
 import TDPostgreSQLQueryHelp from "@/views/helps/TDPostgreSQLQueryHelp.vue";
 import TDServerPostgreSQLAPI from "@/common/api/request/AgentAPI/TDServerPostgreSQLAPI.js";
@@ -265,13 +202,14 @@ export default {
    * Mixin xử lý kết nối database, dotnet wasm, và intellisense
    */
   mixins: [
+    TDCollectionMixin,
     TDDatabaseConnectionMixin,
     TDDotNetWasmMixin,
     TDPostgreSQLIntellisenseMixin,
   ],
   components: {
     TDSubSidebar,
-    TDArrow,
+    TDCollectionList,
     TDPostgreSQLQueryHelp,
     TDHistorySidebar,
     TDDynamicBackgroundEffect,
@@ -318,11 +256,8 @@ export default {
       resultSectionSize: 50,
 
       // ── Connection ───────────────────────────────────────────────────
+      // Cây group + connection do TDCollectionMixin quản lý
       selectedConnectionId: "",
-      allGroups: [], // Danh sách nhóm connection
-      allConnections: [], // Danh sách tất cả connection
-      openGroups: {}, // Trạng thái đóng/mở của từng nhóm
-      newGroupName: "", // Tên nhóm mới khi tạo
 
       // ── Editor ───────────────────────────────────────────────────
       sqlText: "",
@@ -333,7 +268,6 @@ export default {
       activeResultIndex: 0, // Index của result tab đang active
       queryError: null, // Lỗi query (nếu có)
       isRunning: false, // Đang chạy query
-      isLoading: false, // Đang tải connections
       isLoadingIntellisense: false, // Đang tải intellisense data
       isLoadingBuiltinIntellisense: false, // Đang tải gợi ý built-in PostgreSQL
 
@@ -351,7 +285,10 @@ export default {
   async mounted() {
     let me = this;
     me.agentAPI = new TDServerPostgreSQLAPI();
-    await me.loadAllData();
+    // Trỏ 2 API vào mixin để nó gọi get_tree / create / update / delete
+    me.collectionItemAPI = me.agentAPI.connection;
+    me.collectionGroupAPI = me.agentAPI.connectionGroup;
+    await me.loadCollection();
     me.loadLastDatabaseConnect();
   },
 
@@ -510,7 +447,7 @@ export default {
           {
             key: "reloadDatabase",
             label: me.$t("i18nCommon.postgreSQLQuery.reloadDatabase"),
-            run: me.loadAllData,
+            run: me.loadCollection,
           },
           {
             key: "templatePostgresSQL",
@@ -682,7 +619,7 @@ export default {
      * Danh sách connection dạng dropdown option
      */
     connectionOptions() {
-      return this.allConnections.map((c) => ({
+      return this.allCollectionItems.map((c) => ({
         value: c.id,
         label: c.connection_name,
       }));
@@ -699,26 +636,6 @@ export default {
      */
     editorSectionSizeStyle() {
       return { height: `${this.editorSectionSize}%` };
-    },
-
-    /**
-     * Nhóm connections theo group, thêm nhóm "ungrouped" cho connection không có group
-     */
-    groupedConnections() {
-      let groups = this.allGroups.map((g) => ({ ...g, items: [] }));
-      groups.push({ id: "", name: "", items: [] });
-
-      this.allConnections.forEach((conn) => {
-        let group = groups.find((g) => g.id === conn.group_id);
-        if (group) {
-          group.items.push(conn);
-        } else {
-          let ungrouped = groups.find((g) => g.id === "");
-          if (ungrouped) ungrouped.items.push(conn);
-        }
-      });
-
-      return groups.filter((g) => g.id !== "" || g.items.length > 0);
     },
 
     /**
@@ -825,57 +742,6 @@ export default {
     },
 
     /**
-     * Kích hoạt chế độ rename collection (tìm object gốc trong allGroups để reactive)
-     */
-    enableRenameCollection(collectionFromView) {
-      let me = this;
-      let collection = me.allGroups.find((g) => g.id === collectionFromView.id);
-      if (collection) {
-        collection.is_renaming = true;
-        collection.temp_name = collection.name;
-        this.$nextTick(() => {
-          if (me.$refs && me.$refs[collection.temp_name]) {
-            let refs = me.$refs[collection.temp_name];
-            if (refs) {
-              if (Array.isArray(refs)) {
-                refs[0].focus();
-              } else {
-                refs.focus();
-              }
-            }
-          }
-        });
-      }
-    },
-
-    /**
-     * Lưu tên mới của collection sau khi rename
-     */
-    async saveNewCollectionName(collectionFromView) {
-      let me = this;
-      let collection = me.allGroups.find((g) => g.id === collectionFromView.id);
-      if (collection) {
-        delete collection.is_renaming;
-        if (
-          collection.temp_name &&
-          collectionFromView.temp_name !== collection.name
-        ) {
-          try {
-            let response = await me.agentAPI.connectionGroup.update({
-              id: collection.id,
-              name: collectionFromView.temp_name,
-            });
-            if (response && response.success && response.data?.success) {
-              await me.loadAllData();
-            }
-          } catch (e) {
-            me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
-          }
-        }
-      }
-    },
-
-    /**
      * Chuẩn hoá kết quả query (hỗ trợ cả single và multi-statement)
      */
     normalizeMultiQueryResult(payload) {
@@ -940,63 +806,6 @@ export default {
     },
 
     /**
-     * Tải đồng thời groups, connections, và saved queries từ API
-     */
-    async loadAllData() {
-      let me = this;
-      me.isLoading = true;
-      try {
-        await Promise.all([
-          me.loadGroups(),
-          me.loadConnections(),
-        ]);
-      } catch (error) {
-        console.error("Lỗi tải dữ liệu:", error);
-        me.$tdUtility.showErrorNotFoundAgentServer();
-      } finally {
-        me.isLoading = false;
-      }
-    },
-
-    /**
-     * Tải danh sách groups connection, tự động mở rộng tất cả
-     */
-    async loadGroups() {
-      let me = this;
-      let response = await me.agentAPI.connectionGroup.getAll();
-      let data = response?.data?.data ?? [];
-      if (Array.isArray(data)) {
-        me.allGroups.splice(0, me.allGroups.length, ...data);
-        data.forEach((g) => {
-          g.is_renaming = false;
-          if (!(g.id in me.openGroups)) me.openGroups[g.id] = true;
-        });
-        if (!("__ungrouped__" in me.openGroups)) {
-          me.openGroups["__ungrouped__"] = true;
-        }
-      }
-    },
-
-    /**
-     * Tải danh sách tất cả connections
-     */
-    async loadConnections() {
-      let me = this;
-      let response = await me.agentAPI.connection.getAll();
-      let data = response?.data?.data ?? [];
-      if (Array.isArray(data)) {
-        me.allConnections.splice(0, me.allConnections.length, ...data);
-      }
-    },
-
-    /**
-     * Bật/tắt trạng thái mở rộng của group
-     */
-    toggleGroup(groupKey) {
-      this.openGroups[groupKey] = !this.openGroups[groupKey];
-    },
-
-    /**
      * Chọn connection và lưu vào cache
      */
     selectConnection(conn) {
@@ -1009,16 +818,17 @@ export default {
     },
 
     /**
-     * Mở popup thêm connection mới (có thể gán vào group)
+     * Mở popup thêm connection mới, gán vào group được truyền vào
+     * (group ảo "Ungrouped" sẽ gán group_id rỗng)
      */
-    openAddConnectionPopup(groupId) {
+    openAddConnectionPopup(group) {
       let me = this;
       TDDialogUtil.showPopup({
         dialogType: TDDialogEnum.TDPostgreSQLConnectionPopup,
         ownerForm: me,
-        param: { group_id: groupId },
+        param: { group_id: group?.groupId ?? "" },
         callback: async (payload) => {
-          if (payload?.saved) await me.loadConnections();
+          if (payload?.saved) await me.loadCollection();
         },
       });
     },
@@ -1033,72 +843,48 @@ export default {
         ownerForm: me,
         param: conn,
         callback: async (payload) => {
-          if (payload?.saved) await me.loadConnections();
+          if (payload?.saved) await me.loadCollection();
         },
       });
     },
 
     /**
-     * Xoá connection, nếu là connection đang chọn thì reset
+     * Xoá connection.
+     * Việc hỏi xác nhận + xoá + reload cây do TDCollectionMixin lo.
      */
-    async deleteConnection(id) {
+    async handleDeleteConnection(conn) {
+      await this.deleteCollectionItem(conn);
+    },
+
+    /**
+     * Xoá xong mới reset, và chỉ khi connection đang chọn chính là vừa xoá.
+     * Reset trước khi xác nhận sẽ mất dữ liệu người dùng dù họ bấm Cancel.
+     */
+    onCollectionItemDeleted(conn) {
       let me = this;
-      try {
-        let response = await me.agentAPI.connection.deleteById(id);
-        if (response?.data?.success) {
-          me.$tdToast.success(
-            me.$t("i18nCommon.postgreSQLQuery.deleteConnectionSuccess"),
-          );
-          if (me.selectedConnectionId === id) {
-            me.selectedConnectionId = "";
-            me.resetQueryResults();
-          }
-          await me.loadConnections();
-        }
-      } catch {
-        me.$tdToast.error(
-          me.$t("i18nCommon.postgreSQLQuery.deleteConnectionErr"),
-        );
+      if (me.selectedConnectionId === conn.id) {
+        me.selectedConnectionId = "";
+        me.resetQueryResults();
       }
     },
 
     /**
-     * Tạo nhóm connection mới
+     * Tên hiển thị của connection, dùng cho toast xác nhận xoá
      */
-    async addNewGroup() {
-      let me = this;
-      if (!me.newGroupName) return;
-      try {
-        let response = await me.agentAPI.connectionGroup.create({
-          name: me.newGroupName,
-        });
-        if (response?.data?.success) {
-          me.$tdToast.success(
-            me.$t("i18nCommon.postgreSQLQuery.createGroupSuccess"),
-          );
-          me.newGroupName = "";
-          await me.loadGroups();
-        }
-      } catch {
-        me.$tdToast.error(me.$t("i18nCommon.postgreSQLQuery.createGroupErr"));
-      }
+    getCollectionItemName(conn) {
+      return conn?.connection_name ?? "";
     },
 
     /**
-     * Xoá nhóm connection (kèm các connection trong nhóm)
+     * Xoá 1 nhóm: connection đang chọn có thể nằm trong nhóm bị xoá.
+     * Hook này chạy SAU khi cây đã tải lại nên kiểm tra trên cây mới nhất.
      */
-    async deleteGroup(id) {
+    onCollectionGroupDeleted() {
       let me = this;
-      try {
-        let response = await me.agentAPI.connectionGroup.deleteById(id);
-        if (response?.data?.success) {
-          me.$tdToast.success(
-            me.$t("i18nCommon.postgreSQLQuery.deleteGroupSuccess"),
-          );
-          await me.loadAllData();
-        }
-      } catch {
-        me.$tdToast.error(me.$t("i18nCommon.postgreSQLQuery.deleteGroupErr"));
+      if (!me.selectedConnectionId) return;
+      if (!me.findCollectionGroupByItemId(me.selectedConnectionId)) {
+        me.selectedConnectionId = "";
+        me.resetQueryResults();
       }
     },
 
@@ -1175,7 +961,7 @@ export default {
       let me = this;
       if (!me.checkInitDotNetWasm()) return;
 
-      let conn = me.allConnections.find(
+      let conn = me.allCollectionItems.find(
         (c) => c.id === me.selectedConnectionId,
       );
       if (!conn?.connection_string) {
@@ -1213,7 +999,7 @@ export default {
      */
     handleCopyDSNConnectionString() {
       let me = this;
-      let conn = me.allConnections.find(
+      let conn = me.allCollectionItems.find(
         (c) => c.id === me.selectedConnectionId,
       );
       if (conn?.connection_string) {
@@ -1537,13 +1323,8 @@ export default {
       let oldSelectedConnection = await me.$tdCache.get(
         me.$tdEnum.cacheConfig.PostgreSQLLastConnectionId,
       );
-      if (
-        oldSelectedConnection &&
-        me.allConnections &&
-        Array.isArray(me.allConnections) &&
-        me.allConnections.length > 0
-      ) {
-        let oldConnection = me.allConnections.find(
+      if (oldSelectedConnection) {
+        let oldConnection = me.allCollectionItems.find(
           (x) => x.id == oldSelectedConnection,
         );
         if (oldConnection) {
@@ -1561,7 +1342,7 @@ export default {
       if (newId) {
         await this.loadCachedIntellisense();
       }
-      let conn = this.allConnections.find((c) => c.id === newId);
+      let conn = this.allCollectionItems.find((c) => c.id === newId);
       this.reBuildTabTitle(conn ? conn.connection_name : null);
     },
 
@@ -1586,8 +1367,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@use "@/styles/collection-sub-sidebar.scss";
-
 .td-pg-query-container {
   width: 100%;
   height: 100%;
@@ -1721,35 +1500,13 @@ export default {
   position: relative;
 }
 
-.response-loading {
-  width: 100%;
-  height: 100%;
-  background-color: var(--bg-layer-color);
-  border: 1px solid transparent;
-  border-radius: var(--border-radius);
-}
-
 .td-sidebar-content {
   flex: 1;
   width: 100%;
   min-height: 0;
 }
 
-.td-header-collection {
-  gap: var(--padding);
-  width: 100%;
-  margin-top: var(--padding);
-
-  .td-new-collection {
-    flex: 1;
-  }
-}
-
 .td-sidebar-menu {
-  width: 100%;
-}
-
-.td-collection-rename {
   width: 100%;
 }
 

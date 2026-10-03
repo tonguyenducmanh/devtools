@@ -1,9 +1,9 @@
 package model
 
-// model cho database PostgreSQL connection group
+// model cho database PostgreSQL connection group.
+// Dùng chung TDGroupModel với các bảng group khác (id, name, created_date, modified_date)
 type TDPostgreSQLConnectionGroup struct {
-	TDBaseModel
-	Name string `json:"name"`
+	TDGroupModel
 }
 
 func (g TDPostgreSQLConnectionGroup) TableName() string {
@@ -21,4 +21,9 @@ type TDPostgreSQLConnection struct {
 
 func (m TDPostgreSQLConnection) TableName() string {
 	return "td_postgresql_connection"
+}
+
+// GetGroupID trả về id của nhóm chứa connection này, rỗng nghĩa là chưa gán nhóm
+func (m TDPostgreSQLConnection) GetGroupID() string {
+	return m.GroupID
 }
