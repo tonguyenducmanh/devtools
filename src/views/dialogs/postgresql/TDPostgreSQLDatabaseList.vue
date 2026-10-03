@@ -77,7 +77,7 @@ export default {
   },
   computed: {
     currentConnLabel() {
-      const conn = this.ownerForm?.allConnections?.find(
+      const conn = this.ownerForm?.allCollectionItems?.find(
         (c) => c.id === this.connectionId,
       );
       return conn?.connection_name ?? conn?.connection_string ?? "";
@@ -150,7 +150,7 @@ export default {
       if (!db?.database_name) return;
 
       // Lấy thông tin kết nối hiện tại từ ownerForm
-      const currentConn = this.ownerForm?.allConnections?.find(
+      const currentConn = this.ownerForm?.allCollectionItems?.find(
         (c) => c.id === this.connectionId,
       );
       if (!currentConn?.connection_string) {

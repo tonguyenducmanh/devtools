@@ -4,7 +4,7 @@
     :showHeader="true"
     :showFullScreenHeaderIcon="false"
     :resizable="false"
-    width="420px"
+    width="320px"
     height="auto"
     :title="$t('i18nCommon.collection.addGroup')"
     @close="handleClose(false)"
@@ -96,8 +96,8 @@ export default {
 <style scoped lang="scss">
 .td-collection-group-popup {
   gap: var(--padding);
-  padding: calc(var(--padding) * 2) var(--padding) var(--padding);
-  min-height: 110px;
+  padding: var(--padding);
+  min-height: 100px;
 
   .td-collection-group-actions {
     gap: var(--padding);

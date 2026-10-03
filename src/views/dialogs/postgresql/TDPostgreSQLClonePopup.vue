@@ -247,7 +247,7 @@ export default {
   },
   methods: {
     loadCurrentConnection() {
-      const conn = this.ownerForm?.allConnections?.find(
+      const conn = this.ownerForm?.allCollectionItems?.find(
         (c) => c.id === this.ownerForm.selectedConnectionId,
       );
       if (conn?.connection_string) {

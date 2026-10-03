@@ -1536,18 +1536,6 @@ export default {
   box-sizing: border-box;
 }
 
-.td-connection-list-header {
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: var(--padding);
-  padding-right: var(--padding);
-}
-
-.td-connection-list-title {
-  font-weight: 600;
-  font-size: 14px;
-}
-
 .td-dynamic-effect-canvas {
   display: none;
 }
