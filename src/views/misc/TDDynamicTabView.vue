@@ -874,7 +874,7 @@ export default {
   &.td-tab-active {
     color: var(--selected-item-text-color);
     border-color: unset !important;
-
+    border: 1px solid var(--focus-color);
     .td-tab-bg {
       opacity: 1;
       transform: scale(1);

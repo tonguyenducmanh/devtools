@@ -3,7 +3,6 @@
     <div class="flex flex-col td-collection-picker">
       <!-- ô tìm nhóm: dùng TDInput cho đồng nhất với các ô nhập khác trong app -->
       <div class="td-collection-picker-search">
-        <div class="td-icon td-search-icon"></div>
         <div class="flex-one">
           <TDInput
             ref="searchInput"
@@ -22,7 +21,10 @@
       </div>
 
       <!-- chưa có group nào khớp tìm kiếm -->
-      <div v-if="filteredGroups.length === 0" class="flex flex-col td-picker-empty">
+      <div
+        v-if="filteredGroups.length === 0"
+        class="flex flex-col td-picker-empty"
+      >
         <div class="td-picker-empty-text">
           {{ $t("i18nCommon.search.noResults") }}
         </div>
@@ -196,6 +198,7 @@ export default {
   height: 100%;
   overflow: hidden;
 
+  justify-content: flex-start;
   .td-collection-picker-search {
     display: flex;
     align-items: center;
