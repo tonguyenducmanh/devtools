@@ -99,7 +99,7 @@ export default {
     },
 
     async loadConnectionsWithCache() {
-      const all = this.ownerForm?.allConnections ?? [];
+      const all = this.ownerForm?.allCollectionItems ?? [];
       const others = all.filter((c) => c.id !== this.currentConnectionId);
       if (others.length === 0) {
         this.isChecking = false;

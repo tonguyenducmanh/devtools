@@ -1,14 +1,24 @@
 <template>
   <TDPopup :visible="true" :showHeader="false" @close="handleClose(false)">
     <div class="flex flex-col td-collection-picker">
+      <!-- ô tìm nhóm: dùng TDInput cho đồng nhất với các ô nhập khác trong app -->
       <div class="td-collection-picker-search">
         <div class="td-icon td-search-icon"></div>
-        <input
-          ref="searchInput"
-          v-model="searchQuery"
-          class="td-collection-picker-input"
-          :placeholder="$t('i18nCommon.collection.findGroup')"
-        />
+        <div class="flex-one">
+          <TDInput
+            ref="searchInput"
+            v-model="searchQuery"
+            :noMargin="true"
+            :placeHolder="$t('i18nCommon.collection.findGroup')"
+            @keyup.enter="handleSelectFirst"
+          />
+        </div>
+        <div
+          class="td-icon td-close-icon td-collection-picker-clear"
+          v-if="searchQuery"
+          v-tooltip="clearFilterLabel"
+          @click="clearSearch"
+        ></div>
       </div>
 
       <!-- chưa có group nào khớp tìm kiếm -->
@@ -46,6 +56,8 @@
 
 <script>
 import TDPopup from "@/components/TDPopup.vue";
+import TDInput from "@/components/TDInput.vue";
+import TDButton from "@/components/TDButton.vue";
 
 /**
  * TDCollectionPickerPopup - popup chọn 1 nhóm trong cây collection.
@@ -61,6 +73,8 @@ export default {
   name: "TDCollectionPickerPopup",
   components: {
     TDPopup,
+    TDInput,
+    TDButton,
   },
 
   props: {
@@ -112,13 +126,21 @@ export default {
         this.$t("i18nCommon.collection.createGroupNamed");
       return template.format(this.searchQuery);
     },
+
+    clearFilterLabel() {
+      return this.$t("i18nCommon.collection.clearFilter");
+    },
   },
 
   mounted() {
-    this.$refs.searchInput?.focus?.();
+    this.focusSearchInput();
   },
 
   methods: {
+    focusSearchInput() {
+      this.$refs.searchInput?.focus?.();
+    },
+
     /**
      * Được gọi từ TDDialogUtil ngay sau khi mount
      * @param {Object} param createLabelTemplate: dùng tên nhóm trong nhãn nút tạo mới
@@ -127,8 +149,28 @@ export default {
       this.createLabelTemplate = param.createLabelTemplate ?? "";
       this.searchQuery = "";
       this.$nextTick(() => {
-        this.$refs.searchInput?.focus?.();
+        this.focusSearchInput();
       });
+    },
+
+    /**
+     * Xoá từ khoá đang tìm, quay lại hiển thị đủ danh sách group
+     */
+    clearSearch() {
+      this.searchQuery = "";
+      this.focusSearchInput();
+    },
+
+    /**
+     * Enter trong ô tìm: chọn luôn group đầu tiên nếu có, không có thì tạo mới.
+     */
+    handleSelectFirst() {
+      const first = this.filteredGroups[0];
+      if (first) {
+        this.handleSelect(first);
+      } else {
+        this.handleCreateNew();
+      }
     },
 
     handleSelect(group) {
@@ -147,48 +189,44 @@ export default {
 </script>
 
 <style scoped lang="scss">
+// Nền + bo góc của popup do chính TDPopup lo (.td-popup-container),
+// ở đây chỉ lo phần nội dung: ô tìm + danh sách group.
 .td-collection-picker {
   width: 100%;
   height: 100%;
-  background-color: var(--bg-main-color);
-  border: 1px solid var(--border-color);
-  border-radius: calc(var(--border-radius) * 1.5);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 
   .td-collection-picker-search {
     display: flex;
     align-items: center;
-    padding: 16px;
+    gap: var(--padding);
+    padding: var(--padding);
     width: 100%;
     border-bottom: 1px solid var(--border-color);
 
     .td-icon {
-      margin-right: var(--padding);
+      flex-shrink: 0;
     }
+  }
 
-    .td-collection-picker-input {
-      flex: 1;
-      border: none;
-      outline: none;
-      background: transparent;
-      font-size: 16px;
-      color: var(--text-color);
+  // icon xoá từ khoá: mờ đi cho nhẹ mắt, hover dòng thì hiện rõ
+  .td-collection-picker-clear {
+    flex-shrink: 0;
+    opacity: 0.6;
 
-      &::placeholder {
-        color: var(--text-color-secondary);
-        opacity: var(--placeholder-opacity);
-      }
+    &:hover {
+      opacity: 1;
+      color: var(--btn-color);
     }
   }
 
   .td-collection-picker-results {
     width: 100%;
-    overflow: auto;
+    overflow-y: auto;
   }
 
   .td-picker-section {
-    padding: 8px 0;
+    padding: var(--padding) 0;
   }
 
   .td-picker-item {
@@ -196,17 +234,17 @@ export default {
     align-items: center;
     justify-content: space-between;
     gap: var(--padding);
-    padding: 12px 16px;
+    padding: var(--padding) calc(var(--padding) * 2);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease;
 
     &:hover {
-      background-color: var(--bg-layer-color);
+      background-color: var(--bg-hover-color);
     }
 
     .td-picker-item-title {
-      font-weight: 500;
-      color: var(--text-color);
+      font-weight: 600;
+      color: var(--text-primary-color);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -214,20 +252,20 @@ export default {
 
     .td-picker-item-count {
       flex-shrink: 0;
-      font-size: 12px;
-      color: var(--text-color-secondary);
+      font-size: var(--font-size-small);
+      color: var(--text-secondary-color);
     }
   }
 
   .td-picker-empty {
-    padding: 40px 16px;
+    padding: calc(var(--padding) * 5) calc(var(--padding) * 2);
     align-items: center;
     gap: var(--padding);
     text-align: center;
 
     .td-picker-empty-text {
-      color: var(--text-color-secondary);
-      font-size: 14px;
+      color: var(--text-secondary-color);
+      font-size: var(--font-size-medium-rare);
     }
   }
 }

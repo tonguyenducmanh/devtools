@@ -6,45 +6,78 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
     <!-- Tab bar: chỉ hiện khi có tab và không ở zen mode -->
     <Transition name="td-tabbar">
       <div v-if="isTabMode && !zenMode" class="flex td-tab-wrap">
-        <div class="td-tab-bar" :class="{ 'td-tab-bar-wrap': wrapTab }" ref="tabBarRef" @dragover.prevent="onDragOver"
-          @drop.prevent="onDrop" @dragleave="onDragLeave">
-          <div v-for="(tab, index) in tabs" :key="tab.id" class="td-tab-item" :class="{
-            'td-tab-active': activeTabId === tab.id,
-            'td-tab-dragging': draggingId === tab.id,
-            'td-tab-drag-over':
-              dragOverIndex === index && draggingId !== tab.id,
-            'td-tab-shift-right': shouldShiftRight(index),
-            'td-tab-shift-left': shouldShiftLeft(index),
-          }" :draggable="true" @dragstart="onDragStart($event, tab.id, index)" @dragend="onDragEnd"
-            @click="activateTab(tab.id)" @contextmenu.prevent="openContextMenu($event, tab)"
-            @click.middle="closeTab(tab.id)" v-tooltip="getTabTitle(tab)">
+        <div
+          class="td-tab-bar"
+          :class="{ 'td-tab-bar-wrap': wrapTab }"
+          ref="tabBarRef"
+          @dragover.prevent="onDragOver"
+          @drop.prevent="onDrop"
+          @dragleave="onDragLeave"
+        >
+          <div
+            v-for="(tab, index) in tabs"
+            :key="tab.id"
+            class="td-tab-item"
+            :class="{
+              'td-tab-active': activeTabId === tab.id,
+              'td-tab-dragging': draggingId === tab.id,
+              'td-tab-drag-over':
+                dragOverIndex === index && draggingId !== tab.id,
+              'td-tab-shift-right': shouldShiftRight(index),
+              'td-tab-shift-left': shouldShiftLeft(index),
+            }"
+            :draggable="true"
+            @dragstart="onDragStart($event, tab.id, index)"
+            @dragend="onDragEnd"
+            @click="activateTab(tab.id)"
+            @contextmenu.prevent="openContextMenu($event, tab)"
+            @click.middle="closeTab(tab.id)"
+            v-tooltip="getTabTitle(tab)"
+          >
             <div class="td-tab-bg"></div>
 
-            <div v-if="dragOverIndex === index && draggingId !== tab.id"
-              class="td-drop-indicator td-drop-indicator-before"></div>
+            <div
+              v-if="dragOverIndex === index && draggingId !== tab.id"
+              class="td-drop-indicator td-drop-indicator-before"
+            ></div>
 
             <span class="td-tab-label">
               {{ getTabLabel(tab) }}
             </span>
 
             <button class="flex td-tab-quick-btn">
-              <span class="td-icon td-dupplicate-icon" v-tooltip="$t('i18nCommon.tabManager.duplicateTab')"
-                @click.stop="duplicateTab(tab.id)"></span>
-              <span class="td-icon td-close-icon" v-tooltip="$t('i18nCommon.tabManager.closeTab')"
-                @click.stop="closeTab(tab.id)"></span>
+              <span
+                class="td-icon td-dupplicate-icon"
+                v-tooltip="$t('i18nCommon.tabManager.duplicateTab')"
+                @click.stop="duplicateTab(tab.id)"
+              ></span>
+              <span
+                class="td-icon td-close-icon"
+                v-tooltip="$t('i18nCommon.tabManager.closeTab')"
+                @click.stop="closeTab(tab.id)"
+              ></span>
             </button>
           </div>
 
-          <div class="td-tab-drop-sentinel" :class="{
-            'td-tab-drop-sentinel-active': dragOverIndex === tabs.length,
-          }">
-            <div v-if="dragOverIndex === tabs.length && draggingId !== null"
-              class="td-drop-indicator td-drop-indicator-end"></div>
+          <div
+            class="td-tab-drop-sentinel"
+            :class="{
+              'td-tab-drop-sentinel-active': dragOverIndex === tabs.length,
+            }"
+          >
+            <div
+              v-if="dragOverIndex === tabs.length && draggingId !== null"
+              class="td-drop-indicator td-drop-indicator-end"
+            ></div>
           </div>
         </div>
 
         <!-- Nút đóng tất cả -->
-        <button class="td-tab-exit-btn" @click="exitTabMode" v-tooltip="$t('i18nCommon.tabManager.closeAllTabs')">
+        <button
+          class="td-tab-exit-btn"
+          @click="exitTabMode"
+          v-tooltip="$t('i18nCommon.tabManager.closeAllTabs')"
+        >
           <span class="td-icon td-close-icon"> </span>
         </button>
       </div>
@@ -53,22 +86,47 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
     <!-- Content area -->
     <div class="td-tab-content" :class="{ 'td-zen-active': zenMode }">
       <!-- Zen mode toolbar -->
-      <div v-if="zenMode" class="td-zen-toolbar" :class="{ 'td-zen-toolbar-pinned': zenToolbarPinned }">
-        <div v-if="!zenToolbarPinned" class="flex toolbar-btn" @click="pinZenToolbar"
-          v-tooltip="$t('i18nCommon.remoteDesktop.pin')">
+      <div
+        v-if="zenMode"
+        class="td-zen-toolbar"
+        :class="{ 'td-zen-toolbar-pinned': zenToolbarPinned }"
+      >
+        <div
+          v-if="!zenToolbarPinned"
+          class="flex toolbar-btn"
+          @click="pinZenToolbar"
+          v-tooltip="$t('i18nCommon.remoteDesktop.pin')"
+        >
           <span class="td-icon td-pin-icon"></span>
         </div>
-        <div v-else class="flex toolbar-btn" @click="unpinZenToolbar" v-tooltip="$t('i18nCommon.remoteDesktop.unpin')">
+        <div
+          v-else
+          class="flex toolbar-btn"
+          @click="unpinZenToolbar"
+          v-tooltip="$t('i18nCommon.remoteDesktop.unpin')"
+        >
           <span class="td-icon td-unpin-icon"></span>
         </div>
-        <div class="flex toolbar-btn" @click="zenPrevTab" v-tooltip="$t('i18nCommon.tabManager.tabPrevious')">
+        <div
+          class="flex toolbar-btn"
+          @click="zenPrevTab"
+          v-tooltip="$t('i18nCommon.tabManager.tabPrevious')"
+        >
           <TDArrow :arrowDirection="tdEnum.Direction.left" />
         </div>
-        <div class="flex toolbar-btn" @click="zenNextTab" v-tooltip="$t('i18nCommon.tabManager.tabNext')">
+        <div
+          class="flex toolbar-btn"
+          @click="zenNextTab"
+          v-tooltip="$t('i18nCommon.tabManager.tabNext')"
+        >
           <TDArrow :arrowDirection="tdEnum.Direction.right" />
         </div>
         <span class="td-zen-toolbar-separator"></span>
-        <div class="flex toolbar-btn" @click="exitZenMode" v-tooltip="$t('i18nCommon.tdheader.exitZenMode')">
+        <div
+          class="flex toolbar-btn"
+          @click="exitZenMode"
+          v-tooltip="$t('i18nCommon.tdheader.exitZenMode')"
+        >
           <span class="td-icon td-center-icon"></span>
         </div>
       </div>
@@ -76,8 +134,15 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
       <!-- Tab mode: render sẵn tất cả bằng v-show -->
       <template v-if="isTabMode">
         <KeepAlive>
-          <component v-if="activeTab" :ref="setTabRef" :is="activeTab.resolvedComponent" :key="activeTab.id"
-            :tabId="activeTab.id" class="td-tab-pane" @updateTabTitle="(payload) => onTabTitleUpdate(payload)" />
+          <component
+            v-if="activeTab"
+            :ref="setTabRef"
+            :is="activeTab.resolvedComponent"
+            :key="activeTab.id"
+            :tabId="activeTab.id"
+            class="td-tab-pane"
+            @updateTabTitle="(payload) => onTabTitleUpdate(payload)"
+          />
         </KeepAlive>
       </template>
 
@@ -90,23 +155,32 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
       <div v-if="showTabPreview && isTabMode" class="td-tab-preview-overlay">
         <div class="td-tab-preview-container">
           <div class="td-tab-preview-grid">
-            <div v-for="(tab, index) in tabs" :key="tab.id" class="text-nowrap td-tab-preview-item"
-              :class="{ 'td-tab-preview-item--active': previewIndex === index }" @click="selectTabFromPreview(tab.id)"
-              @mouseenter="previewIndex = index">
+            <div
+              v-for="(tab, index) in tabs"
+              :key="tab.id"
+              class="text-nowrap td-tab-preview-item"
+              :class="{ 'td-tab-preview-item--active': previewIndex === index }"
+              @click="selectTabFromPreview(tab.id)"
+              @mouseenter="previewIndex = index"
+            >
               {{ getTabLabel(tab) }}
             </div>
           </div>
           <div class="td-tab-preview-footer">
             <div class="td-tab-preview-footer__grid">
-              <div v-for="item in tabShortcuts" :key="item.key" class="td-tab-preview-footer__item">
+              <div
+                v-for="item in tabShortcuts"
+                :key="item.key"
+                class="td-tab-preview-footer__item"
+              >
                 <span class="td-tab-preview-footer__keys">
                   <kbd v-for="part in item.presentKey" :key="part">{{
                     part
-                    }}</kbd>
+                  }}</kbd>
                 </span>
                 <span class="td-tab-preview-footer__label">{{
                   $t(item.labelKey)
-                  }}</span>
+                }}</span>
               </div>
             </div>
             <!-- /__grid -->
@@ -787,7 +861,7 @@ export default {
     z-index: 0;
   }
 
-  >*:not(.td-tab-bg) {
+  > *:not(.td-tab-bg) {
     position: relative;
     z-index: 1;
   }
@@ -799,7 +873,7 @@ export default {
 
   &.td-tab-active {
     color: var(--selected-item-text-color);
-    border: var(--border-component-style);
+    border-color: unset !important;
 
     .td-tab-bg {
       opacity: 1;

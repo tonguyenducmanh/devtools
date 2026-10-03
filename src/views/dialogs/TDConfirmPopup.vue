@@ -15,15 +15,15 @@
       <div class="flex td-confirm-actions">
         <TDButton
           :noMargin="true"
-          :label="cancelLabel || $t('i18nCommon.toastMessage.cancel')"
-          :type="$tdEnum.buttonType.secondary"
-          @click="handleClose(false)"
-        />
-        <TDButton
-          :noMargin="true"
           :label="confirmLabel || $t('i18nCommon.toastMessage.ok')"
           :type="confirmType"
           @click="handleClose(true)"
+        />
+        <TDButton
+          :noMargin="true"
+          :label="cancelLabel || $t('i18nCommon.toastMessage.cancel')"
+          :type="$tdEnum.buttonType.secondary"
+          @click="handleClose(false)"
         />
       </div>
     </div>
@@ -85,21 +85,19 @@ export default {
 <style scoped lang="scss">
 .td-confirm-popup {
   gap: var(--padding);
-  padding: calc(var(--padding) * 2) var(--padding) var(--padding);
+  padding: var(--padding);
   min-height: 80px;
   justify-content: center;
 
   .td-confirm-message {
-    font-size: var(--font-size-medium);
-    line-height: 1.5;
-    white-space: pre-line;
-    word-break: break-word;
+    width: 100%;
+    text-align: center;
   }
 
   .td-confirm-actions {
     gap: var(--padding);
-    margin-top: var(--padding);
-    justify-content: flex-end;
+    justify-content: space-between;
+    margin: 0 var(--padding);
   }
 }
 </style>

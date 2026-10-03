@@ -4,7 +4,7 @@
     :showHeader="true"
     @close="handleClose"
     width="700px"
-    height="360px"
+    height="340px"
     :title="
       isEditMode
         ? $t('i18nCommon.postgreSQLQuery.editConnection')
