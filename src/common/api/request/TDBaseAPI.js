@@ -191,6 +191,14 @@ class TDBaseAPI {
     const finalEndpoint = endpoint.includes("?") ? `${endpoint}&id=${id}` : `${endpoint}?id=${id}`;
     return await this.delete(finalEndpoint, headers, signal);
   }
+
+  /**
+   * Lấy cây group + item đã gom sẵn từ server.
+   * Chỉ áp dụng cho controller master-detail, xem TDCollectionMixin.
+   */
+  async getTree(endpoint = "get_tree", param = {}, headers = {}, signal = null) {
+    return await this.get(endpoint, param, headers, signal);
+  }
 }
 
 export default TDBaseAPI;

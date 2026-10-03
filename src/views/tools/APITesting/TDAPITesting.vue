@@ -60,7 +60,7 @@
         ></TDButton>
         <TDButton
           v-if="currentRequestId"
-          :readOnly="isLoadingData"
+          :readOnly="isLoadingCollection"
           @click="createNewRequest"
           :type="$tdEnum.buttonType.secondary"
           :noMargin="true"
@@ -68,7 +68,7 @@
           v-tooltip="$t('i18nCommon.apiTesting.createNewRequest')"
         ></TDButton>
         <TDButton
-          :readOnly="isLoadingData || !requestName"
+          :readOnly="isLoadingCollection || !requestName"
           @click="saveRequest"
           :type="$tdEnum.buttonType.secondary"
           :noMargin="true"
@@ -266,7 +266,8 @@
         >
           <TDAPITestingHelp />
         </div>
-        <!-- Collection -->
+        <!-- Collection: danh sách nhóm + request.
+             Dùng chung component collection, backend trả về cây đã gom sẵn -->
         <div
           class="flex flex-col td-sidebar-content"
           v-show="
@@ -274,115 +275,21 @@
             $tdEnum.APISidebarOption.Collection
           "
         >
-          <div class="flex td-header-collection">
-            <div class="td-new-collection">
-              <TDInput
-                v-model="newCollectionName"
-                :noMargin="true"
-                :placeHolder="$t('i18nCommon.apiTesting.newCollectionName')"
-              />
-            </div>
-            <TDButton
-              :noMargin="true"
-              @click="addNewCollection"
-              :type="$tdEnum.buttonType.secondary"
-              iconClass="td-plus-icon"
-              v-tooltip="$t('i18nCommon.apiTesting.add')"
-            />
-            <TDButton
-              :noMargin="true"
-              @click="loadAllTestingData"
-              :type="$tdEnum.buttonType.secondary"
-              iconClass="td-reload-icon"
-              v-tooltip="$t('i18nCommon.APIMocking.refresh')"
-            />
-          </div>
-          <div class="td-collection">
-            <div class="flex flex-col response-loading" v-if="isLoadingData">
-              <TDLoading />
-            </div>
-            <div class="td-collection-body" v-else>
-              <div
-                v-for="(collection, index) in allCollection"
-                class="flex flex-col no-select td-collection-item"
-                :key="index"
-              >
-                <div v-if="collection.is_renaming" class="td-collection-rename">
-                  <TDInput
-                    v-model="collection.temp_name"
-                    :noMargin="true"
-                    :placeHolder="$t('i18nCommon.apiTesting.collectionRename')"
-                    :ref="collection.temp_name"
-                    @keyup.enter="saveNewCollectionName(collection)"
-                    @clickOutSide="saveNewCollectionName(collection)"
-                  >
-                  </TDInput>
-                </div>
-                <div
-                  v-else
-                  class="flex td-collection-header"
-                  @click="toggleCollection(collection)"
-                >
-                  <div class="flex text-nowrap td-collection-header-left">
-                    <TDArrow
-                      :openProp="collection.openingCollection"
-                      :arrowOpenDirection="$tdEnum.Direction.bottom"
-                      :arrowDirection="$tdEnum.Direction.right"
-                    />
-                    <div class="" v-tooltip="collection.name">
-                      {{ collection.name }}
-                    </div>
-                  </div>
-                  <div class="flex td-collection-edit-btn">
-                    <div
-                      class="td-icon td-edit-icon"
-                      v-tooltip="$t('i18nCommon.edit')"
-                      @click.stop="enableRenameCollection(collection)"
-                    ></div>
-                    <div
-                      v-tooltip="$t('i18nCommon.apiTesting.delete')"
-                      class="td-icon td-close-icon"
-                      @click.stop="deleteCollection(collection.collection_id)"
-                    ></div>
-                  </div>
-                </div>
-                <div
-                  v-if="
-                    collection.openingCollection &&
-                    collection.requests &&
-                    collection.requests.length > 0
-                  "
-                  class="flex flex-col td-collection-content"
-                >
-                  <div
-                    v-for="(request, indexRequest) in collection.requests"
-                    :key="indexRequest"
-                    class="flex td-collection-request-item"
-                    :class="{
-                      'td-collection-request-item-selected':
-                        request && currentRequestId == request.requestId,
-                    }"
-                    @click="applyRequest(request)"
-                  >
-                    <span class="text-nowrap">
-                      <div v-tooltip="request.requestName">
-                        {{ request.requestName }}
-                      </div>
-                    </span>
-                    <span class="td-collection-item-edit-btn">
-                      <div
-                        class="td-icon td-close-icon"
-                        v-tooltip="$t('i18nCommon.apiTesting.delete')"
-                        @click.stop="
-                          deleteRequest(collection.collection_id, request)
-                        "
-                      ></div>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <TDCollectionList
+            :groups="collectionGroups"
+            :selectedItemId="currentRequestId"
+            :isLoading="isLoadingCollection"
+            itemNameKey="request_name"
+            :allowEditItem="false"
+            :defaultOpen="false"
+            @refresh="loadCollection"
+            @add-group="handleAddCollectionGroup"
+            @rename-group="renameCollectionGroup"
+            @delete-group="deleteCollectionGroup"
+            @add-item="createNewRequestInGroup"
+            @select-item="applyRequest"
+            @delete-item="deleteCollectionItem"
+          />
         </div>
         <!-- Settings -->
         <div
@@ -439,7 +346,8 @@
 <script>
 import TDAutomation from "@/common/automation/TDAutomation.js";
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
-import TDArrow from "@/components/TDArrow.vue";
+import TDCollectionList from "@/components/TDCollectionList.vue";
+import TDCollectionMixin from "@/mixins/TDCollectionMixin.js";
 import JSZip from "jszip";
 import TDHistorySidebar from "@/components/TDHistorySidebar.vue";
 import TDAPIResponse from "@/views/tools/APITesting/TDAPIResponse.vue";
@@ -454,11 +362,11 @@ import TDAPIPanelSwitcher from "@/views/tools/APITesting/TDAPIPanelSwitcher.vue"
 import TDAPIFormDataMixin from "@/mixins/TDAPIFormDataMixin.js";
 export default {
   extends: TDToolBase,
-  mixins: [TDAPIFormDataMixin],
+  mixins: [TDCollectionMixin, TDAPIFormDataMixin],
   name: "TDAPITesting",
   components: {
     TDSubSidebar,
-    TDArrow,
+    TDCollectionList,
     TDAPIResponse,
     TDHistorySidebar,
     TDAPITestingHelp,
@@ -472,8 +380,6 @@ export default {
       apiUrl: "",
       requestName: "",
       currentRequestId: null,
-      newCollectionName: "",
-      allCollection: [],
       httpMethod: "GET",
       headersText: "Content-Type: application/json",
       bodyText: "",
@@ -511,7 +417,8 @@ export default {
       requestSectionSize: 50,
       responseSectionSize: 50,
       agentAPI: null,
-      isLoadingData: false,
+      // group được chọn sẵn khi bấm "+" trên 1 group, dùng khi lưu request mới
+      pendingGroupId: "",
     };
   },
   created() {
@@ -526,8 +433,12 @@ export default {
     }
   },
   async mounted() {
-    this.agentAPI = new TDServerTestingAPI();
-    await this.loadAllTestingData();
+    let me = this;
+    me.agentAPI = new TDServerTestingAPI();
+    // Trỏ 2 API vào mixin để nó gọi get_tree / create / update / delete
+    me.collectionItemAPI = me.agentAPI.testingItem;
+    me.collectionGroupAPI = me.agentAPI.testingGroup;
+    await me.loadCollection();
   },
   watch: {
     requestName(oldVal, newVal) {
@@ -660,220 +571,152 @@ export default {
       this.requestSectionSize = sizes.leftSize;
       this.responseSectionSize = sizes.rightSize;
     },
-    async addNewCollection(collectionName) {
+    /**
+     * Nút "+" trên 1 group: tạo request mới và gán thẳng vào group đó
+     */
+    createNewRequestInGroup(group) {
       let me = this;
-      if (typeof collectionName == "string") {
-        me.newCollectionName = collectionName;
-      }
-      if (me.newCollectionName) {
-        try {
-          let response = await me.agentAPI.testingGroup.create({
-            name: me.newCollectionName,
-          });
-          if (response && response.success && response.data?.success) {
-            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-            me.newCollectionName = "";
-            await me.loadAllTestingData();
-          }
-        } catch (error) {
-          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
-        }
-      }
+      me.createNewRequest();
+      // Group ảo "Ungrouped" không có group_id thật, để trống thì lúc lưu
+      // sẽ mở popup chọn collection
+      me.pendingGroupId = group?.groupId ?? "";
     },
-    async toggleCollection(collection) {
-      if (collection) {
-        collection.openingCollection = !collection.openingCollection;
-      }
-    },
-    async loadAllTestingData() {
-      let me = this;
-      me.isLoadingData = true;
-      try {
-        let [groupsParams, testsParams] = await Promise.all([
-          me.agentAPI.testingGroup.getAll(),
-          me.agentAPI.testingItem.getAll(),
-        ]);
-
-        let groups = groupsParams?.data?.data || [];
-        let tests = testsParams?.data?.data || [];
-
-        let collections = groups.map((g) => ({
-          name: g.name,
-          collection_id: g.id,
-          openingCollection: false,
-          requests: [],
-          is_renaming: false,
-        }));
-
-        tests.forEach((t) => {
-          let collection = collections.find(
-            (c) => c.collection_id === t.group_id,
-          );
-          if (collection) {
-            collection.requests.push({
-              requestName: t.request_name,
-              method: t.method,
-              apiUrl: t.end_point,
-              headersText: t.headers_text,
-              bodyText: t.body_text,
-              bodyType: t.body_type,
-              formDataText: t.form_data_text,
-              requestId: t.id,
-            });
-          }
-        });
-
-        if (me.allCollection && me.allCollection.length > 0) {
-          collections.forEach((newCol) => {
-            let oldCol = me.allCollection.find(
-              (c) => c.collection_id === newCol.collection_id,
-            );
-            if (oldCol) {
-              newCol.openingCollection = oldCol.openingCollection;
-            }
-          });
-        }
-
-        me.allCollection = collections;
-      } catch (error) {
-        console.error("Lỗi tải dữ liệu testing:", error);
-        me.$tdUtility.showErrorNotFoundAgentServer();
-      } finally {
-        me.isLoadingData = false;
-      }
-    },
+    /**
+     * Nạp 1 request từ cây collection vào form
+     */
     applyRequest(request) {
       let me = this;
-      me.handleSendRequestFromHistory(request);
-      me.currentRequestId = request.requestId;
+      me.currentRequestId = request.id;
+      me.requestName = request.request_name;
+      me.apiUrl = request.end_point;
+      me.httpMethod = request.method;
+      me.headersText = request.headers_text ?? "";
+      // request dạng form data lưu body_text = null, gán rỗng cho editor
+      me.bodyText = request.body_text ?? "";
+      me.formData = me.parseFormDataFromText(request.form_data_text);
+      me.applyBodyTypeOption(request.body_type);
     },
+    /**
+     * Lưu request. Nếu request đang mở thì update tại chỗ,
+     * nếu là request mới thì hỏi user chọn collection để lưu.
+     */
     async saveRequest() {
       let me = this;
-      if (me.requestName && me.allCollection && me.allCollection.length > 0) {
-        if (me.currentRequestId) {
-          let currentCollection = me.allCollection.find((c) =>
-            c.requests.find((r) => r.requestId == me.currentRequestId),
-          );
-          if (currentCollection) {
-            let testData = {
-              id: me.currentRequestId,
-              request_name: me.requestName,
-              group_id: currentCollection.collection_id,
-              method: me.httpMethod,
-              end_point: me.apiUrl,
-              headers_text: me.headersText,
-              ...me.buildBodyDataForSave(),
-            };
-            try {
-              let response = await me.agentAPI.testingItem.update(testData);
-              if (response && response.success && response.data?.success) {
-                me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-                await me.loadAllTestingData();
-              }
-            } catch (e) {
-              me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+      if (!me.requestName) return;
+
+      if (me.currentRequestId) {
+        let currentGroup = me.findCollectionGroupByItemId(me.currentRequestId);
+        if (!currentGroup) return;
+
+        let testData = {
+          id: me.currentRequestId,
+          request_name: me.requestName,
+          group_id: currentGroup.groupId,
+          method: me.httpMethod,
+          end_point: me.apiUrl,
+          headers_text: me.headersText,
+          ...me.buildBodyDataForSave(),
+        };
+        try {
+          let response = await me.collectionItemAPI.update(testData);
+          if (response?.data?.success) {
+            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
+            await me.loadCollection();
+          }
+        } catch (e) {
+          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
+        }
+        return;
+      }
+
+      // Request mới: nếu đã bấm "+" trên 1 group thì lưu thẳng vào group đó,
+      // không cần hỏi lại user chọn collection
+      if (me.pendingGroupId) {
+        await me.saveRequestToGroup(me.pendingGroupId);
+        me.pendingGroupId = "";
+        return;
+      }
+
+      // Chưa chọn group: mở popup chọn collection
+      me.openSaveToCollectionPopup();
+    },
+    /**
+     * Mở popup chọn collection để lưu request mới
+     */
+    openSaveToCollectionPopup() {
+      let me = this;
+      TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDCollectionPickerPopup,
+        ownerForm: me,
+        props: {
+          groups: me.collectionGroups,
+          showItemCount: false,
+        },
+        param: {
+          createLabelTemplate: me.$t("i18nCommon.collection.saveToNewCollection"),
+        },
+        callback: async (payload) => {
+          if (payload?.groupId) {
+            await me.saveRequestToGroup(payload.groupId);
+          } else if (payload?.newGroupName) {
+            let group = await me.createCollectionGroup(payload.newGroupName);
+            if (group) {
+              await me.saveRequestToGroup(group.groupId);
             }
           }
-        } else {
-          TDDialogUtil.showPopup({
-            dialogType: TDDialogEnum.TDAPISaveToCollectionPopup,
-            ownerForm: this,
-            props: {
-              allCollection: me.allCollection,
-            },
-          });
-        }
-      }
+        },
+      });
     },
-    async saveToCollection(collection) {
+    /**
+     * Lưu request hiện tại vào 1 collection
+     */
+    async saveRequestToGroup(groupId) {
       let me = this;
       let testData = {
         request_name: me.requestName || me.apiUrl,
-        group_id: collection.collection_id,
+        group_id: groupId,
         method: me.httpMethod,
         end_point: me.apiUrl,
         headers_text: me.headersText,
         ...me.buildBodyDataForSave(),
       };
       try {
-        let response = await me.agentAPI.testingItem.create(testData);
-        if (response && response.success && response.data?.success) {
+        let response = await me.collectionItemAPI.create(testData);
+        if (response?.data?.success) {
           me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
           me.currentRequestId = response.data.data.id;
-          await me.loadAllTestingData();
+          await me.loadCollection();
         }
       } catch (e) {
         me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
-    async deleteRequest(collectionId, request) {
+    /**
+     * Tên hiển thị của request, dùng cho toast xác nhận xoá
+     */
+    getCollectionItemName(request) {
+      return request?.request_name ?? "";
+    },
+    /**
+     * Xoá request đang mở thì reset form về trạng thái mới
+     */
+    onCollectionItemDeleted(request) {
       let me = this;
-      if (request && request.requestId) {
-        try {
-          let response = await me.agentAPI.testingItem.deleteById(
-            request.requestId,
-          );
-          if (response && response.success && response.data?.success) {
-            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-            await me.loadAllTestingData();
-          }
-        } catch (e) {
-          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
-        }
+      if (me.currentRequestId === request.id) {
+        me.createNewRequest();
       }
     },
-    enableRenameCollection(collection) {
+
+    /**
+     * Xoá nhóm sẽ xoá luôn các request bên trong. Request đang mở có thể nằm
+     * trong nhóm vừa xoá: phải reset form, không thì nút Save sẽ im lặng
+     * không làm gì vì không tìm được group chứa request đó.
+     */
+    onCollectionGroupDeleted() {
       let me = this;
-      if (collection) {
-        collection.is_renaming = true;
-        collection.temp_name = collection.name;
-        this.$nextTick(() => {
-          if (me.$refs && me.$refs[collection.temp_name]) {
-            let refs = me.$refs[collection.temp_name];
-            if (refs) {
-              if (Array.isArray(refs)) {
-                refs[0].focus();
-              } else {
-                refs.focus();
-              }
-            }
-          }
-        });
-      }
-    },
-    async saveNewCollectionName(collection) {
-      let me = this;
-      if (collection) {
-        delete collection.is_renaming;
-        if (collection.temp_name && collection.temp_name !== collection.name) {
-          try {
-            let response = await me.agentAPI.testingGroup.update({
-              id: collection.collection_id,
-              name: collection.temp_name,
-            });
-            if (response && response.success && response.data?.success) {
-              me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-              await me.loadAllTestingData();
-            }
-          } catch (e) {
-            me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
-          }
-        }
-      }
-    },
-    async deleteCollection(collectionId) {
-      let me = this;
-      if (collectionId) {
-        try {
-          let response =
-            await me.agentAPI.testingGroup.deleteById(collectionId);
-          if (response && response.success && response.data?.success) {
-            me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-            await me.loadAllTestingData();
-          }
-        } catch (e) {
-          me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
-        }
+      if (!me.currentRequestId) return;
+      if (!me.findCollectionGroupByItemId(me.currentRequestId)) {
+        me.createNewRequest();
       }
     },
     async importCollectionZip() {
@@ -933,7 +776,7 @@ export default {
         });
         if (response && response.success && response.data?.success) {
           me.$tdToast.success(me.$t("i18nCommon.toastMessage.success"));
-          await me.loadAllTestingData();
+          await me.loadCollection();
         }
       } catch (e) {
         me.$tdToast.error(me.$t("i18nCommon.toastMessage.error"));
@@ -1106,8 +949,10 @@ export default {
     createNewRequest() {
       let me = this;
       me.requestName = "";
-      me.groupName = "";
       me.currentRequestId = null;
+      // Xoá group đã chọn sẵn, nếu không request tạo sau sẽ bị lưu nhầm
+      // vào group đã bấm "+" trước đó
+      me.pendingGroupId = "";
       me.apiUrl = null;
       me.httpMethod = "GET";
       me.headersText = "Content-Type: application/json";
@@ -1432,8 +1277,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@use "@/styles/collection-sub-sidebar.scss";
-
 .td-api-container {
   width: 100%;
   height: 100%;
@@ -1481,33 +1324,10 @@ export default {
   gap: var(--padding);
 }
 
-.td-header-collection {
-  width: 100%;
-  height: 30px;
-  margin-top: var(--padding);
-  gap: var(--padding);
-
-  .td-new-collection {
-    flex: 1;
-  }
-}
-
-.response-loading {
-  width: 100%;
-  height: 100%;
-  background-color: var(--bg-layer-color);
-  border: 1px solid transparent;
-  border-radius: var(--border-radius);
-}
-
 .td-sidebar-content {
   flex: 1;
   width: 100%;
   min-height: 0;
-}
-
-.td-collection-rename {
-  width: 100%;
 }
 
 .td-import-request-group {

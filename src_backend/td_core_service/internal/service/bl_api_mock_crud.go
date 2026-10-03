@@ -4,44 +4,37 @@ package service
 
 import (
 	"net/http"
-	"td_core_service/internal/database"
 	"td_core_service/internal/model"
 )
 
-// --- Hooks cho Mock API Item ---
+// --- Hooks cho Mock API ---
+//
+// Mock server đăng ký route lúc start nên không hot-reload được:
+// mọi thay đổi mock (thêm / sửa / xoá) đều phải restart server để nạp lại route.
 
-func triggerRestartMockServer(item interface{}, r *http.Request) {
+// restartMockServerAfterMockChange hook sau khi thêm hoặc sửa 1 mock
+func restartMockServerAfterMockChange(_ *model.TDAPIMockItem, _ *http.Request) {
 	go RestartMockServer()
 }
 
-func triggerRestartMockServerOnDelete(id string, r *http.Request) {
+// restartMockServerAfterMockDelete hook sau khi xoá 1 mock hoặc 1 nhóm mock
+func restartMockServerAfterMockDelete(_ string, _ *http.Request) {
 	go RestartMockServer()
 }
 
-// GetMockAPIController trả về controller quản lý mock API
-func GetMockAPIController() *TDBLBase[model.TDAPIMockItem] {
-	return &TDBLBase[model.TDAPIMockItem]{
-		PathPrefix:  "mock_api",
-		Repo:        database.TDDLBase[model.TDAPIMockItem]{},
-		AfterInsert: func(req *model.TDAPIMockItem, r *http.Request) { triggerRestartMockServer(req, r) },
-		AfterUpdate: func(req *model.TDAPIMockItem, r *http.Request) { triggerRestartMockServer(req, r) },
-		AfterDelete: triggerRestartMockServerOnDelete,
-	}
-}
-
-// --- Hooks cho Mock API Group ---
-
-func beforeDeleteMockGroup(id string, r *http.Request) error {
-	// Xóa các bảng liên quan trước ở tầng DL
-	return database.DeleteMockItemsByGroupID(id)
-}
-
-// GetMockGroupController trả về controller quản lý nhóm mock API
-func GetMockGroupController() *TDBLBase[model.TDAPIMockGroup] {
-	return &TDBLBase[model.TDAPIMockGroup]{
-		PathPrefix:   "mock_group",
-		Repo:         database.TDDLBase[model.TDAPIMockGroup]{},
-		BeforeDelete: beforeDeleteMockGroup,
-		AfterDelete:  triggerRestartMockServerOnDelete,
-	}
+// GetMockAPICollection trả về cặp master-detail của mock API:
+// bảng master là td_api_mock_group, bảng detail là td_api_mock.
+//
+// Cascade delete và endpoint get_tree đã có sẵn trong TDCollection,
+// ở đây chỉ gắn thêm hook restart mock server.
+func GetMockAPICollection() *TDCollection[model.TDAPIMockGroup, model.TDAPIMockItem] {
+	collection := NewCollection[model.TDAPIMockGroup, model.TDAPIMockItem](
+		"mock_group",
+		"mock_api",
+	)
+	collection.Item.AfterInsert = restartMockServerAfterMockChange
+	collection.Item.AfterUpdate = restartMockServerAfterMockChange
+	collection.Item.AfterDelete = restartMockServerAfterMockDelete
+	collection.SetGroupAfterDelete(restartMockServerAfterMockDelete)
+	return collection
 }

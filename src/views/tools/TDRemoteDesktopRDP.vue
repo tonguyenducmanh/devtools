@@ -70,57 +70,25 @@
           ">
           <TDRemoteDesktopRDPHelp />
         </div>
+        <!-- Collection: danh sách nhóm + connection.
+             Dùng chung component collection, backend trả về cây đã gom sẵn -->
         <div class="flex flex-col td-sub-sidebar" v-show="currentConfigLayout.currentSidebarOption ==
           $tdEnum.RemoteDesktopSidebarOption.Collection
           ">
-          <div class="td-rdp-collection">
-            <div class="flex flex-col td-collection-header">
-              <div class="td-connection-form">
-                <TDInput v-model="connectionName" :placeHolder="$t('i18nCommon.remoteDesktop.connectionNamePlaceholder')
-                  " :noMargin="true" class="rdp-connection-input" />
-                <TDInput v-model="host" :placeHolder="$t('i18nCommon.remoteDesktop.hostPlaceholder')" :noMargin="true"
-                  class="rdp-connection-input" />
-                <TDInput v-model="username" :placeHolder="$t('i18nCommon.remoteDesktop.usernamePlaceholder')
-                  " :noMargin="true" class="rdp-connection-input" />
-                <TDInput v-model="password" :placeHolder="$t('i18nCommon.remoteDesktop.passwordPlaceholder')
-                  " :inputType="'password'" :noMargin="true" class="rdp-connection-input" />
-                <div class="td-connection-actions">
-                  <TDButton :noMargin="true" @click="saveConnection"
-                    :label="$t('i18nCommon.remoteDesktop.saveConnection')" />
-                  <TDButton :noMargin="true" :type="$tdEnum.buttonType.secondary" @click="createNewConnection"
-                    :label="$t('i18nCommon.remoteDesktop.newConnection')" />
-                </div>
-              </div>
-            </div>
-            <div class="td-connection-list">
-              <div class="flex td-connection-list-header">
-                <span class="td-connection-list-title">{{
-                  $t("i18nCommon.remoteDesktop.collection.title")
-                }}</span>
-                <div @click="loadConnections" class="td-icon td-reload-icon"
-                  v-tooltip="$t('i18nCommon.remoteDesktop.collection.reload')"></div>
-              </div>
-              <div class="flex response-loading" v-if="isLoading">
-                <TDLoading />
-              </div>
-              <div v-else-if="connections.length === 0" class="td-no-connections">
-                {{ $t("i18nCommon.remoteDesktop.collection.noConnections") }}
-              </div>
-              <div v-else v-for="(conn, index) in connections" :key="index" class="td-connection-item" :class="{
-                'td-connection-item-selected':
-                  currentConnectionId === conn.id,
-              }" @click="loadConnection(conn)">
-                <div class="td-connection-info">
-                  <span class="td-connection-name">{{
-                    conn.connection_name
-                  }}</span>
-                  <span class="td-connection-host">{{ conn.host }}</span>
-                </div>
-                <div class="td-icon td-close-icon" @click.stop="deleteConnection(conn)"
-                  v-tooltip="$t('i18nCommon.remoteDesktop.deleteConnection')"></div>
-              </div>
-            </div>
-          </div>
+          <TDCollectionList
+            :groups="collectionGroups"
+            :selectedItemId="currentConnectionId"
+            :isLoading="isLoadingCollection"
+            itemNameKey="connection_name"
+            @refresh="loadCollection"
+            @add-group="handleAddCollectionGroup"
+            @rename-group="renameCollectionGroup"
+            @delete-group="deleteCollectionGroup"
+            @add-item="openAddConnectionPopup"
+            @select-item="selectConnection"
+            @edit-item="openEditConnectionPopup"
+            @delete-item="deleteConnection"
+          />
         </div>
         <div class="flex flex-col td-sub-sidebar" v-show="currentConfigLayout.currentSidebarOption ==
           $tdEnum.RemoteDesktopSidebarOption.Setting
@@ -156,6 +124,8 @@ import TDServerRDPAPI from "@/common/api/request/AgentAPI/TDServerRDPAPI.js";
 import TDDynamicBackgroundEffect from "@/views/backgroundEffect/TDDynamicBackgroundEffect.vue";
 import TDFullTabWrapper from "@/components/TDFullTabWrapper.vue";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
+import TDCollectionList from "@/components/TDCollectionList.vue";
+import TDCollectionMixin from "@/mixins/TDCollectionMixin.js";
 
 // Bit values of the Rust `PerformanceFlags` bitflags, sent to the backend as a bitmask.
 const PERF_FLAG_DISABLE_WALLPAPER = 0x00000001;
@@ -193,8 +163,10 @@ const RDP_FILE_CHUNK_SIZE = 64 * 1024;
 export default {
   name: "TDRemoteDesktop",
   extends: TDToolBase,
+  mixins: [TDCollectionMixin],
   components: {
     TDSubSidebar,
+    TDCollectionList,
     TDRemoteDesktopRDPHelp,
     TDDynamicBackgroundEffect,
     TDFullTabWrapper,
@@ -225,10 +197,9 @@ export default {
       canvasWidth: 1920,
       canvasHeight: 1080,
       logEntries: [],
-      connections: [],
+      // Cây group + connection do TDCollectionMixin quản lý
       currentConnectionId: null,
       connectionName: "",
-      isLoading: false,
       agentAPI: null,
       remoteFilesDialogId: null,
       // File transfer state. `clipDataId` is the remote clipboard lock id and must
@@ -343,10 +314,14 @@ export default {
   },
 
   async mounted() {
-    this.agentAPI = new TDServerRDPAPI();
-    this.setupInputHandlers();
-    this.addLog(this.$t("i18nCommon.remoteDesktop.ready"), "info");
-    await this.loadConnections();
+    let me = this;
+    me.agentAPI = new TDServerRDPAPI();
+    // Trỏ 2 API vào mixin để nó gọi get_tree / create / update / delete
+    me.collectionItemAPI = me.agentAPI.rdpConnection;
+    me.collectionGroupAPI = me.agentAPI.rdpConnectionGroup;
+    me.setupInputHandlers();
+    me.addLog(me.$t("i18nCommon.remoteDesktop.ready"), "info");
+    await me.loadCollection();
   },
 
   beforeUnmount() {
@@ -396,28 +371,12 @@ export default {
       });
     },
 
-    async loadConnections() {
+    /**
+     * Chọn 1 connection trong cây collection rồi kết nối tới server RDP đó
+     */
+    async selectConnection(conn) {
       let me = this;
-      me.isLoading = true;
-      try {
-        let response = await me.agentAPI.rdpConnection.getAll();
-        let data = response?.data?.data ?? [];
-        if (response && response.success && Array.isArray(data)) {
-          me.connections.splice(0, me.connections.length, ...data);
-        }
-      } catch (error) {
-        console.error(
-          me.$t("i18nCommon.remoteDesktop.collection.loadError"),
-          error,
-        );
-        me.$tdUtility.showErrorNotFoundAgentServer();
-      } finally {
-        me.isLoading = false;
-      }
-    },
-
-    async loadConnection(conn) {
-      let me = this;
+      // Đang kết nối thì ngắt connection cũ trước, chờ session cũ tự teardown
       if (me.isConnected) {
         me.handleDisconnect();
         await new Promise((resolve) => setTimeout(resolve, 500));
@@ -430,7 +389,10 @@ export default {
       await me.handleConnect();
     },
 
-    createNewConnection() {
+    /**
+     * Ngắt kết nối hiện tại và xoá thông tin connection đang dùng
+     */
+    resetCurrentConnection() {
       let me = this;
       if (me.isConnected) {
         me.handleDisconnect();
@@ -442,68 +404,94 @@ export default {
       me.password = "";
     },
 
-    async saveConnection() {
+    /**
+     * Mở popup thêm connection mới, gán vào group được truyền vào
+     */
+    openAddConnectionPopup(group) {
       let me = this;
-      if (!me.connectionName) {
-        me.$tdToast.warning(
-          me.$t("i18nCommon.remoteDesktop.connectionNameRequired"),
-        );
-        return;
-      }
-      if (!me.host) {
-        me.$tdToast.warning(me.$t("i18nCommon.remoteDesktop.hostRequired"));
-        return;
-      }
-
-      let connData = {
-        connection_name: me.connectionName,
-        host: me.host,
-        username: me.username,
-        password: me.password,
-      };
-
-      try {
-        if (me.currentConnectionId) {
-          connData.id = me.currentConnectionId;
-          let response = await me.agentAPI.rdpConnection.update(connData);
-          if (response && response.success) {
-            me.$tdToast.success(me.$t("i18nCommon.remoteDesktop.saveSuccess"));
-            await me.loadConnections();
+      TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDRDPConnectionPopup,
+        ownerForm: me,
+        param: { group_id: group?.groupId ?? "" },
+        callback: async (payload) => {
+          if (payload?.saved) {
+            // tạo mới xong thì chọn luôn connection vừa tạo
+            await me.loadCollection();
+            if (payload.id) {
+              let created = me.allCollectionItems.find(
+                (conn) => conn.id === payload.id,
+              );
+              if (created) me.selectConnection(created);
+            }
           }
-        } else {
-          let response = await me.agentAPI.rdpConnection.create(connData);
-          if (response && response.success) {
-            me.$tdToast.success(me.$t("i18nCommon.remoteDesktop.saveSuccess"));
-            me.currentConnectionId = response.data?.data?.id;
-            await me.loadConnections();
-          }
-        }
-      } catch (error) {
-        console.error(me.$t("i18nCommon.remoteDesktop.saveError"), error);
-        me.$tdToast.error(me.$t("i18nCommon.remoteDesktop.saveError"));
-      }
+        },
+      });
     },
 
+    /**
+     * Mở popup sửa connection. Đang dùng connection đó thì nạp lại thông tin
+     * để không phải kết nối lại từ đầu.
+     */
+    openEditConnectionPopup(conn) {
+      let me = this;
+      TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDRDPConnectionPopup,
+        ownerForm: me,
+        param: { connection: conn },
+        callback: async (payload) => {
+          if (!payload?.saved) return;
+          await me.loadCollection();
+          if (me.currentConnectionId === conn.id) {
+            let updated = me.allCollectionItems.find(
+              (item) => item.id === conn.id,
+            );
+            if (updated) {
+              me.connectionName = updated.connection_name;
+              me.host = updated.host;
+              me.username = updated.username || "";
+              me.password = updated.password || "";
+            }
+          }
+        },
+      });
+    },
+
+    /**
+     * Xoá connection.
+     * Việc hỏi xác nhận + xoá + reload cây do TDCollectionMixin lo.
+     */
     async deleteConnection(conn) {
-      let me = this;
-      await me.deleteConnectionById(conn.id);
+      await this.deleteCollectionItem(conn);
     },
 
-    async deleteConnectionById(id) {
+    /**
+     * Xoá xong mới ngắt kết nối, và chỉ khi đang dùng đúng connection vừa xoá.
+     * Ngắt trước khi xác nhận sẽ mất phiên đang chạy dù người dùng bấm Cancel.
+     */
+    onCollectionItemDeleted(conn) {
       let me = this;
-      try {
-        let response = await me.agentAPI.rdpConnection.deleteById(id);
-        if (response && response.success) {
-          me.$tdToast.success(me.$t("i18nCommon.remoteDesktop.deleteSuccess"));
-          if (me.currentConnectionId === id) {
-            me.createNewConnection();
-          }
-          await me.loadConnections();
-        }
-      } catch (error) {
-        console.error(me.$t("i18nCommon.remoteDesktop.deleteError"), error);
-        me.$tdToast.error(me.$t("i18nCommon.remoteDesktop.deleteError"));
+      if (me.currentConnectionId === conn.id) {
+        me.resetCurrentConnection();
       }
+    },
+
+    /**
+     * Xoá nhóm có thể chứa connection đang dùng.
+     * Hook này chạy SAU khi cây đã tải lại nên kiểm tra trên cây mới nhất.
+     */
+    onCollectionGroupDeleted() {
+      let me = this;
+      if (!me.currentConnectionId) return;
+      if (!me.findCollectionGroupByItemId(me.currentConnectionId)) {
+        me.resetCurrentConnection();
+      }
+    },
+
+    /**
+     * Tên hiển thị của connection, dùng cho toast xác nhận xoá
+     */
+    getCollectionItemName(conn) {
+      return conn?.connection_name ?? "";
     },
 
     async handleConnect() {
@@ -1539,114 +1527,6 @@ export default {
   .td-combobox {
     width: 100%;
   }
-}
-
-.td-rdp-collection {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: var(--padding);
-}
-
-.td-collection-header {
-  gap: var(--padding);
-  width: 100%;
-  margin-top: var(--padding);
-}
-
-.td-connection-form {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: var(--padding);
-}
-
-.rdp-connection-input {
-  width: 100%;
-}
-
-.rdp-port-input {
-  width: 100px;
-}
-
-.td-connection-actions {
-  display: flex;
-  gap: var(--padding);
-  width: 100%;
-}
-
-.td-connection-list {
-  flex: 1;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow-y: auto;
-}
-
-.td-no-connections {
-  padding: var(--padding);
-  text-align: center;
-  color: #6e7681;
-}
-
-.td-connection-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--padding);
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  margin-bottom: var(--padding);
-}
-
-.td-connection-host {
-  font-size: 12px;
-  color: var(--text-color);
-}
-
-.td-connection-item:hover {
-  background-color: var(--focus-color);
-  color: var(--selected-item-text-color);
-
-  .td-connection-host {
-    color: var(--selected-item-text-color);
-  }
-}
-
-.td-connection-item-selected {
-  background-color: var(--focus-color);
-  color: var(--selected-item-text-color);
-  font-weight: 600;
-
-  .td-connection-host {
-    color: var(--selected-item-text-color);
-  }
-}
-
-.td-connection-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  overflow: hidden;
-}
-
-.td-connection-name {
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-
-.response-loading {
-  width: 100%;
-  height: 100px;
-  background-color: var(--bg-layer-color);
-  border: 1px solid transparent;
-  border-radius: var(--border-radius);
-  justify-content: center;
-  align-items: center;
 }
 
 .td-setting-item {

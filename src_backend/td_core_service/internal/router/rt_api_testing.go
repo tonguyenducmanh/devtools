@@ -13,13 +13,9 @@ func InjectAPITestingRouter(app *http.ServeMux) {
 	// Thực thi API đồng thời (goroutines)
 	app.HandleFunc("POST /api_test/exec_parallel", service.ExecuteParallel)
 
-	// CRUD API Testing và Group sử dụng base controller
-	service.GetTestingAPIController().RegisterRoutes(app)
-	service.GetTestingGroupController().RegisterRoutes(app)
-
-	// CRUD API Testing ProMode và Group sử dụng base controller
-	service.GetTestingProModeAPIController().RegisterRoutes(app)
-	service.GetTestingProModeGroupController().RegisterRoutes(app)
+	// CRUD API Testing + Group và ProMode + Group, kèm endpoint get_tree trả về cây đã gom sẵn
+	service.GetTestingAPICollection().RegisterRoutes(app)
+	service.GetTestingProModeAPICollection().RegisterRoutes(app)
 
 	// Import Batch
 	app.HandleFunc("POST /api_test/import_batch", service.BatchImportTestingData)

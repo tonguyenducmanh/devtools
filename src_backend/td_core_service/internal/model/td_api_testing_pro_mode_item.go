@@ -12,10 +12,15 @@ func (m TDAPITestingProModeItem) TableName() string {
 	return "td_api_testing_pro_mode"
 }
 
-// model quản lý nhóm của api testing promode
+// GetGroupID trả về id của nhóm chứa script này, rỗng nghĩa là chưa gán nhóm
+func (m TDAPITestingProModeItem) GetGroupID() string {
+	return m.GroupID
+}
+
+// model quản lý nhóm của api testing promode.
+// Dùng chung TDGroupModel với các bảng group khác (id, name, created_date, modified_date)
 type TDAPITestingProModeGroup struct {
-	TDBaseModel
-	Name string `json:"name"`
+	TDGroupModel
 }
 
 func (g TDAPITestingProModeGroup) TableName() string {

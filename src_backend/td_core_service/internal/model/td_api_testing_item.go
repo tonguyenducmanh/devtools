@@ -20,10 +20,15 @@ func (m TDAPITestingItem) TableName() string {
 	return "td_api_testing"
 }
 
-// model quản lý nhóm của api testing
+// GetGroupID trả về id của nhóm chứa request này, rỗng nghĩa là chưa gán nhóm
+func (m TDAPITestingItem) GetGroupID() string {
+	return m.GroupID
+}
+
+// model quản lý nhóm của api testing.
+// Dùng chung TDGroupModel với các bảng group khác (id, name, created_date, modified_date)
 type TDAPITestingGroup struct {
-	TDBaseModel
-	Name string `json:"name"`
+	TDGroupModel
 }
 
 func (g TDAPITestingGroup) TableName() string {

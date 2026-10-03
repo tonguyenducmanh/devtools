@@ -7,5 +7,5 @@ import (
 
 // Inject các router liên quan đến RDP Connection
 func InjectRDPConnectionRouter(app *http.ServeMux) {
-	service.GetRDPConnectionController().RegisterRoutes(app)
+	service.GetRDPConnectionCollection().RegisterRoutes(app)
 }

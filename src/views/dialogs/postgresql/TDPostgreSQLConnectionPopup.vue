@@ -209,9 +209,11 @@ export default {
   },
 
   computed: {
+    /**
+     * Danh sách nhóm lấy từ cây collection của tool chủ nhật
+     */
     groupOptions() {
-      let ownerGroups = this.ownerForm?.allGroups ?? [];
-      return ownerGroups.map((g) => ({ value: g.id, label: g.name }));
+      return this.ownerForm?.collectionGroupOptions ?? [];
     },
   },
 
