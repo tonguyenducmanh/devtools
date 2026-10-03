@@ -25,6 +25,11 @@ func (m TDAPIMockItem) TableName() string {
 	return "td_api_mock"
 }
 
+// GetGroupID trả về id của nhóm chứa mock này, rỗng nghĩa là chưa gán nhóm
+func (m TDAPIMockItem) GetGroupID() string {
+	return m.GroupID
+}
+
 // IsFormData kiểm tra body của mock có phải multipart/form-data không
 func (m TDAPIMockItem) IsFormData() bool {
 	return m.BodyType == TDAPIBodyTypeFormData
@@ -39,10 +44,11 @@ func (m TDAPIMockItem) HasBody() bool {
 	return strings.TrimSpace(m.BodyText) != "" && m.BodyText != "null"
 }
 
-// model quản lý nhóm của api mock
+// model quản lý nhóm của api mock.
+// Cấu trúc giống mọi bảng group khác (id, name, created_date, modified_date) nên
+// dùng chung TDGroupModel, giúp generic collection controller xử lý được như các tool còn lại.
 type TDAPIMockGroup struct {
-	TDBaseModel
-	Name string `json:"name"`
+	TDGroupModel
 }
 
 func (g TDAPIMockGroup) TableName() string {

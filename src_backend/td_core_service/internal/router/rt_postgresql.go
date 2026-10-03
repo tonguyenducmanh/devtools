@@ -7,9 +7,8 @@ import (
 
 // InjectPostgreSQLRouter đăng ký tất cả router liên quan đến PostgreSQL
 func InjectPostgreSQLRouter(app *http.ServeMux) {
-	// CRUD cho connection group, connection
-	postgresql.GetPostgreSQLConnectionGroupController().RegisterRoutes(app)
-	postgresql.GetPostgreSQLConnectionController().RegisterRoutes(app)
+	// CRUD cho connection group + connection, kèm endpoint get_tree trả về cây đã gom sẵn
+	postgresql.GetPostgreSQLConnectionCollection().RegisterRoutes(app)
 
 	// Endpoint thực thi query
 	app.HandleFunc("POST /postgresql/execute_query", postgresql.ExecutePostgreSQLQueryHandler)

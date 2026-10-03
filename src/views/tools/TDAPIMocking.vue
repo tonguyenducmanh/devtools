@@ -21,7 +21,7 @@
           <TDComboBox
             v-model="groupId"
             :placeHolder="$t('i18nCommon.APIMocking.groupName')"
-            :options="allGroupOptions"
+            :options="collectionGroupOptions"
             :noMargin="true"
             :width="120"
             :isEditable="false"
@@ -299,7 +299,8 @@
         >
           <TDAPIMockingHelp />
         </div>
-        <!-- phần bộ sưu tập các request -->
+        <!-- phần bộ sưu tập các mock API.
+             Dùng chung component collection, backend trả về cây group + item đã gom sẵn -->
         <div
           class="flex flex-col td-sidebar-content"
           v-show="
@@ -307,100 +308,21 @@
             $tdEnum.APISidebarOption.Collection
           "
         >
-          <!-- phần header của bộ sưu tập request (Quản lý nhóm) -->
-          <div class="flex td-header-collection">
-            <div class="td-new-collection">
-              <TDInput
-                v-model="newGroupName"
-                :noMargin="true"
-                :placeHolder="$t('i18nCommon.APIMocking.groupName')"
-              />
-            </div>
-            <TDButton
-              :noMargin="true"
-              @click="addNewGroup"
-              :type="$tdEnum.buttonType.secondary"
-              iconClass="td-plus-icon"
-              v-tooltip="$t('i18nCommon.apiTesting.add')"
-            />
-            <TDButton
-              :noMargin="true"
-              @click="loadAllMockAPIs"
-              :type="$tdEnum.buttonType.secondary"
-              iconClass="td-reload-icon"
-              v-tooltip="$t('i18nCommon.APIMocking.refresh')"
-            />
-          </div>
-          <!-- danh sách các mock API được nhóm theo group_name -->
-          <div class="td-collection">
-            <div class="flex flex-col response-loading" v-if="isLoading">
-              <TDLoading />
-            </div>
-            <div class="td-collection-body" v-else>
-              <div
-                v-for="(group, index) in groupedMockAPIs"
-                class="flex flex-col no-select td-collection-item"
-                :key="index"
-              >
-                <!-- phần tên nhóm -->
-                <div
-                  class="flex td-collection-header"
-                  @click="toggleGroup(group.name)"
-                >
-                  <div class="flex text-nowrap td-collection-header-left">
-                    <TDArrow
-                      :openProp="openGroups[group.name]"
-                      :arrowOpenDirection="$tdEnum.Direction.bottom"
-                      :arrowDirection="$tdEnum.Direction.right"
-                    />
-                    <div class="" v-tooltip="group.name || 'Ungrouped'">
-                      {{ group.name || "Ungrouped" }}
-                    </div>
-                  </div>
-                  <div class="flex td-collection-edit-btn" v-if="group.name">
-                    <div
-                      v-tooltip="$t('i18nCommon.APIMocking.delete')"
-                      class="td-icon td-close-icon"
-                      @click.stop="deleteGroupByName(group.name)"
-                    ></div>
-                  </div>
-                </div>
-                <!-- danh sách các mock API trong nhóm -->
-                <div
-                  v-if="
-                    openGroups[group.name] &&
-                    group.items &&
-                    group.items.length > 0
-                  "
-                  class="flex flex-col td-collection-content"
-                >
-                  <div
-                    v-for="(mock, index) in group.items"
-                    :key="index"
-                    class="flex td-collection-request-item"
-                    :class="{
-                      'td-collection-request-item-selected':
-                        mock && currentMockId == mock.id,
-                    }"
-                    @click="loadMockAPI(mock)"
-                  >
-                    <span class="text-nowrap">
-                      <div v-tooltip="mock.request_name">
-                        {{ mock.request_name }}
-                      </div>
-                    </span>
-                    <span class="td-collection-item-edit-btn">
-                      <div
-                        class="td-icon td-close-icon"
-                        v-tooltip="$t('i18nCommon.APIMocking.delete')"
-                        @click.stop="deleteMockAPI(mock.id)"
-                      ></div>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <TDCollectionList
+            :groups="collectionGroups"
+            :selectedItemId="currentMockId"
+            :isLoading="isLoadingCollection"
+            itemNameKey="request_name"
+            :allowEditItem="false"
+            :defaultOpen="false"
+            @refresh="loadAllMockAPIs"
+            @add-group="handleAddCollectionGroup"
+            @rename-group="renameCollectionGroup"
+            @delete-group="deleteCollectionGroup"
+            @add-item="addMockInGroup"
+            @select-item="loadMockAPI"
+            @delete-item="handleDeleteMockAPI"
+          />
         </div>
         <!-- phần sidebar nếu đang tùy chọn thiết lập api -->
         <div
@@ -431,7 +353,8 @@
 
 <script>
 import TDSubSidebar from "@/components/TDSubSidebar.vue";
-import TDArrow from "@/components/TDArrow.vue";
+import TDCollectionList from "@/components/TDCollectionList.vue";
+import TDCollectionMixin from "@/mixins/TDCollectionMixin.js";
 import TDServerMockAPI from "@/common/api/request/AgentAPI/TDServerMockAPI.js";
 import TDAutomation from "@/common/automation/TDAutomation.js";
 import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
@@ -442,11 +365,11 @@ import TDAPIPanelSwitcher from "@/views/tools/APITesting/TDAPIPanelSwitcher.vue"
 import TDAPIFormDataMixin from "@/mixins/TDAPIFormDataMixin.js";
 export default {
   extends: TDToolBase,
-  mixins: [TDAPIFormDataMixin],
+  mixins: [TDCollectionMixin, TDAPIFormDataMixin],
   name: "TDAPIMocking",
   components: {
     TDSubSidebar,
-    TDArrow,
+    TDCollectionList,
     TDAPIMockingHelp,
     TDAPIFormDataEditor,
     TDAPIPanelSwitcher,
@@ -471,8 +394,6 @@ export default {
       responseHeadersText: "",
       statusCode: null,
       currentMockId: null,
-      allMockAPIs: [],
-      openGroups: {},
       mockBaseUrl: null,
       methodOptions: [
         { value: "GET", label: "GET" },
@@ -496,12 +417,9 @@ export default {
         // kiểu body đang dùng, độc lập với việc đang xem header hay body
         currentBodyType: this.$tdEnum.APIBodyType.json,
       },
-      newGroupName: "",
-      allGroups: [],
       requestSectionSize: 50,
       responseSectionSize: 50,
       agentAPI: null,
-      isLoading: false,
     };
   },
   created() {
@@ -515,8 +433,12 @@ export default {
     }
   },
   async mounted() {
-    this.agentAPI = new TDServerMockAPI();
-    await this.loadAllMockAPIs();
+    let me = this;
+    me.agentAPI = new TDServerMockAPI();
+    // Trỏ 2 API vào mixin để nó gọi get_tree / create / update / delete
+    me.collectionItemAPI = me.agentAPI.mockItem;
+    me.collectionGroupAPI = me.agentAPI.mockGroup;
+    await me.loadAllMockAPIs();
   },
   computed: {
     sidebarOptions() {
@@ -539,12 +461,6 @@ export default {
       });
       return options;
     },
-    allGroupOptions() {
-      return this.allGroups.map((g) => ({
-        value: g.id,
-        label: g.name,
-      }));
-    },
     customStyleComboMethodAPI() {
       let me = this;
       let style = me.methodOptions.find((x) => x.value == me.httpMethod);
@@ -553,34 +469,6 @@ export default {
       } else {
         return null;
       }
-    },
-    /**
-     * Nhóm các mock API theo group_name
-     */
-    groupedMockAPIs() {
-      let me = this;
-      let groups = me.allGroups.map((g) => ({
-        ...g,
-        items: [],
-      }));
-      // Add 'Ungrouped'
-      groups.push({ id: "", name: "", items: [] });
-
-      if (Array.isArray(me.allMockAPIs)) {
-        me.allMockAPIs.forEach((mock) => {
-          let group = groups.find((g) => g.id === mock.group_id);
-          if (group) {
-            group.items.push(mock);
-          } else {
-            // Fallback to ungrouped if ID not found
-            let ungrouped = groups.find((g) => g.id === "");
-            if (ungrouped) ungrouped.items.push(mock);
-          }
-        });
-      }
-      // Filter out empty groups if desired, or keep them.
-      // For now, let's keep groups that have items or are real groups (not ungrouped fallback if empty)
-      return groups.filter((g) => g.id !== "" || g.items.length > 0);
     },
     /**
      * Tính toán style động cho request area
@@ -638,100 +526,72 @@ export default {
       this.currentConfigLayout.currentAPIResponseInfoOption = option;
     },
     /**
-     * Toggle mở/đóng nhóm
-     */
-    toggleGroup(groupName) {
-      let me = this;
-      me.openGroups[groupName] = !me.openGroups[groupName];
-    },
-    /**
-     * Tải tất cả mock APIs từ server
+     * Tải cây group + mock và base url của mock server.
+     * Cây do TDCollectionMixin gọi 1 request get_tree, không còn gọi 2 API rồi ghép tay.
      */
     async loadAllMockAPIs() {
       let me = this;
-      me.isLoading = true;
-      try {
-        // Tải cả danh sách nhóm và danh sách mock
-        await Promise.all([
-          me.loadAllGroups(),
-          me.loadMockData(),
-          me.loadMockServerBaseUrl(),
-        ]);
-      } catch (error) {
-        console.error("Lỗi tải mock APIs:", error);
-        me.$tdUtility.showErrorNotFoundAgentServer();
-      } finally {
-        me.isLoading = false;
-      }
+      await Promise.all([
+        me.loadCollection(),
+        me.loadMockServerBaseUrl(),
+      ]);
     },
     async loadMockServerBaseUrl() {
       let me = this;
       let response = await me.agentAPI.getMockBaseURL();
       me.mockBaseUrl = response?.data?.data;
     },
-    async loadMockData() {
-      let me = this;
-      let response = await me.agentAPI.mockItem.getAll();
-      let mockData = response?.data?.data ?? [];
-      if (response && response.success && Array.isArray(mockData)) {
-        me.allMockAPIs.splice(0, me.allMockAPIs.length, ...mockData);
-      } else {
-        me.allMockAPIs.splice(0, me.allMockAPIs.length);
-      }
-    },
-    async loadAllGroups() {
-      let me = this;
-      try {
-        let response = await me.agentAPI.mockGroup.getAll();
-        let groupData = response?.data?.data ?? [];
-        if (response && response.success && Array.isArray(groupData)) {
-          me.allGroups.splice(0, me.allGroups.length, ...groupData);
-        }
-      } catch (error) {
-        console.error("Lỗi tải nhóm:", error);
-      }
-    },
     /**
-     * Thêm nhóm mới
+     * Nút "+" trên 1 group: tạo mock mới và gán thẳng vào group đó.
+     *
+     * Nhóm ảo "Ungrouped" không có group_id thật, mà mock bắt buộc phải thuộc 1
+     * group thật nên bấm "+" ở đây sẽ hỏi chọn/tạo group thay vì để trống.
      */
-    async addNewGroup() {
+    addMockInGroup(group) {
       let me = this;
-      if (!me.newGroupName) return;
-
-      try {
-        let response = await me.agentAPI.mockGroup.create({
-          name: me.newGroupName,
-        });
-        if (response && response.success && response.data?.success) {
-          me.$tdToast.success(
-            me.$t("i18nCommon.APIMocking.createGroupSuccess"),
-          );
-          me.newGroupName = "";
-          await me.loadAllGroups();
-        }
-      } catch (error) {
-        me.$tdToast.error(me.$t("i18nCommon.APIMocking.createGroupErr"));
+      if (!group?.groupId) {
+        me.openPickGroupForNewMock();
+        return;
       }
+      me.groupId = group.groupId;
+      me.currentMockId = null;
+      me.requestName = "";
     },
-    /**
-     * Xóa nhóm theo tên
-     */
-    async deleteGroupByName(groupName) {
-      let me = this;
-      let group = me.allGroups.find((g) => g.name === groupName);
-      if (!group) return;
 
-      try {
-        let response = await me.agentAPI.mockGroup.deleteById(group.id);
-        if (response && response.success && response.data?.success) {
-          me.$tdToast.success(
-            me.$t("i18nCommon.APIMocking.deleteGroupSuccess"),
-          );
-          await me.loadAllMockAPIs();
-        }
-      } catch (error) {
-        me.$tdToast.error(me.$t("i18nCommon.APIMocking.deleteGroupErr"));
-      }
+    /**
+     * Popup chọn / tạo group cho mock mới
+     */
+    openPickGroupForNewMock() {
+      let me = this;
+      TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDCollectionPickerPopup,
+        ownerForm: me,
+        props: {
+          groups: me.collectionGroups,
+          showItemCount: false,
+        },
+        param: {
+          createLabelTemplate: me.$t("i18nCommon.collection.createGroupNamed"),
+        },
+        callback: async (payload) => {
+          if (payload?.groupId) {
+            me.applyPickedGroup(payload.groupId);
+          } else if (payload?.newGroupName) {
+            let group = await me.createCollectionGroup(payload.newGroupName);
+            if (group) me.applyPickedGroup(group.groupId);
+          }
+        },
+      });
+    },
+
+    /**
+     * Gán group vừa chọn và bắt đầu tạo mock mới
+     */
+    applyPickedGroup(groupId) {
+      let me = this;
+      me.groupId = groupId;
+      me.currentMockId = null;
+      me.requestName = "";
     },
     /**
      * Tải thông tin mock API vào form
@@ -889,31 +749,47 @@ export default {
       });
     },
     /**
-     * Xóa mock API
+     * Xóa mock API.
+     * Việc hỏi xác nhận + xóa + reload cây do TDCollectionMixin lo.
      */
-    async deleteMockAPI(id) {
+    async handleDeleteMockAPI(mock) {
+      await this.deleteCollectionItem(mock);
+    },
+
+    /**
+     * Xóa xong mới reset form, và chỉ khi form đang mở đúng mock vừa xóa.
+     * Reset trước khi xác nhận sẽ mất dữ liệu người dùng dù họ bấm Cancel.
+     */
+    onCollectionItemDeleted(mock) {
       let me = this;
-      try {
-        let response = await me.agentAPI.mockItem.deleteById(id);
-        if (response && response.success && response.data?.success) {
-          me.$tdToast.success(me.$t("i18nCommon.APIMocking.deleteMockSuccess"));
-          if (me.currentMockId === id) {
-            me.createNewMock();
-          }
-          await me.loadAllMockAPIs();
-        }
-      } catch (error) {
-        console.error(me.$t("i18nCommon.APIMocking.deleteMockErr"), error);
-        me.$tdToast.error(me.$t("i18nCommon.APIMocking.deleteMockErr"));
+      if (me.currentMockId === mock.id) {
+        me.createNewMock();
       }
+    },
+
+    /**
+     * Xóa nhóm sẽ xóa luôn các mock bên trong. Nếu mock đang mở nằm trong nhóm
+     * vừa xóa thì phải reset form, không thì Save sẽ lưu nhầm / im lặng không làm gì.
+     */
+    onCollectionGroupDeleted() {
+      let me = this;
+      if (!me.currentMockId) return;
+      if (!me.findCollectionGroupByItemId(me.currentMockId)) {
+        me.createNewMock();
+      }
+    },
+
+    /**
+     * Tên hiển thị của mock, dùng cho toast xác nhận xoá
+     */
+    getCollectionItemName(mock) {
+      return mock?.request_name ?? "";
     },
   },
 };
 </script>
 
 <style scoped lang="scss">
-@use "@/styles/collection-sub-sidebar.scss";
-
 .td-mocking-container {
   width: 100%;
   height: 100%;
@@ -942,34 +818,12 @@ export default {
     }
   }
 }
-.response-loading {
-  width: 100%;
-  height: 100%;
-  background-color: var(--bg-layer-color);
-  border: 1px solid transparent;
-  border-radius: var(--border-radius);
-}
 .td-sidebar-content {
   flex: 1;
   width: 100%;
   min-height: 0;
 }
 
-.td-header-collection {
-  gap: var(--padding);
-  width: 100%;
-  margin-top: var(--padding);
-  .td-new-collection {
-    flex: 1;
-  }
-}
-
-.td-plus-icon {
-  cursor: pointer;
-}
-.collection-group-footer {
-  gap: var(--padding);
-}
 .td-base-url {
   background-color: var(--bg-thirt-color);
   height: var(--base-component-height);
@@ -983,9 +837,6 @@ export default {
 }
 .td-base-url:hover {
   border: 1px solid var(--focus-color);
-}
-.td-request-footer-btn {
-  cursor: pointer;
 }
 .td-response-status-label {
   font-size: 12px;

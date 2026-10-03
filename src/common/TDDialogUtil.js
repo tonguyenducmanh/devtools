@@ -2,23 +2,29 @@ import { createApp } from "vue";
 
 /**
  * Enum định nghĩa các loại dialog
+ *
+ * Giá trị chỉ dùng nội bộ làm key tra cứu, không lưu vào database nên có thể
+ * đánh số lại khi bỏ bớt dialog. Luôn thêm mới ở cuối danh sách.
  */
 export const TDDialogEnum = {
-  TDAPISaveToCollectionPopup: 1,
-  TDGoToToolPopup: 2,
-  TDAPIImportCURLPopup: 3,
-  TDAPIMokingImportPopup: 4,
-  TDPostgreSQLConnectionPopup: 5,
-  TDPostgreSQLInspect: 6,
-  TDQuickPreview: 7,
-  TDPostgreSQLDatabaseList: 8,
-  TDPostgreSQLCloneCachePopup: 9,
-  TDShowAllShortcutPopup: 10,
-  TDPostgreSQLBackupPopup: 11,
-  TDPostgreSQLRestorePopup: 12,
-  TDPostgreSQLClonePopup: 13,
-  TDAPISaveProModeToCollectionPopup: 14,
-  TDRDPRemoteFilesPopup: 15,
+  TDGoToToolPopup: 1,
+  TDAPIImportCURLPopup: 2,
+  TDAPIMokingImportPopup: 3,
+  TDPostgreSQLConnectionPopup: 4,
+  TDPostgreSQLInspect: 5,
+  TDQuickPreview: 6,
+  TDPostgreSQLDatabaseList: 7,
+  TDPostgreSQLCloneCachePopup: 8,
+  TDShowAllShortcutPopup: 9,
+  TDPostgreSQLBackupPopup: 10,
+  TDPostgreSQLRestorePopup: 11,
+  TDPostgreSQLClonePopup: 12,
+  TDRDPRemoteFilesPopup: 13,
+  TDRDPConnectionPopup: 14,
+  // ── Dialog dùng chung cho pattern master-detail ──────────────────────────
+  TDCollectionGroupPopup: 15,
+  TDCollectionPickerPopup: 16,
+  TDConfirmPopup: 17,
 };
 
 /**
@@ -26,8 +32,6 @@ export const TDDialogEnum = {
  * CHỈ QUẢN LÝ TRONG FILE NÀY
  */
 const DialogComponentMap = {
-  [TDDialogEnum.TDAPISaveToCollectionPopup]: () =>
-    import("@/views/dialogs/TDAPISaveToCollectionPopup.vue"),
   [TDDialogEnum.TDGoToToolPopup]: () =>
     import("@/views/dialogs/TDGoToToolPopup.vue"),
   [TDDialogEnum.TDAPIImportCURLPopup]: () =>
@@ -52,10 +56,16 @@ const DialogComponentMap = {
     import("@/views/dialogs/postgresql/TDPostgreSQLRestorePopup.vue"),
   [TDDialogEnum.TDPostgreSQLClonePopup]: () =>
     import("@/views/dialogs/postgresql/TDPostgreSQLClonePopup.vue"),
-  [TDDialogEnum.TDAPISaveProModeToCollectionPopup]: () =>
-    import("@/views/dialogs/TDAPISaveProModeToCollectionPopup.vue"),
   [TDDialogEnum.TDRDPRemoteFilesPopup]: () =>
     import("@/views/dialogs/TDRDPRemoteFilesPopup.vue"),
+  [TDDialogEnum.TDRDPConnectionPopup]: () =>
+    import("@/views/dialogs/rdp/TDRDPConnectionPopup.vue"),
+  [TDDialogEnum.TDCollectionGroupPopup]: () =>
+    import("@/views/dialogs/TDCollectionGroupPopup.vue"),
+  [TDDialogEnum.TDCollectionPickerPopup]: () =>
+    import("@/views/dialogs/TDCollectionPickerPopup.vue"),
+  [TDDialogEnum.TDConfirmPopup]: () =>
+    import("@/views/dialogs/TDConfirmPopup.vue"),
 };
 
 class TDDialogUtil {
@@ -75,7 +85,14 @@ class TDDialogUtil {
     if (event.key === "Escape" && this.activeDialogs.size > 0) {
       const lastId = Array.from(this.activeDialogs.keys()).pop();
       if (lastId) {
-        this.closeById(lastId);
+        // Gọi onClose (nếu có) chứ không đóng thẳng, để callback của popup
+        // (vd: TDDialogUtil.confirm) vẫn được chạy và không bị treo promise.
+        const dialog = this.activeDialogs.get(lastId);
+        if (dialog?.onClose) {
+          dialog.onClose();
+        } else {
+          this.closeById(lastId);
+        }
       }
     }
   }
@@ -147,11 +164,42 @@ class TDDialogUtil {
     this.activeDialogs.set(dialogId, {
       app,
       container,
+      // Giữ lại onClose để đóng bằng Escape vẫn chạy callback,
+      // không bỏ sót promise đang chờ (xem _onKeydown)
+      onClose: close,
     });
 
     this._updateKeydownListener();
 
     return dialogId;
+  }
+
+  /**
+   * Hỏi xác nhận user, trả về Promise<boolean>
+   * Dùng cho thao tác không thể hoàn tác như xoá nhóm (xoá luôn item bên trong)
+   * @returns {Promise<boolean>} true nếu user đồng ý
+   */
+  async confirm({ ownerForm, title = "", message = "", confirmLabel = "", cancelLabel = "" }) {
+    return new Promise((resolve) => {
+      // Chốt 1 lần: callback của showPopup chỉ chạy 1 lần khi popup đóng,
+      // nhưng guard lại để chắc chắn resolve chỉ đúng 1 lần
+      let settled = false;
+      const settle = (value) => {
+        if (settled) return;
+        settled = true;
+        resolve(value);
+      };
+
+      this.showPopup({
+        dialogType: TDDialogEnum.TDConfirmPopup,
+        ownerForm,
+        param: { title, message, confirmLabel, cancelLabel },
+        callback: (result) => settle(!!result),
+      }).catch((error) => {
+        console.error("Không mở được popup xác nhận:", error);
+        settle(false);
+      });
+    });
   }
 
   /**
