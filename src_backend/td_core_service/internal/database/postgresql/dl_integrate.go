@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
-	"td_core_service/internal/database"
 	"td_core_service/internal/model"
 
 	"github.com/jackc/pgx/v5"
@@ -22,16 +21,6 @@ var defaultTypeMap = pgtype.NewMap()
 // file này hướng tới việc gọi nối vào postgressl ở server khác
 // coding sẽ là truyền từ UI vào
 // chỉ có các config kết nối thì vẫn lưu ở sqlite của backend app
-
-// Xóa toàn bộ connection thuộc 1 group (dùng khi xóa group)
-func DeletePostgreSQLConnectionsByGroupID(groupID string) error {
-	db, err := database.GetConnectionDB()
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec("DELETE FROM td_postgresql_connection WHERE group_id = ?", groupID)
-	return err
-}
 
 // rawStatementResult lưu kết quả thô của 1 statement, CHƯA resolve tên bảng.
 // Việc resolve OID -> tên bảng phải làm SAU khi MultiResultReader đã đóng hoàn toàn,

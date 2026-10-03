@@ -11,26 +11,16 @@ import (
 	"time"
 )
 
-// GetTestingAPIController trả về controller quản lý API testing
-func GetTestingAPIController() *TDBLBase[model.TDAPITestingItem] {
-	return &TDBLBase[model.TDAPITestingItem]{
-		PathPrefix: "api_testing",
-		Repo:       database.TDDLBase[model.TDAPITestingItem]{},
-	}
-}
-
-func beforeDeleteTestingGroup(id string, r *http.Request) error {
-	// Xóa các bảng liên quan trước ở tầng DL
-	return database.DeleteTestingItemsByGroupID(id)
-}
-
-// GetTestingGroupController trả về controller quản lý nhóm API testing
-func GetTestingGroupController() *TDBLBase[model.TDAPITestingGroup] {
-	return &TDBLBase[model.TDAPITestingGroup]{
-		PathPrefix:   "api_testing_group",
-		Repo:         database.TDDLBase[model.TDAPITestingGroup]{},
-		BeforeDelete: beforeDeleteTestingGroup,
-	}
+// GetTestingAPICollection trả về cặp master-detail của API testing:
+// bảng master là td_api_testing_group, bảng detail là td_api_testing.
+//
+// Cascade delete và endpoint get_tree đã có sẵn trong TDCollection, nên ở đây
+// không cần viết thêm gì — đúng bằng 0 dòng business logic riêng.
+func GetTestingAPICollection() *TDCollection[model.TDAPITestingGroup, model.TDAPITestingItem] {
+	return NewCollection[model.TDAPITestingGroup, model.TDAPITestingItem](
+		"api_testing_group",
+		"api_testing",
+	)
 }
 
 // Import batch API testing (giữ nguyên vì logic phức tạp nhiều bảng)
@@ -65,26 +55,13 @@ func BatchImportTestingData(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// GetTestingProModeAPIController trả về controller quản lý API testing promode
-func GetTestingProModeAPIController() *TDBLBase[model.TDAPITestingProModeItem] {
-	return &TDBLBase[model.TDAPITestingProModeItem]{
-		PathPrefix: "api_testing_pro_mode",
-		Repo:       database.TDDLBase[model.TDAPITestingProModeItem]{},
-	}
-}
-
-func beforeDeleteTestingProModeGroup(id string, r *http.Request) error {
-	// Xóa các item liên quan trước ở tầng DL
-	return database.DeleteTestingProModeItemsByGroupID(id)
-}
-
-// GetTestingProModeGroupController trả về controller quản lý nhóm API testing promode
-func GetTestingProModeGroupController() *TDBLBase[model.TDAPITestingProModeGroup] {
-	return &TDBLBase[model.TDAPITestingProModeGroup]{
-		PathPrefix:   "api_testing_pro_mode_group",
-		Repo:         database.TDDLBase[model.TDAPITestingProModeGroup]{},
-		BeforeDelete: beforeDeleteTestingProModeGroup,
-	}
+// GetTestingProModeAPICollection trả về cặp master-detail của API testing pro mode:
+// bảng master là td_api_testing_pro_mode_group, bảng detail là td_api_testing_pro_mode
+func GetTestingProModeAPICollection() *TDCollection[model.TDAPITestingProModeGroup, model.TDAPITestingProModeItem] {
+	return NewCollection[model.TDAPITestingProModeGroup, model.TDAPITestingProModeItem](
+		"api_testing_pro_mode_group",
+		"api_testing_pro_mode",
+	)
 }
 
 // BatchImportProModeTestingData import batch API testing promode (Groups + Items)

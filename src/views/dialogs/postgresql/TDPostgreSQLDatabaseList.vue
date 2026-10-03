@@ -181,7 +181,7 @@ export default {
         },
         callback: async (payload) => {
           if (payload?.saved) {
-            await this.ownerForm?.loadConnections?.();
+            await this.ownerForm?.loadCollection?.();
           }
         },
       });

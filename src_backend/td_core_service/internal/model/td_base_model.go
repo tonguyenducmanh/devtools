@@ -12,3 +12,9 @@ type TDBaseModel struct {
 func (m TDBaseModel) PrimaryKey() string {
 	return "id"
 }
+
+// GetID trả về giá trị khóa chính hiện tại.
+// Cần cho các thao tác generic (vd: index group theo id khi gom cây master-detail).
+func (m TDBaseModel) GetID() string {
+	return m.ID
+}
