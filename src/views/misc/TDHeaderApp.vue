@@ -237,6 +237,13 @@ export default {
             labelKey: "i18nTip.viewAllTips",
             action: this.showAllTipsPopup,
           },
+          {
+            // Điều khoản vốn chỉ hiện 1 lần lúc khởi chạy, đặt thêm ở đây để
+            // xem lại được bất cứ lúc nào
+            key: "showAgreement",
+            labelKey: "i18nCommon.agreementTitle",
+            action: this.showAgreementPopup,
+          },
         ],
       };
     },
@@ -513,6 +520,23 @@ export default {
     },
     showAllTipsPopup() {
       this.showAllTips();
+      this.closeFlyout();
+    },
+    /**
+     * Xem lại điều khoản sử dụng. Popup này vốn do App.vue gọi lúc khởi chạy,
+     * ở đây mở lại thủ công nên vẫn lưu cờ đã đồng ý khi bấm nút đồng ý để
+     * lần sau app không hỏi lại nữa
+     */
+    showAgreementPopup() {
+      let me = this;
+      let cacheKey = me.$tdEnum.cacheConfig.AgreementAccepted;
+      TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDAgreementPopup,
+        ownerForm: me,
+        props: {},
+        param: {},
+        callback: () => me.$tdCache.set(cacheKey, true),
+      });
       this.closeFlyout();
     },
     reloadAppFunc() {
