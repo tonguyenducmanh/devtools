@@ -3,12 +3,12 @@
     :visible="true"
     :showHeader="true"
     :showFullScreenHeaderIcon="false"
+    :showCloseHeaderIcon="false"
     :closeOnClickOverlay="false"
     :resizable="false"
     width="520px"
     height="auto"
     :title="$t('i18nCommon.agreementTitle')"
-    @close="handleClose"
   >
     <div class="flex flex-col td-agreement-popup">
       <!-- Nội dung điều khoản dài nên chỉ giới hạn chiều cao và cho cuộn,
