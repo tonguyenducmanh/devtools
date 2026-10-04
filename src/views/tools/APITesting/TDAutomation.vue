@@ -108,6 +108,7 @@
               :responseText="responseText"
               :responseHeadersText="responseHeadersText"
               :currentConfigLayout="currentConfigLayout"
+              @change="changeToViewResponsePanel"
             />
           </div>
         </div>
@@ -430,6 +431,15 @@ export default {
     handleResize(sizes) {
       this.requestSectionSize = sizes.leftSize;
       this.responseSectionSize = sizes.rightSize;
+    },
+    /**
+     * Panel response do TDAPIResponse emit lên, phải ghi cache layout
+     * để mở lại tool vẫn giữ đúng panel đang xem
+     */
+    changeToViewResponsePanel(option) {
+      let me = this;
+      me.currentConfigLayout.currentAPIResponseInfoOption = option;
+      me.updateConfigLayout();
     },
     /**
      * Nạp 1 script từ cây collection vào editor

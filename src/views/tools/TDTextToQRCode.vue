@@ -155,6 +155,7 @@
                 class="value-input-config max-length-input"
                 :placeHolder="'1000'"
                 :noMargin="true"
+                @clickOutSide="updateConfigLayout"
               />
             </div>
             <div class="flex input-config-item">
@@ -167,6 +168,7 @@
                 class="value-input-config max-length-input"
                 :placeHolder="350"
                 :noMargin="true"
+                @clickOutSide="updateConfigLayout"
               />
             </div>
             <div class="flex input-config-item">
@@ -179,6 +181,7 @@
                 class="value-input-config max-length-input"
                 :placeHolder="10"
                 :noMargin="true"
+                @clickOutSide="updateConfigLayout"
               />
             </div>
           </div>

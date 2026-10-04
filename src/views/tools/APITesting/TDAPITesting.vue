@@ -232,6 +232,7 @@
               :responseText="responseText"
               :responseHeadersText="responseHeadersText"
               :currentConfigLayout="currentConfigLayout"
+              @change="changeToViewResponsePanel"
             />
           </div>
         </div>
@@ -424,13 +425,6 @@ export default {
   created() {
     let me = this;
     me.debouncedHandleSend = _.debounce(me.handleSend, 300);
-    // cache cũ chưa có currentBodyType, đồng bộ theo panel đang mở
-    if (
-      me.currentConfigLayout.currentAPIInfoOption ==
-      me.$tdEnum.APIInfoOption.bodyFormData
-    ) {
-      me.currentConfigLayout.currentBodyType = me.$tdEnum.APIBodyType.formData;
-    }
   },
   async mounted() {
     let me = this;
@@ -438,6 +432,9 @@ export default {
     // Trỏ 2 API vào mixin để nó gọi get_tree / create / update / delete
     me.collectionItemAPI = me.agentAPI.testingItem;
     me.collectionGroupAPI = me.agentAPI.testingGroup;
+    // Đọc xong cache layout rồi mới chuẩn hoá được kiểu body
+    await me.configLayoutLoaded;
+    me.syncBodyTypeFromPanel();
     await me.loadCollection();
   },
   watch: {
@@ -550,9 +547,8 @@ export default {
      * Đổi kiểu body từ combo box ở header, đồng thời mở panel tương ứng
      */
     changeBodyType(bodyType) {
-      let me = this;
-      me.applyBodyTypeOption(bodyType);
-      me.updateConfigLayout();
+      // applyBodyTypeOption đã ghi cache layout
+      this.applyBodyTypeOption(bodyType);
     },
     /**
      * Quay lại panel body, giữ nguyên kiểu body đang dùng
@@ -565,6 +561,15 @@ export default {
         : me.$tdEnum.APIInfoOption.body;
       me.currentConfigLayout.currentAPIInfoOption =
         option == me.$tdEnum.APIInfoOption.body ? bodyOption : option;
+      me.updateConfigLayout();
+    },
+    /**
+     * Panel response do TDAPIResponse emit lên, phải ghi cache layout
+     * để mở lại tool vẫn giữ đúng panel đang xem
+     */
+    changeToViewResponsePanel(option) {
+      let me = this;
+      me.currentConfigLayout.currentAPIResponseInfoOption = option;
       me.updateConfigLayout();
     },
     handleResize(sizes) {
@@ -958,9 +963,8 @@ export default {
       me.headersText = "Content-Type: application/json";
       me.bodyText = "";
       me.formData = [];
-      me.currentConfigLayout.currentAPIInfoOption =
-        me.$tdEnum.APIInfoOption.body;
-      me.currentConfigLayout.currentBodyType = me.$tdEnum.APIBodyType.json;
+      // về json, hàm này ghi luôn cache layout
+      me.applyBodyTypeOption(me.$tdEnum.APIBodyType.json);
       me.responseText = "";
       me.responseHeadersText = null;
       me.statusCode = null;
@@ -1181,6 +1185,7 @@ export default {
       me.currentConfigLayout.currentAPIInfoOption = isFormData
         ? me.$tdEnum.APIInfoOption.bodyFormData
         : me.$tdEnum.APIInfoOption.body;
+      me.updateConfigLayout();
     },
     getRequestObj() {
       let me = this;

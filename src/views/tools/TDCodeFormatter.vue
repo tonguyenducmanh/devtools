@@ -37,6 +37,7 @@
           <TDCheckbox
             v-model="currentConfigLayout.enableHighlight"
             :label="$t('i18nCommon.enableHighlight')"
+            @change="updateConfigLayout"
           ></TDCheckbox>
           <TDButton
             @click="applyMock"

@@ -173,10 +173,10 @@ export const TDCacheConfig = {
     Note: "cache cấu hình layout tool JSON to Model",
   },
   JSONSortByKeyConfigLayout: {
-    KeyFormat: "JSONToOneLineStringConfigLayout",
+    KeyFormat: "JSONSortByKeyConfigLayout",
     CacheLevel: tdEnum.cacheType.local,
     ExpireTime: 0,
-    Note: "cache cấu hình layout tool JSON to One Line String",
+    Note: "cache cấu hình layout tool JSON sort by key",
   },
   JSONToOneLineStringConfigLayout: {
     KeyFormat: "JSONToOneLineStringConfigLayout",

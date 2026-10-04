@@ -422,22 +422,15 @@ export default {
       agentAPI: null,
     };
   },
-  created() {
-    let me = this;
-    // cache cũ chưa có currentBodyType, đồng bộ theo panel đang mở
-    if (
-      me.currentConfigLayout.currentAPIInfoOption ==
-      me.$tdEnum.APIInfoOption.bodyFormData
-    ) {
-      me.currentConfigLayout.currentBodyType = me.$tdEnum.APIBodyType.formData;
-    }
-  },
   async mounted() {
     let me = this;
     me.agentAPI = new TDServerMockAPI();
     // Trỏ 2 API vào mixin để nó gọi get_tree / create / update / delete
     me.collectionItemAPI = me.agentAPI.mockItem;
     me.collectionGroupAPI = me.agentAPI.mockGroup;
+    // Đọc xong cache layout rồi mới chuẩn hoá được kiểu body
+    await me.configLayoutLoaded;
+    me.syncBodyTypeFromPanel();
     await me.loadAllMockAPIs();
   },
   computed: {
@@ -523,7 +516,9 @@ export default {
       me.updateConfigLayout();
     },
     changeToViewResponsePanel(option) {
-      this.currentConfigLayout.currentAPIResponseInfoOption = option;
+      let me = this;
+      me.currentConfigLayout.currentAPIResponseInfoOption = option;
+      me.updateConfigLayout();
     },
     /**
      * Tải cây group + mock và base url của mock server.

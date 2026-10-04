@@ -4,10 +4,7 @@
   </div>
   <div v-else class="td-text-area-wrap">
     <TDTextEditor
-      v-if="
-        currentConfigLayout.currentAPIResponseInfoOption ==
-        $tdEnum.APIInfoOption.body
-      "
+      v-if="responsePanelOption == $tdEnum.APIInfoOption.body"
       :isShowHeader="true"
       :modelValue="responseText"
       :enableHighlight="true"
@@ -19,7 +16,7 @@
     >
       <template v-slot:header-main>
         <TDAPIPanelSwitcher
-          :currentOption="currentConfigLayout.currentAPIResponseInfoOption"
+          :currentOption="responsePanelOption"
           :headerOption="$tdEnum.APIInfoOption.header"
           :bodyOption="$tdEnum.APIInfoOption.body"
           :isResponse="true"
@@ -36,10 +33,7 @@
       </template>
     </TDTextEditor>
     <TDTextEditor
-      v-if="
-        currentConfigLayout.currentAPIResponseInfoOption ==
-        $tdEnum.APIInfoOption.header
-      "
+      v-if="responsePanelOption == $tdEnum.APIInfoOption.header"
       :isShowHeader="true"
       :modelValue="responseHeadersTextDisplay"
       :enableHighlight="true"
@@ -51,7 +45,7 @@
     >
       <template v-slot:header-main>
         <TDAPIPanelSwitcher
-          :currentOption="currentConfigLayout.currentAPIResponseInfoOption"
+          :currentOption="responsePanelOption"
           :headerOption="$tdEnum.APIInfoOption.header"
           :bodyOption="$tdEnum.APIInfoOption.body"
           :isResponse="true"
@@ -78,6 +72,8 @@ export default {
     return {};
   },
   components: { TDAPIResponseStatus, TDAPIPanelSwitcher },
+  // Không tự sửa currentConfigLayout của cha, chỉ báo lên để cha ghi cache layout
+  emits: ["change"],
   props: {
     responseTime: {
       type: Number,
@@ -105,6 +101,20 @@ export default {
     },
   },
   computed: {
+    /**
+     * Panel response đang mở.
+     * Cache cũ hoặc config bị thiếu field này thì mặc định xem body,
+     * tránh trường hợp không panel nào render được.
+     */
+    responsePanelOption() {
+      let me = this;
+      let option = me.currentConfigLayout?.currentAPIResponseInfoOption;
+      let isValid = [
+        me.$tdEnum.APIInfoOption.header,
+        me.$tdEnum.APIInfoOption.body,
+      ].includes(option);
+      return isValid ? option : me.$tdEnum.APIInfoOption.body;
+    },
     responseHeadersTextDisplay() {
       let me = this;
       if (!me.responseHeadersText) return "";
@@ -125,7 +135,7 @@ export default {
   },
   methods: {
     changeToViewResponsePanel(option) {
-      this.currentConfigLayout.currentAPIResponseInfoOption = option;
+      this.$emit("change", option);
     },
   },
 };
