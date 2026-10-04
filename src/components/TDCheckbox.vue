@@ -168,7 +168,7 @@ export default {
     white-space: nowrap;
   }
 
-  // Switch styles - giống TDHeader
+  // Switch styles - giống TDHeaderApp
   .td-theme-toggle-switch {
     position: relative;
     width: 48px;

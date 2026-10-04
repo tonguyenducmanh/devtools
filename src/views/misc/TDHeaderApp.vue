@@ -21,7 +21,9 @@
       </div>
     </div>
 
-    <div class="td-header-right"></div>
+    <div class="td-header-right">
+      <span class="td-header-version">{{ appVersion }}</span>
+    </div>
 
     <!-- Flyout Menu: mở xuống dưới (placement="bottom") -->
     <TDFlyoutPanel
@@ -91,7 +93,7 @@ import TDCommonFunction from "@/common/TDCommonFunction.js";
 import TDTipsMixin from "@/mixins/TDTipsMixin.js";
 
 export default {
-  name: "TDHeader",
+  name: "TDHeaderApp",
   components: { TDFlyoutPanel },
   mixins: [TDTipsMixin],
   setup() {
@@ -128,6 +130,9 @@ export default {
   computed: {
     appName() {
       return window.__env.appName;
+    },
+    appVersion() {
+      return `v${this.$tdUtility.getAppVersion()}`;
     },
     menuConfig() {
       return {
@@ -555,6 +560,11 @@ export default {
     align-items: center;
     gap: var(--padding);
     margin-left: auto;
+  }
+
+  .td-header-version {
+    font-size: var(--font-size-medium-rare);
+    white-space: nowrap;
   }
 }
 

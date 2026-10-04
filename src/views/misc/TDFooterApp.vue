@@ -1,90 +1,210 @@
 <template>
   <div class="td-footer-app">
-    <div class="td-footer-shortcuts">
+    <div ref="shortcutsEl" class="td-footer-shortcuts">
       <transition-group name="slide-fade" tag="div" class="td-shortcut-wrapper">
-        <div
+        <TDFooterShortcutItem
           v-for="shortcut in displayedShortcuts"
           :key="shortcut.key"
-          class="td-shortcut-item"
-        >
-          <span class="td-shortcut-keys">
-            <span
-              v-for="part in shortcut.presentKey"
-              :key="part"
-              class="td-shortcut-key"
-            >
-              {{ part }}
-            </span>
-          </span>
-          <span class="text-nowrap td-shortcut-label">
-            {{ $t(shortcut.labelKey) }}
-          </span>
-        </div>
+          :presentKey="shortcut.presentKey"
+          :label="$t(shortcut.labelKey)"
+        />
       </transition-group>
     </div>
-    <div class="td-footer-actions">
-      <span class="td-footer-title">{{ currentTitle }}</span>
+
+    <!--
+      Row đo: render sẵn toàn bộ phím tắt ở trạng thái ẩn để lấy chiều rộng thật
+      của từng item. Nhờ vậy số item hiển thị không bị hardcode theo số phím
+      (Ctrl / Option / Shift...) hay độ dài chuỗi đa ngôn ngữ
+    -->
+    <div
+      ref="measureEl"
+      class="td-shortcut-wrapper td-shortcut-measure"
+      aria-hidden="true"
+    >
+      <TDFooterShortcutItem
+        v-for="shortcut in activeShortcuts"
+        :key="shortcut.key"
+        :presentKey="shortcut.presentKey"
+        :label="$t(shortcut.labelKey)"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import TDShortcutAction from "@/common/TDShortcutAction.js";
+import TDCommonFunction from "@/common/TDCommonFunction.js";
+import TDFooterShortcutItem from "@/views/misc/TDFooterShortcutItem.vue";
+
+// Debounce đo lại số item: kéo/thay đổi kích thước cửa sổ bắn event liên tục
+const MEASURE_DEBOUNCE_DELAY = 150;
 
 export default {
   name: "TDFooterApp",
+  components: { TDFooterShortcutItem },
   data() {
     return {
       activeShortcuts: [],
+      // Số item vừa khít chiều ngang footer, tính ra sau khi đo DOM
+      itemsPerPage: 0,
       currentPage: 0,
       intervalId: null,
-      itemsPerPage: 3, // Cấu hình số lượng phím tắt hiển thị trên một màn hình
+      resizeObserver: null,
     };
   },
   computed: {
-    currentTitle() {
-      let version = this.$tdUtility.getAppVersion();
-      return `v${version}`;
-    },
     // Trả về danh sách phím tắt cần hiển thị của trang hiện tại
     displayedShortcuts() {
-      if (this.activeShortcuts.length <= this.itemsPerPage) {
+      let perPage = this.itemsPerPage;
+      // Chưa đo xong thì chưa hiện gì, tránh hiện thừa rồi giật lại
+      if (perPage <= 0) {
+        return [];
+      }
+      if (this.activeShortcuts.length <= perPage) {
         return this.activeShortcuts;
       }
-      const start = this.currentPage * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
+      const start = this.currentPage * perPage;
+      const end = start + perPage;
       return this.activeShortcuts.slice(start, end);
     },
-    // Tính tổng số trang phím tắt dựa trên cấu hình số lượng
+    // Tính tổng số trang phím tắt dựa trên số item vừa khít bề ngang footer
     totalPages() {
+      if (this.itemsPerPage <= 0) {
+        return 1;
+      }
       return Math.ceil(this.activeShortcuts.length / this.itemsPerPage);
+    },
+    // Chữ ký của các label: đổi ngôn ngữ làm độ rộng item đổi theo
+    // nên cần đo lại số item hiển thị
+    labelsSignature() {
+      return this.activeShortcuts
+        .map((item) => this.$t(item.labelKey))
+        .join("|");
+    },
+  },
+  watch: {
+    labelsSignature() {
+      this.refreshCapacity();
     },
   },
   created() {
     TDShortcutAction.onChange(() => {
       this.updateActiveShortcuts();
     });
+    // Kéo cửa sổ sẽ bắn rất nhiều lần, debounce để chỉ đo lại 1 lần
+    this.debouncedRefreshCapacity = TDCommonFunction.debounce(
+      this.refreshCapacity,
+      MEASURE_DEBOUNCE_DELAY,
+    );
   },
-  mounted() {
-    this.updateActiveShortcuts();
+  async mounted() {
+    this.initResizeObserver();
+    await this.updateActiveShortcuts();
   },
   beforeUnmount() {
     // Vue 3 sử dụng beforeUnmount thay thế cho beforeDestroy để xóa Interval tránh leak memory
     this.stopRotation();
+    this.disposeResizeObserver();
+    if (this.debouncedRefreshCapacity?.cancel) {
+      this.debouncedRefreshCapacity.cancel();
+    }
   },
   methods: {
-    updateActiveShortcuts() {
+    async updateActiveShortcuts() {
       const componentShortcuts = TDShortcutAction.getActiveShortcuts();
       this.activeShortcuts = [...componentShortcuts];
 
-      // Reset về trang đầu tiên và kích hoạt lại vòng lặp đếm thời gian
+      // Reset về trang đầu tiên, đo lại số item vừa khít rồi mới bắt đầu xoay vòng
       this.currentPage = 0;
+      await this.$nextTick();
+      this.applyMeasuredCapacity();
       this.startRotation();
+    },
+    /**
+     * Đo bề ngang thật của từng item rồi cộng dồn (kèm gap) để biết chính xác
+     * bao nhiêu item vừa khít chiều ngang footer.
+     * @returns số item vừa khít, hoặc null nếu chưa đo được (DOM chưa layout xong)
+     */
+    measureItemsPerPage() {
+      let me = this;
+      let containerEl = me.$refs.shortcutsEl;
+      let measureEl = me.$refs.measureEl;
+      if (!containerEl || !measureEl) {
+        return null;
+      }
+      let available = containerEl.clientWidth;
+      // Footer đang bị ẩn (display: none) thì clientWidth = 0, đo lúc khác
+      if (available <= 0) {
+        return null;
+      }
+      let gap = parseFloat(getComputedStyle(measureEl).columnGap) || 0;
+      let itemEls = measureEl.querySelectorAll(".td-shortcut-item");
+
+      let used = 0;
+      let count = 0;
+      for (let itemEl of itemEls) {
+        let itemWidth = itemEl.offsetWidth;
+        // Có item chưa layout xong thì số đo không đáng tin, để lần sau đo lại
+        if (itemWidth <= 0) {
+          return null;
+        }
+        let need = count === 0 ? itemWidth : gap + itemWidth;
+        if (used + need > available) {
+          break;
+        }
+        used += need;
+        count++;
+      }
+      // Footer hẹp hơn cả item đầu tiên thì vẫn hiện tối thiểu 1 item
+      return Math.max(count, 1);
+    },
+    applyMeasuredCapacity() {
+      let nextPerPage = this.measureItemsPerPage();
+      if (nextPerPage === null) {
+        return;
+      }
+      this.itemsPerPage = nextPerPage;
+      this.clampCurrentPage();
+    },
+    /**
+     * Đo lại rồi cập nhật luôn vòng xoay: khi số item/trang thay đổi thì
+     * chuyển từ "xoay vòng" sang "hiện hết" (hoặc ngược lại) cần xử lý lại
+     */
+    refreshCapacity() {
+      this.$nextTick(() => {
+        let before = this.itemsPerPage;
+        this.applyMeasuredCapacity();
+        if (before !== this.itemsPerPage) {
+          this.startRotation();
+        }
+      });
+    },
+    clampCurrentPage() {
+      let lastPage = Math.max(this.totalPages - 1, 0);
+      if (this.currentPage > lastPage) {
+        this.currentPage = lastPage;
+      }
+    },
+    initResizeObserver() {
+      let me = this;
+      if (typeof ResizeObserver == "undefined") return;
+      me.resizeObserver = new ResizeObserver(() => {
+        me.debouncedRefreshCapacity();
+      });
+      if (me.$refs.shortcutsEl) {
+        me.resizeObserver.observe(me.$refs.shortcutsEl);
+      }
+    },
+    disposeResizeObserver() {
+      if (this.resizeObserver) {
+        this.resizeObserver.disconnect();
+        this.resizeObserver = null;
+      }
     },
     startRotation() {
       this.stopRotation();
 
-      // Chỉ tự động xoay vòng nếu số lượng phím tắt vượt quá số lượng tối đa hiển thị (3)
+      // Chỉ tự động xoay vòng khi số phím tắt vượt quá số item vừa khít footer
       if (this.activeShortcuts.length > this.itemsPerPage) {
         this.intervalId = setInterval(() => {
           this.nextPage();
@@ -126,6 +246,7 @@ export default {
   align-items: center;
   flex-wrap: nowrap;
   flex-grow: 1;
+  min-width: 0;
 }
 
 /* Khung chứa các phím tắt làm điểm mốc tương đối cho hiệu ứng absolute */
@@ -137,48 +258,20 @@ export default {
   width: 100%;
 }
 
-.td-shortcut-item {
-  display: flex;
+/*
+   Row đo chiều rộng: bị kéo ra ngoài luồng + ẩn đi, nhưng item bên trong vẫn
+   layout bình thường nên đọc được offsetWidth thật của từng item
+*/
+.td-shortcut-measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
   flex-wrap: nowrap;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  border-radius: var(--border-radius);
-  /* Tránh co chữ đột ngột khi chuyển đổi layout */
   white-space: nowrap;
-}
-
-.td-shortcut-keys {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.td-shortcut-key {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  padding: 2px 6px;
-  background-color: var(--bg-layer-color);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.td-shortcut-label {
-  font-size: var(--font-size-medium-rare);
-}
-
-.td-footer-actions {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-}
-
-.td-footer-title {
-  font-size: var(--font-size-medium-rare);
 }
 
 /* 

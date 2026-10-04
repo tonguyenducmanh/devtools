@@ -4,7 +4,7 @@
       <div v-if="appLoading" class="flex td-loading-app"></div>
     </transition>
     <div class="td-header-wrap">
-      <TDHeader />
+      <TDHeaderApp />
     </div>
     <div class="flex td-content-wrap">
       <div class="td-sidebar-wrap">
@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import TDHeader from "@/views/misc/TDHeader.vue";
+import TDHeaderApp from "@/views/misc/TDHeaderApp.vue";
 import TDFooterApp from "@/views/misc/TDFooterApp.vue";
 import TDSidebar from "@/views/misc/TDSidebar.vue";
 import TDDynamicTabView from "@/views/misc/TDDynamicTabView.vue";
@@ -33,7 +33,7 @@ import TDDynamicCursorEffect from "@/views/cursorEffect/TDDynamicCursorEffect.vu
 
 export default {
   components: {
-    TDHeader,
+    TDHeaderApp,
     TDFooterApp,
     TDSidebar,
     TDDynamicTabView,
