@@ -113,37 +113,38 @@
               <TDInput
                 v-model="currentConfigLayout.csharp.namespace"
                 :placeHolder="$t('i18nCommon.JSONToModel.namespace')"
+                @clickOutSide="handleGeneratorOptionChange"
               />
             </div>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
               v-model="currentConfigLayout.csharp.useJsonProperty"
               :label="$t('i18nCommon.JSONToModel.useJsonProperty')"
-              @change="convertToModel"
+              @change="handleGeneratorOptionChange"
             ></TDCheckbox>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
               v-model="currentConfigLayout.csharp.usePascalCase"
               :label="$t('i18nCommon.JSONToModel.usePascalCase')"
-              @change="convertToModel"
+              @change="handleGeneratorOptionChange"
             ></TDCheckbox>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
               v-model="currentConfigLayout.csharp.useNullable"
               :label="$t('i18nCommon.JSONToModel.useNullable')"
-              @change="convertToModel"
+              @change="handleGeneratorOptionChange"
             ></TDCheckbox>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
               v-model="currentConfigLayout.csharp.useRecord"
               :label="$t('i18nCommon.JSONToModel.useRecord')"
-              @change="convertToModel"
+              @change="handleGeneratorOptionChange"
             ></TDCheckbox>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
               v-model="currentConfigLayout.csharp.useDataAnnotation"
               :label="$t('i18nCommon.JSONToModel.useDataAnnotation')"
-              @change="convertToModel"
+              @change="handleGeneratorOptionChange"
             ></TDCheckbox>
           </template>
 
@@ -152,25 +153,26 @@
               <TDInput
                 v-model="currentConfigLayout.golang.packageName"
                 :placeHolder="$t('i18nCommon.JSONToModel.packageName')"
+                @clickOutSide="handleGeneratorOptionChange"
               />
             </div>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
               v-model="currentConfigLayout.golang.useJsonTag"
               :label="$t('i18nCommon.JSONToModel.useJsonTag')"
-              @change="convertToModel"
+              @change="handleGeneratorOptionChange"
             ></TDCheckbox>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
               v-model="currentConfigLayout.golang.useOmitempty"
               :label="$t('i18nCommon.JSONToModel.useOmitempty')"
-              @change="convertToModel"
+              @change="handleGeneratorOptionChange"
             ></TDCheckbox>
             <TDCheckbox
               :variant="$tdEnum.checkboxType.switch"
               v-model="currentConfigLayout.golang.usePointer"
               :label="$t('i18nCommon.JSONToModel.usePointer')"
-              @change="convertToModel"
+              @change="handleGeneratorOptionChange"
             ></TDCheckbox>
           </template>
           <TDCheckbox
@@ -241,6 +243,17 @@ export default {
   },
 
   methods: {
+    /**
+     * Đổi option sinh model (namespace, package name, các switch C#/Go):
+     * convert lại kết quả và ghi cache layout, không ghi thì mở lại tool mất setting.
+     * Ô input text gọi khi click ra ngoài để không ghi cache mỗi ký tự.
+     */
+    handleGeneratorOptionChange() {
+      let me = this;
+      me.convertToModel();
+      me.updateConfigLayout();
+    },
+
     // ─── Parse input (JSON strict + JS object fallback) ───────────────────────
     tryParseInput(raw) {
       try {

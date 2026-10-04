@@ -312,6 +312,7 @@ export default {
       if (item && item.jsonSource) {
         me.jsonSource = item.jsonSource;
         me.currentConfigLayout.enableFileUpload = false;
+        me.updateConfigLayout();
       }
     },
   },

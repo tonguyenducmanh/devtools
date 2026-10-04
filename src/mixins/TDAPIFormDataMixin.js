@@ -46,6 +46,21 @@ export default {
   },
   methods: {
     /**
+     * Cache layout cũ chưa có currentBodyType, đồng bộ theo panel request đang mở.
+     * Phải gọi sau khi đã đọc xong cache (await configLayoutLoaded) thì mới
+     * đọc được currentAPIInfoOption thật, gọi ở created sẽ luôn ra default.
+     */
+    syncBodyTypeFromPanel() {
+      let me = this;
+      if (
+        me.currentConfigLayout.currentAPIInfoOption ==
+        me.$tdEnum.APIInfoOption.bodyFormData
+      ) {
+        me.currentConfigLayout.currentBodyType =
+          me.$tdEnum.APIBodyType.formData;
+      }
+    },
+    /**
      * Tạo mới 1 field form data, mặc định là dạng text
      * @param {object} fieldData field đã có sẵn, null nếu tạo mới
      * @returns {object} field có đủ các thuộc tính
