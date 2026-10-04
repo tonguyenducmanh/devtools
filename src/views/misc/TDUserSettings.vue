@@ -95,19 +95,15 @@ export default {
         { value: "vi", label: me.$t("i18nGlobal.language.vi") },
         { value: "en", label: me.$t("i18nGlobal.language.en") },
       ],
-      loadingOption: [
-        {
-          value: this.$tdEnum.LoadingType.Normal,
-          label: me.$t("i18nUserSettings.loadingType.Normal"),
-        },
-        {
-          value: this.$tdEnum.LoadingType.Meme,
-          label: me.$t("i18nUserSettings.loadingType.Meme"),
-        },
-      ],
     };
   },
   computed: {
+    loadingOption() {
+      return this.$tdEnum.loadingTypeList.map((item) => ({
+        label: this.$t(item.labelKey),
+        value: item.value,
+      }));
+    },
     backgroundEffectOption() {
       return this.$tdEnum.backgroundEffectList.map((item) => ({
         label: this.$t(item.labelKey),

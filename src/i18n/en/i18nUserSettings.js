@@ -17,6 +17,7 @@ export default {
     loadingType: {
       Normal: "Normal",
       Meme: "Meme",
+      Avatar: "Avatar",
     },
     backgroundEffect: {
       off: "Off",

@@ -58,4 +58,5 @@ export const EnumCacheConfig = {
   QRCodeToTextHistory: 64,
   PostgreSQLSavedQuery: 65,
   PostgreSQLBuiltinIntellisense: 66,
+  AgreementAccepted: 67,
 };

@@ -138,7 +138,26 @@ class TDEnum {
   LoadingType = {
     Normal: "normal",
     Meme: "meme",
+    Avatar: "avatar",
   };
+  /**
+   * danh sách loại loading hiển thị ở màn welcome, dùng chung cho cả form
+   * thiết lập và menu giao diện trên header nên thêm loại mới chỉ sửa ở đây
+   */
+  loadingTypeList = [
+    {
+      labelKey: "i18nUserSettings.loadingType.Normal",
+      value: "normal",
+    },
+    {
+      labelKey: "i18nUserSettings.loadingType.Meme",
+      value: "meme",
+    },
+    {
+      labelKey: "i18nUserSettings.loadingType.Avatar",
+      value: "avatar",
+    },
+  ];
   PostgreSQLQuerySidebarOption = {
     Help: 0,
     Setting: 1,

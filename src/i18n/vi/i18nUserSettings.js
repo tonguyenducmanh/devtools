@@ -17,6 +17,7 @@ export default {
     loadingType: {
       Normal: "Bình thường",
       Meme: "Meme",
+      Avatar: "Ảnh đại diện",
     },
     backgroundEffect: {
       off: "Tắt",
