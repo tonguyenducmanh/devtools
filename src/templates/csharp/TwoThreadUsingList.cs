@@ -2,7 +2,7 @@
 // 1 thread luôn làm việc thêm dữ liệu vào biến lưu trữ global
 // 1 thread luôn làm việc đọc dữ liệu ra và handle nghiệp vụ
 
-namespace TDProject.Core.Business;
+namespace TMProject.Core.Business;
 
 /// <summary>
 /// Test chạy song song 2 luồng bằng kiểu dữ liệu List

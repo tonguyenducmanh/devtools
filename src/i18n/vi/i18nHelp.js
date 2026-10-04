@@ -77,25 +77,6 @@ export default {
         wrapText: "Hỗ trợ wrap text để xem code dài mà không cần cuộn ngang.",
       },
     },
-    colorPicker: {
-      purpose: {
-        title: "Trích xuất màu từ ảnh là gì?",
-        content:
-          "Công cụ cho phép upload ảnh, click vào vị trí bất kỳ trên ảnh để lấy mã màu (HEX, RGB, HSL) tại điểm đó.",
-      },
-      howToUse: {
-        title: "Cách sử dụng",
-        upload: "Upload ảnh cần trích xuất màu.",
-        click: "Click vào vị trí bất kỳ trên ảnh để lấy mã màu.",
-        copy: "Nhấn nút Copy để sao chép mã màu HEX vào clipboard.",
-      },
-      features: {
-        title: "Tính năng",
-        magnifier:
-          "Kính lúp phóng đại vùng xung quanh con trỏ chuột để chọn màu chính xác hơn.",
-        palette: "Tự động trích xuất bảng màu chính từ ảnh.",
-      },
-    },
     imageToBase64: {
       purpose: {
         title: "Chuyển ảnh sang Base64 là gì?",
@@ -540,29 +521,7 @@ export default {
         agent: "Đảm bảo Agent app đang chạy và kết nối được.",
       },
     },
-    bilingualWeb: {
-      purpose: {
-        title: "Dịch trang web song ngữ là gì?",
-        content:
-          "Công cụ cho phép hiển thị một trang web thực tế 100% giao diện gốc, đồng thời dịch các đoạn văn bản hiển thị trên trang thành song ngữ mà không làm hỏng cấu trúc HTML/CSS.",
-      },
-      howToUse: {
-        title: "Cách sử dụng",
-        input: "Nhập URL trang web cần dịch.",
-        fetch:
-          "Nhấn 'Tải & Dịch' để hệ thống nhúng trang web và tự động tìm văn bản để dịch.",
-        wait: "Hệ thống sẽ tự động gọi Agent để dịch và chèn kết quả trực tiếp xuống phía dưới mỗi văn bản gốc.",
-      },
-      options: {
-        title: "Tuỳ chọn cấu hình",
-        delay:
-          "Thời gian delay - Thời gian chờ trang web động (React, v.v) tải xong giao diện trước khi bắt đầu quét text.",
-        tags: "Block Tags - Các thẻ HTML sẽ được quét để dịch (VD: P, H1, LI).",
-        classes:
-          "Lọc theo Class - Chỉ định cụ thể tên các class muốn dịch, ngăn cách bởi dấu chấm phẩy (;).",
-        ids: "Lọc theo ID - Chỉ định cụ thể tên các ID muốn dịch, ngăn cách bởi dấu chấm phẩy (;).",
-      },
-    },
+    
     postgreSQLQuery: {
       purpose: {
         title: "PostgreSQL Query",

@@ -23,6 +23,7 @@ export default {
       reset_to_commit: "Rollback to a commit",
       undo_last_commit: "Undo last commit",
       cherry_pick_to_branch: "Cherry-pick to another branch",
+      squash_commits_rebase: "Squash multiple commits into one",
     },
     postgreSQLTemplate: {
       query_all_info_table: "Get Table Columns",

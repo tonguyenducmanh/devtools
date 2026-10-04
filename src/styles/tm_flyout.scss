@@ -1,0 +1,229 @@
+/* Không scoped — dùng Teleport nên cần global */
+
+/* ============ Style chung cho mọi flyout panel ============ */
+.tm-flyout-panel {
+  background-color: var(--bg-main-color);
+  border: 1px solid var(--bg-layer-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 4px;
+  border: var(--border-component-style);
+}
+
+/* ============ Transition theo từng hướng mở ============
+   Tên class được TMFlyoutPanel tự chọn dựa trên placement đã
+   resolve (kể cả khi auto-flip do sát mép màn hình), nên item
+   nào cũng tự có animation đúng hướng mà không cần khai báo gì thêm. */
+
+.tm-flyout-bottom-enter-active,
+.tm-flyout-bottom-leave-active {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.tm-flyout-bottom-leave-active {
+  transition-duration: 0.1s;
+}
+.tm-flyout-bottom-enter-from,
+.tm-flyout-bottom-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.tm-flyout-top-enter-active,
+.tm-flyout-top-leave-active {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.tm-flyout-top-leave-active {
+  transition-duration: 0.1s;
+}
+.tm-flyout-top-enter-from,
+.tm-flyout-top-leave-to {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.tm-flyout-right-enter-active,
+.tm-flyout-right-leave-active {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.tm-flyout-right-leave-active {
+  transition-duration: 0.1s;
+}
+.tm-flyout-right-enter-from,
+.tm-flyout-right-leave-to {
+  opacity: 0;
+  transform: translateX(-6px);
+}
+
+.tm-flyout-left-enter-active,
+.tm-flyout-left-leave-active {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.tm-flyout-left-leave-active {
+  transition-duration: 0.1s;
+}
+.tm-flyout-left-enter-from,
+.tm-flyout-left-leave-to {
+  opacity: 0;
+  transform: translateX(6px);
+}
+.tm-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--border-radius-component);
+  cursor: pointer;
+  font-size: var(--font-size-medium-rare);
+  color: var(--text-color);
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
+  }
+
+  &--active {
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
+  }
+}
+
+/* ============ Combo box flyout (TMComboBox): nội dung riêng ============ */
+.tm-flyout-panel.tm-combobox-flyout {
+  /* panel mặc định có padding 4px, combo box tự lo phần danh sách option
+     nên bỏ padding để viền panel khớp đúng danh sách */
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-component);
+  background: var(--bg-main-color);
+  box-shadow: none;
+}
+
+/* ============ Header dropdown: nội dung riêng ============ */
+.tm-header-flyout {
+  min-width: 160px;
+}
+
+.tm-flyout-title {
+  padding: 8px 12px 4px;
+  font-size: var(--font-size-small);
+  font-weight: 700;
+  color: var(--text-color);
+  opacity: 0.6;
+}
+
+/* ============ Query action flyout (TMPostgreSQLQuery): nội dung riêng ============ */
+.tm-query-action-flyout {
+  min-width: 200px;
+}
+
+.tm-flyout-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: var(--font-size-medium-rare);
+  color: var(--text-color);
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: var(--border-radius-component);
+
+  &:hover {
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
+  }
+
+  &--active {
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
+  }
+}
+
+.tm-flyout-item--logo {
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+/* ============ Sidebar group flyout: nội dung riêng ============ */
+.tm-sidebar-group-flyout {
+  padding: calc(var(--padding) / 2);
+  overflow: hidden;
+  /* tự co theo item dài nhất bên trong, không kẹp cứng min-width.
+     max-width để chữ dài quá thì xuống dòng bằng ellipsis và không tràn
+     ra ngoài mép màn hình (TMFlyoutPanel có sẵn logic clamp vị trí) */
+  width: max-content;
+  max-width: min(320px, calc(100vw - 2 * var(--padding)));
+}
+
+.tm-sidebar-flyout-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  /* giãn hết chiều rộng panel để nền hover phủ trọn dòng */
+  width: 100%;
+  border-radius: var(--border-radius-component);
+
+  &:hover {
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
+    .tm-flyout-pin-btn {
+      opacity: 1;
+    }
+  }
+}
+
+.tm-sidebar-flyout-item {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  padding: var(--padding);
+  font-size: var(--font-size-medium-rare);
+  color: var(--text-color);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  border-radius: var(--border-radius-component);
+
+  &:hover {
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
+  }
+}
+
+.tm-flyout-pin-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 6px;
+  border-radius: calc(var(--border-radius) * 0.75);
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+.tm-toolbar-btn-disabled {
+  opacity: 0.3 !important;
+  pointer-events: none !important;
+  cursor: default !important;
+}

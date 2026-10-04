@@ -2,8 +2,8 @@
 # Version của bản build: ưu tiên biến môi trường VERSION,
 # không truyền thì lấy version trong package.json (giống cách lấy version UI)
 #   VERSION=1.2.3 ./build_all.sh
-. "$(dirname "$0")/scripts/td_version.sh"
-echo "Đang build version: $(td_get_version)"
+. "$(dirname "$0")/scripts/tm_version.sh"
+echo "Đang build version: $(tm_get_version)"
 
 # cần build wasm mới thì mở ra
 # chmod 777 ./scripts/build_wasm.sh

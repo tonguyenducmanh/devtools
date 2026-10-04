@@ -2,11 +2,11 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug td_tool_api",
+      "name": "Debug tm_tool_api",
       "type": "go",
       "request": "launch",
       "mode": "debug",
-      "program": "${workspaceFolder}/src_backend/td_app/cmd/api_app/main.go",
+      "program": "${workspaceFolder}/src_backend/tm_app/cmd/api_app/main.go",
       "cwd": "${workspaceFolder}",
       "env": {
         "GO_ENV": "development"
@@ -14,11 +14,11 @@
       "showLog": false
     },
     {
-      "name": "Debug td_tool_daemon",
+      "name": "Debug tm_tool_daemon",
       "type": "go",
       "request": "launch",
       "mode": "debug",
-      "program": "${workspaceFolder}/src_backend/td_app/cmd/daemon_app/main.go",
+      "program": "${workspaceFolder}/src_backend/tm_app/cmd/daemon_app/main.go",
       "cwd": "${workspaceFolder}",
       "env": {
         "GO_ENV": "development"

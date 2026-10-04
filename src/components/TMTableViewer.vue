@@ -1,0 +1,1476 @@
+<template>
+  <div class="tm-table-viewer" :class="{
+    'tm-table-viewer-no-margin': noMargin,
+    'tm-table-viewer-hoverable': hoverable,
+  }">
+    <!-- Table View -->
+    <template v-if="viewMode === 'table'">
+      <div class="tm-table-container" :class="{ 'tm-table-grabbing': _isDragging }" :style="containerStyle"
+        ref="tableContainer" @scroll="handleScroll" @mousedown="onDragStart">
+        <div class="tm-table-wrapper" ref="tableWrapper">
+          <table class="tm-table">
+            <!-- Header -->
+            <thead class="tm-table-header" :class="{ 'tm-table-header-sticky': stickyHeader }">
+              <tr>
+                <!-- Selection Column -->
+                <th v-if="selectable" class="tm-table-cell tm-table-cell-checkbox tm-table-cell-sticky-header"
+                  :style="checkboxStickyStyle">
+                  <label class="tm-table-checkbox-label">
+                    <input type="checkbox" :checked="isAllSelected" @change="toggleSelectAll"
+                      class="tm-table-checkbox" />
+                    <span class="tm-checkbox-custom">
+                      <span v-if="isAllSelected" class="tm-checkbox-active"></span>
+                    </span>
+                  </label>
+                </th>
+
+                <!-- Index Column -->
+                <th v-if="showIndex" class="tm-table-cell tm-table-cell-index tm-table-cell-sticky-header"
+                  :style="indexStickyStyle">
+                  {{ indexLabel }}
+                </th>
+
+                <!-- Data Columns -->
+                <th v-for="(column, index) in computedColumns" :key="`header-${index}`"
+                  class="tm-table-cell tm-table-cell-header" :class="getColumnClass(column)"
+                  :style="getColumnStyle(column)" @click="handleHeaderClick(column)">
+                  <div class="tm-table-header-content">
+                    <span>{{ column.label || column.key }}</span>
+                    <span v-if="column.sortable" class="tm-table-sort-icon">
+                      <span v-if="
+                        sortColumn === column.key && sortDirection === 'asc'
+                      ">▲</span>
+                      <span v-else-if="
+                        sortColumn === column.key && sortDirection === 'desc'
+                      ">▼</span>
+                      <span v-else class="tm-table-sort-icon-inactive">⬍</span>
+                    </span>
+                  </div>
+                </th>
+
+                <!-- Actions Column -->
+                <th v-if="hasActions" class="tm-table-cell tm-table-cell-actions">
+                  {{ actionsLabel }}
+                </th>
+              </tr>
+            </thead>
+
+            <!-- Body -->
+            <tbody class="tm-table-body">
+              <!-- Top spacer for virtual scroll -->
+              <tr v-if="virtualScroll && paddingTop > 0" :style="{ height: paddingTop + 'px' }">
+                <td :colspan="totalColumns" style="padding: 0; border: none"></td>
+              </tr>
+
+              <tr v-for="{ row, index: rowIndex } in visibleData" :key="row[rowKey] || `row-${rowIndex}`"
+                class="tm-table-row" :class="{ 'tm-table-row-selected': isRowSelected(row) }"
+                @click="handleRowClick(row, rowIndex)">
+                <!-- Selection Column -->
+                <td v-if="selectable" class="tm-table-cell tm-table-cell-checkbox tm-table-cell-sticky"
+                  :style="checkboxStickyStyle">
+                  <label class="tm-table-checkbox-label" @click.stop>
+                    <input type="checkbox" :checked="isRowSelected(row)" @change="toggleRowSelection(row)"
+                      class="tm-table-checkbox" />
+                    <span class="tm-checkbox-custom">
+                      <span v-if="isRowSelected(row)" class="tm-checkbox-active"></span>
+                    </span>
+                  </label>
+                </td>
+
+                <!-- Index Column -->
+                <td v-if="showIndex" class="tm-table-cell tm-table-cell-index tm-table-cell-sticky"
+                  :class="{ 'tm-table-cell-active': activeCellKey === getCellKey(row, '__td_index__') }"
+                  :style="indexStickyStyle" @click="copyRow(row)"
+                  @contextmenu.prevent="onRowContextMenu(row, null, $event)">
+                  <div>
+                    {{ rowIndex + 1 }}
+                  </div>
+                </td>
+
+                <!-- Data Columns -->
+                <td v-for="(column, colIndex) in computedColumns" :key="`cell-${rowIndex}-${colIndex}`"
+                  class="tm-table-cell" :class="[
+                    getColumnClass(column),
+                    {
+                      'tm-table-cell-active':
+                        activeCellKey === getCellKey(row, column.key),
+                    },
+                  ]" :style="getColumnStyle(column)" @contextmenu.prevent="onRowContextMenu(row, column, $event)">
+                  <slot :name="`cell-${column.key}`" :row="row" :column="column" :value="getCellValue(row, column.key)"
+                    :rowIndex="rowIndex">
+                    <div class="tm-table-cell-content" :class="{
+                      'tm-table-cell-content-clamped': virtualScroll,
+                    }" :style="getCellContentStyle()">
+                      {{ formatCellValue(row, column) }}
+                    </div>
+                  </slot>
+                </td>
+
+                <!-- Actions Column -->
+                <td v-if="hasActions" class="tm-table-cell tm-table-cell-actions">
+                  <slot name="actions" :row="row" :rowIndex="rowIndex">
+                    <div class="tm-table-actions">
+                      <button v-for="(action, actionIndex) in actions" :key="`action-${actionIndex}`"
+                        @click.stop="handleAction(action, row, rowIndex)" class="tm-table-action-button"
+                        :class="action.class">
+                        {{ action.label }}
+                      </button>
+                    </div>
+                  </slot>
+                </td>
+              </tr>
+
+              <!-- Bottom spacer for virtual scroll -->
+              <tr v-if="virtualScroll && paddingBottom > 0" :style="{ height: paddingBottom + 'px' }">
+                <td :colspan="totalColumns" style="padding: 0; border: none"></td>
+              </tr>
+
+              <!-- Empty State -->
+              <tr v-if="!processedData || processedData.length === 0" class="tm-table-row-empty">
+                <td :colspan="totalColumns" class="tm-table-cell tm-table-cell-empty">
+                  <slot name="empty">
+                    {{ emptyText || $t("i18nCommon.noDataAvailable") }}
+                  </slot>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </template>
+
+    <!-- Record View -->
+    <div v-else class="tm-record-container" :style="containerStyle">
+      <div class="tm-record-header">
+        <div class="tm-record-back-btn" @click="switchToTableView">
+          <TMArrow :arrowDirection="tmEnum.Direction.left" :openProp="false" v-tooltip="$t('i18nCommon.backToTable')" />
+        </div>
+        <span class="tm-record-title">{{ $t("i18nCommon.viewRecord") }} #{{ currentRecordIndex + 1 }}</span>
+      </div>
+      <div class="tm-record-body">
+        <table class="tm-record-table">
+          <tbody>
+            <tr v-for="col in computedColumns" :key="col.key" class="tm-record-row">
+              <td class="tm-record-cell tm-record-cell-label">
+                {{ col.label || col.key }}
+              </td>
+              <td class="tm-record-cell tm-record-cell-value" :class="{
+                'tm-record-cell-active':
+                  activeRecordColKey === col.key,
+              }" @contextmenu.prevent="onRecordCellContextMenu(col, $event)">
+                {{ formatCellValue(currentRecord, col) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer Info -->
+    <div v-if="showFooter" class="tm-table-footer">
+      <div class="flex tm-table-info">
+        <slot name="footer" :selectedRows="selectedRows" :totalRows="processedData.length">
+          <span class="tm-table-info-row-count">
+            <span v-if="selectable && selectedRows.length > 0">
+              {{ selectedRows.length }}
+              {{ $t("i18nCommon.selectedRecord") }} /
+            </span>
+            <span>
+              {{ processedData.length }} {{ $t("i18nCommon.record") }}
+            </span>
+          </span>
+          <span v-if="usingFooterHelp">
+            {{ footerHelpText }}
+          </span>
+        </slot>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import ExcelJS from "exceljs";
+import TMDialogUtil, { TMDialogEnum } from "@/common/TMDialogUtil.js";
+import tmEnum from "@/common/TMEnum.js";
+import TMArrow from "@/components/TMArrow.vue";
+
+export default {
+  name: "TMTableViewer",
+  components: { TMArrow },
+
+  props: {
+    // Data
+    tableData: {
+      type: Array,
+      default: () => [],
+    },
+    usingFooterHelp: {
+      type: Boolean,
+      default: true,
+    },
+    footerHelp: {
+      type: String,
+      default: null,
+    },
+    columns: {
+      type: Array,
+      default: null,
+      // Example: [{
+      //   key: 'name',
+      //   label: 'Name',
+      //   width: '200px',
+      //   minWidth: '100px',
+      //   maxWidth: '400px',
+      //   align: 'left',
+      //   sortable: true,
+      //   formatter: (val) => val,
+      //   autoWidth: true,
+      // }]
+    },
+
+    // Selection
+    selectable: {
+      type: Boolean,
+      default: false,
+    },
+    modelValue: {
+      type: Array,
+      default: () => [],
+    },
+    rowKey: {
+      type: String,
+      default: "id",
+    },
+    showIndex: {
+      type: Boolean,
+      default: false,
+    },
+    indexLabel: {
+      type: String,
+      default: "",
+    },
+    hoverable: {
+      type: Boolean,
+      default: true,
+    },
+    stickyHeader: {
+      type: Boolean,
+      default: true,
+    },
+
+    // Size
+    height: {
+      type: String,
+      default: null,
+    },
+    maxHeight: {
+      type: String,
+      default: "100%",
+    },
+    noMargin: {
+      type: Boolean,
+      default: false,
+    },
+    autoCalculateWidth: {
+      type: Boolean,
+      default: true, // Enable auto width calculation by default
+    },
+    charWidthPx: {
+      type: Number,
+      default: 10, // Average character width in pixels
+    },
+    minColumnWidth: {
+      type: Number,
+      default: 100, // Minimum column width in pixels
+    },
+    maxColumnWidth: {
+      type: Number,
+      default: 400, // Maximum column width in pixels
+    },
+
+    // Sorting
+    sortable: {
+      type: Boolean,
+      default: false,
+    },
+    defaultSortColumn: {
+      type: String,
+      default: null,
+    },
+    defaultSortDirection: {
+      type: String,
+      default: "asc",
+      validator: (val) => ["asc", "desc"].includes(val),
+    },
+    emptyCellText: {
+      type: String,
+      default: "",
+    },
+
+    // Actions
+    actions: {
+      type: Array,
+      default: () => [],
+    },
+    actionsLabel: {
+      type: String,
+      default: "Actions",
+    },
+
+    // Empty state
+    emptyText: {
+      type: String,
+      default: null,
+    },
+
+    // Footer
+    showFooter: {
+      type: Boolean,
+      default: false,
+    },
+
+    // Virtual Scroll
+    virtualScroll: {
+      type: Boolean,
+      default: true,
+    },
+    rowHeight: {
+      type: Number,
+      default: 45,
+    },
+    bufferSize: {
+      type: Number,
+      default: 5,
+    },
+
+    // Khi virtual scroll bật thì cell text chỉ hiển thị tối đa N dòng
+    virtualScrollLineClamp: {
+      type: Number,
+      default: 2,
+    },
+  },
+
+  data() {
+    return {
+      selectedRows: [],
+      sortColumn: this.defaultSortColumn,
+      sortDirection: this.defaultSortDirection,
+      columnWidthCache: {}, // Cache calculated widths
+      scrollTop: 0,
+      containerHeight: 400,
+
+      // drag-to-scroll
+      _isDragging: false,
+      _dragStartX: 0,
+      _dragStartY: 0,
+      _scrollStartLeft: 0,
+      _scrollStartTop: 0,
+
+      // record view mode
+      viewMode: "table",
+      currentRecord: null,
+      activeCellKey: null, // key của cell đang được mở context menu (right-click)
+      activeRecordColKey: null, // key của record cell đang mở context menu (right-click)
+    };
+  },
+
+  computed: {
+    tmEnum() {
+      return tmEnum;
+    },
+    currentRecordIndex() {
+      if (!this.currentRecord) return -1;
+      return this.processedData.indexOf(this.currentRecord);
+    },
+    checkboxStickyStyle() {
+      return {
+        position: "sticky",
+        left: "0px",
+      };
+    },
+    indexStickyStyle() {
+      return {
+        position: "sticky",
+        left: this.selectable ? "48px" : "0px",
+      };
+    },
+    footerHelpText() {
+      let me = this;
+      if (me.usingFooterHelp) {
+        if (me.footerHelp) {
+          return me.footerHelp;
+        } else {
+          return me.$t("i18nCommon.footerHelp");
+        }
+      }
+      return null;
+    },
+
+    // Auto-generate columns from data if not provided
+    computedColumns() {
+      if (this.columns && this.columns.length > 0) {
+        return this.columns.map((col) => ({
+          ...col,
+          autoWidth:
+            col.autoWidth !== undefined
+              ? col.autoWidth
+              : this.autoCalculateWidth,
+        }));
+      }
+
+      // Generate columns from first data row
+      if (!this.tableData || this.tableData.length === 0) {
+        return [];
+      }
+
+      const firstRow = this.tableData[0];
+      return Object.keys(firstRow).map((key) => ({
+        key,
+        label: this.formatLabel(key),
+        align: "left",
+        autoWidth: this.autoCalculateWidth,
+      }));
+    },
+
+    containerStyle() {
+      const styles = {};
+      if (this.height) {
+        styles.height = this.height;
+      }
+      if (this.maxHeight) {
+        styles.maxHeight = this.maxHeight;
+      }
+      return styles;
+    },
+
+    hasActions() {
+      return this.actions && this.actions.length > 0;
+    },
+
+    totalColumns() {
+      let count = this.computedColumns.length;
+      if (this.selectable) count++;
+      if (this.showIndex) count++;
+      if (this.hasActions) count++;
+      return count;
+    },
+
+    isAllSelected() {
+      return (
+        this.tableData.length > 0 &&
+        this.selectedRows.length === this.tableData.length
+      );
+    },
+
+    processedData() {
+      let tableData = [...this.tableData];
+
+      // Apply sorting
+      if (this.sortColumn) {
+        tableData.sort((a, b) => {
+          const aVal = this.getCellValue(a, this.sortColumn);
+          const bVal = this.getCellValue(b, this.sortColumn);
+
+          let comparison = 0;
+          if (aVal > bVal) comparison = 1;
+          if (aVal < bVal) comparison = -1;
+
+          return this.sortDirection === "asc" ? comparison : -comparison;
+        });
+      }
+
+      return tableData;
+    },
+
+    // Virtual Scroll computed properties
+    totalRows() {
+      return this.processedData.length;
+    },
+    visibleData() {
+      if (!this.virtualScroll) {
+        return this.processedData.map((row, index) => ({ row, index }));
+      }
+      const start = this.startRowWithBuffer;
+      const end = this.endRowWithBuffer;
+      return this.processedData.slice(start, end).map((row, i) => ({
+        row,
+        index: start + i,
+      }));
+    },
+    startRow() {
+      return Math.max(0, Math.floor(this.scrollTop / this.rowHeight));
+    },
+    endRow() {
+      return Math.min(
+        this.totalRows - 1,
+        Math.ceil((this.scrollTop + this.containerHeight) / this.rowHeight),
+      );
+    },
+    startRowWithBuffer() {
+      return Math.max(0, this.startRow - this.bufferSize);
+    },
+    endRowWithBuffer() {
+      return Math.min(this.totalRows, this.endRow + this.bufferSize + 1);
+    },
+    paddingTop() {
+      if (!this.virtualScroll) return 0;
+      return this.startRowWithBuffer * this.rowHeight;
+    },
+    paddingBottom() {
+      if (!this.virtualScroll) return 0;
+      const remainingRows = this.totalRows - this.endRowWithBuffer;
+      return Math.max(0, remainingRows * this.rowHeight);
+    },
+  },
+
+  watch: {
+    modelValue: {
+      handler(newVal) {
+        this.selectedRows = newVal || [];
+      },
+      immediate: true,
+    },
+    tableData: {
+      handler() {
+        // Recalculate widths when data changes
+        this.columnWidthCache = {};
+      },
+      deep: true,
+    },
+  },
+
+  mounted() {
+    if (this.virtualScroll) {
+      this.updateContainerSize();
+      this.resizeObserver = new ResizeObserver(() => {
+        this.updateContainerSize();
+      });
+      if (this.$refs.tableContainer) {
+        this.resizeObserver.observe(this.$refs.tableContainer);
+      }
+    }
+  },
+
+  beforeUnmount() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+    document.removeEventListener("mousemove", this.onDragMove);
+    document.removeEventListener("mouseup", this.onDragEnd);
+  },
+
+  methods: {
+    handleScroll(event) {
+      if (this.virtualScroll) {
+        this.scrollTop = event.target.scrollTop;
+      }
+    },
+
+    updateContainerSize() {
+      if (this.$refs.tableContainer) {
+        this.containerHeight = this.$refs.tableContainer.clientHeight;
+      }
+    },
+
+    formatLabel(key) {
+      return key.trim();
+    },
+
+    getCellValue(row, key) {
+      return key.split(".").reduce((obj, k) => obj?.[k], row);
+    },
+
+    formatCellValue(row, column) {
+      const value = this.getCellValue(row, column.key);
+      if (column.formatter && typeof column.formatter === "function") {
+        return column.formatter(value, row);
+      }
+      if (value === null || value === undefined) {
+        return "null";
+      }
+      if (value === false) {
+        return "false";
+      }
+      if (typeof value === "object") {
+        return JSON.stringify(value);
+      }
+      return value === "" ? this.emptyCellText : value;
+    },
+
+    getCellContentStyle() {
+      if (!this.virtualScroll) return {};
+
+      return {
+        WebkitLineClamp: String(this.virtualScrollLineClamp),
+        lineClamp: String(this.virtualScrollLineClamp),
+      };
+    },
+
+    /**
+     * Calculate the maximum content width for a column
+     */
+    calculateMaxContentWidth(column) {
+      // Check cache first
+      if (this.columnWidthCache[column.key]) {
+        return this.columnWidthCache[column.key];
+      }
+
+      let maxLength = 0;
+
+      // Check header length
+      const headerText = column.label || column.key;
+      maxLength = Math.max(maxLength, headerText.length);
+
+      // Check all data rows
+      this.tableData.forEach((row) => {
+        const value = this.formatCellValue(row, column);
+        const valueStr = String(value);
+        maxLength = Math.max(maxLength, valueStr.length);
+      });
+
+      // Calculate width in pixels (character count * average char width + padding)
+      let calculatedWidth = maxLength * this.charWidthPx + 48; // 48px for padding
+
+      // Cache the result
+      if (calculatedWidth > this.maxColumnWidth) {
+        calculatedWidth = this.maxColumnWidth;
+      } else if (calculatedWidth < this.minColumnWidth) {
+        calculatedWidth = this.minColumnWidth;
+      }
+      this.columnWidthCache[column.key] = calculatedWidth;
+      return calculatedWidth;
+    },
+
+    /**
+     * Get tooltip content for truncated cells
+     */
+    getTooltipContent(row, column) {
+      const value = this.formatCellValue(row, column);
+      const valueStr = String(value);
+      return valueStr;
+    },
+
+    getColumnClass(column) {
+      const classes = [];
+      if (column.align) {
+        classes.push(`tm-table-cell-${column.align}`);
+      }
+      if (column.class) {
+        classes.push(column.class);
+      }
+      return classes.join(" ");
+    },
+
+    getColumnStyle(column) {
+      const styles = {};
+
+      // If column has explicit width, use it
+      if (column.width && column.width !== "auto") {
+        styles.width = column.width;
+        styles.minWidth = column.width;
+      }
+      // Auto calculate width based on content
+      else if (column.autoWidth) {
+        const calculatedWidth = this.calculateMaxContentWidth(column);
+        styles.width = `${calculatedWidth}px`;
+        styles.minWidth = `${calculatedWidth}px`;
+      }
+
+      // Apply explicit min/max width if provided
+      if (column.minWidth) {
+        styles.minWidth = column.minWidth;
+      }
+      if (column.maxWidth) {
+        styles.maxWidth = column.maxWidth;
+      }
+
+      return styles;
+    },
+
+    isRowSelected(row) {
+      const rowId = row[this.rowKey];
+      return this.selectedRows.some((r) => r[this.rowKey] === rowId);
+    },
+
+    toggleRowSelection(row) {
+      const rowId = row[this.rowKey];
+      const index = this.selectedRows.findIndex(
+        (r) => r[this.rowKey] === rowId,
+      );
+
+      if (index > -1) {
+        this.selectedRows.splice(index, 1);
+      } else {
+        this.selectedRows.push(row);
+      }
+
+      this.$emit("update:modelValue", this.selectedRows);
+      this.$emit("selection-change", this.selectedRows);
+    },
+
+    toggleSelectAll() {
+      if (this.isAllSelected) {
+        this.selectedRows = [];
+      } else {
+        this.selectedRows = [...this.tableData];
+      }
+
+      this.$emit("update:modelValue", this.selectedRows);
+      this.$emit("selection-change", this.selectedRows);
+    },
+
+    handleHeaderClick(column) {
+      if (!column.sortable) return;
+
+      if (this.sortColumn === column.key) {
+        this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
+      } else {
+        this.sortColumn = column.key;
+        this.sortDirection = "asc";
+      }
+
+      this.$emit("sort-change", {
+        column: this.sortColumn,
+        direction: this.sortDirection,
+      });
+    },
+
+    handleRowClick(row, index) {
+      this.activeCellKey = null;
+      this.$emit("row-click", row, index);
+    },
+
+    handleAction(action, row, index) {
+      this.$emit("action", {
+        action: action.action || action.label,
+        row,
+        index,
+      });
+    },
+
+    clearSelection() {
+      this.selectedRows = [];
+      this.$emit("update:modelValue", this.selectedRows);
+      this.$emit("selection-change", this.selectedRows);
+    },
+
+    getCellKey(row, columnKey) {
+      const rowKeyVal = row[this.rowKey];
+      return `${rowKeyVal !== undefined ? rowKeyVal : this.processedData.indexOf(row)}-${columnKey}`;
+    },
+
+    // Sau khi mở context menu, click chuột tiếp theo bất kỳ (click-away/select)
+    // sẽ xóa highlight của cell đang active.
+    scheduleClearActiveCell(extra = null) {
+      const clear = () => {
+        this.activeCellKey = null;
+        this.activeRecordColKey = null;
+        if (typeof extra === "function") extra();
+        document.removeEventListener("pointerdown", clear);
+        document.removeEventListener("scroll", clear, true);
+      };
+      document.addEventListener("pointerdown", clear);
+      document.addEventListener("scroll", clear, true);
+    },
+
+    selectAll() {
+      this.selectedRows = [...this.tableData];
+      this.$emit("update:modelValue", this.selectedRows);
+      this.$emit("selection-change", this.selectedRows);
+    },
+
+    // Context menu đồng nhất cho MỌI cell trong row (kể cả STT):
+    // right-click vào td nào cũng cho cùng danh sách tùy chọn.
+    onRowContextMenu(row, column, event) {
+      const cellKey = column ? column.key : "__td_index__";
+      this.activeCellKey = this.getCellKey(row, cellKey);
+      this.scheduleClearActiveCell();
+      this.$tmContextMenu.open(event, [
+        {
+          key: "copyCell",
+          label: this.$t("i18nCommon.copyCell"),
+          action: () => this.handleDataSelected(row, column),
+        },
+        {
+          key: "copyRow",
+          label: this.$t("i18nCommon.copyRow"),
+          action: () => this.copyRow(row),
+        },
+        {
+          key: "copyTable",
+          label: this.$t("i18nCommon.copyTable"),
+          action: () => this.copyTable(),
+        },
+        {
+          key: "viewCell",
+          label: this.$t("i18nCommon.viewCell"),
+          action: () => this.onCellPreview(row, column),
+        },
+        {
+          key: "viewRow",
+          label: this.$t("i18nCommon.viewRow"),
+          action: () => this.onRowPreview(row),
+        },
+        {
+          key: "viewTable",
+          label: this.$t("i18nCommon.viewTable"),
+          action: () => this.onTablePreview(),
+        },
+        {
+          key: "exportExcel",
+          label: this.$t("i18nCommon.exportExcel"),
+          action: () => this.exportToExcel(),
+        },
+      ]);
+    },
+
+    handleDataSelected(row, column) {
+      let data = column ? this.formatCellValue(row, column) : row;
+      if (data !== null && typeof data === "object") {
+        data = JSON.stringify(data);
+      }
+      this.$tmUtility.copyToClipboard(data);
+    },
+
+    copyRow(row) {
+      this.$tmUtility.copyToClipboard(JSON.stringify(row));
+    },
+
+    copyTable() {
+      this.$tmUtility.copyToClipboard(JSON.stringify(this.tableData));
+    },
+
+    onRowPreview(row) {
+      TMDialogUtil.showPopup({
+        dialogType: TMDialogEnum.TMQuickPreview,
+        ownerForm: this,
+        props: {},
+        param: { value: row, label: this.$t("i18nCommon.rowData") },
+      });
+    },
+
+    onTablePreview() {
+      TMDialogUtil.showPopup({
+        dialogType: TMDialogEnum.TMQuickPreview,
+        ownerForm: this,
+        props: {},
+        param: { value: this.tableData, label: this.$t("i18nCommon.tableData") },
+      });
+    },
+
+    // Xuất toàn bộ bảng ra file Excel
+    async exportToExcel() {
+      let me = this;
+      try {
+        const rows = me.processedData;
+        if (!rows || rows.length === 0) return;
+        const headers = me.computedColumns.map((c) => c.label || c.key);
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Sheet1", {
+          views: [{ state: "frozen", ySplit: 1 }],
+        });
+
+        const headerRow = worksheet.addRow(headers);
+        headerRow.eachCell((cell) => (cell.font = { bold: true }));
+
+        rows.forEach((row) => {
+          const values = me.computedColumns.map((c) => {
+            let v = me.getCellValue(row, c.key);
+            if (v !== null && typeof v === "object") {
+              v = JSON.stringify(v);
+            }
+            return v;
+          });
+          worksheet.addRow(values);
+        });
+
+        // Tự động chỉnh độ rộng cột
+        worksheet.columns.forEach((col, i) => {
+          const maxLen = Math.max(
+            headers[i]?.length || 0,
+            ...worksheet
+              .getColumn(i + 1)
+              .values.slice(2)
+              .map((v) => (v != null ? String(v).length : 0)),
+          );
+          col.width = maxLen + 2;
+        });
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        me.$tmUtility.createDownloadFileFromBuffer(
+          buffer,
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          me.getExcelFileName(),
+        );
+        me.$tmToast?.success(me.$t("i18nCommon.toastMessage.success"));
+      } catch (error) {
+        console.error("Export excel error:", error);
+        me.$tmToast?.error(me.$t("i18nCommon.toastMessage.error"));
+      }
+    },
+
+    getExcelFileName() {
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      return `table-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(
+        now.getDate(),
+      )}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(
+        now.getSeconds(),
+      )}.xlsx`;
+    },
+
+    onCellPreview(row, column) {
+      const value = column ? this.getCellValue(row, column.key) : row;
+      const label = column ? column.label || column.key : this.$t("i18nCommon.rowData");
+      TMDialogUtil.showPopup({
+        dialogType: TMDialogEnum.TMQuickPreview,
+        ownerForm: this,
+        props: {},
+        param: { value, label },
+      });
+    },
+
+    onRecordView(row) {
+      this.currentRecord = row;
+      this.viewMode = "record";
+    },
+
+    switchToTableView() {
+      this.viewMode = "table";
+      this.currentRecord = null;
+      this.scrollTop = 0;
+      if (this.virtualScroll) {
+        this.$nextTick(() => {
+          this.updateContainerSize();
+          if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+          }
+          this.resizeObserver = new ResizeObserver(() => {
+            this.updateContainerSize();
+          });
+          if (this.$refs.tableContainer) {
+            this.resizeObserver.observe(this.$refs.tableContainer);
+          }
+        });
+      }
+    },
+
+    onRecordCellContextMenu(column, event) {
+      this.activeRecordColKey = column.key;
+      this.scheduleClearActiveCell(() => {
+        this.activeRecordColKey = null;
+      });
+      this.$tmContextMenu.open(event, [
+        {
+          key: "copyCell",
+          label: this.$t("i18nCommon.copy"),
+          action: () => this.handleDataSelected(this.currentRecord, column),
+        },
+        {
+          key: "backToTable",
+          label: this.$t("i18nCommon.backToTable"),
+          action: () => this.switchToTableView(),
+        },
+      ]);
+    },
+
+    onDragStart(e) {
+      const el = this.$refs.tableContainer;
+      if (
+        !el ||
+        (el.scrollWidth <= el.clientWidth && el.scrollHeight <= el.clientHeight)
+      )
+        return;
+      if (e.shiftKey || e.ctrlKey || e.metaKey || e.button !== 0) return;
+
+      // Không kéo từ sticky cells (index, checkbox)
+      const target =
+        e.target.closest?.(".tm-table-cell-sticky") ||
+        e.target.closest?.(".tm-table-cell-checkbox");
+      if (target) return;
+
+      this._isDragging = true;
+      this._dragStartX = e.clientX;
+      this._dragStartY = e.clientY;
+      this._scrollStartLeft = el.scrollLeft;
+      this._scrollStartTop = el.scrollTop;
+
+      document.addEventListener("mousemove", this.onDragMove);
+      document.addEventListener("mouseup", this.onDragEnd);
+    },
+
+    onDragMove(e) {
+      if (!this._isDragging) return;
+      const el = this.$refs.tableContainer;
+      if (!el) return;
+
+      const dx = e.clientX - this._dragStartX;
+      const dy = e.clientY - this._dragStartY;
+      el.scrollLeft = this._scrollStartLeft - dx;
+      el.scrollTop = this._scrollStartTop - dy;
+    },
+
+    onDragEnd() {
+      if (!this._isDragging) return;
+      this._isDragging = false;
+      document.removeEventListener("mousemove", this.onDragMove);
+      document.removeEventListener("mouseup", this.onDragEnd);
+    },
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+.tm-table-viewer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  margin: var(--padding);
+
+  .tm-table-label {
+    font-size: var(--font-size-l-medium);
+    font-weight: 500;
+    margin-bottom: var(--padding);
+    color: var(--text-primary-color);
+  }
+
+  .tm-table-container {
+    position: relative;
+    overflow: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-component);
+    background-color: var(--bg-main-color);
+
+    &.tm-table-grabbing {
+      cursor: grabbing;
+      user-select: none;
+    }
+  }
+
+  .tm-table-wrapper {
+    min-width: 100%;
+    width: fit-content;
+  }
+
+  .tm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-medium);
+
+    .tm-table-header {
+      background-color: var(--bg-layer-color);
+
+      &.tm-table-header-sticky th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: var(--bg-layer-color);
+      }
+
+      tr {
+        border-bottom: 1px solid var(--border-color);
+      }
+    }
+
+    .tm-table-cell {
+      padding: var(--padding) calc(var(--padding) * 1.5);
+      text-align: left;
+      color: var(--text-primary-color);
+      vertical-align: top;
+
+      &-header {
+        font-weight: 600;
+        cursor: default;
+        user-select: none;
+
+        .tm-table-header-content {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .tm-table-sort-icon {
+          font-size: 10px;
+          opacity: 0.7;
+
+          &-inactive {
+            opacity: 0.3;
+          }
+        }
+      }
+
+      &-content {
+        word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        line-height: 1.5;
+
+        &.tm-table-cell-content-clamped {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      &-truncated {
+        .tm-table-cell-content {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          -webkit-line-clamp: 1;
+          line-clamp: 1;
+        }
+      }
+
+      &-checkbox {
+        width: 48px;
+        min-width: 48px;
+        max-width: 48px;
+        box-sizing: border-box;
+        text-align: center;
+        padding: 0 var(--padding);
+      }
+
+      &-index {
+        width: 40px;
+        min-width: 40px;
+        max-width: 40px;
+        box-sizing: border-box;
+        text-align: center;
+        padding: 0 var(--padding);
+        color: var(--text-secondary-color);
+        font-weight: 500;
+        display: table-cell;
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      &-sticky {
+        background-color: var(--bg-main-color);
+        box-shadow: 1px 0 0 0 var(--border-color);
+        z-index: 1;
+      }
+
+      tr:hover>&-sticky {
+        background-color: var(--bg-layer-color);
+      }
+
+      &-sticky-header {
+        background-color: var(--bg-layer-color);
+        box-shadow: 1px 0 0 0 var(--border-color);
+        z-index: 3 !important;
+        top: 0;
+      }
+
+      &-actions {
+        width: auto;
+        white-space: nowrap;
+      }
+
+      &-left {
+        text-align: left;
+      }
+
+      &-center {
+        text-align: center;
+      }
+
+      &-right {
+        text-align: right;
+      }
+
+      &-empty {
+        text-align: center;
+        padding: calc(var(--padding) * 4);
+        color: var(--text-secondary-color);
+      }
+    }
+
+    // Chỉ hover trên body (không áp dụng cho th header theo chuẩn tmheader)
+    .tm-table-body .tm-table-cell:hover {
+      background-color: var(--focus-color);
+      color: var(--selected-item-text-color);
+      cursor: pointer;
+
+      .tm-table-cell-content {
+        color: var(--selected-item-text-color);
+      }
+    }
+
+    // Cell đang được mở context menu (right-click) → highlight theo chuẩn chung
+    .tm-table-body .tm-table-cell-active {
+      background-color: var(--focus-color);
+      color: var(--selected-item-text-color);
+
+      .tm-table-cell-content {
+        color: var(--selected-item-text-color);
+      }
+    }
+
+    // Hover vào cell index (STT đầu dòng) → đổi background + màu chữ cả dòng như tmheader
+    .tm-table-body .tm-table-row:has(.tm-table-cell-index:hover) .tm-table-cell {
+      background-color: var(--focus-color);
+      color: var(--selected-item-text-color);
+
+      .tm-table-cell-content {
+        color: var(--selected-item-text-color);
+      }
+    }
+
+    .tm-table-body {
+      .tm-table-row {
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.2s ease;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &-selected {
+          background-color: rgba(var(--focus-color-rgb), 0.1);
+        }
+
+        &-empty {
+          background-color: transparent;
+
+          &:hover {
+            background-color: transparent;
+          }
+        }
+      }
+    }
+  }
+
+  // Checkbox styles
+  .tm-table-checkbox-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    .tm-table-checkbox {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .tm-checkbox-custom {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: var(--border-radius-component);
+      border: 1px solid var(--border-color);
+      background: var(--bg-main-color);
+      transition: all 0.2s ease;
+
+      .tm-checkbox-active {
+        width: 10px;
+        height: 6px;
+        border-width: 0 0 2px 2px;
+        border-style: solid;
+        border-color: var(--btn-color);
+        transform: rotate(-45deg) translate(1px, -1px);
+      }
+    }
+
+    .tm-table-checkbox:checked+.tm-checkbox-custom {
+      border-color: var(--btn-color);
+    }
+
+    &:hover .tm-checkbox-custom {
+      border-color: var(--focus-color);
+    }
+  }
+
+  // Actions
+  .tm-table-actions {
+    display: flex;
+    gap: calc(var(--padding) / 2);
+
+    .tm-table-action-button {
+      padding: calc(var(--padding) / 2) var(--padding);
+      font-size: var(--font-size-small);
+      border: 1px solid var(--border-color);
+      border-radius: calc(var(--border-radius) / 2);
+      background-color: var(--bg-thirt-color);
+      color: var(--text-primary-color);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+
+      &:hover {
+        border-color: var(--focus-color);
+        background-color: var(--bg-layer-color);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+
+      &.primary {
+        background-color: var(--btn-color);
+        color: white;
+        border-color: var(--btn-color);
+
+        &:hover {
+          background-color: var(--focus-color);
+          border-color: var(--focus-color);
+        }
+      }
+
+      &.danger {
+        color: #dc3545;
+        border-color: #dc3545;
+
+        &:hover {
+          background-color: #dc3545;
+          color: white;
+        }
+      }
+    }
+  }
+
+  // Footer
+  .tm-table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--padding);
+    margin-top: var(--padding);
+    background-color: var(--bg-layer-color);
+    border-radius: var(--border-radius-component);
+
+    .tm-table-info {
+      font-size: var(--font-size-small);
+      color: var(--text-secondary-color);
+      justify-content: space-between;
+      width: 100%;
+    }
+  }
+}
+
+// Hoverable rows
+.tm-table-viewer-hoverable {
+  .tm-table-body .tm-table-row:hover {
+    background-color: var(--bg-thirt-color);
+    cursor: pointer;
+  }
+
+  .tm-table-body .tm-table-row-selected:hover {
+    background-color: rgba(var(--focus-color-rgb), 0.15);
+  }
+}
+
+// No margin
+.tm-table-viewer-no-margin {
+  margin: 0;
+}
+
+// Record View
+.tm-record-container {
+  position: relative;
+  overflow: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-component);
+  background-color: var(--bg-main-color);
+
+  .tm-record-header {
+    display: flex;
+    align-items: center;
+    gap: var(--padding);
+    padding: var(--padding) calc(var(--padding) * 1.5);
+    text-align: left;
+    color: var(--text-primary-color);
+    vertical-align: top;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-layer-color);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+
+    .tm-record-back-btn {
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tm-record-title {
+      font-size: var(--font-size-medium-rare);
+      font-weight: 600;
+      color: var(--text-primary-color);
+    }
+  }
+
+  .tm-record-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    .tm-record-row {
+      border-bottom: 1px solid var(--border-color);
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    .tm-record-cell {
+      padding: var(--padding-medium) var(--padding-x-medium);
+      vertical-align: top;
+      line-height: 1.5;
+      word-wrap: break-word;
+      word-break: break-word;
+      overflow-wrap: break-word;
+
+      &-label {
+        width: 30%;
+        min-width: 150px;
+        font-weight: 500;
+        font-size: var(--font-size-medium-rare);
+        color: var(--text-secondary-color);
+        background-color: var(--bg-layer-color);
+        border-right: 1px solid var(--border-color);
+      }
+
+      &-value {
+        font-size: var(--font-size-medium);
+        color: var(--text-primary-color);
+        font-family: var(--main-font);
+      }
+
+      &-active {
+        background-color: var(--focus-color);
+        color: var(--selected-item-text-color);
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .tm-table-viewer {
+    .tm-table-cell {
+      padding: calc(var(--padding) / 2) var(--padding);
+      font-size: var(--font-size-small);
+
+      &-actions {
+        .tm-table-action-button {
+          padding: calc(var(--padding) / 3) calc(var(--padding) / 2);
+          font-size: 11px;
+        }
+      }
+    }
+  }
+}
+
+.tm-table-cell:not(:last-child) {
+  border-right: 1px solid var(--border-color);
+}
+</style>

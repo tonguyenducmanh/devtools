@@ -52,7 +52,7 @@ async initDotNetWasm() {
       .create();
 
     const exports = await getAssemblyExports("Tools.NetWrapper.dll");
-    this.dotnetExports = exports.TDTools.TDToolDotNetWrapper;
+    this.dotnetExports = exports.TMTools.TMToolDotNetWrapper;
     this.dotnetInitialized = true;
   } catch (error) {
     console.error("Failed to load C# WASM Wrapper:", error);

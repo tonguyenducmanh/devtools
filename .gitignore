@@ -539,3 +539,6 @@ __debug*
 .sisyphus/
 
 config.json
+
+# External repos dùng để build wasm (clone on-demand bởi scripts/fetch_wasm_sources.sh)
+src_wasm/*/external_repo/

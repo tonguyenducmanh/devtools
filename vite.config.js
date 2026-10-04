@@ -9,18 +9,33 @@ import packageJson from "./package.json";
 // Biến này được gắn vào binary Go qua ldflags nên version UI và BE luôn khớp.
 const APP_VERSION = process.env.VERSION || packageJson.version;
 
+// Các thư mục con trong `src_wasm/pkg/` được copy sang
+// `dist/assets-wasm-<VERSION>/<tên>/` (nội dung copy phẳng, bỏ thư mục con).
+//
+// Thêm tool wasm mới chỉ cần thêm 1 dòng vào đây, không phải sửa phần plugin:
+//   - `src_wasm/<tên>/build.sh` tạo ra `src_wasm/pkg/<tên>/`
+//   - `src/views/tools/Craft/` dùng `appKey = <tên>` để nạp
+//     `/assets-wasm-<version>/<tên>/index.html`
+const WASM_PKG_FOLDERS = [
+  "dotnet",
+  "rdp",
+  "photocraft",
+  "vectorcraft",
+  "gridcraft",
+  "wordcraft",
+];
+
+const wasmCopyTargets = WASM_PKG_FOLDERS.map((folder) => ({
+  src: `src_wasm/pkg/${folder}/*`,
+  dest: `assets-wasm-${APP_VERSION}/${folder}`,
+  rename: { stripBase: true },
+}));
+
 export default defineConfig({
   plugins: [
     vue(),
     viteStaticCopy({
-      targets: [
-        // Cấu hình copy folder dotnet sang dist/assets-wasm khi build
-        {
-          src: "src_wasm/pkg/dotnet/*",
-          dest: `assets-wasm-${APP_VERSION}`,
-          rename: { stripBase: true },
-        },
-      ],
+      targets: wasmCopyTargets,
     }),
   ],
   define: {

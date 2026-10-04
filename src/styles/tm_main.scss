@@ -1,0 +1,196 @@
+@use "@/styles/tm_icon.scss";
+@use "@/styles/tm_help.scss";
+@use "@/styles/tm_flyout.scss";
+@use "@/styles/tm_context_menu.scss";
+@use "@/styles/tm_tooltip.scss";
+@use "@/styles/tm_transition.scss";
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* Includes padding in the total width */
+}
+
+:root {
+  --padding: 8px;
+  --base-component-height: 35px;
+  --placeholder-opacity: 0.5;
+  --padding-medium: 4px;
+  --padding-x-medium: 10px;
+  --padding-large: 20px;
+  --border-radius: 8px;
+  --border-radius-component: 4px;
+  --font-size-large: 20px;
+  --font-size-l-medium: 18px;
+  --font-size-medium: 16px;
+  --font-size-medium-rare: 14px;
+  --font-size-small: 12px;
+  --text-color-light: rgba(60, 60, 60, 0.7);
+  --text-color-dark: rgba(235, 235, 235, 0.6);
+  --vt-font-family-base:
+    "Inter var experimental", "Inter var", Inter, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  --box-shadow: 0 2px 2px rgba(92, 96, 93, 0.06);
+  --text-error-color: #ef4444;
+}
+
+.flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.flex-wrap {
+  flex-wrap: wrap;
+  column-gap: var(--padding);
+  row-gap: var(--padding);
+}
+.flex-start {
+  justify-content: flex-start;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+.flex-row {
+  flex-direction: row;
+}
+
+/* Theme color vars are now applied dynamically via JS from TMMonacoTheme.js appVars */
+
+body {
+  --main-font:
+    ui-monospace, "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  --straight-font: "CormorantGaramond";
+}
+a {
+  color: inherit; /* blue colors for links too */
+  text-decoration: inherit; /* no underline */
+}
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+/* Target the scrollbar track */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: var(--scroll-bg-color);
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb-color);
+  border-radius: 10px;
+  border: 3px solid var(--scroll-bg-color); /* space around thumb */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scroll-thumb-hover-color);
+  cursor: pointer;
+}
+
+::selection {
+  color: white; /* Text color */
+  background-color: var(--focus-color); /* Background color */
+}
+
+/* For Firefox support */
+::-moz-selection {
+  color: white;
+  background-color: var(--focus-color);
+}
+.title {
+  text-align: center;
+  margin-bottom: var(--padding);
+  font-size: var(--font-size-large);
+}
+html,
+body {
+  font-family: var(--main-font);
+  height: 100%;
+  width: 100%;
+  background-color: var(--bg-main-color);
+  color: var(--text-primary-color);
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+#app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+.mb-medium {
+  margin-bottom: var(--padding);
+}
+.mt-medium {
+  margin-top: var(--padding);
+}
+.ml-medium {
+  margin-left: var(--padding);
+}
+.mr-medium {
+  margin-right: var(--padding);
+}
+
+.pb-medium {
+  padding-bottom: var(--padding);
+}
+.pt-medium {
+  padding-top: var(--padding);
+}
+.pl-medium {
+  padding-left: var(--padding);
+}
+.pr-medium {
+  padding-right: var(--padding);
+}
+
+.no-select {
+  -webkit-user-select: none; /* Chrome, Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE/Edge cũ */
+  user-select: none; /* Chuẩn */
+}
+
+.text-nowrap {
+  white-space: nowrap; /* không xuống dòng */
+  overflow: hidden; /* ẩn phần dư */
+  text-overflow: ellipsis; /* hiện ... */
+}
+
+.flex-one {
+  flex: 1;
+}

@@ -79,25 +79,6 @@ export default {
           "Support wrap text to view long code without horizontal scrolling.",
       },
     },
-    colorPicker: {
-      purpose: {
-        title: "What is Color Picker?",
-        content:
-          "A tool that allows you to upload an image, click anywhere on the image to extract color codes (HEX, RGB, HSL) at that point.",
-      },
-      howToUse: {
-        title: "How to Use",
-        upload: "Upload the image you want to extract colors from.",
-        click: "Click anywhere on the image to get the color code.",
-        copy: "Press the Copy button to copy the HEX color code to clipboard.",
-      },
-      features: {
-        title: "Features",
-        magnifier:
-          "Magnifying glass zooms the area around the mouse cursor for more accurate color selection.",
-        palette: "Automatically extract main color palette from the image.",
-      },
-    },
     imageToBase64: {
       purpose: {
         title: "What is Image to Base64?",
@@ -548,29 +529,7 @@ export default {
         agent: "Make sure the Agent app is running and connected.",
       },
     },
-    bilingualWeb: {
-      purpose: {
-        title: "What is Bilingual Web?",
-        content:
-          "A tool that displays an actual website with 100% original layout, while translating the visible text into bilingual form without breaking the HTML/CSS structure.",
-      },
-      howToUse: {
-        title: "How to use",
-        input: "Enter the website URL to translate.",
-        fetch:
-          "Click 'Fetch & Translate' to embed the website and automatically find text to translate.",
-        wait: "The system will automatically call the Agent to translate and inject the results directly below each original text.",
-      },
-      options: {
-        title: "Configuration Options",
-        delay:
-          "Delay time - Wait time for dynamic websites (React, etc.) to finish loading UI before scanning for text.",
-        tags: "Block Tags - HTML tags that will be scanned for translation (e.g., P, H1, LI).",
-        classes:
-          "Filter by Class - Specify class names to translate, separated by semicolons (;).",
-        ids: "Filter by ID - Specify ID names to translate, separated by semicolons (;).",
-      },
-    },
+    
     postgreSQLQuery: {
       purpose: {
         title: "PostgreSQL Query",

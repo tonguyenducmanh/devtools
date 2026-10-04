@@ -4,18 +4,18 @@ set -e
 echo "--- Bắt đầu quy trình build api ---"
 ROOT_DIR=$(pwd)
 # Đường dẫn tuyệt đối hoặc tương đối tính từ thư mục chạy script
-MODULE_DIR="$ROOT_DIR/src_backend/td_app/cmd/api_app"
+MODULE_DIR="$ROOT_DIR/src_backend/tm_app/cmd/api_app"
 APP_NAME="$ROOT_DIR/out/dev-tool-api"
 
 # ĐỌC VERSION TỪ PACKAGE.JSON (giống cách Vite lấy version cho UI)
-. "$ROOT_DIR/scripts/td_version.sh"
+. "$ROOT_DIR/scripts/tm_version.sh"
 
-VERSION=$(td_get_version)
+VERSION=$(tm_get_version)
 
 echo "Phiên bản hiện tại: $VERSION"
 
 # gắn version vào binary Go, API health check sẽ trả về version này cho UI
-LDFLAGS=$(td_get_go_ldflags "$VERSION")
+LDFLAGS=$(tm_get_go_ldflags "$VERSION")
 
 # Di chuyển vào thư mục module để Go nhận diện go.mod
 cd $MODULE_DIR
