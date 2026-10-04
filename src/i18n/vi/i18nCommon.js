@@ -105,9 +105,11 @@ export default {
       themeTooltip: "Di chuột để xem trước chủ đề, click để áp dụng",
       backgroundEffectTooltip: "Click để chọn hiệu ứng nền",
       cursorEffectTooltip: "Click để chọn hiệu ứng chuột",
+      loadingEffectTooltip: "Click để chọn loại loading, app sẽ khởi động lại",
       themes: "Chủ đề ứng dụng",
       backgroundEffects: "Hiệu ứng nền",
       cursorEffects: "Hiệu ứng chuột",
+      loadingTypes: "Loại loading",
       pingAgentSuccess: "Server agent đang hoạt động",
       pingAgentFailed: "Server agent không phản hồi đúng",
       uiVersion: "Phiên bản UI",
@@ -120,6 +122,8 @@ export default {
     enableHighlight: "Highlight code",
     wrapText: "Xuống dòng",
     changeMonacoTheme: "Đổi màu Editor",
+    agreementTitle: "Điều khoản sử dụng",
+    agreementAccept: "Đã đọc và đồng ý",
     agreement:
       "Khi sử dụng trang web này, bạn đồng ý chỉ khai thác các công cụ và tiện ích tại đây cho những mục đích tích cực, lành mạnh và mang lại giá trị cho cộng đồng. Chúng tôi nghiêm cấm mọi hành vi lợi dụng trang web để gây hại, phá hoại, xâm phạm quyền riêng tư, tấn công hệ thống, tạo ra nội dung độc hại hoặc thực hiện bất kỳ hành vi nào gây tổn thất lợi ích cho bất kỳ tổ chức, cá nhân hay công ty nào. Việc tiếp tục sử dụng đồng nghĩa với việc bạn cam kết tuân thủ các nguyên tắc này và sử dụng các công cụ một cách có trách nhiệm.",
     sidebar: {

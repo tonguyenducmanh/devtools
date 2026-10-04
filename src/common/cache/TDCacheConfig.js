@@ -352,4 +352,10 @@ export const TDCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử tool QR code to text",
   },
+  AgreementAccepted: {
+    KeyFormat: "AgreementAccepted",
+    CacheLevel: tdEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "đã đọc và đồng ý điều khoản sử dụng, chỉ hiện popup điều khoản 1 lần",
+  },
 };

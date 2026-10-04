@@ -25,6 +25,7 @@ export const TDDialogEnum = {
   TDCollectionGroupPopup: 15,
   TDCollectionPickerPopup: 16,
   TDConfirmPopup: 17,
+  TDAgreementPopup: 18,
 };
 
 /**
@@ -66,6 +67,8 @@ const DialogComponentMap = {
     import("@/views/dialogs/TDCollectionPickerPopup.vue"),
   [TDDialogEnum.TDConfirmPopup]: () =>
     import("@/views/dialogs/TDConfirmPopup.vue"),
+  [TDDialogEnum.TDAgreementPopup]: () =>
+    import("@/views/dialogs/TDAgreementPopup.vue"),
 };
 
 class TDDialogUtil {

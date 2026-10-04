@@ -26,7 +26,7 @@ import TDHeader from "@/views/misc/TDHeader.vue";
 import TDFooterApp from "@/views/misc/TDFooterApp.vue";
 import TDSidebar from "@/views/misc/TDSidebar.vue";
 import TDDynamicTabView from "@/views/misc/TDDynamicTabView.vue";
-import TDDialogUtil from "@/common/TDDialogUtil.js";
+import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
 import "@/common/TDPrototype.js";
 import TDAppStartup from "@/common/TDAppStartup.js";
 import TDDynamicCursorEffect from "@/views/cursorEffect/TDDynamicCursorEffect.vue";
@@ -68,6 +68,26 @@ export default {
     async processWhenRunApp() {
       let me = this;
       await TDAppStartup.initialize();
+      await me.showAgreementIfNotAccepted();
+    },
+    /**
+     * Điều khoản sử dụng chỉ hiện 1 lần duy nhất: đóng popup xong thì lưu cờ
+     * xuống cache, những lần mở app sau không hiện lại
+     */
+    async showAgreementIfNotAccepted() {
+      let me = this;
+      let cacheKey = me.$tdEnum.cacheConfig.AgreementAccepted;
+      let accepted = await me.$tdCache.get(cacheKey);
+      if (accepted) {
+        return;
+      }
+      await TDDialogUtil.showPopup({
+        dialogType: TDDialogEnum.TDAgreementPopup,
+        ownerForm: me,
+        props: {},
+        param: {},
+        callback: () => me.$tdCache.set(cacheKey, true),
+      });
     },
   },
 };

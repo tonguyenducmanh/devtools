@@ -104,9 +104,11 @@ export default {
       themeTooltip: "Hover to preview theme, click to apply",
       backgroundEffectTooltip: "Click to choose background effect",
       cursorEffectTooltip: "Click to choose cursor effect",
+      loadingEffectTooltip: "Click to choose loading type, app will restart",
       themes: "App theme",
       backgroundEffects: "Background effects",
       cursorEffects: "Cursor effects",
+      loadingTypes: "Loading types",
       pingAgentSuccess: "Agent server is running",
       pingAgentFailed: "Agent server did not respond correctly",
       uiVersion: "UI version",
@@ -119,6 +121,8 @@ export default {
     enableHighlight: "Highlight code",
     wrapText: "Wrap text",
     changeMonacoTheme: "Change Editor Theme",
+    agreementTitle: "Terms of use",
+    agreementAccept: "I have read and agree",
     agreement:
       "When using this website, you agree to only exploit the tools and utilities here for positive, healthy purposes and bring value to the community. We strictly prohibit any act of exploiting the website to cause harm, destruction, violate privacy, attack the system, create malicious content or perform any act that causes loss of benefits to any organization, individual or company. Continued use means you commit to comply with these principles and use the tools responsibly.",
     sidebar: {

@@ -2,13 +2,16 @@
   <div class="flex td-welcome">
     <div class="flex flex-col wrap-container">
       <div class="container">
+        <!-- Meme và Avatar đều chỉ hiện ảnh, TDLoading đã giữ chung 1 khung
+500px cho 2 loại nên hiển thị đều nhau. Loại loading còn lại: chỉ có title app -->
+        <div v-if="isShowOnlyTitle" class="main-line-title">
+          {{ welcomeTitle }}
+        </div>
         <transition v-if="isShowLoading" name="td-fade-loading">
           <TDLoading />
         </transition>
-        <div v-else class="main-line-title">{{ welcomeTitle }}</div>
         <TDDynamicBackgroundEffect />
       </div>
-      <p class="agreement">{{ $t("i18nCommon.agreement") }}</p>
     </div>
     <TDSubSidebar v-model="currentConfigLayout.isShowSidebar" @toggleSidebar="toggleSidebar">
       <template v-slot:main>
@@ -50,6 +53,14 @@ export default {
     isShowLoading() {
       return this.loadingType != this.$tdEnum.LoadingType.Normal;
     },
+    /**
+     * 2 loại loading có ảnh (meme, avatar) đều chỉ hiện ảnh nên không hiện
+     * title app, chỉ loại normal mới hiện title to giữa màn hình
+     */
+    isShowOnlyTitle() {
+      let me = this;
+      return me.loadingType == me.$tdEnum.LoadingType.Normal;
+    },
   },
   created() { },
   methods: {
@@ -82,14 +93,6 @@ export default {
   height: 100%;
   flex: 1;
 }
-
-.agreement {
-  // color: var(--text-color-light);
-  text-align: center;
-  width: 95%;
-  margin: var(--padding);
-}
-
 
 .container {
   display: flex;

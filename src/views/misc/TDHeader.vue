@@ -185,6 +185,13 @@ export default {
             onChildClick: (value) => this.applyCursorEffect(value),
           },
           {
+            key: "loadingType",
+            labelKey: "i18nCommon.tdheader.loadingTypes",
+            tooltipKey: "i18nCommon.tdheader.loadingEffectTooltip",
+            children: this.loadingTypeItems,
+            onChildClick: (value) => this.applyLoadingType(value),
+          },
+          {
             key: "zenMode",
             labelKey: "i18nCommon.tdheader.zenMode",
             action: this.toggleZenMode,
@@ -239,6 +246,12 @@ export default {
     },
     cursorEffectItems() {
       return this.$tdEnum.cursorEffectList.map((item) => ({
+        label: this.$t(item.labelKey),
+        value: item.value,
+      }));
+    },
+    loadingTypeItems() {
+      return this.$tdEnum.loadingTypeList.map((item) => ({
         label: this.$t(item.labelKey),
         value: item.value,
       }));
@@ -332,6 +345,18 @@ export default {
       // Áp dụng tức thì cho hiệu ứng chuột đang mount
       eventBus.emit(TDEnumEventBus.cursorEffectChanged, effectValue);
       this.closeFlyout();
+    },
+    /**
+     * Loại loading chỉ hiện ở màn welcome lúc app vừa mở (xem TDWelcome), nên đổi
+     * loại loading phải khởi động lại app thì mới nhìn thấy loại vừa chọn
+     */
+    async applyLoadingType(loadingValue) {
+      await this.$tdUtility.saveUserSettings(
+        "currentLoadingType",
+        loadingValue,
+      );
+      this.closeFlyout();
+      this.$tdUtility.reloadApp();
     },
     openSub(type, event) {
       this.subAnchorEl = event?.currentTarget ?? this.subAnchorEl;
