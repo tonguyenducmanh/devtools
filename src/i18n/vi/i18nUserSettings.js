@@ -11,11 +11,11 @@ export default {
       wrapTab: "Multi tab hiển thị nhiều dòng tab",
       cursorTrail: "Hiệu ứng đuôi chuột",
       cursorEffect: "Hiệu ứng chuột",
-      loadingType: "Loại loading",
+      welcomeBackground: "Hình nền màn welcome",
       backgroundEffect: "Hiệu ứng nền",
     },
-    loadingType: {
-      Normal: "Bình thường",
+    welcomeBackground: {
+      Normal: "Không dùng ảnh",
       Meme: "Meme",
       Avatar: "Ảnh đại diện",
     },

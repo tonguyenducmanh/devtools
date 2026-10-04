@@ -16,4 +16,7 @@ export const TDEnumEventBus = {
 
   // Cursor effect changed (apply)
   cursorEffectChanged: "cursorEffectChanged",
+
+  // Welcome background changed (apply)
+  welcomeBackgroundChanged: "welcomeBackgroundChanged",
 };

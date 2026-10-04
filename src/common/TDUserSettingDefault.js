@@ -12,6 +12,6 @@ export function getUserSettingDefault() {
     showSideBar: true,
     cursorEffect: "off",
     backgroundEffect: "off",
-    currentLoadingType: tdEnum.LoadingType.Normal,
+    welcomeBackground: tdEnum.welcomeBackground.Normal,
   };
 }

@@ -185,11 +185,11 @@ export default {
             onChildClick: (value) => this.applyCursorEffect(value),
           },
           {
-            key: "loadingType",
-            labelKey: "i18nCommon.tdheader.loadingTypes",
-            tooltipKey: "i18nCommon.tdheader.loadingEffectTooltip",
-            children: this.loadingTypeItems,
-            onChildClick: (value) => this.applyLoadingType(value),
+            key: "welcomeBackground",
+            labelKey: "i18nCommon.tdheader.welcomeBackgrounds",
+            tooltipKey: "i18nCommon.tdheader.welcomeBackgroundTooltip",
+            children: this.welcomeBackgroundItems,
+            onChildClick: (value) => this.applyWelcomeBackground(value),
           },
           {
             key: "zenMode",
@@ -250,8 +250,8 @@ export default {
         value: item.value,
       }));
     },
-    loadingTypeItems() {
-      return this.$tdEnum.loadingTypeList.map((item) => ({
+    welcomeBackgroundItems() {
+      return this.$tdEnum.welcomeBackgroundList.map((item) => ({
         label: this.$t(item.labelKey),
         value: item.value,
       }));
@@ -347,16 +347,16 @@ export default {
       this.closeFlyout();
     },
     /**
-     * Loại loading chỉ hiện ở màn welcome lúc app vừa mở (xem TDWelcome), nên đổi
-     * loại loading phải khởi động lại app thì mới nhìn thấy loại vừa chọn
+     * Hình nền màn welcome: áp dụng tức thì cho màn welcome đang mở, không
+     * cần khởi động lại app
      */
-    async applyLoadingType(loadingValue) {
+    async applyWelcomeBackground(backgroundValue) {
       await this.$tdUtility.saveUserSettings(
-        "currentLoadingType",
-        loadingValue,
+        "welcomeBackground",
+        backgroundValue,
       );
+      eventBus.emit(TDEnumEventBus.welcomeBackgroundChanged, backgroundValue);
       this.closeFlyout();
-      this.$tdUtility.reloadApp();
     },
     openSub(type, event) {
       this.subAnchorEl = event?.currentTarget ?? this.subAnchorEl;

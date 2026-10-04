@@ -135,26 +135,30 @@ class TDEnum {
     Collection: 1,
     Setting: 2,
   };
-  LoadingType = {
+  /**
+   * Hình nền của màn welcome. Trước đây gọi là loại loading nhưng TDLoading
+   * chỉ còn spinner, các ảnh này chuyển thành nền cho màn welcome
+   */
+  welcomeBackground = {
     Normal: "normal",
     Meme: "meme",
     Avatar: "avatar",
   };
   /**
-   * danh sách loại loading hiển thị ở màn welcome, dùng chung cho cả form
-   * thiết lập và menu giao diện trên header nên thêm loại mới chỉ sửa ở đây
+   * danh sách hình nền welcome, dùng chung cho cả form thiết lập và menu
+   * giao diện trên header nên thêm loại mới chỉ sửa ở đây
    */
-  loadingTypeList = [
+  welcomeBackgroundList = [
     {
-      labelKey: "i18nUserSettings.loadingType.Normal",
+      labelKey: "i18nUserSettings.welcomeBackground.Normal",
       value: "normal",
     },
     {
-      labelKey: "i18nUserSettings.loadingType.Meme",
+      labelKey: "i18nUserSettings.welcomeBackground.Meme",
       value: "meme",
     },
     {
-      labelKey: "i18nUserSettings.loadingType.Avatar",
+      labelKey: "i18nUserSettings.welcomeBackground.Avatar",
       value: "avatar",
     },
   ];

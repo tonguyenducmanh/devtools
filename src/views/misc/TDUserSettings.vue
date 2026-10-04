@@ -41,11 +41,11 @@
           />
         </div>
         <div class="flex user-setting-item">
-          <div>{{ $t("i18nUserSettings.settings.loadingType") }}</div>
+          <div>{{ $t("i18nUserSettings.settings.welcomeBackground") }}</div>
           <TDComboBox
             :width="200"
-            v-model="currentUserSetting.currentLoadingType"
-            :options="loadingOption"
+            v-model="currentUserSetting.welcomeBackground"
+            :options="welcomeBackgroundOption"
             :noMargin="true"
           />
         </div>
@@ -98,8 +98,8 @@ export default {
     };
   },
   computed: {
-    loadingOption() {
-      return this.$tdEnum.loadingTypeList.map((item) => ({
+    welcomeBackgroundOption() {
+      return this.$tdEnum.welcomeBackgroundList.map((item) => ({
         label: this.$t(item.labelKey),
         value: item.value,
       }));

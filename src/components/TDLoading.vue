@@ -1,35 +1,12 @@
 <template>
   <div class="flex flex-col td-loading">
-    <div v-if="loadingType == $tdEnum.LoadingType.Meme" class="meme"></div>
-    <div
-      v-else-if="loadingType == $tdEnum.LoadingType.Avatar"
-      class="avatar"
-    ></div>
-    <div
-      v-else-if="loadingType == $tdEnum.LoadingType.Normal"
-      class="loader"
-    ></div>
+    <div class="loader"></div>
   </div>
 </template>
 
 <script>
 export default {
   name: "TDLoading",
-  created() {},
-  mounted() {},
-  emits: [],
-  beforeUnmount() {},
-  props: {},
-  data() {
-    return {
-      loadingType: this.$tdEnum.LoadingType.Normal,
-    };
-  },
-  async mounted() {
-    this.loadingType =
-      await this.$tdUtility.getUserSettings("currentLoadingType");
-  },
-  methods: {},
 };
 </script>
 <style lang="scss" scoped>
@@ -40,31 +17,6 @@ export default {
   justify-content: center;
   padding: var(--padding);
   z-index: 1;
-}
-
-/* Meme và avatar đều là ảnh tĩnh nên dùng chung khung 500px để 2 loại hiển
-thị đều nhau, chỉ khác tỉ lệ ảnh và bo góc */
-.meme,
-.avatar {
-  width: 100%;
-  height: fit-content;
-  max-width: 500px;
-  max-height: 500px;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  overflow: hidden;
-}
-
-.meme {
-  aspect-ratio: 249 / 140;
-  background-image: url("@/assets/dependency.jpg");
-}
-
-.avatar {
-  aspect-ratio: 3 / 4;
-  border-radius: var(--border-radius);
-  background-image: url("@/assets/loading_avatar.jpg");
 }
 
 .loader {

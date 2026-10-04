@@ -11,11 +11,11 @@ export default {
       wrapTab: "Multi line tab in Multi tab mode",
       cursorTrail: "Cursor trail effect",
       cursorEffect: "Cursor effect",
-      loadingType: "Loading type",
+      welcomeBackground: "Welcome screen background",
       backgroundEffect: "Background effect",
     },
-    loadingType: {
-      Normal: "Normal",
+    welcomeBackground: {
+      Normal: "No image",
       Meme: "Meme",
       Avatar: "Avatar",
     },
