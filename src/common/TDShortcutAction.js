@@ -60,6 +60,9 @@ const ShortcutConfigMap = {
   [TDShortcutActionEnum.FormatCodeTextEditor]: {
     sortOrder: 4,
     key: tdUtility.newGuid(),
+    // Shift+Alt+F là keybinding mặc định của monaco (editor.action.formatDocument),
+    // handler keydown ở TDDynamicTabView cũng chỉ chặn khi không kèm modifier khác
+    // → cấm dùng Alt+F (hoặc bất kỳ tổ hợp chứa Shift+Alt+F) cho shortcut khác.
     presentKey: (() => {
       if (isLinux) {
         return ["Ctrl", "Shift", "I"];

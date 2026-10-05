@@ -150,7 +150,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
       <TDWelcome v-else />
     </div>
 
-    <!-- Tab preview overlay (Alt+A / Alt+D) -->
+    <!-- Tab preview overlay (Alt+A / Alt+D / Alt+Q) -->
     <Teleport to="body">
       <div v-if="showTabPreview && isTabMode" class="td-tab-preview-overlay">
         <div class="td-tab-preview-container">
@@ -297,7 +297,6 @@ export default {
     },
     registerTabShortcuts() {
       const altKey = isMacOS ? "Option" : "Alt";
-      const guid = () => this.$tdUtility.newGuid();
 
       TDShortcutAction.register(TDShortcutActionEnum.TabPrevious, {
         sortOrder: 10,
@@ -317,9 +316,14 @@ export default {
         labelKey: "i18nCommon.tabManager.tabClose",
       });
 
+      // Alt+F11 (Option+F11 trên macOS) thay cho Alt+F:
+      // - Alt+F trùng phím với Shift+Alt+F (format code của monaco) vì handler
+      //   cũ chỉ kiểm tra altKey + KeyF nên không chặn Shift → bấm format SQL là
+      //   zen mode bật/tắt luôn.
+      // - Không dùng F11 trần vì browser đã chiếm F11 để fullscreen.
       TDShortcutAction.register(TDShortcutActionEnum.TabZenMode, {
         sortOrder: 13,
-        presentKey: [altKey, "F"],
+        presentKey: [altKey, "F11"],
         labelKey: "i18nCommon.tdheader.zenMode",
       });
     },
@@ -654,7 +658,7 @@ export default {
       );
     }
 
-    // ── Tab preview (Alt+A / Alt+D / Alt+Q) ──────────────────────────────
+    // ── Zen mode + tab preview (Alt+F11 / Alt+A / Alt+D / Alt+Q) ─────────────
     const altKeyName = isMacOS ? "Option" : "Alt";
     const tabShortcuts = ref(TDShortcutAction.getActiveShortcuts());
     const showTabPreview = ref(false);
@@ -665,10 +669,25 @@ export default {
       showTabPreview.value = false;
     }
 
-    function handleTabPreviewKeydown(event) {
-      if (!event.altKey) return;
+    /**
+     * Chỉ nhận shortcut khi bấm ĐÚNG bộ modifier đã khai báo (Alt mà không kèm
+     * Shift/Ctrl/Cmd). Bắt buộc vì Shift+Alt+F là keybinding format document mặc
+     * định của monaco (editor.action.formatDocument) — nếu không chặn Shift thì
+     * bấm format code SQL sẽ bị bật/tắt zen mode theo.
+     */
+    function isExactAltCombo(event) {
+      return (
+        event.altKey && !event.shiftKey && !event.ctrlKey && !event.metaKey
+      );
+    }
 
-      if (event.code === "KeyF") {
+    function handleTabPreviewKeydown(event) {
+      if (!isExactAltCombo(event)) return;
+
+      // Alt+F11: bật/tắt zen mode. Bỏ qua event repeat để giữ phím không làm
+      // zen mode nhấp nháy (và không spam ghi setting mỗi lần auto-repeat).
+      if (event.code === "F11") {
+        if (event.repeat) return;
         event.preventDefault();
         eventBus.emit(TDEnumEventBus.zenModeToggle);
         return;
