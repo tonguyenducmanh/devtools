@@ -23,6 +23,7 @@ export default {
       reset_to_commit: "Rollback về 1 commit",
       undo_last_commit: "Undo commit gần nhất",
       cherry_pick_to_branch: "Cherry-pick sang nhánh khác",
+      squash_commits_rebase: "Gộp nhiều commit thành 1",
     },
     postgreSQLTemplate: {
       query_all_info_table: "Xem danh sách cột",
