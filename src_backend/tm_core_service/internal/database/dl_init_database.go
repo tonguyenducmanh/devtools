@@ -125,12 +125,20 @@ func stripBlockComments(script string) string {
 	}
 }
 
-// isAlreadyAppliedError kiểm tra lỗi SQLite "cột đã tồn tại" và có thể bỏ qua.
+// isAlreadyAppliedError kiểm tra lỗi SQLite "đã ở trạng thái mới" và có thể bỏ qua.
 //
-// SQLite không hỗ trợ "ADD COLUMN IF NOT EXISTS" nên câu ALTER sẽ luôn lỗi
-// trên database đã có cột đó — đây là trường hợp bình thường, không phải lỗi.
-// Mọi lỗi khác vẫn được trả về để ghi log.
+//  1. "duplicate column name" — SQLite không hỗ trợ "ADD COLUMN IF NOT EXISTS" nên câu
+//     ALTER sẽ luôn lỗi trên database đã có cột đó (xem 0002_add_missing_columns.sql).
+//
+//  2. "no such table" — câu INSERT ... SELECT đọc từ bảng td_* khi bảng đó không
+//     tồn tại: database mới (chưa từng có bảng td_*) hoặc lần khởi động trước đã
+//     chuyển xong và xoá bảng cũ (xem 0003_copy_data_from_legacy_tables.sql).
+//
+// SQLite không cho viết SQL có điều kiện quanh bảng có thể không tồn tại (không có
+// "INSERT ... FROM IF EXISTS"), nên migration phải luôn phát câu lệnh rồi bỏ qua lỗi
+// ở trên. Mọi lỗi khác vẫn được trả về để ghi log.
 func isAlreadyAppliedError(err error) bool {
 	message := strings.ToLower(err.Error())
-	return strings.Contains(message, "duplicate column name")
+	return strings.Contains(message, "duplicate column name") ||
+		strings.Contains(message, "no such table")
 }
