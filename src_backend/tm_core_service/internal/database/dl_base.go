@@ -1,0 +1,538 @@
+package database
+
+import (
+	"database/sql"
+	"fmt"
+	"os"
+	"path/filepath"
+	"reflect"
+	"strings"
+	"tm_config"
+	"tm_core_service/tm_common"
+)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Marker interface – mỗi model cần implement để khai báo metadata
+// ─────────────────────────────────────────────────────────────────────────────
+
+// TMModelBase là interface bắt buộc cho mọi model muốn dùng TMDLBase.
+type TMModelBase interface {
+	// TableName trả về tên bảng trong database, vd: "tm_api_mock"
+	TableName() string
+	// PrimaryKey trả về tên field JSON/db của khóa chính, vd: "id"
+	PrimaryKey() string
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TMDLBase[T] — generic repository, T phải implement TMModelBase
+// ─────────────────────────────────────────────────────────────────────────────
+
+type TMDLBase[T TMModelBase] struct{}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Internal helpers — reflection utils
+// ─────────────────────────────────────────────────────────────────────────────
+
+// tmColumnInfo chứa thông tin 1 field đã được parse từ struct tag
+type tmColumnInfo struct {
+	fieldIndex   []int  // vị trí field trong struct (slice để hỗ trợ embedded struct)
+	dbColumn     string // tên cột trong DB (lấy từ tag `json:"..."`)
+	isPrimaryKey bool   // có phải khóa chính không
+	isAutoSet    bool   // tự động sinh bởi DB, không tự insert/update
+}
+
+// parseColumns dùng reflection để đọc tất cả field của struct T, kể cả field từ embedded struct
+func parseColumns[T TMModelBase]() []tmColumnInfo {
+	var zero T
+	pkName := zero.PrimaryKey()
+
+	t := reflect.TypeOf(zero)
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+
+	var cols []tmColumnInfo
+	// VisibleFields duyệt đệ quy qua embedded struct (giống kế thừa class base C#)
+	for _, field := range reflect.VisibleFields(t) {
+		tag := field.Tag.Get("json")
+		if tag == "" || tag == "-" {
+			continue
+		}
+		// Bỏ qua embedded struct container (vd: TMBaseModel), chỉ lấy các field con
+		if field.Anonymous {
+			continue
+		}
+
+		colName := strings.Split(tag, ",")[0]
+
+		// Bỏ qua không tự insert/update các trường created_date, modified_date
+		isAutoSet := colName == "created_date" || colName == "modified_date"
+
+		cols = append(cols, tmColumnInfo{
+			fieldIndex:   field.Index, // slice path, hỗ trợ embedded struct
+			dbColumn:     colName,
+			isPrimaryKey: colName == pkName,
+			isAutoSet:    isAutoSet,
+		})
+	}
+	return cols
+}
+
+func scanRow[T TMModelBase](rows *sql.Rows, cols []tmColumnInfo) (T, error) {
+	var item T
+
+	v := reflect.ValueOf(&item).Elem()
+	ptrs := make([]any, len(cols))
+	for i, col := range cols {
+		ptrs[i] = v.FieldByIndex(col.fieldIndex).Addr().Interface()
+	}
+
+	err := rows.Scan(ptrs...)
+	return item, err
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Query helpers — build SQL
+// ─────────────────────────────────────────────────────────────────────────────
+
+func buildSelectAll[T TMModelBase](cols []tmColumnInfo) string {
+	var zero T
+	colNames := make([]string, len(cols))
+	for i, c := range cols {
+		colNames[i] = c.dbColumn
+	}
+	return fmt.Sprintf(
+		"SELECT %s FROM %s ORDER BY created_date DESC",
+		strings.Join(colNames, ", "),
+		zero.TableName(),
+	)
+}
+
+func buildSelectByPK[T TMModelBase](cols []tmColumnInfo) string {
+	var zero T
+	colNames := make([]string, len(cols))
+	for i, c := range cols {
+		colNames[i] = c.dbColumn
+	}
+	return fmt.Sprintf(
+		"SELECT %s FROM %s WHERE %s = ?",
+		strings.Join(colNames, ", "),
+		zero.TableName(),
+		zero.PrimaryKey(),
+	)
+}
+
+func buildInsert[T TMModelBase](cols []tmColumnInfo) string {
+	var zero T
+	var colNames []string
+	var placeholders []string
+	for _, c := range cols {
+		if !c.isAutoSet {
+			colNames = append(colNames, c.dbColumn)
+			placeholders = append(placeholders, "?")
+		}
+	}
+	return fmt.Sprintf(
+		"INSERT INTO %s (%s) VALUES (%s)",
+		zero.TableName(),
+		strings.Join(colNames, ", "),
+		strings.Join(placeholders, ", "),
+	)
+}
+
+func buildUpdate[T TMModelBase](cols []tmColumnInfo) string {
+	var zero T
+	var setClauses []string
+	for _, c := range cols {
+		if !c.isPrimaryKey && !c.isAutoSet {
+			setClauses = append(setClauses, fmt.Sprintf("%s = ?", c.dbColumn))
+		}
+	}
+
+	setClauses = append(setClauses, "modified_date = CURRENT_TIMESTAMP")
+	return fmt.Sprintf(
+		"UPDATE %s SET %s WHERE %s = ?",
+		zero.TableName(),
+		strings.Join(setClauses, ", "),
+		zero.PrimaryKey(),
+	)
+}
+
+func buildDelete[T TMModelBase]() string {
+	var zero T
+	return fmt.Sprintf(
+		"DELETE FROM %s WHERE %s = ?",
+		zero.TableName(),
+		zero.PrimaryKey(),
+	)
+}
+
+func extractValues[T TMModelBase](item *T, cols []tmColumnInfo) []any {
+	v := reflect.ValueOf(item).Elem()
+	var vals []any
+	for _, c := range cols {
+		if !c.isAutoSet {
+			vals = append(vals, v.FieldByIndex(c.fieldIndex).Interface())
+		}
+	}
+	return vals
+}
+
+func extractUpdateValues[T TMModelBase](item *T, cols []tmColumnInfo) []any {
+	v := reflect.ValueOf(item).Elem()
+	var vals []any
+	var pkVal any
+	for _, c := range cols {
+		if c.isPrimaryKey {
+			pkVal = v.FieldByIndex(c.fieldIndex).Interface()
+		} else if !c.isAutoSet {
+			vals = append(vals, v.FieldByIndex(c.fieldIndex).Interface())
+		}
+	}
+	vals = append(vals, pkVal)
+	return vals
+}
+
+func dbPath() string {
+	dir := executableDir()
+	return filepath.Join(dir, tm_config.GetConfigGlobal().DatabaseName)
+}
+
+// GetDBPath trả về đường dẫn file database đang dùng
+func GetDBPath() string {
+	return dbPath()
+}
+
+// ExecutableDir trả về thư mục chứa file thực thi của app
+func ExecutableDir() string {
+	return executableDir()
+}
+
+func executableDir() string {
+	exe, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	return filepath.Dir(exe)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// withTx — helper chạy fn trong 1 transaction, tự rollback nếu có lỗi
+// ─────────────────────────────────────────────────────────────────────────────
+
+func withTx(db *sql.DB, fn func(*sql.Tx) error) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	if err := fn(tx); err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+	return tx.Commit()
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Public API — các method của TMDLBase[T]
+// ─────────────────────────────────────────────────────────────────────────────
+
+func (r *TMDLBase[T]) GetAll() ([]T, error) {
+	db, err := GetConnectionDB()
+	if err != nil {
+		return nil, err
+	}
+
+	cols := parseColumns[T]()
+	// FIX: đổi tên biến từ `sql` thành `query` để tránh shadow package "database/sql"
+	query := buildSelectAll[T](cols)
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var results []T
+	for rows.Next() {
+		item, err := scanRow[T](rows, cols)
+		if err != nil {
+			continue
+		}
+		results = append(results, item)
+	}
+	// FIX: kiểm tra lỗi sau vòng lặp (rows.Err() có thể chứa lỗi network/IO)
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func (r *TMDLBase[T]) GetByID(id any) (*T, error) {
+	db, err := GetConnectionDB()
+	if err != nil {
+		return nil, err
+	}
+
+	cols := parseColumns[T]()
+	query := buildSelectByPK[T](cols)
+	rows, err := db.Query(query, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		item, err := scanRow[T](rows, cols)
+		if err != nil {
+			return nil, err
+		}
+		return &item, nil
+	}
+	return nil, nil // not found
+}
+
+func (r *TMDLBase[T]) Insert(item *T) error {
+	db, err := GetConnectionDB()
+	if err != nil {
+		return err
+	}
+
+	cols := parseColumns[T]()
+
+	// Auto-generate UUID nếu PK là string và rỗng
+	v := reflect.ValueOf(item).Elem()
+	for _, c := range cols {
+		if c.isPrimaryKey {
+			field := v.FieldByIndex(c.fieldIndex)
+			if field.Kind() == reflect.String && field.String() == "" {
+				field.SetString(tm_common.GenUUID())
+			}
+		}
+	}
+
+	vals := extractValues(item, cols)
+	query := buildInsert[T](cols)
+	_, err = db.Exec(query, vals...)
+	return err
+}
+
+func (r *TMDLBase[T]) InsertBatch(items []T) error {
+	if len(items) == 0 {
+		return nil
+	}
+
+	db, err := GetConnectionDB()
+	if err != nil {
+		return err
+	}
+
+	cols := parseColumns[T]()
+	query := buildInsert[T](cols)
+
+	return withTx(db, func(tx *sql.Tx) error {
+		stmt, err := tx.Prepare(query)
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+
+		for i := range items {
+			v := reflect.ValueOf(&items[i]).Elem()
+			for _, c := range cols {
+				if c.isPrimaryKey {
+					field := v.FieldByIndex(c.fieldIndex)
+					if field.Kind() == reflect.String && field.String() == "" {
+						field.SetString(tm_common.GenUUID())
+					}
+				}
+			}
+			vals := extractValues(&items[i], cols)
+			if _, err = stmt.Exec(vals...); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+func (r *TMDLBase[T]) InsertOrIgnoreBatch(items []T) error {
+	if len(items) == 0 {
+		return nil
+	}
+
+	db, err := GetConnectionDB()
+	if err != nil {
+		return err
+	}
+
+	cols := parseColumns[T]()
+	query := strings.Replace(buildInsert[T](cols), "INSERT INTO", "INSERT OR IGNORE INTO", 1)
+
+	return withTx(db, func(tx *sql.Tx) error {
+		stmt, err := tx.Prepare(query)
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+
+		for i := range items {
+			v := reflect.ValueOf(&items[i]).Elem()
+			for _, c := range cols {
+				if c.isPrimaryKey {
+					field := v.FieldByIndex(c.fieldIndex)
+					if field.Kind() == reflect.String && field.String() == "" {
+						field.SetString(tm_common.GenUUID())
+					}
+				}
+			}
+			vals := extractValues(&items[i], cols)
+			if _, err = stmt.Exec(vals...); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+func (r *TMDLBase[T]) Update(item *T) (int64, error) {
+	db, err := GetConnectionDB()
+	if err != nil {
+		return 0, err
+	}
+
+	cols := parseColumns[T]()
+	query := buildUpdate[T](cols)
+	vals := extractUpdateValues(item, cols)
+	result, err := db.Exec(query, vals...)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+func (r *TMDLBase[T]) UpdateBatch(items []T) error {
+	if len(items) == 0 {
+		return nil
+	}
+
+	db, err := GetConnectionDB()
+	if err != nil {
+		return err
+	}
+
+	cols := parseColumns[T]()
+	query := buildUpdate[T](cols)
+
+	return withTx(db, func(tx *sql.Tx) error {
+		stmt, err := tx.Prepare(query)
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+
+		for i := range items {
+			vals := extractUpdateValues(&items[i], cols)
+			if _, err = stmt.Exec(vals...); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+func (r *TMDLBase[T]) Delete(id any) (int64, error) {
+	db, err := GetConnectionDB()
+	if err != nil {
+		return 0, err
+	}
+
+	query := buildDelete[T]()
+	result, err := db.Exec(query, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+func (r *TMDLBase[T]) DeleteBatch(ids []any) error {
+	if len(ids) == 0 {
+		return nil
+	}
+
+	db, err := GetConnectionDB()
+	if err != nil {
+		return err
+	}
+
+	query := buildDelete[T]()
+
+	return withTx(db, func(tx *sql.Tx) error {
+		stmt, err := tx.Prepare(query)
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+
+		for _, id := range ids {
+			if _, err = stmt.Exec(id); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+func (r *TMDLBase[T]) QueryRaw(query string, args ...any) ([]map[string]any, error) {
+	db, err := GetConnectionDB()
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
+
+	var results []map[string]any
+	for rows.Next() {
+		values := make([]any, len(columns))
+		valuePtrs := make([]any, len(columns))
+		for i := range columns {
+			valuePtrs[i] = &values[i]
+		}
+		if err := rows.Scan(valuePtrs...); err != nil {
+			return nil, err
+		}
+		rowMap := make(map[string]any)
+		for i, col := range columns {
+			if b, ok := values[i].([]byte); ok {
+				rowMap[col] = string(b)
+			} else {
+				rowMap[col] = values[i]
+			}
+		}
+		results = append(results, rowMap)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func (r *TMDLBase[T]) ExecRaw(query string, args ...any) (int64, error) {
+	db, err := GetConnectionDB()
+	if err != nil {
+		return 0, err
+	}
+
+	result, err := db.Exec(query, args...)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}

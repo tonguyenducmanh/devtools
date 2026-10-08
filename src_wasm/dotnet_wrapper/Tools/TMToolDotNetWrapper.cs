@@ -1,0 +1,116 @@
+using System.Runtime.InteropServices.JavaScript;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Npgsql;
+
+namespace TMTools
+{
+    /// <summary>
+    /// Cấu hình các tùy chọn cho Source Generator (ví dụ: WriteIndented để tự động format đẹp)
+    /// </summary>
+    [JsonSourceGenerationOptions(WriteIndented = true)]
+    [JsonSerializable(typeof(TMPosgreSQLCnonectionString))]
+    public partial class TMToolPosgreSQlContextString : JsonSerializerContext
+    {
+    }
+
+    /// <summary>
+    /// Class biểu diễn dữ liệu đầu vào cho hàm đọc connection gửi từ UI lên
+    /// (Đã bỏ kế thừa từ JsonSerializerContext vì đây là class chứa dữ liệu)
+    /// </summary>
+    public class TMPosgreSQLCnonectionString
+    {
+        /// <summary>
+        /// tên user
+        /// </summary>
+        public string? user_name { get; set; }
+
+        /// <summary>
+        /// mật khẩu
+        /// </summary>
+        public string? password { get; set; }
+
+        /// <summary>
+        /// địa chỉ
+        /// </summary>
+        public string? host { get; set; }
+
+        /// <summary>
+        /// port của kết nối
+        /// </summary>
+        public int port { get; set; }
+
+        /// <summary>
+        /// tên database
+        /// </summary>
+        public string? database_name { get; set; }
+    }
+
+    /// <summary>
+    /// Class chứa danh sách các hàm tiện ích liên quan đến dev tool được viết bằng .NET
+    /// </summary>
+    public static partial class TMToolDotNetWrapper
+    {
+        /// <summary>
+        /// đọc cấu hình connectionstring của NpgSQL rồi parse về thành object cụ thể
+        /// cho UI, do mỗi 1 phiên bản NpqSQL lại có 1 cách lưu connection string khác nhau
+        /// </summary>
+        /// <param name="source">connection string đã lưu bằng NpgSQL</param>
+        [JSExport]
+        public static string ParseNpgSQLConnection(string source)
+        {
+            string result = string.Empty;
+
+            if (string.IsNullOrEmpty(source))
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            NpgsqlConnectionStringBuilder npgParsedConnect = new NpgsqlConnectionStringBuilder(source);
+            if (npgParsedConnect != null)
+            {
+                TMPosgreSQLCnonectionString connectionConvert = new TMPosgreSQLCnonectionString()
+                {
+                    user_name = npgParsedConnect.Username,
+                    password = npgParsedConnect.Password,
+                    host = npgParsedConnect.Host,
+                    port = npgParsedConnect.Port,
+                    database_name = npgParsedConnect.Database
+                };
+
+                // Sử dụng AppJsonContext.Default.TMPosgreSQLCnonectionString đã được sinh code sẵn
+                result = JsonSerializer.Serialize(connectionConvert, TMToolPosgreSQlContextString.Default.TMPosgreSQLCnonectionString);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// đọc cấu hình connectionstring từ ngoài truyền vào rồi convert thành object NpgsqlConnectionStringBuilder
+        /// </summary>
+        /// <param name="source">connection string đã lưu bằng NpgSQL</param>
+        [JSExport]
+        public static string StringifyNpgSQLConnection(string source)
+        {
+            string result = string.Empty;
+
+            if (string.IsNullOrEmpty(source))
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+            TMPosgreSQLCnonectionString? parseConnect = JsonSerializer.Deserialize<TMPosgreSQLCnonectionString>(source, TMToolPosgreSQlContextString.Default.TMPosgreSQLCnonectionString);
+            if (parseConnect != null)
+            {
+                NpgsqlConnectionStringBuilder npgParsedConnect = new NpgsqlConnectionStringBuilder()
+                {
+                    Username = parseConnect.user_name,
+                    Password = parseConnect.password,
+                    Host = parseConnect.host,
+                    Port = parseConnect.port,
+                    Database = parseConnect.database_name
+                };
+                result = npgParsedConnect.ConnectionString;
+            }
+            return result;
+        }
+    }
+}

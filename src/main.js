@@ -1,75 +1,75 @@
 import { createApp } from "vue";
 import "@/cfg/config.js";
 import App from "@/App.vue";
-import cache from "@/common/cache/TDCache.js";
-import tdEnum from "@/common/TDEnum.js";
-import tdUtility from "@/common/TDUtility.js";
-import TDButton from "@/components/TDButton.vue";
-import TDTextEditor from "@/components/TDTextEditor.vue";
-import TDLoading from "@/components/TDLoading.vue";
-import TDInput from "@/components/TDInput.vue";
-import TDCheckbox from "@/components/TDCheckbox.vue";
-import TDColorPicker from "@/components/TDColorPicker.vue";
-import TDUpload from "@/components/TDUpload.vue";
-import TDRadio from "@/components/TDRadio.vue";
-import TDRadioGroup from "@/components/TDRadioGroup.vue";
-import TDSlideOption from "@/components/TDSlideOption.vue";
-import TDComboBox from "@/components/TDComboBox.vue";
-import TDHistory from "@/components/TDHistory.vue";
-import TDTableViewer from "@/components/TDTableViewer.vue";
-import TDResizer from "@/components/TDResizer.vue";
-import TDVirtualScroll from "@/components/TDVirtualScroll.vue";
-import TDDateTime from "@/components/TDDateTime.vue";
-import TDPopup from "@/components/TDPopup.vue";
+import cache from "@/common/cache/TMCache.js";
+import tmEnum from "@/common/TMEnum.js";
+import tmUtility from "@/common/TMUtility.js";
+import TMButton from "@/components/TMButton.vue";
+import TMTextEditor from "@/components/TMTextEditor.vue";
+import TMLoading from "@/components/TMLoading.vue";
+import TMInput from "@/components/TMInput.vue";
+import TMCheckbox from "@/components/TMCheckbox.vue";
+import TMColorPicker from "@/components/TMColorPicker.vue";
+import TMUpload from "@/components/TMUpload.vue";
+import TMRadio from "@/components/TMRadio.vue";
+import TMRadioGroup from "@/components/TMRadioGroup.vue";
+import TMSlideOption from "@/components/TMSlideOption.vue";
+import TMComboBox from "@/components/TMComboBox.vue";
+import TMHistory from "@/components/TMHistory.vue";
+import TMTableViewer from "@/components/TMTableViewer.vue";
+import TMResizer from "@/components/TMResizer.vue";
+import TMVirtualScroll from "@/components/TMVirtualScroll.vue";
+import TMDateTime from "@/components/TMDateTime.vue";
+import TMPopup from "@/components/TMPopup.vue";
 import i18nData, { loadLocaleDefault } from "@/i18n/i18nData.js";
-import tdEventbus from "@/common/event/TDEventBus.js";
-import TDToastPlugin from "@/common/plugin/TDToastPlugin.js";
-import TDContextMenuPlugin from "@/common/plugin/TDContextMenuPlugin.js";
-import TDClickOutside from "@/directives/TDClickOutside.js";
-import TDTooltip from "@/directives/TDTooltip.js";
-import "@/common/plugin/TDMonacoEditor.js";
+import tmEventbus from "@/common/event/TMEventBus.js";
+import TMToastPlugin from "@/common/plugin/TMToastPlugin.js";
+import TMContextMenuPlugin from "@/common/plugin/TMContextMenuPlugin.js";
+import TMClickOutside from "@/directives/TMClickOutside.js";
+import TMTooltip from "@/directives/TMTooltip.js";
+import "@/common/plugin/TMMonacoEditor.js";
 
 // Async IIFE
 (async () => {
   const currentApp = createApp(App);
 
   // add 1 vài directive
-  currentApp.directive("click-outside", TDClickOutside);
-  currentApp.directive("tooltip", TDTooltip);
+  currentApp.directive("click-outside", TMClickOutside);
+  currentApp.directive("tooltip", TMTooltip);
 
   // add 1 vài global object
-  currentApp.config.globalProperties.$tdCache = cache;
-  currentApp.config.globalProperties.$tdEnum = tdEnum;
-  currentApp.config.globalProperties.$tdUtility = tdUtility;
-  currentApp.config.globalProperties.$tdEventBus = tdEventbus;
+  currentApp.config.globalProperties.$tmCache = cache;
+  currentApp.config.globalProperties.$tmEnum = tmEnum;
+  currentApp.config.globalProperties.$tmUtility = tmUtility;
+  currentApp.config.globalProperties.$tmEventBus = tmEventbus;
 
   // add 1 vài component global
-  currentApp.component("TDButton", TDButton);
-  currentApp.component("TDTextEditor", TDTextEditor);
-  currentApp.component("TDLoading", TDLoading);
-  currentApp.component("TDInput", TDInput);
-  currentApp.component("TDCheckbox", TDCheckbox);
-  currentApp.component("TDUpload", TDUpload);
-  currentApp.component("TDRadio", TDRadio);
-  currentApp.component("TDRadioGroup", TDRadioGroup);
-  currentApp.component("TDSlideOption", TDSlideOption);
-  currentApp.component("TDComboBox", TDComboBox);
-  currentApp.component("TDHistory", TDHistory);
-  currentApp.component("TDPopup", TDPopup);
-  currentApp.component("TDTableViewer", TDTableViewer);
-  currentApp.component("TDResizer", TDResizer);
-  currentApp.component("TDVirtualScroll", TDVirtualScroll);
-  currentApp.component("TDDateTime", TDDateTime);
-  currentApp.component("TDColorPicker", TDColorPicker);
+  currentApp.component("TMButton", TMButton);
+  currentApp.component("TMTextEditor", TMTextEditor);
+  currentApp.component("TMLoading", TMLoading);
+  currentApp.component("TMInput", TMInput);
+  currentApp.component("TMCheckbox", TMCheckbox);
+  currentApp.component("TMUpload", TMUpload);
+  currentApp.component("TMRadio", TMRadio);
+  currentApp.component("TMRadioGroup", TMRadioGroup);
+  currentApp.component("TMSlideOption", TMSlideOption);
+  currentApp.component("TMComboBox", TMComboBox);
+  currentApp.component("TMHistory", TMHistory);
+  currentApp.component("TMPopup", TMPopup);
+  currentApp.component("TMTableViewer", TMTableViewer);
+  currentApp.component("TMResizer", TMResizer);
+  currentApp.component("TMVirtualScroll", TMVirtualScroll);
+  currentApp.component("TMDateTime", TMDateTime);
+  currentApp.component("TMColorPicker", TMColorPicker);
 
   // globalization language
   currentApp.use(i18nData);
 
   // using toastmessage
-  currentApp.use(TDToastPlugin);
+  currentApp.use(TMToastPlugin);
 
   // context menu
-  currentApp.use(TDContextMenuPlugin);
+  currentApp.use(TMContextMenuPlugin);
 
   // load ngôn ngữ
   await loadLocaleDefault();

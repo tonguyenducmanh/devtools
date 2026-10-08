@@ -1,0 +1,12 @@
+package router
+
+import (
+	"net/http"
+	"tm_core_service/internal/service"
+)
+
+// Inject các router liên quan đến xem dữ liệu ứng dụng
+func InjectAppDataMiner(app *http.ServeMux) {
+	app.HandleFunc("GET  /data_miner/get_all_table_and_columns", service.GetAllTableAndColumnsHandler)
+	app.HandleFunc("POST /data_miner/execute_query", service.DataMinerExecuteQuery)
+}

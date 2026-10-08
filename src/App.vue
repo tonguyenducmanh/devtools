@@ -1,43 +1,43 @@
 <template>
-  <div class="td-container">
-    <transition name="td-fade-loading">
-      <div v-if="appLoading" class="flex td-loading-app"></div>
+  <div class="tm-container">
+    <transition name="tm-fade-loading">
+      <div v-if="appLoading" class="flex tm-loading-app"></div>
     </transition>
-    <div class="td-header-wrap">
-      <TDHeaderApp />
+    <div class="tm-header-wrap">
+      <TMHeaderApp />
     </div>
-    <div class="flex td-content-wrap">
-      <div class="td-sidebar-wrap">
-        <TDSidebar />
+    <div class="flex tm-content-wrap">
+      <div class="tm-sidebar-wrap">
+        <TMSidebar />
       </div>
-      <div class="td-main">
-        <TDDynamicTabView />
+      <div class="tm-main">
+        <TMDynamicTabView />
       </div>
     </div>
-    <div class="td-footer-wrap">
-      <TDFooterApp />
+    <div class="tm-footer-wrap">
+      <TMFooterApp />
     </div>
-    <TDDynamicCursorEffect />
+    <TMDynamicCursorEffect />
   </div>
 </template>
 
 <script>
-import TDHeaderApp from "@/views/misc/TDHeaderApp.vue";
-import TDFooterApp from "@/views/misc/TDFooterApp.vue";
-import TDSidebar from "@/views/misc/TDSidebar.vue";
-import TDDynamicTabView from "@/views/misc/TDDynamicTabView.vue";
-import TDDialogUtil, { TDDialogEnum } from "@/common/TDDialogUtil.js";
-import "@/common/TDPrototype.js";
-import TDAppStartup from "@/common/TDAppStartup.js";
-import TDDynamicCursorEffect from "@/views/cursorEffect/TDDynamicCursorEffect.vue";
+import TMHeaderApp from "@/views/misc/TMHeaderApp.vue";
+import TMFooterApp from "@/views/misc/TMFooterApp.vue";
+import TMSidebar from "@/views/misc/TMSidebar.vue";
+import TMDynamicTabView from "@/views/misc/TMDynamicTabView.vue";
+import TMDialogUtil, { TMDialogEnum } from "@/common/TMDialogUtil.js";
+import "@/common/TMPrototype.js";
+import TMAppStartup from "@/common/TMAppStartup.js";
+import TMDynamicCursorEffect from "@/views/cursorEffect/TMDynamicCursorEffect.vue";
 
 export default {
   components: {
-    TDHeaderApp,
-    TDFooterApp,
-    TDSidebar,
-    TDDynamicTabView,
-    TDDynamicCursorEffect,
+    TMHeaderApp,
+    TMFooterApp,
+    TMSidebar,
+    TMDynamicTabView,
+    TMDynamicCursorEffect,
   },
   created() {
     let me = this;
@@ -58,7 +58,7 @@ export default {
     }, 200);
 
     // Set global app context for dialogs
-    TDDialogUtil.setAppContext(this.$root.$.appContext);
+    TMDialogUtil.setAppContext(this.$root.$.appContext);
   },
   beforeUnmount() {},
   methods: {
@@ -67,7 +67,7 @@ export default {
      */
     async processWhenRunApp() {
       let me = this;
-      await TDAppStartup.initialize();
+      await TMAppStartup.initialize();
       await me.showAgreementIfNotAccepted();
     },
     /**
@@ -76,17 +76,17 @@ export default {
      */
     async showAgreementIfNotAccepted() {
       let me = this;
-      let cacheKey = me.$tdEnum.cacheConfig.AgreementAccepted;
-      let accepted = await me.$tdCache.get(cacheKey);
+      let cacheKey = me.$tmEnum.cacheConfig.AgreementAccepted;
+      let accepted = await me.$tmCache.get(cacheKey);
       if (accepted) {
         return;
       }
-      await TDDialogUtil.showPopup({
-        dialogType: TDDialogEnum.TDAgreementPopup,
+      await TMDialogUtil.showPopup({
+        dialogType: TMDialogEnum.TMAgreementPopup,
         ownerForm: me,
         props: {},
         param: {},
-        callback: () => me.$tdCache.set(cacheKey, true),
+        callback: () => me.$tmCache.set(cacheKey, true),
       });
     },
   },
@@ -95,7 +95,7 @@ export default {
 <style lang="scss">
 // không scope để dùng global style
 @use "@/styles/main.scss";
-.td-container {
+.tm-container {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -103,7 +103,7 @@ export default {
   font-size: var(--font-size-medium);
   background-color: var(--bg-layer-color);
   position: relative;
-  .td-loading-app {
+  .tm-loading-app {
     position: absolute;
     top: 0;
     left: 0;
@@ -112,26 +112,26 @@ export default {
     z-index: 1000;
     background-color: var(--bg-main-color);
   }
-  .td-header-wrap {
+  .tm-header-wrap {
     position: relative;
     border-radius: calc(var(--border-radius) * 1.5);
     width: 100%;
     height: 32px;
   }
-  .td-content-wrap {
+  .tm-content-wrap {
     border-top: var(--border-component-style);
     border-bottom: var(--border-component-style);
     padding: var(--padding);
     width: 100%;
     min-height: 0;
     flex: 1;
-    .td-sidebar-wrap {
+    .tm-sidebar-wrap {
       border-radius: calc(var(--border-radius) * 1.5);
       display: flex;
       flex-direction: column;
       height: 100%;
     }
-    .td-main {
+    .tm-main {
       overflow: unset;
       flex: 1;
       display: flex;
@@ -143,7 +143,7 @@ export default {
       background-color: var(--bg-main-color);
     }
   }
-  .td-footer-wrap {
+  .tm-footer-wrap {
     width: 100%;
     height: 32px;
     flex-shrink: 0;

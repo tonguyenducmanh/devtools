@@ -1,4 +1,4 @@
-.td-icon {
+.tm-icon {
   width: 20px;
   height: 20px;
   background-color: currentColor;
@@ -9,7 +9,7 @@
   cursor: pointer;
 }
 
-.td-logo {
+.tm-logo {
   width: 20px;
   height: 20px;
   background: url("@/assets/LogoApps.svg") no-repeat;
@@ -17,58 +17,58 @@
   cursor: pointer;
 }
 
-.td-logo-tool-app {
+.tm-logo-tool-app {
   background-position: 0px 0px;
 }
-.td-logo-stories-app {
+.tm-logo-stories-app {
   background-position: -20px 0px;
 }
-.td-logo-graphics-app {
+.tm-logo-graphics-app {
   background-position: -40px 0px;
 }
-.td-logo-stories-app {
+.tm-logo-stories-app {
   background-position: -20px 0px;
 }
-.td-logo-graphic-app {
+.tm-logo-graphic-app {
   background-position: -40px 0px;
 }
 
-.td-close-icon {
+.tm-close-icon {
   mask-position: -124px 0px;
 }
-.td-search-icon {
+.tm-search-icon {
   mask-position: -100px 0px;
 }
-.td-plus-icon {
+.tm-plus-icon {
   mask-position: -148px 0px;
 }
 
-.td-copy-icon {
+.tm-copy-icon {
   mask-position: -166px 0px;
 }
 
-.td-json-icon {
+.tm-json-icon {
   mask-position: -186px 0px;
 }
 
-.td-edit-icon {
+.tm-edit-icon {
   mask-position: -205px 0px;
 }
 
-.td-folder-icon {
+.tm-folder-icon {
   mask-position: -230px 0px;
 }
-.td-history-icon {
+.tm-history-icon {
   mask-position: -255px 0px;
 }
-.td-setting-icon {
+.tm-setting-icon {
   mask-position: -280px 0px;
 }
-.td-reload-icon {
+.tm-reload-icon {
   mask-position: -307px 0px;
 }
 
-.td-github-icon {
+.tm-github-icon {
   mask-position: -76px 0px;
 
   &:hover {
@@ -76,145 +76,145 @@
   }
 }
 
-.td-help-icon {
+.tm-help-icon {
   mask-position: 0px -20px;
 }
 
-.td-camera-icon {
+.tm-camera-icon {
   mask-position: -26px -20px;
 }
 
-.td-exit-full-screen-icon {
+.tm-exit-full-screen-icon {
   mask-position: -50px -20px;
 }
 
-.td-full-screen-icon {
+.tm-full-screen-icon {
   mask-position: -70px -20px;
 }
 
-.td-command-code-icon {
+.tm-command-code-icon {
   mask-position: -92px -20px;
 }
 
-.td-connect-icon {
+.tm-connect-icon {
   mask-position: -120px -20px;
 }
 
-.td-disconnect-icon {
+.tm-disconnect-icon {
   mask-position: -145px -20px;
 }
 
-.td-pin-icon {
+.tm-pin-icon {
   mask-position: -170px -20px;
 }
 
-.td-unpin-icon {
+.tm-unpin-icon {
   mask-position: -195px -20px;
 }
 
-.td-import-icon {
+.tm-import-icon {
   mask-position: -225px -20px;
 }
 
-.td-export-icon {
+.tm-export-icon {
   mask-position: -250px -20px;
 }
 
-.td-undo-icon {
+.tm-undo-icon {
   mask-position: -280px -20px;
 }
 
-.td-redo-icon {
+.tm-redo-icon {
   mask-position: -305px -20px;
 }
 
-.td-minus-icon {
+.tm-minus-icon {
   mask-position: -330px -20px;
 }
 
-.td-add-node-child-icon {
+.tm-add-node-child-icon {
   mask-position: -385px -20px;
 }
 
-.td-add-node-icon {
+.tm-add-node-icon {
   mask-position: -410px -20px;
 }
 
-.td-delete-node-icon {
+.tm-delete-node-icon {
   mask-position: -360px -20px;
 }
 
-.td-new-file-icon {
+.tm-new-file-icon {
   mask-position: -0px -40px;
 }
 
-.td-node-expand-icon {
+.tm-node-expand-icon {
   mask-position: -25px -40px;
 }
-.td-node-collapse-icon {
+.tm-node-collapse-icon {
   mask-position: -50px -40px;
 }
 
-.td-center-icon {
+.tm-center-icon {
   mask-position: -75px -40px;
 }
 
-.td-node-merge-icon {
+.tm-node-merge-icon {
   mask-position: -95px -40px;
 }
 
-.td-send-icon {
+.tm-send-icon {
   mask-position: -115px -40px;
 }
 
-.td-cancel-icon {
+.tm-cancel-icon {
   mask-position: -135px -41px;
 }
 
-.td-download-icon {
+.tm-download-icon {
   mask-position: -155px -41px;
 }
 
-.td-example-icon {
+.tm-example-icon {
   mask-position: -181px -41px;
 }
 
-.td-save-icon {
+.tm-save-icon {
   mask-position: -205px -40px;
 }
 
-.td-upload-icon {
+.tm-upload-icon {
   mask-position: -230px -40px;
 }
 
-.td-postman-icon {
+.tm-postman-icon {
   mask-position: -255px -40px;
 }
 
-.td-dupplicate-icon {
+.tm-dupplicate-icon {
   mask-position: -280px -42px;
 }
 
-.td-database-icon {
+.tm-database-icon {
   mask-position: -300px -40px;
 }
 
-.td-format-icon {
+.tm-format-icon {
   mask-position: -320px -40px;
 }
 
-.td-test-icon {
+.tm-test-icon {
   mask-position: -345px -40px;
 }
 
-.td-book-icon {
+.tm-book-icon {
   mask-position: -370px -40px;
 }
 
-.td-random-icon {
+.tm-random-icon {
   mask-position: -402px -42.5px;
 }
 
-.td-menu-icon {
+.tm-menu-icon {
   mask-position: -430px -40px;
 }

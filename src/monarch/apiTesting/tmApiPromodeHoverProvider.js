@@ -1,0 +1,35 @@
+/**
+ * Hover provider cho language "javascript".
+ * Đăng ký Monaco HoverProvider, documentation lấy từ file .md.
+ */
+import { API_ITEMS, getItemLabels } from "./tmApiPromodeItems.js";
+
+/**
+ * Đăng ký hover provider cho javascript.
+ * @param {object} monacoInstance - Monaco editor instance
+ * @returns {object} Disposable
+ */
+export function registerTmApiPromodeHoverProvider(monacoInstance) {
+  const itemLabels = getItemLabels();
+
+  return monacoInstance.languages.registerHoverProvider("javascript", {
+      provideHover: (model, position) => {
+        const word = model.getWordAtPosition(position);
+        if (!word) return null;
+
+        const name = word.word;
+        if (!itemLabels.includes(name)) return null;
+
+        const item = API_ITEMS.find((i) => i.label === name);
+        if (!item) return null;
+
+        return {
+          contents: [
+            { value: `> **${window.__env?.author || "tomanh"} API**` },
+            { value: item.documentation, isTrusted: true },
+          ],
+        };
+      },
+    },
+  );
+}

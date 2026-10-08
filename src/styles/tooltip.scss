@@ -1,4 +1,4 @@
-.td-tooltip {
+.tm-tooltip {
   z-index: 9999;
 
   padding: 6px 10px;
@@ -15,10 +15,10 @@
   white-space: normal;
   overflow-wrap: anywhere;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  animation: td-tooltip-fade 0.15s ease;
+  animation: tm-tooltip-fade 0.15s ease;
 }
 
-@keyframes td-tooltip-fade {
+@keyframes tm-tooltip-fade {
   from {
     opacity: 0;
     transform: translateY(4px);

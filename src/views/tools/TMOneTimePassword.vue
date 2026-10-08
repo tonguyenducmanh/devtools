@@ -1,0 +1,852 @@
+<template>
+  <div class="flex tm-otp">
+    <div class="container">
+      <div class="flex flex-col otp-header">
+        <div class="flex tm-first-header">
+          <TMComboBox
+            :width="120"
+            :noMargin="true"
+            v-model="sourceOTPImport"
+            :options="radioImports"
+            class="tm-source-otp"
+            :borderRadiusPosition="[
+              $tmEnum.BorderRadiusPosition.TopLeft,
+              $tmEnum.BorderRadiusPosition.BottomLeft,
+            ]"
+          />
+          <div v-if="sourceOTPImport == 'googleqrcode'" class="flex flex-one">
+            <TMUpload
+              :noMargin="true"
+              @selected="convertQRCode"
+              ref="uploadArea"
+              class="upload-area"
+              maxHeight="200px"
+              multiple
+              :borderRadiusPosition="[
+                $tmEnum.BorderRadiusPosition.TopRight,
+                $tmEnum.BorderRadiusPosition.BottomRight,
+              ]"
+            ></TMUpload>
+            <div>
+              <TMButton
+                :noMargin="true"
+                :type="$tmEnum.buttonType.secondary"
+                :label="$t('i18nCommon.oneTimePassword.auth.add')"
+                @click="decodeGoogleAuth"
+              />
+            </div>
+          </div>
+          <div v-if="sourceOTPImport == 'google'" class="flex flex-one">
+            <TMInput
+              :noMargin="true"
+              v-model="migrationURL"
+              :placeHolder="$t('i18nCommon.oneTimePassword.urlPlaceholder')"
+              :borderRadiusPosition="[
+                $tmEnum.BorderRadiusPosition.TopRight,
+                $tmEnum.BorderRadiusPosition.BottomRight,
+              ]"
+            />
+            <div>
+              <TMButton
+                :noMargin="true"
+                :type="$tmEnum.buttonType.secondary"
+                :label="$t('i18nCommon.oneTimePassword.auth.add')"
+                :readOnly="!migrationURL"
+                @click="decodeGoogleAuth"
+              />
+            </div>
+          </div>
+          <div v-if="sourceOTPImport == 'manual'" class="flex flex-one">
+            <TMInput
+              :noMargin="true"
+              :borderRadiusPosition="[
+                $tmEnum.BorderRadiusPosition.TopRight,
+                $tmEnum.BorderRadiusPosition.BottomRight,
+              ]"
+              v-model="addNewObject.issuer"
+              :placeHolder="$t('i18nCommon.oneTimePassword.inputs.issuer')"
+            />
+            <TMInput
+              :noMargin="true"
+              v-model="addNewObject.name"
+              :placeHolder="$t('i18nCommon.oneTimePassword.inputs.name')"
+            />
+            <TMInput
+              :noMargin="true"
+              v-model="addNewObject.secret"
+              :placeHolder="$t('i18nCommon.oneTimePassword.inputs.secret')"
+            />
+            <TMButton
+              :noMargin="true"
+              :type="$tmEnum.buttonType.secondary"
+              :readOnly="
+                !addNewObject || !addNewObject.name || !addNewObject.secret
+              "
+              :label="$t('i18nCommon.oneTimePassword.auth.add')"
+              @click="addNewTOTP"
+            />
+          </div>
+        </div>
+        <div class="flex tm-second-header">
+          <TMInput
+            v-model="filterOtp"
+            :noMargin="true"
+            :placeHolder="$t('i18nCommon.oneTimePassword.filter')"
+          />
+          <TMInput
+            v-model="username"
+            :noMargin="true"
+            :placeHolder="$t('i18nCommon.oneTimePassword.auth.username')"
+          />
+          <TMInput
+            :noMargin="true"
+            v-model="password"
+            :inputType="'password'"
+            :placeHolder="$t('i18nCommon.oneTimePassword.auth.password')"
+            @keyup.enter="openAuthenSaved"
+          />
+          <TMButton
+            :label="$t('i18nCommon.oneTimePassword.auth.open')"
+            :readOnly="!password || !username"
+            @click="openAuthenSaved"
+            :noMargin="true"
+          />
+          <TMButton
+            :type="$tmEnum.buttonType.secondary"
+            :label="$t('i18nCommon.oneTimePassword.auth.save')"
+            :readOnly="!password || !username"
+            @click="saveAuthen"
+            :noMargin="true"
+          />
+        </div>
+        <div class="flex tm-decoded-data">
+          <TMTextEditor
+            v-if="isShowDecoded"
+            :placeHolder="$t('i18nCommon.oneTimePassword.decodeData')"
+            v-model="decodedDataString"
+            :label="$t('i18nCommon.oneTimePassword.decodeData')"
+            isLabelTop
+            :readOnly="true"
+            height="400px"
+          ></TMTextEditor>
+        </div>
+        <div v-if="isShowProgress" class="otp-progress-wrapper">
+          <progress :value="progress" max="100"></progress>
+        </div>
+      </div>
+      <div class="main-otp-container">
+        <div class="flex otp-container">
+          <template v-for="(item, index) in optShowList">
+            <div
+              class="otp-item"
+              @click="handleCopyEvent(item.otp)"
+              v-tooltip="item.displayName"
+            >
+              <div class="otp-left">
+                <div class="otp-name">{{ item.displayName }}</div>
+                <div class="otp-type">{{ item.type }}</div>
+              </div>
+              <div v-if="item.type.compareNotSentive('HOTP')">NotSupported</div>
+              <div v-else class="otp-value">
+                {{ item.otp }}
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+      <div class="flex footer-section">
+        <TMInput
+          :noMargin="true"
+          v-model="filterRemove"
+          :placeHolder="placeHolderRemove"
+        />
+        <TMButton
+          :noMargin="true"
+          :label="$t('i18nCommon.oneTimePassword.remove.button')"
+          :readOnly="!filterRemove"
+          @click="removeByFilter"
+        />
+      </div>
+    </div>
+    <TMSubSidebar
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
+      <template v-slot:menu>
+        <div class="tm-sidebar-menu">
+          <TMSlideOption
+            :showIcon="true"
+            v-model="currentConfigLayout.currentSidebarOption"
+            :options="sidebarOptions"
+            :noMargin="true"
+            @change="updateConfigLayout"
+          />
+        </div>
+      </template>
+      <template v-slot:main>
+        <div
+          class="flex flex-col tm-sub-sidebar"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tmEnum.ToolSidebarOption.Help
+          "
+        >
+          <TMOneTimePasswordHelp />
+        </div>
+        <div
+          class="flex flex-col tm-sub-sidebar"
+          v-show="
+            currentConfigLayout.currentSidebarOption ==
+            $tmEnum.ToolSidebarOption.Setting
+          "
+        >
+          <TMCheckbox
+            :variant="$tmEnum.checkboxType.switch"
+            v-model="currentConfigLayout.showDecodedInfo"
+            :label="$t('i18nCommon.oneTimePassword.settings.showDecodedInfo')"
+            @change="updateConfigLayout"
+          ></TMCheckbox>
+          <TMCheckbox
+            :variant="$tmEnum.checkboxType.switch"
+            v-model="currentConfigLayout.autoSave"
+            :label="$t('i18nCommon.oneTimePassword.settings.autoSave')"
+            @change="updateConfigLayout"
+          ></TMCheckbox>
+        </div>
+      </template>
+    </TMSubSidebar>
+  </div>
+</template>
+
+<script>
+import protobuf from "protobufjs";
+import { Buffer } from "buffer";
+import * as OTPAuth from "otpauth";
+import { toRaw } from "vue";
+import googleAuthen from "@/common/proto/googleAuth.js";
+import TMToolBase from "@/views/tools/base/TMToolBase.vue";
+import TMSubSidebar from "@/components/TMSubSidebar.vue";
+import TMSlideOption from "@/components/TMSlideOption.vue";
+import TMOneTimePasswordHelp from "@/views/helps/TMOneTimePasswordHelp.vue";
+export default {
+  extends: TMToolBase,
+  name: "TMOneTimePassword",
+  components: { TMSubSidebar, TMSlideOption, TMOneTimePasswordHelp },
+  created() {
+    let me = this;
+    me.processWhenMounted();
+  },
+  computed: {
+    sidebarOptions() {
+      let options = [];
+      options.push({
+        value: this.$tmEnum.ToolSidebarOption.Help,
+        label: this.$t("i18nCommon.sidebarOption.help"),
+        icon: "tm-help-icon",
+      });
+      options.push({
+        value: this.$tmEnum.ToolSidebarOption.Setting,
+        label: this.$t("i18nCommon.sidebarOption.setting"),
+        icon: "tm-setting-icon",
+      });
+      return options;
+    },
+    optShowList() {
+      let me = this;
+      let allOTPVisible = [];
+      if (me.decodedData && me.decodedData.length > 0) {
+        if (!me.filterOtp) {
+          allOTPVisible = me.decodedData;
+        } else {
+          allOTPVisible = me.decodedData.filter((x) =>
+            x.displayName.includes(me.filterOtp),
+          );
+        }
+        if (!me.filterOtp) {
+          allOTPVisible = me.decodedData;
+        } else {
+          allOTPVisible = me.decodedData.filter(
+            (x) =>
+              x.displayName &&
+              x.displayName
+                .trim()
+                .toLowerCase()
+                .includes(me.filterOtp.trim().toLowerCase()),
+          );
+        }
+      }
+      return allOTPVisible;
+    },
+    isShowDecoded() {
+      let me = this;
+      let result = false;
+      if (
+        me.decodedData &&
+        me.currentConfigLayout &&
+        me.currentConfigLayout.showDecodedInfo
+      ) {
+        result = true;
+      }
+      return result;
+    },
+    placeHolderRemove() {
+      let me = this;
+      let result = me
+        .$t("i18nCommon.oneTimePassword.remove.filter")
+        .format(me.removeAllKey);
+      return result;
+    },
+    isShowProgress() {
+      let me = this;
+      let result = false;
+      if (me.decodedData && me.decodedData.length > 0) {
+        result = true;
+      }
+      return result;
+    },
+    autoSave() {
+      let me = this;
+      let result = false;
+      if (
+        me.decodedData &&
+        me.currentConfigLayout &&
+        me.currentConfigLayout.autoSave
+      ) {
+        result = true;
+      }
+      return result;
+    },
+  },
+  mounted() {},
+  watch: {
+    filterOtp(oldVal, newVal) {
+      if (oldVal != newVal) {
+        this.reBuildTabTitle(this.filterOtp);
+      }
+    },
+  },
+  beforeUnmount() {
+    let me = this;
+    // Clean up interval when the component is destroyed
+    if (me.timeoutId) {
+      clearTimeout(me.timeoutId); // Clear timeout thay vì interval
+    }
+    if (me.progressIntervalId) {
+      clearInterval(me.progressIntervalId);
+    }
+    me.saveUsername();
+  },
+  methods: {
+    async convertQRCode() {
+      let me = this;
+      if (
+        me.$refs.uploadArea &&
+        typeof me.$refs.uploadArea.getFileSelected === "function"
+      ) {
+        // Lazy-load module
+        const { imagesQRToText } = await import(
+          /* webpackChunkName: "mock-qr-code-util" */
+          "@/common/qrcode/TMQRCodeUtil.js"
+        );
+        // Lọc kết quả hợp lệ
+        let result = await imagesQRToText(me.$refs.uploadArea);
+        if (result && result.length > 0) {
+          result.forEach((item) => {
+            // Chỉ lấy những chuỗi có định dạng otpauth-migration
+            if (item.startsWith("otpauth-migration://")) {
+              me.migrationURL = item;
+              me.decodeGoogleAuth();
+            }
+          });
+        }
+      }
+    },
+    handleCopyEvent(value) {
+      let me = this;
+      me.$tmUtility.copyToClipboard(value);
+    },
+    async processWhenMounted() {
+      let me = this;
+      let lastUserName = await me.$tmCache.get(
+        me.$tmEnum.cacheConfig.LastOneTimeAuthenUserName,
+      );
+      if (lastUserName) {
+        me.username = lastUserName;
+        let lastAuthen = await me.$tmCache.get(
+          me.$tmEnum.cacheConfig.LastOneTimeAuthenPassword,
+        );
+        if (lastAuthen && lastAuthen.userName == lastUserName) {
+          // load luôn danh sách user theo tài khoản, mật khẩu cuối cùng lưu được trong mem
+          await me.openAuthenSavedByUser(
+            lastAuthen.userName,
+            lastAuthen.password,
+          );
+        }
+      }
+    },
+    async saveUsername() {
+      let me = this;
+      if (me.username) {
+        await me.$tmCache.set(
+          me.$tmEnum.cacheConfig.LastOneTimeAuthenUserName,
+          me.username,
+        );
+        // lưu tạm vào mem sau đỡ phải dùng
+        if (me.password) {
+          await me.$tmCache.set(
+            me.$tmEnum.cacheConfig.LastOneTimeAuthenPassword,
+            {
+              userName: me.username,
+              password: me.password,
+            },
+          );
+        }
+      }
+    },
+    async decodeGoogleAuth() {
+      let me = this;
+      let result = await me.decodeExportUri(me.migrationURL);
+      if (result && result.length > 0) {
+        // chỉ thêm mới nếu không có secret trùng lặp
+        if (!me.decodedData || me.decodedData.length == 0) {
+          me.decodedData = result;
+        } else {
+          result.forEach((item) => {
+            let checkExist = me.decodedData.find((i) => {
+              return i.secret === item.secret;
+            });
+            if (!checkExist) {
+              me.decodedData.push(item);
+            }
+          });
+        }
+        me.buildData();
+        me.decodedDataString = JSON.stringify(result, null, 2);
+        me.generateNow();
+      }
+    },
+    generateNow() {
+      let me = this;
+      me.generateTOTP();
+      me.scheduleNextUpdate(); // Bắt đầu chu kỳ cập nhật
+      me.startProgressTimer(); // Bắt đầu đồng hồ đếm ngược
+    },
+    buildData() {
+      let me = this;
+      if (me.decodedData && me.decodedData.length > 0) {
+        me.decodedData.forEach((item) => {
+          if (item.issuer) {
+            item.displayName = item.issuer + " - " + item.name;
+          } else {
+            item.displayName = item.name;
+          }
+        });
+      }
+    },
+    scheduleNextUpdate() {
+      let me = this;
+      // Lấy số giây còn lại cho đến khi hết chu kỳ 30 giây hiện tại
+      const secondsRemaining = 30 - (Math.floor(Date.now() / 1000) % 30);
+
+      // Lên lịch cập nhật mã OTP sau khoảng thời gian còn lại
+      me.timeoutId = setTimeout(() => {
+        me.generateTOTP();
+        me.scheduleNextUpdate(); // Lên lịch cho lần cập nhật tiếp theo
+      }, secondsRemaining * 1000);
+    },
+    /**
+     * Generate TOTP code from the decoded data.
+     */
+    generateTOTP(secretKey) {
+      let me = this;
+      if (me.decodedData && me.decodedData.length > 0) {
+        let dataCaculate = me.decodedData;
+        if (secretKey) {
+          dataCaculate = me.decodedData.filter((item) => {
+            return item.secret === secretKey;
+          });
+        }
+        if (dataCaculate && dataCaculate.length > 0) {
+          dataCaculate.forEach((item) => {
+            // chỉ tự động interval cho TOTP thôi
+            if (item.type.compareNotSentive("TOTP")) {
+              let totp = new OTPAuth.TOTP({
+                issuer: item.issuer,
+                label: item.name,
+                secret: item.secret,
+                algorithm: item.algorithm,
+                digits: item.digits.compareNotSentive("six") ? 6 : 8,
+                digits: 6,
+                // Interval of time for which a token is valid, in seconds.
+                period: 30,
+              });
+              item.otp = totp.generate();
+            }
+          });
+        }
+      }
+    },
+
+    generateHOTP(item) {
+      let me = this;
+      if (item && item.type.compareNotSentive("HOTP")) {
+        let hotp = new OTPAuth.HOTP({
+          issuer: item.issuer,
+          label: item.name,
+          secret: item.secret,
+          algorithm: item.algorithm,
+          digits: item.digits.compareNotSentive("six") ? 6 : 8,
+          counter: item.counter,
+        });
+        item.otp = hotp.generate();
+      }
+    },
+
+    async saveAuthen() {
+      let me = this;
+      if (me.password && me.username) {
+        await me.$tmCache.set(
+          me.$tmEnum.cacheConfig.OneTimeAuthen,
+          me.decodedData,
+          {
+            id: me.username,
+          },
+          me.password,
+        );
+        await me.saveUsername();
+        me.$tmToast.success(me.$t("i18nCommon.toastMessage.saved"));
+      }
+    },
+    async openAuthenSaved() {
+      let me = this;
+      await me.openAuthenSavedByUser(me.username, me.password);
+    },
+    async openAuthenSavedByUser(username, password) {
+      let me = this;
+      if (password && username) {
+        let result = await me.$tmCache.get(
+          me.$tmEnum.cacheConfig.OneTimeAuthen,
+          {
+            id: username,
+          },
+          password,
+        );
+        if (result) {
+          me.decodedData = result;
+          me.decodedDataString = JSON.stringify(result, null, 2);
+          me.buildData();
+          me.generateNow();
+          await me.saveUsername();
+        }
+      }
+    },
+    /**
+     * Google Authenticator uses protobuff to encode the 2fa data.
+     *
+     * @param {Uint8Array} payload
+     */
+    async decodeProtobuf(payload) {
+      let me = this;
+      let protoText = googleAuthen.googleProto;
+      let root = protobuf.parse(protoText).root;
+      let MigrationPayload = root.MigrationPayload;
+
+      let message = MigrationPayload.decode(payload);
+      return MigrationPayload.toObject(message, {
+        longs: String,
+        enums: String,
+        bytes: String,
+      });
+    },
+
+    /**
+     * Convert a base64 to base32.
+     * Most Time based One Time Password (TOTP)
+     * password managers use this as the "secret key" when generating a code.
+     *
+     * An example is: https://totp.danhersam.com/.
+     *
+     * @returns RFC3548 compliant base32 string
+     */
+    toBase32(base64String) {
+      const raw = Buffer.from(base64String, "base64");
+      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+      let output = "";
+      let val = 0;
+      let len = 0;
+
+      for (let i = 0; i < raw.length; i++) {
+        // Đẩy byte hiện tại vào bộ đệm giá trị
+        val = (val << 8) | raw[i];
+        len += 8;
+
+        // Cứ mỗi khi đủ 5 bit, lấy ra một ký tự Base32
+        while (len >= 5) {
+          output += alphabet[(val >>> (len - 5)) & 31];
+          len -= 5;
+        }
+      }
+
+      // Xử lý các bit dư thừa còn lại
+      if (len > 0) {
+        output += alphabet[(val << (5 - len)) & 31];
+      }
+
+      // Thêm Padding để đúng chuẩn RFC (Độ dài phải là bội số của 8)
+      while (output.length % 8 !== 0) {
+        output += "=";
+      }
+
+      return output;
+    },
+    /**
+     * The data in the URI from Google Authenticator
+     * is a protobuff payload which is Base64 encoded and then URI encoded.
+     * This function decodes those, and then decodes the protobuf data contained inside.
+     *
+     * @param {String} data the `data` query parameter from the totp migration string that google authenticator outputs.
+     */
+    async decode(data) {
+      let me = this;
+      let buffer = Buffer.from(decodeURIComponent(data), "base64");
+
+      let payload = await me.decodeProtobuf(buffer);
+      let accounts = payload.otpParameters.map((account) => {
+        account.secret = me.toBase32(account.secret);
+        return account;
+      });
+
+      return accounts;
+    },
+
+    /**
+     * @param {string} uri The raw QR code uri
+     * @returns decoded data with account info
+     */
+    async decodeExportUri(uri) {
+      let me = this;
+      let queryParams = new URL(uri).search;
+      let data = new URLSearchParams(queryParams).get("data");
+
+      return await me.decode(data);
+    },
+    addNewTOTP() {
+      let me = this;
+      if (me.addNewObject) {
+        let clonedObject = me.$tmUtility.cloneDeep(toRaw(me.addNewObject));
+        if (clonedObject) {
+          me.decodedData.push(clonedObject);
+          me.$tmToast.success(me.$t("i18nCommon.toastMessage.success"));
+          me.buildData();
+          me.addNewObject = {
+            issuer: null,
+            name: null,
+            secret: null,
+            algorithm: "SHA1",
+            digits: "six",
+            counter: 0,
+            type: "TOTP",
+          };
+          // lưu lại authen sau khi thêm mới
+          if (me.password && me.username && me.autoSave) {
+            me.saveAuthen();
+          }
+          me.generateTOTP(clonedObject.secret);
+        }
+      }
+    },
+    removeByFilter() {
+      let me = this;
+      if (me.filterRemove) {
+        // nếu là xóa tất cả
+        // thì xóa tất cả
+        if (me.filterRemove == me.removeAllKey) {
+          me.decodedData = [];
+        } else {
+          // nếu không thì xóa theo tên authen
+          // tìm và xóa authen theo tên
+          me.decodedData = me.decodedData.filter((item) => {
+            return item.displayName != me.filterRemove;
+          });
+        }
+        // lưu lại authen sau khi xóa
+        if (me.password && me.username && me.autoSave) {
+          me.saveAuthen();
+        }
+        me.$tmToast.success(me.$t("i18nCommon.toastMessage.removed"));
+      }
+    },
+    startProgressTimer() {
+      let me = this;
+      if (me.progressIntervalId) {
+        clearInterval(me.progressIntervalId);
+      }
+
+      me.progressIntervalId = setInterval(() => {
+        const seconds = Math.floor(Date.now() / 1000) % 30;
+        me.progress = Math.floor((seconds / 30) * 100);
+      }, 1000);
+    },
+  },
+  data() {
+    return {
+      keyCacheLayout: this.$tmEnum.cacheConfig.OneTimePasswordConfigLayout,
+      currentConfigLayout: {
+        isShowSidebar: true,
+        currentSidebarOption: this.$tmEnum.ToolSidebarOption.Help,
+        showDecodedInfo: false,
+        autoSave: true,
+      },
+      filterOtp: null,
+      migrationURL: null,
+      decodedData: null,
+      decodedDataString: null,
+      password: null,
+      username: null,
+      timeoutId: null,
+      filterRemove: null,
+      progress: 0,
+      addNewObject: {
+        issuer: null,
+        name: null,
+        secret: null,
+        algorithm: "SHA1",
+        digits: "six",
+        counter: 0,
+        type: "TOTP",
+      },
+      removeAllKey: "removeall",
+      sourceOTPImport: "googleqrcode",
+      radioImports: [
+        {
+          value: "googleqrcode",
+          label: this.$t("i18nCommon.oneTimePassword.importOptions.googleQR"),
+        },
+        {
+          value: "google",
+          label: this.$t("i18nCommon.oneTimePassword.importOptions.google"),
+        },
+        {
+          value: "manual",
+          label: this.$t("i18nCommon.oneTimePassword.importOptions.manual"),
+        },
+      ],
+    };
+  },
+};
+</script>
+
+<style scoped lang="scss">
+.tm-otp {
+  width: 100%;
+  height: 100%;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+}
+.note {
+  color: var(--warning-color);
+  margin: var(--padding);
+}
+.main-otp-container {
+  flex: 1;
+  width: 100%;
+  overflow: auto;
+  .tm-decoded-data {
+    padding: var(--padding);
+  }
+  .otp-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--padding);
+    width: 100%;
+    padding: var(--padding) 0;
+  }
+
+  .otp-item {
+    position: relative;
+    display: flex;
+    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 60px;
+    padding: var(--padding);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    .otp-left {
+      display: flex;
+      flex-direction: column;
+      min-width: 0; /* CỰC KỲ QUAN TRỌNG */
+      flex: 1;
+      .otp-name {
+        font-weight: bold;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .otp-type {
+        font-size: 12px;
+        color: var(--focus-color);
+      }
+    }
+    .otp-value {
+      font-size: 30px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .otp-value:active {
+      font-size: 32px;
+    }
+  }
+}
+
+.otp-header {
+  width: 100%;
+  .tm-first-header {
+    width: 100%;
+    margin-bottom: var(--padding);
+    .flex-one {
+      gap: var(--padding);
+    }
+  }
+  .tm-second-header {
+    width: 100%;
+    gap: var(--padding);
+  }
+  .otp-progress-wrapper {
+    width: 100%;
+    progress {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      appearance: none;
+      &::-webkit-progress-bar {
+        background-color: var(--bg-layer-color);
+        border-radius: 4px;
+      }
+      &::-webkit-progress-value {
+        background-color: var(--focus-color);
+        border-radius: 4px;
+      }
+    }
+  }
+}
+.tm-sub-sidebar {
+  height: 100%;
+  justify-content: flex-start;
+  width: 100%;
+  overflow: auto;
+}
+.footer-section {
+  margin-top: var(--padding);
+  gap: var(--padding);
+}
+</style>

@@ -5,18 +5,18 @@ echo "--- Bắt đầu quy trình daemon ---"
 ROOT_DIR=$(pwd)
 
 # ĐỌC VERSION TỪ PACKAGE.JSON (giống cách Vite lấy version cho UI)
-. "$ROOT_DIR/scripts/td_version.sh"
+. "$ROOT_DIR/scripts/tm_version.sh"
 
-VERSION=$(td_get_version)
+VERSION=$(tm_get_version)
 
 echo "Phiên bản hiện tại: $VERSION"
 
 # gắn version vào binary Go, API health check sẽ trả về version này cho UI
-LDFLAGS=$(td_get_go_ldflags "$VERSION")
+LDFLAGS=$(tm_get_go_ldflags "$VERSION")
 
 # Cấu hình đường dẫn
-DAEMON_DIR="$ROOT_DIR/src_backend/td_app/cmd/daemon_app"
-WEB_APP_DIR="$ROOT_DIR/src_backend/td_core_service/internal/web/dist/"
+DAEMON_DIR="$ROOT_DIR/src_backend/tm_app/cmd/daemon_app"
+WEB_APP_DIR="$ROOT_DIR/src_backend/tm_core_service/internal/web/dist/"
 FRONTEND_DIST="$ROOT_DIR/dist"
 OUTPUT_DIR="$ROOT_DIR/out"
 

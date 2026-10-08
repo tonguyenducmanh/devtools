@@ -1,7 +1,7 @@
 /* Không scoped — dùng Teleport nên cần global */
 
 /* ============ Style chung cho mọi flyout panel ============ */
-.td-flyout-panel {
+.tm-flyout-panel {
   background-color: var(--bg-main-color);
   border: 1px solid var(--bg-layer-color);
   border-radius: var(--border-radius);
@@ -11,70 +11,70 @@
 }
 
 /* ============ Transition theo từng hướng mở ============
-   Tên class được TDFlyoutPanel tự chọn dựa trên placement đã
+   Tên class được TMFlyoutPanel tự chọn dựa trên placement đã
    resolve (kể cả khi auto-flip do sát mép màn hình), nên item
    nào cũng tự có animation đúng hướng mà không cần khai báo gì thêm. */
 
-.td-flyout-bottom-enter-active,
-.td-flyout-bottom-leave-active {
+.tm-flyout-bottom-enter-active,
+.tm-flyout-bottom-leave-active {
   transition:
     opacity 0.15s ease,
     transform 0.15s ease;
 }
-.td-flyout-bottom-leave-active {
+.tm-flyout-bottom-leave-active {
   transition-duration: 0.1s;
 }
-.td-flyout-bottom-enter-from,
-.td-flyout-bottom-leave-to {
+.tm-flyout-bottom-enter-from,
+.tm-flyout-bottom-leave-to {
   opacity: 0;
   transform: translateY(-4px);
 }
 
-.td-flyout-top-enter-active,
-.td-flyout-top-leave-active {
+.tm-flyout-top-enter-active,
+.tm-flyout-top-leave-active {
   transition:
     opacity 0.15s ease,
     transform 0.15s ease;
 }
-.td-flyout-top-leave-active {
+.tm-flyout-top-leave-active {
   transition-duration: 0.1s;
 }
-.td-flyout-top-enter-from,
-.td-flyout-top-leave-to {
+.tm-flyout-top-enter-from,
+.tm-flyout-top-leave-to {
   opacity: 0;
   transform: translateY(4px);
 }
 
-.td-flyout-right-enter-active,
-.td-flyout-right-leave-active {
+.tm-flyout-right-enter-active,
+.tm-flyout-right-leave-active {
   transition:
     opacity 0.15s ease,
     transform 0.15s ease;
 }
-.td-flyout-right-leave-active {
+.tm-flyout-right-leave-active {
   transition-duration: 0.1s;
 }
-.td-flyout-right-enter-from,
-.td-flyout-right-leave-to {
+.tm-flyout-right-enter-from,
+.tm-flyout-right-leave-to {
   opacity: 0;
   transform: translateX(-6px);
 }
 
-.td-flyout-left-enter-active,
-.td-flyout-left-leave-active {
+.tm-flyout-left-enter-active,
+.tm-flyout-left-leave-active {
   transition:
     opacity 0.15s ease,
     transform 0.15s ease;
 }
-.td-flyout-left-leave-active {
+.tm-flyout-left-leave-active {
   transition-duration: 0.1s;
 }
-.td-flyout-left-enter-from,
-.td-flyout-left-leave-to {
+.tm-flyout-left-enter-from,
+.tm-flyout-left-leave-to {
   opacity: 0;
   transform: translateX(6px);
 }
-.td-menu-item {
+.tm-menu-item {
   display: flex;
   align-items: center;
   padding: 4px 10px;
@@ -95,8 +95,8 @@
   }
 }
 
-/* ============ Combo box flyout (TDComboBox): nội dung riêng ============ */
-.td-flyout-panel.td-combobox-flyout {
+/* ============ Combo box flyout (TMComboBox): nội dung riêng ============ */
+.tm-flyout-panel.tm-combobox-flyout {
   /* panel mặc định có padding 4px, combo box tự lo phần danh sách option
      nên bỏ padding để viền panel khớp đúng danh sách */
   padding: 0;
@@ -107,11 +107,11 @@
 }
 
 /* ============ Header dropdown: nội dung riêng ============ */
-.td-header-flyout {
+.tm-header-flyout {
   min-width: 160px;
 }
 
-.td-flyout-title {
+.tm-flyout-title {
   padding: 8px 12px 4px;
   font-size: var(--font-size-small);
   font-weight: 700;
@@ -119,12 +119,12 @@
   opacity: 0.6;
 }
 
-/* ============ Query action flyout (TDPostgreSQLQuery): nội dung riêng ============ */
-.td-query-action-flyout {
+/* ============ Query action flyout (TMPostgreSQLQuery): nội dung riêng ============ */
+.tm-query-action-flyout {
   min-width: 200px;
 }
 
-.td-flyout-item {
+.tm-flyout-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -146,19 +146,19 @@
   }
 }
 
-.td-flyout-item--logo {
+.tm-flyout-item--logo {
   font-weight: 700;
   color: var(--text-color);
 }
 
 /* ============ Sidebar group flyout: nội dung riêng ============ */
-.td-sidebar-group-flyout {
+.tm-sidebar-group-flyout {
   padding: calc(var(--padding) / 2);
   overflow: hidden;
   min-width: 200px;
 }
 
-.td-sidebar-flyout-row {
+.tm-sidebar-flyout-row {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -167,13 +167,13 @@
   &:hover {
     background-color: var(--focus-color);
     color: var(--selected-item-text-color);
-    .td-flyout-pin-btn {
+    .tm-flyout-pin-btn {
       opacity: 1;
     }
   }
 }
 
-.td-sidebar-flyout-item {
+.tm-sidebar-flyout-item {
   flex: 1;
   display: block;
   padding: var(--padding);
@@ -192,7 +192,7 @@
   }
 }
 
-.td-flyout-pin-btn {
+.tm-flyout-pin-btn {
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -215,7 +215,7 @@
     opacity: 1;
   }
 }
-.td-toolbar-btn-disabled {
+.tm-toolbar-btn-disabled {
   opacity: 0.3 !important;
   pointer-events: none !important;
   cursor: default !important;

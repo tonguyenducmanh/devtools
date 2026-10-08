@@ -1,0 +1,361 @@
+import tmEnum from "@/common/TMEnum.js";
+
+/**
+ * Cấu hình cache
+ * @typedef {Object} CacheConfig
+ * @property {string} KeyFormat - Định dạng khóa (có thể chứa {id})
+ * @property {number} CacheLevel - Cấp độ cache (local, session, indexedDB)
+ * @property {number} ExpireTime - Thời gian hết hạn (0 là không hết hạn)
+ * @property {string} Note - Ghi chú về cache
+ */
+
+export const TMCacheConfig = {
+  QRHistory: {
+    KeyFormat: "QRHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử quét mã",
+  },
+  APIHistory: {
+    KeyFormat: "APIHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử gọi API",
+  },
+  APIPromodeHistory: {
+    KeyFormat: "APIPromodeHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử gọi API",
+  },
+  JSONToExcelHistory: {
+    KeyFormat: "JSONToExcelHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử json xuất ra excel",
+  },
+  JSONToPostgreSQLHistory: {
+    KeyFormat: "JSONToPostgreSQLHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử json convert thành postgresql",
+  },
+  CodeFormatterHistory: {
+    KeyFormat: "CodeFormatterHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử format code",
+  },
+  HTMLPreviewHistory: {
+    KeyFormat: "HTMLPreviewHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử preview HTML",
+  },
+  APICollection: {
+    KeyFormat: "APICollection",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "collection API được lưu bởi user",
+  },
+  OneTimeAuthen: {
+    KeyFormat: "OneTimeAuthen_{id}",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "cài đặt xác thực",
+  },
+  LastOneTimeAuthenUserName: {
+    KeyFormat: "LastOneTimeAuthenUserName",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "tên đăng nhập xác thực một lần cuối cùng",
+  },
+  LastOneTimeAuthenPassword: {
+    KeyFormat: "LastOneTimeAuthenPassword",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "mật khẩu đăng nhập xác thực theo user, chỉ được phép lưu trong mem",
+  },
+  APIConfigLayout: {
+    KeyFormat: "APIConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool api",
+  },
+  APIMockConfigLayout: {
+    KeyFormat: "APIMockConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool mock api",
+  },
+  TMAutomationConfigLayout: {
+    KeyFormat: "TMAutomationConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool automation",
+  },
+  UserSettings: {
+    KeyFormat: "UserSettings",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình thiết lập của user",
+  },
+  QRCodeToTextConfigLayout: {
+    KeyFormat: "QRCodeToTextConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool QR code to text",
+  },
+  TextToQRCodeConfigLayout: {
+    KeyFormat: "TextToQRCodeConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool text to QR code",
+  },
+  TextGeneratorConfigLayout: {
+    KeyFormat: "TextGeneratorConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool text generator",
+  },
+  TextManipulationConfigLayout: {
+    KeyFormat: "TextManipulationConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool text manipulation",
+  },
+  WelcomeLayout: {
+    KeyFormat: "WelcomeLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout WelcomeLayout",
+  },
+  TextCompressConfigLayout: {
+    KeyFormat: "TextCompressConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool text compress",
+  },
+  CodeFormatterConfigLayout: {
+    KeyFormat: "CodeFormatterConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool code formatter",
+  },
+  CompareCodeConfigLayout: {
+    KeyFormat: "CompareCodeConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool compare code",
+  },
+  CosinSimilarityConfigLayout: {
+    KeyFormat: "CosinSimilarityConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool cosin similarity",
+  },
+  ColorPickerConfigLayout: {
+    KeyFormat: "ColorPickerConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool color picker",
+  },
+  JSONToExcelConfigLayout: {
+    KeyFormat: "JSONToExcelConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool JSON to Excel",
+  },
+  JSONToModelConfigLayout: {
+    KeyFormat: "JSONToModelConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool JSON to Model",
+  },
+  JSONSortByKeyConfigLayout: {
+    KeyFormat: "JSONSortByKeyConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool JSON sort by key",
+  },
+  JSONToOneLineStringConfigLayout: {
+    KeyFormat: "JSONToOneLineStringConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool JSON to One Line String",
+  },
+  JSONToPostgreSQLConfigLayout: {
+    KeyFormat: "JSONToPostgreSQLConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool JSON to PostgreSQL",
+  },
+  Base64ToImageConfigLayout: {
+    KeyFormat: "Base64ToImageConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool Base64 to Image",
+  },
+  ImageToBase64ConfigLayout: {
+    KeyFormat: "ImageToBase64ConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool Image to Base64",
+  },
+  OneTimePasswordConfigLayout: {
+    KeyFormat: "OneTimePasswordConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool One Time Password",
+  },
+  OpticalCharacterRecognitionConfigLayout: {
+    KeyFormat: "OpticalCharacterRecognitionConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool Optical Character Recognition",
+  },
+  RemoteDesktopConfigLayout: {
+    KeyFormat: "RemoteDesktopConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool Remote Desktop RDP",
+  },
+  BilingualWebConfigLayout: {
+    KeyFormat: "BilingualWebConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool Bilingual Web",
+  },
+  MindMapHistory: {
+    KeyFormat: "MindMapHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử auto-save mind map",
+  },
+  PostgreSQLTemplateConfigLayout: {
+    KeyFormat: "PostgreSQLTemplateConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool PostgreSQL Template",
+  },
+  BilingualWebHistory: {
+    KeyFormat: "BilingualWebHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử dịch trang web song ngữ",
+  },
+  BlankTextConfigLayout: {
+    KeyFormat: "BlankTextConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool blank text",
+  },
+  PostgreSQLQueryConfigLayout: {
+    KeyFormat: "PostgreSQLQueryConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool PostgreSQL Query",
+  },
+  PostgreSQLQueryHistory: {
+    KeyFormat: "PostgreSQLQueryHistory_{id}",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "cache intellisense PostgreSQL theo connection id",
+  },
+  PostgreSQLBuiltinIntellisense: {
+    KeyFormat: "PostgreSQLBuiltinIntellisense",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "cache gợi ý built-in PostgreSQL (pg_catalog + information_schema), dùng chung cho mọi kết nối",
+  },
+  PostgreSQLLastConnectionId: {
+    KeyFormat: "PostgreSQLLastConnectionId",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "cache kết nối database gần nhất thao tác",
+  },
+  PostgreSQLSavedQuery: {
+    KeyFormat: "PostgreSQLSavedQuery",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "danh sách saved query PostgreSQL",
+  },
+  MonacoTheme: {
+    KeyFormat: "MonacoTheme",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache theme monaco editor do user chọn riêng",
+  },
+  VectorMockGeneratorConfigLayout: {
+    KeyFormat: "VectorMockGeneratorConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool vector mock generator",
+  },
+  PostgreSQLBinPath: {
+    KeyFormat: "PostgreSQLBinPath",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache đường dẫn file bin PostgreSQL của user",
+  },
+  AppDataMinerSchema: {
+    KeyFormat: "AppDataMinerSchema",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "cache schema tables+columns của AppDataMiner",
+  },
+  ExcelToJSONConfigLayout: {
+    KeyFormat: "ExcelToJSONConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool Excel to JSON",
+  },
+  HTMLPreviewConfigLayout: {
+    KeyFormat: "HTMLPreviewConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool HTML Preview",
+  },
+  TextToQRCodeHistory: {
+    KeyFormat: "TextToQRCodeHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử text to QR code",
+  },
+  BlankTextHistory: {
+    KeyFormat: "BlankTextHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử tool blank text",
+  },
+  JSONToOneLineStringHistory: {
+    KeyFormat: "JSONToOneLineStringHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử json convert thành 1 dòng string",
+  },
+  JSONToModelHistory: {
+    KeyFormat: "JSONToModelHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử json convert thành model",
+  },
+  JSONSortByKeyHistory: {
+    KeyFormat: "JSONSortByKeyHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử json sort by key",
+  },
+  QRCodeToTextHistory: {
+    KeyFormat: "QRCodeToTextHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử tool QR code to text",
+  },
+  AgreementAccepted: {
+    KeyFormat: "AgreementAccepted",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "đã đọc và đồng ý điều khoản sử dụng, chỉ hiện popup điều khoản 1 lần",
+  },
+};

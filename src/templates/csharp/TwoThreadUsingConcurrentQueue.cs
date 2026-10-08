@@ -4,7 +4,7 @@
 
 using System.Collections.Concurrent;
 
-namespace TDProject.Core.Business;
+namespace TMProject.Core.Business;
 
 /// <summary>
 /// Test chạy song song 2 luồng bằng kiểu dữ liệu concurrentqueue
@@ -88,7 +88,7 @@ public class TwoThreadUsingConcurrentQueue
         while (_concurrentQueueDBIds.Count > 0)
         {
             // nếu còn đang xử lý thì chưa dừng thread chính để trace log
-            TDSlowMethod.CPUBurnByTime(TimeSpan.FromSeconds(2));
+            TMSlowMethod.CPUBurnByTime(TimeSpan.FromSeconds(2));
         }
     }
 

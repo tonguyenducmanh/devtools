@@ -1,0 +1,22 @@
+// enum for event bus global events
+// each event only emit from one place
+
+export const TMEnumEventBus = {
+  // Zen mode (fullscreen tab content)
+  zenModeToggle: "zenModeToggle",
+
+  // Zen mode state change (broadcast current zen mode)
+  zenModeState: "zenModeState",
+
+  // Theme changed (preview or apply)
+  themeChanged: "themeChanged",
+
+  // Background effect changed (apply)
+  backgroundEffectChanged: "backgroundEffectChanged",
+
+  // Cursor effect changed (apply)
+  cursorEffectChanged: "cursorEffectChanged",
+
+  // Welcome background changed (apply)
+  welcomeBackgroundChanged: "welcomeBackgroundChanged",
+};

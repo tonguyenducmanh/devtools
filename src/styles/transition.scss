@@ -1,14 +1,14 @@
-.td-fade-loading-enter-active,
-.td-fade-loading-leave-active {
+.tm-fade-loading-enter-active,
+.tm-fade-loading-leave-active {
   transition: opacity 0.4s ease;
 }
 
-.td-fade-loading-enter-from,
-.td-fade-loading-leave-to {
+.tm-fade-loading-enter-from,
+.tm-fade-loading-leave-to {
   opacity: 0;
 }
 
-.td-fade-loading-enter-to,
-.td-fade-loading-leave-from {
+.tm-fade-loading-enter-to,
+.tm-fade-loading-leave-from {
   opacity: 1;
 }

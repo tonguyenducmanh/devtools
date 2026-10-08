@@ -95,7 +95,7 @@ export default {
       filterClear: "Xóa tìm kiếm",
       filterEmptyResult: "Không có kết quả phù hợp",
     },
-    tdheader: {
+    tmheader: {
       toggleTheme: "Thay đổi chủ đề",
       changeLanguage: "Thay đổi ngôn ngữ",
       goToSource: "Source code",
@@ -784,7 +784,7 @@ export default {
       copy: "Sao chép",
       example: "Ví dụ",
     },
-    TDTextEditor: {
+    TMTextEditor: {
       sortByKey: "JSON sắp xếp theo key",
     },
     blanktext: {

@@ -1,6 +1,6 @@
 import { reactive, computed } from "vue";
 import i18nGlobal from "@/i18n/global/i18nGlobal.js";
-import utility from "@/common/TDUtility.js";
+import utility from "@/common/TMUtility.js";
 
 /**
  * Tự quản lý logic đa ngôn ngữ thay vì xài thư viện bên ngoài

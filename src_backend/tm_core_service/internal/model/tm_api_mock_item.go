@@ -1,0 +1,56 @@
+package model
+
+import "strings"
+
+// param api mock muốn tạo
+type TMAPIMockItem struct {
+	TMBaseModel
+	RequestName string `json:"request_name"`
+	GroupID     string `json:"group_id"`
+	Method      string `json:"method"`
+	Endpoint    string `json:"end_point"`
+	HeadersText string `json:"headers_text"`
+	BodyText    string `json:"body_text"`
+	// BodyType là kiểu body: json hoặc form_data
+	BodyType string `json:"body_type"`
+	// FormDataText là danh sách field của body form_data, lưu dạng json
+	// không lưu nội dung file (base64) vì quá nặng, chỉ lưu tên file và kiểu
+	FormDataText        string `json:"form_data_text"`
+	ResponeText         string `json:"response_text"`
+	ResponseHeadersText string `json:"response_headers_text"`
+	StatusCode          int    `json:"status_code"`
+}
+
+func (m TMAPIMockItem) TableName() string {
+	return "tm_api_mock"
+}
+
+// GetGroupID trả về id của nhóm chứa mock này, rỗng nghĩa là chưa gán nhóm
+func (m TMAPIMockItem) GetGroupID() string {
+	return m.GroupID
+}
+
+// IsFormData kiểm tra body của mock có phải multipart/form-data không
+func (m TMAPIMockItem) IsFormData() bool {
+	return m.BodyType == TMAPIBodyTypeFormData
+}
+
+// HasBody kiểm tra mock có khai báo body để đối chiếu với request không.
+// Mock không khai báo body thì được dùng làm mặc định cho mọi request cùng endpoint
+func (m TMAPIMockItem) HasBody() bool {
+	if m.IsFormData() {
+		return strings.TrimSpace(m.FormDataText) != "" && m.FormDataText != "null"
+	}
+	return strings.TrimSpace(m.BodyText) != "" && m.BodyText != "null"
+}
+
+// model quản lý nhóm của api mock.
+// Cấu trúc giống mọi bảng group khác (id, name, created_date, modified_date) nên
+// dùng chung TMGroupModel, giúp generic collection controller xử lý được như các tool còn lại.
+type TMAPIMockGroup struct {
+	TMGroupModel
+}
+
+func (g TMAPIMockGroup) TableName() string {
+	return "tm_api_mock_group"
+}

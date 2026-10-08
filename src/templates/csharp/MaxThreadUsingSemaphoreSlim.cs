@@ -3,7 +3,7 @@
 
 using System.Collections.Concurrent;
 
-namespace TDProject.Core.Business;
+namespace TMProject.Core.Business;
 
 /// <summary>
 /// Chạy max thread sử dụng SemaphoreSlim

@@ -94,7 +94,7 @@ export default {
       filterClear: "Clear search",
       filterEmptyResult: "No matching results",
     },
-    tdheader: {
+    tmheader: {
       toggleTheme: "Change theme",
       changeLanguage: "Change language",
       goToSource: "Source code",
@@ -788,7 +788,7 @@ export default {
       copy: "Copy",
       example: "Example",
     },
-    TDTextEditor: {
+    TMTextEditor: {
       sortByKey: "Sort JSON by key",
     },
     blanktext: {
