@@ -65,7 +65,7 @@ vite.config.js                  Build frontend; viteStaticCopy wasm → dist/ass
 9. **Không phá WASM đã commit.** `src_wasm/pkg/*` được commit thẳng để CI/Cloudflare chỉ cần `npm run build`. Khi build lại wasm, source được `scripts/git_pull_if_repo.sh` cập nhật về nhánh mặc định rồi mới build.
 10. **`window.__tdAPI` là cầu nối chung.** `automation.agentURL` quyết định URL agent (UI tự đọc để gọi API); `automation.*` là các hàm inject cho tool Automation; `dotnetExports` từ .NET WASM. Đừng đổi shape tùy tiện mà không cập nhật tất cả nơi dùng.
 11. **Dialog enum append-only.** `TMDialogEnum` + `DialogComponentMap` nằm trong `src/common/TMDialogUtil.js`. Thêm dialog mới = thêm enum ở CUỐI `TMDialogEnum` + mapping trong `DialogComponentMap` + component trong `views/dialogs/`. Không đổi/đảo số enum cũ.
-12. **Không commit artifact.** `dist/`, `out/`, `node_modules/`, `config.json`, `*.db*`, `src_wasm/*/external_repo/` đều gitignore.
+12. **Không commit artifact.** `dist/`, `out/`, `node_modules/`, `config.json`, `*.db*`, `src_wasm/*/external_repo/` đều gitignore. `build_daemon.sh` nén 3 binary cuối cùng (mac/linux → `.tar.gz`, window → `.zip`) rồi xoá bản thô, nên `out/` chỉ còn file upload release — upload thẳng cả thư mục.
 
 ## 4. Chọn việc làm
 

@@ -53,6 +53,16 @@ chmod 777 ./build_all.sh
 ./build_all.sh
 ```
 
+`build_all.sh` xuất ra `out/` cho 3 hệ điều hành, kèm bản nén để upload release:
+
+| File | Nén |
+|---|---|
+| `dev-tool-mac-arm-<VERSION>` | `dev-tool-mac-arm-<VERSION>.tar.gz` |
+| `dev-tool-linux-<VERSION>` | `dev-tool-linux-<VERSION>.tar.gz` |
+| `dev-tool-window-<VERSION>.exe` | `dev-tool-window-<VERSION>.exe.zip` |
+
+Nén xong binary thô bị xoá, nên `out/` chỉ còn lại file nén — upload thẳng cả thư mục này.
+
 ## Cấu hình
 
 Các dịch vụ backend được cấu hình hoặc mặc định thông qua `config/config.json`.

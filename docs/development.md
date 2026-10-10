@@ -83,7 +83,7 @@ Trong mỗi `build.sh`, source được lấy từ `src_wasm/<tên>/external_rep
 - Version 1 nguồn: biến `VERSION` khi build, hoặc `package.json.version`.
 - UI: `vite.config.js` → `import.meta.env.PACKAGE_VERSION` → tên file assets có version.
 - BE: `scripts/tm_version.sh` → ldflags `-X tm_config.Version=…` → health check `/` trả `beVersion`.
-- Release: tag `v<version>`, `build_all.sh` tạo `out/dev-tool-…-<VERSION>`, upload GitHub Releases (header có mục "Download agent").
+- Release: tag `v<version>`, `build_all.sh` tạo `out/dev-tool-…-<VERSION>` cho 3 OS rồi **xoá bản thô**, chỉ giữ lại archive: mac/linux → `.tar.gz`, window → `.zip`. Nén do `build_daemon.sh` làm ở bước cuối (`-6` cho tar.gz, `-9` cho zip). Bản thô chỉ bị xoá khi archive đã tạo ra và không rỗng — nén lỗi thì giữ binary lại. Thiếu lệnh `tar`/`zip` thì giữ nguyên bản thô và chỉ cảnh báo, không làm build fail. Header trỏ tới trang releases chung nên đổi định dạng không phải sửa link.
 - Dọn tag cũ: `scripts/remove_old_tag.sh` (giữ `EXCLUDE_TAGS`, hiện `v16.1.5`).
 
 ## 7. Debug
