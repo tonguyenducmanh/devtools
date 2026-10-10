@@ -9,6 +9,12 @@ echo "========================================="
 echo "STARTING TOTAL WASM BUILD PROCESS"
 echo "========================================="
 
+# 0. Đảm bảo có nguồn external repo để build (clone on-demand, không phải submodule)
+if [ -f "$ROOT_DIR/scripts/fetch_wasm_sources.sh" ]; then
+    chmod +x "$ROOT_DIR/scripts/fetch_wasm_sources.sh"
+    "$ROOT_DIR/scripts/fetch_wasm_sources.sh"
+fi
+
 # 1. Build Rust WASM (IronRDP)
 if [ -d "$RUST_MODULE_DIR" ]; then
     echo "Entering Rust Module..."
@@ -31,6 +37,21 @@ if [ -d "$DOTNET_MODULE_DIR" ]; then
     ./build.sh
 else
     echo "Error: C# directory $DOTNET_MODULE_DIR not found!"
+    exit 1
+fi
+
+# Quay lại root
+cd "$ROOT_DIR"
+
+# 3. Build PhotoCraft WASM (web app Rust)
+PHOTOCRAFT_MODULE_DIR="$ROOT_DIR/src_wasm/photocraft"
+if [ -d "$PHOTOCRAFT_MODULE_DIR" ]; then
+    echo "Entering PhotoCraft Module..."
+    cd "$PHOTOCRAFT_MODULE_DIR"
+    chmod +x ./build.sh
+    ./build.sh
+else
+    echo "Error: PhotoCraft directory $PHOTOCRAFT_MODULE_DIR not found!"
     exit 1
 fi
 

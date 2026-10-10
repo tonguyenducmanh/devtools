@@ -33,6 +33,7 @@ export default {
       API: "Tích hợp API",
       JSON: "Xử lý JSON",
       Image: "Xử lý ảnh",
+      GraphicDesign: "Thiết kế đồ họa",
       Text: "Văn bản",
       ArtificialIntelligence: "Tích hợp AI",
       RemoteDesktop: "Máy tính từ xa",
@@ -197,6 +198,7 @@ export default {
       Automation: "Tự động hóa",
       APIMocking: "API mocking",
       remoteDesktopRDP: "Window RDP",
+      PhotoCraft: "Chỉnh sửa ảnh",
       PostgreSQLTemplate: "Code mẫu PostgreSQL",
       CSharpTemplate: "Code mẫu C#",
       JavaScriptTemplate: "Code mẫu JavaScript",
@@ -862,6 +864,13 @@ export default {
       downloaded: "Đã tải xuống",
       downloadFailed: "Tải file thất bại",
       downloadAborted: "Huỷ tải file",
+    },
+    photoCraft: {
+      loading: "Đang tải PhotoCraft...",
+      loadingHint:
+        "PhotoCraft đang được tải về và khởi động (web assembly ~19MB). Nếu màn hình này kéo dài, có thể bạn chưa build wasm PhotoCraft (xem src_wasm/photocraft/README.md).",
+      loadFailed:
+        "Không thể tải PhotoCraft. Kiểm tra xem đã build wasm chưa, hoặc thử tải lại trang.",
     },
     dateTime: {
       placeholder: "dd/mm/yyyy hh:mm:ss",

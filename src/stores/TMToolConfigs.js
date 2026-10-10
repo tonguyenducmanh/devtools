@@ -19,6 +19,20 @@ const sidebarConfig = [
     meta: { titleKey: "i18nCommon.feature.userSettings" },
   },
   {
+    type: "group",
+    groupKey: "graphicdesign",
+    groupTitleKey: "i18nCommon.group.GraphicDesign",
+    children: [
+      {
+        name: "TMPhotoCraft",
+        component: () => import("@/views/tools/TMPhotoCraft.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.PhotoCraft",
+        },
+      },
+    ],
+  },
+  {
     type: "route",
     name: "TMOneTimePassword",
     component: () => import("@/views/tools/TMOneTimePassword.vue"),

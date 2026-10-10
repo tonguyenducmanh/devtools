@@ -8,7 +8,14 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+EXTERNAL_DIR="$SCRIPT_DIR/external_repo"
 OUTPUT_DIR="$(dirname "$SCRIPT_DIR")/pkg"
+
+# Đảm bảo có external repo để build (clone on-demand, không phải submodule)
+if [ ! -d "$EXTERNAL_DIR" ]; then
+    echo "external_repo chưa có, đang clone..."
+    "$(dirname "$SCRIPT_DIR")/../scripts/fetch_wasm_sources.sh"
+fi
 
 echo "Building IronRDP WASM..."
 echo "Output directory: $OUTPUT_DIR"

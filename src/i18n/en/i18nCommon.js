@@ -33,6 +33,7 @@ export default {
       API: "API intergate",
       JSON: "JSON building",
       Image: "Image handle",
+      GraphicDesign: "Graphic Design",
       Text: "Text",
       ArtificialIntelligence: "AI tooling",
       RemoteDesktop: "Remote Desktop",
@@ -196,6 +197,7 @@ export default {
       Automation: "Automation",
       APIMocking: "API mocking",
       remoteDesktopRDP: "Window RDP",
+      PhotoCraft: "Photo editor",
       PostgreSQLTemplate: "PostgreSQL Template",
       CSharpTemplate: "C# template",
       JavaScriptTemplate: "JavaScript template",
@@ -866,6 +868,13 @@ export default {
       downloaded: "Downloaded",
       downloadFailed: "Download failed",
       downloadAborted: "Download aborted",
+    },
+    photoCraft: {
+      loading: "Loading PhotoCraft...",
+      loadingHint:
+        "PhotoCraft is downloading and starting up (web assembly ~19MB). If this screen stays for a long time, you may need to build the PhotoCraft wasm first (see src_wasm/photocraft/README.md).",
+      loadFailed:
+        "Could not load PhotoCraft. Check that the wasm was built, or try reloading the page.",
     },
     dateTime: {
       placeholder: "dd/mm/yyyy hh:mm:ss",

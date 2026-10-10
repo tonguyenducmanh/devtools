@@ -99,6 +99,12 @@ func spaHandler(fsys fs.FS) http.HandlerFunc {
 		// Check if the file exists
 		if file, err := fsys.Open(cleanPath); err == nil {
 			file.Close()
+			// Go's mime database không nhận diện .wasm trên mọi OS (đặc biệt Windows),
+			// nên ép MIME chuẩn để browser stream-compile wasm
+			// (WebAssembly.instantiateStreaming) thay vì fallback chậm.
+			if strings.EqualFold(filepath.Ext(cleanPath), ".wasm") {
+				w.Header().Set("Content-Type", "application/wasm")
+			}
 			fileServer.ServeHTTP(w, r)
 			return
 		}

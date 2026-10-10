@@ -20,6 +20,12 @@ export default defineConfig({
           dest: `assets-wasm-${APP_VERSION}`,
           rename: { stripBase: true },
         },
+        // Copy static site PhotoCraft (index.html + js + wasm) sang dist/assets-wasm/photocraft
+        {
+          src: "src_wasm/pkg/photocraft/*",
+          dest: `assets-wasm-${APP_VERSION}/photocraft`,
+          rename: { stripBase: true },
+        },
       ],
     }),
   ],
