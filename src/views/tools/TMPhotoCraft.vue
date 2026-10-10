@@ -1,38 +1,55 @@
 <template>
-  <div class="tm-photocraft-container">
-    <iframe
-      ref="photocraftFrame"
-      class="photocraft-frame"
-      :src="iframeSrc"
-      title="PhotoCraft"
-      allow="fullscreen; clipboard-read; clipboard-write"
-      allowfullscreen
-      @load="onIframeLoad"
-      @error="onIframeError"
-    ></iframe>
-    <div v-if="isLoading" class="photocraft-loading" @click.stop>
-      <TMLoading />
-      <p class="photocraft-loading-text">
-        {{ $t("i18nCommon.photoCraft.loading") }}
-      </p>
-      <p v-if="loadFailed" class="photocraft-loading-error">
-        {{ $t("i18nCommon.photoCraft.loadFailed") }}
-      </p>
-      <p v-else class="photocraft-loading-hint">
-        {{ $t("i18nCommon.photoCraft.loadingHint") }}
-      </p>
+  <TMFullTabWrapper
+    v-model="isFullTab"
+    :alwaysShowToolbar="true"
+    fullScreenBgColor="#262626"
+    class="photocraft-wrapper"
+  >
+    <template #toolbar-left>
+      <div
+        v-tooltip="$t('i18nCommon.remoteDesktop.screenshot')"
+        class="flex toolbar-btn"
+        @click="takeScreenshot"
+      >
+        <span class="tm-icon tm-camera-icon"></span>
+      </div>
+    </template>
+    <div class="tm-photocraft-container">
+      <iframe
+        ref="photocraftFrame"
+        class="photocraft-frame"
+        :src="iframeSrc"
+        title="PhotoCraft"
+        allow="fullscreen; clipboard-read; clipboard-write"
+        allowfullscreen
+        @load="onIframeLoad"
+        @error="onIframeError"
+      ></iframe>
+      <div v-if="isLoading" class="photocraft-loading" @click.stop>
+        <TMLoading />
+        <p class="photocraft-loading-text">
+          {{ $t("i18nCommon.photoCraft.loading") }}
+        </p>
+        <p v-if="loadFailed" class="photocraft-loading-error">
+          {{ $t("i18nCommon.photoCraft.loadFailed") }}
+        </p>
+        <p v-else class="photocraft-loading-hint">
+          {{ $t("i18nCommon.photoCraft.loadingHint") }}
+        </p>
+      </div>
     </div>
-  </div>
+  </TMFullTabWrapper>
 </template>
 
 <script>
 import TMToolBase from "@/views/tools/base/TMToolBase.vue";
 import TMLoading from "@/components/TMLoading.vue";
+import TMFullTabWrapper from "@/components/TMFullTabWrapper.vue";
 
 export default {
   name: "TMPhotoCraft",
   extends: TMToolBase,
-  components: { TMLoading },
+  components: { TMLoading, TMFullTabWrapper },
   data() {
     return {
       // Tool này chỉ có 1 nhiệm vụ: tải wasm PhotoCraft về và load lên.
@@ -41,6 +58,7 @@ export default {
       iframeSrc: "",
       isLoading: true,
       loadFailed: false,
+      isFullTab: false,
     };
   },
   mounted() {
