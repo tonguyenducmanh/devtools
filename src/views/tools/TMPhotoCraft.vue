@@ -76,11 +76,45 @@ export default {
       this.isLoading = false;
       this.loadFailed = true;
     },
+    takeScreenshot() {
+      const iframe = this.$refs.photocraftFrame;
+      if (!iframe) return;
+      try {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        const canvas = iframeDoc?.getElementById("photocraft_canvas");
+        if (canvas && typeof canvas.toDataURL === "function") {
+          const dataUrl = canvas.toDataURL("image/png");
+          const link = document.createElement("a");
+          link.download = `photocraft-screenshot-${Date.now()}.png`;
+          link.href = dataUrl;
+          link.click();
+          return;
+        }
+        if (typeof iframe.contentWindow?.html2canvas === "function") {
+          iframe.contentWindow.html2canvas(iframeDoc?.body || document.body).then((c) => {
+            const dataUrl = c.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.download = `photocraft-screenshot-${Date.now()}.png`;
+            link.href = dataUrl;
+            link.click();
+          });
+          return;
+        }
+      } catch (e) {
+        console.error("PhotoCraft screenshot failed", e);
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
+.photocraft-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
 .tm-photocraft-container {
   width: 100%;
   height: 100%;
