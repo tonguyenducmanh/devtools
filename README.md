@@ -10,6 +10,15 @@ Dự án này cung cấp một bộ sưu tập các công cụ hữu ích dành 
 
 ---
 
+## Tài liệu (AI-ready)
+
+- [`AGENTS.md`](AGENTS.md) — hướng dẫn ngắn cho AI agent / người đóng góp (đọc trước).
+- [`docs/architecture.md`](docs/architecture.md) — kiến trúc Client–Daemon, frontend/backend/WASM.
+- [`docs/development.md`](docs/development.md) — build, chạy, debug, version & phát hành.
+- [`docs/contributing.md`](docs/contributing.md) — luật đóng góp + checklist thêm tool/API.
+
+---
+
 ## Cài đặt
 
 ### 1. Clone
