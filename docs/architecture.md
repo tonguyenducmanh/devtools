@@ -6,7 +6,7 @@
 |---|---|---|---|
 | Frontend (Client) | Vue 3 + Vite 8 (rolldown) | `src/` | SPA chạy trên browser, host độc lập hoặc do daemon phục vụ |
 | Backend (Agent/Daemon) | Go 1.25 | `src_backend/` | 3 module: cấu hình, lõi dịch vụ, ứng dụng |
-| WASM | Rust / .NET 10 | `src_wasm/` | Remote Desktop, .NET Wrapper, PhotoCraft |
+| WASM | Rust / .NET 10 | `src_wasm/` | Remote Desktop, .NET Wrapper, PhotoCraft, VectorCraft |
 
 Frontend không nhúng "trái tim" logic nặng; những việc cần máy nội bộ (SQLite, proxy RDP, đọc/ghi file, mock server, PostgreSQL) đều đi qua agent API HTTP ở cổng **7777** (mặc định). Web UI của daemon là cổng **1403**, mock server là cổng **8888**.
 
@@ -95,16 +95,19 @@ Middleware: CORS `Allow-Origin *` + OPTIONS short-circuit; path lowercasing mặ
 |---|---|---|---|
 | IronRDP | `wasm-pack build --target web` | `pkg/rdp/rdp_client.js` + `_bg.wasm` (~4,5 MB) | `TMRemoteDesktopRDP.vue` |
 | .NET Wrapper | `dotnet publish … AppBundle/_framework` | `pkg/dotnet/` (~3,9 MB) | `TMDotNetWasmMixin.js` |
-| PhotoCraft | `trunk build --release` + nén wasm gzip | `pkg/photocraft/` (index.html + js + `_bg.wasm.gz` ~11 MB) | `TMPhotoCraft.vue` (iframe) |
+| PhotoCraft | `trunk build --release` + nén wasm gzip | `pkg/photocraft/` (index.html + js + `_bg.wasm.gz`) | `views/tools/Craft/TMPhotoCraft.vue` (iframe) |
+| VectorCraft | `trunk build --release` + nén wasm gzip | `pkg/vectorcraft/` (index.html + js + `_bg.wasm.gz`) | `views/tools/Craft/TMVectorCraft.vue` (iframe) |
 
-`vite.config.js` (viteStaticCopy): copy `pkg/dotnet/*` → `assets-wasm-<VERSION>/`; `pkg/rdp/*` → `assets-wasm-<VERSION>/rdp/`; `pkg/photocraft/*` → `assets-wasm-<VERSION>/photocraft/`. Runtime nạp theo đường dẫn tuyệt đối `assets-wasm-<version>/…` (DEV cũng được serve bởi plugin static-copy middleware). Alias `@wasm` → `src_wasm` (dùng cho dotnet khi dev).
+Hai tool "craft" dùng chung component `src/views/tools/Craft/TMCraftApp.vue`: mỗi tool chỉ là wrapper mỏng truyền `app-key` (`photocraft` / `vectorcraft`), component tính `iframe src = /assets-wasm-<version>/<appKey>/index.html`.
+
+`vite.config.js` (viteStaticCopy): copy `pkg/dotnet/*` → `assets-wasm-<VERSION>/`; `pkg/rdp/*` → `assets-wasm-<VERSION>/rdp/`; `pkg/<craft>/*` → `assets-wasm-<VERSION>/<craft>/`. Runtime nạp theo đường dẫn tuyệt đối `assets-wasm-<version>/…` (DEV cũng được serve bởi plugin static-copy middleware). Alias `@wasm` → `src_wasm` (dùng cho dotnet khi dev).
 
 ## 5. Luồng build & phát hành
 
 ```text
 VERSION=1.2.3 ./build_all.sh
  ├─ scripts/tm_version.sh        → version + ldflags
- ├─ scripts/build_wasm.sh        → (tùy chọn, đang comment) build IronRDP + .NET + PhotoCraft
+ ├─ scripts/build_wasm.sh        → (tùy chọn, đang comment) build IronRDP + .NET + 2 craft tool
  ├─ scripts/build_web_for_daemon.sh → npm install && npm run build
  │      └─ copy dist/ → src_backend/tm_core_service/internal/web/dist/  (go:embed)
  ├─ scripts/build_api.sh         → out/dev-tool-api-{mac-arm|linux|window}

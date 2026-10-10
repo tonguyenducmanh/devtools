@@ -198,7 +198,8 @@ export default {
       Automation: "Tự động hóa",
       APIMocking: "API mocking",
       remoteDesktopRDP: "Window RDP",
-      PhotoCraft: "Chỉnh sửa ảnh",
+      PhotoCraft: "Ảnh pixel",
+      VectorCraft: "Ảnh vector",
       PostgreSQLTemplate: "Code mẫu PostgreSQL",
       CSharpTemplate: "Code mẫu C#",
       JavaScriptTemplate: "Code mẫu JavaScript",
@@ -865,12 +866,23 @@ export default {
       downloadFailed: "Tải file thất bại",
       downloadAborted: "Huỷ tải file",
     },
-    photoCraft: {
-      loading: "Đang tải PhotoCraft...",
-      loadingHint:
-        "PhotoCraft đang được tải về và khởi động (web assembly ~19MB). Nếu màn hình này kéo dài, có thể bạn chưa build wasm PhotoCraft (xem src_wasm/photocraft/README.md).",
-      loadFailed:
-        "Không thể tải PhotoCraft. Kiểm tra xem đã build wasm chưa, hoặc thử tải lại trang.",
+    // Dùng chung cho các tool "craft" (web app Rust → WebAssembly chạy trong iframe),
+    // xem src/views/tools/Craft/TMCraftApp.vue và src_wasm/<appKey>/README.md
+    craftApp: {
+      photocraft: {
+        loading: "Đang tải PhotoCraft...",
+        loadingHint:
+          "PhotoCraft đang được tải về và khởi động. Nếu màn hình này kéo dài, có thể bạn chưa build wasm (xem src_wasm/photocraft/README.md).",
+        loadFailed:
+          "Không thể tải PhotoCraft. Kiểm tra xem đã build wasm chưa, hoặc thử tải lại trang.",
+      },
+      vectorcraft: {
+        loading: "Đang tải VectorCraft...",
+        loadingHint:
+          "VectorCraft đang được tải về và khởi động. Nếu màn hình này kéo dài, có thể bạn chưa build wasm (xem src_wasm/vectorcraft/README.md).",
+        loadFailed:
+          "Không thể tải VectorCraft. Kiểm tra xem đã build wasm chưa, hoặc thử tải lại trang.",
+      },
     },
     dateTime: {
       placeholder: "dd/mm/yyyy hh:mm:ss",

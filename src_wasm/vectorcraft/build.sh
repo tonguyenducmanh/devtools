@@ -1,27 +1,26 @@
 #!/bin/bash
-# Build script for PhotoCraft WASM (web app)
+# Build script for VectorCraft WASM (web app)
 # Requirements:
 # 1. Rust toolchain: https://rustup.rs/
 # 2. trunk: brew install trunk  (hoặc: cargo install trunk --locked)
-# 3. clang (để build feature heif cho target wasm32)
 #
-# Build toàn bộ source từ external_repo (storytold/photocraft)
-# rồi copy output tĩnh sang src_wasm/pkg/photocraft/ để serve cùng web app.
-# Kết quả build gồm: index.html + photocraft-web-<hash>.js + photocraft-web-<hash>_bg.wasm
-# (wasm ~27MB được nén gzip thành .wasm.gz ~9MB để dưới giới hạn 25 MiB của Cloudflare).
+# Build toàn bộ source từ external_repo (storytold/vectorcraft)
+# rồi copy output tĩnh sang src_wasm/pkg/vectorcraft/ để serve cùng web app.
+# Kết quả build gồm: index.html + vectorcraft-web-<hash>.js + vectorcraft-web-<hash>_bg.wasm
+# (wasm luôn được nén .wasm.gz để nhẹ khi tải và dưới giới hạn 25 MiB của Cloudflare).
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 EXTERNAL_DIR="$SCRIPT_DIR/external_repo"
-OUTPUT_DIR="$(dirname "$SCRIPT_DIR")/pkg/photocraft"
+OUTPUT_DIR="$(dirname "$SCRIPT_DIR")/pkg/vectorcraft"
 
-echo "Building PhotoCraft WASM..."
+echo "Building VectorCraft WASM..."
 echo "Source directory: $EXTERNAL_DIR"
 echo "Output directory: $OUTPUT_DIR"
 
 # 1. Kiểm tra external repo đã clone chưa
-if [ ! -d "$EXTERNAL_DIR/apps/photocraft-web" ]; then
+if [ ! -f "$EXTERNAL_DIR/apps/vectorcraft-web/index.html" ]; then
     echo "external_repo chưa có, đang clone..."
     "$SCRIPT_DIR/../../scripts/fetch_wasm_sources.sh"
 fi
@@ -43,23 +42,22 @@ fi
 # 3. Thêm target wasm32 nếu chưa có
 rustup target add wasm32-unknown-unknown
 
-# 4. Build web app bằng trunk (đọc apps/photocraft-web/Trunk.toml,
-#    profile wasm-release + feature heif được khai báo trong index.html)
-#    Output mặc định: external_repo/dist/web
-cd "$EXTERNAL_DIR/apps/photocraft-web"
+# 4. Build web app bằng trunk (đọc apps/vectorcraft-web/Trunk.toml:
+#    dist = ../../dist/web, public_url = "./" để chạy được dưới mọi prefix URL)
+cd "$EXTERNAL_DIR/apps/vectorcraft-web"
 trunk build --release
 
-# 5. Copy toàn bộ static site sang pkg/photocraft
+# 5. Copy toàn bộ static site sang pkg/vectorcraft
 rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 cp -R "$EXTERNAL_DIR/dist/web/." "$OUTPUT_DIR/"
 
-# 6. Dọn site tĩnh: nén wasm và patch index.html cho browser tự giải nén (DecompressionStream).
+# 6. Dọn site tĩnh: nén wasm (luôn nén) và patch index.html cho browser tự giải nén
 . "$SCRIPT_DIR/../../scripts/wasm_dist_common.sh"
-tm_prepare_wasm_dist "$OUTPUT_DIR" "PhotoCraft"
+tm_prepare_wasm_dist "$OUTPUT_DIR" "VectorCraft"
 
 echo "========================================="
-echo "PhotoCraft WASM BUILD COMPLETED!"
+echo "VectorCraft WASM BUILD COMPLETED!"
 echo "Output in $OUTPUT_DIR"
 ls -lh "$OUTPUT_DIR"
 echo "========================================="

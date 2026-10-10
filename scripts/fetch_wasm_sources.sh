@@ -32,10 +32,15 @@ fetch "$ROOT_DIR/src_wasm/iron_rdp/external_repo" \
   "https://github.com/tonguyenducmanh/IronRDP.git" \
   "aa87f5d27e6b6f1c45a1a01500e39b96f0eff7b1"
 
-# PhotoCraft (dùng cho tool Chỉnh sửa ảnh) — SHA cũ:
+# PhotoCraft (dùng cho tool Ảnh pixel) — SHA cũ:
 #   e398cc80b8c909fb5183fb6b879191a258410997
 fetch "$ROOT_DIR/src_wasm/photocraft/external_repo" \
   "https://github.com/storytold/photocraft.git" \
   "e398cc80b8c909fb5183fb6b879191a258410997"
+
+# VectorCraft (dùng cho tool Ảnh vector)
+fetch "$ROOT_DIR/src_wasm/vectorcraft/external_repo" \
+  "https://github.com/storytold/vectorcraft.git" \
+  ""
 
 echo "Fetch wasm sources completed."

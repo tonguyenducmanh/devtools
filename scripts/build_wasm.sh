@@ -43,17 +43,22 @@ fi
 # Quay lại root
 cd "$ROOT_DIR"
 
-# 3. Build PhotoCraft WASM (web app Rust)
-PHOTOCRAFT_MODULE_DIR="$ROOT_DIR/src_wasm/photocraft"
-if [ -d "$PHOTOCRAFT_MODULE_DIR" ]; then
-    echo "Entering PhotoCraft Module..."
-    cd "$PHOTOCRAFT_MODULE_DIR"
-    chmod +x ./build.sh
-    ./build.sh
-else
-    echo "Error: PhotoCraft directory $PHOTOCRAFT_MODULE_DIR not found!"
-    exit 1
-fi
+# 3. Build các web app "craft" (Rust → WebAssembly, static site chạy trong iframe)
+#    PhotoCraft  — Ảnh pixel   — trunk
+#    VectorCraft — Ảnh vector — trunk
+for CRAFT in photocraft vectorcraft; do
+    CRAFT_MODULE_DIR="$ROOT_DIR/src_wasm/$CRAFT"
+    if [ -d "$CRAFT_MODULE_DIR" ]; then
+        echo "Entering ${CRAFT} Module..."
+        cd "$CRAFT_MODULE_DIR"
+        chmod +x ./build.sh
+        ./build.sh
+        cd "$ROOT_DIR"
+    else
+        echo "Error: ${CRAFT} directory $CRAFT_MODULE_DIR not found!"
+        exit 1
+    fi
+done
 
 echo "========================================="
 echo "ALL WASM BUILDS COMPLETED SUCCESSFULLY!"

@@ -197,7 +197,8 @@ export default {
       Automation: "Automation",
       APIMocking: "API mocking",
       remoteDesktopRDP: "Window RDP",
-      PhotoCraft: "Photo editor",
+      PhotoCraft: "Pixel image",
+      VectorCraft: "Vector image",
       PostgreSQLTemplate: "PostgreSQL Template",
       CSharpTemplate: "C# template",
       JavaScriptTemplate: "JavaScript template",
@@ -869,12 +870,23 @@ export default {
       downloadFailed: "Download failed",
       downloadAborted: "Download aborted",
     },
-    photoCraft: {
-      loading: "Loading PhotoCraft...",
-      loadingHint:
-        "PhotoCraft is downloading and starting up (web assembly ~19MB). If this screen stays for a long time, you may need to build the PhotoCraft wasm first (see src_wasm/photocraft/README.md).",
-      loadFailed:
-        "Could not load PhotoCraft. Check that the wasm was built, or try reloading the page.",
+    // Shared by every "craft" tool (a Rust web app compiled to WebAssembly, run in an
+    // iframe), see src/views/tools/Craft/TMCraftApp.vue and src_wasm/<appKey>/README.md
+    craftApp: {
+      photocraft: {
+        loading: "Loading PhotoCraft...",
+        loadingHint:
+          "PhotoCraft is downloading and starting up. If this screen stays for a long time, you may need to build the wasm first (see src_wasm/photocraft/README.md).",
+        loadFailed:
+          "Could not load PhotoCraft. Check that the wasm was built, or try reloading the page.",
+      },
+      vectorcraft: {
+        loading: "Loading VectorCraft...",
+        loadingHint:
+          "VectorCraft is downloading and starting up. If this screen stays for a long time, you may need to build the wasm first (see src_wasm/vectorcraft/README.md).",
+        loadFailed:
+          "Could not load VectorCraft. Check that the wasm was built, or try reloading the page.",
+      },
     },
     dateTime: {
       placeholder: "dd/mm/yyyy hh:mm:ss",

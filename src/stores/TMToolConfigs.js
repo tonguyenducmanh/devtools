@@ -25,9 +25,16 @@ const sidebarConfig = [
     children: [
       {
         name: "TMPhotoCraft",
-        component: () => import("@/views/tools/TMPhotoCraft.vue"),
+        component: () => import("@/views/tools/Craft/TMPhotoCraft.vue"),
         meta: {
           titleKey: "i18nCommon.feature.PhotoCraft",
+        },
+      },
+      {
+        name: "TMVectorCraft",
+        component: () => import("@/views/tools/Craft/TMVectorCraft.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.VectorCraft",
         },
       },
     ],

@@ -4,7 +4,7 @@
 
 - **Node.js** ≥ 22 (npm) cho frontend (Vite 8 / rolldown).
 - **Go 1.25+** cho backend (3 module dùng `go 1.25.x`; route kiểu method-pattern của Go 1.22+).
-- **Không bắt buộc hàng ngày:** Rust + wasm-pack (IronRDP), .NET 10 SDK (dotnet_wrapper), trunk + clang (PhotoCraft) — chỉ cần khi **build lại wasm**.
+- **Không bắt buộc hàng ngày:** Rust + wasm-pack (IronRDP), .NET 10 SDK (dotnet_wrapper), trunk (PhotoCraft / VectorCraft) — chỉ cần khi **build lại wasm**.
 
 ## 1. Chạy frontend (dev)
 
@@ -16,7 +16,7 @@ npm run dev        # Vite dev server (mặc định port 5173)
 Lưu ý dev-only:
 
 - WASM được phục vụ qua **middleware của viteStaticCopy** ở đúng đường dẫn prod:
-  `/assets-wasm-<version>/rdp/…`, `…/photocraft/index.html`, `…/dotnet.js`. Không cần build wasm cho dev **trừ khi** `src_wasm/pkg/*` đang trống.
+  `/assets-wasm-<version>/rdp/…`, `…/photocraft/index.html`, `…/vectorcraft/index.html`, `…/dotnet.js`. Không cần build wasm cho dev **trừ khi** `src_wasm/pkg/*` đang trống.
 - Alias: `@` → `src`, `@wasm` → `src_wasm`.
 - Agent URL mặc định `http://localhost:7777` (`src/cfg/config.js`). Tool cần agent sẽ lỗi "agent not found" nếu daemon chưa chạy.
 
@@ -26,7 +26,7 @@ Lưu ý dev-only:
 npm run build
 ```
 
-- Output: `dist/` (gitignored) — gồm bundle `assets/tjs-*`, `assets/tas-*` (có version) và `assets-wasm-<version>/{dotnet,rdp,photocraft}` được copy từ `src_wasm/pkg/`.
+- Output: `dist/` (gitignored) — gồm bundle `assets/tjs-*`, `assets/tas-*` (có version) và `assets-wasm-<version>/{dotnet,rdp,photocraft,vectorcraft}` được copy từ `src_wasm/pkg/`.
 - **Bắt buộc:** `src_wasm/pkg/*` phải tồn tại trước khi build (xem mục WASM).
 - Chạy `npm run dev` sau đó Ctrl-click mở tool bị đổi để smoke-test; rồi `npm run build` để chắc chắn không phá bundle.
 
@@ -68,11 +68,15 @@ Script lần lượt build:
 
 1. **IronRDP** → `src_wasm/pkg/rdp/` (wasm-pack `--target web`)
 2. **.NET Wrapper** → `src_wasm/pkg/dotnet/` (dotnet publish browser-wasm, copy `_framework`)
-3. **PhotoCraft** → `src_wasm/pkg/photocraft/` (trunk build external_repo, nén wasm gzip ~11 MB, patch index.html)
+3. **PhotoCraft** → `src_wasm/pkg/photocraft/` (trunk build external_repo)
+4. **WordCraft** → `src_wasm/pkg/wordcraft/` (trunk build external_repo)
+5. **GridCraft** → `src_wasm/pkg/gridcraft/` (trunk build external_repo)
+6. **VectorCraft** → `src_wasm/pkg/vectorcraft/` (trunk build external_repo)
+ 7. **PdfCraft** → `src_wasm/pkg/pdfcraft/` (trunk build external_repo)
 
 Trong mỗi `build.sh`, source được lấy từ `src_wasm/<tên>/external_repo/` (clone on-demand bởi `scripts/fetch_wasm_sources.sh`, gitignored) và được `scripts/git_pull_if_repo.sh` cập nhật **về nhánh mặc định** rồi `git pull origin` trước khi build. Sau khi build wasm, **bắt buộc chạy lại `npm run build`** vì viteStaticCopy lấy từ `src_wasm/pkg/`.
 
-> PhotoCraft: wasm gốc ~27 MB > giới hạn 25 MiB/file của Cloudflare, nên được nén `.gz` ~11 MB và browser tự giải nén (`DecompressionStream`) — đừng xoá bước nén trong `src_wasm/photocraft/build.sh`.
+> **Nén wasm (cả 2 craft tool):** wasm luôn được nén gzip thành `_bg.wasm.gz` và `index.html` được patch để browser tự giải nén (`DecompressionStream`) trước khi gọi `init()`. Lý do: Cloudflare Pages/Workers chặn file > 25 MiB/file (PhotoCraft gốc ~27 MB), và nén giúp tải nhanh hơn nhiều. Logic này **dùng chung** ở `scripts/wasm_dist_common.sh` + `scripts/patch_wasm_dist.py` — đừng copy vào từng `build.sh` và đừng xoá bước nén.
 
 ## 6. Version & phát hành
 
