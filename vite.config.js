@@ -20,6 +20,12 @@ export default defineConfig({
           dest: `assets-wasm-${APP_VERSION}`,
           rename: { stripBase: true },
         },
+        // Copy IronRDP (rdp_client.js + rdp_client_bg.wasm) sang dist/assets-wasm/rdp
+        {
+          src: "src_wasm/pkg/rdp/*",
+          dest: `assets-wasm-${APP_VERSION}/rdp`,
+          rename: { stripBase: true },
+        },
         // Copy static site PhotoCraft (index.html + js + wasm) sang dist/assets-wasm/photocraft
         {
           src: "src_wasm/pkg/photocraft/*",

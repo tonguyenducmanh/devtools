@@ -64,7 +64,7 @@ Thư mục dưới đây chứa nhiều công cụ được viết bằng các n
 
 [Thư mục Web Assembly](src_wasm)
 
-- **IronRDP** (`src_wasm/iron_rdp`): client RDP (Rust) → `src_wasm/pkg/rdp_client*`
+- **IronRDP** (`src_wasm/iron_rdp`): client RDP (Rust) → `src_wasm/pkg/rdp/`
 - **.NET Wrapper** (`src_wasm/dotnet_wrapper`): wrapper C# (.NET 10) → `src_wasm/pkg/dotnet/`
 - **PhotoCraft** (`src_wasm/photocraft`): trình chỉnh sửa ảnh (Rust, wasm-bindgen) → `src_wasm/pkg/photocraft/`
 
@@ -81,6 +81,13 @@ Script tự clone nguồn external repo (IronRDP, PhotoCraft) về `src_wasm/<t�
 chmod 777 ./scripts/fetch_wasm_sources.sh
 ./scripts/fetch_wasm_sources.sh
 ```
+
+> **Trước khi build**, mỗi `build.sh` sẽ đi vào repo nguồn của nó và chạy
+> `git pull origin` để lấy source mới nhất **nếu thư mục đó là git repo**
+> (helper: `scripts/git_pull_if_repo.sh`). Các repo ngoài **luôn đứng trên nhánh
+> mặc định** của origin (không pin commit nữa); nếu repo đang ở detached HEAD thì
+> helper tự quay về nhánh mặc định rồi mới pull. Pull/checkout lỗi chỉ cảnh báo
+> rồi vẫn tiếp tục build.
 
 ### Tool PhotoCraft
 

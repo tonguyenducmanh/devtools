@@ -26,6 +26,10 @@ if [ ! -d "$EXTERNAL_DIR/apps/photocraft-web" ]; then
     "$(dirname "$SCRIPT_DIR")/../scripts/fetch_wasm_sources.sh"
 fi
 
+# 1b. Cập nhật source mới nhất trước khi build (git pull origin) nếu là git repo
+. "$(dirname "$SCRIPT_DIR")/../scripts/git_pull_if_repo.sh"
+tm_git_pull_if_repo "$EXTERNAL_DIR"
+
 # 2. Cài trunk nếu chưa có
 if ! command -v trunk &> /dev/null; then
     echo "trunk not found. Installing..."

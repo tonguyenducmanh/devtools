@@ -512,7 +512,12 @@ export default {
       try {
         if (!this.wasmInitialized) {
           this.addLog(this.$t("i18nCommon.remoteDesktop.loadingWasm"), "info");
-          const wasmModule = await import("@wasm/pkg/rdp_client.js");
+          // Giống PhotoCraft: luôn nạp từ assets-wasm-<version>/rdp. Khi build,
+          // vite.config.js copy folder src_wasm/pkg/rdp sang đó; khi dev,
+          // vite-plugin-static-copy serve đúng đường dẫn này qua middleware.
+          // Dùng biến chuỗi để Vite không bundle/không quét file wasm này.
+          const rdpPath = `/assets-wasm-${import.meta.env.PACKAGE_VERSION}/rdp/rdp_client.js`;
+          const wasmModule = await import(/* @vite-ignore */ rdpPath);
           await wasmModule.default();
           wasmModule.setup("info");
           this.wasmInitialized = true;

@@ -9,13 +9,19 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 EXTERNAL_DIR="$SCRIPT_DIR/external_repo"
-OUTPUT_DIR="$(dirname "$SCRIPT_DIR")/pkg"
+# Xuất riêng vào pkg/rdp để tách khỏi dotnet/ và photocraft/ (không còn nằm lẫn
+# ở gốc pkg). vite.config.js copy nguyên folder này sang assets-wasm-<version>/rdp.
+OUTPUT_DIR="$(dirname "$SCRIPT_DIR")/pkg/rdp"
 
 # Đảm bảo có external repo để build (clone on-demand, không phải submodule)
 if [ ! -d "$EXTERNAL_DIR" ]; then
     echo "external_repo chưa có, đang clone..."
     "$(dirname "$SCRIPT_DIR")/../scripts/fetch_wasm_sources.sh"
 fi
+
+# Cập nhật source mới nhất trước khi build (git pull origin) nếu là git repo
+. "$(dirname "$SCRIPT_DIR")/../scripts/git_pull_if_repo.sh"
+tm_git_pull_if_repo "$EXTERNAL_DIR"
 
 echo "Building IronRDP WASM..."
 echo "Output directory: $OUTPUT_DIR"
