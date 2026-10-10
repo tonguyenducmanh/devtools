@@ -25,7 +25,7 @@ Quy ước toàn repo: tiền tố frontend `TM*`, backend file `tm_*.go` với 
 src/                            Frontend Vue 3 SPA (Vite 8 / rolldown)
   main.js App.vue               Bootstrap: global components, plugin, load locale
   cfg/config.js                 window.__env (bundle vào entry, có hash/version)
-  stores/                       Store tự viết (không Pinia): TMTabManager (tab), TMToolConfigs (tool/sidebar)
+  stores/                       Store tự viết (không Pinia): TMTabManager (tab), TMToolConfigs (tool/sidebar), TMAppState
   common/                       TMUtility, TMDialogUtil+TMDialogEnum, TMToastPlugin, api/request/AgentAPI,
                                 automation/ (window.__tdAPI), cache/ (mã hoá AES-GCM), proto/, mock/, plugin/
   components/                   ~29 component TM*.vue dùng chung
@@ -62,7 +62,7 @@ vite.config.js                  Build frontend; viteStaticCopy wasm → dist/ass
 8. **Version 1 nguồn duy nhất.** `VERSION=1.2.3 ./build_all.sh` (hoặc `package.json.version`). `tm_version.sh` tạo ldflags `-X tm_config.Version=...` cho Go và `import.meta.env.PACKAGE_VERSION` cho UI. Không tự ý sửa version rải rác.
 9. **Không phá WASM đã commit.** `src_wasm/pkg/*` được commit thẳng để CI/Cloudflare chỉ cần `npm run build`. Khi build lại wasm, source được `scripts/git_pull_if_repo.sh` cập nhật về nhánh mặc định rồi mới build.
 10. **`window.__tdAPI` là cầu nối chung.** `automation.agentURL` quyết định URL agent (UI tự đọc để gọi API); `automation.*` là các hàm inject cho tool Automation; `dotnetExports` từ .NET WASM. Đừng đổi shape tùy tiện mà không cập nhật tất cả nơi dùng.
-11. **Dialog enum append-only.** Thêm dialog mới = thêm enum ở CUỐI `TMDialogEnum` + mapping trong `DialogComponentMap` + component trong `views/dialogs/`. Không đổi/đảo số enum cũ.
+11. **Dialog enum append-only.** `TMDialogEnum` + `DialogComponentMap` nằm trong `src/common/TMDialogUtil.js`. Thêm dialog mới = thêm enum ở CUỐI `TMDialogEnum` + mapping trong `DialogComponentMap` + component trong `views/dialogs/`. Không đổi/đảo số enum cũ.
 12. **Không commit artifact.** `dist/`, `out/`, `node_modules/`, `config.json`, `*.db*`, `src_wasm/*/external_repo/` đều gitignore.
 
 ## 4. Chọn việc làm
@@ -70,7 +70,7 @@ vite.config.js                  Build frontend; viteStaticCopy wasm → dist/ass
 Ưu tiên: hạ tầng/refactor an toàn → tool có giá trị sử dụng cao → long tail.
 
 0. **Đọc README + `docs/`** trước để nắm vòng đời build.
-1. **Mở app (`npm run dev`)** xem sidebar các nhóm: GraphicDesign, API, Automation, QRCode, Database, RemoteDesktop, Text, JSON, SampleCode, Image, AI, Miscellaneous.
+1. **Mở app (`npm run dev`)** xem sidebar: tool Automation là route riêng (`type: "automation"`); các nhóm group: GraphicDesign, API, QRCode, Database, RemoteDesktop, Text, JSON, SampleCode, Image, AI, Miscellaneous.
 2. Tool mới nên bám theo nhóm hiện có trong `sidebarConfig`, đặt tên `TM<Thing>.vue` theo chuẩn.
 3. Backend: kiểm tra endpoint đã có trong `rt_*.go`; chỉ thêm khi tool thật sự cần agent (cần máy nội bộ / nhạy cảm).
 4. Không có file roadmap — ghi ý tưởng vào commit message hoặc issue GitHub, không tự tạo `docs/roadmap.md` trừ khi được yêu cầu.
@@ -99,7 +99,7 @@ npm run build                                 # build lại vì viteStaticCopy l
 ## 6. Agent song song
 
 - Không chạy `npm run build` hay `go build` đồng thời vào cùng cache build (`dist/`, module Go) — chờ nhau, đừng sửa file artifact của nhau.
-- Mỗi agent chỉ sửa file mình được giao. File dùng chung (`TMToolConfigs.js`, `TMDialogEnum.js`, `i18n/*`, `internal/router/*`, `go.mod`) sửa tối thiểu, đọc lại trước khi sửa.
+- Mỗi agent chỉ sửa file mình được giao. File dùng chung (`TMToolConfigs.js`, `TMDialogUtil.js`, `i18n/*`, `internal/router/*`, `go.mod`) sửa tối thiểu, đọc lại trước khi sửa.
 - Không build lại wasm nếu không cần (tốn thời gian: Rust/.NET/trunk).
 - Dev server: mỗi agent dùng port riêng nếu cần (`npm run dev -- --port 5180`).
 

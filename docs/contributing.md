@@ -30,7 +30,7 @@
    - `hide: true` nếu chưa muốn hiện trên sidebar (vẫn search được nếu cần chỉnh `getAllSearchableRoutes`).
 3. **i18n:** thêm `$t` key vào `src/i18n/vi/i18nCommon.js` **và** `src/i18n/en/i18nCommon.js` cho `titleKey` + mọi chuỗi trong UI. Tiêu đề tab tự hiển thị từ `meta.titleKey`.
 4. **(Tùy chọn) Help:** tạo `src/views/helps/TM<Thing>Help.vue` và nối `helpKey` trong tab meta; nội dung help đặt trong `i18nHelp`.
-5. **(Tùy chọn) Dialog:** thêm enum ở **cuối** `TMDialogEnum`, mapping trong `DialogComponentMap`, component trong `src/views/dialogs/` (implement `show(param)`).
+5. **(Tùy chọn) Dialog:** `TMDialogEnum` + `DialogComponentMap` nằm trong `src/common/TMDialogUtil.js` — thêm enum ở **cuối** `TMDialogEnum`, mapping trong `DialogComponentMap`, tạo component trong `src/views/dialogs/` (implement `show(param)`).
 6. **(Tùy chọn) Monaco intellisense:** override `registerIntellisense()`/`disposeIntellisense()` trong tool; định nghĩa ngôn ngữ ở `src/monarch/`.
 7. **Tool cần lưu cấu hình:** kế thừa `TMLayoutConfigMixin` (cache key `keyCacheLayout`). Tool master-detail GHÉP với backend: dùng `TMCollectionMixin` + `TMCollectionList` (xem mục backend).
 

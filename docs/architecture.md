@@ -43,7 +43,7 @@ Frontend không nhúng "trái tim" logic nặng; những việc cần máy nội
 
 | Module | Mô tả | Ghi chú |
 |---|---|---|
-| `tm_config` | `TMCenterConfig` + defaults, `GetConfigGlobal()` singleton (tìm `config/config.json` đi ngược từ exe; sinh file mặc định nếu thiếu), `var Version` (ldflags) | dependency duy nhất: `tm_core_service` replace |
+| `tm_config` | `TMCenterConfig` + defaults, `GetConfigGlobal()` singleton (tìm `config/config.json` đi ngược từ exe; sinh file mặc định nếu thiếu), `var Version` (ldflags) | module lá: không require module nào; được `tm_core_service` và `tm_app` tham chiếu qua `replace tm_config => ../tm_config` |
 | `tm_core_service` | Thư viện lõi: `external/api_app/tm_api_builder.go`, `external/web_app/tm_web_builder.go`, `internal/router/*`, `internal/service/*`, `internal/database/*` (+ `migrations/` 0001–0003), `internal/middleware/tm_cors.go` | requires tm_config (replace); gorilla/websocket, pgx, modernc sqlite, lipgloss |
 | `tm_app` | 2 binary: `cmd/api_app` (chỉ API), `cmd/daemon_app` (chạy API app + Web app song song goroutine, gated bởi `cfg.APIConfig.Enable`/`cfg.WebConfig.Enable`) | replace tm_core_service + tm_config |
 
@@ -67,7 +67,7 @@ SQLite: `dev_tool.db` cạnh exe, WAL, `foreign_keys=ON`, migration chạy lúc 
 
 | File | Endpoint |
 |---|---|
-| `rt_common.go` | `GET /` — health check `{success, message, beVersion}` (BE version = `tm_config.Version`) |
+| `rt_common.go` | `GET /{$}` — health check `{success, message, beVersion}` (BE version = `tm_config.Version`; `{$}` = khớp chính xác root, Go 1.22+) |
 | `rt_api_testing.go` | `POST /api_test/exec`, `/exec_parallel`, `/import_batch`, `/import_pro_mode_batch`; CRUD + `get_tree` cho collections |
 | `rt_mock_api.go` | CRUD + `get_tree` `mock_api`/`mock_group`; `GET /mock_api/restart_mock_server`, `/get_base_url`; `POST /import_batch` |
 | `rt_rdp.go` | `GET /rdp/ws` — WebSocket proxy RDP (RDCleanPath: parse ASN.1 DER, TCP→X.224→TLS, relay 2 chiều) |
