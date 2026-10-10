@@ -10,14 +10,14 @@ Quy ước toàn repo: tiền tố frontend `TM*`, backend file `tm_*.go` với 
 
 ## 1. Định hướng (5 phút)
 
-| Đọc | Vì sao |
-|---|---|
-| `docs/architecture.md` | Sơ đồ client–daemon, cấu trúc frontend/backend/WASM, mẫu CRUD generic, các cổng mạng |
-| `docs/development.md` | Build, chạy, debug, version/release, thứ tự build bắt buộc |
-| `docs/contributing.md` | Luật đóng góp; checklist "thêm một tool" và "thêm một API" |
-| `src/stores/TMToolConfigs.js` | Nơi duy nhất đăng ký tool/sidebar (`sidebarConfig`) |
-| `README.md` | Tổng quan, cài đặt, phần WASM |
-| `scripts/tm_version.sh` | Cơ chế version duy nhất (UI + BE luôn khớp) |
+| Đọc                           | Vì sao                                                                               |
+| ----------------------------- | ------------------------------------------------------------------------------------ |
+| `docs/architecture.md`        | Sơ đồ client–daemon, cấu trúc frontend/backend/WASM, mẫu CRUD generic, các cổng mạng |
+| `docs/development.md`         | Build, chạy, debug, version/release, thứ tự build bắt buộc                           |
+| `docs/contributing.md`        | Luật đóng góp; checklist "thêm một tool" và "thêm một API"                           |
+| `src/stores/TMToolConfigs.js` | Nơi duy nhất đăng ký tool/sidebar (`sidebarConfig`)                                  |
+| `README.md`                   | Tổng quan, cài đặt, phần WASM                                                        |
+| `scripts/tm_version.sh`       | Cơ chế version duy nhất (UI + BE luôn khớp)                                          |
 
 ## 2. Bản đồ workspace
 
@@ -27,7 +27,7 @@ src/                            Frontend Vue 3 SPA (Vite 8 / rolldown)
   cfg/config.js                 window.__env (bundle vào entry, có hash/version)
   stores/                       Store tự viết (không Pinia): TMTabManager (tab), TMToolConfigs (tool/sidebar), TMAppState
   common/                       TMUtility, TMDialogUtil+TMDialogEnum, TMToastPlugin, api/request/AgentAPI,
-                                automation/ (window.__tdAPI), cache/ (mã hoá AES-GCM), proto/, mock/, plugin/
+                                automation/ (window.__tmAPI), cache/ (mã hoá AES-GCM), proto/, mock/, plugin/
   components/                   ~29 component TM*.vue dùng chung
   mixins/                       TMLayoutConfigMixin, TMCollectionMixin, TMDotNetWasmMixin, ...
   views/tools/                  Các tool (extends base/TMToolBase.vue); APITesting/, PostgreSQLQuery/, codeTemplateTools/
@@ -63,7 +63,7 @@ vite.config.js                  Build frontend; viteStaticCopy wasm → dist/ass
 7. **Thứ tự build.** WASM → `npm run build` → copy `dist/` vào `src_backend/tm_core_service/internal/web/dist/` → `build_daemon.sh`. Bỏ sót một bước là daemon không chạy (`go:embed` lỗi) hoặc wasm 404.
 8. **Version 1 nguồn duy nhất.** `VERSION=1.2.3 ./build_all.sh` (hoặc `package.json.version`). `tm_version.sh` tạo ldflags `-X tm_config.Version=...` cho Go và `import.meta.env.PACKAGE_VERSION` cho UI. Không tự ý sửa version rải rác.
 9. **Không phá WASM đã commit.** `src_wasm/pkg/*` được commit thẳng để CI/Cloudflare chỉ cần `npm run build`. Khi build lại wasm, source được `scripts/git_pull_if_repo.sh` cập nhật về nhánh mặc định rồi mới build.
-10. **`window.__tdAPI` là cầu nối chung.** `automation.agentURL` quyết định URL agent (UI tự đọc để gọi API); `automation.*` là các hàm inject cho tool Automation; `dotnetExports` từ .NET WASM. Đừng đổi shape tùy tiện mà không cập nhật tất cả nơi dùng.
+10. **`window.__tmAPI` là cầu nối chung.** `automation.agentURL` quyết định URL agent (UI tự đọc để gọi API); `automation.*` là các hàm inject cho tool Automation; `dotnetExports` từ .NET WASM. Đừng đổi shape tùy tiện mà không cập nhật tất cả nơi dùng.
 11. **Dialog enum append-only.** `TMDialogEnum` + `DialogComponentMap` nằm trong `src/common/TMDialogUtil.js`. Thêm dialog mới = thêm enum ở CUỐI `TMDialogEnum` + mapping trong `DialogComponentMap` + component trong `views/dialogs/`. Không đổi/đảo số enum cũ.
 12. **Không commit artifact.** `dist/`, `out/`, `node_modules/`, `config.json`, `*.db*`, `src_wasm/*/external_repo/` đều gitignore. `build_daemon.sh` nén 3 binary cuối cùng (mac/linux → `.tar.gz`, window → `.zip`) rồi xoá bản thô, nên `out/` chỉ còn file upload release — upload thẳng cả thư mục.
 

@@ -56,8 +56,8 @@ export default {
         const exports = await getAssemblyExports("Tools.NetWrapper.dll");
         this.dotnetExports = exports.TMTools.TMToolDotNetWrapper;
         // gắn vào global để tiện debug
-        window.__tdAPI = window.__tdAPI ?? {};
-        window.__tdAPI.dotnetExports = this.dotnetExports;
+        window.__tmAPI = window.__tmAPI ?? {};
+        window.__tmAPI.dotnetExports = this.dotnetExports;
         this.dotnetInitialized = true;
       } catch (error) {
         console.error("Failed to load C# WASM Wrapper:", error);

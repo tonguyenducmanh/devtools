@@ -5,7 +5,7 @@ import tmEnum from "@/common/TMEnum.js";
 
 import * as curlReader from "@/common/api/CURLHandle/curlReader/index.ts";
 /**
- * Các method injectable cho Automation (window.__tdAPI.automation).
+ * Các method injectable cho Automation (window.__tmAPI.automation).
  * Các method này được inject vào eval scope để user script sử dụng.
  * file này có tài liệu đặc tả cho monaco editor ở
  * @/monarch/apiTesting/docs/ và @/monarch/apiTesting/apiTypes.d.ts
@@ -759,7 +759,10 @@ class TMAutomationInject {
    * @returns {string} Chuỗi ngày dạng "YYYY-MM-DD HH:mm:ss"
    */
   readUnixSecondTime(timestamp) {
-    return new Date(timestamp * 1000).toISOString().replace("T", " ").slice(0, 19);
+    return new Date(timestamp * 1000)
+      .toISOString()
+      .replace("T", " ")
+      .slice(0, 19);
   }
 
   /**

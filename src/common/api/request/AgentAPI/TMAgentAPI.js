@@ -14,7 +14,7 @@ class TMAgentAPI extends TMBaseAPI {
     super(baseUrl, controllerName);
   }
   getBaseUrl() {
-    return window.__tdAPI?.automation?.agentURL;
+    return window.__tmAPI?.automation?.agentURL;
   }
 
   /**

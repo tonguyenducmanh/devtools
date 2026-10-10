@@ -13,7 +13,7 @@ function getInjectableMethods() {
 class TMAutomation extends TMAutomationInject {
   setGlobalInfoBeforeRequest(options) {
     let me = this;
-    window.__tdAPI = window.__tdAPI ?? {};
+    window.__tmAPI = window.__tmAPI ?? {};
 
     let automation = {
       agentURL: options?.agentURL ?? window.__env?.APITesting?.agentServer,
@@ -23,8 +23,8 @@ class TMAutomation extends TMAutomationInject {
       automation[name] = me[name].bind(me);
     });
 
-    window.__tdAPI.automation = automation;
-    return window.__tdAPI.automation;
+    window.__tmAPI.automation = automation;
+    return window.__tmAPI.automation;
   }
 
   /**
@@ -33,7 +33,7 @@ class TMAutomation extends TMAutomationInject {
    */
   buildInjectCode(scenarioCode) {
     let bindings = getInjectableMethods()
-      .map((name) => `let ${name} = window.__tdAPI.automation.${name};`)
+      .map((name) => `let ${name} = window.__tmAPI.automation.${name};`)
       .join("\n");
 
     return `
