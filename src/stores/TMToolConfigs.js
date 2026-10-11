@@ -28,30 +28,6 @@ export const sidebarConfig = [
     meta: { titleKey: "i18nCommon.feature.userSettings" },
   },
   {
-    type: "group",
-    groupKey: "graphicdesign",
-    groupTitleKey: "i18nCommon.group.GraphicDesign",
-    // App vẽ canvas → không padding, và có dữ liệu tạm chưa lưu → hỏi khi đóng
-    contentFlush: true,
-    confirmOnClose: true,
-    children: [
-      {
-        name: "TMPhotoCraft",
-        component: () => import("@/views/tools/Craft/TMPhotoCraft.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.PhotoCraft",
-        },
-      },
-      {
-        name: "TMVectorCraft",
-        component: () => import("@/views/tools/Craft/TMVectorCraft.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.VectorCraft",
-        },
-      },
-    ],
-  },
-  {
     type: "route",
     name: "TMOneTimePassword",
     component: () => import("@/views/tools/TMOneTimePassword.vue"),
@@ -78,33 +54,11 @@ export const sidebarConfig = [
           titleKey: "i18nCommon.feature.APIMocking",
         },
       },
-    ],
-  },
-  {
-    type: "automation",
-    name: "TMAutomation",
-    component: () => import("@/views/tools/APITesting/TMAutomation.vue"),
-    meta: {
-      titleKey: "i18nCommon.feature.Automation",
-    },
-  },
-  {
-    type: "group",
-    groupKey: "qrcode",
-    groupTitleKey: "i18nCommon.group.QRCode",
-    children: [
       {
-        name: "textoqrcode",
-        component: () => import("@/views/tools/TMTextToQRCode.vue"),
+        name: "TMAutomation",
+        component: () => import("@/views/tools/APITesting/TMAutomation.vue"),
         meta: {
-          titleKey: "i18nCommon.feature.QRCodeFromText",
-        },
-      },
-      {
-        name: "qrcodetotext",
-        component: () => import("@/views/tools/TMQRCodeToText.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.QRCodeToText",
+          titleKey: "i18nCommon.feature.Automation",
         },
       },
     ],
@@ -137,6 +91,75 @@ export const sidebarConfig = [
         component: () => import("@/views/tools/TMRemoteDesktopRDP.vue"),
         meta: {
           titleKey: "i18nCommon.feature.remoteDesktopRDP",
+        },
+      },
+    ],
+  },
+  {
+    type: "group",
+    groupKey: "graphicdesign",
+    groupTitleKey: "i18nCommon.group.GraphicDesign",
+    // App vẽ canvas → không padding, và có dữ liệu tạm chưa lưu → hỏi khi đóng
+    contentFlush: true,
+    confirmOnClose: true,
+    children: [
+      {
+        name: "TMPhotoCraft",
+        component: () => import("@/views/tools/Craft/TMPhotoCraft.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.PhotoCraft",
+        },
+      },
+      {
+        name: "TMVectorCraft",
+        component: () => import("@/views/tools/Craft/TMVectorCraft.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.VectorCraft",
+        },
+      },
+    ],
+  },
+  {
+    type: "group",
+    groupKey: "office",
+    groupTitleKey: "i18nCommon.group.Office",
+    // App vẽ canvas → không padding, và có dữ liệu tạm chưa lưu → hỏi khi đóng
+    contentFlush: true,
+    confirmOnClose: true,
+    children: [
+      {
+        name: "TMWordCraft",
+        component: () => import("@/views/tools/Craft/TMWordCraft.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.WordCraft",
+        },
+      },
+      {
+        name: "TMGridCraft",
+        component: () => import("@/views/tools/Craft/TMGridCraft.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.GridCraft",
+        },
+      },
+    ],
+  },
+  {
+    type: "group",
+    groupKey: "qrcode",
+    groupTitleKey: "i18nCommon.group.QRCode",
+    children: [
+      {
+        name: "textoqrcode",
+        component: () => import("@/views/tools/TMTextToQRCode.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.QRCodeFromText",
+        },
+      },
+      {
+        name: "qrcodetotext",
+        component: () => import("@/views/tools/TMQRCodeToText.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.QRCodeToText",
         },
       },
     ],

@@ -6,7 +6,7 @@
 | ---------------------- | ------------------------- | -------------- | ---------------------------------------------------------- |
 | Frontend (Client)      | Vue 3 + Vite 8 (rolldown) | `src/`         | SPA chạy trên browser, host độc lập hoặc do daemon phục vụ |
 | Backend (Agent/Daemon) | Go 1.25                   | `src_backend/` | 3 module: cấu hình, lõi dịch vụ, ứng dụng                  |
-| WASM                   | Rust / .NET 10            | `src_wasm/`    | Remote Desktop, .NET Wrapper, PhotoCraft, VectorCraft      |
+| WASM                   | Rust / .NET 10            | `src_wasm/`    | Remote Desktop, .NET Wrapper, PhotoCraft, VectorCraft, GridCraft, WordCraft |
 
 Frontend không nhúng "trái tim" logic nặng; những việc cần máy nội bộ (SQLite, proxy RDP, đọc/ghi file, mock server, PostgreSQL) đều đi qua agent API HTTP ở cổng **7777** (mặc định). Web UI của daemon là cổng **1403**, mock server là cổng **8888**.
 
@@ -108,8 +108,10 @@ Middleware: CORS `Allow-Origin *` + OPTIONS short-circuit; path lowercasing mặ
 | .NET Wrapper | `dotnet publish … AppBundle/_framework` | `pkg/dotnet/` (~3,9 MB)                              | `TMDotNetWasmMixin.js`                         |
 | PhotoCraft   | `trunk build --release` + nén wasm gzip | `pkg/photocraft/` (index.html + js + `_bg.wasm.gz`)  | `views/tools/Craft/TMPhotoCraft.vue` (iframe)  |
 | VectorCraft  | `trunk build --release` + nén wasm gzip | `pkg/vectorcraft/` (index.html + js + `_bg.wasm.gz`) | `views/tools/Craft/TMVectorCraft.vue` (iframe) |
+| GridCraft    | `trunk build --release` + nén wasm gzip | `pkg/gridcraft/` (index.html + js + `_bg.wasm.gz`)   | `views/tools/Craft/TMGridCraft.vue` (iframe)   |
+| WordCraft    | `trunk build --release` + nén wasm gzip | `pkg/wordcraft/` (index.html + js + `_bg.wasm.gz`)   | `views/tools/Craft/TMWordCraft.vue` (iframe)   |
 
-Hai tool "craft" dùng chung component `src/views/tools/Craft/TMCraftApp.vue`: mỗi tool chỉ là wrapper mỏng truyền `app-key` (`photocraft` / `vectorcraft`), component tính `iframe src = /assets-wasm-<version>/<appKey>/index.html`.
+Các tool "craft" dùng chung component `src/views/tools/Craft/TMCraftApp.vue`: mỗi tool chỉ là wrapper mỏng truyền `app-key` (`photocraft` / `vectorcraft` / `gridcraft` / `wordcraft`), component tính `iframe src = /assets-wasm-<version>/<appKey>/index.html`.
 
 `vite.config.js` (viteStaticCopy): copy `pkg/dotnet/*` → `assets-wasm-<VERSION>/`; `pkg/rdp/*` → `assets-wasm-<VERSION>/rdp/`; `pkg/<craft>/*` → `assets-wasm-<VERSION>/<craft>/`. Runtime nạp theo đường dẫn tuyệt đối `assets-wasm-<version>/…` (DEV cũng được serve bởi plugin static-copy middleware). Alias `@wasm` → `src_wasm` (dùng cho dotnet khi dev).
 

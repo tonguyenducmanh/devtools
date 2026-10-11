@@ -38,6 +38,7 @@ export default {
       JSON: "JSON building",
       Image: "Image handle",
       GraphicDesign: "Graphic Design",
+      Office: "Office",
       Text: "Text",
       ArtificialIntelligence: "AI tooling",
       RemoteDesktop: "Remote Desktop",
@@ -209,6 +210,8 @@ export default {
       remoteDesktopRDP: "Window RDP",
       PhotoCraft: "Pixel image",
       VectorCraft: "Vector image",
+      GridCraft: "Spreadsheet",
+      WordCraft: "Word processor",
       PostgreSQLTemplate: "PostgreSQL Template",
       CSharpTemplate: "C# template",
       JavaScriptTemplate: "JavaScript template",
@@ -850,24 +853,6 @@ export default {
       downloaded: "Downloaded",
       downloadFailed: "Download failed",
       downloadAborted: "Download aborted",
-    },
-    // Shared by every "craft" tool (a Rust web app compiled to WebAssembly, run in an
-    // iframe), see src/views/tools/Craft/TMCraftApp.vue and src_wasm/<appKey>/README.md
-    craftApp: {
-      photocraft: {
-        loading: "Loading PhotoCraft...",
-        loadingHint:
-          "PhotoCraft is downloading and starting up. If this screen stays for a long time, you may need to build the wasm first (see src_wasm/photocraft/README.md).",
-        loadFailed:
-          "Could not load PhotoCraft. Check that the wasm was built, or try reloading the page.",
-      },
-      vectorcraft: {
-        loading: "Loading VectorCraft...",
-        loadingHint:
-          "VectorCraft is downloading and starting up. If this screen stays for a long time, you may need to build the wasm first (see src_wasm/vectorcraft/README.md).",
-        loadFailed:
-          "Could not load VectorCraft. Check that the wasm was built, or try reloading the page.",
-      },
     },
     dateTime: {
       placeholder: "dd/mm/yyyy hh:mm:ss",

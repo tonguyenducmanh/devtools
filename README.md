@@ -23,7 +23,7 @@ Dự án này cung cấp một bộ sưu tập các công cụ hữu ích dành 
 
 ### 1. Clone
 
-Dự án này **không dùng Git Submodules** nữa: các file wasm đã build (`src_wasm/pkg/`) được commit thẳng vào repo, nên CI/Cloudflare chỉ cần `npm run build` mà không cần clone thêm gì. Source của các dự án ngoài (IronRDP, PhotoCraft, VectorCraft) chỉ được clone **khi bạn muốn build lại wasm**:
+Dự án này **không dùng Git Submodules** nữa: các file wasm đã build (`src_wasm/pkg/`) được commit thẳng vào repo, nên CI/Cloudflare chỉ cần `npm run build` mà không cần clone thêm gì. Source của các dự án ngoài (IronRDP, PhotoCraft, VectorCraft, GridCraft, WordCraft) chỉ được clone **khi bạn muốn build lại wasm**:
 
 ```bash
 git clone https://github.com/tonguyenducmanh/devtools.git
@@ -87,6 +87,8 @@ Thư mục dưới đây chứa nhiều công cụ được viết bằng các n
 - **.NET Wrapper** (`src_wasm/dotnet_wrapper`): wrapper C# (.NET 10) → `src_wasm/pkg/dotnet/`
 - **PhotoCraft** (`src_wasm/photocraft`): trình chỉnh sửa ảnh (Rust, trunk) → `src_wasm/pkg/photocraft/`
 - **VectorCraft** (`src_wasm/vectorcraft`): trình thiết kế vector (Rust, trunk) → `src_wasm/pkg/vectorcraft/`
+- **GridCraft** (`src_wasm/gridcraft`): trình bảng tính (Rust, trunk) → `src_wasm/pkg/gridcraft/`
+- **WordCraft** (`src_wasm/wordcraft`): trình soạn thảo văn bản (Rust, trunk) → `src_wasm/pkg/wordcraft/`
 
 Build toàn bộ wasm bằng:
 
@@ -95,7 +97,7 @@ chmod 777 ./scripts/build_wasm.sh
 ./scripts/build_wasm.sh
 ```
 
-Script tự clone nguồn external repo (IronRDP, PhotoCraft, VectorCraft) về `src_wasm/<tên>/external_repo/` nếu chưa có (không dùng git submodule) rồi build. Nếu chỉ muốn lấy nguồn mà chưa build:
+Script tự clone nguồn external repo (IronRDP, PhotoCraft, VectorCraft, GridCraft, WordCraft) về `src_wasm/<tên>/external_repo/` nếu chưa có (không dùng git submodule) rồi build. Nếu chỉ muốn lấy nguồn mà chưa build:
 
 ```bash
 chmod 777 ./scripts/fetch_wasm_sources.sh
@@ -109,13 +111,13 @@ chmod 777 ./scripts/fetch_wasm_sources.sh
 > helper tự quay về nhánh mặc định rồi mới pull. Pull/checkout lỗi chỉ cảnh báo
 > rồi vẫn tiếp tục build.
 
-### Các tool "craft" (PhotoCraft / VectorCraft)
+### Các tool "craft" (PhotoCraft / VectorCraft / GridCraft / WordCraft)
 
-Hai tool này ở sidebar chỉ làm đúng 1 việc: tải wasm về và load lên toàn màn hình trong một `<iframe>` (wasm app hoàn chỉnh, egui + WebGPU/WebGL2). File wasm luôn được `build.sh` nén gzip thành `_bg.wasm.gz` (vừa để dưới giới hạn **25 MiB/file của Cloudflare Pages**, vừa để tải nhanh hơn), `index.html` tự giải nén (DecompressionStream) khi tải. Vì vậy cần **build wasm trước** khi `npm run build` (nếu chưa build, folder `src_wasm/pkg/<tên>` trống và iframe sẽ báo lỗi):
+Các tool này ở sidebar chỉ làm đúng 1 việc: tải wasm về và load lên toàn màn hình trong một `<iframe>` (wasm app hoàn chỉnh, egui + WebGPU/WebGL2). File wasm luôn được `build.sh` nén gzip thành `_bg.wasm.gz` (vừa để dưới giới hạn **25 MiB/file của Cloudflare Pages**, vừa để tải nhanh hơn), `index.html` tự giải nén (DecompressionStream) khi tải. Vì vậy cần **build wasm trước** khi `npm run build` (nếu chưa build, folder `src_wasm/pkg/<tên>` trống và `npm run build` sẽ lỗi "No file was found to copy"):
 
 ```bash
 # Cách 1: build riêng một tool
-chmod +x ./src_wasm/photocraft/build.sh    # hoặc vectorcraft
+chmod +x ./src_wasm/photocraft/build.sh    # hoặc vectorcraft, gridcraft, wordcraft
 ./src_wasm/photocraft/build.sh
 
 # Cách 2: build toàn bộ wasm (IronRDP + .NET + 4 craft tool)

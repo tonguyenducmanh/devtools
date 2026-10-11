@@ -43,4 +43,14 @@ fetch "$ROOT_DIR/src_wasm/vectorcraft/external_repo" \
   "https://github.com/storytold/vectorcraft.git" \
   ""
 
+# GridCraft (dùng cho tool Bảng tính)
+fetch "$ROOT_DIR/src_wasm/gridcraft/external_repo" \
+  "https://github.com/storytold/gridcraft.git" \
+  ""
+
+# WordCraft (dùng cho tool Soạn thảo văn bản)
+fetch "$ROOT_DIR/src_wasm/wordcraft/external_repo" \
+  "https://github.com/storytold/wordcraft.git" \
+  ""
+
 echo "Fetch wasm sources completed."

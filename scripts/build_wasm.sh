@@ -46,7 +46,9 @@ cd "$ROOT_DIR"
 # 3. Build các web app "craft" (Rust → WebAssembly, static site chạy trong iframe)
 #    PhotoCraft  — Ảnh pixel   — trunk
 #    VectorCraft — Ảnh vector — trunk
-for CRAFT in photocraft vectorcraft; do
+#    GridCraft   — Bảng tính  — trunk
+#    WordCraft   — Văn bản    — trunk
+for CRAFT in photocraft vectorcraft gridcraft wordcraft; do
     CRAFT_MODULE_DIR="$ROOT_DIR/src_wasm/$CRAFT"
     if [ -d "$CRAFT_MODULE_DIR" ]; then
         echo "Entering ${CRAFT} Module..."

@@ -4,7 +4,7 @@ DevTools (tên hiển thị **Tools**, repo GitHub `tonguyenducmanh/devtools`) l
 
 - **Frontend (Client):** Vue 3 SPA chạy trên browser (`src/`), có thể host độc lập (Cloudflare Pages) hoặc được daemon phục vụ.
 - **Backend (Daemon/Agent):** Go, 3 module riêng trong `src_backend/` (`tm_config`, `tm_core_service`, `tm_app`). Daemon lo phần cần máy nội bộ: SQLite, RDP over WebSocket, Mock API, PostgreSQL, đọc ghi file.
-- **WASM (`src_wasm/`):** IronRDP (Remote Desktop), .NET Wrapper (C#), 2 web app "craft" (PhotoCraft / VectorCraft) — **file wasm đã build được commit thẳng** vào `src_wasm/pkg/`, KHÔNG dùng git submodule.
+- **WASM (`src_wasm/`):** IronRDP (Remote Desktop), .NET Wrapper (C#), 4 web app "craft" (PhotoCraft / VectorCraft / GridCraft / WordCraft) — **file wasm đã build được commit thẳng** vào `src_wasm/pkg/`, KHÔNG dùng git submodule.
 
 Quy ước toàn repo: tiền tố frontend `TM*`, backend file `tm_*.go` với tiền tố tầng (`bl_` service, `dl_` database, `rt_` router). Ngôn ngữ giao diện & tài liệu chính là **tiếng Việt**; i18n hỗ trợ `en`/`vi` (fallback `vi`). **Đọc file này trước, rồi `docs/`.**
 
@@ -44,6 +44,8 @@ src_wasm/                       Nguồn WASM
   dotnet_wrapper → pkg/dotnet   .NET 10 browser-wasm (AppBundle/_framework)
   photocraft → pkg/photocraft    Static site PhotoCraft (trunk, wasm nén gzip)
   vectorcraft → pkg/vectorcraft  Static site VectorCraft (trunk, wasm nén gzip)
+  gridcraft → pkg/gridcraft      Static site GridCraft (trunk, wasm nén gzip)
+  wordcraft → pkg/wordcraft      Static site WordCraft (trunk, wasm nén gzip)
 scripts/                        tm_version.sh, build_api.sh, build_daemon.sh, build_web_for_daemon.sh,
                                 build_wasm.sh, fetch_wasm_sources.sh, git_pull_if_repo.sh,
                                 wasm_dist_common.sh + patch_wasm_dist.py (nén wasm dùng chung), remove_*.sh

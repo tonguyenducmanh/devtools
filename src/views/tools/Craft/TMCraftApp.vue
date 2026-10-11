@@ -23,13 +23,6 @@
       <canvas ref="craftCanvas" class="tm-craft-app-canvas"></canvas>
       <div v-if="isLoading" class="tm-craft-app-loading" @click.stop>
         <TMLoading />
-        <p class="tm-craft-app-loading-text">{{ $t(`i18nCommon.craftApp.${appKey}.loading`) }}</p>
-        <p v-if="loadFailed" class="tm-craft-app-loading-error">
-          {{ $t(`i18nCommon.craftApp.${appKey}.loadFailed`) }}
-        </p>
-        <p v-else class="tm-craft-app-loading-hint">
-          {{ $t(`i18nCommon.craftApp.${appKey}.loadingHint`) }}
-        </p>
       </div>
     </div>
   </TMFullTabWrapper>
@@ -67,7 +60,6 @@ export default {
   data() {
     return {
       isLoading: true,
-      loadFailed: false,
       isFullTab: false,
       // khoá riêng cho instance này, dùng làm query của URL glue
       instanceKey: nextCraftInstanceKey(this.appKey),
@@ -122,11 +114,9 @@ export default {
         // getElementById) rồi tự vẽ.
         await mod.default({ module_or_path: wasmBytes });
         this.isLoading = false;
-        this.loadFailed = false;
       } catch (e) {
         console.error(`${this.appName} failed to start`, e);
         this.isLoading = false;
-        this.loadFailed = true;
       }
     },
     takeScreenshot() {
@@ -171,29 +161,7 @@ export default {
   position: absolute;
   inset: 0;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  color: #b8b8b8;
-  text-align: center;
-}
-.tm-craft-app-loading-text {
-  margin: 0;
-  font-size: 14px;
-}
-.tm-craft-app-loading-hint {
-  margin: 0;
-  font-size: 12px;
-  color: #8c8c8c;
-  max-width: 420px;
-  line-height: 1.5;
-}
-.tm-craft-app-loading-error {
-  margin: 0;
-  font-size: 13px;
-  color: #e06c75;
-  max-width: 420px;
-  line-height: 1.5;
 }
 </style>

@@ -16,7 +16,14 @@ const APP_VERSION = process.env.VERSION || packageJson.version;
 //   - `src_wasm/<tên>/build.sh` tạo ra `src_wasm/pkg/<tên>/`
 //   - `src/views/tools/Craft/` dùng `appKey = <tên>` để nạp
 //     `/assets-wasm-<version>/<tên>/index.html`
-const WASM_PKG_FOLDERS = ["dotnet", "rdp", "photocraft", "vectorcraft"];
+const WASM_PKG_FOLDERS = [
+  "dotnet",
+  "rdp",
+  "photocraft",
+  "vectorcraft",
+  "gridcraft",
+  "wordcraft",
+];
 
 const wasmCopyTargets = WASM_PKG_FOLDERS.map((folder) => ({
   src: `src_wasm/pkg/${folder}/*`,
