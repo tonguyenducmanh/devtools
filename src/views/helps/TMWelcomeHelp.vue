@@ -76,7 +76,3 @@ export default {
   mounted() {},
 };
 </script>
-
-<style lang="scss" scoped>
-@use "@/styles/help.scss";
-</style>

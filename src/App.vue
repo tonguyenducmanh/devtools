@@ -94,7 +94,7 @@ export default {
 </script>
 <style lang="scss">
 // không scope để dùng global style
-@use "@/styles/main.scss";
+@use "@/styles/tm_main.scss";
 .tm-container {
   display: flex;
   flex-direction: column;

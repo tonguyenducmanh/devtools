@@ -45,7 +45,3 @@ export default {
   name: "TMJSONSortByKeyHelp",
 };
 </script>
-
-<style lang="scss" scoped>
-@use "@/styles/help.scss";
-</style>
