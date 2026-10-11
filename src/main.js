@@ -9,7 +9,6 @@ import TMTextEditor from "@/components/TMTextEditor.vue";
 import TMLoading from "@/components/TMLoading.vue";
 import TMInput from "@/components/TMInput.vue";
 import TMCheckbox from "@/components/TMCheckbox.vue";
-import TMColorPicker from "@/components/TMColorPicker.vue";
 import TMUpload from "@/components/TMUpload.vue";
 import TMRadio from "@/components/TMRadio.vue";
 import TMRadioGroup from "@/components/TMRadioGroup.vue";
@@ -60,7 +59,6 @@ import "@/common/plugin/TMMonacoEditor.js";
   currentApp.component("TMResizer", TMResizer);
   currentApp.component("TMVirtualScroll", TMVirtualScroll);
   currentApp.component("TMDateTime", TMDateTime);
-  currentApp.component("TMColorPicker", TMColorPicker);
 
   // globalization language
   currentApp.use(i18nData);

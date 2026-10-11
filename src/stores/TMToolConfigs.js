@@ -277,11 +277,6 @@ export const sidebarConfig = [
         component: () => import("@/views/tools/TMImageToBase64.vue"),
         meta: { titleKey: "i18nCommon.feature.ImageToBase64" },
       },
-      {
-        name: "colorpicker",
-        component: () => import("@/views/tools/TMColorPickerFromImage.vue"),
-        meta: { titleKey: "i18nCommon.feature.colorPicker" },
-      },
     ],
   },
   {

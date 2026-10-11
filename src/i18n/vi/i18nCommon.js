@@ -179,7 +179,6 @@ export default {
       oneTimePassword: "Tạo mã OTP",
       textCompress: "Nén văn bản",
       compareCode: "So sánh mã",
-      colorPicker: "Chọn màu",
       componentShowcase: "Demo Component",
       JSONToPostgreSQL: "JSON sang Postgres",
       JSONToOneLineString: "JSON thành 1 dòng",
@@ -279,15 +278,6 @@ export default {
       outputCode: "Mã đầu ra",
       formatCode: "Định dạng mã",
       copyOutput: "Sao chép đầu ra",
-    },
-    colorPicker: {
-      title: "Công cụ chọn màu!",
-      uploadLabel: "Chọn ảnh",
-      uploadButton: "Tải lên",
-      colorPalette: "Bảng màu",
-      selectedColor: "Màu đã chọn",
-      copyColor: "Sao chép màu",
-      uploadNewImage: "Tải ảnh mới",
     },
     compareCode: {
       title: "Công cụ so sánh hai tệp (diff) !",
@@ -730,7 +720,6 @@ export default {
       blockTags: "Block Tags",
       classFilters: "Lọc Class",
       idFilters: "Lọc ID",
-      bilingualTextColor: "Màu text song ngữ",
     },
     textgenerator: {
       resultPlaceholder: "Kết quả gen text ngẫu nhiên",

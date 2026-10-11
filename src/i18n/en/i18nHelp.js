@@ -79,25 +79,6 @@ export default {
           "Support wrap text to view long code without horizontal scrolling.",
       },
     },
-    colorPicker: {
-      purpose: {
-        title: "What is Color Picker?",
-        content:
-          "A tool that allows you to upload an image, click anywhere on the image to extract color codes (HEX, RGB, HSL) at that point.",
-      },
-      howToUse: {
-        title: "How to Use",
-        upload: "Upload the image you want to extract colors from.",
-        click: "Click anywhere on the image to get the color code.",
-        copy: "Press the Copy button to copy the HEX color code to clipboard.",
-      },
-      features: {
-        title: "Features",
-        magnifier:
-          "Magnifying glass zooms the area around the mouse cursor for more accurate color selection.",
-        palette: "Automatically extract main color palette from the image.",
-      },
-    },
     imageToBase64: {
       purpose: {
         title: "What is Image to Base64?",

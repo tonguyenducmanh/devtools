@@ -178,7 +178,6 @@ export default {
       oneTimePassword: "OTP gen",
       textCompress: "Text Compress",
       compareCode: "Compare code",
-      colorPicker: "Color picker",
       componentShowcase: "Component Showcase",
       JSONToPostgreSQL: "JSON to Postgres",
       JSONMapping: "JSON Mapping",
@@ -278,15 +277,6 @@ export default {
       outputCode: "Output code",
       formatCode: "Format code",
       copyOutput: "Copy output",
-    },
-    colorPicker: {
-      title: "Color picker tool!",
-      uploadLabel: "Choose an image",
-      uploadButton: "Upload",
-      colorPalette: "Color Palette",
-      selectedColor: "Selected Color",
-      copyColor: "Copy color",
-      uploadNewImage: "Upload New Image",
     },
     compareCode: {
       title: "Compare two file (diff changes) !",
@@ -734,7 +724,6 @@ export default {
       blockTags: "Block Tags",
       classFilters: "Class Filter",
       idFilters: "ID Filter",
-      bilingualTextColor: "Bilingual text color",
     },
     textgenerator: {
       resultPlaceholder: "Result random text",

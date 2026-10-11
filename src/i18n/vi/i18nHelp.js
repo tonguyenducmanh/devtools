@@ -77,25 +77,6 @@ export default {
         wrapText: "Hỗ trợ wrap text để xem code dài mà không cần cuộn ngang.",
       },
     },
-    colorPicker: {
-      purpose: {
-        title: "Trích xuất màu từ ảnh là gì?",
-        content:
-          "Công cụ cho phép upload ảnh, click vào vị trí bất kỳ trên ảnh để lấy mã màu (HEX, RGB, HSL) tại điểm đó.",
-      },
-      howToUse: {
-        title: "Cách sử dụng",
-        upload: "Upload ảnh cần trích xuất màu.",
-        click: "Click vào vị trí bất kỳ trên ảnh để lấy mã màu.",
-        copy: "Nhấn nút Copy để sao chép mã màu HEX vào clipboard.",
-      },
-      features: {
-        title: "Tính năng",
-        magnifier:
-          "Kính lúp phóng đại vùng xung quanh con trỏ chuột để chọn màu chính xác hơn.",
-        palette: "Tự động trích xuất bảng màu chính từ ảnh.",
-      },
-    },
     imageToBase64: {
       purpose: {
         title: "Chuyển ảnh sang Base64 là gì?",
