@@ -1,6 +1,6 @@
 <!-- Tool Ảnh pixel — web app PhotoCraft (Rust → WebAssembly), xem src_wasm/photocraft -->
 <template>
-  <TMCraftApp app-key="photocraft" app-name="PhotoCraft" bg-color="#262626" />
+  <TMCraftApp app-key="photocraft" app-name="PhotoCraft" />
 </template>
 
 <script>

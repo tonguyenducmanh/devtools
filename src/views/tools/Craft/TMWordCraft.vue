@@ -1,6 +1,6 @@
 <!-- Tool Soạn thảo văn bản — web app WordCraft (Rust → WebAssembly), xem src_wasm/wordcraft -->
 <template>
-  <TMCraftApp app-key="wordcraft" app-name="WordCraft" bg-color="#e6e6e6" />
+  <TMCraftApp app-key="wordcraft" app-name="WordCraft" />
 </template>
 
 <script>

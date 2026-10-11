@@ -1,6 +1,6 @@
 <!-- Tool Ảnh vector — web app VectorCraft (Rust → WebAssembly), xem src_wasm/vectorcraft -->
 <template>
-  <TMCraftApp app-key="vectorcraft" app-name="VectorCraft" bg-color="#262626" />
+  <TMCraftApp app-key="vectorcraft" app-name="VectorCraft" />
 </template>
 
 <script>

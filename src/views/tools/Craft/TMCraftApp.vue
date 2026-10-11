@@ -2,7 +2,6 @@
   <TMFullTabWrapper
     v-model="isFullTab"
     :alwaysShowToolbar="true"
-    :fullScreenBgColor="bgColor"
     class="tm-craft-app-wrapper"
   >
     <template #toolbar-left>
@@ -14,7 +13,7 @@
         <span class="tm-icon tm-camera-icon"></span>
       </div>
     </template>
-    <div class="tm-craft-app-container" :style="{ backgroundColor: bgColor }">
+    <div class="tm-craft-app-container">
       <!--
         App craft tự tìm canvas khi khởi động rồi giữ thẳng tham chiếu element,
         nên canvas nằm nguyên trong DOM của tab này và không bị reload khi đổi
@@ -50,11 +49,6 @@ export default {
     appName: {
       type: String,
       required: true,
-    },
-    // Màu nền cho tới khi app tự vẽ lên canvas
-    bgColor: {
-      type: String,
-      default: "#262626",
     },
   },
   data() {

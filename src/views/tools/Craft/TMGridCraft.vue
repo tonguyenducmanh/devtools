@@ -1,6 +1,6 @@
 <!-- Tool Bảng tính — web app GridCraft (Rust → WebAssembly), xem src_wasm/gridcraft -->
 <template>
-  <TMCraftApp app-key="gridcraft" app-name="GridCraft" bg-color="#f3f3f3" />
+  <TMCraftApp app-key="gridcraft" app-name="GridCraft" />
 </template>
 
 <script>
