@@ -204,51 +204,94 @@ export default {
         ],
         help: [
           {
-            key: "downloadAgent",
-            labelKey: "i18nCommon.feature.agentDownload.title",
-            tooltip: this.$t("i18nCommon.apiTesting.toolTipDownloadAgent"),
-            action: this.downloadAgentFunc,
+            key: "agent",
+            labelKey: "i18nCommon.tmheader.helpAgent",
+            tooltipKey: "i18nCommon.tmheader.helpAgentTooltip",
+            children: this.helpAgentItems,
+            onChildClick: (value) => this.onHelpItemClick(value),
           },
           {
-            key: "userSettings",
-            labelKey: "i18nCommon.feature.userSettings",
-            action: this.userSettingsFunc,
+            key: "app",
+            labelKey: "i18nCommon.tmheader.helpApp",
+            tooltipKey: "i18nCommon.tmheader.helpAppTooltip",
+            children: this.helpAppItems,
+            onChildClick: (value) => this.onHelpItemClick(value),
           },
           {
-            key: "pingAgent",
-            labelKey: "i18nCommon.apiTesting.pingAgent",
-            action: this.pingAgentFunc,
-          },
-          {
-            key: "reloadApp",
-            labelKey: "i18nCommon.help.reloadApp",
-            action: this.reloadAppFunc,
-          },
-          {
-            key: "goToSource",
-            labelKey: "i18nCommon.tmheader.goToSource",
-            action: this.goToSourceFunc,
-          },
-
-          {
-            // Màn welcome chỉ hiện khi chưa mở tab nào, nên đặt thêm ở menu trợ giúp
-            // để xem toàn bộ tip được dù khi đang mở tool
-            key: "showAllTips",
-            labelKey: "i18nTip.viewAllTips",
-            action: this.showAllTipsPopup,
-          },
-          {
-            // Điều khoản vốn chỉ hiện 1 lần lúc khởi chạy, đặt thêm ở đây để
-            // xem lại được bất cứ lúc nào
-            key: "showAgreement",
-            labelKey: "i18nCommon.agreementTitle",
-            action: this.showAgreementPopup,
+            key: "docs",
+            labelKey: "i18nCommon.tmheader.helpDocs",
+            tooltipKey: "i18nCommon.tmheader.helpDocsTooltip",
+            children: this.helpDocsItems,
+            onChildClick: (value) => this.onHelpItemClick(value),
           },
         ],
       };
     },
     currentMenuItems() {
       return this.menuConfig[this.activeKeyFlyOut] ?? [];
+    },
+    /**
+     * Menu trợ giúp tách thành 3 nhóm con, mỗi nhóm mở 1 sub-flyout
+     * (giống hệt cách menu Giao diện chia nhóm chủ đề / hiệu ứng)
+     */
+    helpAgentItems() {
+      return [
+        {
+          label: this.$t("i18nCommon.feature.agentDownload.title"),
+          value: "downloadAgent",
+        },
+        {
+          label: this.$t("i18nCommon.apiTesting.pingAgent"),
+          value: "pingAgent",
+        },
+      ];
+    },
+    helpAppItems() {
+      return [
+        {
+          label: this.$t("i18nCommon.feature.userSettings"),
+          value: "userSettings",
+        },
+        {
+          label: this.$t("i18nCommon.help.reloadApp"),
+          value: "reloadApp",
+        },
+      ];
+    },
+    helpDocsItems() {
+      return [
+        // Màn welcome chỉ hiện khi chưa mở tab nào, nên đặt thêm ở menu trợ giúp
+        // để xem toàn bộ tip được dù khi đang mở tool
+        {
+          label: this.$t("i18nTip.viewAllTips"),
+          value: "showAllTips",
+        },
+        // Điều khoản vốn chỉ hiện 1 lần lúc khởi chạy, đặt thêm ở đây để
+        // xem lại được bất cứ lúc nào
+        {
+          label: this.$t("i18nCommon.agreementTitle"),
+          value: "showAgreement",
+        },
+        {
+          label: this.$t("i18nCommon.tmheader.goToSource"),
+          value: "goToSource",
+        },
+      ];
+    },
+    /**
+     * Bảng tra value của item trong sub-menu trợ giúp → hàm xử lý tương ứng,
+     * để các nhóm con chỉ cần khai báo value là chạy, không lặp lại hàm.
+     */
+    helpItemActions() {
+      return {
+        downloadAgent: this.downloadAgentFunc,
+        pingAgent: this.pingAgentFunc,
+        userSettings: this.userSettingsFunc,
+        reloadApp: this.reloadAppFunc,
+        goToSource: this.goToSourceFunc,
+        showAllTips: this.showAllTipsPopup,
+        showAgreement: this.showAgreementPopup,
+      };
     },
     backgroundEffectItems() {
       return this.$tmEnum.backgroundEffectList.map((item) => ({
@@ -407,6 +450,13 @@ export default {
     onSubItemClick(item, child) {
       if (item?.onChildClick) {
         item.onChildClick(child.value);
+      }
+    },
+    /** Chạy action của 1 item trong sub-menu của nhóm trợ giúp */
+    onHelpItemClick(value) {
+      const action = this.helpItemActions[value];
+      if (typeof action === "function") {
+        action();
       }
     },
     onFlyoutPanelLeave() {

@@ -118,6 +118,13 @@ export default {
       pingAgentFailed: "Agent server did not respond correctly",
       uiVersion: "UI version",
       serverVersion: "Server version",
+      helpAgent: "Agent",
+      helpAgentTooltip:
+        "Download the Agent (desktop app that calls APIs for you) and check the connection to it",
+      helpApp: "App",
+      helpAppTooltip: "User settings and reload the app",
+      helpDocs: "Docs & others",
+      helpDocsTooltip: "View all tips, terms of use and source code",
     },
     splitHorizontal: "Split horizontal",
     deleteAll: "Delete all history",

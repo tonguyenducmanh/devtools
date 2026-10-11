@@ -119,6 +119,13 @@ export default {
       pingAgentFailed: "Server agent không phản hồi đúng",
       uiVersion: "Phiên bản UI",
       serverVersion: "Phiên bản server",
+      helpAgent: "Agent",
+      helpAgentTooltip:
+        "Tải Agent (app desktop gọi API hộ) và kiểm tra kết nối tới Agent",
+      helpApp: "Ứng dụng",
+      helpAppTooltip: "Cài đặt người dùng, tải lại ứng dụng",
+      helpDocs: "Tài liệu & khác",
+      helpDocsTooltip: "Xem toàn bộ tips, điều khoản sử dụng, mã nguồn",
     },
     splitHorizontal: "Chia ngang",
     deleteAll: "Xóa tất cả lịch sử",
