@@ -28,6 +28,7 @@
    - Tool đơn lẻ: thêm entry `{ type: "route", name, component: () => import(...), meta: { titleKey } }`.
    - Tool trong nhóm: thêm con vào mảng `children` của group có sẵn (hoặc tạo group mới với `groupKey`, `groupTitleKey`).
    - `hide: true` nếu chưa muốn hiện trên sidebar (vẫn search được nếu cần chỉnh `getAllSearchableRoutes`).
+   - **Layout vùng nội dung tab (tuỳ chọn):** khai báo ở cấp group `contentFlush: true` (tool tự lo bố trí, ví dụ app vẽ canvas → không padding) và/hoặc `confirmOnClose: true` (tool có dữ liệu tạm chưa lưu → đóng tab sẽ hỏi xác nhận). Ghi đè riêng cho 1 tool bằng `meta.contentFlush` / `meta.confirmOnClose`.
 3. **i18n:** thêm `$t` key vào `src/i18n/vi/i18nCommon.js` **và** `src/i18n/en/i18nCommon.js` cho `titleKey` + mọi chuỗi trong UI. Tiêu đề tab tự hiển thị từ `meta.titleKey`.
 4. **(Tùy chọn) Help:** tạo `src/views/helps/TM<Thing>Help.vue` và nối `helpKey` trong tab meta; nội dung help đặt trong `i18nHelp`.
 5. **(Tùy chọn) Dialog:** `TMDialogEnum` + `DialogComponentMap` nằm trong `src/common/TMDialogUtil.js` — thêm enum ở **cuối** `TMDialogEnum`, mapping trong `DialogComponentMap`, tạo component trong `src/views/dialogs/` (implement `show(param)`).

@@ -92,6 +92,8 @@ export default {
   .tm-confirm-message {
     width: 100%;
     text-align: center;
+    // message có \n để ngắt dòng
+    white-space: pre-line;
   }
 
   .tm-confirm-actions {

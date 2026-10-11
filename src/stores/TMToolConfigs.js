@@ -2,8 +2,17 @@
 // type: "group"  → nhóm nhiều tool, hiển thị tab bar khi vào
 // type: "route"  → tool đơn lẻ, điều hướng trực tiếp như cũ
 // hide: true     → không hiện trên sidebar (vẫn đăng ký)
+//
+// ─── Cấu hình layout của vùng nội dung tab (tuỳ chọn) ─────────────────────────
+// contentFlush  : true → vùng nội dung tab KHÔNG padding, tool tự lo bố trí
+//                          (vd: app vẽ canvas cần chiếm hết vùng)
+// confirmOnClose: true → đóng tab sẽ bật popup hỏi xác nhận vì tool có dữ liệu
+//                          tạm chưa lưu
+// Khai báo ở cấp group áp dụng cho mọi tool trong group đó; muốn ghi đè riêng
+// cho 1 tool thì đặt trong meta của tool (meta.contentFlush / meta.confirmOnClose).
+// File này chỉ chứa cấu hình, phần đọc/resolve cấu hình nằm ở TMTabManager.js.
 
-const sidebarConfig = [
+export const sidebarConfig = [
   {
     type: "route",
     hide: true,
@@ -22,6 +31,9 @@ const sidebarConfig = [
     type: "group",
     groupKey: "graphicdesign",
     groupTitleKey: "i18nCommon.group.GraphicDesign",
+    // App vẽ canvas → không padding, và có dữ liệu tạm chưa lưu → hỏi khi đóng
+    contentFlush: true,
+    confirmOnClose: true,
     children: [
       {
         name: "TMPhotoCraft",

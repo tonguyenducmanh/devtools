@@ -27,6 +27,10 @@ export default {
       tabPrevious: "Previous tab",
       tabNext: "Next tab",
       tabClose: "Close tab",
+      confirmCloseTabTitle: "Close tab",
+      confirmCloseTabMessage: "Are you sure you want to close this tab?",
+      confirmCloseYes: "Close",
+      confirmCloseNo: "Cancel",
     },
     group: {
       QRCode: "QR tooling",

@@ -5,6 +5,7 @@
 
 import { reactive, markRaw } from "vue";
 import tmUtility from "@/common/TMUtility.js";
+import { sidebarConfig } from "@/stores/TMToolConfigs.js";
 
 // biến toàn cục lưu trữ danh sách các tab đang làm việc
 // thay vì dùng viewrouter render 1 trang duy nhất
@@ -28,11 +29,53 @@ function genId(mod) {
 }
 
 /**
+ * Tìm config của tool theo groupKey + toolKey trong TMToolConfigs.
+ * Tool nằm trong group thì lấy từ children của group, tool đơn lẻ (route) thì
+ * tìm trực tiếp trong sidebarConfig.
+ * @returns {{ child: object|null, group: object|null }}
+ */
+function findToolConfig(groupKey, toolKey) {
+  const group =
+    sidebarConfig.find(
+      (item) => item.type === "group" && item.groupKey === groupKey,
+    ) ?? null;
+  const childInGroup = group?.children?.find((c) => c.name === toolKey);
+  if (childInGroup) return { child: childInGroup, group };
+
+  const route = sidebarConfig.find(
+    (item) => item.type === "route" && item.name === toolKey,
+  );
+  return { child: route ?? null, group: null };
+}
+
+/**
+ * Cấu hình layout của vùng nội dung tab cho 1 tool.
+ * Thứ tự ưu tiên: khai báo riêng trong meta của tool → mặc định của group →
+ * mặc định chung (có padding, không hỏi xác nhận).
+ * @param {string} groupKey - group chứa tool (route đơn lẻ thì để "")
+ * @param {string} toolKey  - tên tool trong config
+ * @returns {{ contentFlush: boolean, confirmOnClose: boolean }}
+ */
+function getToolContentLayout(groupKey, toolKey) {
+  const { child, group } = findToolConfig(groupKey, toolKey);
+  return {
+    contentFlush: !!(
+      child?.meta?.contentFlush ?? group?.contentFlush ?? false
+    ),
+    confirmOnClose: !!(
+      child?.meta?.confirmOnClose ?? group?.confirmOnClose ?? false
+    ),
+  };
+}
+
+/**
  * Hàm expose ra bên ngoài để sử dụng tab
  */
 export function useTabManager() {
   /**
    * mở 1 tab mới
+   * Layout của tab (contentFlush / confirmOnClose) lấy từ config tool trong
+   * TMToolConfigs, đọc qua getToolContentLayout
    */
   async function openTab({
     titleKey,
@@ -53,6 +96,10 @@ export function useTabManager() {
 
     const id = genId(mod);
 
+    // Layout vùng nội dung do config tool quyết định: có padding hay không,
+    // và đóng tab có cần hỏi xác nhận hay không.
+    const layout = getToolContentLayout(groupKey, toolKey);
+
     const tab = {
       id,
       toolKey,
@@ -62,6 +109,8 @@ export function useTabManager() {
       component,
       resolvedComponent: null,
       customTitle: null,
+      contentFlush: layout.contentFlush,
+      confirmOnClose: layout.confirmOnClose,
     };
 
     tab.resolvedComponent = markRaw(mod.default ?? mod);

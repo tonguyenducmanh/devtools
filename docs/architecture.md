@@ -20,9 +20,9 @@ Frontend không nhúng "trái tim" logic nặng; những việc cần máy nội
 
 ### Điều hướng — tab system (không vue-router)
 
-- `src/stores/TMTabManager.js`: `{tabs[], activeTabId}`; `openTab({titleKey, helpKey, groupKey, toolKey, component, checkExisting})` lazy-load component; tabId = `ComponentName-<guid>`.
-- `src/views/misc/TMDynamicTabView.vue`: thanh tab (drag-drop, close giữa chuột, duplicate, zen mode) + render tool active.
-- `src/stores/TMToolConfigs.js`: mảng `sidebarConfig` là nguồn duy nhất đăng ký tool. Kiểu: `route`, `group` (flyout nhiều con), `automation`. Helper: `getSidebarItems()`, `getGroupConfig(groupKey)`, `getAllSearchableRoutes()`.
+- `src/stores/TMTabManager.js`: `{tabs[], activeTabId}`; `openTab({titleKey, helpKey, groupKey, toolKey, component, checkExisting})` lazy-load component; tabId = `ComponentName-<guid>`. Mỗi tab lưu thêm cờ layout đã resolve từ config (`contentFlush`, `confirmOnClose`) bằng helper nội bộ `getToolContentLayout(groupKey, toolKey)`.
+- `src/views/misc/TMDynamicTabView.vue`: thanh tab (drag-drop, close giữa chuột, duplicate, zen mode) + render tool active. `.tm-tab-content` có padding mặc định, thêm class `tm-tab-content-flush` khi tab active khai báo `contentFlush`; mọi thao tác đóng tab (nút X, chuột giữa, context menu, Alt+Q, đóng tất cả) đi qua `onCloseTab/onCloseTabs/onExitTabMode` → `TMDialogUtil.confirm()` nếu tab cần xác nhận.
+- `src/stores/TMToolConfigs.js`: mảng `sidebarConfig` là nguồn duy nhất đăng ký tool (chỉ chứa cấu hình, không xử lý logic). Kiểu: `route`, `group` (flyout nhiều con), `automation`. Helper đọc cấu hình: `getSidebarItems()`, `getGroupConfig(groupKey)`, `getAllSearchableRoutes()`.
 
 ### Tầng request
 

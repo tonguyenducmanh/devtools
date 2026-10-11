@@ -31,7 +31,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
             @dragend="onDragEnd"
             @click="activateTab(tab.id)"
             @contextmenu.prevent="openContextMenu($event, tab)"
-            @click.middle="closeTab(tab.id)"
+            @click.middle="onCloseTab(tab.id)"
             v-tooltip="getTabTitle(tab)"
           >
             <div class="tm-tab-bg"></div>
@@ -54,7 +54,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
               <span
                 class="tm-icon tm-close-icon"
                 v-tooltip="$t('i18nCommon.tabManager.closeTab')"
-                @click.stop="closeTab(tab.id)"
+                @click.stop="onCloseTab(tab.id)"
               ></span>
             </button>
           </div>
@@ -75,7 +75,7 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
         <!-- Nút đóng tất cả -->
         <button
           class="tm-tab-exit-btn"
-          @click="exitTabMode"
+          @click="onExitTabMode"
           v-tooltip="$t('i18nCommon.tabManager.closeAllTabs')"
         >
           <span class="tm-icon tm-close-icon"> </span>
@@ -84,7 +84,13 @@ support cùng 1 tính năng được phép hiển thị thành nhiều lần
     </Transition>
 
     <!-- Content area -->
-    <div class="tm-tab-content" :class="{ 'tm-zen-active': zenMode }">
+    <div
+      class="tm-tab-content"
+      :class="{
+        'tm-zen-active': zenMode,
+        'tm-tab-content-flush': isContentFlush,
+      }"
+    >
       <!-- Zen mode toolbar -->
       <div
         v-if="zenMode"
@@ -199,12 +205,14 @@ import {
   watch as vueWatch,
   nextTick,
   defineAsyncComponent,
+  getCurrentInstance,
   onMounted,
   onBeforeUnmount,
 } from "vue";
 import { useTabManager } from "@/stores/TMTabManager.js";
 import i18nData from "@/i18n/i18nData.js";
 import tmUtility from "@/common/TMUtility.js";
+import TMDialogUtil from "@/common/TMDialogUtil.js";
 import TMShortcutAction, {
   TMShortcutActionEnum,
 } from "@/common/TMShortcutAction.js";
@@ -343,6 +351,9 @@ export default {
     // Lấy context menu từ plugin toàn cục
     const tmContextMenu = inject("tmContextMenu");
 
+    // Dùng cho TMDialogUtil.confirm (kế thừa appContext để popup có $t, v-tooltip…)
+    const ownerForm = getCurrentInstance()?.proxy ?? null;
+
     const tabs = computed(() => state.tabs);
     const activeTabId = computed(() => state.activeTabId);
     const activeTab = computed(() => {
@@ -352,6 +363,8 @@ export default {
       let isMultiTab = state.tabs.length > 0;
       return isMultiTab;
     });
+    // Tool tự khai báo contentFlush (vd: app vẽ canvas) → vùng nội dung không padding
+    const isContentFlush = computed(() => !!activeTab.value?.contentFlush);
 
     // quản lý danh sách các tab đang mở theo $refs để sau có thể handle 1 số event custom
     const tabRefs = {};
@@ -408,6 +421,52 @@ export default {
       { immediate: true },
     );
 
+    // ── Đóng tab có hỏi xác nhận ────────────────────────────────────────────
+    // Tool có dữ liệu tạm chưa lưu khai báo confirmOnClose trong TMToolConfigs
+    // → đóng bằng nút X, chuột giữa, context menu, Alt+Q hay đóng tất cả đều
+    // phải hỏi lại user trước.
+    function getTabsNeedConfirm(ids) {
+      const idSet = new Set(ids);
+      return tabs.value.filter((t) => idSet.has(t.id) && t.confirmOnClose);
+    }
+
+    async function confirmCloseTabs(ids) {
+      const listNeedConfirm = getTabsNeedConfirm(ids);
+      if (!listNeedConfirm.length) return true;
+
+      const tabLabel = (key) =>
+        i18nData.global.t(`i18nCommon.tabManager.${key}`);
+
+      return await TMDialogUtil.confirm({
+        ownerForm,
+        title: tabLabel("confirmCloseTabTitle"),
+        message: tabLabel("confirmCloseTabMessage"),
+        confirmLabel: tabLabel("confirmCloseYes"),
+        cancelLabel: tabLabel("confirmCloseNo"),
+      });
+    }
+
+    /** Đóng 1 tab, hỏi xác nhận nếu tool có dữ liệu chưa lưu */
+    async function onCloseTab(id) {
+      if (await confirmCloseTabs([id])) {
+        closeTab(id);
+      }
+    }
+
+    /** Đóng nhiều tab, chỉ hỏi 1 lần nếu trong đó có tool cần xác nhận */
+    async function onCloseTabs(ids) {
+      if (await confirmCloseTabs(ids)) {
+        closeTabs(ids);
+      }
+    }
+
+    /** Đóng toàn bộ tab (nút thoát tab mode) */
+    async function onExitTabMode() {
+      if (await confirmCloseTabs(tabs.value.map((t) => t.id))) {
+        exitTabMode();
+      }
+    }
+
     // ── Context menu ── dùng plugin thay vì tự quản lý state
     function openContextMenu(event, tab) {
       const tabList = tabs.value;
@@ -431,7 +490,7 @@ export default {
           item: {
             key: "closeOthers",
             label: tabLabel("closeOtherTabs"),
-            action: () => closeTabs(otherIds),
+            action: () => onCloseTabs(otherIds),
           },
         },
         {
@@ -439,7 +498,7 @@ export default {
           item: {
             key: "closeRight",
             label: tabLabel("closeTabsToRight"),
-            action: () => closeTabs(rightIds),
+            action: () => onCloseTabs(rightIds),
           },
         },
         {
@@ -447,7 +506,7 @@ export default {
           item: {
             key: "closeLeft",
             label: tabLabel("closeTabsToLeft"),
-            action: () => closeTabs(leftIds),
+            action: () => onCloseTabs(leftIds),
           },
         },
       ]
@@ -463,7 +522,7 @@ export default {
         {
           key: "close",
           label: tabLabel("closeTab"),
-          action: () => closeTab(tab.id),
+          action: () => onCloseTab(tab.id),
         },
         ...bulkItems,
       ]);
@@ -714,7 +773,7 @@ export default {
         event.preventDefault();
         showTabPreview.value = false;
         if (activeTabId.value) {
-          closeTab(activeTabId.value);
+          onCloseTab(activeTabId.value);
         }
       }
     }
@@ -753,9 +812,11 @@ export default {
       isTabMode,
       tmEnum,
       activateTab,
-      closeTab,
+      onCloseTab,
+      onCloseTabs,
+      onExitTabMode,
       duplicateTab,
-      exitTabMode,
+      isContentFlush,
       getTabLabel,
       getTabTitle,
       onTabTitleUpdate,
@@ -1076,6 +1137,12 @@ export default {
   border: var(--border-component-style);
 }
 
+/* Tool tự khai báo contentFlush (vd: app vẽ canvas) → không padding,
+   để tool chiếm hết vùng nội dung */
+.tm-tab-content-flush {
+  padding: 0;
+}
+
 .tm-tab-pane {
   width: 100%;
   height: 100%;
@@ -1091,6 +1158,11 @@ export default {
   z-index: 5 !important;
   border-radius: 0 !important;
   padding: var(--padding) !important;
+}
+
+/* Zen mode vẫn giữ nguyên quy tắc contentFlush của tool */
+.tm-tab-content-flush.tm-zen-active {
+  padding: 0 !important;
 }
 
 .tm-zen-toolbar {

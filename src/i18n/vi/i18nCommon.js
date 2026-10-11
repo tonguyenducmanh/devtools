@@ -27,6 +27,10 @@ export default {
       tabPrevious: "Tab trước",
       tabNext: "Tab sau",
       tabClose: "Đóng tab",
+      confirmCloseTabTitle: "Đóng tab",
+      confirmCloseTabMessage: "Bạn có chắc muốn đóng tab này không?",
+      confirmCloseYes: "Đóng",
+      confirmCloseNo: "Huỷ",
     },
     group: {
       QRCode: "Công cụ QR",
