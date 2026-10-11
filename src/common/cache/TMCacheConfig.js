@@ -220,12 +220,7 @@ export const TMCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool Remote Desktop RDP",
   },
-  BilingualWebConfigLayout: {
-    KeyFormat: "BilingualWebConfigLayout",
-    CacheLevel: tmEnum.cacheType.local,
-    ExpireTime: 0,
-    Note: "cache cấu hình layout tool Bilingual Web",
-  },
+  
   MindMapHistory: {
     KeyFormat: "MindMapHistory",
     CacheLevel: tmEnum.cacheType.indexedDB,
@@ -238,12 +233,7 @@ export const TMCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool PostgreSQL Template",
   },
-  BilingualWebHistory: {
-    KeyFormat: "BilingualWebHistory",
-    CacheLevel: tmEnum.cacheType.indexedDB,
-    ExpireTime: 0,
-    Note: "lịch sử dịch trang web song ngữ",
-  },
+  
   BlankTextConfigLayout: {
     KeyFormat: "BlankTextConfigLayout",
     CacheLevel: tmEnum.cacheType.local,

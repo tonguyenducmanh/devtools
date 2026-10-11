@@ -216,7 +216,6 @@ export default {
       PowerShellTemplate: "Code mẫu PowerShell",
       GitTemplate: "Code mẫu Git",
       AutomationTemplate: "Code mẫu tự động hóa",
-      BilingualWeb: "Web song ngữ",
       agentDownload: {
         title: "Tải Agent",
         redirecting: "Đang chuyển hướng...",
@@ -709,24 +708,6 @@ export default {
       dataSourceServerAgent: "Dữ liệu agent",
       deleteClipboard: "Xóa clipboard",
       queryAgentSQl: "Script query dữ liệu",
-    },
-    bilingualWeb: {
-      undo: "Trở về link trước",
-      redo: "Tiến tới link tiếp theo",
-      fullScreen: "Bật/tắt toàn màn hình",
-      title: "Công cụ dịch trang web song ngữ!",
-      urlPlaceholder: "Nhập đường dẫn trang web (ví dụ: https://...)",
-      fetchButton: "Dịch trang",
-      resultPlaceholder: "Kết quả sẽ hiển thị ở đây",
-      fetching: "Đang tải và dịch...",
-      fetchSuccess: "Dịch trang web thành công",
-      fetchError: "Lỗi khi dịch trang web",
-      infoTooltip:
-        "Công cụ dịch song ngữ cho trang web tĩnh và động. Yêu cầu tải và chạy Agent.",
-      delayTime: "Delay (ms)",
-      blockTags: "Block Tags",
-      classFilters: "Lọc Class",
-      idFilters: "Lọc ID",
     },
     textgenerator: {
       resultPlaceholder: "Kết quả gen text ngẫu nhiên",

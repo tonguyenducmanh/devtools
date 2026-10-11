@@ -215,7 +215,6 @@ export default {
       PowerShellTemplate: "PowerShell template",
       GitTemplate: "Git template",
       AutomationTemplate: "Automation template",
-      BilingualWeb: "Bilingual Web",
       agentDownload: {
         title: "Download Agent",
         redirecting: "Redirecting...",
@@ -713,24 +712,6 @@ export default {
       dataSourceServerAgent: "Agent data",
       deleteClipboard: "Delete clipboard",
       queryAgentSQl: "Script query data",
-    },
-    bilingualWeb: {
-      undo: "Back previous link",
-      redo: "Go to next link",
-      fullScreen: "Toggle full screen",
-      title: "Bilingual Web Translation Tool!",
-      urlPlaceholder: "Enter website URL (e.g., https://...)",
-      fetchButton: "Translate Page",
-      resultPlaceholder: "Result will appear here",
-      fetching: "Fetching and translating...",
-      fetchSuccess: "Website translated successfully",
-      fetchError: "Error translating website",
-      infoTooltip:
-        "Bilingual website translation tool. Requires Agent to function.",
-      delayTime: "Delay (ms)",
-      blockTags: "Block Tags",
-      classFilters: "Class Filter",
-      idFilters: "ID Filter",
     },
     textgenerator: {
       resultPlaceholder: "Result random text",

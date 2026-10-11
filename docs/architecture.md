@@ -30,7 +30,7 @@ Frontend không nhúng "trái tim" logic nặng; những việc cần máy nội
 
 - `TMAgentAPI` — `getBaseUrl()` đọc `window.__tmAPI?.automation?.agentURL`; `heathCheck()` (GET `/`).
 - `TMServerTestingAPI` — test API (exec, parallel, import batch, file ops).
-- `TMServerMockAPI`, `TMServerPostgreSQLAPI`, `TMServerRDPAPI`, `TMServerAppDataMiner`, `TMBilingualWebAPI`, `TMTerminalAPI`.
+- `TMServerMockAPI`, `TMServerPostgreSQLAPI`, `TMServerRDPAPI`, `TMServerAppDataMiner`, `TMTerminalAPI`.
 
 ### Cầu nối global
 
@@ -85,7 +85,7 @@ SQLite: `dev_tool.db` cạnh exe, WAL, `foreign_keys=ON`, migration chạy lúc 
 | `rt_postgresql.go`     | `POST /postgresql/execute_query`, `/database_ops`, `/database_ops_upload`; `GET /detect_bin_path`; CRUD + `get_tree`                |
 | `rt_file_ops.go`       | `POST /file_ops/read_file`, `/read_folder`, `/write_file`                                                                           |
 | `rt_app_data_miner.go` | `GET /data_miner/get_all_table_and_columns`; `POST /execute_query` (SQLite introspection)                                           |
-| `rt_bilingual_web.go`  | `POST /bilingual_web/fetch`, `/translate`                                                                                           |
+
 
 Middleware: CORS `Allow-Origin *` + OPTIONS short-circuit; path lowercasing mặc định (`endpoint_case_sensitive: false`); route kiểu Go 1.22+ method-pattern (`app.HandleFunc("POST /x", …)`).
 

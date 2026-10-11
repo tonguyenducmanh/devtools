@@ -306,13 +306,6 @@ export const sidebarConfig = [
     groupTitleKey: "i18nCommon.group.Miscellaneous",
     children: [
       {
-        name: "TMBilingualWeb",
-        component: () => import("@/views/tools/TMBilingualWeb.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.BilingualWeb",
-        },
-      },
-      {
         name: "TMHTMLPreview",
         component: () => import("@/views/tools/TMHTMLPreview.vue"),
         meta: { titleKey: "i18nCommon.feature.HTMLPreview" },
