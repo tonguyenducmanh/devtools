@@ -155,13 +155,19 @@
 .tm-sidebar-group-flyout {
   padding: calc(var(--padding) / 2);
   overflow: hidden;
-  min-width: 200px;
+  /* tự co theo item dài nhất bên trong, không kẹp cứng min-width.
+     max-width để chữ dài quá thì xuống dòng bằng ellipsis và không tràn
+     ra ngoài mép màn hình (TMFlyoutPanel có sẵn logic clamp vị trí) */
+  width: max-content;
+  max-width: min(320px, calc(100vw - 2 * var(--padding)));
 }
 
 .tm-sidebar-flyout-row {
   display: flex;
   align-items: center;
   gap: 4px;
+  /* giãn hết chiều rộng panel để nền hover phủ trọn dòng */
+  width: 100%;
   border-radius: var(--border-radius-component);
 
   &:hover {
@@ -175,6 +181,7 @@
 
 .tm-sidebar-flyout-item {
   flex: 1;
+  min-width: 0;
   display: block;
   padding: var(--padding);
   font-size: var(--font-size-medium-rare);
