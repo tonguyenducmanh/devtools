@@ -4,7 +4,7 @@
 
 - **Node.js** ≥ 22 (npm) cho frontend (Vite 8 / rolldown).
 - **Go 1.25+** cho backend (3 module dùng `go 1.25.x`; route kiểu method-pattern của Go 1.22+).
-- **Không bắt buộc hàng ngày:** Rust + wasm-pack (IronRDP), .NET 10 SDK (dotnet_wrapper), trunk (PhotoCraft / VectorCraft / GridCraft / WordCraft) — chỉ cần khi **build lại wasm**.
+- **Không bắt buộc hàng ngày:** Rust + wasm-pack (IronRDP), .NET 10 SDK (dotnet_wrapper), trunk (PhotoCraft / VectorCraft) — chỉ cần khi **build lại wasm**.
 
 ## 1. Chạy frontend (dev)
 
@@ -16,7 +16,7 @@ npm run dev        # Vite dev server (mặc định port 5173)
 Lưu ý dev-only:
 
 - WASM được phục vụ qua **middleware của viteStaticCopy** ở đúng đường dẫn prod:
-  `/assets-wasm-<version>/rdp/…`, `…/photocraft/index.html`, `…/vectorcraft/index.html`, `…/gridcraft/index.html`, `…/wordcraft/index.html`, `…/dotnet.js`. Không cần build wasm cho dev **trừ khi** `src_wasm/pkg/*` đang trống (clone mới sẽ trống vì `src_wasm/pkg/` là gitignored — chạy `./scripts/build_wasm.sh` một lần).
+  `/assets-wasm-<version>/rdp/…`, `…/photocraft/index.html`, `…/vectorcraft/index.html`, `…/dotnet.js`. Không cần build wasm cho dev **trừ khi** `src_wasm/pkg/*` đang trống (clone mới sẽ trống vì `src_wasm/pkg/` là gitignored — chạy `./scripts/build_wasm.sh` một lần).
 - Alias: `@` → `src`, `@wasm` → `src_wasm`.
 - Agent URL mặc định `http://localhost:7777` (`src/cfg/config.js`). Tool cần agent sẽ lỗi "agent not found" nếu daemon chưa chạy.
 
@@ -26,7 +26,7 @@ Lưu ý dev-only:
 npm run build
 ```
 
-- Output: `dist/` (gitignored) — gồm bundle `assets/tjs-*`, `assets/tas-*` (có version) và `assets-wasm-<version>/{dotnet,rdp,photocraft,vectorcraft,gridcraft,wordcraft}` được copy từ `src_wasm/pkg/`.
+- Output: `dist/` (gitignored) — gồm bundle `assets/tjs-*`, `assets/tas-*` (có version) và `assets-wasm-<version>/{dotnet,rdp,photocraft,vectorcraft}` được copy từ `src_wasm/pkg/`.
 - `src_wasm/pkg/` là **gitignored** (~58 MB). Folder nào rỗng thì `vite` **cảnh báo và bỏ qua** để build vẫn xanh; dùng `REQUIRE_WASM=1 npm run build` khi build phát hành — lúc đó thiếu folder nào là **fail ngay**.
 - Chạy `npm run dev` sau đó Ctrl-click mở tool bị đổi để smoke-test; rồi `npm run build` để chắc chắn không phá bundle.
 
@@ -70,8 +70,6 @@ Script lần lượt build:
 2. **.NET Wrapper** → `src_wasm/pkg/dotnet/` (dotnet publish browser-wasm, copy `_framework`)
 3. **PhotoCraft** → `src_wasm/pkg/photocraft/` (trunk build external_repo)
 4. **VectorCraft** → `src_wasm/pkg/vectorcraft/` (trunk build external_repo)
-5. **GridCraft** → `src_wasm/pkg/gridcraft/` (trunk build external_repo)
-6. **WordCraft** → `src_wasm/pkg/wordcraft/` (trunk build external_repo)
 
 Trong mỗi `build.sh`, source được lấy từ `src_wasm/<tên>/external_repo/` (clone on-demand bởi `scripts/fetch_wasm_sources.sh`, gitignored) và được `scripts/git_pull_if_repo.sh` cập nhật **về nhánh mặc định** rồi `git pull origin` trước khi build. Sau khi build wasm, **bắt buộc chạy lại `npm run build`** vì viteStaticCopy lấy từ `src_wasm/pkg/`.
 

@@ -22,8 +22,6 @@ const WASM_PKG_FOLDERS = [
   "rdp",
   "photocraft",
   "vectorcraft",
-  "gridcraft",
-  "wordcraft",
 ];
 
 // `src_wasm/pkg/` KHÔNG được commit vào git (gitignored, ~58 MB). Nếu clone mới

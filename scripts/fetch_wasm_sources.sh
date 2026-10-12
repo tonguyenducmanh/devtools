@@ -3,7 +3,7 @@
 #
 # Repo này KHÔNG dùng git submodule, và `src_wasm/pkg/` (wasm đã build, ~58 MB)
 # cũng KHÔNG được commit — nó là gitignore. Nghĩa là clone repo về sẽ KHÔNG có
-# sẵn wasm: muốn build frontend đầy đủ (Remote Desktop / .NET Wrapper / 4 craft
+# sẵn wasm: muốn build frontend đầy đủ (Remote Desktop / .NET Wrapper / 2 craft
 # tool) hay deploy Cloudflare thì phải build wasm trước (./scripts/build_wasm.sh).
 # Cloudflare Pages vì thế KHÔNG bật Git integration được — deploy thủ công bằng
 # ./scripts/deploy_cloudflare.sh.
@@ -43,16 +43,6 @@ fetch "$ROOT_DIR/src_wasm/photocraft/external_repo" \
 # VectorCraft (dùng cho tool Ảnh vector)
 fetch "$ROOT_DIR/src_wasm/vectorcraft/external_repo" \
   "https://github.com/storytold/vectorcraft.git" \
-  ""
-
-# GridCraft (dùng cho tool Bảng tính)
-fetch "$ROOT_DIR/src_wasm/gridcraft/external_repo" \
-  "https://github.com/storytold/gridcraft.git" \
-  ""
-
-# WordCraft (dùng cho tool Soạn thảo văn bản)
-fetch "$ROOT_DIR/src_wasm/wordcraft/external_repo" \
-  "https://github.com/storytold/wordcraft.git" \
   ""
 
 echo "Fetch wasm sources completed."

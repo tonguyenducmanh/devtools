@@ -121,30 +121,6 @@ export const sidebarConfig = [
   },
   {
     type: "group",
-    groupKey: "office",
-    groupTitleKey: "i18nCommon.group.Office",
-    // App vẽ canvas → không padding, và có dữ liệu tạm chưa lưu → hỏi khi đóng
-    contentFlush: true,
-    confirmOnClose: true,
-    children: [
-      {
-        name: "TMWordCraft",
-        component: () => import("@/views/tools/Craft/TMWordCraft.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.WordCraft",
-        },
-      },
-      {
-        name: "TMGridCraft",
-        component: () => import("@/views/tools/Craft/TMGridCraft.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.GridCraft",
-        },
-      },
-    ],
-  },
-  {
-    type: "group",
     groupKey: "qrcode",
     groupTitleKey: "i18nCommon.group.QRCode",
     children: [
