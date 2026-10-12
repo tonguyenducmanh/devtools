@@ -24,6 +24,7 @@ export default {
       undo_last_commit: "Undo last commit",
       cherry_pick_to_branch: "Cherry-pick to another branch",
       squash_commits_rebase: "Squash multiple commits into one",
+      shrink_repo_history: "Purge files from git history",
     },
     postgreSQLTemplate: {
       query_all_info_table: "Get Table Columns",

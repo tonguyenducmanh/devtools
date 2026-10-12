@@ -24,6 +24,7 @@ export default {
       undo_last_commit: "Undo commit gần nhất",
       cherry_pick_to_branch: "Cherry-pick sang nhánh khác",
       squash_commits_rebase: "Gộp nhiều commit thành 1",
+      shrink_repo_history: "Gỡ file rác khỏi lịch sử git",
     },
     postgreSQLTemplate: {
       query_all_info_table: "Xem danh sách cột",
