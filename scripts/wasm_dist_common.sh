@@ -92,7 +92,7 @@ tm_prepare_wasm_dist() {
         echo "[$tm_app] WARNING: không tìm thấy file glue .js trong $tm_dist (bỏ qua manifest)"
     fi
 
-    # 4. Chặn file vượt giới hạn của Cloudflare trước khi commit
+    # 4. Chặn file vượt giới hạn của Cloudflare trước khi bị vite copy vào dist/
     if find "$tm_dist" -type f -size +${TM_WASM_MAX_MIB}MiB -print -quit | grep -q .; then
         echo "ERROR: có file vượt quá ${TM_WASM_MAX_MIB} MiB trong $tm_dist" >&2
         find "$tm_dist" -type f -size +${TM_WASM_MAX_MIB}MiB -exec ls -lh {} \;

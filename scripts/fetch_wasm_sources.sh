@@ -1,10 +1,12 @@
 #!/bin/sh
 # Fetch các external repo cần để build wasm (chạy khi chưa có thư mục external_repo).
 #
-# Repo này KHÔNG dùng git submodule nữa: pkg (wasm đã build) được commit sẵn nên
-# Cloudflare/CI chỉ cần chạy `npm run build` mà không cần clone bất kỳ submodule nào.
-# Nếu bạn muốn BUILD LẠI wasm, chạy script này (hoặc scripts/build_wasm.sh) để lấy
-# nguồn mới nhất (luôn ở nhánh mặc định của origin), rồi build.
+# Repo này KHÔNG dùng git submodule, và `src_wasm/pkg/` (wasm đã build, ~58 MB)
+# cũng KHÔNG được commit — nó là gitignore. Nghĩa là clone repo về sẽ KHÔNG có
+# sẵn wasm: muốn build frontend đầy đủ (Remote Desktop / .NET Wrapper / 4 craft
+# tool) hay deploy Cloudflare thì phải build wasm trước (./scripts/build_wasm.sh).
+# Cloudflare Pages vì thế KHÔNG bật Git integration được — deploy thủ công bằng
+# ./scripts/deploy_cloudflare.sh.
 #
 # Lưu ý: trước đây script có "pin commit" (checkout theo SHA cụ thể -> detached HEAD),
 # giờ đã bỏ để luôn dùng nhánh mặc định. SHA cũ được giữ lại làm chú thích tham khảo.

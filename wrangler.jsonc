@@ -1,0 +1,19 @@
+{
+  // Cloudflare Pages — deploy THỦ CÔNG bằng scripts/deploy_cloudflare.sh.
+  //
+  // Repo KHÔNG commit src_wasm/pkg/ (wasm đã build, ~58 MB) nên Cloudflare
+  // KHÔNG thể tự build: Pages build command chỉ chạy `npm run build` và sẽ
+  // thiếu wasm. Vì vậy quy trình là build ở máy local (có Rust/.NET/trunk)
+  // rồi đẩy thẳng thư mục `dist/` lên Pages bằng `wrangler pages deploy`.
+  //
+  //   ./scripts/deploy_cloudflare.sh              # deploy thường
+  //   ./scripts/deploy_cloudflare.sh --build-wasm # build lại wasm trước khi deploy
+  //
+  // Cần đăng nhập trước (1 lần): `npx wrangler login`
+  // Hoặc đặt biến môi trường CLOUDFLARE_API_TOKEN (token có quyền
+  // "Cloudflare Pages: Edit") khi deploy từ CI.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "devtools",
+  "pages_build_output_dir": "dist",
+  "compatibility_date": "2025-01-01"
+}

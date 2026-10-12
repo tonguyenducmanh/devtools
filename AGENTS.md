@@ -4,7 +4,7 @@ DevTools (tên hiển thị **Tools**, repo GitHub `tonguyenducmanh/devtools`) l
 
 - **Frontend (Client):** Vue 3 SPA chạy trên browser (`src/`), có thể host độc lập (Cloudflare Pages) hoặc được daemon phục vụ.
 - **Backend (Daemon/Agent):** Go, 3 module riêng trong `src_backend/` (`tm_config`, `tm_core_service`, `tm_app`). Daemon lo phần cần máy nội bộ: SQLite, RDP over WebSocket, Mock API, PostgreSQL, đọc ghi file.
-- **WASM (`src_wasm/`):** IronRDP (Remote Desktop), .NET Wrapper (C#), 4 web app "craft" (PhotoCraft / VectorCraft / GridCraft / WordCraft) — **file wasm đã build được commit thẳng** vào `src_wasm/pkg/`, KHÔNG dùng git submodule.
+- **WASM (`src_wasm/`):** IronRDP (Remote Desktop), .NET Wrapper (C#), 4 web app "craft" (PhotoCraft / VectorCraft / GridCraft / WordCraft) — **wasm đã build KHÔNG commit** (nằm ở `src_wasm/pkg/`, gitignored ~58 MB), KHÔNG dùng git submodule. Cloudflare Pages deploy **thủ công** qua `scripts/deploy_cloudflare.sh`.
 
 Quy ước toàn repo: tiền tố frontend `TM*`, backend file `tm_*.go` với tiền tố tầng (`bl_` service, `dl_` database, `rt_` router). Ngôn ngữ giao diện & tài liệu chính là **tiếng Việt**; i18n hỗ trợ `en`/`vi` (fallback `vi`). **Đọc file này trước, rồi `docs/`.**
 
@@ -48,15 +48,17 @@ src_wasm/                       Nguồn WASM
   wordcraft → pkg/wordcraft      Static site WordCraft (trunk, wasm nén gzip)
 scripts/                        tm_version.sh, build_api.sh, build_daemon.sh, build_web_for_daemon.sh,
                                 build_wasm.sh, fetch_wasm_sources.sh, git_pull_if_repo.sh,
-                                wasm_dist_common.sh + patch_wasm_dist.py (nén wasm dùng chung), remove_*.sh
+                                wasm_dist_common.sh + patch_wasm_dist.py (nén wasm dùng chung), remove_*.sh,
+                                deploy_cloudflare.sh (deploy thủ công Cloudflare Pages)
 vite.config.js                  Build frontend; viteStaticCopy wasm → dist/assets-wasm-<VERSION>/…
+wrangler.jsonc                  Cloudflare Pages config (project `devtools`, output `dist/`)
 ```
 
 **Thứ tự phụ thuộc bất biến:** WASM phải build trước `npm run build` (vì `viteStaticCopy` lấy từ `src_wasm/pkg/*`), và frontend phải build trước `build_daemon.sh` (vì `internal/web/bl_web.go` có `//go:embed all:dist`).
 
 ## 3. Luật vàng
 
-1. **Frontend luôn build được.** `npm run build` phải xanh mỗi lần thay đổi. Vite 8 dùng rolldown — không phá `build.rolldownOptions`, không phá naming có bản quyền `assets/tjs-...`/`tas-...` (đã gắn version chống cache CDN).
+1. **Frontend luôn build được.** `npm run build` phải xanh mỗi lần thay đổi. Vite 8 dùng rolldown — không phá `build.rolldownOptions`, không phá naming có bản quyền `assets/tjs-...`/`tas-...` (đã gắn version chống cache CDN). Thiếu wasm chỉ cảnh báo (`vite.config.js` bỏ qua folder rỗng); build phát hành thì dùng `REQUIRE_WASM=1` để fail sớm.
 2. **Backend luôn build được.** Build cả 3 module: `go build ./...` trong `tm_config`, `tm_core_service`, `tm_app`. Giữ đúng `replace` directives trong `go.mod`; không thêm dependency nặng không cần thiết.
 3. **API response chuẩn.** Mọi endpoint trả `{success, message, data}`. Lỗi nhập liệu/file hỏng → trả lỗi nhẹ nhàng, KHÔNG panic server, KHÔNG sập daemon. Đừng chỉ dựa vào panic-safe; tự kiểm tra input.
 4. **Mẫu CRUD generic là chuẩn.** Backend: model implement `TableName()`/`PrimaryKey()`, dùng `TMDLBase[T]` (data) + `TMBLBase[T]` (controller); tool master-detail dùng `TMCollection[TGroup,TItem]` (tự đăng ký CRUD + `get_tree`, xoá group cascade). Không tự viết router/DB riêng lẻ kiểu copy-paste khi có thể tái dùng mẫu này.
@@ -64,10 +66,10 @@ vite.config.js                  Build frontend; viteStaticCopy wasm → dist/ass
 6. **i18n bắt buộc.** Dùng `$t("i18nCommon...")`; mọi key phải có ở cả `en/` và `vi/` (fallback `vi`). Tool title qua `meta.titleKey`. Không viết chuỗi tiếng Việt cứng trong component trừ khi là comment.
 7. **Thứ tự build.** WASM → `npm run build` → copy `dist/` vào `src_backend/tm_core_service/internal/web/dist/` → `build_daemon.sh`. Bỏ sót một bước là daemon không chạy (`go:embed` lỗi) hoặc wasm 404.
 8. **Version 1 nguồn duy nhất.** `VERSION=1.2.3 ./build_all.sh` (hoặc `package.json.version`). `tm_version.sh` tạo ldflags `-X tm_config.Version=...` cho Go và `import.meta.env.PACKAGE_VERSION` cho UI. Không tự ý sửa version rải rác.
-9. **Không phá WASM đã commit.** `src_wasm/pkg/*` được commit thẳng để CI/Cloudflare chỉ cần `npm run build`. Khi build lại wasm, source được `scripts/git_pull_if_repo.sh` cập nhật về nhánh mặc định rồi mới build.
+9. **WASM đã build KHÔNG commit.** `src_wasm/pkg/` gitignored (~58 MB) — đừng `git add -f` thư mục này. Cloudflare Pages cũng **KHÔNG được bật Git integration** (Pages checkout code không có wasm → bản deploy hỏng); deploy bằng `scripts/deploy_cloudflare.sh` (build local → `wrangler pages deploy`). Khi build lại wasm, source được `scripts/git_pull_if_repo.sh` cập nhật về nhánh mặc định rồi mới build.
 10. **`window.__tmAPI` là cầu nối chung.** `automation.agentURL` quyết định URL agent (UI tự đọc để gọi API); `automation.*` là các hàm inject cho tool Automation; `dotnetExports` từ .NET WASM. Đừng đổi shape tùy tiện mà không cập nhật tất cả nơi dùng.
 11. **Dialog enum append-only.** `TMDialogEnum` + `DialogComponentMap` nằm trong `src/common/TMDialogUtil.js`. Thêm dialog mới = thêm enum ở CUỐI `TMDialogEnum` + mapping trong `DialogComponentMap` + component trong `views/dialogs/`. Không đổi/đảo số enum cũ.
-12. **Không commit artifact.** `dist/`, `out/`, `node_modules/`, `config.json`, `*.db*`, `src_wasm/*/external_repo/` đều gitignore. `build_daemon.sh` nén 3 binary cuối cùng (mac/linux → `.tar.gz`, window → `.zip`) rồi xoá bản thô, nên `out/` chỉ còn file upload release — upload thẳng cả thư mục.
+12. **Không commit artifact.** `dist/`, `out/`, `node_modules/`, `config.json`, `*.db*`, `src_wasm/pkg/`, `src_wasm/*/external_repo/` đều gitignore. `build_daemon.sh` nén 3 binary cuối cùng (mac/linux → `.tar.gz`, window → `.zip`) rồi xoá bản thô, nên `out/` chỉ còn file upload release — upload thẳng cả thư mục.
 
 ## 4. Chọn việc làm
 
@@ -92,7 +94,7 @@ cd ../tm_core_service && go build ./... && go vet ./... && go test ./...   # có
 cd ../tm_app && go build ./...
 
 # WASM (CHỈ khi đụng src_wasm)
-./scripts/build_wasm.sh                       # build rdp + dotnet + 2 craft tool
+./scripts/build_wasm.sh                       # build rdp + dotnet + 4 craft tool
 npm run build                                 # build lại vì viteStaticCopy lấy từ pkg/
 ```
 
@@ -111,4 +113,5 @@ npm run build                                 # build lại vì viteStaticCopy l
 
 - **Git + GitHub** `tonguyenducmanh/devtools`. Version release theo tag `v<version>` (hiện có `v17.x … v19.x`); `scripts/remove_old_tag.sh` dọn tag cũ (giữ danh sách `EXCLUDE_TAGS`).
 - **Release binary:** `build_all.sh` → `out/dev-tool-{mac-arm|linux|window}-<VERSION>` (daemon nhúng frontend), đăng lên GitHub Releases (`window.__env.githubSource.releasesUrl`, mục "Download agent" bên header).
+- **Deploy web:** Cloudflare Pages project `devtools` — `./scripts/deploy_cloudflare.sh` (thủ công, xem Luật 9). KHÔNG bật Git integration trên Cloudflare.
 - **Tài liệu:** `README.md` (tổng quan) + `docs/` (AI-ready: architecture, development, contributing).

@@ -3,7 +3,7 @@
 - **Ngôn ngữ:** Tiếng Việt là chính (comment, tài liệu, giao diện); i18n phải có cả `en/` và `vi/`. Code bám sát phong cách file xung quanh.
 - **License:** MIT (`LICENSE`).
 - **Quy ước đặt tên:** frontend `TM*` (component `TM*.vue`, class `TM*.js`, store `TM*.js`, mixin `TM*Mixin.js`, directive `TM*.js`); backend file `tm_*.go` + tiền tố tầng `bl_` (service), `dl_` (database), `rt_` (router).
-- **Không commit artifact:** xem Luật 12 trong `AGENTS.md` (`dist/`, `out/`, `node_modules/`, `config.json`, `*.db*`, `src_wasm/*/external_repo/`).
+- **Không commit artifact:** xem Luật 12 trong `AGENTS.md` (`dist/`, `out/`, `node_modules/`, `config.json`, `*.db*`, `src_wasm/pkg/`, `src_wasm/*/external_repo/`).
 - **Commit:** nhỏ, 1 ý/commit; subject rõ nghĩa (có thể tiếng Việt ngắn gọn).
 - **Chưa có CI/test frontend:** tự smoke-test kỹ trên `npm run dev`; Go chạy `go test ./...` module đụng đến.
 

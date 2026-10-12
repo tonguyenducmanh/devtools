@@ -1,3 +1,4 @@
+import { existsSync, readdirSync } from "node:fs";
 import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
@@ -25,7 +26,30 @@ const WASM_PKG_FOLDERS = [
   "wordcraft",
 ];
 
-const wasmCopyTargets = WASM_PKG_FOLDERS.map((folder) => ({
+// `src_wasm/pkg/` KHÔNG được commit vào git (gitignored, ~58 MB). Nếu clone mới
+// mà chưa chạy `scripts/build_wasm.sh` thì thư mục này rỗng/không tồn tại.
+//
+// Vì vậy chỉ copy những folder thực sự có file, để `npm run build` vẫn xanh trên
+// clone mới. Khi build phát hành (deploy Cloudflare hoặc build daemon) cần đủ
+// wasm — đặt biến môi trường REQUIRE_WASM=1 để fail sớm, nếu không chỉ cảnh báo.
+const REQUIRE_WASM = process.env.REQUIRE_WASM === "1";
+
+const wasmCopyTargets = WASM_PKG_FOLDERS.filter((folder) => {
+  const dir = `src_wasm/pkg/${folder}`;
+  const hasFiles = existsSync(dir) && readdirSync(dir).length > 0;
+  if (!hasFiles) {
+    const msg =
+      `[vite] thiếu wasm "${folder}" — chạy ./scripts/build_wasm.sh để build.`;
+    if (REQUIRE_WASM) {
+      throw new Error(
+        `${msg} REQUIRED_WASM=1 nên build bị dừng (src_wasm/pkg/ là gitignored).`,
+      );
+    }
+    console.warn(msg);
+    return false;
+  }
+  return true;
+}).map((folder) => ({
   src: `src_wasm/pkg/${folder}/*`,
   dest: `assets-wasm-${APP_VERSION}/${folder}`,
   rename: { stripBase: true },

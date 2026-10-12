@@ -102,8 +102,8 @@ Middleware: CORS `Allow-Origin *` + OPTIONS short-circuit; path lowercasing mặ
 
 ## 4. WASM (`src_wasm/`)
 
-| Module       | Build                                   | Output (đã commit)                                   | Load bởi                                       |
-| ------------ | --------------------------------------- | ---------------------------------------------------- | ---------------------------------------------- |
+| Module       | Build                                   | Output (gitignored)                                | Load bởi                                       |
+| ------------ | --------------------------------------- | -------------------------------------------------- | ---------------------------------------------- |
 | IronRDP      | `wasm-pack build --target web`          | `pkg/rdp/rdp_client.js` + `_bg.wasm` (~4,5 MB)       | `TMRemoteDesktopRDP.vue`                       |
 | .NET Wrapper | `dotnet publish … AppBundle/_framework` | `pkg/dotnet/` (~3,9 MB)                              | `TMDotNetWasmMixin.js`                         |
 | PhotoCraft   | `trunk build --release` + nén wasm gzip | `pkg/photocraft/` (index.html + js + `_bg.wasm.gz`)  | `views/tools/Craft/TMPhotoCraft.vue` (iframe)  |
@@ -114,6 +114,8 @@ Middleware: CORS `Allow-Origin *` + OPTIONS short-circuit; path lowercasing mặ
 Các tool "craft" dùng chung component `src/views/tools/Craft/TMCraftApp.vue`: mỗi tool chỉ là wrapper mỏng truyền `app-key` (`photocraft` / `vectorcraft` / `gridcraft` / `wordcraft`), component tính `iframe src = /assets-wasm-<version>/<appKey>/index.html`.
 
 `vite.config.js` (viteStaticCopy): copy `pkg/dotnet/*` → `assets-wasm-<VERSION>/`; `pkg/rdp/*` → `assets-wasm-<VERSION>/rdp/`; `pkg/<craft>/*` → `assets-wasm-<VERSION>/<craft>/`. Runtime nạp theo đường dẫn tuyệt đối `assets-wasm-<version>/…` (DEV cũng được serve bởi plugin static-copy middleware). Alias `@wasm` → `src_wasm` (dùng cho dotnet khi dev).
+
+`pkg/` là **thư mục output, gitignored** (~58 MB binary). Vì repo không chứa wasm, `vite.config.js` bỏ qua folder `pkg/<tên>` nào rỗng (chỉ cảnh báo) để `npm run build` vẫn xanh trên clone mới; khi build phát hành (`REQUIRE_WASM=1`) thì thiếu folder nào là fail ngay. Vì vậy Cloudflare Pages không tự build được → deploy thủ công qua `scripts/deploy_cloudflare.sh`.
 
 ## 5. Luồng build & phát hành
 
@@ -127,7 +129,19 @@ VERSION=1.2.3 ./build_all.sh
  └─ scripts/build_daemon.sh      → out/dev-tool-{mac-arm|linux|window}-<VERSION> (nhúng frontend)
 ```
 
-Version: `VERSION` env > `package.json.version`; `vite.config.js` đặt `import.meta.env.PACKAGE_VERSION`; `tm_version.sh` tạo `-X tm_config.Version=…`. UI version và BE version luôn khớp, frontend tự so sánh qua health check (hiện cảnh báo "agent not found"/version lệch).
+VERSION: `VERSION` env > `package.json.version`; `vite.config.js` đặt `import.meta.env.PACKAGE_VERSION`; `tm_version.sh` tạo `-X tm_config.Version=…`. UI version và BE version luôn khớp, frontend tự so sánh qua health check (hiện cảnh báo "agent not found"/version lệch).
+
+### Deploy web (Cloudflare Pages, thủ công)
+
+```text
+./scripts/deploy_cloudflare.sh [--build-wasm] [--preview]
+ ├─ scripts/build_wasm.sh      → (tùy chọn) build lại wasm vào src_wasm/pkg/
+ ├─ npm install
+ ├─ REQUIRE_WASM=1 npm run build
+ └─ npx wrangler pages deploy dist --project-name devtools   (wrangler.jsonc)
+```
+
+Pages project: `devtools`. **Không bật Git integration** — Pages chỉ checkout code sẽ không có `src_wasm/pkg/` nên bản deploy hỏng Remote Desktop / .NET Wrapper / 4 tool Craft.
 
 ## 6. Một luồng dữ liệu điển hình (tool gọi backend)
 

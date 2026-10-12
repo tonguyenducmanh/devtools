@@ -16,7 +16,7 @@ npm run dev        # Vite dev server (mặc định port 5173)
 Lưu ý dev-only:
 
 - WASM được phục vụ qua **middleware của viteStaticCopy** ở đúng đường dẫn prod:
-  `/assets-wasm-<version>/rdp/…`, `…/photocraft/index.html`, `…/vectorcraft/index.html`, `…/gridcraft/index.html`, `…/wordcraft/index.html`, `…/dotnet.js`. Không cần build wasm cho dev **trừ khi** `src_wasm/pkg/*` đang trống.
+  `/assets-wasm-<version>/rdp/…`, `…/photocraft/index.html`, `…/vectorcraft/index.html`, `…/gridcraft/index.html`, `…/wordcraft/index.html`, `…/dotnet.js`. Không cần build wasm cho dev **trừ khi** `src_wasm/pkg/*` đang trống (clone mới sẽ trống vì `src_wasm/pkg/` là gitignored — chạy `./scripts/build_wasm.sh` một lần).
 - Alias: `@` → `src`, `@wasm` → `src_wasm`.
 - Agent URL mặc định `http://localhost:7777` (`src/cfg/config.js`). Tool cần agent sẽ lỗi "agent not found" nếu daemon chưa chạy.
 
@@ -27,7 +27,7 @@ npm run build
 ```
 
 - Output: `dist/` (gitignored) — gồm bundle `assets/tjs-*`, `assets/tas-*` (có version) và `assets-wasm-<version>/{dotnet,rdp,photocraft,vectorcraft,gridcraft,wordcraft}` được copy từ `src_wasm/pkg/`.
-- **Bắt buộc:** `src_wasm/pkg/*` phải tồn tại trước khi build (xem mục WASM).
+- `src_wasm/pkg/` là **gitignored** (~58 MB). Folder nào rỗng thì `vite` **cảnh báo và bỏ qua** để build vẫn xanh; dùng `REQUIRE_WASM=1 npm run build` khi build phát hành — lúc đó thiếu folder nào là **fail ngay**.
 - Chạy `npm run dev` sau đó Ctrl-click mở tool bị đổi để smoke-test; rồi `npm run build` để chắc chắn không phá bundle.
 
 ## 3. Build backend (Go)
@@ -85,6 +85,25 @@ Trong mỗi `build.sh`, source được lấy từ `src_wasm/<tên>/external_rep
 - Release: tag `v<version>`, `build_all.sh` tạo `out/dev-tool-…-<VERSION>` cho 3 OS rồi **xoá bản thô**, chỉ giữ lại archive: mac/linux → `.tar.gz`, window → `.zip`. Nén do `build_daemon.sh` làm ở bước cuối (`-6` cho tar.gz, `-9` cho zip). Bản thô chỉ bị xoá khi archive đã tạo ra và không rỗng — nén lỗi thì giữ binary lại. Thiếu lệnh `tar`/`zip` thì giữ nguyên bản thô và chỉ cảnh báo, không làm build fail. Header trỏ tới trang releases chung nên đổi định dạng không phải sửa link.
 - Dọn tag cũ: `scripts/remove_old_tag.sh` (giữ `EXCLUDE_TAGS`, hiện `v16.1.5`).
 
+## 6b. Deploy web lên Cloudflare Pages (thủ công)
+
+Frontend được host ở project Cloudflare Pages **`devtools`** (cấu hình: `wrangler.jsonc`, output `dist/`).
+
+> **KHÔNG bật Git integration cho Cloudflare Pages.** `src_wasm/pkg/` là gitignored nên Pages checkout code sẽ không có wasm → bản deploy hỏng Remote Desktop, .NET Wrapper và 4 tool Craft. Phải build ở máy local rồi đẩy `dist/`.
+
+```bash
+npx wrangler login                              # 1 lần
+
+chmod +x ./scripts/deploy_cloudflare.sh
+./scripts/deploy_cloudflare.sh                  # deploy (dùng wasm đã build sẵn)
+./scripts/deploy_cloudflare.sh --build-wasm     # build lại wasm trước khi deploy
+./scripts/deploy_cloudflare.sh --preview        # bản preview, URL tạm
+```
+
+Script: (build wasm nếu `--build-wasm`) → `npm install` → `REQUIRE_WASM=1 npm run build` → kiểm tra `dist/index.html` → `wrangler pages deploy dist --project-name devtools`.
+
+Deploy headless/CI: đặt `CLOUDFLARE_API_TOKEN` (quyền **Cloudflare Pages: Edit**), và `CLOUDFLARE_PROJECT_NAME` nếu deploy sang project khác.
+
 ## 7. Debug
 
 - **Frontend:** `npm run dev`; Vue DevTools; console đã có log `TMUtility`.
@@ -101,3 +120,4 @@ Trong mỗi `build.sh`, source được lấy từ `src_wasm/<tên>/external_rep
 | `scripts/remove_old_tag.sh` | Xoá tag cũ local + remote theo danh sách loại trừ |
 | `scripts/fetch_wasm_sources.sh` | Clone external repo về `src_wasm/*/external_repo/` (nếu chưa có) |
 | `scripts/git_pull_if_repo.sh` | Helper: pull repo nguồn, tự về nhánh mặc định nếu đang detached HEAD |
+| `scripts/deploy_cloudflare.sh` | Deploy thủ công Cloudflare Pages (build wasm + `REQUIRE_WASM=1 npm run build` → `wrangler pages deploy`) |

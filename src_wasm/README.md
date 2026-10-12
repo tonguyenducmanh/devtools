@@ -19,8 +19,11 @@ src_wasm/
 
 ## Quy tắc quan trọng
 
-- **Không dùng git submodule.** `pkg/` chứa kết quả build đã được commit thẳng vào repo,
-  nên CI/Cloudflare chỉ cần `npm run build`.
+- **Không dùng git submodule.** `pkg/` là thư mục **output** (~58 MB) và **đã gitignore** —
+  không commit vào repo. Clone mới sẽ không có `pkg/`, phải chạy `scripts/build_wasm.sh` một lần.
+- Vì repo không chứa wasm, **Cloudflare Pages không tự build được**: deploy thủ công bằng
+  `scripts/deploy_cloudflare.sh` (build local → `wrangler pages deploy`). Đừng bật Git integration
+  trên Cloudflare Pages.
 - `src_wasm/*/external_repo/` được `.gitignore` và chỉ clone **on-demand** khi bạn muốn
   build lại wasm (xem `scripts/fetch_wasm_sources.sh`).
 - Các web app "craft" (PhotoCraft / VectorCraft / GridCraft / WordCraft) đều build ra một
