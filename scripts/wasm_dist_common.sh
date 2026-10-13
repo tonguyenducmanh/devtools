@@ -1,5 +1,5 @@
 #!/bin/sh
-# Helper dùng chung cho các build script wasm (photocraft, vectorcraft):
+# Helper dùng chung cho các build script wasm (photocraft):
 # dọn static site vừa build ra để serve được trong app (và trên Cloudflare).
 #
 #   . "$SCRIPT_DIR/../scripts/wasm_dist_common.sh"
@@ -8,7 +8,7 @@
 # TM_WASM_GZIP_THRESHOLD_MIB (mặc định 0): nén gzip wasm thành .wasm.gz và patch
 # index.html cho browser tự giải nén (DecompressionStream) khi wasm LỚN HƠN ngưỡng.
 # Mặc định 0 = LUÔN nén mọi file wasm, dù nhỏ: vừa để dưới giới hạn 25 MiB của
-# Cloudflare (VectorCraft gốc ~47 MiB), vừa để tải nhanh hơn nhiều.
+# Cloudflare (PhotoCraft gốc ~27 MiB), vừa để tải nhanh hơn nhiều.
 
 # Cloudflare Pages/Workers giới hạn 25 MiB cho mỗi file.
 TM_WASM_MAX_MIB=25

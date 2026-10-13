@@ -21,7 +21,6 @@ const WASM_PKG_FOLDERS = [
   "dotnet",
   "rdp",
   "photocraft",
-  "vectorcraft",
 ];
 
 // `src_wasm/pkg/` KHÔNG được commit vào git (gitignored, ~58 MB). Nếu clone mới

@@ -23,7 +23,7 @@ Dự án này cung cấp một bộ sưu tập các công cụ hữu ích dành 
 
 ### 1. Clone
 
-Dự án này **không dùng Git Submodules** và **không commit file wasm đã build**: thư mục `src_wasm/pkg/` (wasm build xong, ~58 MB) nằm trong `.gitignore` nên repo clone về rất nhẹ. Vì vậy Cloudflare Pages **không tự build được** — deploy được làm **thủ công** bằng [`scripts/deploy_cloudflare.sh`](scripts/deploy_cloudflare.sh) (build local rồi `wrangler pages deploy`). Source của các dự án ngoài (IronRDP, PhotoCraft, VectorCraft) chỉ được clone **khi bạn muốn build lại wasm**:
+Dự án này **không dùng Git Submodules** và **không commit file wasm đã build**: thư mục `src_wasm/pkg/` (wasm build xong, ~58 MB) nằm trong `.gitignore` nên repo clone về rất nhẹ. Vì vậy Cloudflare Pages **không tự build được** — deploy được làm **thủ công** bằng [`scripts/deploy_cloudflare.sh`](scripts/deploy_cloudflare.sh) (build local rồi `wrangler pages deploy`). Source của các dự án ngoài (IronRDP, PhotoCraft) chỉ được clone **khi bạn muốn build lại wasm**:
 
 ```bash
 git clone https://github.com/tonguyenducmanh/devtools.git
@@ -86,7 +86,6 @@ Thư mục dưới đây chứa nhiều công cụ được viết bằng các n
 - **IronRDP** (`src_wasm/iron_rdp`): client RDP (Rust) → `src_wasm/pkg/rdp/`
 - **.NET Wrapper** (`src_wasm/dotnet_wrapper`): wrapper C# (.NET 10) → `src_wasm/pkg/dotnet/`
 - **PhotoCraft** (`src_wasm/photocraft`): trình chỉnh sửa ảnh (Rust, trunk) → `src_wasm/pkg/photocraft/`
-- **VectorCraft** (`src_wasm/vectorcraft`): trình thiết kế vector (Rust, trunk) → `src_wasm/pkg/vectorcraft/`
 
 > `src_wasm/pkg/` là **thư mục output** (gitignored, ~58 MB). Clone repo về sẽ **không có** thư mục này — phải chạy `scripts/build_wasm.sh` một lần để build, hoặc dùng luôn bản build có sẵn ở máy bạn. Deploy Cloudflare cũng vì thế phải chạy **thủ công** (build local → `wrangler pages deploy`), không bật Git integration trên Cloudflare Pages.
 
@@ -97,7 +96,7 @@ chmod 777 ./scripts/build_wasm.sh
 ./scripts/build_wasm.sh
 ```
 
-Script tự clone nguồn external repo (IronRDP, PhotoCraft, VectorCraft) về `src_wasm/<tên>/external_repo/` nếu chưa có (không dùng git submodule) rồi build. Nếu chỉ muốn lấy nguồn mà chưa build:
+Script tự clone nguồn external repo (IronRDP, PhotoCraft) về `src_wasm/<tên>/external_repo/` nếu chưa có (không dùng git submodule) rồi build. Nếu chỉ muốn lấy nguồn mà chưa build:
 
 ```bash
 chmod 777 ./scripts/fetch_wasm_sources.sh
@@ -111,21 +110,21 @@ chmod 777 ./scripts/fetch_wasm_sources.sh
 > helper tự quay về nhánh mặc định rồi mới pull. Pull/checkout lỗi chỉ cảnh báo
 > rồi vẫn tiếp tục build.
 
-### Các tool "craft" (PhotoCraft / VectorCraft)
+### Tool "craft" (PhotoCraft)
 
-Các tool này ở sidebar chỉ làm đúng 1 việc: tải wasm về và load lên toàn màn hình trong một `<iframe>` (wasm app hoàn chỉnh, egui + WebGPU/WebGL2). File wasm luôn được `build.sh` nén gzip thành `_bg.wasm.gz` (vừa để dưới giới hạn **25 MiB/file của Cloudflare Pages**, vừa để tải nhanh hơn), `index.html` tự giải nén (DecompressionStream) khi tải. Vì `src_wasm/pkg/` là gitignored, **phải build wasm trước** khi `npm run build` nếu muốn bản build có đủ các tool Craft (thiếu thì `vite` chỉ cảnh báo và bỏ qua folder đó, tool tương ứng sẽ không load được):
+Tool này ở sidebar chỉ làm đúng 1 việc: tải wasm về và load lên toàn màn hình (wasm app hoàn chỉnh, egui + WebGPU/WebGL2). `TMCraftApp.vue` **không** nạp `index.html` trong iframe mà render thẳng một `<canvas>`, rồi tự fetch `manifest.json` → giải nén wasm → `import()` glue → `init()`. Rust tra canvas bằng `getElementById` với id cố định nên `src/common/TMCraftCanvas.js` shim lại hàm này để trả đúng canvas của từng tab. File wasm luôn được `build.sh` nén gzip thành `_bg.wasm.gz` (vừa để dưới giới hạn **25 MiB/file của Cloudflare Pages**, vừa để tải nhanh hơn) và được giải nén ngay trong JS bằng `DecompressionStream` khi tải. Vì `src_wasm/pkg/` là gitignored, **phải build wasm trước** khi `npm run build` nếu muốn bản build có đủ PhotoCraft (thiếu thì `vite` chỉ cảnh báo và bỏ qua folder đó, tool sẽ không load được):
 
 ```bash
 # Cách 1: build riêng một tool
-chmod +x ./src_wasm/photocraft/build.sh    # hoặc vectorcraft
+chmod +x ./src_wasm/photocraft/build.sh
 ./src_wasm/photocraft/build.sh
 
-# Cách 2: build toàn bộ wasm (IronRDP + .NET + 4 craft tool)
+# Cách 2: build toàn bộ wasm (IronRDP + .NET + craft tool)
 chmod 777 ./scripts/build_wasm.sh
 ./scripts/build_wasm.sh
 ```
 
-Phần nén wasm + patch `index.html` là logic **dùng chung** cho cả bốn tool, nằm trong
+Phần nén wasm + patch `index.html` là logic **dùng chung** cho các tool craft, nằm trong
 `scripts/wasm_dist_common.sh` và `scripts/patch_wasm_dist.py`.
 
 Chi tiết từng tool: [src_wasm/README.md](src_wasm/README.md).
@@ -138,7 +137,7 @@ Frontend được host trên Cloudflare Pages dưới tên project **`devtools`*
 > ⚠️ **KHÔNG bật Git integration cho Cloudflare Pages.** Repo không chứa
 > `src_wasm/pkg/` (wasm đã build, ~58 MB — gitignored), nên Cloudflare chỉ
 > checkout code sẽ **không có wasm** và bản deploy sẽ hỏng Remote Desktop,
-> .NET Wrapper cùng 4 tool Craft. Phải **build ở máy local rồi đẩy `dist/`**.
+> .NET Wrapper cùng tool Craft. Phải **build ở máy local rồi đẩy `dist/`**.
 
 Đăng nhập Cloudflare (1 lần):
 

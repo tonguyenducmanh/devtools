@@ -6,7 +6,7 @@
 | ---------------------- | ------------------------- | -------------- | ---------------------------------------------------------- |
 | Frontend (Client)      | Vue 3 + Vite 8 (rolldown) | `src/`         | SPA chạy trên browser, host độc lập hoặc do daemon phục vụ |
 | Backend (Agent/Daemon) | Go 1.25                   | `src_backend/` | 3 module: cấu hình, lõi dịch vụ, ứng dụng                  |
-| WASM                   | Rust / .NET 10            | `src_wasm/`    | Remote Desktop, .NET Wrapper, PhotoCraft, VectorCraft |
+| WASM                   | Rust / .NET 10            | `src_wasm/`    | Remote Desktop, .NET Wrapper, PhotoCraft           |
 
 Frontend không nhúng "trái tim" logic nặng; những việc cần máy nội bộ (SQLite, proxy RDP, đọc/ghi file, mock server, PostgreSQL) đều đi qua agent API HTTP ở cổng **7777** (mặc định). Web UI của daemon là cổng **1403**, mock server là cổng **8888**.
 
@@ -106,10 +106,17 @@ Middleware: CORS `Allow-Origin *` + OPTIONS short-circuit; path lowercasing mặ
 | ------------ | --------------------------------------- | -------------------------------------------------- | ---------------------------------------------- |
 | IronRDP      | `wasm-pack build --target web`          | `pkg/rdp/rdp_client.js` + `_bg.wasm` (~4,5 MB)       | `TMRemoteDesktopRDP.vue`                       |
 | .NET Wrapper | `dotnet publish … AppBundle/_framework` | `pkg/dotnet/` (~3,9 MB)                              | `TMDotNetWasmMixin.js`                         |
-| PhotoCraft   | `trunk build --release` + nén wasm gzip | `pkg/photocraft/` (index.html + js + `_bg.wasm.gz`)  | `views/tools/Craft/TMPhotoCraft.vue` (iframe)  |
-| VectorCraft  | `trunk build --release` + nén wasm gzip | `pkg/vectorcraft/` (index.html + js + `_bg.wasm.gz`) | `views/tools/Craft/TMVectorCraft.vue` (iframe) |
+| PhotoCraft   | `trunk build --release` + nén wasm gzip | `pkg/photocraft/` (manifest.json + js + `_bg.wasm.gz`) | `views/tools/Craft/TMPhotoCraft.vue` (canvas) |
 
-Các tool "craft" dùng chung component `src/views/tools/Craft/TMCraftApp.vue`: mỗi tool chỉ là wrapper mỏng truyền `app-key` (`photocraft` / `vectorcraft`), component tính `iframe src = /assets-wasm-<version>/<appKey>/index.html`.
+Tool "craft" dùng chung component `src/views/tools/Craft/TMCraftApp.vue`: mỗi tool chỉ là wrapper mỏng truyền `app-key` (`photocraft`). Component **không nạp `index.html` trong iframe** — nó render thẳng một `<canvas>` và tự boot wasm:
+
+1. `fetch(/assets-wasm-<version>/<appKey>/manifest.json)` → tên file glue + wasm (có content-hash, đổi theo từng build);
+2. `fetch(.../<wasm>.gz)` → giải nén ngay trong JS bằng `DecompressionStream("gzip")`;
+3. `import(<glue>.js?i=<instanceKey>)` → gọi `init({ module_or_path: wasmBytes })`.
+
+Nhờ query `?i=` riêng cho từng tab, mỗi tab có instance wasm riêng (wasm-bindgen chỉ khởi tạo một lần cho mỗi module). Rust `main()` tra canvas bằng `document.getElementById("photocraft_canvas")` — id cố định, **không truyền được từ JS** — nên `src/common/TMCraftCanvas.js` shim `getElementById` để trả đúng `<canvas>` của tab đó (xem mục "Vì sao phải là singleton" trong file). Nhờ vậy canvas nằm nguyên trong DOM của tab nên đổi tab không reload app.
+
+`index.html` do trunk sinh ra vẫn được giữ lại: nó là trang chạy độc lập để debug app wasm, và là nơi `patch_wasm_dist.py` ghi logic tự giải nén.
 
 `vite.config.js` (viteStaticCopy): copy `pkg/dotnet/*` → `assets-wasm-<VERSION>/`; `pkg/rdp/*` → `assets-wasm-<VERSION>/rdp/`; `pkg/<craft>/*` → `assets-wasm-<VERSION>/<craft>/`. Runtime nạp theo đường dẫn tuyệt đối `assets-wasm-<version>/…` (DEV cũng được serve bởi plugin static-copy middleware). Alias `@wasm` → `src_wasm` (dùng cho dotnet khi dev).
 

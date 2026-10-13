@@ -6,17 +6,19 @@ Folder này chứa source code để build [PhotoCraft](https://github.com/story
 (trình chỉnh sửa ảnh viết bằng Rust thuần) thành WebAssembly (WASM) chạy được trên web.
 
 PhotoCraft build ra một **web app hoàn chỉnh** (egui + wgpu), gồm:
-- `index.html`
+- `manifest.json` (tên file glue + wasm — app đọc file này để biết hash mới nhất)
 - `photocraft-web-<hash>.js` (glue được tạo bởi wasm-bindgen, ES module)
 - `photocraft-web-<hash>_bg.wasm.gz` (wasm ~27 MiB được nén gzip còn ~9 MiB)
+- `index.html` (trang chạy độc lập, chỉ dùng để debug — app **không** nạp file này)
 
 ### Vì sao file wasm bị nén gzip?
 
 **Cloudflare Pages/Workers giới hạn tối đa 25 MiB mỗi file.** Wasm PhotoCraft
-hiện tại ~27 MiB (vượt giới hạn), nên `build.sh` nén gzip thành `.wasm.gz`
-(~9 MiB) và `scripts/patch_wasm_dist.py` sửa `index.html` để browser **tự giải nén**
-(`DecompressionStream('gzip')`) trước khi gọi `init({ module_or_path: bytes })`.
-Không cần đổi code Rust; mọi host chỉ cần serve static thông thường.
+hiện tại ~27 MiB (vượt giới hạn), nên `build.sh` nén gzip thành `.wasm.gz` (~9 MiB).
+Phía app tự giải nén bằng `DecompressionStream('gzip')` rồi mới gọi
+`init({ module_or_path: bytes })`; `scripts/patch_wasm_dist.py` ghi cùng logic đó
+vào `index.html` để trang chạy độc lập vẫn hoạt động. Không cần đổi code Rust;
+mọi host chỉ cần serve static thông thường.
 
 ## Yêu cầu
 
@@ -45,7 +47,7 @@ src_wasm/
 │   ├── build.sh          # gọi chung scripts/wasm_dist_common.sh để nén wasm + dọn site
 │   └── README.md
 ├── pkg/
-│   └── photocraft/       # Output từ build (index.html + js + wasm.gz đã nén)
+│   └── photocraft/       # Output từ build (manifest.json + js + wasm.gz đã nén)
 └── README.md
 ```
 
@@ -58,9 +60,11 @@ src_wasm/
 Sau khi build, `vite.config.js` copy folder `src_wasm/pkg/photocraft` vào
 `assets-wasm-<version>/photocraft` khi build frontend.
 
-Tool `TMPhotoCraft` mở app trong một `<iframe>` với src:
-`/assets-wasm-<version>/photocraft/index.html`. Nếu iframe ẩn/reload lỗi, kiểm tra
-bạn đã chạy `./build.sh` (hoặc `./scripts/build_wasm.sh`) trước khi `npm run build`.
+Tool `TMPhotoCraft` render thẳng một `<canvas>` và tự boot wasm từ
+`/assets-wasm-<version>/photocraft/` — **không** dùng `index.html` (xem `TMCraftApp.vue`
+và `src/common/TMCraftCanvas.js`). Nếu canvas trắng/treo, kiểm tra bạn đã chạy
+`./build.sh` (hoặc `./scripts/build_wasm.sh`) trước khi `npm run build`, và xem
+console trình duyệt — lỗi fetch wasm/glue được log ra ở đó.
 
 ## Lưu ý
 

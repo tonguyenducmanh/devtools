@@ -9,7 +9,7 @@ and this script rewrites `index.html` to fetch the `.gz`, gunzip it with
 
 Two upstream loader shapes are supported:
 
-1. trunk — `photocraft`, `vectorcraft`:
+1. trunk — `photocraft`:
        const wasm = await init({ module_or_path: './<name>_bg.wasm' });
 2. `cargo xtask web` — các craft app nặng hơn, dựng site bằng xtask thay vì trunk:
        await init({ module_or_path: new URL("<name>_bg.wasm" + v, location.href) });

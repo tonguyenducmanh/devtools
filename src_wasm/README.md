@@ -11,8 +11,7 @@ src_wasm/
 ├── iron_rdp/       # Remote Desktop (Rust → wasm-pack)  → pkg/rdp
 ├── dotnet_wrapper/ # .NET Wrapper (C#)                 → pkg/dotnet
 ├── photocraft/     # Chỉnh sửa ảnh (trunk)            → pkg/photocraft
-├── vectorcraft/    # Thiết kế vector (trunk)           → pkg/vectorcraft
-└── pkg/            # Output đã build — COMMIT SẴN vào repo, KHÔNG phải git submodule
+└── pkg/            # Output đã build — KHÔNG commit vào repo, KHÔNG phải git submodule
 ```
 
 ## Quy tắc quan trọng
@@ -24,9 +23,12 @@ src_wasm/
   trên Cloudflare Pages.
 - `src_wasm/*/external_repo/` được `.gitignore` và chỉ clone **on-demand** khi bạn muốn
   build lại wasm (xem `scripts/fetch_wasm_sources.sh`).
-- Các web app "craft" (PhotoCraft / VectorCraft) đều build ra một
-  **static site** (`index.html` + js glue + wasm), serve trong `<iframe>` từ
-  `assets-wasm-<version>/<tên>/index.html`. Phần nén wasm + patch `index.html` là logic
-  **dùng chung** trong `scripts/wasm_dist_common.sh` và `scripts/patch_wasm_dist.py`.
+- Web app "craft" (PhotoCraft) build ra một **static site** (`manifest.json` + js glue +
+  wasm) trong `pkg/photocraft/`, được copy lên `assets-wasm-<version>/photocraft/`.
+  Phía app **không** nạp `index.html` trong iframe: `TMCraftApp.vue` tự fetch
+  `manifest.json`, giải nén wasm rồi `import()` glue (xem `docs/architecture.md`).
+  `index.html` vẫn được giữ làm trang chạy độc lập để debug. Phần nén wasm + patch
+  `index.html` là logic **dùng chung** trong `scripts/wasm_dist_common.sh` và
+  `scripts/patch_wasm_dist.py`.
 
 Build tất cả: `./scripts/build_wasm.sh` (xem `docs/development.md`).

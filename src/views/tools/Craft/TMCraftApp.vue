@@ -45,7 +45,7 @@ export default {
   name: "TMCraftApp",
   components: { TMLoading, TMFullTabWrapper },
   props: {
-    // Tên thư mục trong src_wasm/pkg và assets-wasm (photocraft/vectorcraft/...)
+    // Tên thư mục trong src_wasm/pkg và assets-wasm (photocraft/...)
     appKey: {
       type: String,
       required: true,

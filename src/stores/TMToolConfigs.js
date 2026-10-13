@@ -97,30 +97,6 @@ export const sidebarConfig = [
   },
   {
     type: "group",
-    groupKey: "graphicdesign",
-    groupTitleKey: "i18nCommon.group.GraphicDesign",
-    // App vẽ canvas → không padding, và có dữ liệu tạm chưa lưu → hỏi khi đóng
-    contentFlush: true,
-    confirmOnClose: true,
-    children: [
-      {
-        name: "TMPhotoCraft",
-        component: () => import("@/views/tools/Craft/TMPhotoCraft.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.PhotoCraft",
-        },
-      },
-      {
-        name: "TMVectorCraft",
-        component: () => import("@/views/tools/Craft/TMVectorCraft.vue"),
-        meta: {
-          titleKey: "i18nCommon.feature.VectorCraft",
-        },
-      },
-    ],
-  },
-  {
-    type: "group",
     groupKey: "qrcode",
     groupTitleKey: "i18nCommon.group.QRCode",
     children: [
@@ -266,6 +242,16 @@ export const sidebarConfig = [
     groupKey: "image",
     groupTitleKey: "i18nCommon.group.Image",
     children: [
+      {
+        name: "TMPhotoCraft",
+        component: () => import("@/views/tools/Craft/TMPhotoCraft.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.PhotoCraft",
+          // App vẽ canvas → không padding, và có dữ liệu tạm chưa lưu → hỏi khi đóng
+          contentFlush: true,
+          confirmOnClose: true,
+        },
+      },
       {
         name: "base64toimage",
         component: () => import("@/views/tools/TMBase64ToImage.vue"),

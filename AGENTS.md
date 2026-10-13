@@ -4,7 +4,7 @@ DevTools (tên hiển thị **Tools**, repo GitHub `tonguyenducmanh/devtools`) l
 
 - **Frontend (Client):** Vue 3 SPA chạy trên browser (`src/`), có thể host độc lập (Cloudflare Pages) hoặc được daemon phục vụ.
 - **Backend (Daemon/Agent):** Go, 3 module riêng trong `src_backend/` (`tm_config`, `tm_core_service`, `tm_app`). Daemon lo phần cần máy nội bộ: SQLite, RDP over WebSocket, Mock API, PostgreSQL, đọc ghi file.
-- **WASM (`src_wasm/`):** IronRDP (Remote Desktop), .NET Wrapper (C#), 2 web app "craft" (PhotoCraft / VectorCraft) — **wasm đã build KHÔNG commit** (nằm ở `src_wasm/pkg/`, gitignored ~58 MB), KHÔNG dùng git submodule. Cloudflare Pages deploy **thủ công** qua `scripts/deploy_cloudflare.sh`.
+- **WASM (`src_wasm/`):** IronRDP (Remote Desktop), .NET Wrapper (C#), web app "craft" PhotoCraft — **wasm đã build KHÔNG commit** (nằm ở `src_wasm/pkg/`, gitignored ~58 MB), KHÔNG dùng git submodule. Cloudflare Pages deploy **thủ công** qua `scripts/deploy_cloudflare.sh`.
 
 Quy ước toàn repo: tiền tố frontend `TM*`, backend file `tm_*.go` với tiền tố tầng (`bl_` service, `dl_` database, `rt_` router). Ngôn ngữ giao diện & tài liệu chính là **tiếng Việt**; i18n hỗ trợ `en`/`vi` (fallback `vi`). **Đọc file này trước, rồi `docs/`.**
 
@@ -43,7 +43,6 @@ src_wasm/                       Nguồn WASM
   iron_rdp → pkg/rdp            RDP client (Rust, wasm-pack)
   dotnet_wrapper → pkg/dotnet   .NET 10 browser-wasm (AppBundle/_framework)
   photocraft → pkg/photocraft    Static site PhotoCraft (trunk, wasm nén gzip)
-  vectorcraft → pkg/vectorcraft  Static site VectorCraft (trunk, wasm nén gzip)
 scripts/                        tm_version.sh, build_api.sh, build_daemon.sh, build_web_for_daemon.sh,
                                 build_wasm.sh, fetch_wasm_sources.sh, git_pull_if_repo.sh,
                                 wasm_dist_common.sh + patch_wasm_dist.py (nén wasm dùng chung), remove_*.sh,
@@ -74,7 +73,7 @@ wrangler.jsonc                  Cloudflare Pages config (project `devtools`, out
 Ưu tiên: hạ tầng/refactor an toàn → tool có giá trị sử dụng cao → long tail.
 
 0. **Đọc README + `docs/`** trước để nắm vòng đời build.
-1. **Mở app (`npm run dev`)** xem sidebar: tool Automation là route riêng (`type: "automation"`); các nhóm group: GraphicDesign, API, QRCode, Database, RemoteDesktop, Text, JSON, SampleCode, Image, AI, Miscellaneous.
+1. **Mở app (`npm run dev`)** xem sidebar: tool Automation là route riêng (`type: "automation"`); các nhóm group: API, QRCode, Database, RemoteDesktop, Text, JSON, SampleCode, Image, AI, Miscellaneous.
 2. Tool mới nên bám theo nhóm hiện có trong `sidebarConfig`, đặt tên `TM<Thing>.vue` theo chuẩn.
 3. Backend: kiểm tra endpoint đã có trong `rt_*.go`; chỉ thêm khi tool thật sự cần agent (cần máy nội bộ / nhạy cảm).
 4. Không có file roadmap — ghi ý tưởng vào commit message hoặc issue GitHub, không tự tạo `docs/roadmap.md` trừ khi được yêu cầu.

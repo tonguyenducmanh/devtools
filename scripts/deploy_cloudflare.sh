@@ -5,7 +5,7 @@
 #   `src_wasm/pkg/` (wasm đã build, ~58 MB) là GITIGNORED, không nằm trong repo.
 #   Nếu để Cloudflare Pages tự build qua Git integration, Pages chỉ checkout
 #   code → không có `src_wasm/pkg/` → `npm run build` thiếu wasm (Remote Desktop,
-#   .NET Wrapper và 4 tool Craft đều hỏng). Nên build ở máy local rồi đẩy `dist/`.
+#   .NET Wrapper và Craft tool đều hỏng). Nên build ở máy local rồi đẩy `dist/`.
 #
 # Cách dùng:
 #   ./scripts/deploy_cloudflare.sh              # build frontend (dùng wasm có sẵn) rồi deploy
@@ -54,7 +54,7 @@ echo "========================================="
 
 # 1. Build lại wasm nếu được yêu cầu
 if [ "$BUILD_WASM" -eq 1 ]; then
-    echo ">>> Build wasm (IronRDP + .NET + 4 craft tool)..."
+    echo ">>> Build wasm (IronRDP + .NET + craft tool)..."
     chmod +x ./scripts/build_wasm.sh
     ./scripts/build_wasm.sh
 fi

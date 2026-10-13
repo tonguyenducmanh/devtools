@@ -1,5 +1,5 @@
 /**
- * Registry canvas cho các web app "craft" (PhotoCraft / VectorCraft).
+ * Registry canvas cho các web app "craft" (PhotoCraft).
  *
  * ── Vấn đề ──────────────────────────────────────────────────────────────────
  * Rust trong `apps/<app>-web/src/web.rs` tìm canvas bằng `document.getElementById`
