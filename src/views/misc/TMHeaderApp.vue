@@ -3,7 +3,9 @@
     <div class="tm-app-name">
       <div class="tm-app-brand" @click="reloadAppFunc">
         <div class="tm-logo tm-logo-tool-app"></div>
-        <div class="tm-app-title">
+        <!-- Khi danh sách công cụ đang đặt ở header thì menu "Công cụ" nằm ngay
+             cạnh logo, hiện thêm app name ("Tools") sẽ thành lặp ý -->
+        <div v-if="!toolsInHeader" class="tm-app-title">
           {{ appName }}
         </div>
       </div>
@@ -91,6 +93,8 @@ import { TMEnumEventBus } from "@/common/event/TMEnumEventBus.js";
 import TMDialogUtil, { TMDialogEnum } from "@/common/TMDialogUtil.js";
 import TMCommonFunction from "@/common/TMCommonFunction.js";
 import TMTipsMixin from "@/mixins/TMTipsMixin.js";
+import { getSidebarItems } from "@/stores/TMToolConfigs.js";
+import { appState } from "@/stores/TMAppState.js";
 
 export default {
   name: "TMHeaderApp",
@@ -134,8 +138,52 @@ export default {
     appVersion() {
       return `v${this.$tmUtility.getAppVersion()}`;
     },
+    toolsInHeader() {
+      return (
+        appState.sideBarMenuPosition === this.$tmEnum.sideBarMenuPosition.Header
+      );
+    },
+    sideBarMenuPositionItems() {
+      return this.$tmEnum.sideBarMenuPositionList.map((item) => ({
+        label: this.$t(item.labelKey),
+        value: item.value,
+      }));
+    },
+    /**
+     * Khi sidebar bị ẩn, header gánh thay vai trò điều hướng: dựng menu
+     * "Công cụ" từ đúng config sidebar (`TMToolConfigs`) để không phải khai
+     * báo lại danh sách tool ở 2 nơi.
+     * - group  → item có children (mở sub-flyout danh sách tool trong group)
+     * - route  → item đơn, click là mở tab luôn
+     */
+    toolsMenuItems() {
+      return getSidebarItems().map((item) => {
+        if (item.type === "group") {
+          const group = item;
+          return {
+            key: group.groupKey,
+            labelKey: group.groupTitleKey,
+            tooltipKey: "i18nCommon.tools.groupTooltip",
+            children: group.children.map((child) => ({
+              value: child.name,
+              label: this.$t(child.meta.titleKey),
+            })),
+            onChildClick: (value) => this.openGroupChildToolTab(group, value),
+          };
+        }
+        const route = item.route;
+        return {
+          key: route.name,
+          labelKey: route.meta.titleKey,
+          action: () => this.openRouteToolTab(route),
+        };
+      });
+    },
     menuConfig() {
       return {
+        // Chỉ hiện khi danh sách công cụ đang đặt ở header — lúc đó đây
+        // là đường vào chính của tool
+        ...(this.toolsInHeader ? { tools: this.toolsMenuItems } : {}),
         view: [
           {
             key: "showAllShortcut",
@@ -195,6 +243,13 @@ export default {
             tooltipKey: "i18nCommon.tmheader.welcomeBackgroundTooltip",
             children: this.welcomeBackgroundItems,
             onChildClick: (value) => this.applyWelcomeBackground(value),
+          },
+          {
+            key: "sideBarMenuPosition",
+            labelKey: "i18nCommon.tmheader.toolPosition",
+            tooltipKey: "i18nCommon.tmheader.toolPositionTooltip",
+            children: this.sideBarMenuPositionItems,
+            onChildClick: (value) => this.applySideBarMenuPosition(value),
           },
           {
             key: "zenMode",
@@ -342,6 +397,7 @@ export default {
       300,
     );
     this.loadCurrentTheme();
+    this.loadSideBarMenuPosition();
     this.logoItems = [
       {
         key: "tool",
@@ -363,6 +419,15 @@ export default {
         (await this.$tmUtility.getUserSettings("backgroundEffect")) ?? "off";
       this.savedCursorEffect =
         (await this.$tmUtility.getUserSettings("cursorEffect")) ?? "off";
+    },
+    /**
+     * Header là nơi duy nhất luôn mount, nên nó gánh luôn việc nạp vị trí
+     * hiển thị danh sách công cụ — App.vue chỉ đọc appState để render.
+     */
+    async loadSideBarMenuPosition() {
+      appState.sideBarMenuPosition =
+        (await this.$tmUtility.getUserSettings("sideBarMenuPosition")) ??
+        this.$tmEnum.sideBarMenuPosition.Sidebar;
     },
     previewTheme(themeName) {
       this.$tmUtility.setTheme(themeName);
@@ -558,6 +623,41 @@ export default {
     },
     toggleZenMode() {
       eventBus.emit(TMEnumEventBus.zenModeToggle);
+      this.closeFlyout();
+    },
+    /**
+     * Chuyển danh sách công cụ giữa sidebar và header. state nằm ở appState
+     * nên App.vue và menu "Công cụ" cập nhật ngay, không cần reload app.
+     */
+    async applySideBarMenuPosition(position) {
+      appState.sideBarMenuPosition = position;
+      await this.$tmUtility.saveUserSettings("sideBarMenuPosition", position);
+      // đóng flyout sẽ kéo theo watcher reset activeSubKey cho sub-menu
+      this.closeFlyout();
+    },
+    /** Mở tab tool thuộc 1 group từ menu "Công cụ" (sub-flyout) */
+    openGroupChildToolTab(group, toolKey) {
+      const child = group.children.find((c) => c.name === toolKey);
+      if (!child) return;
+      this.openTab({
+        titleKey: child.meta.titleKey,
+        helpKey: child.meta?.helpKey,
+        groupKey: group.groupKey,
+        toolKey: child.name,
+        component: child.component,
+      });
+      this.closeSub();
+      this.closeFlyout();
+    },
+    /** Mở tab cho tool dạng standalone route (không thuộc group nào) */
+    openRouteToolTab(route) {
+      this.openTab({
+        titleKey: route.meta.titleKey,
+        helpKey: route.meta?.helpKey,
+        groupKey: "",
+        toolKey: route.name,
+        component: route.component,
+      });
       this.closeFlyout();
     },
     showAllShortcutPopup() {

@@ -9,10 +9,16 @@ export default {
       theme: "Chủ đề ứng dụng",
       language: "Ngôn ngữ",
       wrapTab: "Multi tab hiển thị nhiều dòng tab",
+      sideBarMenuPosition: "Vị trí hiển thị danh sách công cụ",
       cursorTrail: "Hiệu ứng đuôi chuột",
       cursorEffect: "Hiệu ứng chuột",
       welcomeBackground: "Hình nền màn welcome",
       backgroundEffect: "Hiệu ứng nền",
+    },
+    sideBarMenuPosition: {
+      header: "Thanh trên cùng",
+      sidebar: "Bên trái",
+      right: "Bên phải",
     },
     welcomeBackground: {
       Normal: "Không dùng ảnh",

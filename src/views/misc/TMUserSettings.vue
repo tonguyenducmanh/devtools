@@ -69,6 +69,15 @@
             :noMargin="true"
           ></TMCheckbox>
         </div>
+        <div class="flex user-setting-item">
+          <div>{{ $t("i18nUserSettings.settings.sideBarMenuPosition") }}</div>
+          <TMComboBox
+            :width="200"
+            v-model="currentUserSetting.sideBarMenuPosition"
+            :options="sideBarMenuPositionOption"
+            :noMargin="true"
+          />
+        </div>
       </div>
     </div>
     <TMButton
@@ -112,6 +121,12 @@ export default {
     },
     cursorEffectOption() {
       return this.$tmEnum.cursorEffectList.map((item) => ({
+        label: this.$t(item.labelKey),
+        value: item.value,
+      }));
+    },
+    sideBarMenuPositionOption() {
+      return this.$tmEnum.sideBarMenuPositionList.map((item) => ({
         label: this.$t(item.labelKey),
         value: item.value,
       }));

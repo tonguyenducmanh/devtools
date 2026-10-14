@@ -10,6 +10,8 @@ export function getUserSettingDefault() {
     agentURL: window.__env?.APITesting?.agentServer,
     wrapTab: true,
     showSideBar: true,
+    // danh sách công cụ hiển thị ở sidebar hay ở header
+    sideBarMenuPosition: tmEnum.sideBarMenuPosition.Sidebar,
     cursorEffect: "off",
     backgroundEffect: "off",
     welcomeBackground: tmEnum.welcomeBackground.Normal,

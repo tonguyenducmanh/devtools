@@ -1,12 +1,10 @@
 <template>
   <!-- Trigger vô hình ở mép trái, fixed riêng không bị ảnh hưởng bởi transform -->
-  <div v-if="zenMode" class="tm-sidebar-zen-trigger" @mouseenter="onZenMouseEnter" @mouseleave="onZenMouseLeave"></div>
-  <div class="tm-sidebar-container" :class="{ 'tm-sidebar-container-collapsed': !showSideBar }"
-    v-click-outside="closeFlyout">
-    <div v-if="showSideBar || zenMode" class="tm-sidebar" :class="{
-      'tm-sidebar--zen': zenMode,
-      'tm-sidebar--zen-hover': zenHover,
-    }" @mouseenter="onZenMouseEnter" @mouseleave="onZenMouseLeave">
+  <div v-if="zenMode" class="tm-sidebar-zen-trigger" :class="zenTriggerClass"
+    @mouseenter="onZenMouseEnter" @mouseleave="onZenMouseLeave"></div>
+  <div class="tm-sidebar-container" :class="containerClass" v-click-outside="closeFlyout">
+    <div v-if="showSideBar || zenMode" class="tm-sidebar" :class="sidebarClass"
+      @mouseenter="onZenMouseEnter" @mouseleave="onZenMouseLeave">
       <div class="tm-tool-group">
         <template v-for="(item, index) in sidebarItems" :key="index">
           <!-- Group item: hover → flyout -->
@@ -28,13 +26,14 @@
       </div>
     </div>
 
-    <TMToggleArea v-if="!zenMode" :collapsed="!showSideBar" edge="left" v-tooltip="showSideBar
+    <TMToggleArea v-if="!zenMode" :collapsed="!showSideBar" :edge="toggleEdge" :align="toggleAlign"
+      v-tooltip="showSideBar
         ? $t('i18nCommon.sidebar.hide')
         : $t('i18nCommon.sidebar.show')
       " @toggle="toggleSidebar" />
 
-    <!-- Flyout: mở sang phải (placement="right"), tự lật sang trái nếu sát mép phải màn hình -->
-    <TMFlyoutPanel :show="!!activeKeyFlyOut" :anchorElFlyout="anchorElFlyout" placement="right"
+    <!-- Flyout: mở theo hướng còn chỗ (mặc định sang phải, tự lật nếu sát mép) -->
+    <TMFlyoutPanel :show="!!activeKeyFlyOut" :anchorElFlyout="anchorElFlyout" :placement="flyoutPlacement"
       panelClass="tm-sidebar-group-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="scheduleCloseFlyout()">
       <div v-for="row in sidebarFlyoutRows" :key="row.child.meta.titleKey" class="no-select tm-sidebar-flyout-row">
         <div class="tm-sidebar-flyout-item" @click="onOpenGroupChildTab(row.item, row.child)">
@@ -91,6 +90,51 @@ export default {
   computed: {
     zenMode() {
       return appState.zenMode;
+    },
+    position() {
+      return appState.sideBarMenuPosition;
+    },
+    isRight() {
+      return this.position === this.$tmEnum.sideBarMenuPosition.Right;
+    },
+    containerClass() {
+      return {
+        "tm-sidebar-container-collapsed": !this.showSideBar,
+        "tm-sidebar-container--right": this.isRight,
+      };
+    },
+    /** Nút thu gọn luôn nằm ở mép trong của cột (trái với cột dọc) */
+    toggleEdge() {
+      return this.isRight ? "right" : "left";
+    },
+    /**
+     * Cột bên phải đặt nút thu gọn ở đầu cột (start) cho khỏi nằm giữa
+     * đè lên vùng nội dung; cột bên trái giữ căn giữa như cũ.
+     */
+    toggleAlign() {
+      return this.isRight ? "start" : "center";
+    },
+    /** Menu con mở sang trái khi cột ở bên phải, sang phải khi ở bên trái */
+    flyoutPlacement() {
+      return this.isRight ? "left" : "right";
+    },
+    /**
+     * Class của khung sidebar. Các modifier `--zen-*` định vị theo
+     * position:fixed và dịch khung ra ngoài màn hình, nên CHỈ bật khi thật
+     * sự vào zen mode — bật vô điều kiện sẽ đẩy sidebar tràn màn hình.
+     */
+    sidebarClass() {
+      return {
+        "tm-sidebar--zen": this.zenMode,
+        "tm-sidebar--zen-hover": this.zenMode && this.zenHover,
+        "tm-sidebar--zen-right": this.zenMode && this.isRight,
+      };
+    },
+    /** Vùng rê chuột mở sidebar trong zen mode, theo đúng mép đang đặt */
+    zenTriggerClass() {
+      return {
+        "tm-sidebar-zen-trigger--right": this.isRight,
+      };
     },
     activeItem() {
       return (
@@ -191,6 +235,25 @@ export default {
   margin-right: unset;
 }
 
+// Cột dọc bên phải: đảo khoảng cách so với cột bên trái
+.tm-sidebar-container--right {
+  margin-right: unset;
+  margin-left: var(--padding);
+
+  &.tm-sidebar-container-collapsed {
+    margin-left: unset;
+  }
+
+  // Nút thu gọn phải nằm ở mép TRONG của cột (bên trái, quay về phía vùng
+  // nội dung). TMToggleArea với edge="right" lại đặt nút ở mép phải của
+  // element cha, tức là lọt ra ngoài màn hình — phải kéo về mép trái.
+  // --padding bên trong nút là 10px do TMToggleArea tự set.
+  :deep(.tm-toggle-button) {
+    right: unset;
+    left: calc(-1 * var(--padding));
+  }
+}
+
 .tm-sidebar {
   position: relative;
   width: 210px;
@@ -270,6 +333,11 @@ export default {
   z-index: 99;
 }
 
+.tm-sidebar-zen-trigger--right {
+  left: unset;
+  right: 0;
+}
+
 // Zen mode: floating panel with gaps and rounded corners
 .tm-sidebar--zen {
   position: fixed;
@@ -311,6 +379,18 @@ export default {
         display: block;
       }
     }
+  }
+}
+
+// Zen mode đặt cột ở bên phải: lật ngược phía trong màn hình
+.tm-sidebar--zen-right {
+  left: unset;
+  right: var(--padding);
+  transform: translateX(calc(100% + var(--padding)));
+
+  &:hover,
+  &.tm-sidebar--zen-hover {
+    transform: translateX(0);
   }
 }
 

@@ -105,6 +105,9 @@ export default {
       goToSource: "Source code",
       zenMode: "Chế độ Zen",
       exitZenMode: "Thoát chế độ tập trung",
+      toolPosition: "Vị trí công cụ",
+      toolPositionTooltip:
+        "Chọn hiển thị danh sách công cụ trên thanh trên cùng, bên trái hay bên phải",
       showAllShortcut: "Danh sách phím tắt",
       themeTooltip: "Di chuột để xem trước chủ đề, click để áp dụng",
       backgroundEffectTooltip: "Click để chọn hiệu ứng nền",
@@ -171,6 +174,10 @@ export default {
     },
     view: {
       title: "Xem",
+    },
+    tools: {
+      title: "Công cụ",
+      groupTooltip: "Rê chuột để xem các công cụ trong nhóm",
     },
     feature: {
       welcome: "Tổng quan",

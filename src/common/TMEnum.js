@@ -162,6 +162,33 @@ class TMEnum {
       value: "avatar",
     },
   ];
+  /**
+   * Vị trí hiển thị danh sách công cụ: trên header, ở sidebar bên trái
+   * hay bên phải
+   */
+  sideBarMenuPosition = {
+    Header: "header",
+    Sidebar: "sidebar",
+    Right: "right",
+  };
+  /**
+   * danh sách vị trí hiển thị danh sách công cụ, dùng chung cho cả form thiết
+   * lập và menu giao diện trên header nên thêm vị trí mới chỉ sửa ở đây
+   */
+  sideBarMenuPositionList = [
+    {
+      labelKey: "i18nUserSettings.sideBarMenuPosition.header",
+      value: "header",
+    },
+    {
+      labelKey: "i18nUserSettings.sideBarMenuPosition.sidebar",
+      value: "sidebar",
+    },
+    {
+      labelKey: "i18nUserSettings.sideBarMenuPosition.right",
+      value: "right",
+    },
+  ];
   PostgreSQLQuerySidebarOption = {
     Help: 0,
     Setting: 1,

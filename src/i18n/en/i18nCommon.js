@@ -104,6 +104,9 @@ export default {
       goToSource: "Source code",
       zenMode: "Zen Mode",
       exitZenMode: "Exit Focus Mode",
+      toolPosition: "Tool position",
+      toolPositionTooltip:
+        "Choose where to show the tool list: on the top bar, on the left or on the right",
       showAllShortcut: "Show all shortcut",
       themeTooltip: "Hover to preview theme, click to apply",
       backgroundEffectTooltip: "Click to choose background effect",
@@ -170,6 +173,10 @@ export default {
     },
     view: {
       title: "View",
+    },
+    tools: {
+      title: "Tools",
+      groupTooltip: "Hover to see the tools in this group",
     },
     feature: {
       welcome: "Welcome",

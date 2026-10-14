@@ -9,10 +9,16 @@ export default {
       theme: "Theme app",
       language: "Language",
       wrapTab: "Multi line tab in Multi tab mode",
+      sideBarMenuPosition: "Tool list position",
       cursorTrail: "Cursor trail effect",
       cursorEffect: "Cursor effect",
       welcomeBackground: "Welcome screen background",
       backgroundEffect: "Background effect",
+    },
+    sideBarMenuPosition: {
+      header: "Top bar",
+      sidebar: "Left",
+      right: "Right",
     },
     welcomeBackground: {
       Normal: "No image",

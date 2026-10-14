@@ -7,11 +7,14 @@
       <TMHeaderApp />
     </div>
     <div class="flex tm-content-wrap">
-      <div class="tm-sidebar-wrap">
+      <div v-if="showSideBarLeft" class="tm-sidebar-wrap">
         <TMSidebar />
       </div>
       <div class="tm-main">
         <TMDynamicTabView />
+      </div>
+      <div v-if="showSideBarRight" class="tm-sidebar-wrap">
+        <TMSidebar />
       </div>
     </div>
     <div class="tm-footer-wrap">
@@ -30,6 +33,7 @@ import TMDialogUtil, { TMDialogEnum } from "@/common/TMDialogUtil.js";
 import "@/common/TMPrototype.js";
 import TMAppStartup from "@/common/TMAppStartup.js";
 import TMDynamicCursorEffect from "@/views/cursorEffect/TMDynamicCursorEffect.vue";
+import { appState } from "@/stores/TMAppState.js";
 
 export default {
   components: {
@@ -61,6 +65,20 @@ export default {
     TMDialogUtil.setAppContext(this.$root.$.appContext);
   },
   beforeUnmount() {},
+  computed: {
+    enumPosition() {
+      return this.$tmEnum.sideBarMenuPosition;
+    },
+    // Danh sách công cụ có 4 nơi đặt; 3 vị trí còn lại đều render TMSidebar,
+    // chỉ khác chỗ đặt. Khi đặt ở header thì không render sidebar nào cả —
+    // menu "Công cụ" ở TMHeaderApp đảm nhiệm vai trò điều hướng.
+    showSideBarLeft() {
+      return appState.sideBarMenuPosition === this.enumPosition.Sidebar;
+    },
+    showSideBarRight() {
+      return appState.sideBarMenuPosition === this.enumPosition.Right;
+    },
+  },
   methods: {
     /**
      * Xử lý 1 số kịch bản khi khởi chạy ứng dụng
