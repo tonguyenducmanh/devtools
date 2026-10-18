@@ -17,11 +17,7 @@ const APP_VERSION = process.env.VERSION || packageJson.version;
 //   - `src_wasm/<tên>/build.sh` tạo ra `src_wasm/pkg/<tên>/`
 //   - `src/views/tools/Craft/` dùng `appKey = <tên>` để nạp
 //     `/assets-wasm-<version>/<tên>/index.html`
-const WASM_PKG_FOLDERS = [
-  "dotnet",
-  "rdp",
-  "photocraft",
-];
+const WASM_PKG_FOLDERS = ["dotnet", "rdp", "photocraft"];
 
 // `src_wasm/pkg/` KHÔNG được commit vào git (gitignored, ~58 MB). Nếu clone mới
 // mà chưa chạy `scripts/build_wasm.sh` thì thư mục này rỗng/không tồn tại.
@@ -35,8 +31,7 @@ const wasmCopyTargets = WASM_PKG_FOLDERS.filter((folder) => {
   const dir = `src_wasm/pkg/${folder}`;
   const hasFiles = existsSync(dir) && readdirSync(dir).length > 0;
   if (!hasFiles) {
-    const msg =
-      `[vite] thiếu wasm "${folder}" — chạy ./scripts/build_wasm.sh để build.`;
+    const msg = `[vite] thiếu wasm "${folder}" — chạy ./scripts/build_wasm.sh để build.`;
     if (REQUIRE_WASM) {
       throw new Error(
         `${msg} REQUIRED_WASM=1 nên build bị dừng (src_wasm/pkg/ là gitignored).`,
@@ -78,6 +73,19 @@ export default defineConfig({
   },
   optimizeDeps: {
     exclude: ["rdp_client"],
+  },
+  // Worker (Web Worker) được Vite bundle riêng nên KHÔNG đi qua
+  // `build.rolldownOptions.output`. Phải khai báo lại ở đây, nếu không file
+  // worker (TMQRCodeWorker, monaco *.worker.js) sẽ mất prefix `tjs-`/`tas-`
+  // và version chống cache CDN.
+  worker: {
+    rolldownOptions: {
+      output: {
+        entryFileNames: `assets/tjs-[name]-[hash]-${APP_VERSION}.js`,
+        chunkFileNames: `assets/tjs-[name]-[hash]-${APP_VERSION}.js`,
+        assetFileNames: `assets/tas-[name]-[hash]-${APP_VERSION}[extname]`,
+      },
+    },
   },
   build: {
     rolldownOptions: {

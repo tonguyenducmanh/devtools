@@ -27,7 +27,8 @@ src/                            Frontend Vue 3 SPA (Vite 8 / rolldown)
   cfg/config.js                 window.__env (bundle vào entry, có hash/version)
   stores/                       Store tự viết (không Pinia): TMTabManager (tab), TMToolConfigs (tool/sidebar), TMAppState
   common/                       TMUtility, TMDialogUtil+TMDialogEnum, TMToastPlugin, api/request/AgentAPI,
-                                automation/ (window.__tmAPI), cache/ (mã hoá AES-GCM), proto/, mock/, plugin/
+                                automation/ (window.__tmAPI), cache/ (mã hoá AES-GCM), proto/, mock/, plugin/,
+                                worker/ (TMWorkerPool — pool Web Worker dùng chung), qrcode/ (TMQRCodeWorker + client)
   components/                   ~29 component TM*.vue dùng chung
   mixins/                       TMLayoutConfigMixin, TMCollectionMixin, TMDotNetWasmMixin, ...
   views/tools/                  Các tool (extends base/TMToolBase.vue); APITesting/, PostgreSQLQuery/, codeTemplateTools/
@@ -47,7 +48,8 @@ scripts/                        tm_version.sh, build_api.sh, build_daemon.sh, bu
                                 build_wasm.sh, fetch_wasm_sources.sh, git_pull_if_repo.sh,
                                 wasm_dist_common.sh + patch_wasm_dist.py (nén wasm dùng chung), remove_*.sh,
                                 deploy_cloudflare.sh (deploy thủ công Cloudflare Pages)
-vite.config.js                  Build frontend; viteStaticCopy wasm → dist/assets-wasm-<VERSION>/…
+vite.config.js                  Build frontend; viteStaticCopy wasm → dist/assets-wasm-<VERSION>/…;
+                                worker.rollupOptions.output cho tên file worker (xem Luật 13)
 wrangler.jsonc                  Cloudflare Pages config (project `devtools`, output `dist/`)
 ```
 
@@ -67,6 +69,14 @@ wrangler.jsonc                  Cloudflare Pages config (project `devtools`, out
 10. **`window.__tmAPI` là cầu nối chung.** `automation.agentURL` quyết định URL agent (UI tự đọc để gọi API); `automation.*` là các hàm inject cho tool Automation; `dotnetExports` từ .NET WASM. Đừng đổi shape tùy tiện mà không cập nhật tất cả nơi dùng.
 11. **Dialog enum append-only.** `TMDialogEnum` + `DialogComponentMap` nằm trong `src/common/TMDialogUtil.js`. Thêm dialog mới = thêm enum ở CUỐI `TMDialogEnum` + mapping trong `DialogComponentMap` + component trong `views/dialogs/`. Không đổi/đảo số enum cũ.
 12. **Không commit artifact.** `dist/`, `out/`, `node_modules/`, `config.json`, `*.db*`, `src_wasm/pkg/`, `src_wasm/*/external_repo/` đều gitignore. `build_daemon.sh` nén 3 binary cuối cùng (mac/linux → `.tar.gz`, window → `.zip`) rồi xoá bản thô, nên `out/` chỉ còn file upload release — upload thẳng cả thư mục.
+13. **Tác vụ nặng phải tách Web Worker.** Bất kỳ thứ gì block >~200ms trên main thread (đọc/ghi ảnh, encode giải mã, parse lớn, tính toán lặp) là bug UX — app đứng hình, user không click được tab khác. Dùng `TMWorkerPool` (`src/common/worker/TMWorkerPool.js`) + một worker file riêng. Mẫu tham chiếu: `src/common/qrcode/TMQRCodeWorker.js`.
+    - **3 lỗi phải tránh** (đều đã dính rồi, đừng lặp lại):
+      1. `new Worker(new URL("./x.js", import.meta.url), {type:"module"})` phải nằm **LITERALLY** trong module gọi. Truyền `new Worker(urlVar)` sẽ **không** được Vite transform → build xong worker không tồn tại, chạy lúc mới lộ. (Plugin `vite:worker-import-meta-url` chỉ match regex lồng nhau.)
+      2. **Không** truyền object reactive của Vue (Proxy), function, hay DOM node vào worker — structured-clone không hỗ trợ → `DataCloneError`. Hằng số config đặt ở **ngoài component** (module scope) hoặc dùng `markRaw()`.
+      3. Worker **không có DOM**. Dùng `createImageBitmap(blob)` thay `Image`/`FileReader`, `OffscreenCanvas` thay `document.createElement("canvas")`, `ImageData` thì có sẵn. Chỉ giữ lại phần cần DOM (vd QrScanner, ZXing) làm fallback ở main thread.
+    - **Protocol** (giữ nguyên cho mọi worker): `main → worker: {id, type, payload}`; `worker → main: {id, final:true, ok, result|error}` và `{id, final:false, …}` cho progress. Task trong worker phải **serialize bằng chuỗi promise** (pool giả định 1 worker chạy 1 task/lần).
+    - **Bắt buộc:** xử lý `message.id` của task mới nhất trong component (token/generation id) để lần gọi sau không bị lần trước đè; và **báo tiến trình** (spinner + x/y) vì tác vụ vẫn mất vài giây.
+    - **Naming:** worker được Vite bundle **riêng**, KHÔNG đi qua `build.rolldownOptions.output`. Muốn giữ prefix `tjs-`/`tas-` + version (Luật 1) thì phải khai báo thêm `worker.rollupOptions.output` trong `vite.config.js` — nếu không, file worker sẽ tên trần, mất version chống cache CDN.
 
 ## 4. Chọn việc làm
 
@@ -76,7 +86,8 @@ wrangler.jsonc                  Cloudflare Pages config (project `devtools`, out
 1. **Mở app (`npm run dev`)** xem sidebar: tool Automation là route riêng (`type: "automation"`); các nhóm group: API, QRCode, Database, RemoteDesktop, Text, JSON, SampleCode, Image, AI, Miscellaneous.
 2. Tool mới nên bám theo nhóm hiện có trong `sidebarConfig`, đặt tên `TM<Thing>.vue` theo chuẩn.
 3. Backend: kiểm tra endpoint đã có trong `rt_*.go`; chỉ thêm khi tool thật sự cần agent (cần máy nội bộ / nhạy cảm).
-4. Không có file roadmap — ghi ý tưởng vào commit message hoặc issue GitHub, không tự tạo `docs/roadmap.md` trừ khi được yêu cầu.
+4. Trước khi tối ưu code, hỏi: "việc này có block main thread không?" — nếu có thì tách worker (Luật 13) chứ đừng tối ưu/thêm `await` giả.
+5. Không có file roadmap — ghi ý tưởng vào commit message hoặc issue GitHub, không tự tạo `docs/roadmap.md` trừ khi được yêu cầu.
 
 ## 5. Trước khi kết thúc task
 
@@ -96,6 +107,11 @@ npm run build                                 # build lại vì viteStaticCopy l
 ```
 
 - **Test:** repo CHƯA có framework test frontend; tự kiểm tra thủ công trên `npm run dev`. Với Go, chạy `go test ./...` của module đụng đến (hiện có `dl_group_test.go`, `bl_collection_test.go`).
+- **Đụng Web Worker thì phải verify cả 2 lớp** — `npm run build` xanh KHÔNG đủ:
+  1. **Dev server**: `curl http://localhost:<port>/src/<path>/<File>WorkerClient.js` → phải thấy `new URL("...Worker.js?worker_file&type=module", ...)` trong code đã transform. Đây là lỗi #1 ở Luật 13, dev mode lộ ra trước.
+  2. **File worker có thật trong `dist/`**: `ls dist/assets/ | grep -i worker` → file phải có prefix `tjs-` + version (Luật 13, naming).
+  3. **Chạy thật trong browser**: bundle worker là file IIFE/ESM tự đăng ký listener `message`, nên load nó vào trang test rồi post message trực tiếp là smoke-test nhanh nhất — đây là cách bắt được lỗi `DataCloneError` và lỗi DOM API mà Node không lộ (Node thiếu `OffscreenCanvas`/`createImageBitmap` thật).
+  4. **Đo main thread còn phản hồi**: bọc tác vụ bằng `setInterval(ticks++, 16)` rồi đếm tick trong lúc chờ. Nếu tick ≈ 0 → main thread đang block (tức là tác vụ chạy sai chỗ).
 - Commit nhỏ, rõ ràng, 1 ý/commit. Cập nhật `README.md` / `docs/` nếu hành vi hoặc bước build thay đổi.
 - Không commit các file artifact nêu trong Luật 12.
 

@@ -6,6 +6,7 @@
 - **Không commit artifact:** xem Luật 12 trong `AGENTS.md` (`dist/`, `out/`, `node_modules/`, `config.json`, `*.db*`, `src_wasm/pkg/`, `src_wasm/*/external_repo/`).
 - **Commit:** nhỏ, 1 ý/commit; subject rõ nghĩa (có thể tiếng Việt ngắn gọn).
 - **Chưa có CI/test frontend:** tự smoke-test kỹ trên `npm run dev`; Go chạy `go test ./...` module đụng đến.
+- **Main thread không được block:** xử lý nặng tách worker (xem mục "Tác vụ nặng"); luôn báo tiến trình và để user thao tác được tab khác trong lúc chờ.
 
 ## Thêm một tool (frontend)
 
@@ -34,6 +35,31 @@
 5. **(Tùy chọn) Dialog:** `TMDialogEnum` + `DialogComponentMap` nằm trong `src/common/TMDialogUtil.js` — thêm enum ở **cuối** `TMDialogEnum`, mapping trong `DialogComponentMap`, tạo component trong `src/views/dialogs/` (implement `show(param)`).
 6. **(Tùy chọn) Monaco intellisense:** override `registerIntellisense()`/`disposeIntellisense()` trong tool; định nghĩa ngôn ngữ ở `src/monarch/`.
 7. **Tool cần lưu cấu hình:** kế thừa `TMLayoutConfigMixin` (cache key `keyCacheLayout`). Tool master-detail GHÉP với backend: dùng `TMCollectionMixin` + `TMCollectionList` (xem mục backend).
+8. **Tool xử lý nặng:** nếu có bước block main thread >~200ms (duyệt/xử lý ảnh, encode, parse dữ liệu lớn, vòng lặp nặng) → tách sang Web Worker qua `TMWorkerPool`, không tối ưu bằng `await` hay `setTimeout`. Xem mục "Tác vụ nặng" bên dưới.
+
+## Tác vụ nặng (Web Worker)
+
+Mẫu tham chiếu: `src/common/qrcode/` (đọc + sinh mã QR).
+
+```js
+// 1. Worker file: src/common/<miền>/TM<Miền>Worker.js — KHÔNG import gì chạm DOM
+import { process } from "<lib thuần>";
+self.addEventListener("message", (e) => {
+  taskChain = taskChain.then(() => handle(e.data)).catch(sendError); // serialize!
+});
+// 2. Client: src/common/<miền>/TM<Miền>WorkerClient.js
+const pool = getWorkerPool("<tên>", () =>
+  new Worker(new URL("./TM<Miền>Worker.js", import.meta.url), { type: "module" }),
+);
+```
+
+Ba lỗi hay gặp nhất — đều dính rồi nên ghi lại:
+
+1. **`new Worker(new URL(...))` phải literal.** Truyền qua biến sẽ không được Vite transform, build vẫn xanh nhưng lúc chạy worker không tồn tại. Kiểm tra bằng cách `curl` file client trên dev server và xem đã thành `...?worker_file&type=module` chưa.
+2. **Payload phải clone được.** Object trong `data()` của Vue là reactive `Proxy` → `DataCloneError` khi postMessage. Hằng số đặt ngoài component hoặc `markRaw()`. Function/DOM node cũng không được.
+3. **Worker không có DOM.** `createImageBitmap(blob)` thay `Image`/`FileReader`; `OffscreenCanvas` + `convertToBlob()` thay canvas DOM; `ImageData` có sẵn. Phần cần DOM giữ lại làm fallback ở main thread và chỉ chạy khi worker không xử lý được.
+
+Ngoài ra: báo tiến trình (spinner + x/y), dùng token để lần gọi sau không bị lần trước đè, và nhớ `worker.rollupOptions.output` trong `vite.config.js` để file worker giữ prefix `tjs-` + version chống cache CDN. Chi tiết: `AGENTS.md` Luật 13 + `docs/architecture.md`.
 
 ## Thêm một API (backend)
 
@@ -62,5 +88,7 @@ cd src_backend/tm_config && go build ./...
 cd ../tm_core_service && go build ./... && go vet ./... && go test ./...
 cd ../tm_app && go build ./...
 ```
+
+Nếu đụng Web Worker, `npm run build` xanh **chưa đủ** — phải kiểm tra thêm: dev server đã transform đúng `new Worker(new URL(...))` chưa; `dist/assets/` có file worker với prefix `tjs-` + version; và chạy thật trong browser với tác vụ nặng để xác nhận main thread vẫn phản hồi (đếm tick của `setInterval(…, 16)` trong lúc chờ). Chi tiết ở `AGENTS.md` mục 5.
 
 Cập nhật `README.md` / `docs/` nếu hành vi hay quy trình build đổi. Không commit artifact (Luật 12, `AGENTS.md`).

@@ -37,6 +37,40 @@ Frontend không nhúng "trái tim" logic nặng; những việc cần máy nội
 - `window.__env` (từ `src/cfg/config.js`): appName, theme mặc định, `githubSource.url/releasesUrl`, `APITesting.agentServer` (default `http://localhost:7777`).
 - `window.__tmAPI` (từ `src/common/automation/TMAutomation.js`, set trong `TMAppStartup`): `automation.agentURL` + các method inject (`parseCURL`, http helpers…); `dotnetExports` (.NET WASM, từ `TMDotNetWasmMixin`).
 
+### Web Worker (tác vụ nặng ngoài main thread)
+
+Main thread chỉ lo render + I/O. Mọi thứ block lâu (>~200ms) đều đẩy sang worker, để user vẫn click/switch tab được trong lúc xử lý.
+
+```text
+TM*.vue  ──run({type,payload})──▶  TMWorkerPool  ──▶  Worker (module scope)
+   ▲                                    │                     │
+   └── resolve/reject ◀── {id,final,ok} ─┴── progress ─────────┘
+```
+
+- **`src/common/worker/TMWorkerPool.js`** — pool generic, dùng chung qua `getWorkerPool(name, createWorker, {maxWorker})`. Mỗi pool tối đa `min(4, hardwareConcurrency-1)` worker; task được gán cho worker rảnh sẵn (first-available), hết chỗ thì spawn thêm đến khi đạt trần. Tự `terminate()` toàn bộ sau 60s không rảnh (giải phóng RAM cho app nhiều tab). Worker chết giữa chừng → task đang chạy reject, worker hỏng bị loại và tạo lại ở task kế tiếp.
+- **Worker file** — mỗi miền nặng một file riêng, không import gì chạm DOM.
+- **Protocol** (chuẩn hoá cho mọi worker): `main → worker {id, type, payload}`; `worker → main {id, final:true, ok, result|error}` kèm `{id, final:false, type:"<progress>"}` cho báo tiến trình. Task được xếp chuỗi promise trong worker nên **1 worker chạy tuần tự 1 task** — đúng giả định của pool.
+- **Ràng buộc kỹ thuật:**
+  - Worker **không có DOM** → `createImageBitmap(blob)` thay `Image`/`FileReader`, `OffscreenCanvas` (+`convertToBlob`) thay canvas DOM, `ImageData`/`Uint8ClampedArray` thì có sẵn.
+  - `new Worker(new URL("./x.js", import.meta.url), {type:"module"})` phải **literal** trong module gọi — Vite chỉ transform đúng pattern lồng nhau này (plugin `vite:worker-import-meta-url`).
+  - Payload phải structured-clone được: **không** truyền reactive Proxy của Vue, function, DOM node. Hằng số config đặt ngoài component hoặc `markRaw()`.
+  - Worker được bundle **riêng** nên không đi qua `build.rolldownOptions.output`; `vite.config.js` khai báo thêm `worker.rollupOptions.output` để giữ prefix `tjs-`/`tas-` + version chống cache CDN.
+
+**Mẫu tham chiếu — QR (`src/common/qrcode/`):**
+
+| File | Vai trò |
+| --- | --- |
+| `TMQRCodeConfig.js` | `QR_CONFIG` dùng chung main thread ↔ worker (định dạng ảnh hỗ trợ, giới hạn canvas, bộ tiền xử lý) |
+| `TMQRCodeWorker.js` | task `gen` (ma trận QR → OffscreenCanvas → PNG → data URL) và task `scan` (decode ảnh → tiền xử lý pixel → jsQR, nhiều tỉ lệ + nhiều bộ lọc) |
+| `TMQRCodeWorkerClient.js` | sở hữu pool, `generateQRItems()` / `scanQRFiles()` |
+| `TMQRCodeUtil.js` | orchestrator main thread: `imagesQRToText()` chạy song song qua pool, fallback `QrScanner`/`ZXing` ở main thread (cần DOM) khi worker không đọc được |
+
+Sinh QR dùng core thuần của thư viện `qrcode` (`qrcode/lib/core/qrcode.js` + `lib/renderer/utils.js`) vì bản `toDataURL` cần canvas DOM; `getOptions`/`qrToImageData` được tái dùng để giữ nguyên output cũ.
+
+Thứ tự tìm kiếm trong `scan` được sắp theo **chi phí tăng dần**, vì jsQR chỉ ~1.2 Mpx/s: kích thước gốc trước (bỏ 3 bộ lọc thừa vì `attemptBoth` đã thử cả ảnh đảo màu), rồi mới thu nhỏ 0.5/0.4/0.3 (loại trùng kích thước), cuối cùng mới xoay 90°/270° ở kích thước đầu. Ảnh 2048² không có QR: worker mất ~13s nhưng main thread vẫn phản hồi đều.
+
+Cả 2 tool đều báo tiến trình (spinner + x/y) vì tác vụ vẫn mất vài giây, và dùng token (`generateToken` / `scanToken`) để kết quả của lần bấm trước không đè lên lần sau.
+
 ### i18n
 
 `src/i18n/i18nData.js`: reactive `{locale, fallbackLocale:"vi", messages}`, tích hợp qua `app.use`, `$t`/`$te`. Mỗi locale (`en/`, `vi/`) gồm 5 file: `i18nCommon`, `i18nUserSettings`, `i18nHelp`, `i18nTemplate`, `i18nTip` + `global/i18nGlobal.js`. `loadLocale(locale)` dynamic import; mặc định theo user setting `currentLanguage`.

@@ -444,6 +444,8 @@ export default {
       part: "Phần {0}/{1}",
       compressText: "Nén dữ liệu",
       addHeaderToQR: "Có header QR",
+      generatingProgress: "Đang tạo... {0}/{1}",
+      generateError: "Có mã QR không tạo được",
     },
     qrCodeToText: {
       title: "Công cụ chuyển đổi mã QR sang văn bản!",
@@ -455,6 +457,7 @@ export default {
       hasHeaderInQR: "Có header QR",
       uploadLabel: "Tải ảnh lên hoặc Ctrl + V ảnh vào đây",
       scanMultipleQR: "1 ảnh nhiều QR",
+      scanningProgress: "Đang đọc... {0}/{1}",
     },
     oneTimePassword: {
       title: "Mật khẩu một lần theo thời gian (TOTP) và theo HMAC (HOTP)!",

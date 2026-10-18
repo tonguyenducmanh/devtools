@@ -445,6 +445,8 @@ export default {
       part: "Part {0}/{1}",
       compressText: "Compress text",
       addHeaderToQR: "Use QR header",
+      generatingProgress: "Generating... {0}/{1}",
+      generateError: "Some QR codes could not be generated",
     },
     qrCodeToText: {
       title: "QRCode To Text tool!",
@@ -456,6 +458,7 @@ export default {
       hasHeaderInQR: "Use QR header",
       uploadLabel: "Upload image or Ctrl + V to paste image here",
       scanMultipleQR: "Image Multi QR",
+      scanningProgress: "Scanning... {0}/{1}",
     },
     oneTimePassword: {
       title: "Time-based (TOTP) and HMAC-based (HOTP) One-Time Password!",

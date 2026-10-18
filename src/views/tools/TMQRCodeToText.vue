@@ -15,6 +15,7 @@
           <TMButton
             :noMargin="true"
             @click="convertQRCode"
+            :readOnly="isLoading"
             iconClass="tm-send-icon"
             v-tooltip="$t('i18nCommon.qrCodeToText.convert')"
           ></TMButton>
@@ -22,12 +23,21 @@
             @click="copyResult"
             :noMargin="true"
             :type="$tmEnum.buttonType.secondary"
+            :readOnly="isLoading"
             iconClass="tm-copy-icon"
             v-tooltip="$t('i18nCommon.qrCodeToText.copy')"
           ></TMButton>
         </div>
         <div class="flex flex-col response-loading" v-if="isLoading">
           <TMLoading />
+          <div class="scan-progress">
+            {{
+              $t("i18nCommon.qrCodeToText.scanningProgress").format(
+                progressCurrent,
+                progressTotal,
+              )
+            }}
+          </div>
         </div>
         <TMTextEditor
           v-else
@@ -188,13 +198,21 @@ export default {
         typeof me.$refs.uploadArea.getFileSelected === "function"
       ) {
         me.isLoading = true;
+        me.progressCurrent = 0;
+        me.progressTotal = 0;
         const { imagesQRToText } = await import(
           /* webpackChunkName: "mock-qr-code-util" */
           "@/common/qrcode/TMQRCodeUtil.js"
         );
+        const scanToken = ++me.scanToken;
         try {
           let rawResults = await imagesQRToText(me.$refs.uploadArea, {
             scanMultipleQR: me.currentConfigLayout.scanMultipleQR,
+            onProgress: (progress) => {
+              if (me.scanToken !== scanToken) return;
+              me.progressCurrent = progress.current;
+              me.progressTotal = progress.total;
+            },
           });
           if (rawResults && rawResults.length > 0) {
             let finalOutput = "";
@@ -219,7 +237,9 @@ export default {
           console.error("Error in convertQRCode:", error);
           me.$tmToast.error(me.$t("i18nCommon.toastMessage.error"));
         } finally {
-          me.isLoading = false;
+          if (me.scanToken === scanToken) {
+            me.isLoading = false;
+          }
         }
       }
     },
@@ -329,6 +349,9 @@ export default {
       isRemoveEmpty: false,
       historyItems: [],
       qrCodeItems: [],
+      progressCurrent: 0,
+      progressTotal: 0,
+      scanToken: 0,
     };
   },
 };
@@ -372,8 +395,15 @@ export default {
 .response-loading {
   width: 100%;
   height: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: var(--padding);
   background-color: var(--bg-layer-color);
   border: 1px solid transparent;
   border-radius: var(--border-radius);
+}
+.scan-progress {
+  color: var(--text-secondary-color);
+  white-space: nowrap;
 }
 </style>

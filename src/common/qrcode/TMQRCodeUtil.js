@@ -1,53 +1,17 @@
-import jsQR from "jsqr";
 import QrScanner from "qr-scanner";
+import { QR_CONFIG } from "./TMQRCodeConfig.js";
+import { scanQRFiles } from "./TMQRCodeWorkerClient.js";
 
 /**
- * Enhanced configuration for QR scanning optimization
+ * Tiện ích đọc QR từ ảnh.
+ *
+ * Kiến trúc sau khi tách phần nặng sang Web Worker:
+ *   - jsQR + tiền xử lý ảnh (nhiều tỉ lệ / nhiều bộ lọc / xoay ảnh) chạy trong
+ *     `TMQRCodeWorker` → main thread không bị đứng hình, vẫn click/switch tab được.
+ *   - QrScanner và ZXing giữ làm fallback chạy trên main thread vì cần DOM
+ *     (`HTMLImageElement`/canvas). Chúng chỉ chạy khi worker không đọc được,
+ *     và QrScanner bản thân đã có worker jsQR riêng nên cũng khá nhẹ.
  */
-const QR_CONFIG = {
-  // QrScanner options for better performance
-  qrScannerOptions: {
-    returnDetailedScanResult: true,
-    highlightScanRegion: false,
-    highlightCodeOutline: false,
-    preferredCamera: "environment",
-    maxScansPerSecond: 5,
-  },
-
-  // Canvas optimization for jsQR
-  canvasOptions: {
-    maxWidth: 2048,
-    maxHeight: 2048,
-    minWidth: 200,
-    minHeight: 200,
-    quality: 1.0,
-  },
-
-  // Image preprocessing options
-  preprocessOptions: {
-    enableSharpening: true,
-    enableNoiseReduction: true,
-    enableContrastEnhancement: true,
-    enableBinarization: true,
-    enableRotationCorrection: true,
-  },
-
-  // Supported image formats
-  supportedFormats: [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/webp",
-    "image/bmp",
-    "image/gif",
-  ],
-
-  // Retry configuration
-  retryOptions: {
-    maxRetries: 0,
-    retryDelay: 0,
-  },
-};
 
 /**
  * Utility function to validate file format
@@ -57,495 +21,36 @@ function isValidImageFormat(file) {
 }
 
 /**
- * Apply image sharpening filter
+ * Helper function to create image element from file
  */
-function applySharpenFilter(imageData) {
-  const data = imageData.data;
-  const width = imageData.width;
-  const height = imageData.height;
-  const output = new Uint8ClampedArray(data);
+function createImageElementFromFile(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
 
-  // Sharpening kernel
-  const kernel = [0, -1, 0, -1, 5, -1, 0, -1, 0];
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(img);
+    };
 
-  for (let y = 1; y < height - 1; y++) {
-    for (let x = 1; x < width - 1; x++) {
-      for (let c = 0; c < 3; c++) {
-        // RGB channels only
-        let sum = 0;
-        for (let ky = -1; ky <= 1; ky++) {
-          for (let kx = -1; kx <= 1; kx++) {
-            const idx = ((y + ky) * width + (x + kx)) * 4 + c;
-            sum += data[idx] * kernel[(ky + 1) * 3 + (kx + 1)];
-          }
-        }
-        const idx = (y * width + x) * 4 + c;
-        output[idx] = Math.max(0, Math.min(255, sum));
-      }
-    }
-  }
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Failed to load image"));
+    };
 
-  return new ImageData(output, width, height);
-}
-
-/**
- * Apply noise reduction using median filter
- */
-function applyNoiseReduction(imageData) {
-  const data = imageData.data;
-  const width = imageData.width;
-  const height = imageData.height;
-  const output = new Uint8ClampedArray(data);
-
-  for (let y = 1; y < height - 1; y++) {
-    for (let x = 1; x < width - 1; x++) {
-      for (let c = 0; c < 3; c++) {
-        const values = [];
-        for (let ky = -1; ky <= 1; ky++) {
-          for (let kx = -1; kx <= 1; kx++) {
-            const idx = ((y + ky) * width + (x + kx)) * 4 + c;
-            values.push(data[idx]);
-          }
-        }
-        values.sort((a, b) => a - b);
-        const idx = (y * width + x) * 4 + c;
-        output[idx] = values[4]; // median of 9 values
-      }
-    }
-  }
-
-  return new ImageData(output, width, height);
-}
-
-/**
- * Enhance contrast using histogram stretching
- */
-function enhanceContrast(imageData) {
-  const data = imageData.data;
-  const length = data.length;
-
-  // Find min and max values for each channel
-  let minR = 255,
-    maxR = 0,
-    minG = 255,
-    maxG = 0,
-    minB = 255,
-    maxB = 0;
-
-  for (let i = 0; i < length; i += 4) {
-    minR = Math.min(minR, data[i]);
-    maxR = Math.max(maxR, data[i]);
-    minG = Math.min(minG, data[i + 1]);
-    maxG = Math.max(maxG, data[i + 1]);
-    minB = Math.min(minB, data[i + 2]);
-    maxB = Math.max(maxB, data[i + 2]);
-  }
-
-  // Stretch histogram
-  const rangeR = maxR - minR || 1;
-  const rangeG = maxG - minG || 1;
-  const rangeB = maxB - minB || 1;
-
-  for (let i = 0; i < length; i += 4) {
-    data[i] = Math.round(((data[i] - minR) / rangeR) * 255);
-    data[i + 1] = Math.round(((data[i + 1] - minG) / rangeG) * 255);
-    data[i + 2] = Math.round(((data[i + 2] - minB) / rangeB) * 255);
-  }
-
-  return imageData;
-}
-
-/**
- * Apply adaptive binarization (Otsu's method)
- */
-function applyAdaptiveBinarization(imageData) {
-  const data = imageData.data;
-  const length = data.length;
-
-  // Convert to grayscale and build histogram
-  const histogram = new Array(256).fill(0);
-  for (let i = 0; i < length; i += 4) {
-    const gray = Math.round(
-      0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2],
-    );
-    histogram[gray]++;
-  }
-
-  // Otsu's method to find optimal threshold
-  let total = length / 4;
-  let sum = 0;
-  for (let i = 0; i < 256; i++) {
-    sum += i * histogram[i];
-  }
-
-  let sumB = 0;
-  let wB = 0;
-  let wF = 0;
-  let mB = 0;
-  let mF = 0;
-  let max = 0;
-  let between = 0;
-  let threshold1 = 0;
-  let threshold2 = 0;
-
-  for (let i = 0; i < 256; i++) {
-    wB += histogram[i];
-    if (wB === 0) continue;
-    wF = total - wB;
-    if (wF === 0) break;
-
-    sumB += i * histogram[i];
-    mB = sumB / wB;
-    mF = (sum - sumB) / wF;
-    between = wB * wF * (mB - mF) * (mB - mF);
-
-    if (between >= max) {
-      threshold1 = i;
-      if (between > max) {
-        threshold2 = i;
-      }
-      max = between;
-    }
-  }
-
-  const threshold = (threshold1 + threshold2) / 2;
-
-  // Apply binarization
-  for (let i = 0; i < length; i += 4) {
-    const gray = Math.round(
-      0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2],
-    );
-    const binary = gray > threshold ? 255 : 0;
-    data[i] = data[i + 1] = data[i + 2] = binary;
-  }
-
-  return imageData;
-}
-
-/**
- * Preprocess image for better QR detection
- */
-function preprocessImage(canvas, ctx, options = QR_CONFIG.preprocessOptions) {
-  let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-  if (options.enableNoiseReduction) {
-    imageData = applyNoiseReduction(imageData);
-    ctx.putImageData(imageData, 0, 0);
-  }
-
-  if (options.enableSharpening) {
-    imageData = applySharpenFilter(imageData);
-    ctx.putImageData(imageData, 0, 0);
-  }
-
-  if (options.enableContrastEnhancement) {
-    imageData = enhanceContrast(imageData);
-    ctx.putImageData(imageData, 0, 0);
-  }
-
-  return imageData;
-}
-
-/**
- * Get optimal dimensions with multiple scale factors
- */
-function getMultipleScales(img) {
-  const { maxWidth, maxHeight, minWidth, minHeight } = QR_CONFIG.canvasOptions;
-  const { width, height } = img;
-
-  const scales = [];
-
-  // Scaled down versions
-  const maxScale = Math.min(maxWidth / width, maxHeight / height);
-  const minScale = Math.max(minWidth / width, minHeight / height);
-
-  [0.5, 0.4, 0.3].forEach((factor) => {
-    const scale = Math.min(maxScale, factor);
-    if (scale >= minScale && scale !== 1) {
-      scales.push({
-        width: Math.floor(width * scale),
-        height: Math.floor(height * scale),
-        scale,
-      });
-    }
-  });
-
-  // Ensure we have at least one scale
-  if (scales.length === 0) {
-    const scale = Math.min(maxScale, Math.max(minScale, 0.5));
-    scales.push({
-      width: Math.floor(width * scale),
-      height: Math.floor(height * scale),
-      scale,
-    });
-  }
-  // đưa việc xử lý scale = 1 xuống dưới
-  // Original size (if within limits)
-  if (
-    width <= maxWidth &&
-    height <= maxHeight &&
-    width >= minWidth &&
-    height >= minHeight
-  ) {
-    scales.push({ width, height, scale: 1 });
-  }
-  return scales;
-}
-
-/**
- * Try multiple rotations of the image
- */
-function tryRotations(canvas, ctx, originalImageData) {
-  const rotations = [0, 90, 180, 270];
-  const results = [];
-
-  for (const rotation of rotations) {
-    try {
-      // Reset canvas
-      ctx.putImageData(originalImageData, 0, 0);
-
-      if (rotation !== 0) {
-        // Apply rotation
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-        ctx.translate(centerX, centerY);
-        ctx.rotate((rotation * Math.PI) / 180);
-        ctx.translate(-centerX, -centerY);
-
-        // Redraw
-        ctx.putImageData(originalImageData, 0, 0);
-      }
-
-      const rotatedImageData = ctx.getImageData(
-        0,
-        0,
-        canvas.width,
-        canvas.height,
-      );
-      results.push({ rotation, imageData: rotatedImageData });
-
-      // Reset transform
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-    } catch (error) {
-      console.warn(`Rotation ${rotation}° failed:`, error);
-    }
-  }
-
-  return results;
-}
-
-/**
- * Enhanced QR code reader using jsQR with advanced preprocessing
- */
-async function readQRWithJsQR(file) {
-  return new Promise((resolve) => {
-    try {
-      if (!isValidImageFormat(file)) {
-        console.warn(`Unsupported file format: ${file.type}`);
-        resolve(null);
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        try {
-          const imageData = event.target.result;
-          const img = new Image();
-
-          img.onload = function () {
-            try {
-              const scales = getMultipleScales(img);
-
-              // Try different scales
-              for (const scale of scales) {
-                const canvas = document.createElement("canvas");
-                const ctx = canvas.getContext("2d", {
-                  willReadFrequently: true,
-                });
-
-                canvas.width = scale.width;
-                canvas.height = scale.height;
-
-                // High quality rendering
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = "high";
-
-                // Draw resized image
-                ctx.drawImage(img, 0, 0, scale.width, scale.height);
-
-                // Store original for rotation attempts
-                const originalImageData = ctx.getImageData(
-                  0,
-                  0,
-                  scale.width,
-                  scale.height,
-                );
-
-                // Try without preprocessing first
-                const attempts = [
-                  {
-                    name: "original",
-                    preprocess: false,
-                    options: { inversionAttempt: "attemptBoth" },
-                  },
-                  {
-                    name: "original-invert",
-                    preprocess: false,
-                    options: { inversionAttempt: "onlyInvert" },
-                  },
-                  {
-                    name: "original-no-invert",
-                    preprocess: false,
-                    options: { inversionAttempt: "dontInvert" },
-                  },
-                ];
-
-                // Add preprocessing attempts
-                if (QR_CONFIG.preprocessOptions.enableContrastEnhancement) {
-                  attempts.push(
-                    {
-                      name: "contrast",
-                      preprocess: { enableContrastEnhancement: true },
-                      options: { inversionAttempt: "attemptBoth" },
-                    },
-                    {
-                      name: "contrast-invert",
-                      preprocess: { enableContrastEnhancement: true },
-                      options: { inversionAttempt: "onlyInvert" },
-                    },
-                  );
-                }
-
-                if (QR_CONFIG.preprocessOptions.enableSharpening) {
-                  attempts.push(
-                    {
-                      name: "sharpen",
-                      preprocess: { enableSharpening: true },
-                      options: { inversionAttempt: "attemptBoth" },
-                    },
-                    {
-                      name: "sharpen-contrast",
-                      preprocess: {
-                        enableSharpening: true,
-                        enableContrastEnhancement: true,
-                      },
-                      options: { inversionAttempt: "attemptBoth" },
-                    },
-                  );
-                }
-
-                if (QR_CONFIG.preprocessOptions.enableBinarization) {
-                  attempts.push(
-                    {
-                      name: "binary",
-                      preprocess: { enableBinarization: true },
-                      options: { inversionAttempt: "dontInvert" },
-                    },
-                    {
-                      name: "binary-invert",
-                      preprocess: { enableBinarization: true },
-                      options: { inversionAttempt: "onlyInvert" },
-                    },
-                  );
-                }
-
-                // Try each preprocessing method
-                for (const attempt of attempts) {
-                  try {
-                    // Reset to original
-                    ctx.putImageData(originalImageData, 0, 0);
-
-                    let processedImageData = originalImageData;
-
-                    if (attempt.preprocess) {
-                      processedImageData = preprocessImage(
-                        canvas,
-                        ctx,
-                        attempt.preprocess,
-                      );
-                    } else {
-                      processedImageData = ctx.getImageData(
-                        0,
-                        0,
-                        scale.width,
-                        scale.height,
-                      );
-                    }
-
-                    // Try normal orientation
-                    const code = jsQR(
-                      processedImageData.data,
-                      processedImageData.width,
-                      processedImageData.height,
-                      attempt.options,
-                    );
-                    if (code && code.data) {
-                      resolve(code.data);
-                      return;
-                    }
-
-                    // Try rotations if enabled
-                    if (QR_CONFIG.preprocessOptions.enableRotationCorrection) {
-                      const rotations = tryRotations(
-                        canvas,
-                        ctx,
-                        processedImageData,
-                      );
-                      for (const rotation of rotations) {
-                        if (rotation.rotation === 0) continue; // Already tried
-
-                        const rotatedCode = jsQR(
-                          rotation.imageData.data,
-                          rotation.imageData.width,
-                          rotation.imageData.height,
-                          attempt.options,
-                        );
-                        if (rotatedCode && rotatedCode.data) {
-                          resolve(rotatedCode.data);
-                          return;
-                        }
-                      }
-                    }
-                  } catch (error) {
-                    console.warn(`jsQR ${attempt.name} attempt failed:`, error);
-                  }
-                }
-              }
-
-              resolve(null);
-            } catch (error) {
-              console.warn("jsQR processing error:", error);
-              resolve(null);
-            }
-          };
-
-          img.onerror = () => {
-            console.warn("Image load error for jsQR");
-            resolve(null);
-          };
-
-          img.src = imageData;
-        } catch (error) {
-          console.warn("jsQR setup error:", error);
-          resolve(null);
-        }
-      };
-
-      reader.onerror = () => {
-        console.warn("FileReader error for jsQR");
-        resolve(null);
-      };
-
-      reader.readAsDataURL(file);
-    } catch (error) {
-      console.warn("jsQR general error:", error);
-      resolve(null);
-    }
+    img.src = url;
   });
 }
 
 /**
- * Enhanced QR code reader using QrScanner with better options
+ * Delay function for retry mechanism
+ */
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Đọc 1 ảnh bằng QrScanner (fallback, cần DOM)
  */
 async function readQRWithQrScanner(file) {
   try {
@@ -584,12 +89,13 @@ async function readQRWithQrScanner(file) {
 }
 
 /**
- * ZXing-js fallback with multiple attempts
+ * ZXing-js fallback with multiple attempts (fallback, cần DOM)
  */
 async function readQRWithZXing(file) {
   try {
-    const { BrowserQRCodeReader, BrowserMultiFormatReader } =
-      await import("@zxing/library");
+    const { BrowserQRCodeReader, BrowserMultiFormatReader } = await import(
+      "@zxing/library"
+    );
 
     const readers = [new BrowserQRCodeReader(), new BrowserMultiFormatReader()];
 
@@ -614,239 +120,111 @@ async function readQRWithZXing(file) {
 }
 
 /**
- * Helper function to create image element from file
+ * Thử lần lượt các fallback trên main thread (QrScanner → ZXing)
+ * @param {Blob|File} blob
+ * @returns {Promise<string|null>}
  */
-function createImageElementFromFile(file) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      resolve(img);
-    };
-
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Failed to load image"));
-    };
-
-    img.src = url;
-  });
-}
-
-/**
- * Delay function for retry mechanism
- */
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-/**
- * Enhanced QR code reader with multiple fallback methods and advanced retry logic
- */
-async function readQRFromFile(file) {
-  const { maxRetries, retryDelay } = QR_CONFIG.retryOptions;
-
-  // Define scanning methods in order of preference (QrScanner first for better performance)
+async function readQRWithFallback(blob) {
   const scanMethods = [
-    { name: "jsQR", fn: readQRWithJsQR },
     { name: "QrScanner", fn: readQRWithQrScanner },
     { name: "ZXing", fn: readQRWithZXing },
   ];
 
   for (const method of scanMethods) {
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      try {
-        const result = await method.fn(file);
-
-        if (result && typeof result === "string" && result.trim()) {
-          return result.trim();
-        }
-
-        if (attempt < maxRetries) {
-          await delay(retryDelay);
-        }
-      } catch (error) {
-        console.warn(
-          `${method.name} attempt ${attempt + 1} error:`,
-          error.message,
-        );
-
-        if (attempt < maxRetries) {
-          await delay(retryDelay);
-        }
+    try {
+      const result = await method.fn(blob);
+      if (result && typeof result === "string" && result.trim()) {
+        return result.trim();
       }
+    } catch (error) {
+      console.warn(`${method.name} error:`, error.message || error);
     }
   }
   return null;
 }
 
 /**
- * Extract individual QR codes from an image by slicing along white gaps (quiet zones)
+ * Đọc QR bằng pipeline nặng (jsQR + tiền xử lý) chạy trong Web Worker.
+ * @param {Blob|File} blob
+ * @returns {Promise<{text: string|null, blob: Blob}>} text hoặc blob để chạy fallback
  */
-async function sliceImageByQuietZones(file) {
-  const img = await createImageElementFromFile(file);
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
-  const width = img.width;
-  const height = img.height;
-  canvas.width = width;
-  canvas.height = height;
-  ctx.drawImage(img, 0, 0);
-
-  // If image is too small, just return it
-  if (width < 50 || height < 50) return [file];
-
-  const imageData = ctx.getImageData(0, 0, width, height);
-  const data = imageData.data;
-
-  const colSums = new Int32Array(width);
-  const rowSums = new Int32Array(height);
-
-  const threshold = 200; // Consider pixels darker than 200 as "content"
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const idx = (y * width + x) * 4;
-      const r = data[idx];
-      const g = data[idx + 1];
-      const b = data[idx + 2];
-      const a = data[idx + 3];
-
-      // Ignore transparent pixels
-      if (a < 128) continue;
-
-      const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-      if (gray < threshold) {
-        colSums[x]++;
-        rowSums[y]++;
-      }
+async function decodeInWorker(blob) {
+  try {
+    const { results } = await scanQRFiles([blob], { scanMultiple: false });
+    const part = results?.[0]?.parts?.[0];
+    if (part) {
+      return { text: part.text, blob: part.fallback ? part.fallback.blob : null };
     }
+  } catch (error) {
+    console.warn("Worker đọc QR lỗi:", error);
   }
-
-  function findGaps(sums, length, maxNoise) {
-    const gaps = [];
-    let inGap = true;
-    let gapStart = 0;
-
-    for (let i = 0; i < length; i++) {
-      if (sums[i] <= maxNoise) {
-        if (!inGap) {
-          inGap = true;
-          gapStart = i;
-        }
-      } else {
-        if (inGap) {
-          inGap = false;
-          // Gap must be somewhat wide to be considered a quiet zone
-          if (i - gapStart >= Math.max(3, Math.floor(length * 0.005))) {
-            gaps.push({ start: gapStart, end: i - 1, center: Math.floor((gapStart + i - 1) / 2) });
-          }
-        }
-      }
-    }
-    if (inGap) {
-      gaps.push({ start: gapStart, end: length - 1, center: Math.floor((gapStart + length - 1) / 2) });
-    }
-    return gaps;
-  }
-
-  // Allow a tiny bit of noise
-  const maxNoiseCol = Math.max(1, Math.floor(height * 0.005));
-  const maxNoiseRow = Math.max(1, Math.floor(width * 0.005));
-
-  const colGaps = findGaps(colSums, width, maxNoiseCol);
-  const rowGaps = findGaps(rowSums, height, maxNoiseRow);
-
-  // Ensure we have bounding gaps at the edges
-  if (colGaps.length === 0 || colGaps[0].start > 0) colGaps.unshift({ center: 0 });
-  if (colGaps[colGaps.length - 1].end < width - 1) colGaps.push({ center: width });
-  
-  if (rowGaps.length === 0 || rowGaps[0].start > 0) rowGaps.unshift({ center: 0 });
-  if (rowGaps[rowGaps.length - 1].end < height - 1) rowGaps.push({ center: height });
-
-  const extractedBlobs = [];
-
-  for (let r = 0; r < rowGaps.length - 1; r++) {
-    const y1 = rowGaps[r].center;
-    const y2 = rowGaps[r + 1].center;
-    const regionHeight = y2 - y1;
-
-    for (let c = 0; c < colGaps.length - 1; c++) {
-      const x1 = colGaps[c].center;
-      const x2 = colGaps[c + 1].center;
-      const regionWidth = x2 - x1;
-
-      // Filter out regions that are too small to be a QR code
-      if (regionWidth > 50 && regionHeight > 50) {
-        // Check if this region actually has black pixels
-        let hasContent = false;
-        for (let x = x1; x < x2; x++) {
-          if (colSums[x] > maxNoiseCol) {
-            hasContent = true;
-            break;
-          }
-        }
-        if (!hasContent) continue;
-
-        const subCanvas = document.createElement("canvas");
-        subCanvas.width = regionWidth;
-        subCanvas.height = regionHeight;
-        const subCtx = subCanvas.getContext("2d");
-        
-        // Fill white background first (in case of transparency)
-        subCtx.fillStyle = "#ffffff";
-        subCtx.fillRect(0, 0, regionWidth, regionHeight);
-        subCtx.drawImage(img, x1, y1, regionWidth, regionHeight, 0, 0, regionWidth, regionHeight);
-
-        const blob = await new Promise(resolve => subCanvas.toBlob(resolve, file.type || "image/png"));
-        blob.name = file.name ? `${file.name}_part_${r}_${c}.png` : `qr_part_${r}_${c}.png`;
-        blob.lastModified = file.lastModified || Date.now();
-        extractedBlobs.push(blob);
-      }
-    }
-  }
-
-  return extractedBlobs.length > 0 ? extractedBlobs : [file];
+  return { text: null, blob };
 }
 
 /**
- * Scan multiple QR codes from a single file by slicing it first
+ * Đọc QR từ 1 file: ưu tiên worker (jsQR), sau đó mới tới fallback main thread.
+ * @param {File|Blob} file
+ * @returns {Promise<string|null>}
+ */
+async function readQRFromFile(file) {
+  const { maxRetries, retryDelay } = QR_CONFIG.retryOptions;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const { text, blob } = await decodeInWorker(file);
+    if (text) {
+      return text;
+    }
+    const fallbackText = await readQRWithFallback(blob || file);
+    if (fallbackText) {
+      return fallbackText;
+    }
+    if (attempt < maxRetries) {
+      await delay(retryDelay);
+    }
+  }
+  return null;
+}
+
+/**
+ * Quét nhiều file, giữ nguyên thứ tự kết quả.
+ * @param {File} file
+ * @param {boolean} scanMultiple 1 ảnh có thể chứa nhiều QR
+ * @returns {Promise<string[]>}
  */
 async function readMultipleQRsFromFile(file, scanMultiple) {
-  if (!scanMultiple) {
-    const res = await readQRFromFile(file);
-    return res ? [res] : [];
+  try {
+    const { results } = await scanQRFiles([file], { scanMultiple: !!scanMultiple });
+    const parts = results?.[0]?.parts || [];
+    const texts = [];
+    for (const part of parts) {
+      if (part.text) {
+        texts.push(part.text);
+        continue;
+      }
+      // worker không đọc được phần này → chạy fallback cần DOM trên main thread
+      const fallbackText = await readQRWithFallback(part.fallback?.blob || file);
+      if (fallbackText) {
+        texts.push(fallbackText);
+      }
+    }
+    return texts;
+  } catch (error) {
+    console.error(`Error processing ${file.name}:`, error);
+    throw error;
   }
-
-  const subFiles = await sliceImageByQuietZones(file);
-  
-  const promises = subFiles.map(async (subFile) => {
-    return await readQRFromFile(subFile);
-  });
-
-  const results = (await Promise.all(promises)).filter(res => res);
-
-  return results;
 }
 
 /**
- * Batch process multiple files with progress tracking
+ * Xử lý nhiều file với progress tracking.
+ *
+ * Không tự chia batch ở đây nữa: `TMQRCodeWorkerClient` đã có worker pool tự
+ * chia tải, thêm batch ở đây chỉ làm thêm một lớp queue không cần thiết.
  */
 async function batchProcessQRFiles(files, options = {}, onProgress = null) {
-  const results = new Array(files.length).fill(null);
   const total = files.length;
-  let doneCount = 0;
 
-  const BATCH_SIZE = Math.max(4, navigator.hardwareConcurrency - 1 || 4);
-
-  for (let i = 0; i < files.length; i += BATCH_SIZE) {
-    const batch = files.slice(i, i + BATCH_SIZE);
-
-    // Xử lý song song các file trong batch
-    const batchPromises = batch.map(async (file, localIndex) => {
-      const globalIndex = i + localIndex;
+  return Promise.all(
+    files.map(async (file, index) => {
       let result = null;
       let error = null;
 
@@ -860,28 +238,20 @@ async function batchProcessQRFiles(files, options = {}, onProgress = null) {
         console.error(`Error processing ${file.name}:`, err);
       }
 
-      results[globalIndex] = { file, result, error };
-      doneCount++;
-
       if (onProgress && typeof onProgress === "function") {
         onProgress({
-          current: doneCount,
+          current: index + 1,
           total,
           file,
           result,
           error,
-          progress: (doneCount / total) * 100,
+          progress: ((index + 1) / total) * 100,
         });
       }
-    });
 
-    await Promise.all(batchPromises);
-
-    // Yield control cho browser sau mỗi batch
-    await new Promise((resolve) => setTimeout(resolve, 0));
-  }
-
-  return results;
+      return { file, result, error };
+    }),
+  );
 }
 
 /**
@@ -924,7 +294,7 @@ export async function imagesQRToText(uploadArea, options = {}) {
       return [];
     }
 
-    // Process files in batch
+    // Process files (heavy work chạy trong worker)
     const batchResults = await batchProcessQRFiles(supportedFiles, options, onProgress);
 
     // Format results (sử dụng flatMap để trải phẳng mảng nếu 1 ảnh có nhiều result)
@@ -969,19 +339,21 @@ export async function imagesQRToText(uploadArea, options = {}) {
 export function getQRScannerInfo() {
   return {
     supportedFormats: QR_CONFIG.supportedFormats,
-    scannerMethods: ["QrScanner", "jsQR", "ZXing"],
+    scannerMethods: ["jsQR (worker)", "QrScanner", "ZXing"],
     maxDimensions: QR_CONFIG.canvasOptions,
     retryOptions: QR_CONFIG.retryOptions,
     preprocessOptions: QR_CONFIG.preprocessOptions,
-    version: "2.1.0",
+    version: "2.2.0",
   };
 }
 
 // Export individual methods for advanced usage
 export {
   readQRFromFile,
-  readQRWithJsQR,
+  readMultipleQRsFromFile,
   readQRWithQrScanner,
+  readQRWithZXing,
+  readQRWithFallback,
   batchProcessQRFiles,
   QR_CONFIG,
 };

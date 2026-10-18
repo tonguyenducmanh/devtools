@@ -10,7 +10,7 @@
           <div class="flex flex-col button-generate">
             <TMButton
               :noMargin="true"
-              :readOnly="!textGenQR"
+              :readOnly="!textGenQR || isGenerating"
               @click="generateQRCode(null)"
               iconClass="tm-send-icon"
               v-tooltip="$t('i18nCommon.textToQRCode.buttons.generate')"
@@ -19,7 +19,7 @@
               :noMargin="true"
               @click="downloadAllQRCodes"
               :type="$tmEnum.buttonType.secondary"
-              :readOnly="!qrCodeItems || !qrCodeItems.length"
+              :readOnly="isGenerating || !qrCodeItems || !qrCodeItems.length"
               iconClass="tm-download-icon"
               v-tooltip="$t('i18nCommon.textToQRCode.buttons.downloadAll')"
             ></TMButton>
@@ -48,6 +48,14 @@
               )
             }}
           </div>
+          <div v-if="isGenerating" class="generating-status">
+            <span>{{
+              $t("i18nCommon.textToQRCode.generatingProgress").format(
+                generatedCount,
+                totalToGenerate,
+              )
+            }}</span>
+          </div>
         </div>
       </div>
       <!-- Resizer -->
@@ -64,6 +72,9 @@
         class="qrcode-wrapper"
       >
         <div class="qrcode-box">
+          <div class="qr-loading" v-if="isGenerating && !qrCodeItems.length">
+            <TMLoading />
+          </div>
           <TMVirtualScroll
             :items="qrCodeItems"
             :itemHeight="currentConfigLayout.QRSizeInPixel"
@@ -191,7 +202,6 @@
   </div>
 </template>
 <script>
-import QRCode from "qrcode";
 import JSZip from "jszip";
 import TMCompress from "@/common/compress/TMCompress.js";
 import TMSubSidebar from "@/components/TMSubSidebar.vue";
@@ -200,6 +210,24 @@ import TMToolBase from "@/views/tools/base/TMToolBase.vue";
 import TMTextToQRCodeHelp from "@/views/helps/TMTextToQRCodeHelp.vue";
 import TMFullTabWrapper from "@/components/TMFullTabWrapper.vue";
 import TMHistorySidebar from "@/components/TMHistorySidebar.vue";
+import { generateQRItems } from "@/common/qrcode/TMQRCodeWorkerClient.js";
+
+// Option sinh QR, giữ nguyên như lúc dùng `qrcode.toDataURL`.
+// ĐỂ NGOÀI component (không đặt trong `data()`): Vue sẽ bọc object trong
+// `data()` thành reactive Proxy, mà Proxy thì không thể structured-clone để
+// postMessage sang worker → DataCloneError.
+const QR_GENERATE_OPTIONS = {
+  errorCorrectionLevel: "L",
+  type: "image/png",
+  quality: 1,
+  margin: 1,
+  color: {
+    dark: "#000000",
+    light: "#ffffff",
+  },
+  width: 1000,
+};
+
 export default {
   extends: TMToolBase,
   name: "TMTextToQRCode",
@@ -252,6 +280,10 @@ export default {
     },
     /**
      * Tạo QR code từ text
+     *
+     * Phần nặng (dựng ma trận + encode PNG cho từng chunk) chạy trong Web Worker
+     * `TMQRCodeWorker` nên main thread không bị block: người dùng vẫn gõ text,
+     * đổi setting, chuyển tab trong lúc đang sinh ảnh.
      */
     async generateQRCode(textInput) {
       let me = this;
@@ -271,7 +303,6 @@ export default {
 
       let text = me.getUserInput(textInput);
       let textBuild = await me.buildTextBeforeGenQR(text);
-      me.qrCodeItems = [];
 
       let timestamp = me.getCurrentTimestampForHeader();
 
@@ -281,11 +312,51 @@ export default {
         me.currentConfigLayout.addHeaderToQR,
         timestamp,
       );
-      chunks.forEach((chunk) => {
-        me.generateQRCodeJS(chunk);
-      });
-      await me.saveToHistory(text);
-      me.$tmToast.success(me.$t("i18nCommon.toastMessage.success"));
+      if (chunks.length === 0) {
+        return;
+      }
+
+      // Token để bỏ qua kết quả của lần generate đã bị thay thế
+      const genToken = ++me.generateToken;
+      me.totalToGenerate = chunks.length;
+      me.generatedCount = 0;
+      me.qrCodeItems = [];
+      me.isGenerating = true;
+
+      try {
+        const { items, errors } = await generateQRItems(
+          chunks.map((chunk, index) => ({ index, text: chunk })),
+          QR_GENERATE_OPTIONS,
+          ({ index, src }) => {
+            if (me.generateToken !== genToken) return;
+            // Hiển thị dần từng mã thay vì đợi sinh xong hết
+            me.qrCodeItems[index] = { src };
+            me.generatedCount = me.qrCodeItems.length;
+          },
+        );
+
+        if (me.generateToken !== genToken) return;
+
+        if (errors && errors.length) {
+          me.$tmToast.error(me.$t("i18nCommon.textToQRCode.generateError"));
+        }
+        // Chốt lại theo đúng thứ tự chunk, bỏ các mã sinh lỗi
+        me.qrCodeItems = items
+          .slice()
+          .sort((a, b) => a.index - b.index)
+          .map((item) => ({ src: item.src }));
+        me.generatedCount = me.qrCodeItems.length;
+
+        await me.saveToHistory(text);
+        me.$tmToast.success(me.$t("i18nCommon.toastMessage.success"));
+      } catch (error) {
+        console.error("Error in generateQRCode:", error);
+        me.$tmToast.error(me.$t("i18nCommon.toastMessage.error"));
+      } finally {
+        if (me.generateToken === genToken) {
+          me.isGenerating = false;
+        }
+      }
     },
 
     /**
@@ -365,29 +436,6 @@ export default {
       return text;
     },
 
-    /**
-     * Tạo QR code bằng thư viện qrcode.js
-     */
-    generateQRCodeJS(textBuild) {
-      let me = this;
-      let opts = {
-        errorCorrectionLevel: "L",
-        type: "image/png",
-        quality: 1,
-        margin: 1,
-        color: {
-          dark: "#000000",
-          light: "#ffffff",
-        },
-        width: 1000,
-      };
-      let result = {};
-      QRCode.toDataURL(textBuild, opts, function (err, url) {
-        if (err) throw err;
-        result.src = url;
-      });
-      me.qrCodeItems.push(result);
-    },
     /**
      * Copy ảnh từ url
      * @param {string} dataUrl - Data URL của QR code
@@ -526,11 +574,15 @@ export default {
           window.__env.textToQRConfig.isCompressText,
         addHeaderToQR: true,
       },
-      firstSectionSize: 30,
-      secondSectionSize: 70,
+      firstSectionSize: 35,
+      secondSectionSize: 65,
       textGenQR: null,
       qrCodeItems: [],
       isFullTab: false,
+      isGenerating: false,
+      generatedCount: 0,
+      totalToGenerate: 0,
+      generateToken: 0,
     };
   },
 };
@@ -636,8 +688,22 @@ export default {
 }
 .group-footer-input {
   width: 100%;
-  justify-content: flex-start;
+  justify-content: space-between;
+  align-items: center;
   margin: var(--padding) 0;
+}
+.generating-status {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--padding);
+  color: var(--text-secondary-color);
+  white-space: nowrap;
+}
+.qr-loading {
+  width: 100%;
+  align-items: center;
+  justify-content: center;
 }
 .button-generate {
   justify-content: flex-start;
