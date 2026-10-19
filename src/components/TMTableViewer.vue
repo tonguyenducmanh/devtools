@@ -1,55 +1,94 @@
 <template>
-  <div class="tm-table-viewer" :class="{
-    'tm-table-viewer-no-margin': noMargin,
-    'tm-table-viewer-hoverable': hoverable,
-  }">
+  <div
+    class="tm-table-viewer"
+    :class="{
+      'tm-table-viewer-no-margin': noMargin,
+      'tm-table-viewer-hoverable': hoverable,
+    }"
+  >
     <!-- Table View -->
     <template v-if="viewMode === 'table'">
-      <div class="tm-table-container" :class="{ 'tm-table-grabbing': _isDragging }" :style="containerStyle"
-        ref="tableContainer" @scroll="handleScroll" @mousedown="onDragStart">
+      <div
+        class="tm-table-container"
+        :class="{ 'tm-table-grabbing': _isDragging }"
+        :style="containerStyle"
+        ref="tableContainer"
+        @scroll="handleScroll"
+        @mousedown="onDragStart"
+      >
         <div class="tm-table-wrapper" ref="tableWrapper">
           <table class="tm-table">
             <!-- Header -->
-            <thead class="tm-table-header" :class="{ 'tm-table-header-sticky': stickyHeader }">
+            <thead
+              class="tm-table-header"
+              :class="{ 'tm-table-header-sticky': stickyHeader }"
+            >
               <tr>
                 <!-- Selection Column -->
-                <th v-if="selectable" class="tm-table-cell tm-table-cell-checkbox tm-table-cell-sticky-header"
-                  :style="checkboxStickyStyle">
+                <th
+                  v-if="selectable"
+                  class="tm-table-cell tm-table-cell-checkbox tm-table-cell-sticky-header"
+                  :style="checkboxStickyStyle"
+                >
                   <label class="tm-table-checkbox-label">
-                    <input type="checkbox" :checked="isAllSelected" @change="toggleSelectAll"
-                      class="tm-table-checkbox" />
+                    <input
+                      type="checkbox"
+                      :checked="isAllSelected"
+                      @change="toggleSelectAll"
+                      class="tm-table-checkbox"
+                    />
                     <span class="tm-checkbox-custom">
-                      <span v-if="isAllSelected" class="tm-checkbox-active"></span>
+                      <span
+                        v-if="isAllSelected"
+                        class="tm-checkbox-active"
+                      ></span>
                     </span>
                   </label>
                 </th>
 
                 <!-- Index Column -->
-                <th v-if="showIndex" class="tm-table-cell tm-table-cell-index tm-table-cell-sticky-header"
-                  :style="indexStickyStyle">
+                <th
+                  v-if="showIndex"
+                  class="tm-table-cell tm-table-cell-index tm-table-cell-sticky-header"
+                  :style="indexStickyStyle"
+                >
                   {{ indexLabel }}
                 </th>
 
                 <!-- Data Columns -->
-                <th v-for="(column, index) in computedColumns" :key="`header-${index}`"
-                  class="tm-table-cell tm-table-cell-header" :class="getColumnClass(column)"
-                  :style="getColumnStyle(column)" @click="handleHeaderClick(column)">
+                <th
+                  v-for="(column, index) in computedColumns"
+                  :key="`header-${index}`"
+                  class="tm-table-cell tm-table-cell-header"
+                  :class="getColumnClass(column)"
+                  :style="getColumnStyle(column)"
+                  @click="handleHeaderClick(column)"
+                >
                   <div class="tm-table-header-content">
                     <span>{{ column.label || column.key }}</span>
                     <span v-if="column.sortable" class="tm-table-sort-icon">
-                      <span v-if="
-                        sortColumn === column.key && sortDirection === 'asc'
-                      ">▲</span>
-                      <span v-else-if="
-                        sortColumn === column.key && sortDirection === 'desc'
-                      ">▼</span>
+                      <span
+                        v-if="
+                          sortColumn === column.key && sortDirection === 'asc'
+                        "
+                        >▲</span
+                      >
+                      <span
+                        v-else-if="
+                          sortColumn === column.key && sortDirection === 'desc'
+                        "
+                        >▼</span
+                      >
                       <span v-else class="tm-table-sort-icon-inactive">⬍</span>
                     </span>
                   </div>
                 </th>
 
                 <!-- Actions Column -->
-                <th v-if="hasActions" class="tm-table-cell tm-table-cell-actions">
+                <th
+                  v-if="hasActions"
+                  class="tm-table-cell tm-table-cell-actions"
+                >
                   {{ actionsLabel }}
                 </th>
               </tr>
@@ -58,61 +97,110 @@
             <!-- Body -->
             <tbody class="tm-table-body">
               <!-- Top spacer for virtual scroll -->
-              <tr v-if="virtualScroll && paddingTop > 0" :style="{ height: paddingTop + 'px' }">
-                <td :colspan="totalColumns" style="padding: 0; border: none"></td>
+              <tr
+                v-if="virtualScroll && paddingTop > 0"
+                :style="{ height: paddingTop + 'px' }"
+              >
+                <td
+                  :colspan="totalColumns"
+                  style="padding: 0; border: none"
+                ></td>
               </tr>
 
-              <tr v-for="{ row, index: rowIndex } in visibleData" :key="row[rowKey] || `row-${rowIndex}`"
-                class="tm-table-row" :class="{ 'tm-table-row-selected': isRowSelected(row) }"
-                @click="handleRowClick(row, rowIndex)">
+              <tr
+                v-for="{ row, index: rowIndex } in visibleData"
+                :key="row[rowKey] || `row-${rowIndex}`"
+                class="tm-table-row"
+                :class="{ 'tm-table-row-selected': isRowSelected(row) }"
+                @click="handleRowClick(row, rowIndex)"
+              >
                 <!-- Selection Column -->
-                <td v-if="selectable" class="tm-table-cell tm-table-cell-checkbox tm-table-cell-sticky"
-                  :style="checkboxStickyStyle">
+                <td
+                  v-if="selectable"
+                  class="tm-table-cell tm-table-cell-checkbox tm-table-cell-sticky"
+                  :style="checkboxStickyStyle"
+                >
                   <label class="tm-table-checkbox-label" @click.stop>
-                    <input type="checkbox" :checked="isRowSelected(row)" @change="toggleRowSelection(row)"
-                      class="tm-table-checkbox" />
+                    <input
+                      type="checkbox"
+                      :checked="isRowSelected(row)"
+                      @change="toggleRowSelection(row)"
+                      class="tm-table-checkbox"
+                    />
                     <span class="tm-checkbox-custom">
-                      <span v-if="isRowSelected(row)" class="tm-checkbox-active"></span>
+                      <span
+                        v-if="isRowSelected(row)"
+                        class="tm-checkbox-active"
+                      ></span>
                     </span>
                   </label>
                 </td>
 
                 <!-- Index Column -->
-                <td v-if="showIndex" class="tm-table-cell tm-table-cell-index tm-table-cell-sticky"
-                  :class="{ 'tm-table-cell-active': activeCellKey === getCellKey(row, '__td_index__') }"
-                  :style="indexStickyStyle" @click="copyRow(row)"
-                  @contextmenu.prevent="onRowContextMenu(row, null, $event)">
+                <td
+                  v-if="showIndex"
+                  class="tm-table-cell tm-table-cell-index tm-table-cell-sticky"
+                  :class="{
+                    'tm-table-cell-active':
+                      activeCellKey === getCellKey(row, '__td_index__'),
+                  }"
+                  :style="indexStickyStyle"
+                  @click="copyRow(row)"
+                  @contextmenu.prevent="onRowContextMenu(row, null, $event)"
+                >
                   <div>
                     {{ rowIndex + 1 }}
                   </div>
                 </td>
 
                 <!-- Data Columns -->
-                <td v-for="(column, colIndex) in computedColumns" :key="`cell-${rowIndex}-${colIndex}`"
-                  class="tm-table-cell" :class="[
+                <td
+                  v-for="(column, colIndex) in computedColumns"
+                  :key="`cell-${rowIndex}-${colIndex}`"
+                  class="tm-table-cell"
+                  :class="[
                     getColumnClass(column),
                     {
                       'tm-table-cell-active':
                         activeCellKey === getCellKey(row, column.key),
                     },
-                  ]" :style="getColumnStyle(column)" @contextmenu.prevent="onRowContextMenu(row, column, $event)">
-                  <slot :name="`cell-${column.key}`" :row="row" :column="column" :value="getCellValue(row, column.key)"
-                    :rowIndex="rowIndex">
-                    <div class="tm-table-cell-content" :class="{
-                      'tm-table-cell-content-clamped': virtualScroll,
-                    }" :style="getCellContentStyle()">
+                  ]"
+                  :style="getColumnStyle(column)"
+                  @contextmenu.prevent="onRowContextMenu(row, column, $event)"
+                >
+                  <slot
+                    :name="`cell-${column.key}`"
+                    :row="row"
+                    :column="column"
+                    :value="getCellValue(row, column.key)"
+                    :rowIndex="rowIndex"
+                  >
+                    <div
+                      class="tm-table-cell-content"
+                      :class="{
+                        'tm-table-cell-content-clamped': virtualScroll,
+                      }"
+                      :style="getCellContentStyle()"
+                    >
                       {{ formatCellValue(row, column) }}
                     </div>
                   </slot>
                 </td>
 
                 <!-- Actions Column -->
-                <td v-if="hasActions" class="tm-table-cell tm-table-cell-actions">
+                <td
+                  v-if="hasActions"
+                  class="tm-table-cell tm-table-cell-actions"
+                >
                   <slot name="actions" :row="row" :rowIndex="rowIndex">
                     <div class="tm-table-actions">
-                      <button v-for="(action, actionIndex) in actions" :key="`action-${actionIndex}`"
-                        @click.stop="handleAction(action, row, rowIndex)" class="tm-table-action-button"
-                        :class="action.class">
+                      <button
+                        v-for="(action, actionIndex) in actions"
+                        :key="`action-${actionIndex}`"
+                        @click.stop="handleAction(action, row, rowIndex)"
+                        class="tm-table-action-button"
+                        :class="action.class"
+                      >
                         {{ action.label }}
                       </button>
                     </div>
@@ -121,13 +209,25 @@
               </tr>
 
               <!-- Bottom spacer for virtual scroll -->
-              <tr v-if="virtualScroll && paddingBottom > 0" :style="{ height: paddingBottom + 'px' }">
-                <td :colspan="totalColumns" style="padding: 0; border: none"></td>
+              <tr
+                v-if="virtualScroll && paddingBottom > 0"
+                :style="{ height: paddingBottom + 'px' }"
+              >
+                <td
+                  :colspan="totalColumns"
+                  style="padding: 0; border: none"
+                ></td>
               </tr>
 
               <!-- Empty State -->
-              <tr v-if="!processedData || processedData.length === 0" class="tm-table-row-empty">
-                <td :colspan="totalColumns" class="tm-table-cell tm-table-cell-empty">
+              <tr
+                v-if="!processedData || processedData.length === 0"
+                class="tm-table-row-empty"
+              >
+                <td
+                  :colspan="totalColumns"
+                  class="tm-table-cell tm-table-cell-empty"
+                >
                   <slot name="empty">
                     {{ emptyText || $t("i18nCommon.noDataAvailable") }}
                   </slot>
@@ -143,21 +243,34 @@
     <div v-else class="tm-record-container" :style="containerStyle">
       <div class="tm-record-header">
         <div class="tm-record-back-btn" @click="switchToTableView">
-          <TMArrow :arrowDirection="tmEnum.Direction.left" :openProp="false" v-tooltip="$t('i18nCommon.backToTable')" />
+          <TMArrow
+            :arrowDirection="tmEnum.Direction.left"
+            :openProp="false"
+            v-tooltip="$t('i18nCommon.backToTable')"
+          />
         </div>
-        <span class="tm-record-title">{{ $t("i18nCommon.viewRecord") }} #{{ currentRecordIndex + 1 }}</span>
+        <span class="tm-record-title"
+          >{{ $t("i18nCommon.viewRecord") }} #{{ currentRecordIndex + 1 }}</span
+        >
       </div>
       <div class="tm-record-body">
         <table class="tm-record-table">
           <tbody>
-            <tr v-for="col in computedColumns" :key="col.key" class="tm-record-row">
+            <tr
+              v-for="col in computedColumns"
+              :key="col.key"
+              class="tm-record-row"
+            >
               <td class="tm-record-cell tm-record-cell-label">
                 {{ col.label || col.key }}
               </td>
-              <td class="tm-record-cell tm-record-cell-value" :class="{
-                'tm-record-cell-active':
-                  activeRecordColKey === col.key,
-              }" @contextmenu.prevent="onRecordCellContextMenu(col, $event)">
+              <td
+                class="tm-record-cell tm-record-cell-value"
+                :class="{
+                  'tm-record-cell-active': activeRecordColKey === col.key,
+                }"
+                @contextmenu.prevent="onRecordCellContextMenu(col, $event)"
+              >
                 {{ formatCellValue(currentRecord, col) }}
               </td>
             </tr>
@@ -169,7 +282,11 @@
     <!-- Footer Info -->
     <div v-if="showFooter" class="tm-table-footer">
       <div class="flex tm-table-info">
-        <slot name="footer" :selectedRows="selectedRows" :totalRows="processedData.length">
+        <slot
+          name="footer"
+          :selectedRows="selectedRows"
+          :totalRows="processedData.length"
+        >
           <span class="tm-table-info-row-count">
             <span v-if="selectable && selectedRows.length > 0">
               {{ selectedRows.length }}
@@ -905,7 +1022,10 @@ export default {
         dialogType: TMDialogEnum.TMQuickPreview,
         ownerForm: this,
         props: {},
-        param: { value: this.tableData, label: this.$t("i18nCommon.tableData") },
+        param: {
+          value: this.tableData,
+          label: this.$t("i18nCommon.tableData"),
+        },
       });
     },
 
@@ -969,7 +1089,9 @@ export default {
 
     onCellPreview(row, column) {
       const value = column ? this.getCellValue(row, column.key) : row;
-      const label = column ? column.label || column.key : this.$t("i18nCommon.rowData");
+      const label = column
+        ? column.label || column.key
+        : this.$t("i18nCommon.rowData");
       TMDialogUtil.showPopup({
         dialogType: TMDialogEnum.TMQuickPreview,
         ownerForm: this,
@@ -1203,7 +1325,7 @@ export default {
         z-index: 1;
       }
 
-      tr:hover>&-sticky {
+      tr:hover > &-sticky {
         background-color: var(--bg-layer-color);
       }
 
@@ -1260,7 +1382,9 @@ export default {
     }
 
     // Hover vào cell index (STT đầu dòng) → đổi background + màu chữ cả dòng như tmheader
-    .tm-table-body .tm-table-row:has(.tm-table-cell-index:hover) .tm-table-cell {
+    .tm-table-body
+      .tm-table-row:has(.tm-table-cell-index:hover)
+      .tm-table-cell {
       background-color: var(--focus-color);
       color: var(--selected-item-text-color);
 
@@ -1329,7 +1453,7 @@ export default {
       }
     }
 
-    .tm-table-checkbox:checked+.tm-checkbox-custom {
+    .tm-table-checkbox:checked + .tm-checkbox-custom {
       border-color: var(--btn-color);
     }
 
@@ -1393,12 +1517,11 @@ export default {
     align-items: center;
     padding: var(--padding);
     margin-top: var(--padding);
-    background-color: var(--bg-layer-color);
     border-radius: var(--border-radius-component);
+    border: 1px solid var(--border-color);
 
     .tm-table-info {
       font-size: var(--font-size-small);
-      color: var(--text-secondary-color);
       justify-content: space-between;
       width: 100%;
     }
