@@ -801,6 +801,7 @@ export default {
           label: me.$t("i18nCommon.copyCell"),
           action: () => me.handleDataSelected(row, column),
         },
+        // 3 mục Excel nằm cạnh nhau: copy dòng / copy cả bảng / xuất file
         {
           key: "copyRow",
           label: me.$t("i18nCommon.copyRowForExcel"),
@@ -811,6 +812,12 @@ export default {
           label: me.$t("i18nCommon.copyTableForExcel"),
           action: () => me.copyTable(),
         },
+        {
+          key: "exportExcel",
+          label: me.$t("i18nCommon.exportExcel"),
+          action: () => me.exportToExcel(),
+        },
+        // nhóm xem JSON
         {
           key: "viewCell",
           label: me.$t("i18nCommon.viewCell"),
@@ -825,11 +832,6 @@ export default {
           key: "viewTable",
           label: me.$t("i18nCommon.viewTable"),
           action: () => me.onTablePreview(),
-        },
-        {
-          key: "exportExcel",
-          label: me.$t("i18nCommon.exportExcel"),
-          action: () => me.exportToExcel(),
         },
       ]);
     },
