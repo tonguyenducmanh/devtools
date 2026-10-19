@@ -193,6 +193,10 @@ import ExcelJS from "exceljs";
 import TMDialogUtil, { TMDialogEnum } from "@/common/TMDialogUtil.js";
 import tmEnum from "@/common/TMEnum.js";
 import TMArrow from "@/components/TMArrow.vue";
+import {
+  writeExcelToClipboard,
+  normalizeExcelCell,
+} from "@/common/TMExcelClipboardUtil.js";
 
 export default {
   name: "TMTableViewer",
@@ -577,6 +581,11 @@ export default {
     },
 
     getCellValue(row, key) {
+      // Ưu tiên key nguyên văn: JSON/DB hay có key chứa dấu "." (vd: "user.name")
+      // mà vẫn là 1 field, không phải đường dẫn lồng nhau.
+      if (row && typeof row === "object" && key in row) {
+        return row[key];
+      }
       return key.split(".").reduce((obj, k) => obj?.[k], row);
     },
 
@@ -782,44 +791,45 @@ export default {
     // Context menu đồng nhất cho MỌI cell trong row (kể cả STT):
     // right-click vào td nào cũng cho cùng danh sách tùy chọn.
     onRowContextMenu(row, column, event) {
-      const cellKey = column ? column.key : "__td_index__";
+      let me = this;
+      let cellKey = column ? column.key : "__td_index__";
       this.activeCellKey = this.getCellKey(row, cellKey);
       this.scheduleClearActiveCell();
-      this.$tmContextMenu.open(event, [
+      me.$tmContextMenu.open(event, [
         {
           key: "copyCell",
-          label: this.$t("i18nCommon.copyCell"),
-          action: () => this.handleDataSelected(row, column),
+          label: me.$t("i18nCommon.copyCell"),
+          action: () => me.handleDataSelected(row, column),
         },
         {
           key: "copyRow",
-          label: this.$t("i18nCommon.copyRow"),
-          action: () => this.copyRow(row),
+          label: me.$t("i18nCommon.copyRowForExcel"),
+          action: () => me.copyRow(row),
         },
         {
           key: "copyTable",
-          label: this.$t("i18nCommon.copyTable"),
-          action: () => this.copyTable(),
+          label: me.$t("i18nCommon.copyTableForExcel"),
+          action: () => me.copyTable(),
         },
         {
           key: "viewCell",
-          label: this.$t("i18nCommon.viewCell"),
-          action: () => this.onCellPreview(row, column),
+          label: me.$t("i18nCommon.viewCell"),
+          action: () => me.onCellPreview(row, column),
         },
         {
           key: "viewRow",
-          label: this.$t("i18nCommon.viewRow"),
-          action: () => this.onRowPreview(row),
+          label: me.$t("i18nCommon.viewRow"),
+          action: () => me.onRowPreview(row),
         },
         {
           key: "viewTable",
-          label: this.$t("i18nCommon.viewTable"),
-          action: () => this.onTablePreview(),
+          label: me.$t("i18nCommon.viewTable"),
+          action: () => me.onTablePreview(),
         },
         {
           key: "exportExcel",
-          label: this.$t("i18nCommon.exportExcel"),
-          action: () => this.exportToExcel(),
+          label: me.$t("i18nCommon.exportExcel"),
+          action: () => me.exportToExcel(),
         },
       ]);
     },
@@ -832,12 +842,51 @@ export default {
       this.$tmUtility.copyToClipboard(data);
     },
 
+    /**
+     * Giá trị ô chuẩn bị để xuất (object → JSON string), dùng chung cho
+     * copy Excel và export file .xlsx để 2 đường ra luôn giống nhau.
+     */
+    getExportCellValue(row, key) {
+      return normalizeExcelCell(this.getCellValue(row, key));
+    },
+
+    /**
+     * Copy 1 phần bảng theo định dạng Excel để dán thẳng vào Excel/Sheets.
+     * @param {Array<Object>} rows các dòng cần copy
+     * @param {Object} [options] { includeHeader, boldHeader }
+     */
+    async copyExcelRange(
+      rows,
+      { includeHeader = true, boldHeader = true } = {},
+    ) {
+      let me = this;
+      if (!rows || rows.length === 0) {
+        me.$tmToast?.warning(me.$t("i18nCommon.noDataAvailable"));
+        return;
+      }
+      let headers = me.computedColumns.map((c) => c.label || c.key);
+      let matrix = rows.map((row) =>
+        me.computedColumns.map((c) => me.getExportCellValue(row, c.key)),
+      );
+
+      let copied = await writeExcelToClipboard(
+        includeHeader ? headers : [],
+        matrix,
+        { boldHeader },
+      );
+      if (copied) {
+        me.$tmToast?.success(me.$t("i18nCommon.toastMessage.copy"));
+      } else {
+        me.$tmToast?.error(me.$t("i18nCommon.toastMessage.cannotCopy"));
+      }
+    },
+
     copyRow(row) {
-      this.$tmUtility.copyToClipboard(JSON.stringify(row));
+      return this.copyExcelRange([row]);
     },
 
     copyTable() {
-      this.$tmUtility.copyToClipboard(JSON.stringify(this.tableData));
+      return this.copyExcelRange(this.processedData);
     },
 
     onRowPreview(row) {
@@ -875,13 +924,9 @@ export default {
         headerRow.eachCell((cell) => (cell.font = { bold: true }));
 
         rows.forEach((row) => {
-          const values = me.computedColumns.map((c) => {
-            let v = me.getCellValue(row, c.key);
-            if (v !== null && typeof v === "object") {
-              v = JSON.stringify(v);
-            }
-            return v;
-          });
+          const values = me.computedColumns.map((c) =>
+            me.getExportCellValue(row, c.key),
+          );
           worksheet.addRow(values);
         });
 

@@ -428,16 +428,26 @@ export default {
     jsonToExcel: {
       purpose: {
         title: "What is JSON to Excel?",
-        content: "A tool to convert JSON data to Excel file (.xlsx).",
+        content:
+          "A tool to view JSON data as a table and convert it to Excel (.xlsx).",
       },
       howToUse: {
         title: "How to Use",
         input: "Paste JSON or upload a JSON file.",
-        convert: "Click Convert to generate Excel file.",
-        download: "Excel file will be downloaded automatically.",
+        render:
+          "Press Convert to build the result. Level 1 keys become column names, nested objects/arrays are kept as JSON text.",
+        copy:
+          "Press Copy for Excel, then paste into Excel / Google Sheets / WPS to get a real table.",
+        download: "Press Download Excel to save the table as a .xlsx file.",
       },
       features: {
         title: "Features",
+        showTable:
+          "View table option (on by default): shows the result table below the editor. Turn it off to hide the table and give the editor the full height.",
+        copyFormat:
+          "Copy uses both HTML and TSV clipboard formats, so pasting always lands as columns.",
+        contextMenu:
+          "Right-click a cell to copy that row or the whole table for Excel.",
         boldHeader: "Bold header row.",
         autoWidth: "Auto-fit column widths.",
         freezeRow: "Freeze the first row when scrolling.",

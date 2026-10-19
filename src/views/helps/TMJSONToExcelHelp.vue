@@ -18,7 +18,10 @@
           {{ $t("i18nHelp.jsonToExcel.howToUse.input") }}
         </p>
         <p class="section-text">
-          {{ $t("i18nHelp.jsonToExcel.howToUse.convert") }}
+          {{ $t("i18nHelp.jsonToExcel.howToUse.render") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.jsonToExcel.howToUse.copy") }}
         </p>
         <p class="section-text">
           {{ $t("i18nHelp.jsonToExcel.howToUse.download") }}
@@ -29,6 +32,15 @@
         <h3 class="section-subtitle">
           {{ $t("i18nHelp.jsonToExcel.features.title") }}
         </h3>
+        <p class="section-text">
+          {{ $t("i18nHelp.jsonToExcel.features.showTable") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.jsonToExcel.features.copyFormat") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.jsonToExcel.features.contextMenu") }}
+        </p>
         <p class="section-text">
           {{ $t("i18nHelp.jsonToExcel.features.boldHeader") }}
         </p>

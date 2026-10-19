@@ -419,16 +419,26 @@ export default {
     jsonToExcel: {
       purpose: {
         title: "JSON to Excel là gì?",
-        content: "Công cụ chuyển đổi dữ liệu JSON thành file Excel (.xlsx).",
+        content:
+          "Công cụ hiển thị dữ liệu JSON thành bảng và chuyển đổi sang file Excel (.xlsx).",
       },
       howToUse: {
         title: "Cách sử dụng",
         input: "Dán JSON hoặc upload file JSON.",
-        convert: "Nhấn Convert để tạo file Excel.",
-        download: "File Excel sẽ được tải xuống tự động.",
+        render:
+          "Nhấn Chuyển đổi để xem kết quả. Key level 1 thành tên cột, object/array lồng nhau được giữ dạng text JSON.",
+        copy:
+          "Nhấn Copy cho Excel, sau đó dán vào Excel / Google Sheets / WPS để có bảng thật.",
+        download: "Nhấn Tải file Excel để lưu bảng ra file .xlsx.",
       },
       features: {
         title: "Tính năng",
+        showTable:
+          "Tùy chọn Xem bảng (bật mặc định): hiển thị bảng kết quả bên dưới editor. Tắt đi để ẩn bảng, editor sẽ chiếm hết chiều cao.",
+        copyFormat:
+          "Copy dùng cả định dạng clipboard HTML và TSV nên dán vào luôn ra cột.",
+        contextMenu:
+          "Chuột phải vào 1 ô để copy dòng đó hoặc copy cả bảng cho Excel.",
         boldHeader: "In đậm dòng header.",
         autoWidth: "Tự động điều chỉnh độ rộng cột.",
         freezeRow: "Cố định dòng đầu tiên khi cuộn.",
