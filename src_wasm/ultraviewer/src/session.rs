@@ -35,6 +35,13 @@ pub const DEFAULT_RELAY_HOST: &str = "functions3.ultraviewer.net";
 pub const LOGIN_TIMEOUT_MS: f64 = 20_000.0;
 /// Chu kỳ heartbeat (giống `sendHeartbeat`).
 pub const HEARTBEAT_MS: f64 = 10_000.0;
+/// Chất lượng hình ảnh mà máy đối tác dùng để nén (30 = nhanh, 45 = cân bằng,
+/// 70 = đẹp). Giống RemoteControlCommands.quality của MacViewer.
+pub const DEFAULT_DISPLAY_QUALITY: i32 = 45;
+
+/// Nhịp tối đa gửi vị trí chuột (ms). Máy đối tác phải chụp + nén + gửi lại
+/// màn hình cho mỗi lần di chuyển nên gửi dồn sẽ làm con trỏ bị trễ.
+pub const POINTER_SEND_INTERVAL_MS: f64 = 40.0;
 
 /// Tuỳ chọn kết nối do tầng UI truyền vào.
 #[derive(Clone, Debug)]
@@ -122,6 +129,12 @@ pub struct Session {
     clipboard_allowed: bool,
     /// Các lệnh đã nhận từ máy đối tác (chẩn đoán).
     received_commands: Vec<u8>,
+    /// Tổng thời gian xử lý khung hình (micro giây), đo ở tầng glue.
+    decode_micros: u64,
+    /// Số khung hình đã áp dụng.
+    frames_applied: u64,
+    /// Tổng số byte nén đã nhận.
+    payload_bytes: u64,
     /// Các payload đã gửi tới máy đối tác (chẩn đoán).
     sent_payloads: Vec<String>,
     /// Con trỏ của máy đối tác (máy Windows không vẽ con trỏ vào khung hình
@@ -136,6 +149,18 @@ pub struct Session {
     /// Công tắc "điều khiển" phía người dùng (máy đối tác vẫn là bên quyết
     /// định cuối cùng qua lệnh 49).
     control_enabled: bool,
+    /// Vị trí chuột đang chờ gửi (chỉ giữ vị trí mới nhất).
+    ///
+    /// Mỗi lần di chuyển chuột, máy đối tác phải chụp lại màn hình + nén +
+    /// gửi ảnh. Nếu gửi mọi event (chuột có thể 100+ lần/giây) thì máy đối tác
+    /// không kịp xử lý → con trỏ bị trễ và cảm giác "lag". Giống cách
+    /// RemoteInputBuffer của MacViewer: gộp các lần di chuyển liên tiếp, chỉ
+    /// gửi vị trí mới nhất theo nhịp giới hạn.
+    pending_pointer: Option<(i32, i32)>,
+    /// Mốc thời gian (ms) gửi vị trí chuột gần nhất.
+    last_pointer_sent: f64,
+    /// Chất lượng hình ảnh yêu cầu với máy đối tác.
+    display_quality: i32,
     closed: bool,
 }
 
@@ -183,12 +208,18 @@ impl Session {
             heartbeat_ticks: 0,
             clipboard_allowed: false,
             received_commands: Vec::new(),
+            decode_micros: 0,
+            frames_applied: 0,
+            payload_bytes: 0,
             sent_payloads: Vec::new(),
             cursor: CursorState::default(),
             origin: (0, 0),
             monitors: Vec::new(),
             monitor_index: 0,
             control_enabled: true,
+            pending_pointer: None,
+            last_pointer_sent: 0.0,
+            display_quality: DEFAULT_DISPLAY_QUALITY,
             closed: false,
             options,
         })
@@ -197,6 +228,16 @@ impl Session {
     /// Các lệnh đã nhận từ máy đối tác (để chẩn đoán).
     pub fn received_commands(&self) -> &[u8] {
         &self.received_commands
+    }
+
+    /// Số khung hình đã áp dụng + tổng thời gian xử lý (ms) + tổng byte nén.
+    pub fn frame_stats(&self) -> (u64, u64, u64) {
+        (self.frames_applied, self.decode_micros / 1000, self.payload_bytes)
+    }
+
+    /// Cộng thêm thời gian đã dùng để xử lý khung hình (micro giây).
+    pub fn add_decode_time(&mut self, micros: u64) {
+        self.decode_micros += micros;
     }
 
     /// Các payload đã gửi tới máy đối tác (để chẩn đoán).
@@ -245,10 +286,36 @@ impl Session {
         Some(Rect { x, y, width: w as u32, height: h as u32 })
     }
 
-    /// Gốc toạ độ của vùng đang hiển thị trong ảnh màn hình từ xa.
-    /// Khi chỉ xem 1 màn hình, toạ độ chuột phải cộng thêm gốc này.
-    pub fn view_origin(&self) -> (i32, i32) {
+    /// Gốc toạ độ của desktop ảo (virtualLeft/virtualTop hiệu dụng).
+    ///
+    /// Máy đối tác báo vị trí con trỏ theo toạ độ desktop ảo, nên khi vẽ lên
+    /// canvas (ảnh bắt đầu từ gốc này) phải trừ đi gốc này.
+    pub fn virtual_origin(&self) -> (i32, i32) {
+        self.origin
+    }
+
+    /// Lệch của vùng đang hiển thị so với ảnh (dùng cộng vào toạ độ chuột
+    /// khi đang xem riêng 1 màn hình — giống `+ region.x` của MacViewer).
+    pub fn view_offset(&self) -> (i32, i32) {
         self.view_rect().map(|rect| (rect.x, rect.y)).unwrap_or((0, 0))
+    }
+
+    /// Đổi chất lượng hình ảnh (30 = nhanh, 45 = cân bằng, 70 = đẹp).
+    pub fn set_display_quality(&mut self, quality: i32) {
+        let quality = quality.clamp(0, 100);
+        if quality == self.display_quality {
+            return;
+        }
+        self.display_quality = quality;
+        if self.active {
+            let message = format!("31|||{}", quality);
+            self.send_peer(message.as_bytes());
+        }
+    }
+
+    /// Chất lượng hình ảnh hiện tại.
+    pub fn display_quality(&self) -> i32 {
+        self.display_quality
     }
 
     /// Ảnh con trỏ hiện tại của máy đối tác (0xAARRGGBB, top-down) + điểm nóng.
@@ -715,6 +782,12 @@ impl Session {
         self.observer.view_only(self.view_only);
         // TCP ConnectionType1: viewer trả lời bằng ASCII "17".
         self.send_peer(b"17");
+        // Chế độ chuyển đổi 16bpp + chất lượng nén: giống
+        // RemoteControlCommands.rgb555ColorMode / .quality của MacViewer.
+        // Giảm băng thông và giảm tải CPU cho máy đối tác khi gửi màn hình.
+        self.send_peer(b"32|||2");
+        let quality = format!("31|||{}", self.display_quality);
+        self.send_peer(quality.as_bytes());
         if !self.accepted {
             self.accepted = true;
             // Bật báo vị trí con trỏ (RemoteControlCommands.cursorPositions).
@@ -723,10 +796,12 @@ impl Session {
     }
 
     fn frame(&mut self, parts: &[&[u8]]) {
+        self.payload_bytes += parts.get(2).map(|p| p.len() as u64).unwrap_or(0);
         let applied = match self.screen.as_mut() {
             Some(renderer) => renderer.apply(parts),
             None => return,
         };
+        self.frames_applied += 1;
         // Backpressure: chỉ báo "đã xử lý" sau khi giải mã xong để máy đối tác
         // không dồn frame cũ vào hàng đợi.
         self.send_peer(b"18");
@@ -818,10 +893,36 @@ impl Session {
     // ───────────────────────── nhập liệu từ người dùng ─────────────────────────
 
     /// Chuột di chuyển (toạ độ pixel trên màn hình từ xa).
+    ///
+    /// Chỉ lưu vị trí mới nhất; `flush_pointer` sẽ gửi theo nhịp giới hạn để
+    /// không làm quá tải máy đối tác.
     pub fn on_pointer_move(&mut self, x: i32, y: i32) {
         if !self.can_send_input() {
             return;
         }
+        // Chỉ lưu lại; timer của tầng glue sẽ gửi theo nhịp giới hạn.
+        self.pending_pointer = Some((x, y));
+    }
+
+    /// Gửi vị trí chuột đang chờ nếu đã đủ khoảng cách giữa 2 lần gửi.
+    pub fn flush_pointer(&mut self, now: f64) {
+        let Some((x, y)) = self.pending_pointer.take() else { return };
+        if now - self.last_pointer_sent < POINTER_SEND_INTERVAL_MS {
+            // Chưa đủ nhịp → giữ lại, lần sau gửi.
+            self.pending_pointer = Some((x, y));
+            return;
+        }
+        self.last_pointer_sent = now;
+        for payload in self.encoder.pointer_moved(x, y) {
+            self.send_peer(&payload);
+        }
+    }
+
+    /// Gửi ngay vị trí chuột đang chờ (dùng trước khi gửi nút/phím để giữ
+    /// đúng thứ tự sự kiện).
+    fn flush_pointer_now(&mut self) {
+        let Some((x, y)) = self.pending_pointer.take() else { return };
+        self.last_pointer_sent = self.last_pointer_sent.max(0.0);
         for payload in self.encoder.pointer_moved(x, y) {
             self.send_peer(&payload);
         }
@@ -832,6 +933,8 @@ impl Session {
         if !self.can_send_input() {
             return;
         }
+        // Gửi vị trí đang chờ trước để thứ tự sự kiện trên máy đối tác đúng.
+        self.flush_pointer_now();
         for payload in self.encoder.pointer_button(button, pressed, Some((x, y))) {
             self.send_peer(&payload);
         }
@@ -842,6 +945,7 @@ impl Session {
         if !self.can_send_input() {
             return;
         }
+        self.flush_pointer_now();
         for payload in self.encoder.scroll(lines) {
             self.send_peer(&payload);
         }
@@ -852,6 +956,7 @@ impl Session {
         if !self.can_send_input() {
             return;
         }
+        self.flush_pointer_now();
         let code = match static_code(code) {
             Some(c) => c,
             None => return,

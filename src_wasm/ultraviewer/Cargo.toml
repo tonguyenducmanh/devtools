@@ -39,7 +39,10 @@ version = "=0.3.91"
 features = [
   "BinaryType",
   "CanvasRenderingContext2d",
+  "CssStyleDeclaration",
   "CloseEvent",
+  "DomRect",
+  "Element",
   "ErrorEvent",
   "Event",
   "HtmlCanvasElement",

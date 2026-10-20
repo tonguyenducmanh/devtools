@@ -381,14 +381,26 @@ impl UltraViewerClient {
         }
     }
 
-    /// Gốc toạ độ của vùng đang hiển thị (dùng để cộng vào toạ độ chuột).
+    /// Gốc toạ độ desktop ảo của máy đối tác (chẩn đoán).
+    pub fn virtual_origin(&self) -> Vec<i32> {
+        let (x, y) = self
+            .state
+            .borrow()
+            .session
+            .as_ref()
+            .map(|s| s.virtual_origin())
+            .unwrap_or((0, 0));
+        vec![x, y]
+    }
+
+    /// Lệch của vùng đang hiển thị so với ảnh (cộng vào toạ độ chuột).
     pub fn view_offset(&self) -> Vec<i32> {
         let (x, y) = self
             .state
             .borrow()
             .session
             .as_ref()
-            .map(|s| s.view_origin())
+            .map(|s| s.view_offset())
             .unwrap_or((0, 0));
         vec![x, y]
     }
@@ -401,6 +413,18 @@ impl UltraViewerClient {
             .as_ref()
             .and_then(|s| s.cursor_position())
             .map(|(x, y)| vec![x, y])
+    }
+
+    /// Thống kê khung hình: (số khung, tổng ms giải mã, tổng byte nén).
+    pub fn frame_stats(&self) -> Vec<f64> {
+        let (frames, millis, bytes) = self
+            .state
+            .borrow()
+            .session
+            .as_ref()
+            .map(|s| s.frame_stats())
+            .unwrap_or((0, 0, 0));
+        vec![frames as f64, millis as f64, bytes as f64]
     }
 
     /// Các payload đã gửi tới máy đối tác (chẩn đoán).
@@ -609,14 +633,18 @@ impl UltraViewerClient {
             {
                 let mut inner = state.borrow_mut();
                 if let Some(session) = inner.session.as_mut() {
+                    // Gửi vị trí chuột theo nhịp giới hạn (xem POINTER_SEND_INTERVAL_MS)
+                    // và kiểm tra deadline/heartbeat.
+                    session.flush_pointer(now);
                     session.tick(now);
                 }
             }
             // Đẩy sự kiện ra ngoài sau khi trả khoá.
             pump(&state, &callbacks);
         });
+        // 16ms ≈ 1 khung hình: đủ để gửi vị trí chuột mà không tốn CPU.
         let handle =
-            window.set_interval_with_callback_and_timeout_and_arguments_0(callback.as_ref().unchecked_ref(), 250);
+            window.set_interval_with_callback_and_timeout_and_arguments_0(callback.as_ref().unchecked_ref(), 16);
         callback.forget();
         if let Ok(handle) = handle {
             let mut state = self.state.borrow_mut();
@@ -796,15 +824,49 @@ fn paint(state: &Rc<RefCell<State>>) {
     }
 }
 
+/// Đặt khung của canvas con trỏ trùng với canvas màn hình.
+///
+/// Canvas màn hình được canh giữa trong container (flex + max-width/max-height)
+/// còn canvas con trỏ nằm absolute nên phải đặt lại tọa độ/kích thước theo
+/// khung thực tế của canvas màn hình, nếu không con trỏ sẽ lệch chỗ.
+fn sync_cursor_canvas_box(state: &Rc<RefCell<State>>) {
+    let inner = state.borrow();
+    let (Some(screen), Some(cursor)) = (inner.canvas.as_ref(), inner.cursor_canvas.as_ref()) else {
+        return;
+    };
+    let Some(container) = screen.parent_element() else { return };
+    let screen_rect = screen.get_bounding_client_rect();
+    let container_rect = container.get_bounding_client_rect();
+    let style = cursor.style();
+    let _ = style.set_property(
+        "left",
+        &format!("{}px", screen_rect.left() - container_rect.left()),
+    );
+    let _ = style.set_property(
+        "top",
+        &format!("{}px", screen_rect.top() - container_rect.top()),
+    );
+    let _ = style.set_property("width", &format!("{}px", screen_rect.width()));
+    let _ = style.set_property("height", &format!("{}px", screen_rect.height()));
+}
+
 /// Vẽ con trỏ của máy đối tác lên canvas phủ.
 fn paint_cursor(state: &Rc<RefCell<State>>) {
     // Lấy vị trí + ảnh con trỏ (ảnh là 0xAARRGGBB, top-down).
-    let (position, image) = {
+    let (position, image, origin) = {
         let inner = state.borrow();
         let Some(session) = inner.session.as_ref() else { return };
-        (session.cursor_position(), session.cursor_image())
+        (
+            session.cursor_position(),
+            session.cursor_image(),
+            // Vị trí con trỏ là toạ độ desktop ảo → trừ gốc desktop ảo.
+            session.virtual_origin(),
+        )
     };
     let Some((x, y)) = position else { return };
+    // Toạ độ con trỏ là trên desktop ảo → trừ gốc của vùng đang hiển thị.
+    let (x, y) = (x - origin.0, y - origin.1);
+    sync_cursor_canvas_box(state);
     let (width, height, hot_x, hot_y, pixels) = match image {
         Some(image) => image,
         // Chưa có hình con trỏ: dùng mũi tên mặc định.
@@ -903,5 +965,6 @@ fn now_ms() -> f64 {
     web_sys::window()
         .and_then(|w| w.performance())
         .map(|p| p.now())
-        .unwrap_or(0.0)
+        // Node (test) không có `window` → dùng Date.now().
+        .unwrap_or_else(|| js_sys::Date::now())
 }

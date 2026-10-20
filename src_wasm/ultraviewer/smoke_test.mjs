@@ -65,6 +65,30 @@ const mover = setInterval(() => {
 }, 3000);
 
 // Giữ process sống tối đa 40 giây để chờ phiên.
+// Đo toạ độ chuột: canvas hiển thị ở đâu, canvas gốc ở đâu, và toRemotePoint ra gì.
+const mouse = await page.evaluate(() => {
+  const c = document.querySelector(".tm-uv-canvas");
+  const cur = document.querySelector(".tm-uv-cursor-canvas");
+  const r = c.getBoundingClientRect();
+  const rc = cur ? cur.getBoundingClientRect() : null;
+  const scaleX = r.width ? c.width / r.width : 1;
+  const scaleY = r.height ? c.height / r.height : 1;
+  const cx = r.left + r.width / 2;
+  const cy = r.top + r.height / 2;
+  return {
+    canvasAttr: { w: c.width, h: c.height },
+    canvasRect: { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) },
+    cursorRect: rc ? { x: Math.round(rc.x), y: Math.round(rc.y), w: Math.round(rc.width), h: Math.round(rc.height) } : null,
+    scale: { x: +scaleX.toFixed(3), y: +scaleY.toFixed(3) },
+    toRemotePointCenter: {
+      x: Math.round((cx - r.left) * scaleX),
+      y: Math.round((cy - r.top) * scaleY),
+    },
+    expectedCenter: { x: Math.round(c.width / 2), y: Math.round(c.height / 2) },
+  };
+});
+console.log("ĐO TOẠ ĐỘ CHUỘT:", JSON.stringify(mouse, null, 1));
+
 const timer = setInterval(() => {
   console.log(
     "[tick] frames=" + client.frame_count() +
@@ -78,7 +102,14 @@ setTimeout(() => {
   clearInterval(timer);
   clearInterval(mover);
   console.log("hết thời gian chờ");
-  console.log("tổng số khung hình:", client.frame_count());
+  const stats = client.frame_stats();
+  console.log(
+    "thống kê: frames=" + stats[0] +
+    " tổng ms giải mã=" + stats[1] +
+    " (trung bình " + (stats[0] ? Math.round(stats[1] / stats[0]) : 0) + " ms/khung)" +
+    " tổng byte nén=" + Math.round(stats[2] / 1024) + " KB" +
+    " (trung bình " + (stats[0] ? Math.round(stats[2] / stats[0] / 1024) : 0) + " KB/khung)",
+  );
   console.log("payload đã gửi:", JSON.stringify(client.sent_payloads(), null, 1));
   finish(client.is_connected() ? 0 : 2);
 }, 40000);

@@ -898,15 +898,14 @@ export default {
   cursor: none;
 }
 
-/* Canvas phủ vẽ con trỏ của máy đối tác, nằm đúng vị trí canvas màn hình */
+/* Canvas phủ vẽ con trỏ của máy đối tác. Vị trí/kích thước được module WASM
+   đặt lại theo khung thực tế của canvas màn hình (canvas màn hình được canh
+   giữa nên không thể dùng top/left cố định). */
 .tm-uv-cursor-canvas {
   position: absolute;
   top: 0;
   left: 0;
-  max-width: 100%;
-  max-height: 100%;
   pointer-events: none;
-  object-fit: contain;
 }
 
 /* Ẩn hiệu ứng nền động khi đã có màn hình từ xa */
