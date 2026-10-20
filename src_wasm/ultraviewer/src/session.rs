@@ -609,7 +609,14 @@ impl Session {
                     .filter(|h| !h.is_empty())
                     .unwrap_or_else(|| DEFAULT_RELAY_HOST.to_string());
                 self.write(channel, &http_preamble(&host));
-                self.send_login(0, false);
+                // Chỉ gửi MỘT lệnh login cho máy đối tác: nếu đã gửi login
+                // trên kênh LAN trực tiếp thì không gửi lại qua relay. Gửi cả
+                // hai sẽ khiến máy đối tác đổi đường (nhận login cuối cùng)
+                // trong khi phía ta đã chuyển sang đường trực tiếp → khung hình
+                // gửi qua relay bị bỏ qua → không thấy màn hình.
+                if !self.direct_login_sent {
+                    self.send_login(0, false);
+                }
                 self.deadline = Some(now + LOGIN_TIMEOUT_MS);
             }
             _ => {}
@@ -655,14 +662,21 @@ impl Session {
         if self.direct_login_sent {
             return;
         }
-        let Some(expected) = self.direct_expected else { return };
-        let Some(ip) = self.direct_peer.clone() else { return };
-        // Chỉ nhận đúng máy đối tác trong lệnh tra cứu (chống chiếm cổng).
-        if !Ipv4::parse(&ip).map(|actual| actual == expected).unwrap_or(false) {
-            self.relay.close(CHANNEL_DIRECT);
-            self.direct_peer = None;
+        if self.direct_expected.is_none() {
             return;
         }
+        if self.direct_peer.is_none() {
+            return;
+        }
+        // KHÔNG so sánh địa chỉ nguồn của kết nối với địa chỉ LAN mà máy đối
+        // tác quảng bá: máy đối tác có thể kết nối từ một NIC khác (NIC ảo,
+        // VPN, container…) nên 2 địa chỉ khác nhau dù vẫn là cùng một máy —
+        // so khác là sẽ "từ chối oan" và giết luôn phiên.
+        //
+        // Việc "đúng máy đối tác hay không" được quyết định SAU đó: ứng viên
+        // phải hoàn tất login + khởi tạo màn hình trên kênh trực tiếp mới
+        // được chuyển đường (giống client gốc). Login được mã hoá bằng khoá
+        // phiên mà chỉ máy đối tác mới biết nên máy khác không dựng được.
         self.direct_login_sent = true;
         self.send_login_on(CHANNEL_DIRECT, 0, false);
         self.direct_deadline = Some(now + DIRECT_INIT_TIMEOUT_MS);
