@@ -6,7 +6,7 @@
 echo "Đang build version: $(tm_get_version)"
 
 # cần build wasm mới thì mở ra
-# chmod 777 ./scripts/build_wasm.sh
+chmod 777 ./scripts/build_wasm.sh
 ./scripts/build_wasm.sh
 chmod 777 ./scripts/build_web_for_daemon.sh
 ./scripts/build_web_for_daemon.sh
