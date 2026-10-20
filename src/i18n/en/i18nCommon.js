@@ -873,6 +873,8 @@ export default {
     },
     ultraViewer: {
       title: "Remote Desktop (UltraViewer)",
+      monitorTooltip: "The partner has {count} monitors — viewing: {monitor}",
+      singleMonitor: "The partner has 1 monitor",
       switchMonitor: "Switch monitor",
       allMonitors: "All",
       monitorIndex: "Monitor {index}",

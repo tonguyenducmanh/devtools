@@ -59,6 +59,7 @@ export const EnumCacheConfig = {
   PostgreSQLBuiltinIntellisense: 66,
   AgreementAccepted: 67,
   UltraViewerConfigLayout: 68,
-  UltraViewerDeviceIdentity: 69,
-  UltraViewerDisplayName: 70,
+  // Profile viewer UltraViewer: danh tính thiết bị, tên hiển thị, ID và
+  // mật khẩu máy đối tác — gộp chung 1 khoá cache.
+  UltraViewerProfile: 69,
 };

@@ -17,15 +17,15 @@
             >
               <span class="tm-icon tm-camera-icon"></span>
             </div>
-            <!-- Chuyển qua lại giữa các màn hình của máy đối tác -->
+            <!-- Màn hình của máy đối tác: luôn hiện, chỉ chuyển được khi
+                 máy đối tác có nhiều hơn 1 màn hình -->
             <div
-              v-if="monitorCount > 1"
-              v-tooltip="$t('i18nCommon.ultraViewer.switchMonitor')"
+              v-tooltip="monitorTooltip"
               class="flex toolbar-btn tm-uv-monitor-btn"
+              :class="{ 'toolbar-btn-disabled': monitorCount <= 1 }"
               @click="switchMonitor"
             >
               <span class="tm-icon tm-monitor-icon"></span>
-              <span class="tm-uv-monitor-name">{{ monitorName }}</span>
             </div>
             <div
               v-tooltip="
@@ -327,10 +327,11 @@ export default {
       // Gốc toạ độ của vùng đang xem (khi chỉ xem 1 màn hình).
       viewOffsetX: 0,
       viewOffsetY: 0,
-      // Thông tin đăng nhập của máy đối tác, chỉ giữ trong phiên, không lưu.
+      // Thông tin đăng nhập của máy đối tác + danh tính viewer (lưu trong cache).
       partnerId: "",
       password: "",
       displayName: "",
+      deviceIdentity: "",
       chatInput: "",
       chatMessages: [],
       isPartnerTyping: false,
@@ -351,6 +352,18 @@ export default {
       }
       return this.$t("i18nCommon.ultraViewer.monitorIndex", {
         index: this.selectedMonitor,
+      });
+    },
+    /**
+     * Tooltip: số màn hình của máy đối tác + màn hình đang xem.
+     */
+    monitorTooltip() {
+      if (this.monitorCount <= 1) {
+        return this.$t("i18nCommon.ultraViewer.singleMonitor");
+      }
+      return this.$t("i18nCommon.ultraViewer.monitorTooltip", {
+        count: this.monitorCount,
+        monitor: this.monitorName,
       });
     },
     sidebarOptions() {
@@ -375,9 +388,25 @@ export default {
   },
 
   async mounted() {
-    // Tên hiển thị sinh tự động (5 ký tự ngẫu nhiên + "-PC"), giữ ổn định
-    // qua các phiên nên không phải đặt tay mỗi lần.
-    this.displayName = await this.getDisplayName();
+    // Nạp profile đã lưu: danh tính thiết bị, tên hiển thị, ID + mật khẩu
+    // máy đối tác.
+    const profile = await this.$tmCache.get(
+      this.$tmEnum.cacheConfig.UltraViewerProfile,
+    );
+    if (profile) {
+      this.partnerId = profile.partnerId || "";
+      this.password = profile.password || "";
+      this.displayName = profile.displayName || "";
+      this.deviceIdentity = profile.deviceIdentity || "";
+    }
+    // Chưa có tên hiển thị thì sinh tự động (5 ký tự ngẫu nhiên + "-PC").
+    if (!this.displayName) {
+      this.displayName = this.randomName() + "-PC";
+    }
+    // Chưa có danh tính thiết bị thì sinh mới (relay cấp ID theo MAC).
+    if (!this.deviceIdentity) {
+      this.deviceIdentity = this.randomHex(16);
+    }
   },
 
   beforeUnmount() {
@@ -412,42 +441,18 @@ export default {
     },
 
     /**
-     * Danh tính thiết bị ổn định (32 hex). Relay cấp ID theo địa chỉ MAC nên
-     * phải giữ nguyên giữa các phiên, nếu không mỗi lần kết nối lại sẽ bị
-     * xem là một máy khác. Lưu bằng cache chuẩn của app.
+     * Lưu toàn bộ profile viewer vào cache chuẩn của app:
+     * danh tính thiết bị (relay cấp ID theo MAC nên phải giữ nguyên giữa các
+     * phiên), tên hiển thị gửi máy đối tác, và ID + mật khẩu máy đối tác.
      */
-    async getDeviceIdentity() {
+    async saveProfile() {
       let me = this;
-      let value = await me.$tmCache.get(
-        me.$tmEnum.cacheConfig.UltraViewerDeviceIdentity,
-      );
-      if (!value || !/^[0-9a-fA-F]{32}$/.test(value)) {
-        value = me.randomHex(16);
-        await me.$tmCache.set(
-          me.$tmEnum.cacheConfig.UltraViewerDeviceIdentity,
-          value,
-        );
-      }
-      return value;
-    },
-
-    /**
-     * Tên hiển thị gửi cho máy đối tác: 5 chữ/số ngẫu nhiên + "-PC".
-     * Lưu bằng cache chuẩn của app để giữ nguyên giữa các phiên.
-     */
-    async getDisplayName() {
-      let me = this;
-      let value = await me.$tmCache.get(
-        me.$tmEnum.cacheConfig.UltraViewerDisplayName,
-      );
-      if (!value) {
-        value = me.randomName() + "-PC";
-        await me.$tmCache.set(
-          me.$tmEnum.cacheConfig.UltraViewerDisplayName,
-          value,
-        );
-      }
-      return value;
+      await me.$tmCache.set(me.$tmEnum.cacheConfig.UltraViewerProfile, {
+        deviceIdentity: me.deviceIdentity,
+        displayName: me.displayName,
+        partnerId: me.partnerId.trim(),
+        password: me.password,
+      });
     },
 
     randomName() {
@@ -522,6 +527,8 @@ export default {
           me.monitorCount = client.monitor_count();
           me.selectedMonitor = 0;
           me.updateViewOffset();
+          // Lưu profile (ID + mật khẩu + tên + danh tính) để lần sau khỏi nhập.
+          me.saveProfile();
           me.addLog(
             `${me.$t("i18nCommon.ultraViewer.connected")} ${width}x${height}`,
             "success",
@@ -583,7 +590,7 @@ export default {
           id,
           me.password,
           me.displayName || "DevTools",
-          await me.getDeviceIdentity(),
+          me.deviceIdentity,
           "",
           -new Date().getTimezoneOffset(),
           window.screen?.width || 1920,
@@ -866,18 +873,6 @@ export default {
   display: flex;
   overflow: hidden;
   position: relative;
-}
-
-/* Nút chuyển màn hình: icon + tên màn hình đang xem */
-.tm-uv-monitor-btn {
-  width: auto;
-  gap: var(--padding-medium);
-  padding: 0 var(--padding);
-}
-
-.tm-uv-monitor-name {
-  font-size: var(--font-size-small);
-  white-space: nowrap;
 }
 
 .tm-uv-canvas-container {

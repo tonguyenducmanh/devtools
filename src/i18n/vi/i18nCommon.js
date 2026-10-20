@@ -869,6 +869,8 @@ export default {
     },
     ultraViewer: {
       title: "Máy tính từ xa (UltraViewer)",
+      monitorTooltip: "Máy đối tác có {count} màn hình — đang xem: {monitor}",
+      singleMonitor: "Máy đối tác có 1 màn hình",
       switchMonitor: "Chuyển màn hình",
       allMonitors: "Tất cả",
       monitorIndex: "Màn hình {index}",
