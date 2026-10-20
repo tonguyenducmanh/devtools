@@ -129,6 +129,10 @@ pub struct Session {
     cursor: CursorState,
     /// Gốc toạ độ "bàn phím ảo" của màn hình từ xa.
     origin: (i32, i32),
+    /// Các màn hình của máy đối tác (left, top, right, bottom).
+    monitors: Vec<[i32; 4]>,
+    /// Màn hình đang chọn: 0 = tất cả, 1..n = màn hình thứ n.
+    monitor_index: usize,
     /// Công tắc "điều khiển" phía người dùng (máy đối tác vẫn là bên quyết
     /// định cuối cùng qua lệnh 49).
     control_enabled: bool,
@@ -182,6 +186,8 @@ impl Session {
             sent_payloads: Vec::new(),
             cursor: CursorState::default(),
             origin: (0, 0),
+            monitors: Vec::new(),
+            monitor_index: 0,
             control_enabled: true,
             closed: false,
             options,
@@ -196,6 +202,53 @@ impl Session {
     /// Các payload đã gửi tới máy đối tác (để chẩn đoán).
     pub fn sent_payloads(&self) -> &[String] {
         &self.sent_payloads
+    }
+
+    /// Số màn hình của máy đối tác (0 = chưa có thông tin).
+    pub fn monitor_count(&self) -> usize {
+        self.monitors.len()
+    }
+
+    /// Màn hình đang chọn: 0 = tất cả, 1..n = màn hình thứ n.
+    pub fn selected_monitor(&self) -> usize {
+        self.monitor_index
+    }
+
+    /// Chọn màn hình hiển thị (0 = tất cả). Trả về true nếu có thay đổi.
+    pub fn set_monitor(&mut self, index: usize) -> bool {
+        let index = if index == 0 || index <= self.monitors.len() { index } else { 0 };
+        if index == self.monitor_index {
+            return false;
+        }
+        self.monitor_index = index;
+        true
+    }
+
+    /// Vùng ảnh đang hiển thị (toạ độ trong ảnh màn hình từ xa).
+    /// Chọn 1 màn hình thì chỉ hiện phần ảnh của màn hình đó.
+    pub fn view_rect(&self) -> Option<Rect> {
+        let (width, height) = self.screen_size();
+        if width == 0 || height == 0 {
+            return None;
+        }
+        if self.monitor_index == 0 {
+            return Some(Rect { x: 0, y: 0, width, height });
+        }
+        let monitor = *self.monitors.get(self.monitor_index - 1)?;
+        let x = monitor[0] - self.origin.0;
+        let y = monitor[1] - self.origin.1;
+        let w = (monitor[2] - monitor[0]).max(0);
+        let h = (monitor[3] - monitor[1]).max(0);
+        if w == 0 || h == 0 || x + w > width as i32 || y + h > height as i32 {
+            return None;
+        }
+        Some(Rect { x, y, width: w as u32, height: h as u32 })
+    }
+
+    /// Gốc toạ độ của vùng đang hiển thị trong ảnh màn hình từ xa.
+    /// Khi chỉ xem 1 màn hình, toạ độ chuột phải cộng thêm gốc này.
+    pub fn view_origin(&self) -> (i32, i32) {
+        self.view_rect().map(|rect| (rect.x, rect.y)).unwrap_or((0, 0))
     }
 
     /// Ảnh con trỏ hiện tại của máy đối tác (0xAARRGGBB, top-down) + điểm nóng.
@@ -235,13 +288,16 @@ impl Session {
         self.screen.as_ref().map(|r| (r.width(), r.height())).unwrap_or((0, 0))
     }
 
-    /// Các vùng màn hình vừa thay đổi (để vẽ lại) + dữ liệu RGBA tương ứng.
-    pub fn take_dirty(&mut self) -> Vec<(Rect, Vec<u8>)> {
+    /// Các vùng màn hình vừa thay đổi (tọa độ trong ảnh màn hình từ xa).
+    pub fn take_dirty(&mut self) -> Vec<Rect> {
         let Some(renderer) = self.screen.as_mut() else { return Vec::new() };
-        renderer.take_dirty().into_iter().map(|rect| {
-            let pixels = renderer.rect_rgba(rect);
-            (rect, pixels)
-        }).collect()
+        renderer.take_dirty()
+    }
+
+    /// Pixel RGBA của một vùng trong ảnh màn hình từ xa.
+    pub fn region_pixels(&self, rect: Rect) -> Option<Vec<u8>> {
+        let renderer = self.screen.as_ref()?;
+        Some(renderer.rect_rgba(rect))
     }
 
     // ───────────────────────── vòng đời ─────────────────────────
@@ -645,7 +701,11 @@ impl Session {
             }
         }
         self.version = version;
-        self.origin = (init.virtual_left.unwrap_or(0), init.virtual_top.unwrap_or(0));
+        // Gốc hiệu dụng = gốc khai báo và cạnh trái trên của mọi màn hình
+        // (RemoteControlCommands.effectiveVirtualOrigin).
+        self.origin = init.origin();
+        self.monitors = init.monitors();
+        self.monitor_index = 0;
         self.cursor.reset();
         self.active = true;
         self.deadline = None;

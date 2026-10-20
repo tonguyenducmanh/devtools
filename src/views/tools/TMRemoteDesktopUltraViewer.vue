@@ -17,6 +17,16 @@
             >
               <span class="tm-icon tm-camera-icon"></span>
             </div>
+            <!-- Chuyển qua lại giữa các màn hình của máy đối tác -->
+            <div
+              v-if="monitorCount > 1"
+              v-tooltip="$t('i18nCommon.ultraViewer.switchMonitor')"
+              class="flex toolbar-btn tm-uv-monitor-btn"
+              @click="switchMonitor"
+            >
+              <span class="tm-icon tm-monitor-icon"></span>
+              <span class="tm-uv-monitor-name">{{ monitorName }}</span>
+            </div>
             <div
               v-tooltip="
                 controlEnabled
@@ -311,6 +321,12 @@ export default {
       isConnecting: false,
       isViewOnly: false,
       controlEnabled: true,
+      // Số màn hình của máy đối tác (0 = không rõ) và màn hình đang chọn.
+      monitorCount: 0,
+      selectedMonitor: 0,
+      // Gốc toạ độ của vùng đang xem (khi chỉ xem 1 màn hình).
+      viewOffsetX: 0,
+      viewOffsetY: 0,
       // Thông tin đăng nhập của máy đối tác, chỉ giữ trong phiên, không lưu.
       partnerId: "",
       password: "",
@@ -326,6 +342,17 @@ export default {
   },
 
   computed: {
+    /**
+     * Tên màn hình đang hiển thị ("Tất cả" khi xem toàn bộ desktop ảo).
+     */
+    monitorName() {
+      if (this.selectedMonitor === 0) {
+        return this.$t("i18nCommon.ultraViewer.allMonitors");
+      }
+      return this.$t("i18nCommon.ultraViewer.monitorIndex", {
+        index: this.selectedMonitor,
+      });
+    },
     sidebarOptions() {
       let options = [];
       options.push({
@@ -492,6 +519,9 @@ export default {
           me.isConnected = true;
           me.isConnecting = false;
           me.isHideEffectBackground = true;
+          me.monitorCount = client.monitor_count();
+          me.selectedMonitor = 0;
+          me.updateViewOffset();
           me.addLog(
             `${me.$t("i18nCommon.ultraViewer.connected")} ${width}x${height}`,
             "success",
@@ -588,6 +618,42 @@ export default {
       me.isPartnerTyping = false;
     },
 
+    /**
+     * Bấm nút trên thanh công cụ để chuyển qua lại giữa các màn hình.
+     */
+    switchMonitor() {
+      let me = this;
+      if (!me.client || me.monitorCount <= 1) return;
+      // 0 = xem tất cả, 1..n = từng màn hình → có monitorCount + 1 lựa chọn.
+      const next = (me.selectedMonitor + 1) % (me.monitorCount + 1);
+      me.client.select_monitor(next);
+      // Đọc lại từ module: nếu máy đối tác không có màn hình đó thì module
+      // tự quay về "tất cả".
+      me.selectedMonitor = me.client.selected_monitor();
+      me.updateViewOffset();
+      me.addLog(
+        me.$t("i18nCommon.ultraViewer.monitorSwitched", {
+          monitor: me.monitorName,
+        }),
+        "info",
+      );
+    },
+
+    /**
+     * Lấy gốc toạ độ của vùng đang xem để cộng vào toạ độ chuột gửi đi.
+     */
+    updateViewOffset() {
+      let me = this;
+      if (!me.client) {
+        me.viewOffsetX = 0;
+        me.viewOffsetY = 0;
+        return;
+      }
+      const offset = me.client.view_offset();
+      me.viewOffsetX = offset[0] || 0;
+      me.viewOffsetY = offset[1] || 0;
+    },
+
     toggleControl() {
       let me = this;
       if (!me.isConnected) return;
@@ -671,9 +737,11 @@ export default {
       const rect = canvas.getBoundingClientRect();
       const scaleX = rect.width ? canvas.width / rect.width : 1;
       const scaleY = rect.height ? canvas.height / rect.height : 1;
+      // Cộng gốc của vùng đang xem: máy đối tác luôn dùng toạ độ trên
+      // desktop ảo, không phải toạ độ trong màn hình đang chọn.
       return {
-        x: Math.round((e.clientX - rect.left) * scaleX),
-        y: Math.round((e.clientY - rect.top) * scaleY),
+        x: Math.round((e.clientX - rect.left) * scaleX) + this.viewOffsetX,
+        y: Math.round((e.clientY - rect.top) * scaleY) + this.viewOffsetY,
       };
     },
 
@@ -798,6 +866,18 @@ export default {
   display: flex;
   overflow: hidden;
   position: relative;
+}
+
+/* Nút chuyển màn hình: icon + tên màn hình đang xem */
+.tm-uv-monitor-btn {
+  width: auto;
+  gap: var(--padding-medium);
+  padding: 0 var(--padding);
+}
+
+.tm-uv-monitor-name {
+  font-size: var(--font-size-small);
+  white-space: nowrap;
 }
 
 .tm-uv-canvas-container {

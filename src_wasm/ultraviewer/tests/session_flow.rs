@@ -231,6 +231,16 @@ fn peer_payloads(sent: &[(u8, Vec<u8>)]) -> Vec<Vec<u8>> {
         .collect()
 }
 
+
+/// Màn hình khởi tạo (lệnh 0) với 2 màn hình nằm cạnh nhau.
+fn screen_init_two_monitors() -> Vec<Vec<u8>> {
+    // 2 màn hình cạnh nhau → ảnh desktop ảo rộng 3840.
+    let mut parts = screen_init_parts(3840, 1080);
+    // part 8: "left:top:right:bottom|..." (toạ độ bàn phím ảo)
+    parts[8] = b"0:0:1920:1080|1920:0:3840:1080|".to_vec();
+    parts
+}
+
 // ───────────────────────────── Test ─────────────────────────────
 
 #[test]
@@ -354,14 +364,15 @@ fn full_session_flow_reaches_screen_and_input() {
     // Vùng đổi phải đúng hình chữ nhật 4x2 ở góc trên trái.
     let dirty = session.take_dirty();
     assert_eq!(dirty.len(), 1);
-    assert_eq!(dirty[0].0, Rect { x: 0, y: 0, width: 4, height: 2 });
+    assert_eq!(dirty[0], Rect { x: 0, y: 0, width: 4, height: 2 });
     // Pixel RGBA của hình chữ nhật: 4x2x4 byte.
-    assert_eq!(dirty[0].1.len(), 4 * 2 * 4);
+    let pixels = session.region_pixels(dirty[0]).unwrap();
+    assert_eq!(pixels.len(), 4 * 2 * 4);
     // RGB555: 0x7c00 = đỏ, 0x03e0 = xanh lá, 0x001f = xanh dương.
-    assert_eq!(&dirty[0].1[0..4], &[255, 0, 0, 255]);
-    assert_eq!(&dirty[0].1[4..8], &[0, 255, 0, 255]);
-    assert_eq!(&dirty[0].1[8..12], &[0, 0, 255, 255]);
-    assert_eq!(&dirty[0].1[12..16], &[255, 255, 255, 255]);
+    assert_eq!(&pixels[0..4], &[255, 0, 0, 255]);
+    assert_eq!(&pixels[4..8], &[0, 255, 0, 255]);
+    assert_eq!(&pixels[8..12], &[0, 0, 255, 255]);
+    assert_eq!(&pixels[12..16], &[255, 255, 255, 255]);
 
     // Backpressure: viewer phải gửi "18" sau khi giải mã xong.
     let sent = state.borrow().sent.clone();
@@ -429,4 +440,69 @@ impl SessionObserver for ObserverProxy {
     fn closed(&mut self, message: &str) {
         self.recorder.borrow_mut().closed.push(message.to_string());
     }
+}
+
+#[test]
+fn switching_monitors_changes_the_visible_region() {
+    let state = Rc::new(RefCell::new(MockState::default()));
+    let recorder = Rc::new(RefCell::new(Recorder::default()));
+    let options = ConnectOptions {
+        partner_id: "123456789".into(),
+        password: "secret".into(),
+        display_name: "DevTools".into(),
+        device_identity: "A".repeat(32),
+        device_password: "12345678".into(),
+        ..Default::default()
+    };
+    let mut session = Session::new(
+        Box::new(MockRelay { state: state.clone() }),
+        Box::new(ObserverProxy { recorder: recorder.clone() }),
+        options,
+    )
+    .expect("tạo phiên thất bại");
+
+    session.start(0.0).expect("mở phiên thất bại");
+    pump(&mut session, &state);
+
+    // Trả lời đăng ký + tra cứu (như test chính).
+    push_data(
+        &state,
+        CHANNEL_COMMAND,
+        &system_envelope(b"3:443:00111222333:203.0.113.7::0:ping-list:-1:17/10/2026:relay.example:opaque-token", false),
+    );
+    pump(&mut session, &state);
+    let lookup = last_command_text(&state);
+    let correlation = lookup_correlation(&lookup);
+    let reply = format!(
+        "8:1:192.0.2.9:unused:203.0.113.9:54000:5900:5901:TmFtZQ==:55100:unused:198.51.100.2:-1:123:relay.example:x:x:x:x:x:secret:direct-info:{correlation}"
+    );
+    push_data(&state, CHANNEL_COMMAND, &system_envelope(reply.as_bytes(), false));
+    pump(&mut session, &state);
+
+    // Gửi màn hình 2 màn hình.
+    let init = screen_init_two_monitors();
+    let init_refs: Vec<&[u8]> = init.iter().map(|p| p.as_slice()).collect();
+    push_data(&state, CHANNEL_PEER, &peer_frame(&encode_multipart(&init_refs)));
+    pump(&mut session, &state);
+
+    assert_eq!(session.monitor_count(), 2);
+    // Mặc định xem toàn bộ desktop ảo.
+    assert_eq!(session.selected_monitor(), 0);
+    assert_eq!(session.view_rect().unwrap(), Rect { x: 0, y: 0, width: 3840, height: 1080 });
+
+    // Chọn màn hình thứ 2 → chỉ hiện phần ảnh của màn hình đó.
+    assert!(session.set_monitor(2));
+    assert_eq!(session.selected_monitor(), 2);
+    assert_eq!(session.view_rect().unwrap(), Rect { x: 1920, y: 0, width: 1920, height: 1080 });
+
+    // Quay lại "tất cả" (index 0).
+    assert!(session.set_monitor(0));
+    assert_eq!(session.view_rect().unwrap(), Rect { x: 0, y: 0, width: 3840, height: 1080 });
+
+    // Chọn lại màn hình đang chọn → không đổi.
+    assert!(!session.set_monitor(0));
+    // Chọn số màn hình không tồn tại → về "tất cả".
+    assert!(session.set_monitor(1));
+    assert!(session.set_monitor(9));
+    assert_eq!(session.selected_monitor(), 0);
 }

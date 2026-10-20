@@ -102,6 +102,19 @@ màn hình (`attach_cursor_canvas`). Lưu ý: máy đối tác chỉ gửi vị 
 con trỏ **di chuyển** — nên vừa kết nối xong có thể chưa thấy con trỏ cho tới khi
 chuột trên máy đối tác được di chuyển.
 
+## Chuyển màn hình
+
+Máy Windows **không vẽ con trỏ vào khung hình** mà gửi riêng (lệnh 3/4/28) —
+viewer phải tự vẽ. Tương tự, danh sách màn hình nằm ở part 8 của lệnh khởi tạo
+(lệnh 0), dạng `left:top:right:bottom|…`.
+
+- Máy đối tác có **nhiều màn hình** → tool hiện nút chuyển màn hình trên thanh
+  công cụ (`tm-monitor-icon`), bấm là chuyển qua lại giữa "Tất cả" và từng màn hình.
+- Chọn 1 màn hình → canvas chỉ vẽ phần ảnh của màn hình đó, và **toạ độ chuột
+  được cộng thêm gốc của màn hình** (máy đối tác luôn dùng toạ độ desktop ảo).
+- Máy đối tác chỉ gửi 1 màn hình (hoặc không gửi thông tin màn hình) → nút
+  không hiện, xem toàn bộ desktop.
+
 ## Tài nguyên bên thứ ba
 
 `resources/8bit.dat` là **từ điển zstd do UltraViewer cung cấp** (112.640 byte,

@@ -253,6 +253,14 @@ pub(crate) mod tests {
     }
 
     #[test]
+    fn two_monitor_info_parses() {
+        let info = b"0:0:1920:1080|1920:0:3840:1080|";
+        let init = ScreenInit { monitor_info: Some(info.to_vec()), ..Default::default() };
+        eprintln!("monitors = {:?}", init.monitors());
+        assert_eq!(init.monitors().len(), 2);
+    }
+
+    #[test]
     fn initialization_and_malformed_parts() {
         let mut init: Vec<Vec<u8>> = vec![vec![0], long(1920), long(1080)];
         let r = |p: &[Vec<u8>]| decode_init(&p.iter().map(|v| v.as_slice()).collect::<Vec<_>>(), &Limits::default());

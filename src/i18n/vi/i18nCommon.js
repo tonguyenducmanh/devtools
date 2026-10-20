@@ -869,6 +869,10 @@ export default {
     },
     ultraViewer: {
       title: "Máy tính từ xa (UltraViewer)",
+      switchMonitor: "Chuyển màn hình",
+      allMonitors: "Tất cả",
+      monitorIndex: "Màn hình {index}",
+      monitorSwitched: "Đang xem: {monitor}",
       partnerIdShort: "ID máy",
       passwordShort: "Mật khẩu",
       displayNameShort: "Tên hiển thị",

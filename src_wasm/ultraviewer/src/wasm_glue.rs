@@ -109,6 +109,10 @@ struct State {
     cursor_ctx: Option<web_sys::CanvasRenderingContext2d>,
     /// Vị trí con trỏ đã vẽ lần trước (để xoá trước khi vẽ mới).
     cursor_drawn: Option<(i32, i32, u32, u32)>,
+    /// Vùng ảnh đang hiển thị (khi chọn 1 màn hình thì chỉ hiện phần đó).
+    view: Option<crate::screen::Rect>,
+    /// Ép vẽ lại toàn bộ vùng đang hiển thị (đổi màn hình).
+    full_redraw: bool,
     timer: Option<i32>,
 }
 
@@ -200,6 +204,8 @@ impl UltraViewerClient {
                 cursor_canvas: None,
                 cursor_ctx: None,
                 cursor_drawn: None,
+                view: None,
+                full_redraw: false,
                 timer: None,
             })),
             callbacks: Rc::new(RefCell::new(Callbacks::default())),
@@ -336,6 +342,55 @@ impl UltraViewerClient {
     /// Số khung hình đã giải mã và vẽ lên canvas.
     pub fn frame_count(&self) -> u64 {
         self.state.borrow().frame_count
+    }
+
+    /// Số màn hình của máy đối tác.
+    pub fn monitor_count(&self) -> usize {
+        self.state
+            .borrow()
+            .session
+            .as_ref()
+            .map(|s| s.monitor_count())
+            .unwrap_or(0)
+    }
+
+    /// Màn hình đang chọn (0 = tất cả).
+    pub fn selected_monitor(&self) -> usize {
+        self.state
+            .borrow()
+            .session
+            .as_ref()
+            .map(|s| s.selected_monitor())
+            .unwrap_or(0)
+    }
+
+    /// Chọn màn hình hiển thị (0 = tất cả, 1..n = màn hình thứ n).
+    pub fn select_monitor(&self, index: usize) {
+        let mut inner = self.state.borrow_mut();
+        let Some(session) = inner.session.as_mut() else { return };
+        if !session.set_monitor(index) {
+            return;
+        }
+        inner.view = session.view_rect();
+        inner.full_redraw = true;
+        inner.cursor_drawn = None;
+        // Canvas đổi kích thước theo vùng đang hiển thị.
+        if let (Some(view), Some(canvas)) = (inner.view, inner.canvas.as_ref()) {
+            canvas.set_width(view.width);
+            canvas.set_height(view.height);
+        }
+    }
+
+    /// Gốc toạ độ của vùng đang hiển thị (dùng để cộng vào toạ độ chuột).
+    pub fn view_offset(&self) -> Vec<i32> {
+        let (x, y) = self
+            .state
+            .borrow()
+            .session
+            .as_ref()
+            .map(|s| s.view_origin())
+            .unwrap_or((0, 0));
+        vec![x, y]
     }
 
     /// Vị trí con trỏ của máy đối tác (chẩn đoán).
@@ -697,21 +752,47 @@ fn resize_canvas(state: &Rc<RefCell<State>>, width: u32, height: u32) {
 }
 
 fn paint(state: &Rc<RefCell<State>>) {
-    let dirty = {
+    // Lấy vùng đang hiển thị + các vùng vừa thay đổi trong một khối borrow
+    // riêng, để không giữ khoá `state` khi vẽ.
+    let (view, dirty, ctx) = {
         let mut inner = state.borrow_mut();
-        inner.session.as_mut().map(|s| s.take_dirty()).unwrap_or_default()
+        let full = inner.full_redraw;
+        inner.full_redraw = false;
+        let cached_view = inner.view;
+        let ctx = inner.ctx.clone();
+        let Some(session) = inner.session.as_mut() else { return };
+        let view = session.view_rect().or(cached_view);
+        let Some(view) = view else { return };
+        let dirty = if full { vec![view] } else { session.take_dirty() };
+        (view, dirty, ctx)
     };
-    if dirty.is_empty() {
-        return;
-    }
-    let inner = state.borrow();
-    let Some(ctx) = inner.ctx.as_ref() else { return };
-    for (rect, pixels) in dirty {
+    let Some(ctx) = ctx else { return };
+    for rect in dirty {
+        // Cắt vùng thay đổi theo vùng đang hiển thị.
+        let x0 = rect.x.max(view.x);
+        let y0 = rect.y.max(view.y);
+        let x1 = ((rect.x as i64 + rect.width as i64).min(view.x as i64 + view.width as i64)) as i32;
+        let y1 = ((rect.y as i64 + rect.height as i64).min(view.y as i64 + view.height as i64)) as i32;
+        if x1 <= x0 || y1 <= y0 {
+            continue;
+        }
+        let sub = crate::screen::Rect {
+            x: x0,
+            y: y0,
+            width: (x1 - x0) as u32,
+            height: (y1 - y0) as u32,
+        };
+        let pixels = {
+            let inner = state.borrow();
+            let Some(session) = inner.session.as_ref() else { continue };
+            session.region_pixels(sub)
+        };
+        let Some(pixels) = pixels else { continue };
         let data = wasm_bindgen::Clamped(&pixels[..]);
-        let Ok(image) = web_sys::ImageData::new_with_u8_clamped_array_and_sh(data, rect.width, rect.height) else {
+        let Ok(image) = web_sys::ImageData::new_with_u8_clamped_array_and_sh(data, sub.width, sub.height) else {
             continue;
         };
-        let _ = ctx.put_image_data(&image, rect.x as f64, rect.y as f64);
+        let _ = ctx.put_image_data(&image, (sub.x - view.x) as f64, (sub.y - view.y) as f64);
     }
 }
 
