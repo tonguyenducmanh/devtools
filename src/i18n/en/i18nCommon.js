@@ -894,6 +894,7 @@ export default {
       disconnectError: "Disconnect error",
       connecting: "Connecting to",
       connected: "Connected! Screen:",
+      connectedDirect: "Connected directly over the LAN (bypassing the relay).",
       connectionFailed: "Connection failed",
       statusConnecting: "Connecting...",
       statusDisconnected: "Disconnected",

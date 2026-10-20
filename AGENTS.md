@@ -87,6 +87,10 @@ wrangler.jsonc                  Cloudflare Pages config (project `devtools`, out
     - Kiểm tra sau mỗi lần build wasm: import section của file `.wasm` **không được có** module `"env"`. Script kiểm tra: xem `wasm-tools`/`wasm-objdump`, hoặc đọc trực tiếp import section (byte 2 của file wasm).
     - `wasm-bindgen` của module Rust phải **khớp phiên bản** với CLI mà `wasm-pack` dùng, nếu không glue sinh ra sẽ hỏng (thiếu import, file `_bg.js` không được tạo). Xem `Cargo.lock` của module `iron_rdp` (0.2.114) và dùng đúng phiên bản đó cho module mới.
 16. **WebSocket từ WASM phải chờ `open` mới gửi được.** `new WebSocket(url)` trả về ở trạng thái `CONNECTING`; gọi `send()` ngay sẽ ném lỗi `InvalidStateError` và message **không bao giờ tới đích**. Phải xếp hàng đợi message rồi gửi trong callback `onopen`.
+17. **Kênh LAN direct của UltraViewer: daemon phải làm lớp mã hoá.** Trình duyệt không mở được socket lắng nghe → daemon mở listener TCP và **giải mã/ mã hoá khung AES-256-CBC** (`LE32(len)+IV(16)+ciphertext`, khoá = `MD5(key)` chép `0..16` và `15..31` — lần chồng byte 15). Nhờ vậy phía WASM chỉ thấy byte thô giống kênh relay, chuyển đường chỉ là đổi số kênh.
+    - **Thứ tự sự kiện quan trọng:** máy đối tác có thể kết nối thẳng vào listener **trước khi** ta nhận được kết quả tra cứu → phải **giữ kết nối** và chỉ gửi login khi đã biết địa chỉ LAN dự kiến (suy ra từ lệnh tra cứu), nếu không sẽ từ chối oan.
+    - Khi chuyển đường sang direct, **bộ đệm khung hình phải reset** (kênh mới có chuỗi số khung riêng).
+    - Đối chiếu vector mã hoá bằng `openssl enc -aes-256-cbc` (xem `bl_ultraviewer_direct_test.go`) để chắc chắn khớp client gốc.
 
 ## 4. Chọn việc làm
 

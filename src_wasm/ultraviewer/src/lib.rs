@@ -15,6 +15,7 @@
 pub mod chat;
 pub mod clipboard;
 pub mod cursor;
+pub mod direct;
 pub mod input;
 pub mod messages;
 pub mod screen;

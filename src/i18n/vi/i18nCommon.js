@@ -890,6 +890,7 @@ export default {
       disconnectError: "Lỗi khi ngắt kết nối",
       connecting: "Đang kết nối tới",
       connected: "Đã kết nối! Màn hình:",
+      connectedDirect: "Đã kết nối thẳng trong LAN (không đi qua relay).",
       connectionFailed: "Kết nối thất bại",
       statusConnecting: "Đang kết nối...",
       statusDisconnected: "Chưa kết nối",

@@ -18,7 +18,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
 use crate::session::{ConnectOptions, Session, SessionObserver};
-use crate::transport::{Relay, SessionEvent, CHANNEL_COMMAND};
+use crate::transport::{Relay, SessionEvent, CHANNEL_COMMAND, CHANNEL_DIRECT};
 
 /// Sự kiện phiên gửi lên tầng JS.
 enum OutEvent {
@@ -146,11 +146,10 @@ impl WsRelay {
             json_string(cert_host)
         )
     }
-}
 
-impl Relay for WsRelay {
-    fn open(&mut self, channel: u8, host: &str, port: u16, cert_host: &str) -> crate::wire::Result<()> {
-        let request = Self::request(channel, host, port, cert_host);
+    /// Gửi message điều khiển tới daemon. Nếu WebSocket còn đang CONNECTING thì
+    /// xếp vào hàng đợi (gửi ngay sẽ ném `InvalidStateError`).
+    fn send_control(&mut self, request: String) -> crate::wire::Result<()> {
         match self.weak.upgrade() {
             Some(state) => {
                 let mut inner = state.borrow_mut();
@@ -167,6 +166,12 @@ impl Relay for WsRelay {
         }
         Ok(())
     }
+}
+
+impl Relay for WsRelay {
+    fn open(&mut self, channel: u8, host: &str, port: u16, cert_host: &str) -> crate::wire::Result<()> {
+        self.send_control(Self::request(channel, host, port, cert_host))
+    }
 
     fn write(&mut self, channel: u8, bytes: &[u8]) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         if bytes.is_empty() {
@@ -181,8 +186,16 @@ impl Relay for WsRelay {
     }
 
     fn close(&mut self, channel: u8) {
-        let request = format!("{{\"t\":\"close\",\"c\":{}}}", channel);
-        let _ = self.ws.send_with_str(&request);
+        let _ = self.send_control(format!("{{\"t\":\"close\",\"c\":{}}}", channel));
+    }
+
+    fn listen_direct(&mut self) -> crate::wire::Result<()> {
+        // Yêu cầu daemon mở listener LAN để máy đối tác kết nối thẳng.
+        self.send_control(format!("{{\"t\":\"listen\",\"c\":{}}}", CHANNEL_DIRECT))
+    }
+
+    fn close_direct_listener(&mut self) {
+        let _ = self.send_control(format!("{{\"t\":\"listen_close\",\"c\":{}}}", CHANNEL_DIRECT));
     }
 }
 
@@ -453,6 +466,22 @@ impl UltraViewerClient {
 
     pub fn is_view_only(&self) -> bool {
         self.state.borrow().session.as_ref().map(|s| s.is_view_only()).unwrap_or(false)
+    }
+
+    /// Đang dùng đường LAN trực tiếp (true) hay đi qua relay (false).
+    pub fn is_direct_route(&self) -> bool {
+        self.state.borrow().session.as_ref().map(|s| s.is_direct_route()).unwrap_or(false)
+    }
+
+    /// Listener LAN đã mở: [ip, cổng] (rỗng nếu chưa có).
+    pub fn direct_listener(&self) -> Vec<String> {
+        self.state
+            .borrow()
+            .session
+            .as_ref()
+            .and_then(|s| s.direct_listener())
+            .map(|(ip, port)| vec![ip, port.to_string()])
+            .unwrap_or_default()
     }
 
     /// Bật/tắt gửi chuột & bàn phím tới máy đối tác.
@@ -937,6 +966,32 @@ fn handle_control(state: &Rc<RefCell<State>>, text: &str) {
         }
         "open_err" => inner.queue.push(SessionEvent::OpenFailed { channel, message }),
         "closed" => inner.queue.push(SessionEvent::Closed { channel, message }),
+        "listen_ok" => {
+            // Daemon đã mở listener LAN: lấy IP/cổng/khoá để quảng bá trong
+            // lệnh tra cứu máy đối tác.
+            let ip = js_sys::Reflect::get(&parsed, &JsValue::from_str("ip"))
+                .ok()
+                .and_then(|v| v.as_string())
+                .unwrap_or_default();
+            let port = js_sys::Reflect::get(&parsed, &JsValue::from_str("port"))
+                .ok()
+                .and_then(|v| v.as_f64())
+                .unwrap_or(0.0) as u16;
+            let key = js_sys::Reflect::get(&parsed, &JsValue::from_str("key"))
+                .ok()
+                .and_then(|v| v.as_string())
+                .unwrap_or_default();
+            inner.queue.push(SessionEvent::DirectReady { ip, port, key });
+        }
+        "listen_err" => inner.queue.push(SessionEvent::DirectFailed { message }),
+        "direct_connected" => {
+            // Máy đối tác đã kết nối thẳng vào listener LAN.
+            let ip = js_sys::Reflect::get(&parsed, &JsValue::from_str("ip"))
+                .ok()
+                .and_then(|v| v.as_string())
+                .unwrap_or_default();
+            inner.queue.push(SessionEvent::DirectConnected { ip });
+        }
         _ => {}
     }
 }

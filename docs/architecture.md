@@ -177,11 +177,28 @@ Trình duyệt không mở được socket thô (không có TLS client trong WAS
 | `internal/service/bl_ultraviewer_relay.go` (Go) | Mở TCP + TLS tới relay (ghim chứng thư Sectigo R46, SNI `ultraviewer`), chuyển byte hai chiều qua WebSocket |
 
 Giao thức WebSocket giữa WASM và daemon: message text (JSON) để mở/đóng kênh, message binary
-(byte đầu = số kênh: 1 = kênh lệnh, 2 = kênh dữ liệu với máy đối tác) để chuyển byte thô.
+(byte đầu = số kênh: 1 = kênh lệnh, 2 = kênh dữ liệu với máy đối tác, 3 = kênh LAN trực tiếp)
+để chuyển byte thô.
+
+**Đường LAN trực tiếp (kênh 3):** khi 2 máy cùng mạng LAN, máy đối tác tự kết nối thẳng
+vào listener của daemon (bỏ qua relay → độ trễ thấp hơn nhiều, màn hình không rời LAN).
+
+```text
+[trình duyệt]  src_wasm/ultraviewer  ──WebSocket──▶  daemon Go  ◀──TCP (LAN, AES-256-CBC)──  máy đối tác
+```
+
+- `internal/service/bl_ultraviewer_direct.go` (Go): mở listener trên IP LAN, sinh khoá phiên
+  14 ký tự, mã hoá/giải mã khung `LE32(len) + IV(16) + AES-256-CBC/PKCS7(flag + payload)`.
+  Phần mã hoá nằm ở daemon nên phía WASM chỉ thấy byte thô.
+- Module WASM quảng bá listener trong lệnh tra cứu (`IPRelay|PortRelay|IPLAN|PortLAN|key`),
+  chuyển đường chính sang kênh 3 khi màn hình khởi tạo đến qua kênh đó, và tự quay lại
+  relay nếu kênh trực tiếp hỏng hoặc máy đối tác không cùng LAN.
 
 Phần giao thức Rust thuần nên test được native (`cargo test` trong `src_wasm/ultraviewer`) —
 trong đó có test end-to-end với relay giả lập: đăng ký → tra cứu → login → nhận màn hình →
-gửi chuột/bàn phím.
+gửi chuột/bàn phím, và test đường LAN trực tiếp (chuyển đường + fallback).
+Phía Go có test end-to-end kênh LAN trực tiếp (`bl_ultraviewer_direct_test.go`): listener →
+kết nối máy đối tác giả lập → mã hoá/giải mã hai chiều, đối chiếu vector với `openssl`.
 
 ## 5. Luồng build & phát hành
 

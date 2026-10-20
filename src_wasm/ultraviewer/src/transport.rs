@@ -8,6 +8,8 @@
 //! Mỗi "kênh" là một kết nối TCP/TLS riêng:
 //!   - `CHANNEL_COMMAND`: functions3.ultraviewer.net:443 (đăng ký + tra cứu)
 //!   - `CHANNEL_PEER`: relay được giao (màn hình + điều khiển)
+//!   - `CHANNEL_DIRECT`: kết nối LAN trực tiếp tới máy đối tác (daemon lo
+//!     phần listener và mã hoá AES, phía trình duyệt chỉ thấy byte thô)
 
 use crate::wire::{encode_frame, Result, MAX_FRAME};
 
@@ -15,6 +17,8 @@ use crate::wire::{encode_frame, Result, MAX_FRAME};
 pub const CHANNEL_COMMAND: u8 = 1;
 /// Kênh dữ liệu với máy đối tác (màn hình + bàn phím/chuột).
 pub const CHANNEL_PEER: u8 = 2;
+/// Kênh LAN trực tiếp với máy đối tác (bỏ qua relay).
+pub const CHANNEL_DIRECT: u8 = 3;
 
 /// Một kết nối logic tới relay.
 pub trait Relay {
@@ -27,6 +31,13 @@ pub trait Relay {
 
     /// Đóng kênh.
     fn close(&mut self, channel: u8);
+
+    /// Yêu cầu daemon mở listener LAN cho kênh trực tiếp. Kết quả (IP, cổng,
+    /// khoá) được báo lại qua [`SessionEvent::DirectReady`].
+    fn listen_direct(&mut self) -> Result<()>;
+
+    /// Đóng listener LAN (kết nối trực tiếp đã thiết lập vẫn giữ nguyên).
+    fn close_direct_listener(&mut self);
 }
 
 /// Sự kiện đến từ tầng truyền tải.
@@ -40,6 +51,12 @@ pub enum SessionEvent {
     Closed { channel: u8, message: String },
     /// Byte thô đến từ relay.
     Data { channel: u8, bytes: Vec<u8> },
+    /// Daemon đã mở listener LAN: IP/cổng/khoá để quảng bá trong lệnh tra cứu.
+    DirectReady { ip: String, port: u16, key: String },
+    /// Máy đối tác đã kết nối thẳng vào listener LAN (IP nguồn kết nối).
+    DirectConnected { ip: String },
+    /// Không mở được listener LAN (vẫn dùng đường relay được).
+    DirectFailed { message: String },
 }
 
 /// Bộ tách khung cho một kênh: bỏ header HTTP của relay rồi cắt frame
@@ -52,8 +69,14 @@ pub struct FrameReader {
 }
 
 impl FrameReader {
+    /// Bộ đọc cho kênh của relay (có header HTTP ở đầu).
     pub fn new() -> Self {
         FrameReader { buf: Vec::new(), header: Some(Vec::new()) }
+    }
+
+    /// Bộ đọc cho kênh không có header (LAN trực tiếp).
+    pub fn new_raw() -> Self {
+        FrameReader { buf: Vec::new(), header: None }
     }
 
     /// Bỏ header HTTP của relay (chỉ lần đầu của mỗi kênh).

@@ -23,6 +23,7 @@ Cụ thể:
 | `src/input.rs` | `LinuxViewer/src/input.rs` | Mã hoá chuột/bàn phím (thay `winit::KeyCode` bằng `KeyboardEvent.code`) |
 | `src/chat.rs` | `LinuxViewer/src/chat.rs` | Giao thức chat (12/29/30) |
 | `src/clipboard.rs` | `LinuxViewer/src/clipboard.rs` | Đồng bộ clipboard (5/33) |
+| `src/direct.rs` | `LinuxViewer/src/direct.rs` | Quyết định dùng đường LAN trực tiếp hay đi qua relay (`is_lan_address`, `peer_lan_address`) |
 | `resources/8bit.dat` | `Sources/UltraViewerProtocol/Resources/8bit.dat` | Từ điển zstd do UltraViewer cung cấp (xem mục "Tài nguyên bên thứ ba") |
 
 Các file **viết mới** cho Dev Tools (không có trong MacViewer):
@@ -33,7 +34,7 @@ Các file **viết mới** cho Dev Tools (không có trong MacViewer):
 | `src/transport.rs` | Giao diện tới relay + tách khung length-prefixed, bỏ header HTTP |
 | `src/lib.rs` | Khai báo module + `wasm_glue` (chỉ build cho wasm32) |
 | `src/wasm_glue.rs` | Nối `session` với WebSocket của trình duyệt và vẽ khung hình lên `<canvas>` |
-| `tests/session_flow.rs` | Test end-to-end với relay giả lập (đăng ký → tra cứu → login → màn hình → input) |
+| `tests/session_flow.rs` | Test end-to-end với relay giả lập (đăng ký → tra cứu → login → màn hình → input) + test đường LAN trực tiếp |
 
 Giữ nguyên MIT của MacViewer: xem `LICENSE-MacViewer` trong thư mục này.
 
@@ -59,13 +60,43 @@ Giao thức WebSocket giữa WASM và daemon:
 | --- | --- |
 | WASM → daemon (text) | `{"t":"open","c":1,"host":"...","port":443,"sni":"ultraviewer","cert":"..."}` / `{"t":"close","c":1}` |
 | daemon → WASM (text) | `{"t":"open_ok","c":1,"ip":"192.168.1.10"}` / `{"t":"open_err","c":1,"m":"..."}` / `{"t":"closed","c":1,"m":"..."}` |
-| hai chiều (binary) | byte đầu = số kênh (1 = kênh lệnh, 2 = kênh dữ liệu với máy đối tác), phần còn lại là byte thô |
+| hai chiều (binary) | byte đầu = số kênh (1 = kênh lệnh, 2 = kênh dữ liệu với máy đối tác, 3 = kênh LAN trực tiếp), phần còn lại là byte thô |
+
+## Đường LAN trực tiếp (không đi qua relay)
+
+Khi 2 máy cùng mạng LAN, client gốc của UltraViewer cho phép máy đối tác **tự
+kết nối thẳng** vào máy viewer, nhờ vậy màn hình không phải đi vòng qua máy chủ
+trung gian của UltraViewer (độ trễ giảm từ ~200ms xuống vài ms, và nội dung màn
+hình không rời khỏi mạng nội bộ).
+
+Cơ chế (giống hệt `LinuxViewer/src/direct.rs` của MacViewer):
+
+1. Daemon mở listener TCP trên IP LAN của nó (`internal/service/bl_ultraviewer_direct.go`).
+2. Module WASM gửi kèm "direct details" trong lệnh tra cứu máy đối tác:
+   `IPRelay|PortRelay|IPLAN|PortLAN|key` (`key` = 14 ký tự sinh ngẫu nhiên).
+3. Máy đối tác đọc thông tin đó và tự kết nối vào listener.
+4. Kênh này mã hoá **AES-256-CBC/PKCS7**: khung = `LE32(len) + IV(16) + ciphertext`,
+   khoá = `MD5(key)` chép vào `0..16` và `15..31`. **Phần mã hoá nằm ở daemon**,
+   nên phía trình duyệt chỉ thấy byte thô giống hệt kênh relay.
+5. Khi màn hình khởi tạo (lệnh 0) đến qua kênh này → session **chuyển đường chính**
+   sang kênh trực tiếp (bộ đệm khung hình được reset vì chuỗi khung là của kênh mới).
+
+Điều kiện và xử lý rơi (fallback) — cùng logic với client gốc:
+
+- Chỉ dùng khi 2 máy có **cùng địa chỉ public** (cùng mạng NAT) và máy đối tác có
+  địa chỉ LAN (`direct::peer_lan_address`).
+- Nếu máy đối tác không cùng LAN → **đóng listener** ngay (không để lộ cổng).
+- Listener chỉ mở trong **15 giây**; login trên kênh trực tiếp phải được trả lời
+  trong **8 giây**, nếu không → đăng nhập lại qua relay.
+- Khi đã dùng kênh trực tiếp, relay vẫn mang được tin nhắn phụ (chat, clipboard,
+  truyền file) — màn hình thì đi qua kênh trực tiếp.
+- Kênh trực tiếp đứt → tự quay lại đường relay.
 
 ## Build
 
 ```sh
 ./build.sh          # wasm-pack build --target web --out-dir ../pkg/ultraviewer --release
-cargo test          # 62 test: giao thức + end-to-end với relay giả lập
+cargo test          # 81 test đơn vị + 5 test end-to-end (relay giả lập + LAN trực tiếp)
 ```
 
 Output nằm ở `src_wasm/pkg/ultraviewer/` (gitignored) và được `vite.config.js`
@@ -128,13 +159,10 @@ bộ. Không nhúng bất kỳ mã thực thi Windows nào.
 
 ## Giới hạn
 
-- Chỉ dùng đường qua **relay** (không dùng kết nối trực tiếp trong LAN, vì
-  trình duyệt không mở được socket lắng nghe).
 - Bàn phím theo bố cục vật lý kiểu US (giống MacViewer).
-- Chưa hỗ trợ: truyền file, âm thanh máy đối tác, chọn từng màn hình khi
-  máy đối tác chia sẻ nhiều màn hình.
-- Chỉ dùng đường qua **relay** (không dùng kết nối trực tiếp trong LAN, vì
-  trình duyệt không mở được socket lắng nghe).
+- Đường LAN trực tiếp chỉ dùng được khi 2 máy cùng mạng NAT (cùng địa chỉ
+  public) — nếu khác mạng thì tự động dùng relay.
+- Chưa hỗ trợ: truyền file, âm thanh máy đối tác.
 
 ## Kiểm thử với máy thật
 

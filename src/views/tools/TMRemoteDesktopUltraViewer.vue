@@ -529,6 +529,9 @@ export default {
           me.updateViewOffset();
           // Lưu profile (ID + mật khẩu + tên + danh tính) để lần sau khỏi nhập.
           me.saveProfile();
+          if (client.is_direct_route()) {
+            me.addLog(me.$t("i18nCommon.ultraViewer.connectedDirect"), "success");
+          }
           me.addLog(
             `${me.$t("i18nCommon.ultraViewer.connected")} ${width}x${height}`,
             "success",

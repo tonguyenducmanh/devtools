@@ -14,11 +14,15 @@ package service
 //	  {"t":"open","c":1,"host":"functions3.ultraviewer.net","port":443,
 //	   "sni":"ultraviewer","cert":"functions3.ultraviewer.net"}
 //	  {"t":"close","c":1}
+//	  {"t":"listen","c":3}            mở listener LAN cho đường trực tiếp
 //
 //	text (JSON)  daemon → browser
 //	  {"t":"open_ok","c":1,"ip":"192.168.1.10"}
 //	  {"t":"open_err","c":1,"m":"..."}
 //	  {"t":"closed","c":1,"m":"..."}
+//	  {"t":"listen_ok","c":3,"ip":"192.168.1.10","port":54321,"key":"..."}
+//	  {"t":"listen_err","c":3,"m":"..."}
+//	  {"t":"direct_connected","c":3,"ip":"192.168.1.20"}
 //
 //	binary        cả hai chiều: byte đầu = số kênh, phần còn lại = byte thô.
 
@@ -116,7 +120,8 @@ AWO66GrrUESwN/cgZzL4JLEqz1Y=`
 // ultraViewerControlMessage là message điều khiển (JSON) hai chiều.
 type ultraViewerControlMessage struct {
 	Type string `json:"t"`
-	// Channel là số kênh (1 = kênh lệnh, 2 = kênh dữ liệu với máy đối tác).
+	// Channel là số kênh (1 = kênh lệnh, 2 = kênh dữ liệu với máy đối tác,
+	// 3 = kênh LAN trực tiếp).
 	Channel uint8  `json:"c"`
 	Host    string `json:"host,omitempty"`
 	Port    int    `json:"port,omitempty"`
@@ -124,6 +129,8 @@ type ultraViewerControlMessage struct {
 	Cert    string `json:"cert,omitempty"`
 	Message string `json:"m,omitempty"`
 	IP      string `json:"ip,omitempty"`
+	// Key là khoá phiên của kênh LAN trực tiếp.
+	Key string `json:"key,omitempty"`
 }
 
 // ultraViewerChannel là một kết nối TCP/TLS tới relay.
@@ -163,6 +170,11 @@ type ultraViewerSession struct {
 	mu       sync.Mutex
 	channels map[uint8]*ultraViewerChannel
 	writer   *ultraViewerWriter
+	// Listener LAN cho kênh trực tiếp (mở sau khi trình duyệt yêu cầu).
+	directListener *ultraViewerDirect
+	// Kết nối đã thiết lập với máy đối tác qua đường LAN trực tiếp.
+	directChannel *ultraViewerDirectChannel
+	closed        bool
 }
 
 // HandleUltraViewerWebSocket là endpoint WebSocket cho module WASM UltraViewer.
@@ -229,7 +241,17 @@ func (s *ultraViewerSession) handleControl(control ultraViewerControlMessage) {
 				Message: err.Error(),
 			})
 		}
+	case "listen":
+		// Mở listener LAN để máy đối tác kết nối thẳng (bỏ qua relay).
+		s.startDirectListener()
+	case "listen_close":
+		// Đóng listener LAN nhưng giữ nguyên kết nối đã thiết lập.
+		s.closeDirectListener()
 	case "close":
+		if control.Channel == ultraViewerDirectChannelID {
+			s.closeDirect()
+			return
+		}
 		s.closeChannel(control.Channel)
 	}
 }
@@ -301,6 +323,15 @@ func (s *ultraViewerSession) openChannel(control ultraViewerControlMessage) erro
 
 // writeToChannel ghi byte xuống kênh tương ứng.
 func (s *ultraViewerSession) writeToChannel(channelID uint8, payload []byte) error {
+	if channelID == ultraViewerDirectChannelID {
+		s.mu.Lock()
+		channel := s.directChannel
+		s.mu.Unlock()
+		if channel == nil {
+			return fmt.Errorf("Kênh LAN trực tiếp chưa có máy đối tác kết nối")
+		}
+		return channel.write(payload)
+	}
 	s.mu.Lock()
 	channel := s.channels[channelID]
 	s.mu.Unlock()
@@ -329,10 +360,12 @@ func (s *ultraViewerSession) closeAll() {
 	s.mu.Lock()
 	channels := s.channels
 	s.channels = make(map[uint8]*ultraViewerChannel)
+	s.closed = true
 	s.mu.Unlock()
 	for _, channel := range channels {
 		channel.conn.Close()
 	}
+	s.closeDirect()
 }
 
 // dialUltraViewerRelay mở TCP + TLS tới relay UltraViewer.

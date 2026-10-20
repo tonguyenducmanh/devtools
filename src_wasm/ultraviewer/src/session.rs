@@ -17,10 +17,13 @@ use std::collections::HashMap;
 use crate::chat::{self, ChatEvent};
 use crate::clipboard;
 use crate::cursor::{self, CursorState};
+use crate::direct::{self, DirectListener};
 use crate::input;
 use crate::messages::{self, LoginContext, PeerInfo, Registration, RegistrationReply};
 use crate::screen::{self, Limits, Rect, Renderer, RESET_FRAME_NUMBER};
-use crate::transport::{frame_bytes, FrameReader, Relay, SessionEvent, CHANNEL_COMMAND, CHANNEL_PEER};
+use crate::transport::{
+    frame_bytes, FrameReader, Relay, SessionEvent, CHANNEL_COMMAND, CHANNEL_DIRECT, CHANNEL_PEER,
+};
 use crate::wire::{
     decode_envelope, decode_multipart, forward_envelope, random_string, relay_keepalive_envelope, system_envelope,
     CommandCipher, Envelope, Ipv4, Result, MAX_FRAME,
@@ -35,6 +38,11 @@ pub const DEFAULT_RELAY_HOST: &str = "functions3.ultraviewer.net";
 pub const LOGIN_TIMEOUT_MS: f64 = 20_000.0;
 /// Chu kỳ heartbeat (giống `sendHeartbeat`).
 pub const HEARTBEAT_MS: f64 = 10_000.0;
+/// Thời gian tối đa chờ máy đối tác kết nối thẳng vào listener LAN (15 giây,
+/// giống `direct_window` của client gốc).
+pub const DIRECT_WINDOW_MS: f64 = 15_000.0;
+/// Thời gian tối đa chờ màn hình khởi tạo sau khi gửi login trên kênh trực tiếp.
+pub const DIRECT_INIT_TIMEOUT_MS: f64 = 8_000.0;
 /// Chất lượng hình ảnh mà máy đối tác dùng để nén (30 = nhanh, 45 = cân bằng,
 /// 70 = đẹp). Giống RemoteControlCommands.quality của MacViewer.
 pub const DEFAULT_DISPLAY_QUALITY: i32 = 45;
@@ -102,6 +110,15 @@ enum Phase {
     Closed,
 }
 
+/// Nguồn của một message từ máy đối tác.
+#[derive(Clone, Copy, PartialEq, Debug)]
+enum PeerSource {
+    /// Đi qua relay (có forward envelope).
+    Relay,
+    /// Đi qua kênh LAN trực tiếp (payload thô).
+    Direct,
+}
+
 /// Phiên xem màn hình.
 pub struct Session {
     relay: Box<dyn Relay>,
@@ -162,6 +179,22 @@ pub struct Session {
     /// Chất lượng hình ảnh yêu cầu với máy đối tác.
     display_quality: i32,
     closed: bool,
+    /// Listener LAN do daemon báo (IP/cổng/khoá) để quảng bá trong lệnh tra cứu.
+    direct: Option<DirectListener>,
+    /// Địa chỉ LAN dự kiến của máy đối tác (suy ra từ lệnh tra cứu).
+    direct_expected: Option<Ipv4>,
+    /// Địa chỉ nguồn của kết nối trực tiếp mà máy đối tác vừa mở.
+    direct_peer: Option<String>,
+    /// Đang dùng kênh LAN trực tiếp làm đường chính (màn hình đi kênh này).
+    direct_route: bool,
+    /// Đã gửi lệnh login trên kênh trực tiếp.
+    direct_login_sent: bool,
+    /// Hạn chờ máy đối tác kết nối thẳng vào listener LAN.
+    direct_window: Option<f64>,
+    /// Hạn chờ màn hình khởi tạo trên kênh trực tiếp.
+    direct_deadline: Option<f64>,
+    /// Địa chỉ public mà relay gán cho máy này (để so với máy đối tác).
+    own_public: Option<Ipv4>,
 }
 
 impl Session {
@@ -221,6 +254,14 @@ impl Session {
             last_pointer_sent: 0.0,
             display_quality: DEFAULT_DISPLAY_QUALITY,
             closed: false,
+            direct: None,
+            direct_expected: None,
+            direct_peer: None,
+            direct_route: false,
+            direct_login_sent: false,
+            direct_window: None,
+            direct_deadline: None,
+            own_public: None,
             options,
         })
     }
@@ -346,6 +387,21 @@ impl Session {
         self.view_only
     }
 
+    /// Đang dùng đường LAN trực tiếp hay đi qua relay.
+    pub fn is_direct_route(&self) -> bool {
+        self.direct_route
+    }
+
+    /// Listener LAN đã sẵn sàng (IP/cổng) — dùng để chẩn đoán.
+    pub fn direct_listener(&self) -> Option<(String, u16)> {
+        self.direct.as_ref().map(|d| (d.ip.clone(), d.port))
+    }
+
+    /// Địa chỉ LAN dự kiến của máy đối tác — dùng để chẩn đoán.
+    pub fn direct_expected(&self) -> Option<String> {
+        self.direct_expected.map(|a| a.to_string())
+    }
+
     pub fn version(&self) -> &str {
         &self.version
     }
@@ -369,12 +425,16 @@ impl Session {
 
     // ───────────────────────── vòng đời ─────────────────────────
 
-    /// Bắt đầu: mở kênh lệnh tới relay.
+    /// Bắt đầu: mở kênh lệnh tới relay và listener LAN cho đường trực tiếp.
     pub fn start(&mut self, now: f64) -> Result<()> {
         self.phase = Phase::Registering;
         self.deadline = Some(now + LOGIN_TIMEOUT_MS);
         self.observer.status("Registering this computer…");
-        self.relay.open(CHANNEL_COMMAND, COMMAND_HOST, COMMAND_PORT, COMMAND_HOST)
+        self.relay.open(CHANNEL_COMMAND, COMMAND_HOST, COMMAND_PORT, COMMAND_HOST)?;
+        // Mở listener LAN để máy đối tác có thể kết nối thẳng (nếu cùng LAN).
+        // Thất bại ở bước này không ảnh hưởng gì: vẫn dùng đường relay.
+        let _ = self.relay.listen_direct();
+        Ok(())
     }
 
     /// Xử lý một sự kiện từ tầng truyền tải.
@@ -389,10 +449,25 @@ impl Session {
                     self.fail(&message);
                 }
             }
-            SessionEvent::Closed { channel: _, message } => {
+            SessionEvent::Closed { channel, message } => {
+                if channel == CHANNEL_DIRECT {
+                    self.on_direct_closed();
+                    return;
+                }
+                // Kênh relay đứt mà đang dùng đường LAN trực tiếp → phiên vẫn
+                // chạy được (màn hình không đi qua relay nữa).
+                if channel == CHANNEL_PEER && self.direct_route {
+                    return;
+                }
                 self.fail(&message);
             }
             SessionEvent::Data { channel, bytes } => self.on_data(channel, &bytes, now),
+            SessionEvent::DirectReady { ip, port, key } => self.on_direct_ready(ip, port, key),
+            SessionEvent::DirectConnected { ip } => self.on_direct_connected(ip, now),
+            SessionEvent::DirectFailed { message } => {
+                // Không mở được listener LAN → dùng relay, không báo lỗi.
+                let _ = message;
+            }
         }
     }
 
@@ -408,6 +483,20 @@ impl Session {
             }
             if self.active {
                 self.deadline = None;
+            }
+        }
+        // Hết thời gian chờ máy đối tác kết nối thẳng → đóng listener, dùng relay.
+        if let Some(window) = self.direct_window {
+            if now >= window {
+                self.direct_window = None;
+                self.close_direct_listener();
+            }
+        }
+        // Login trên kênh trực tiếp không được trả lời → quay lại đường relay.
+        if let Some(deadline) = self.direct_deadline {
+            if now >= deadline {
+                self.direct_deadline = None;
+                self.on_direct_failed();
             }
         }
         if self.active && now >= self.next_heartbeat {
@@ -428,6 +517,7 @@ impl Session {
         self.phase = Phase::Closed;
         self.relay.close(CHANNEL_PEER);
         self.relay.close(CHANNEL_COMMAND);
+        self.relay.close(CHANNEL_DIRECT);
         self.observer.closed("Disconnected.");
     }
 
@@ -439,10 +529,20 @@ impl Session {
         self.phase = Phase::Closed;
         self.relay.close(CHANNEL_PEER);
         self.relay.close(CHANNEL_COMMAND);
+        self.relay.close(CHANNEL_DIRECT);
         self.observer.closed(message);
     }
 
     // ───────────────────────── kênh ─────────────────────────
+
+    /// Bộ đọc khung cho một kênh: kênh relay có header HTTP ở đầu, kênh LAN
+    /// trực tiếp thì không có.
+    fn reader_for(channel: u8) -> FrameReader {
+        match channel {
+            CHANNEL_DIRECT => FrameReader::new_raw(),
+            _ => FrameReader::new(),
+        }
+    }
 
     fn on_opened(&mut self, channel: u8, now: f64) {
         match channel {
@@ -478,8 +578,90 @@ impl Session {
 
     fn write(&mut self, channel: u8, bytes: &[u8]) {
         if let Err(e) = self.relay.write(channel, bytes) {
-            self.fail(&format!("The UltraViewer connection failed: {e}"));
+            // Kênh LAN trực tiếp là tuỳ chọn: lỗi ghi ở đây không được làm hỏng
+            // cả phiên (daemon sẽ báo "closed" để ta quay lại đường relay).
+            if channel != CHANNEL_DIRECT {
+                self.fail(&format!("The UltraViewer connection failed: {e}"));
+            }
         }
+    }
+
+    // ───────────────────────── đường LAN trực tiếp ─────────────────────────
+
+    /// Daemon đã mở listener LAN: lưu thông tin để quảng bá trong lệnh tra cứu.
+    fn on_direct_ready(&mut self, ip: String, port: u16, key: String) {
+        if port == 0 || key.is_empty() || ip.is_empty() {
+            return;
+        }
+        self.direct = Some(DirectListener { ip, port, key });
+    }
+
+    /// Máy đối tác đã kết nối thẳng vào listener LAN.
+    fn on_direct_connected(&mut self, ip: String, now: f64) {
+        if self.closed || self.direct_route {
+            return;
+        }
+        self.direct_peer = Some(ip);
+        // Máy đối tác có thể kết nối trước khi ta nhận được kết quả tra cứu
+        // → chờ tới khi biết địa chỉ LAN dự kiến rồi mới gửi login.
+        if self.direct_expected.is_none() {
+            return;
+        }
+        self.begin_direct_login(now);
+    }
+
+    /// Gửi lệnh login trên kênh LAN trực tiếp (đã biết máy đối tác).
+    fn begin_direct_login(&mut self, now: f64) {
+        if self.direct_login_sent {
+            return;
+        }
+        let Some(expected) = self.direct_expected else { return };
+        let Some(ip) = self.direct_peer.clone() else { return };
+        // Chỉ nhận đúng máy đối tác trong lệnh tra cứu (chống chiếm cổng).
+        if !Ipv4::parse(&ip).map(|actual| actual == expected).unwrap_or(false) {
+            self.relay.close(CHANNEL_DIRECT);
+            self.direct_peer = None;
+            return;
+        }
+        self.direct_login_sent = true;
+        self.send_login_on(CHANNEL_DIRECT, 0, false);
+        self.direct_deadline = Some(now + DIRECT_INIT_TIMEOUT_MS);
+    }
+
+    /// Kênh trực tiếp hỏng trước khi có màn hình → quay lại đường relay.
+    fn on_direct_failed(&mut self) {
+        let was_login = self.direct_login_sent;
+        self.direct_login_sent = false;
+        self.direct_peer = None;
+        if self.direct_route {
+            // Đang chạy trên kênh trực tiếp mà kênh đó chết → khôi phục relay.
+            self.direct_route = false;
+            self.active = false;
+            self.screen = None;
+            self.observer.status("Restoring the relay connection…");
+            self.send_login(-1, true);
+            return;
+        }
+        // Login trên kênh trực tiếp không được trả lời → đăng nhập lại qua relay
+        // (máy đối tác có thể đã chuyển sang kênh trực tiếp rồi bỏ ngang).
+        if was_login && self.peer.is_some() {
+            self.send_login(if self.accepted { -1 } else { 0 }, false);
+        }
+    }
+
+    /// Kênh trực tiếp đã đóng (dù đang dùng hay chỉ là ứng viên).
+    fn on_direct_closed(&mut self) {
+        let was_route = self.direct_route;
+        self.on_direct_failed();
+        if !was_route {
+            self.direct_login_sent = false;
+            self.direct_peer = None;
+        }
+    }
+
+    /// Đóng listener LAN (giữ nguyên kết nối trực tiếp đã thiết lập).
+    fn close_direct_listener(&mut self) {
+        self.relay.close_direct_listener();
     }
 
     /// Gửi một frame length-prefixed xuống relay.
@@ -492,7 +674,10 @@ impl Session {
     }
 
     fn on_data(&mut self, channel: u8, bytes: &[u8], now: f64) {
-        let reader = self.readers.entry(channel).or_insert_with(FrameReader::new);
+        let reader = self
+            .readers
+            .entry(channel)
+            .or_insert_with(|| Self::reader_for(channel));
         let frames = match reader.push(bytes) {
             Ok(f) => f,
             Err(e) => {
@@ -504,6 +689,7 @@ impl Session {
             match channel {
                 CHANNEL_COMMAND => self.on_command_frame(&frame, now),
                 CHANNEL_PEER => self.on_peer_frame(&frame),
+                CHANNEL_DIRECT => self.on_direct_frame(&frame),
                 _ => {}
             }
         }
@@ -549,6 +735,7 @@ impl Session {
                 }
             };
             self.local_id = reply.id.clone();
+            self.own_public = Some(reply.public_address);
             self.phase = Phase::LookingUp;
             self.deadline = Some(now + LOGIN_TIMEOUT_MS);
             self.observer.status("Finding the partner computer…");
@@ -576,23 +763,34 @@ impl Session {
         }
     }
 
-    fn send_lookup(&mut self, _registration: &RegistrationReply) {
-        let Some(registration) = self.registration.as_ref() else { return };
+    fn send_lookup(&mut self, registration: &RegistrationReply) {
+        let Some(registration_fields) = self.registration.as_ref() else { return };
+        // Quảng bá listener LAN để máy đối tác có thể kết nối thẳng vào.
+        // Định dạng: "IPRelay|PortRelay|IPLAN|PortLAN|key" (xem direct_details_text).
+        let direct_details = match (&self.direct, self.own_public) {
+            (Some(listener), Some(own_public)) => messages::direct_details_text(
+                &own_public.to_string(),
+                registration.public_port,
+                &listener.ip,
+                listener.port,
+                &listener.key,
+            )
+            .unwrap_or_default(),
+            _ => String::new(),
+        };
         let text = match messages::lookup_fields(&messages::LookupRequest {
             target_id: self.options.partner_id.trim(),
             password: &self.options.password,
             license: "",
             license2: "",
             local_id: &self.local_id,
-            local_password: &registration.password,
+            local_password: &registration_fields.password,
             correlation: self.correlation,
             referral: "0",
             payment: "0",
             tz_offset_minutes: self.options.tz_offset_minutes,
             dictionary_count: 1,
-            // Không dùng kênh trực tiếp trong LAN: trình duyệt không mở được
-            // socket lắng nghe, nên phần chi tiết để trống.
-            direct_details: "",
+            direct_details: &direct_details,
         }) {
             Ok(t) => t,
             Err(e) => {
@@ -618,7 +816,34 @@ impl Session {
             peer.relay_hostname.clone()
         };
         let relay_ip = peer.relay_ip.clone();
+        // Có dùng được đường LAN trực tiếp hay không? Chỉ khi 2 máy có cùng
+        // địa chỉ public (cùng mạng NAT) và máy đối tác có địa chỉ LAN.
+        let peer_public_ip = peer.public_ip;
+        let peer_lan_ip = peer.lan_ip.clone();
+        let peer_direct_details = peer.direct_details.clone();
         self.peer = Some(peer);
+        self.direct_expected = match self.own_public {
+            Some(own_public) => direct::peer_lan_address(
+                peer_public_ip,
+                own_public,
+                peer_direct_details.as_deref(),
+                &peer_lan_ip,
+            ),
+            None => None,
+        };
+        if self.direct_expected.is_none() {
+            // Không cùng LAN → không để lộ cổng lắng nghe.
+            self.close_direct_listener();
+            if self.direct_peer.is_some() {
+                self.relay.close(CHANNEL_DIRECT);
+                self.direct_peer = None;
+            }
+        } else {
+            self.direct_window = Some(now + DIRECT_WINDOW_MS);
+            // Máy đối tác có thể đã kết nối vào listener trước khi ta nhận
+            // được kết quả tra cứu → gửi login ngay nếu đã kết nối.
+            self.begin_direct_login(now);
+        }
         if let Err(e) = self.relay.open(CHANNEL_PEER, &relay_ip, COMMAND_PORT, &host) {
             self.fail(&format!("Could not reach the UltraViewer relay: {e}"));
         }
@@ -637,30 +862,57 @@ impl Session {
             }
         };
         let known = ip == self.peer_ip && port == self.peer_port;
+        let direct_selected = self.direct_route;
         let parts = match decode_multipart(payload) {
             Ok(p) => p,
             Err(e) => {
-                if known {
+                if known && !direct_selected {
                     self.fail(&format!("The partner sent an invalid message: {e}"));
                 }
                 return;
             }
         };
         let Some(&command) = parts.first().and_then(|p| p.first()) else {
-            if known {
+            if known && !direct_selected {
                 self.fail("The partner returned incomplete screen information.");
             }
             return;
         };
+        // Khi đã chuyển sang đường LAN trực tiếp, relay chỉ còn mang tin nhắn
+        // phụ (chat, clipboard, truyền file) — màn hình đi qua kênh trực tiếp.
+        if direct_selected && !(self.active && known && relay_aux_command(command)) {
+            return;
+        }
         // Lệnh 26 là "đổi relay" và luôn được chấp nhận (không theo địa chỉ cũ).
         let relay_switch = command == 26 && parts.get(1) == Some(&self.connection_hash.as_bytes());
         if !known && !relay_switch {
             return;
         }
-        self.consume_app(&parts);
+        self.consume_app(&parts, PeerSource::Relay);
     }
 
-    fn consume_app(&mut self, parts: &[&[u8]]) {
+    /// Khung đến từ kênh LAN trực tiếp: byte cờ định dạng + payload thô
+    /// (daemon đã giải mã AES), khác với kênh relay là có forward envelope.
+    fn on_direct_frame(&mut self, frame: &[u8]) {
+        // Byte đầu là cờ định dạng (0 = ASCII, 1 = UTF-16).
+        if frame.len() < 2 {
+            return;
+        }
+        let parts = match decode_multipart(&frame[1..]) {
+            Ok(p) => p,
+            Err(_) => return,
+        };
+        if parts.is_empty() {
+            return;
+        }
+        // Chỉ ứng viên đã gửi login mới được khởi tạo màn hình.
+        if !self.direct_login_sent {
+            return;
+        }
+        self.consume_app(&parts, PeerSource::Direct);
+    }
+
+    fn consume_app(&mut self, parts: &[&[u8]], source: PeerSource) {
         let Some(&command) = parts.first().and_then(|p| p.first()) else {
             self.fail("The partner returned incomplete screen information.");
             return;
@@ -670,7 +922,7 @@ impl Session {
         }
         let active = self.active;
         match command {
-            0 => self.initialize(parts),
+            0 => self.initialize(parts, source),
             1 if active => self.frame(parts),
             48 if active => {
                 if let Some(renderer) = self.screen.as_mut() {
@@ -729,7 +981,7 @@ impl Session {
         }
     }
 
-    fn initialize(&mut self, parts: &[&[u8]]) {
+    fn initialize(&mut self, parts: &[&[u8]], source: PeerSource) {
         let init = match screen::parse_init(parts) {
             Ok(i) => i,
             Err(e) => {
@@ -741,6 +993,17 @@ impl Session {
         if !messages::version_at_least(&version, [6, 0, 0]) {
             self.fail(&format!("This UltraViewer version ({version}) is not supported yet."));
             return;
+        }
+        // Màn hình khởi tạo đến qua kênh LAN trực tiếp → chuyển đường chính
+        // sang kênh đó (độ trễ thấp hơn nhiều so với đi vòng relay).
+        if source == PeerSource::Direct {
+            self.direct_route = true;
+            self.direct_deadline = None;
+            self.direct_window = None;
+            // Kênh mới bắt đầu chuỗi khung hình và cache mới.
+            self.screen = None;
+            self.close_direct_listener();
+            self.observer.status("Connected directly over the local network.");
         }
         let changed = self
             .screen
@@ -824,26 +1087,66 @@ impl Session {
 
     // ───────────────────────── gửi dữ liệu ─────────────────────────
 
-    /// Gửi payload tới máy đối tác qua relay.
+    /// Gửi payload tới máy đối tác qua đường đang hoạt động.
+    ///
+    /// - Đường relay: bọc trong forward envelope tới IP/port của máy đối tác.
+    /// - Đường LAN trực tiếp: gửi thô kèm byte cờ định dạng (daemon lo phần
+    ///   mã hoá, byte cờ nằm ngoài phần mã hoá giống client gốc).
     fn send_peer(&mut self, payload: &[u8]) {
+        self.send_peer_flagged(false, payload);
+    }
+
+    /// Gửi payload kèm cờ định dạng (chat/clipboard dùng UTF-16).
+    fn send_peer_flagged(&mut self, format_flag: bool, payload: &[u8]) {
+        if self.direct_route {
+            self.record_sent(payload);
+            self.send_frame(CHANNEL_DIRECT, &flagged(format_flag, payload));
+            return;
+        }
         if self.peer_port == 0 {
             return;
         }
+        self.record_sent(payload);
+        let envelope = forward_envelope(self.peer_ip, self.peer_port, format_flag, payload);
+        self.send_frame(CHANNEL_PEER, &envelope);
+    }
+
+    /// Ghi lại payload đã gửi (để chẩn đoán).
+    fn record_sent(&mut self, payload: &[u8]) {
         if self.sent_payloads.len() < 64 {
             let text = String::from_utf8_lossy(payload);
             let preview: String = text.chars().take(40).collect();
             self.sent_payloads.push(format!("{} ({} byte)", preview, payload.len()));
         }
-        let envelope = forward_envelope(self.peer_ip, self.peer_port, false, payload);
-        self.send_frame(CHANNEL_PEER, &envelope);
     }
 
+    /// Gửi lệnh login qua relay (giống `login_relay` của client gốc).
     fn send_login(&mut self, control_mode: i32, clear_control_mode: bool) {
-        let Some(peer) = self.peer.clone() else { return };
+        self.send_login_on(CHANNEL_PEER, control_mode, clear_control_mode);
+    }
+
+    /// Gửi lệnh login qua một kênh cụ thể.
+    fn send_login_on(&mut self, channel: u8, control_mode: i32, clear_control_mode: bool) {
+        let Some(text) = self.build_login(control_mode, clear_control_mode) else { return };
+        match channel {
+            CHANNEL_DIRECT => self.send_frame(CHANNEL_DIRECT, &flagged(false, text.as_bytes())),
+            _ => {
+                if self.peer_port == 0 {
+                    return;
+                }
+                let envelope = forward_envelope(self.peer_ip, self.peer_port, false, text.as_bytes());
+                self.send_frame(CHANNEL_PEER, &envelope);
+            }
+        }
+    }
+
+    /// Dựng nội dung lệnh login (23 trường) gửi cho máy đối tác.
+    fn build_login(&mut self, control_mode: i32, clear_control_mode: bool) -> Option<String> {
+        let peer = self.peer.clone()?;
         let nonce = random_string(8, b"0123456789");
         let display = self.login_display_name();
         let (w, h) = self.options.local_screen;
-        let text = match messages::login_text(&self.options.password, &nonce, &LoginContext {
+        match messages::login_text(&self.options.password, &nonce, &LoginContext {
             screen_width: w,
             screen_height: h,
             local_id: &self.local_id,
@@ -853,13 +1156,12 @@ impl Session {
             connection_hash: &self.connection_hash,
             partner_secret_token: &peer.secret_token,
         }) {
-            Ok(t) => t,
+            Ok(text) => Some(text),
             Err(e) => {
                 self.fail(&format!("Could not build the login message: {e}"));
-                return;
+                None
             }
-        };
-        self.send_peer(text.as_bytes());
+        }
     }
 
     /// Tên gửi cho máy đối tác: ASCII, bỏ ký tự phân cách, tối đa 20 ký tự.
@@ -1008,8 +1310,7 @@ impl Session {
             return Err("The remote session is not connected.".into());
         }
         let out = chat::viewer_to_host(text)?;
-        let envelope = forward_envelope(self.peer_ip, self.peer_port, out.format_flag, &out.payload);
-        self.send_frame(CHANNEL_PEER, &envelope);
+        self.send_peer_flagged(out.format_flag, &out.payload);
         Ok(())
     }
 
@@ -1024,8 +1325,7 @@ impl Session {
             return Err("The remote session is not connected.".into());
         }
         let out = clipboard::viewer_to_host(text)?;
-        let envelope = forward_envelope(self.peer_ip, self.peer_port, out.format_flag, &out.payload);
-        self.send_frame(CHANNEL_PEER, &envelope);
+        self.send_peer_flagged(out.format_flag, &out.payload);
         Ok(())
     }
 
@@ -1048,6 +1348,21 @@ impl Session {
     pub fn is_control_enabled(&self) -> bool {
         self.control_enabled
     }
+}
+
+/// Bọc payload với byte cờ định dạng (giống envelope của kênh LAN trực tiếp
+/// của client gốc: cờ nằm ngoài phần mã hoá).
+fn flagged(format_flag: bool, payload: &[u8]) -> Vec<u8> {
+    let mut out = Vec::with_capacity(payload.len() + 1);
+    out.push(if format_flag { 1 } else { 0 });
+    out.extend_from_slice(payload);
+    out
+}
+
+/// Khi đang dùng đường LAN trực tiếp, relay vẫn có thể mang tin nhắn phụ
+/// (chat, clipboard, truyền file) — xem `relay_aux_command` của client gốc.
+fn relay_aux_command(command: u8) -> bool {
+    matches!(command, 5 | 33 | 12 | 29 | 30 | 13 | 14 | 15 | 16 | 21)
 }
 
 /// Tên phím hợp lệ (dùng để kiểm tra nhanh trước khi gửi).

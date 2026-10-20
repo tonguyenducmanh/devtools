@@ -14,7 +14,7 @@ use std::rc::Rc;
 use ultraviewer_client::messages::CLIENT_VERSION;
 use ultraviewer_client::screen::Rect;
 use ultraviewer_client::session::{ConnectOptions, Session, SessionObserver};
-use ultraviewer_client::transport::{Relay, SessionEvent, CHANNEL_COMMAND, CHANNEL_PEER};
+use ultraviewer_client::transport::{Relay, SessionEvent, CHANNEL_COMMAND, CHANNEL_DIRECT, CHANNEL_PEER};
 use ultraviewer_client::wire::{
     decode_envelope, encode_frame, encode_multipart, forward_envelope, system_envelope, CommandCipher, Envelope, Ipv4,
 };
@@ -31,6 +31,10 @@ struct MockState {
     opened: Vec<(u8, String, u16, String)>,
     /// Kênh đã gửi header HTTP (relay chỉ trả header một lần, ở đầu kênh).
     http_sent: Vec<u8>,
+    /// Số lần yêu cầu mở listener LAN.
+    direct_listens: usize,
+    /// Đã yêu cầu đóng listener LAN.
+    direct_listener_closed: bool,
 }
 
 struct MockRelay {
@@ -51,6 +55,15 @@ impl Relay for MockRelay {
     }
 
     fn close(&mut self, _channel: u8) {}
+
+    fn listen_direct(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        self.state.borrow_mut().direct_listens += 1;
+        Ok(())
+    }
+
+    fn close_direct_listener(&mut self) {
+        self.state.borrow_mut().direct_listener_closed = true;
+    }
 }
 
 /// Ghi lại các sự kiện mà phiên phát ra.
@@ -106,6 +119,18 @@ fn push_data(state: &Rc<RefCell<MockState>>, channel: u8, frame: &[u8]) {
     }
     payload.extend_from_slice(&encode_frame(frame));
     state.pending.push(SessionEvent::Data { channel, bytes: payload });
+}
+
+/// Đưa dữ liệu đến từ kênh LAN trực tiếp (không có header HTTP, payload
+/// bắt đầu bằng byte cờ định dạng).
+fn push_direct_data(state: &Rc<RefCell<MockState>>, payload: &[u8]) {
+    let mut state = state.borrow_mut();
+    let mut frame = vec![0u8];
+    frame.extend_from_slice(payload);
+    state.pending.push(SessionEvent::Data {
+        channel: CHANNEL_DIRECT,
+        bytes: encode_frame(&frame),
+    });
 }
 
 /// Đưa các sự kiện đang chờ vào phiên. Lặp lại vì một sự kiện có thể sinh ra
@@ -416,11 +441,251 @@ fn full_session_flow_reaches_screen_and_input() {
     assert_eq!(recorder.borrow().closed.len(), 1);
 }
 
+/// Màn hình từ máy đối tác, dựng thành payload multipart.
+fn init_payload(width: i32, height: i32) -> Vec<u8> {
+    let init = screen_init_parts(width, height);
+    let refs: Vec<&[u8]> = init.iter().map(|p| p.as_slice()).collect();
+    encode_multipart(&refs)
+}
+
+#[test]
+fn lan_direct_route_takes_over_when_partner_shares_the_lan() {
+    let state = Rc::new(RefCell::new(MockState::default()));
+    let recorder = Rc::new(RefCell::new(Recorder::default()));
+    let options = ConnectOptions {
+        partner_id: "123456789".into(),
+        password: "secret".into(),
+        display_name: "DevTools".into(),
+        device_identity: "A".repeat(32),
+        device_password: "12345678".into(),
+        local_screen: (1920, 1080),
+        tz_offset_minutes: 420,
+        local_ip: "192.168.1.5".into(),
+    };
+    let mut session = Session::new(
+        Box::new(MockRelay { state: state.clone() }),
+        Box::new(ObserverProxy { recorder: recorder.clone() }),
+        options,
+    )
+    .expect("tạo phiên thất bại");
+
+    session.start(0.0).expect("mở phiên thất bại");
+    pump(&mut session, &state);
+    // Phiên phải yêu cầu daemon mở listener LAN ngay từ đầu.
+    assert_eq!(state.borrow().direct_listens, 1);
+
+    // Daemon báo đã mở listener LAN (IP/cổng/khoá).
+    state.borrow_mut().pending.push(SessionEvent::DirectReady {
+        ip: "192.168.1.5".into(),
+        port: 54321,
+        key: "abc123XYZ4567".into(),
+    });
+    pump(&mut session, &state);
+
+    // Trả lời đăng ký (public address = 203.0.113.7).
+    push_data(
+        &state,
+        CHANNEL_COMMAND,
+        &system_envelope(b"3:443:00111222333:203.0.113.7::0:ping-list:-1:17/10/2026:relay.example:opaque-token", false),
+    );
+    pump(&mut session, &state);
+
+    // Lệnh tra cứu phải quảng bá listener LAN: "IPRelay|PortRelay|IPLAN|PortLAN|key".
+    let lookup = last_command_text(&state);
+    let lookup_fields: Vec<&str> = lookup.split(':').collect();
+    assert_eq!(lookup_fields.len(), 17);
+    assert_eq!(lookup_fields[16], "203.0.113.7|443|192.168.1.5|54321|abc123XYZ4567");
+    let correlation = lookup_correlation(&lookup);
+
+    // Máy đối tác cùng địa chỉ public (cùng NAT) và có direct details.
+    let reply = format!(
+        "8:1:192.168.1.20:unused:203.0.113.7:54000:5900:5901:TmFtZQ==:55100:unused:198.51.100.2:-1:123:relay.example:x:x:x:x:x:secret:192.168.1.20|5555:{correlation}"
+    );
+    push_data(&state, CHANNEL_COMMAND, &system_envelope(reply.as_bytes(), false));
+    pump(&mut session, &state);
+
+    // Cùng LAN → không đóng listener.
+    assert!(!state.borrow().direct_listener_closed);
+
+    // Máy đối tác kết nối thẳng vào listener → phiên gửi login trên kênh direct.
+    state.borrow_mut().pending.push(SessionEvent::DirectConnected {
+        ip: "192.168.1.20".into(),
+    });
+    pump(&mut session, &state);
+
+    let sent = state.borrow().sent.clone();
+    let direct_login = sent
+        .iter()
+        .find(|(channel, bytes)| *channel == CHANNEL_DIRECT && bytes.len() > 8)
+        .map(|(_, bytes)| bytes[4..].to_vec())
+        .expect("phải gửi login trên kênh LAN trực tiếp");
+    // Kênh direct không có forward envelope: byte đầu là cờ định dạng.
+    assert_eq!(direct_login[0], 0);
+    let login = String::from_utf8(direct_login[1..].to_vec()).expect("login phải là ASCII");
+    assert!(login.starts_with("login:"));
+
+    // Màn hình khởi tạo đến qua kênh direct → chuyển đường chính sang direct.
+    push_direct_data(&state, &init_payload(8, 4));
+    pump(&mut session, &state);
+    assert_eq!(recorder.borrow().connected, vec![(8, 4)]);
+    assert!(session.is_connected());
+
+    // Input phải đi qua kênh direct (không bọc forward envelope).
+    let before = state.borrow().sent.len();
+    session.on_pointer_move(3, 1);
+    session.flush_pointer(1_000.0);
+    let sent = state.borrow().sent.clone();
+    assert!(sent.len() > before);
+    let direct_input = sent
+        .iter()
+        .rev()
+        .find(|(channel, _)| *channel == CHANNEL_DIRECT)
+        .map(|(_, bytes)| bytes[4..].to_vec())
+        .expect("input phải đi qua kênh LAN trực tiếp");
+    assert_eq!(direct_input[0], 0, "byte cờ định dạng");
+    assert!(String::from_utf8_lossy(&direct_input[1..]).starts_with("8|||512|||"));
+
+    // Không còn payload nào đi qua relay sau khi chuyển đường.
+    let relay_inputs = sent
+        .iter()
+        .filter(|(channel, bytes)| *channel == CHANNEL_PEER && bytes.len() > 8)
+        .filter(|(_, bytes)| {
+            matches!(decode_envelope(&bytes[4..]), Ok(Envelope::Forward { payload, .. })
+                if payload.starts_with(b"8|||512|||"))
+        })
+        .count();
+    assert_eq!(relay_inputs, 0, "input không được đi qua relay nữa");
+}
+
+#[test]
+fn lan_direct_login_waits_for_the_lookup_reply() {
+    // Máy đối tác có thể kết nối thẳng vào listener TRƯỚC khi ta nhận được
+    // kết quả tra cứu → phải chờ biết địa chỉ LAN dự kiến rồi mới gửi login.
+    let state = Rc::new(RefCell::new(MockState::default()));
+    let recorder = Rc::new(RefCell::new(Recorder::default()));
+    let options = ConnectOptions {
+        partner_id: "123456789".into(),
+        password: "secret".into(),
+        display_name: "DevTools".into(),
+        device_identity: "A".repeat(32),
+        device_password: "12345678".into(),
+        local_screen: (1920, 1080),
+        local_ip: "192.168.1.5".into(),
+        ..Default::default()
+    };
+    let mut session = Session::new(
+        Box::new(MockRelay { state: state.clone() }),
+        Box::new(ObserverProxy { recorder: recorder.clone() }),
+        options,
+    )
+    .expect("tạo phiên thất bại");
+
+    session.start(0.0).expect("mở phiên thất bại");
+    pump(&mut session, &state);
+    state.borrow_mut().pending.push(SessionEvent::DirectReady {
+        ip: "192.168.1.5".into(),
+        port: 54321,
+        key: "abc123XYZ4567".into(),
+    });
+    pump(&mut session, &state);
+
+    // Đăng ký → gửi lệnh tra cứu.
+    push_data(
+        &state,
+        CHANNEL_COMMAND,
+        &system_envelope(b"3:443:00111222333:203.0.113.7::0:ping-list:-1:17/10/2026:relay.example:opaque-token", false),
+    );
+    pump(&mut session, &state);
+    let lookup = last_command_text(&state);
+    let correlation = lookup_correlation(&lookup);
+
+    // Máy đối tác kết nối tới listener TRƯỚC khi có kết quả tra cứu.
+    state.borrow_mut().pending.push(SessionEvent::DirectConnected {
+        ip: "192.168.1.20".into(),
+    });
+    pump(&mut session, &state);
+    let sent = state.borrow().sent.clone();
+    assert!(
+        !sent.iter().any(|(channel, _)| *channel == CHANNEL_DIRECT),
+        "chưa được gửi login khi chưa biết địa chỉ LAN của máy đối tác"
+    );
+
+    // Kết quả tra cứu tới → lúc này mới gửi login trên kênh trực tiếp.
+    let reply = format!(
+        "8:1:192.168.1.20:unused:203.0.113.7:54000:5900:5901:TmFtZQ==:55100:unused:198.51.100.2:-1:123:relay.example:x:x:x:x:x:secret:192.168.1.20|5555:{correlation}"
+    );
+    push_data(&state, CHANNEL_COMMAND, &system_envelope(reply.as_bytes(), false));
+    pump(&mut session, &state);
+    let sent = state.borrow().sent.clone();
+    let direct_login = sent
+        .iter()
+        .find(|(channel, bytes)| *channel == CHANNEL_DIRECT && bytes.len() > 8)
+        .map(|(_, bytes)| bytes[4..].to_vec())
+        .expect("phải gửi login trên kênh LAN trực tiếp");
+    assert_eq!(direct_login[0], 0);
+    assert!(String::from_utf8_lossy(&direct_login[1..]).starts_with("login:"));
+}
+
+#[test]
+fn lan_direct_is_skipped_when_partner_is_on_another_network() {
+    let state = Rc::new(RefCell::new(MockState::default()));
+    let recorder = Rc::new(RefCell::new(Recorder::default()));
+    let options = ConnectOptions {
+        partner_id: "123456789".into(),
+        password: "secret".into(),
+        display_name: "DevTools".into(),
+        device_identity: "A".repeat(32),
+        device_password: "12345678".into(),
+        local_ip: "192.168.1.5".into(),
+        ..Default::default()
+    };
+    let mut session = Session::new(
+        Box::new(MockRelay { state: state.clone() }),
+        Box::new(ObserverProxy { recorder: recorder.clone() }),
+        options,
+    )
+    .expect("tạo phiên thất bại");
+
+    session.start(0.0).expect("mở phiên thất bại");
+    pump(&mut session, &state);
+    state.borrow_mut().pending.push(SessionEvent::DirectReady {
+        ip: "192.168.1.5".into(),
+        port: 54321,
+        key: "abc123XYZ4567".into(),
+    });
+    pump(&mut session, &state);
+    push_data(
+        &state,
+        CHANNEL_COMMAND,
+        &system_envelope(b"3:443:00111222333:203.0.113.7::0:ping-list:-1:17/10/2026:relay.example:opaque-token", false),
+    );
+    pump(&mut session, &state);
+    let lookup = last_command_text(&state);
+    let correlation = lookup_correlation(&lookup);
+
+    // Máy đối tác khác địa chỉ public → chắc chắn không cùng LAN.
+    let reply = format!(
+        "8:1:192.0.2.9:unused:203.0.113.9:54000:5900:5901:TmFtZQ==:55100:unused:198.51.100.2:-1:123:relay.example:x:x:x:x:x:secret:192.0.2.9|5555:{correlation}"
+    );
+    push_data(&state, CHANNEL_COMMAND, &system_envelope(reply.as_bytes(), false));
+    pump(&mut session, &state);
+
+    // Phải đóng listener LAN (không để lộ cổng).
+    assert!(state.borrow().direct_listener_closed);
+
+    // Kết nối trực tiếp đến sau đó bị bỏ qua.
+    state.borrow_mut().pending.push(SessionEvent::DirectConnected {
+        ip: "192.0.2.9".into(),
+    });
+    pump(&mut session, &state);
+    let sent = state.borrow().sent.clone();
+    assert!(!sent.iter().any(|(channel, _)| *channel == CHANNEL_DIRECT));
+}
+
 /// Observer dùng chung để test đọc lại được sự kiện.
 struct ObserverProxy {
     recorder: Rc<RefCell<Recorder>>,
 }
-
 impl SessionObserver for ObserverProxy {
     fn status(&mut self, message: &str) {
         self.recorder.borrow_mut().status.push(message.to_string());
