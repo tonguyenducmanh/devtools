@@ -58,4 +58,7 @@ export const EnumCacheConfig = {
   PostgreSQLSavedQuery: 65,
   PostgreSQLBuiltinIntellisense: 66,
   AgreementAccepted: 67,
+  UltraViewerConfigLayout: 68,
+  UltraViewerDeviceIdentity: 69,
+  UltraViewerDisplayName: 70,
 };

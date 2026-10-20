@@ -87,6 +87,13 @@ export const sidebarConfig = [
     groupTitleKey: "i18nCommon.group.RemoteDesktop",
     children: [
       {
+        name: "TMRemoteDesktopUltraViewer",
+        component: () => import("@/views/tools/TMRemoteDesktopUltraViewer.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.remoteDesktopUltraViewer",
+        },
+      },
+      {
         name: "TMRemoteDesktopRDP",
         component: () => import("@/views/tools/TMRemoteDesktopRDP.vue"),
         meta: {

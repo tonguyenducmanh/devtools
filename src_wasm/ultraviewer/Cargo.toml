@@ -1,0 +1,55 @@
+[package]
+name = "ultraviewer-client"
+version = "0.1.0"
+edition = "2021"
+description = "UltraViewer-compatible remote desktop viewer client (Rust → wasm-pack)"
+license = "MIT"
+
+[lib]
+# `rlib` để chạy `cargo test` cho phần giao thức (test chạy native, không cần browser).
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Phải khớp đúng với wasm-bindgen CLI mà wasm-pack dùng (0.2.114 — cùng bản
+# với module iron_rdp). Lệch phiên bản thì wasm-bindgen sinh ra glue hỏng
+# (thiếu file `_bg.js`, import "env" bị bỏ trống) và module không load được.
+wasm-bindgen = "=0.2.114"
+js-sys = "=0.3.91"
+
+# Giao thức (port từ MacViewer/LinuxViewer — MIT, DeanOpen/MacViewer)
+base64 = "0.22"
+md-5 = "0.10"
+sha1 = "0.10"
+cbc = { version = "0.1", features = ["alloc"] }
+des = "0.8"
+# Bộ giải nén zstd thuần Rust: thư viện C (zstd-safe) không link được vào
+# wasm32-unknown-unknown nên các hàm ZSTD_* thành import "env" và module
+# không instantiate được trong trình duyệt.
+ruzstd = "0.9"
+jpeg-decoder = { version = "0.3", default-features = false }
+# Giải m�� ảnh con trỏ dạng PNG (thuần Rust, chạy được trong wasm)
+png = "0.17"
+
+# `wasm_js` dùng crypto.getRandomValues của trình duyệt (native build vẫn dùng
+# backend mặc định của getrandom nên `cargo test` chạy được).
+getrandom = { version = "0.3", features = ["wasm_js"] }
+
+[dependencies.web-sys]
+version = "=0.3.91"
+features = [
+  "BinaryType",
+  "CanvasRenderingContext2d",
+  "CloseEvent",
+  "ErrorEvent",
+  "Event",
+  "HtmlCanvasElement",
+  "ImageData",
+  "MessageEvent",
+  "Performance",
+  "WebSocket",
+  "Window",
+]
+
+[profile.release]
+lto = "thin"
+opt-level = "s"

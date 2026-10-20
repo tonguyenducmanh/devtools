@@ -540,6 +540,37 @@ export default {
       },
     },
     
+    ultraViewer: {
+      purpose: {
+        title: "What is UltraViewer?",
+        content:
+          "UltraViewer connects to computers running the UltraViewer application on Windows. The protocol is implemented in a WebAssembly module, so the tool works on every platform.",
+      },
+      howToUse: {
+        title: "How to Use",
+        inputHost:
+          "On the partner computer, read the ID and password shown in the UltraViewer window.",
+        inputCredentials: "Enter that ID and password in the Connection panel on the right.",
+        connect: "Click the Connect button to start the remote session.",
+        fullscreen:
+          "Click the fullscreen button to enlarge the display, press ESC to exit.",
+      },
+      features: {
+        title: "Features",
+        keyboard: "Full keyboard control (US physical layout).",
+        mouse: "Mouse: move, click, double click and wheel.",
+        clipboard: "Two-way clipboard sync (enable it in the Connection panel).",
+        chat: "Chat with the partner during the session.",
+        agent: "Requires the Agent app to reach the relay.",
+      },
+      troubleshooting: {
+        title: "Troubleshooting",
+        connection: "Check the partner ID and password.",
+        credentials:
+          "The partner computer must be running UltraViewer and allow the connection.",
+        agent: "Make sure the Agent app is running and reachable.",
+      },
+    },
     postgreSQLQuery: {
       purpose: {
         title: "PostgreSQL Query",

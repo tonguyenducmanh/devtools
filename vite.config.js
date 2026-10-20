@@ -17,7 +17,7 @@ const APP_VERSION = process.env.VERSION || packageJson.version;
 //   - `src_wasm/<tên>/build.sh` tạo ra `src_wasm/pkg/<tên>/`
 //   - `src/views/tools/Craft/` dùng `appKey = <tên>` để nạp
 //     `/assets-wasm-<version>/<tên>/index.html`
-const WASM_PKG_FOLDERS = ["dotnet", "rdp", "photocraft"];
+const WASM_PKG_FOLDERS = ["dotnet", "rdp", "photocraft", "ultraviewer"];
 
 // `src_wasm/pkg/` KHÔNG được commit vào git (gitignored, ~58 MB). Nếu clone mới
 // mà chưa chạy `scripts/build_wasm.sh` thì thư mục này rỗng/không tồn tại.

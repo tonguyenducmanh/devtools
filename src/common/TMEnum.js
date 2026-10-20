@@ -121,6 +121,8 @@ class TMEnum {
     Help: 0,
     Collection: 1,
     Setting: 2,
+    // Chat của tool UltraViewer (mục riêng trong sidebar).
+    Chat: 3,
   };
   MindMapSidebarOption = {
     Setting: 0,

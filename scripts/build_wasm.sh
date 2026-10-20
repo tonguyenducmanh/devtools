@@ -29,6 +29,21 @@ fi
 # Quay lại root
 cd "$ROOT_DIR"
 
+# 1b. Build Rust WASM (UltraViewer client) — không cần external repo
+ULTRAVIEWER_MODULE_DIR="$ROOT_DIR/src_wasm/ultraviewer"
+if [ -d "$ULTRAVIEWER_MODULE_DIR" ]; then
+    echo "Entering UltraViewer Rust Module..."
+    cd "$ULTRAVIEWER_MODULE_DIR"
+    chmod +x ./build.sh
+    ./build.sh
+else
+    echo "Error: UltraViewer directory $ULTRAVIEWER_MODULE_DIR not found!"
+    exit 1
+fi
+
+# Quay lại root
+cd "$ROOT_DIR"
+
 # 2. Build C# WASM Wrapper (.NET 10)
 if [ -d "$DOTNET_MODULE_DIR" ]; then
     echo "Entering C# Module..."

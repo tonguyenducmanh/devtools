@@ -116,6 +116,7 @@ SQLite: `dev_tool.db` cạnh exe, WAL, `foreign_keys=ON`, migration chạy lúc 
 | `rt_mock_api.go`       | CRUD + `get_tree` `mock_api`/`mock_group`; `GET /mock_api/restart_mock_server`, `/get_base_url`; `POST /import_batch`               |
 | `rt_rdp.go`            | `GET /rdp/ws` — WebSocket proxy RDP (RDCleanPath: parse ASN.1 DER, TCP→X.224→TLS, relay 2 chiều)                                    |
 | `rt_rdp_connection.go` | CRUD + `get_tree` `rdp_connection`/`rdp_connection_group`                                                                           |
+| `rt_ultraviewer.go`     | `GET /ultraviewer/ws` — WebSocket proxy tới relay UltraViewer (daemon mở TCP + TLS có ghim chứng thư rồi chuyển byte 2 chiều)      |
 | `rt_postgresql.go`     | `POST /postgresql/execute_query`, `/database_ops`, `/database_ops_upload`; `GET /detect_bin_path`; CRUD + `get_tree`                |
 | `rt_file_ops.go`       | `POST /file_ops/read_file`, `/read_folder`, `/write_file`                                                                           |
 | `rt_app_data_miner.go` | `GET /data_miner/get_all_table_and_columns`; `POST /execute_query` (SQLite introspection)                                           |
@@ -139,6 +140,7 @@ Middleware: CORS `Allow-Origin *` + OPTIONS short-circuit; path lowercasing mặ
 | Module       | Build                                   | Output (gitignored)                                | Load bởi                                       |
 | ------------ | --------------------------------------- | -------------------------------------------------- | ---------------------------------------------- |
 | IronRDP      | `wasm-pack build --target web`          | `pkg/rdp/rdp_client.js` + `_bg.wasm` (~4,5 MB)       | `TMRemoteDesktopRDP.vue`                       |
+| UltraViewer   | `wasm-pack build --target web`          | `pkg/ultraviewer/ultraviewer_client.js` + `_bg.wasm` (~0,4 MB) | `TMRemoteDesktopUltraViewer.vue`               |
 | .NET Wrapper | `dotnet publish … AppBundle/_framework` | `pkg/dotnet/` (~3,9 MB)                              | `TMDotNetWasmMixin.js`                         |
 | PhotoCraft   | `trunk build --release` + nén wasm gzip | `pkg/photocraft/` (manifest.json + js + `_bg.wasm.gz`) | `views/tools/Craft/TMPhotoCraft.vue` (canvas) |
 
@@ -152,9 +154,34 @@ Nhờ query `?i=` riêng cho từng tab, mỗi tab có instance wasm riêng (was
 
 `index.html` do trunk sinh ra vẫn được giữ lại: nó là trang chạy độc lập để debug app wasm, và là nơi `patch_wasm_dist.py` ghi logic tự giải nén.
 
-`vite.config.js` (viteStaticCopy): copy `pkg/dotnet/*` → `assets-wasm-<VERSION>/`; `pkg/rdp/*` → `assets-wasm-<VERSION>/rdp/`; `pkg/<craft>/*` → `assets-wasm-<VERSION>/<craft>/`. Runtime nạp theo đường dẫn tuyệt đối `assets-wasm-<version>/…` (DEV cũng được serve bởi plugin static-copy middleware). Alias `@wasm` → `src_wasm` (dùng cho dotnet khi dev).
+`vite.config.js` (viteStaticCopy): copy `pkg/dotnet/*` → `assets-wasm-<VERSION>/`; `pkg/rdp/*` → `assets-wasm-<VERSION>/rdp/`; `pkg/ultraviewer/*` → `assets-wasm-<VERSION>/ultraviewer/`; `pkg/<craft>/*` → `assets-wasm-<VERSION>/<craft>/`. Runtime nạp theo đường dẫn tuyệt đối `assets-wasm-<version>/…` (DEV cũng được serve bởi plugin static-copy middleware). Alias `@wasm` → `src_wasm` (dùng cho dotnet khi dev).
 
 `pkg/` là **thư mục output, gitignored** (~58 MB binary). Vì repo không chứa wasm, `vite.config.js` bỏ qua folder `pkg/<tên>` nào rỗng (chỉ cảnh báo) để `npm run build` vẫn xanh trên clone mới; khi build phát hành (`REQUIRE_WASM=1`) thì thiếu folder nào là fail ngay. Vì vậy Cloudflare Pages không tự build được → deploy thủ công qua `scripts/deploy_cloudflare.sh`.
+
+### UltraViewer client (WASM + relay proxy)
+
+Tool **Remote Desktop (UltraViewer)** xem/điều khiển máy khác đang chạy UltraViewer (Windows).
+Giao thức UltraViewer được port từ dự án [MacViewer](https://github.com/DeanOpen/MacViewer) của
+DeanOpen (giấy phép MIT) — xem `src_wasm/ultraviewer/README.md` để biết file nào port từ đâu.
+
+Trình duyệt không mở được socket thô (không có TLS client trong WASM) nên chia 2 tầng:
+
+```text
+[trình duyệt]  src_wasm/ultraviewer  ──WebSocket──▶  daemon Go  ──TCP+TLS──▶  relay UltraViewer
+   giao thức                              byte thô      trung gian         (functions3.ultraviewer.net)
+```
+
+| Tầng | Nhiệm vụ |
+| --- | --- |
+| `src_wasm/ultraviewer` (Rust → wasm-pack) | Toàn bộ giao thức: mã hoá 3DES kênh lệnh, envelope relay, giải nén zstd (kèm từ điển `8bit.dat`), dựng hình + theo dõi vùng đổi, mã hoá chuột/bàn phím |
+| `internal/service/bl_ultraviewer_relay.go` (Go) | Mở TCP + TLS tới relay (ghim chứng thư Sectigo R46, SNI `ultraviewer`), chuyển byte hai chiều qua WebSocket |
+
+Giao thức WebSocket giữa WASM và daemon: message text (JSON) để mở/đóng kênh, message binary
+(byte đầu = số kênh: 1 = kênh lệnh, 2 = kênh dữ liệu với máy đối tác) để chuyển byte thô.
+
+Phần giao thức Rust thuần nên test được native (`cargo test` trong `src_wasm/ultraviewer`) —
+trong đó có test end-to-end với relay giả lập: đăng ký → tra cứu → login → nhận màn hình →
+gửi chuột/bàn phím.
 
 ## 5. Luồng build & phát hành
 

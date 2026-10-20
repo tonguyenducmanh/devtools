@@ -532,6 +532,36 @@ export default {
       },
     },
     
+    ultraViewer: {
+      purpose: {
+        title: "UltraViewer là gì?",
+        content:
+          "UltraViewer là công cụ kết nối tới máy tính đang chạy phần mềm UltraViewer trên Windows. Giao thức UltraViewer được cài đặt trong module WebAssembly nên chạy được trên mọi nền tảng.",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        inputHost:
+          "Mở máy đối tác, xem ID và mật khẩu hiển thị trên cửa sổ UltraViewer.",
+        inputCredentials: "Nhập ID và mật khẩu đó vào khung Kết nối ở thanh bên phải.",
+        connect: "Nhấn nút Kết nối để bắt đầu phiên làm việc từ xa.",
+        fullscreen:
+          "Nhấn nút fullscreen để phóng to màn hình, nhấn ESC để thoát.",
+      },
+      features: {
+        title: "Tính năng",
+        keyboard: "Điều khiển bàn phím đầy đủ (bàn phím vật lý kiểu US).",
+        mouse: "Chuột: di chuyển, click, click đúp và lăn.",
+        clipboard: "Đồng bộ clipboard hai chiều (bật ở khung Kết nối).",
+        chat: "Chat với máy đối tác trong phiên.",
+        agent: "Cần chạy Agent app để kết nối qua relay.",
+      },
+      troubleshooting: {
+        title: "Xử lý sự cố",
+        connection: "Kiểm tra ID và mật khẩu của máy đối tác.",
+        credentials: "Máy đối tác phải đang chạy UltraViewer và cho phép kết nối.",
+        agent: "Đảm bảo Agent app đang chạy và kết nối được.",
+      },
+    },
     postgreSQLQuery: {
       purpose: {
         title: "PostgreSQL Query",

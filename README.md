@@ -84,8 +84,16 @@ Thư mục dưới đây chứa nhiều công cụ được viết bằng các n
 [Thư mục Web Assembly](src_wasm)
 
 - **IronRDP** (`src_wasm/iron_rdp`): client RDP (Rust) → `src_wasm/pkg/rdp/`
+- **UltraViewer** (`src_wasm/ultraviewer`): client UltraViewer (Rust) → `src_wasm/pkg/ultraviewer/` — xem [`src_wasm/ultraviewer/README.md`](src_wasm/ultraviewer/README.md)
 - **.NET Wrapper** (`src_wasm/dotnet_wrapper`): wrapper C# (.NET 10) → `src_wasm/pkg/dotnet/`
 - **PhotoCraft** (`src_wasm/photocraft`): trình chỉnh sửa ảnh (Rust, trunk) → `src_wasm/pkg/photocraft/`
+
+### Ghi nhận nguồn
+
+Module `src_wasm/ultraviewer` được **port từ [MacViewer](https://github.com/DeanOpen/MacViewer)**
+của **DeanOpen** (giấy phép MIT — `Copyright (c) 2026 MacViewer contributors`). Giấy phép gốc được
+giữ lại tại `src_wasm/ultraviewer/LICENSE-MacViewer`; từng file port đều có header trỏ về nguồn.
+Bảng đối chiếu file-by-file nằm trong [`src_wasm/ultraviewer/README.md`](src_wasm/ultraviewer/README.md).
 
 > `src_wasm/pkg/` là **thư mục output** (gitignored, ~58 MB). Clone repo về sẽ **không có** thư mục này — phải chạy `scripts/build_wasm.sh` một lần để build, hoặc dùng luôn bản build có sẵn ở máy bạn. Deploy Cloudflare cũng vì thế phải chạy **thủ công** (build local → `wrangler pages deploy`), không bật Git integration trên Cloudflare Pages.
 

@@ -42,6 +42,7 @@ src_backend/                    Backend Go 1.25 (3 module riêng)
   tm_app/                       Binary: cmd/api_app (chỉ API), cmd/daemon_app (API + Web embed dist)
 src_wasm/                       Nguồn WASM
   iron_rdp → pkg/rdp            RDP client (Rust, wasm-pack)
+  ultraviewer → pkg/ultraviewer UltraViewer client (Rust, wasm-pack) — xem Luật 14
   dotnet_wrapper → pkg/dotnet   .NET 10 browser-wasm (AppBundle/_framework)
   photocraft → pkg/photocraft    Static site PhotoCraft (trunk, wasm nén gzip)
 scripts/                        tm_version.sh, build_api.sh, build_daemon.sh, build_web_for_daemon.sh,
@@ -77,6 +78,15 @@ wrangler.jsonc                  Cloudflare Pages config (project `devtools`, out
     - **Protocol** (giữ nguyên cho mọi worker): `main → worker: {id, type, payload}`; `worker → main: {id, final:true, ok, result|error}` và `{id, final:false, …}` cho progress. Task trong worker phải **serialize bằng chuỗi promise** (pool giả định 1 worker chạy 1 task/lần).
     - **Bắt buộc:** xử lý `message.id` của task mới nhất trong component (token/generation id) để lần gọi sau không bị lần trước đè; và **báo tiến trình** (spinner + x/y) vì tác vụ vẫn mất vài giây.
     - **Naming:** worker được Vite bundle **riêng**, KHÔNG đi qua `build.rolldownOptions.output`. Muốn giữ prefix `tjs-`/`tas-` + version (Luật 1) thì phải khai báo thêm `worker.rollupOptions.output` trong `vite.config.js` — nếu không, file worker sẽ tên trần, mất version chống cache CDN.
+14. **Port code của dự án khác phải ghi rõ nguồn.** Khi chuyển code từ dự án khác về (vd module `src_wasm/ultraviewer/` port từ [MacViewer](https://github.com/DeanOpen/MacViewer) của DeanOpen, giấy phép MIT) thì BẮT BUỘC:
+    - Giữ nguyên giấy phép gốc trong thư mục đó (vd `LICENSE-MacViewer`) và ghi rõ tên tác giả + URL repo.
+    - Mỗi file được port phải có header trỏ về nguồn (xem `src_wasm/ultraviewer/src/*.rs`).
+    - Ghi rõ trong README của module: file nào port từ đâu, file nào viết mới, và tài nguyên bên thứ ba nào kèm theo (vd `8bit.dat` là từ điển zstd của UltraViewer, **không** phải mã nguồn mở).
+    - Nêu nguồn trong `README.md`/`docs/` của repo nếu là tính năng người dùng thấy được.
+15. **Module WASM không được link thư viện C.** Crate `cc` (mà `zstd-sys` dùng) **KHÔNG** phát `cargo:rustc-link-lib` cho target `wasm32-unknown-unknown` → toàn bộ hàm C thành import từ module `"env"` mà trình duyệt không có → **module wasm không instantiate được**: tool chết ngay lúc load mà log không nói gì (WebSocket mở nhưng không có byte nào chạy). Dùng crate Rust thuần (vd `ruzstd` thay `zstd-safe`).
+    - Kiểm tra sau mỗi lần build wasm: import section của file `.wasm` **không được có** module `"env"`. Script kiểm tra: xem `wasm-tools`/`wasm-objdump`, hoặc đọc trực tiếp import section (byte 2 của file wasm).
+    - `wasm-bindgen` của module Rust phải **khớp phiên bản** với CLI mà `wasm-pack` dùng, nếu không glue sinh ra sẽ hỏng (thiếu import, file `_bg.js` không được tạo). Xem `Cargo.lock` của module `iron_rdp` (0.2.114) và dùng đúng phiên bản đó cho module mới.
+16. **WebSocket từ WASM phải chờ `open` mới gửi được.** `new WebSocket(url)` trả về ở trạng thái `CONNECTING`; gọi `send()` ngay sẽ ném lỗi `InvalidStateError` và message **không bao giờ tới đích**. Phải xếp hàng đợi message rồi gửi trong callback `onopen`.
 
 ## 4. Chọn việc làm
 
@@ -102,11 +112,21 @@ cd ../tm_core_service && go build ./... && go vet ./... && go test ./...   # có
 cd ../tm_app && go build ./...
 
 # WASM (CHỈ khi đụng src_wasm)
-./scripts/build_wasm.sh                       # build rdp + dotnet + 4 craft tool
+./scripts/build_wasm.sh                       # build rdp + ultraviewer + dotnet + craft tool
 npm run build                                 # build lại vì viteStaticCopy lấy từ pkg/
+
+# Module WASM viết bằng Rust (CHỈ khi đụng src_wasm/<module>)
+cd src_wasm/ultraviewer && cargo test         # 79 test: giao thức + end-to-end với relay giả lập
+cd src_wasm/ultraviewer && cargo build --target wasm32-unknown-unknown --lib
 ```
 
-- **Test:** repo CHƯA có framework test frontend; tự kiểm tra thủ công trên `npm run dev`. Với Go, chạy `go test ./...` của module đụng đến (hiện có `dl_group_test.go`, `bl_collection_test.go`).
+- **Sau khi build wasm mới, kiểm tra import section** (Luật 15): file `.wasm` không được có import từ module `"env"`. Nếu có, module sẽ không load được trong trình duyệt:
+  ```sh
+  python3 -c "d=open('src_wasm/pkg/ultraviewer/ultraviewer_client_bg.wasm','rb').read(); print('CÓ import env — module sẽ hỏng!' if b'\x03env' in d[:2000] else 'OK')"
+  ```
+
+- **Test:** repo CHƯA có framework test frontend; tự kiểm tra thủ công trên `npm run dev`. Với Go, chạy `go test ./...` của module đụng đến (hiện có `dl_group_test.go`, `bl_collection_test.go`). Với module Rust (`src_wasm/ultraviewer`), chạy `cargo test` — phần giao thức viết để test được native, không cần trình duyệt.
+- **Module WASM viết bằng Rust phải tách phần giao thức khỏi phần WASM.** `src_wasm/ultraviewer/src/{wire,messages,screen,input,chat,clipboard}.rs` là Rust thuần (test được native); phần gắn với trình duyệt nằm riêng trong `wasm_glue.rs` (`#[cfg(target_arch = "wasm32")]`). Không dùng thread/`std::net` trong module WASM — trình duyệt không có; mọi I/O đi qua WebSocket tới daemon.
 - **Đụng Web Worker thì phải verify cả 2 lớp** — `npm run build` xanh KHÔNG đủ:
   1. **Dev server**: `curl http://localhost:<port>/src/<path>/<File>WorkerClient.js` → phải thấy `new URL("...Worker.js?worker_file&type=module", ...)` trong code đã transform. Đây là lỗi #1 ở Luật 13, dev mode lộ ra trước.
   2. **File worker có thật trong `dist/`**: `ls dist/assets/ | grep -i worker` → file phải có prefix `tjs-` + version (Luật 13, naming).

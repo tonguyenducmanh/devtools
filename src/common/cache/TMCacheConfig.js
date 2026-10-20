@@ -348,4 +348,22 @@ export const TMCacheConfig = {
     ExpireTime: 0,
     Note: "đã đọc và đồng ý điều khoản sử dụng, chỉ hiện popup điều khoản 1 lần",
   },
+  UltraViewerConfigLayout: {
+    KeyFormat: "UltraViewerConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool Remote Desktop UltraViewer",
+  },
+  UltraViewerDeviceIdentity: {
+    KeyFormat: "UltraViewerDeviceIdentity",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "danh tính thiết bị của viewer UltraViewer (relay cấp ID theo MAC)",
+  },
+  UltraViewerDisplayName: {
+    KeyFormat: "UltraViewerDisplayName",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "tên hiển thị gửi cho máy đối tác UltraViewer",
+  },
 };
