@@ -39,6 +39,17 @@
             >
               <span class="tm-icon tm-command-code-icon"></span>
             </div>
+            <!-- Chat: mở popup nổi (không che màn hình) để vẫn xem/thao tác
+                 màn hình từ xa được trong lúc chat. Ở chế độ fullscreen thì
+                 sidebar bị ẩn nên cần nút này trên thanh công cụ. -->
+            <div
+              v-tooltip="$t('i18nCommon.ultraViewer.chatTitle')"
+              class="flex toolbar-btn"
+              :class="{ 'toolbar-btn-active': isChatPopupOpen }"
+              @click="toggleChatPopup"
+            >
+              <span class="tm-icon tm-chat-icon"></span>
+            </div>
           </template>
           <template #toolbar-right>
             <div class="flex" style="margin-left: 16px">
@@ -238,7 +249,8 @@
             @change="updateConfigLayout"
           ></TMCheckbox>
         </div>
-        <!-- Chat trong phiên: mục riêng trên sidebar -->
+        <!-- Chat trong phiên: mục riêng trên sidebar (dùng chung khung chat
+             với popup nổi mở từ nút chat trên thanh công cụ) -->
         <div
           class="flex flex-col tm-uv-sub-sidebar"
           v-show="
@@ -246,44 +258,15 @@
             $tmEnum.RemoteDesktopSidebarOption.Chat
           "
         >
-          <div class="tm-uv-chat">
-            <div class="tm-uv-chat-header">
-              {{ $t("i18nCommon.ultraViewer.chatTitle") }}
-            </div>
-            <div class="tm-uv-chat-messages">
-              <div
-                v-for="(entry, idx) in chatMessages"
-                :key="idx"
-                class="tm-uv-chat-row"
-                :class="
-                  entry.local ? 'tm-uv-chat-row-local' : 'tm-uv-chat-row-remote'
-                "
-              >
-                <div class="tm-uv-chat-bubble">
-                  <div class="tm-uv-chat-text">{{ entry.text }}</div>
-                  <div class="tm-uv-chat-time">{{ entry.time }}</div>
-                </div>
-              </div>
-              <div v-if="isPartnerTyping" class="tm-uv-chat-typing">
-                {{ $t("i18nCommon.ultraViewer.typing") }}
-              </div>
-            </div>
-            <div class="tm-uv-chat-input">
-              <TMInput
-                v-model="chatInput"
-                :noMargin="true"
-                :readOnly="!isConnected"
-                :placeHolder="$t('i18nCommon.ultraViewer.chatPlaceholder')"
-                @keyup.enter="sendChat"
-              />
-              <TMButton
-                :noMargin="true"
-                :readOnly="!isConnected"
-                :iconClass="'tm-send-icon'"
-                @click="sendChat"
-              />
-            </div>
-          </div>
+          <TMUltraViewerChatBox
+            :messages="chatState.messages"
+            :isTyping="chatState.isTyping"
+            :readOnly="!isConnected"
+            :placeHolder="$t('i18nCommon.ultraViewer.chatPlaceholder')"
+            :typingText="$t('i18nCommon.ultraViewer.typing')"
+            :title="$t('i18nCommon.ultraViewer.chatTitle')"
+            @send="sendChat"
+          />
         </div>
       </template>
     </TMSubSidebar>
@@ -291,6 +274,7 @@
 </template>
 
 <script>
+import { reactive } from "vue";
 import TMToolBase from "@/views/tools/base/TMToolBase.vue";
 import TMSubSidebar from "@/components/TMSubSidebar.vue";
 import TMRemoteDesktopUltraViewerHelp from "@/views/helps/TMRemoteDesktopUltraViewerHelp.vue";
@@ -299,6 +283,8 @@ import TMFullTabWrapper from "@/components/TMFullTabWrapper.vue";
 import TMButton from "@/components/TMButton.vue";
 import TMCheckbox from "@/components/TMCheckbox.vue";
 import TMInput from "@/components/TMInput.vue";
+import TMUltraViewerChatBox from "@/views/dialogs/ultraviewer/TMUltraViewerChatBox.vue";
+import TMDialogUtil, { TMDialogEnum } from "@/common/TMDialogUtil.js";
 
 // Tên hiển thị gửi cho máy đối tác: sinh tự động 5 ký tự ngẫu nhiên + "-PC".
 const DISPLAY_NAME_ALPHABET =
@@ -324,6 +310,7 @@ export default {
     TMButton,
     TMCheckbox,
     TMInput,
+    TMUltraViewerChatBox,
   },
 
   data() {
@@ -356,14 +343,32 @@ export default {
       password: "",
       displayName: "",
       deviceIdentity: "",
-      chatInput: "",
-      chatMessages: [],
-      isPartnerTyping: false,
+      // Dữ liệu chat dùng chung giữa khung chat trong sidebar và popup nổi.
+      // Dùng object reactive để popup (app Vue riêng) nhìn thấy tin nhắn mới
+      // ngay khi đang mở.
+      chatState: reactive({
+        messages: [],
+        isTyping: false,
+        // Chặn nhập khi chưa kết nối (đồng bộ qua watch isConnected).
+        readOnly: true,
+      }),
+      // Id của popup chat đang mở (null = đã đóng).
+      chatPopupId: null,
       logEntries: [],
       // Module WASM đã nạp
       wasmModule: null,
       client: null,
     };
+  },
+
+  watch: {
+    /**
+     * Đồng bộ trạng thái "chưa kết nối" sang khung chat dùng chung để popup
+     * nổi cũng chặn nhập đúng lúc.
+     */
+    isConnected(value) {
+      this.chatState.readOnly = !value;
+    },
   },
 
   computed: {
@@ -410,6 +415,12 @@ export default {
         text += " " + me.directRouteText;
       }
       return text;
+    },
+    /**
+     * Popup chat nổi đang mở hay không (để tô đậm nút chat).
+     */
+    isChatPopupOpen() {
+      return !!this.chatPopupId;
     },
     sidebarOptions() {
       let options = [];
@@ -612,7 +623,7 @@ export default {
           me.pushChat(text, false);
         });
         client.on_typing((typing) => {
-          me.isPartnerTyping = typing;
+          me.chatState.isTyping = typing;
         });
         client.on_clipboard((text) => {
           me.addLog(
@@ -696,7 +707,7 @@ export default {
       me.isConnecting = false;
       me.isHideEffectBackground = false;
       me.isViewOnly = false;
-      me.isPartnerTyping = false;
+      me.chatState.isTyping = false;
       me.isDirectRoute = false;
     },
 
@@ -723,6 +734,44 @@ export default {
         me.addLog(
           `${me.$t("i18nCommon.ultraViewer.directToggleFailed")}: ${me.formatError(e)}`,
           "warn",
+        );
+      }
+    },
+
+    /**
+     * Mở/đóng popup chat nổi (không có nền che màn hình).
+     *
+     * Popup dùng chung dữ liệu chat với sidebar nên tin nhắn hiện đồng bộ ở
+     * cả hai nơi. Bấm nút chat lần nữa (hoặc bấm nút X) thì đóng popup.
+     */
+    async toggleChatPopup() {
+      let me = this;
+      if (me.chatPopupId) {
+        TMDialogUtil.closeById(me.chatPopupId);
+        me.chatPopupId = null;
+        return;
+      }
+      try {
+        me.chatPopupId = await TMDialogUtil.showPopup({
+          dialogType: TMDialogEnum.TMUltraViewerChatPopup,
+          ownerForm: me,
+          props: {
+            chatState: me.chatState,
+            onSend: (text) => me.sendChat(text),
+          },
+          param: {
+            title: me.$t("i18nCommon.ultraViewer.chatTitle"),
+            placeHolder: me.$t("i18nCommon.ultraViewer.chatPlaceholder"),
+            typingText: me.$t("i18nCommon.ultraViewer.typing"),
+          },
+          callback: () => {
+            me.chatPopupId = null;
+          },
+        });
+      } catch (e) {
+        me.chatPopupId = null;
+        me.reportError(
+          `${me.$t("i18nCommon.ultraViewer.chatPopupFailed")}: ${me.formatError(e)}`,
         );
       }
     },
@@ -788,24 +837,28 @@ export default {
     },
 
     pushChat(text, local) {
-      this.chatMessages.push({
+      const messages = this.chatState.messages;
+      messages.push({
         text,
         local,
         time: new Date().toLocaleTimeString("en-US", { hour12: false }),
       });
-      if (this.chatMessages.length > 200) {
-        this.chatMessages.splice(0, this.chatMessages.length - 200);
+      if (messages.length > 200) {
+        messages.splice(0, messages.length - 200);
       }
     },
 
-    sendChat() {
+    /**
+     * Gửi tin nhắn tới máy đối tác (dùng chung cho sidebar và popup).
+     * @param {string} text nội dung tin nhắn
+     */
+    sendChat(text) {
       let me = this;
-      const text = me.chatInput.trim();
-      if (!text || !me.client) return;
+      const content = (text ?? "").trim();
+      if (!content || !me.client) return;
       try {
-        me.client.send_chat(text);
-        me.pushChat(text, true);
-        me.chatInput = "";
+        me.client.send_chat(content);
+        me.pushChat(content, true);
       } catch (e) {
         me.addLog(
           `${me.$t("i18nCommon.ultraViewer.chatFailed")}: ${me.formatError(e)}`,
@@ -1123,101 +1176,14 @@ export default {
   }
 }
 
-/* Chat nằm trong sidebar nên không cần nền/viền riêng — chỉ bố cục và
-   khoảng cách theo chuẩn padding của app. */
-.tm-uv-chat {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  min-height: 200px;
-  min-width: 0;
-  overflow: hidden;
-  flex: 1;
-}
+/* Khung chat đã tách thành component dùng chung
+   (src/views/dialogs/ultraviewer/TMUltraViewerChatBox.vue) nên không còn style
+   chat ở đây. */
 
-.tm-uv-chat-header {
-  padding: var(--padding);
-  font-size: var(--font-size-small);
-  font-weight: 600;
-}
-
-.tm-uv-chat-messages {
-  flex: 1;
-  min-width: 0;
-  overflow-y: auto;
-  padding: 0 var(--padding);
-  display: flex;
-  flex-direction: column;
-  gap: var(--padding-medium);
-}
-
-/* Tin của mình bên phải, tin của máy đối tác bên trái */
-.tm-uv-chat-row {
-  display: flex;
-}
-
-.tm-uv-chat-row-local {
-  justify-content: flex-end;
-}
-
-.tm-uv-chat-row-remote {
-  justify-content: flex-start;
-}
-
-.tm-uv-chat-bubble {
-  max-width: 85%;
-  padding: var(--padding-medium) var(--padding-x-medium);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-component);
-  font-size: var(--font-size-small);
-  line-height: 1.5;
-}
-
-/* Tin của mình viền màu nhấn, tin máy đối tác viền màu trung tính */
-.tm-uv-chat-row-local .tm-uv-chat-bubble {
-  border-color: var(--focus-color);
-  color: var(--focus-color);
-}
-
-.tm-uv-chat-row-remote .tm-uv-chat-bubble {
-  border-color: var(--text-secondary-color);
-  color: var(--text-primary-color);
-}
-
-.tm-uv-chat-text {
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.tm-uv-chat-time {
-  margin-top: var(--padding-medium);
-  font-size: var(--font-size-small);
-  opacity: 0.5;
-  text-align: right;
-}
-
-.tm-uv-chat-typing {
-  font-size: var(--font-size-small);
-  opacity: 0.6;
-  font-style: italic;
-}
-
-.tm-uv-chat-input {
-  display: flex;
-  align-items: center;
-  gap: var(--padding);
-  padding: var(--padding);
-  min-width: 0;
-
-  /* Ô nhập co giãn theo sidebar, nút gửi giữ nguyên kích thước */
-  :deep(.tm-input) {
-    flex: 1;
-    min-width: 0;
-  }
-
-  :deep(.tm-button) {
-    flex-shrink: 0;
-  }
+/* Nút chat đang mở popup thì tô đậm để biết popup đang mở (nút nằm trong
+   thanh công cụ của TMFullTabWrapper nên cần :deep) */
+:deep(.toolbar-btn-active) {
+  background-color: var(--focus-color);
+  color: var(--selected-item-text-color);
 }
 </style>

@@ -925,6 +925,7 @@ export default {
       send: "Gửi",
       typing: "Máy đối tác đang nhập...",
       chatFailed: "Gửi chat thất bại",
+      chatPopupFailed: "Không mở được khung chat",
       sidebarOption: {
         help: "Trợ giúp",
         connection: "Kết nối",

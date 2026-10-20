@@ -26,6 +26,8 @@ export const TMDialogEnum = {
   TMCollectionPickerPopup: 16,
   TMConfirmPopup: 17,
   TMAgreementPopup: 18,
+  // ── Popup không có lớp nền che màn hình ────────────────────────────────
+  TMUltraViewerChatPopup: 19,
 };
 
 /**
@@ -69,6 +71,8 @@ const DialogComponentMap = {
     import("@/views/dialogs/TMConfirmPopup.vue"),
   [TMDialogEnum.TMAgreementPopup]: () =>
     import("@/views/dialogs/TMAgreementPopup.vue"),
+  [TMDialogEnum.TMUltraViewerChatPopup]: () =>
+    import("@/views/dialogs/ultraviewer/TMUltraViewerChatPopup.vue"),
 };
 
 class TMDialogUtil {

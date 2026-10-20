@@ -929,6 +929,7 @@ export default {
       send: "Send",
       typing: "The partner is typing...",
       chatFailed: "Could not send the chat message",
+      chatPopupFailed: "Could not open the chat panel",
       sidebarOption: {
         help: "Help",
         connection: "Connection",

@@ -1,6 +1,6 @@
 <template>
   <teleport to="body">
-    <div v-if="visible" class="tm-popup-overlay" @click.self="onOverlayClick">
+    <div v-if="visible" class="tm-popup-overlay" :class="{ 'tm-popup-overlay-transparent': !showOverlayBackground }" @click.self="onOverlayClick">
       <div ref="popupEl" class="flex flex-col tm-popup-container" :style="computeStyle"
         :class="{ 'tm-popup-fullscreen-mode': isFullscreen }">
         <div v-if="showHeader" class="tm-popup-header" :class="{ 'tm-popup-draggable': draggable && !isFullscreen }"
@@ -93,6 +93,17 @@ export default {
       default: true,
     },
     resizable: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * Có lớp nền mờ che toàn màn hình hay không.
+     *
+     * false → popup nổi trên nội dung hiện tại mà không làm tối màn hình và
+     * không chặn thao tác chuột xuống phía dưới (dùng cho panel phụ kiểu chat
+     * trong chế độ fullscreen của remote desktop).
+     */
+    showOverlayBackground: {
       type: Boolean,
       default: true,
     },
@@ -261,8 +272,24 @@ export default {
   z-index: 1000;
 }
 
+/* Popup không có lớp nền che: nội dung phía dưới vẫn thấy và vẫn thao tác
+   được, chỉ riêng thân popup mới bắt chuột. Popup vẫn kéo thả tự do. */
+.tm-popup-overlay-transparent {
+  background: transparent;
+  pointer-events: none;
+
+  .tm-popup-container {
+    pointer-events: auto;
+  }
+}
+
+/* Popup nổi lên như một panel: viền + đổ bóng (giống flyout panel và
+   context menu của app). Kể cả popup không nền che (showOverlayBackground =
+   false) thì vẫn cần viền + bóng để nổi bật trên nội dung hiện tại. */
 .tm-popup-container {
   background: var(--bg-main-color);
+  border: 1px solid var(--bg-layer-color);
+  box-shadow: var(--box-shadow);
   border-radius: var(--border-radius);
   max-width: calc(100vw - var(--padding) * 2);
   max-height: calc(100vh - var(--padding) * 2);
