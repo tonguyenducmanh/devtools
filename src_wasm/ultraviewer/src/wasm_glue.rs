@@ -12,7 +12,7 @@
 //!   - binary: byte đầu là số kênh, phần còn lại là byte thô đi/đến relay.
 
 use std::cell::RefCell;
-use std::rc::{Rc, Weak};
+use std::rc::Rc;
 
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
@@ -90,14 +90,27 @@ struct Callbacks {
     closed: Option<js_sys::Function>,
 }
 
+/// Kênh điều khiển tới daemon: WebSocket + hàng đợi message chờ gửi.
+///
+/// **Phải nằm ở `RefCell` riêng, không gộp vào [`State`]**: relay (phía
+/// session) gọi lại vào đây mỗi khi cần gửi message điều khiển (mở/đóng
+/// kênh, đóng listener LAN). Nếu dùng chung một `RefCell` với `State` thì
+/// lệnh gửi sẽ `borrow_mut()` lại trong lúc `State` đang được khoá →
+/// `RefCell` panic "already mutably borrowed" → wasm trap `unreachable`
+/// (wasm32-unknown-unknown dùng `panic = "abort"`) → phiên chết ngay, log
+/// chỉ còn dòng "RuntimeError: unreachable" không có thông báo.
+struct Control {
+    /// Socket đang mở (None = đã ngắt).
+    ws: Option<web_sys::WebSocket>,
+    /// WebSocket đã mở xong chưa (mới tạo thì đang CONNECTING).
+    open: bool,
+    /// Message điều khiển chờ gửi tới daemon (gửi được sau khi socket mở).
+    pending: Vec<String>,
+}
+
 struct State {
     /// Số khung hình đã giải mã thành công.
     frame_count: u64,
-    ws: Option<web_sys::WebSocket>,
-    /// WebSocket đã mở xong chưa (mới tạo thì đang CONNECTING).
-    ws_open: bool,
-    /// Message điều khiển chờ gửi tới daemon (gửi được sau khi socket mở).
-    pending_control: Vec<String>,
     queue: Vec<SessionEvent>,
     session: Option<Session>,
     observer: SharedObserver,
@@ -121,6 +134,8 @@ struct State {
 pub struct UltraViewerClient {
     state: Rc<RefCell<State>>,
     callbacks: Rc<RefCell<Callbacks>>,
+    /// Kênh điều khiển tới daemon — `RefCell` riêng với `state` (xem [`Control`]).
+    control: Rc<RefCell<Control>>,
 }
 
 impl Default for UltraViewerClient {
@@ -132,8 +147,9 @@ impl Default for UltraViewerClient {
 /// Relay đi qua WebSocket tới daemon.
 struct WsRelay {
     ws: web_sys::WebSocket,
-    /// Dùng để xếp hàng đợi message khi WebSocket còn đang CONNECTING.
-    weak: Weak<RefCell<State>>,
+    /// Kênh điều khiển dùng chung với tầng glue — `RefCell` riêng với
+    /// `State` nên gọi từ đây không bao giờ xung đột khoá với phần state.
+    control: Rc<RefCell<Control>>,
 }
 
 impl WsRelay {
@@ -150,20 +166,9 @@ impl WsRelay {
     /// Gửi message điều khiển tới daemon. Nếu WebSocket còn đang CONNECTING thì
     /// xếp vào hàng đợi (gửi ngay sẽ ném `InvalidStateError`).
     fn send_control(&mut self, request: String) -> crate::wire::Result<()> {
-        match self.weak.upgrade() {
-            Some(state) => {
-                let mut inner = state.borrow_mut();
-                inner.pending_control.push(request);
-                flush_control(&mut inner);
-            }
-            None => {
-                self.ws.send_with_str(&request).map_err(|e| {
-                    let message: Box<dyn std::error::Error + Send + Sync> =
-                        format!("Could not reach the local agent: {e:?}").into();
-                    message
-                })?;
-            }
-        }
+        let mut control = self.control.borrow_mut();
+        control.pending.push(request);
+        flush_control(&mut control);
         Ok(())
     }
 }
@@ -203,12 +208,14 @@ impl Relay for WsRelay {
 impl UltraViewerClient {
     #[wasm_bindgen(constructor)]
     pub fn new() -> UltraViewerClient {
+        let control = Rc::new(RefCell::new(Control {
+            ws: None,
+            open: false,
+            pending: Vec::new(),
+        }));
         UltraViewerClient {
             state: Rc::new(RefCell::new(State {
                 frame_count: 0,
-                ws: None,
-                ws_open: false,
-                pending_control: Vec::new(),
                 queue: Vec::new(),
                 session: None,
                 observer: SharedObserver::default(),
@@ -222,6 +229,7 @@ impl UltraViewerClient {
                 timer: None,
             })),
             callbacks: Rc::new(RefCell::new(Callbacks::default())),
+            control,
         }
     }
 
@@ -272,6 +280,9 @@ impl UltraViewerClient {
     }
 
     /// Mở phiên: kết nối WebSocket tới daemon rồi đăng ký + tra cứu máy đối tác.
+    ///
+    /// `allow_direct`: cho phép dùng đường LAN trực tiếp khi 2 máy cùng mạng
+    /// (bỏ qua relay → độ trễ thấp hơn, nội dung không rời LAN).
     #[allow(clippy::too_many_arguments)]
     pub fn connect(
         &self,
@@ -284,6 +295,7 @@ impl UltraViewerClient {
         tz_offset_minutes: i32,
         local_width: u32,
         local_height: u32,
+        allow_direct: bool,
     ) -> Result<(), JsValue> {
         self.disconnect();
 
@@ -299,13 +311,14 @@ impl UltraViewerClient {
             local_screen: (local_width, local_height),
             tz_offset_minutes,
             local_ip: String::new(),
+            allow_direct,
         };
 
         {
-            let mut state = self.state.borrow_mut();
-            state.ws = Some(ws.clone());
-            state.ws_open = false;
-            state.pending_control.clear();
+            let mut control = self.control.borrow_mut();
+            control.ws = Some(ws.clone());
+            control.open = false;
+            control.pending.clear();
         }
 
         self.install_ws_handlers(&ws);
@@ -313,7 +326,7 @@ impl UltraViewerClient {
 
         let observer = SharedObserver::default();
         let session = Session::new(
-            Box::new(WsRelay { ws: ws.clone(), weak: Rc::downgrade(&self.state) }),
+            Box::new(WsRelay { ws: ws.clone(), control: self.control.clone() }),
             Box::new(observer.clone()),
             options,
         )
@@ -328,7 +341,8 @@ impl UltraViewerClient {
         // Bắt đầu phiên: session tự yêu cầu mở kênh lệnh tới relay.
         // Session phải được lấy ra khỏi state trước khi gọi start() vì
         // start() → relay.open() → xếp hàng đợi message → borrow_mut() lại
-        // state (sẽ panic nếu vẫn giữ khoá).
+        // kênh điều khiển (RefCell riêng nên an toàn, nhưng vẫn lấy ra cho
+        // đúng thứ tự: state không chứa session trong lúc start).
         let mut session = self.state.borrow_mut().session.take().expect("session đã tạo");
         let started = session.start(now_ms());
         self.state.borrow_mut().session = Some(session);
@@ -339,15 +353,21 @@ impl UltraViewerClient {
     /// Ngắt phiên.
     pub fn disconnect(&self) {
         self.stop_timer();
-        let mut state = self.state.borrow_mut();
-        if let Some(session) = state.session.as_mut() {
-            session.close();
+        {
+            let mut state = self.state.borrow_mut();
+            if let Some(session) = state.session.as_mut() {
+                // session.close() → relay.close() → gửi message điều khiển:
+                // kênh điều khiển dùng `RefCell` riêng nên không xung đột với
+                // khoá của `state` (trước đây dùng chung → panic RefCell).
+                session.close();
+            }
+            state.session = None;
+            state.queue.clear();
         }
-        state.session = None;
-        state.queue.clear();
-        state.pending_control.clear();
-        state.ws_open = false;
-        if let Some(ws) = state.ws.take() {
+        let mut control = self.control.borrow_mut();
+        control.pending.clear();
+        control.open = false;
+        if let Some(ws) = control.ws.take() {
             let _ = ws.close();
         }
     }
@@ -484,6 +504,17 @@ impl UltraViewerClient {
             .unwrap_or_default()
     }
 
+    /// Bật/tắt đường LAN trực tiếp giữa phiên.
+    ///
+    /// Tắt thì đóng listener LAN và quay về đường relay ngay. Bật lại thì
+    /// chỉ có tác dụng ở lần kết nối tiếp theo (lệnh tra cứu đã gửi rồi).
+    pub fn set_allow_direct(&self, allow: bool) {
+        let mut state = self.state.borrow_mut();
+        if let Some(session) = state.session.as_mut() {
+            session.set_allow_direct(allow);
+        }
+    }
+
     /// Bật/tắt gửi chuột & bàn phím tới máy đối tác.
     pub fn set_control_enabled(&self, enabled: bool) {
         let mut state = self.state.borrow_mut();
@@ -578,11 +609,11 @@ impl UltraViewerClient {
 impl UltraViewerClient {
     fn install_ws_handlers(&self, ws: &web_sys::WebSocket) {
         // Socket vừa mở: gửi các message điều khiển đang chờ.
-        let weak = Rc::downgrade(&self.state);
+        let weak_control = Rc::downgrade(&self.control);
         let on_open = Closure::<dyn FnMut(web_sys::Event)>::new(move |_event: web_sys::Event| {
-            let Some(state) = weak.upgrade() else { return };
-            let mut inner = state.borrow_mut();
-            inner.ws_open = true;
+            let Some(control) = weak_control.upgrade() else { return };
+            let mut inner = control.borrow_mut();
+            inner.open = true;
             flush_control(&mut inner);
         });
         ws.set_onopen(Some(on_open.as_ref().unchecked_ref()));
@@ -659,14 +690,17 @@ impl UltraViewerClient {
                 return;
             };
             let now = now_ms();
-            {
-                let mut inner = state.borrow_mut();
-                if let Some(session) = inner.session.as_mut() {
-                    // Gửi vị trí chuột theo nhịp giới hạn (xem POINTER_SEND_INTERVAL_MS)
-                    // và kiểm tra deadline/heartbeat.
-                    session.flush_pointer(now);
-                    session.tick(now);
-                }
+            // Session được lấy RA khỏi state trước khi gọi tick/flush_pointer:
+            // các hàm này có thể gọi lại relay (đóng kênh, đóng listener LAN)
+            // và observer. Nếu vẫn giữ khoá `state` thì một lần gọi lại vào
+            // cùng `RefCell` sẽ panic → wasm trap `unreachable` → phiên chết.
+            let taken = state.borrow_mut().session.take();
+            if let Some(mut session) = taken {
+                // Gửi vị trí chuột theo nhịp giới hạn (xem POINTER_SEND_INTERVAL_MS)
+                // và kiểm tra deadline/heartbeat.
+                session.flush_pointer(now);
+                session.tick(now);
+                state.borrow_mut().session = Some(session);
             }
             // Đẩy sự kiện ra ngoài sau khi trả khoá.
             pump(&state, &callbacks);
@@ -692,17 +726,17 @@ impl UltraViewerClient {
 }
 
 /// Gửi các message điều khiển đang chờ (sau khi WebSocket mở).
-fn flush_control(state: &mut State) {
-    if !state.ws_open || state.pending_control.is_empty() {
+fn flush_control(control: &mut Control) {
+    if !control.open || control.pending.is_empty() {
         return;
     }
-    let Some(ws) = state.ws.as_ref() else { return };
-    let pending = std::mem::take(&mut state.pending_control);
+    let Some(ws) = control.ws.as_ref() else { return };
+    let pending = std::mem::take(&mut control.pending);
     for request in pending {
         if ws.send_with_str(&request).is_err() {
             // Socket vừa đóng: đưa message về hàng đợi để thử lại sau.
-            state.pending_control.push(request);
-            state.ws_open = false;
+            control.pending.push(request);
+            control.open = false;
             return;
         }
     }

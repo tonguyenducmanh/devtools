@@ -281,6 +281,7 @@ fn full_session_flow_reaches_screen_and_input() {
         local_screen: (1920, 1080),
         tz_offset_minutes: 420,
         local_ip: "192.0.2.10".into(),
+        allow_direct: true,
     };
 
     let mut session = Session::new(
@@ -461,6 +462,7 @@ fn lan_direct_route_takes_over_when_partner_shares_the_lan() {
         local_screen: (1920, 1080),
         tz_offset_minutes: 420,
         local_ip: "192.168.1.5".into(),
+        allow_direct: true,
     };
     let mut session = Session::new(
         Box::new(MockRelay { state: state.clone() }),
@@ -680,6 +682,155 @@ fn lan_direct_is_skipped_when_partner_is_on_another_network() {
     pump(&mut session, &state);
     let sent = state.borrow().sent.clone();
     assert!(!sent.iter().any(|(channel, _)| *channel == CHANNEL_DIRECT));
+}
+
+/// Tuỳ chọn `allow_direct = false` → không mở listener LAN, không quảng bá
+/// cổng lắng nghe và máy đối tác không thể chiếm đường trực tiếp.
+#[test]
+fn direct_route_is_skipped_when_the_option_is_disabled() {
+    let state = Rc::new(RefCell::new(MockState::default()));
+    let recorder = Rc::new(RefCell::new(Recorder::default()));
+    let options = ConnectOptions {
+        partner_id: "123456789".into(),
+        password: "secret".into(),
+        display_name: "DevTools".into(),
+        device_identity: "A".repeat(32),
+        device_password: "12345678".into(),
+        local_screen: (1920, 1080),
+        tz_offset_minutes: 420,
+        local_ip: "192.168.1.5".into(),
+        allow_direct: false,
+    };
+    let mut session = Session::new(
+        Box::new(MockRelay { state: state.clone() }),
+        Box::new(ObserverProxy { recorder: recorder.clone() }),
+        options,
+    )
+    .expect("tạo phiên thất bại");
+
+    session.start(0.0).expect("mở phiên thất bại");
+    pump(&mut session, &state);
+    // Không được mở listener LAN.
+    assert_eq!(state.borrow().direct_listens, 0);
+
+    // Daemon vẫn có thể báo listener (đã mở từ lần trước) — phiên phải bỏ qua.
+    state.borrow_mut().pending.push(SessionEvent::DirectReady {
+        ip: "192.168.1.5".into(),
+        port: 54321,
+        key: "abc123XYZ4567".into(),
+    });
+    pump(&mut session, &state);
+
+    // Trả lời đăng ký (public address = 203.0.113.7).
+    push_data(
+        &state,
+        CHANNEL_COMMAND,
+        &system_envelope(b"3:443:00111222333:203.0.113.7::0:ping-list:-1:17/10/2026:relay.example:opaque-token", false),
+    );
+    pump(&mut session, &state);
+
+    // Lệnh tra cứu không được quảng bá listener LAN (trường cuối rỗng).
+    let lookup = last_command_text(&state);
+    let lookup_fields: Vec<&str> = lookup.split(':').collect();
+    assert_eq!(lookup_fields.len(), 17);
+    assert_eq!(lookup_fields[16], "", "không được quảng bá cổng LAN khi đã tắt direct");
+    let correlation = lookup_correlation(&lookup);
+
+    // Máy đối tác cùng địa chỉ public + có direct details — vẫn bị bỏ qua.
+    let reply = format!(
+        "8:1:192.168.1.20:unused:203.0.113.7:54000:5900:5901:TmFtZQ==:55100:unused:198.51.100.2:-1:123:relay.example:x:x:x:x:x:secret:192.168.1.20|5555:{correlation}"
+    );
+    push_data(&state, CHANNEL_COMMAND, &system_envelope(reply.as_bytes(), false));
+    pump(&mut session, &state);
+
+    // Máy đối tác kết nối thẳng vào listener → bị bỏ qua, không login direct.
+    state.borrow_mut().pending.push(SessionEvent::DirectConnected {
+        ip: "192.168.1.20".into(),
+    });
+    pump(&mut session, &state);
+    let sent = state.borrow().sent.clone();
+    assert!(!sent.iter().any(|(channel, _)| *channel == CHANNEL_DIRECT));
+    assert!(!session.is_direct_route());
+}
+
+/// Tái hiện lỗi "RefCell already mutably borrowed" của bản cũ.
+///
+/// Ở tầng glue (wasm), relay gọi lại vào ô chứa session (để gửi message điều
+/// khiển) trong lúc ô đó đang được khoá → `RefCell` panic → wasm trap
+/// `unreachable` (wasm32 dùng `panic = "abort"`) → phiên chết, log chỉ còn
+/// "RuntimeError: unreachable".
+///
+/// Test này dựng đúng cấu trúc đó: relay mượn lại ô chứa session, còn timer
+/// thì LẤY SESSION RA khỏi ô trước khi gọi `tick()` rồi đặt lại — như tầng
+/// glue đã sửa. Nếu ai đó để lại khoá ô trong lúc gọi session thì test này
+/// panic → bắt được đúng lỗi gốc.
+#[test]
+fn relay_reentry_does_not_panic_when_the_session_is_taken_out_of_the_state() {
+    /// Ô chứa session + relay cùng mượn ô này (mô phỏng `WsRelay` cũ).
+    #[derive(Default)]
+    struct Shared {
+        session: Option<Session>,
+        /// Số lần relay gọi lại vào ô này.
+        reentries: usize,
+    }
+
+    /// Relay mượn lại ô chứa session ở mỗi lệnh điều khiển.
+    struct ReentrantRelay {
+        shared: Rc<RefCell<Shared>>,
+    }
+
+    impl Relay for ReentrantRelay {
+        fn open(&mut self, _channel: u8, _host: &str, _port: u16, _cert_host: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+            Ok(())
+        }
+        fn write(&mut self, _channel: u8, _bytes: &[u8]) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+            Ok(())
+        }
+        fn close(&mut self, _channel: u8) {
+            // Gọi lại vào ô chứa session — đây là chỗ gây panic ở bản cũ.
+            let mut shared = self.shared.borrow_mut();
+            shared.reentries += 1;
+        }
+        fn listen_direct(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+            Ok(())
+        }
+        fn close_direct_listener(&mut self) {
+            let mut shared = self.shared.borrow_mut();
+            shared.reentries += 1;
+        }
+    }
+
+    let shared = Rc::new(RefCell::new(Shared::default()));
+    let recorder = Rc::new(RefCell::new(Recorder::default()));
+    let options = ConnectOptions {
+        partner_id: "123456789".into(),
+        password: "secret".into(),
+        device_identity: "A".repeat(32),
+        device_password: "12345678".into(),
+        ..Default::default()
+    };
+    let session = Session::new(
+        Box::new(ReentrantRelay { shared: shared.clone() }),
+        Box::new(ObserverProxy { recorder: recorder.clone() }),
+        options,
+    )
+    .expect("tạo phiên thất bại");
+    // start() đặt deadline (LOGIN_TIMEOUT_MS) để tick() sau đó gọi fail().
+    let mut session = session;
+    session.start(0.0).expect("mở phiên thất bại");
+    shared.borrow_mut().session = Some(session);
+
+    // Timer của tầng glue: lấy session ra khỏi ô, gọi tick(), đặt lại.
+    for now in [0.0, 1_000.0, 20_000.0] {
+        let taken = shared.borrow_mut().session.take();
+        if let Some(mut session) = taken {
+            session.tick(now);
+            shared.borrow_mut().session = Some(session);
+        }
+    }
+
+    // tick() sau LOGIN_TIMEOUT_MS sẽ fail() → relay.close() → gọi lại vào ô.
+    assert!(shared.borrow().reentries > 0, "phải gọi relay.close() khi hết thời gian chờ");
 }
 
 /// Observer dùng chung để test đọc lại được sự kiện.

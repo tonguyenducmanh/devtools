@@ -69,7 +69,9 @@
             <canvas
               ref="uvCanvas"
               class="tm-uv-canvas"
-              :class="{ 'tm-uv-canvas-cursor-none': isConnected && controlEnabled }"
+              :class="{
+                'tm-uv-canvas-cursor-none': isConnected && controlEnabled,
+              }"
               tabindex="0"
               @keydown="onCanvasKeydown"
               @keyup="onCanvasKeyup"
@@ -188,7 +190,9 @@
                 v-model="displayName"
                 class="tm-uv-setting-value"
                 :noMargin="true"
-                :placeHolder="$t('i18nCommon.ultraViewer.displayNamePlaceholder')"
+                :placeHolder="
+                  $t('i18nCommon.ultraViewer.displayNamePlaceholder')
+                "
               />
             </div>
 
@@ -200,7 +204,11 @@
                   ? $t('i18nCommon.ultraViewer.disconnect')
                   : $t('i18nCommon.ultraViewer.connect')
               "
-              @click="isConnected || isConnecting ? handleDisconnect() : handleConnect()"
+              @click="
+                isConnected || isConnecting
+                  ? handleDisconnect()
+                  : handleConnect()
+              "
             />
           </div>
 
@@ -209,6 +217,18 @@
             v-model="currentConfigLayout.clipboardSync"
             :label="$t('i18nCommon.ultraViewer.clipboardSync')"
             @change="updateClipboardSync"
+          ></TMCheckbox>
+
+          <!-- Đường LAN trực tiếp: chỉ dùng được khi 2 máy cùng mạng LAN.
+               Bật thì viewer mở listener LAN và quảng bá địa chỉ trong lệnh
+               tra cứu để máy đối tác kết nối thẳng (bỏ qua relay → độ trễ
+               thấp hơn, nội dung màn hình không rời LAN). -->
+          <TMCheckbox
+            v-tooltip="allowDirectTooltip"
+            :variant="$tmEnum.checkboxType.switch"
+            v-model="currentConfigLayout.allowDirect"
+            :label="$t('i18nCommon.ultraViewer.allowDirect')"
+            @change="updateAllowDirect"
           ></TMCheckbox>
 
           <TMCheckbox
@@ -314,6 +334,8 @@ export default {
         currentSidebarOption: this.$tmEnum.RemoteDesktopSidebarOption.Help,
         showLog: false,
         clipboardSync: false,
+        // Cho phép dùng đường LAN trực tiếp khi 2 máy cùng mạng.
+        allowDirect: false,
       },
       isHideEffectBackground: false,
       isFullTab: false,
@@ -321,6 +343,8 @@ export default {
       isConnecting: false,
       isViewOnly: false,
       controlEnabled: true,
+      // Đang chạy trên đường LAN trực tiếp (true) hay qua relay (false).
+      isDirectRoute: false,
       // Số màn hình của máy đối tác (0 = không rõ) và màn hình đang chọn.
       monitorCount: 0,
       selectedMonitor: 0,
@@ -365,6 +389,27 @@ export default {
         count: this.monitorCount,
         monitor: this.monitorName,
       });
+    },
+    /**
+     * Đường đang dùng cho màn hình: LAN trực tiếp hay qua relay.
+     */
+    directRouteText() {
+      if (this.isDirectRoute) {
+        return this.$t("i18nCommon.ultraViewer.routeDirect");
+      }
+      return this.$t("i18nCommon.ultraViewer.routeRelay");
+    },
+    /**
+     * Tooltip của tuỳ chọn kết nối LAN trực tiếp: giải thích + đường đang
+     * dùng (nếu đã kết nối).
+     */
+    allowDirectTooltip() {
+      let me = this;
+      let text = me.$t("i18nCommon.ultraViewer.allowDirectHint");
+      if (me.isConnected) {
+        text += " " + me.directRouteText;
+      }
+      return text;
     },
     sidebarOptions() {
       let options = [];
@@ -502,6 +547,17 @@ export default {
 
       me.isConnecting = true;
       try {
+        // Ngắt phiên cũ (nếu có) trước khi tạo client mới: client cũ giữ
+        // timer 16ms trong WASM, nếu không ngắt thì timer vẫn chạy vô ích.
+        if (me.client) {
+          try {
+            me.client.release_input();
+            me.client.disconnect();
+          } catch (e) {
+            // Client cũ đã hỏng rồi → bỏ qua.
+          }
+          me.client = null;
+        }
         if (!me.wasmModule) {
           me.addLog(me.$t("i18nCommon.ultraViewer.loadingWasm"), "info");
           // Giống RDP: luôn nạp từ assets-wasm-<version>/ultraviewer. Khi build,
@@ -518,6 +574,8 @@ export default {
         me.client = client;
 
         client.on_status((message) => {
+          // Đường truyền có thể đổi (qua relay → LAN trực tiếp) trong phiên.
+          me.isDirectRoute = client.is_direct_route();
           me.addLog(message, "info");
         });
         client.on_connected((width, height) => {
@@ -529,8 +587,12 @@ export default {
           me.updateViewOffset();
           // Lưu profile (ID + mật khẩu + tên + danh tính) để lần sau khỏi nhập.
           me.saveProfile();
-          if (client.is_direct_route()) {
-            me.addLog(me.$t("i18nCommon.ultraViewer.connectedDirect"), "success");
+          me.isDirectRoute = client.is_direct_route();
+          if (me.isDirectRoute) {
+            me.addLog(
+              me.$t("i18nCommon.ultraViewer.connectedDirect"),
+              "success",
+            );
           }
           me.addLog(
             `${me.$t("i18nCommon.ultraViewer.connected")} ${width}x${height}`,
@@ -568,7 +630,15 @@ export default {
           me.isConnecting = false;
           me.isHideEffectBackground = false;
           me.isViewOnly = false;
+          me.isDirectRoute = false;
           me.client = null;
+          // Ngắt client để dừng timer 16ms bên trong WASM (nếu không timer
+          // vẫn chạy mãi dù phiên đã kết thúc).
+          try {
+            client.disconnect();
+          } catch (e) {
+            // Client đã hỏng → bỏ qua.
+          }
           me.addLog(
             `${me.$t("i18nCommon.ultraViewer.sessionEnded")}: ${message}`,
             "warn",
@@ -598,6 +668,7 @@ export default {
           -new Date().getTimezoneOffset(),
           window.screen?.width || 1920,
           window.screen?.height || 1080,
+          me.currentConfigLayout.allowDirect,
         );
       } catch (e) {
         me.isConnecting = false;
@@ -626,6 +697,34 @@ export default {
       me.isHideEffectBackground = false;
       me.isViewOnly = false;
       me.isPartnerTyping = false;
+      me.isDirectRoute = false;
+    },
+
+    /**
+     * Bật/tắt đường LAN trực tiếp.
+     *
+     * Tắt: đóng listener LAN ngay và quay về đường relay. Bật: chỉ có tác
+     * dụng ở lần kết nối tiếp theo (lệnh tra cứu đã gửi rồi) nên cần bấm
+     * "Kết nối" lại.
+     */
+    updateAllowDirect() {
+      let me = this;
+      me.updateConfigLayout();
+      if (!me.client) return;
+      try {
+        me.client.set_allow_direct(me.currentConfigLayout.allowDirect);
+        me.addLog(
+          me.currentConfigLayout.allowDirect
+            ? me.$t("i18nCommon.ultraViewer.directEnabled")
+            : me.$t("i18nCommon.ultraViewer.directDisabled"),
+          "info",
+        );
+      } catch (e) {
+        me.addLog(
+          `${me.$t("i18nCommon.ultraViewer.directToggleFailed")}: ${me.formatError(e)}`,
+          "warn",
+        );
+      }
     },
 
     /**
@@ -681,7 +780,9 @@ export default {
 
     updateClipboardSync() {
       if (this.client) {
-        this.client.set_clipboard_sharing(this.currentConfigLayout.clipboardSync);
+        this.client.set_clipboard_sharing(
+          this.currentConfigLayout.clipboardSync,
+        );
       }
       this.updateConfigLayout();
     },

@@ -562,6 +562,8 @@ export default {
         clipboard: "Two-way clipboard sync (enable it in the Connection panel).",
         chat: "Chat with the partner during the session.",
         agent: "Requires the Agent app to reach the relay.",
+        direct:
+          "Direct LAN connection (enable it in the Connection panel): when both computers share the same LAN the screen stream goes straight between them instead of through the relay, so the latency is lower.",
       },
       troubleshooting: {
         title: "Troubleshooting",

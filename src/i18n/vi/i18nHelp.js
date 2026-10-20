@@ -554,6 +554,8 @@ export default {
         clipboard: "Đồng bộ clipboard hai chiều (bật ở khung Kết nối).",
         chat: "Chat với máy đối tác trong phiên.",
         agent: "Cần chạy Agent app để kết nối qua relay.",
+        direct:
+          "Kết nối LAN trực tiếp (bật ở khung Kết nối): khi 2 máy cùng mạng LAN thì màn hình đi thẳng giữa 2 máy, không qua relay nên độ trễ thấp hơn.",
       },
       troubleshooting: {
         title: "Xử lý sự cố",

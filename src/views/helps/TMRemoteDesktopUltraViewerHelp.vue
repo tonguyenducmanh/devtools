@@ -47,6 +47,9 @@
         <p class="section-text">
           {{ $t("i18nHelp.ultraViewer.features.agent") }}
         </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.ultraViewer.features.direct") }}
+        </p>
       </div>
 
       <div class="help-section">

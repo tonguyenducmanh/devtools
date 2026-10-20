@@ -68,6 +68,12 @@ pub struct ConnectOptions {
     pub tz_offset_minutes: i32,
     /// IP nội bộ của máy chạy daemon (do daemon báo).
     pub local_ip: String,
+    /// Cho phép dùng đường LAN trực tiếp khi 2 máy cùng mạng.
+    ///
+    /// Khi bật, viewer mở listener LAN và quảng bá địa chỉ trong lệnh tra
+    /// cứu để máy đối tác kết nối thẳng (bỏ qua relay → độ trễ thấp hơn và
+    /// nội dung màn hình không rời LAN). Khi tắt, mọi thứ đi qua relay.
+    pub allow_direct: bool,
 }
 
 impl Default for ConnectOptions {
@@ -81,6 +87,7 @@ impl Default for ConnectOptions {
             local_screen: (1920, 1080),
             tz_offset_minutes: 0,
             local_ip: String::new(),
+            allow_direct: true,
         }
     }
 }
@@ -306,6 +313,35 @@ impl Session {
         true
     }
 
+    /// Bật/tắt đường LAN trực tiếp giữa chừng.
+    ///
+    /// Tắt: đóng listener LAN, ngừng chờ máy đối tác kết nối thẳng và bỏ
+    /// đường trực tiếp (nếu đang dùng thì chuyển về relay). Bật lại giữa phiên
+    /// không có tác dụng vì lệnh tra cứu đã gửi đi — cần kết nối lại.
+    ///
+    /// Trả về true nếu trạng thái đã đổi.
+    pub fn set_allow_direct(&mut self, allow: bool) -> bool {
+        if self.options.allow_direct == allow {
+            return false;
+        }
+        self.options.allow_direct = allow;
+        if allow {
+            self.observer.status("The direct LAN route is used on the next connection.");
+            return true;
+        }
+        self.direct_expected = None;
+        self.direct_window = None;
+        self.close_direct_listener();
+        if self.direct_route {
+            // Đang chạy trên kênh trực tiếp → phải quay lại relay.
+            self.on_direct_failed();
+        } else if self.direct_peer.is_some() {
+            self.relay.close(CHANNEL_DIRECT);
+            self.direct_peer = None;
+        }
+        true
+    }
+
     /// Vùng ảnh đang hiển thị (toạ độ trong ảnh màn hình từ xa).
     /// Chọn 1 màn hình thì chỉ hiện phần ảnh của màn hình đó.
     pub fn view_rect(&self) -> Option<Rect> {
@@ -433,7 +469,11 @@ impl Session {
         self.relay.open(CHANNEL_COMMAND, COMMAND_HOST, COMMAND_PORT, COMMAND_HOST)?;
         // Mở listener LAN để máy đối tác có thể kết nối thẳng (nếu cùng LAN).
         // Thất bại ở bước này không ảnh hưởng gì: vẫn dùng đường relay.
-        let _ = self.relay.listen_direct();
+        // Người dùng tắt đường trực tiếp → không mở listener, không quảng bá
+        // cổng lắng nghe ra ngoài LAN.
+        if self.options.allow_direct {
+            let _ = self.relay.listen_direct();
+        }
         Ok(())
     }
 
@@ -767,16 +807,21 @@ impl Session {
         let Some(registration_fields) = self.registration.as_ref() else { return };
         // Quảng bá listener LAN để máy đối tác có thể kết nối thẳng vào.
         // Định dạng: "IPRelay|PortRelay|IPLAN|PortLAN|key" (xem direct_details_text).
-        let direct_details = match (&self.direct, self.own_public) {
-            (Some(listener), Some(own_public)) => messages::direct_details_text(
-                &own_public.to_string(),
-                registration.public_port,
-                &listener.ip,
-                listener.port,
-                &listener.key,
-            )
-            .unwrap_or_default(),
-            _ => String::new(),
+        // Người dùng tắt đường trực tiếp → không quảng bá gì.
+        let direct_details = if !self.options.allow_direct {
+            String::new()
+        } else {
+            match (&self.direct, self.own_public) {
+                (Some(listener), Some(own_public)) => messages::direct_details_text(
+                    &own_public.to_string(),
+                    registration.public_port,
+                    &listener.ip,
+                    listener.port,
+                    &listener.key,
+                )
+                .unwrap_or_default(),
+                _ => String::new(),
+            }
         };
         let text = match messages::lookup_fields(&messages::LookupRequest {
             target_id: self.options.partner_id.trim(),
@@ -822,27 +867,33 @@ impl Session {
         let peer_lan_ip = peer.lan_ip.clone();
         let peer_direct_details = peer.direct_details.clone();
         self.peer = Some(peer);
-        self.direct_expected = match self.own_public {
-            Some(own_public) => direct::peer_lan_address(
-                peer_public_ip,
-                own_public,
-                peer_direct_details.as_deref(),
-                &peer_lan_ip,
-            ),
-            None => None,
-        };
-        if self.direct_expected.is_none() {
-            // Không cùng LAN → không để lộ cổng lắng nghe.
-            self.close_direct_listener();
-            if self.direct_peer.is_some() {
-                self.relay.close(CHANNEL_DIRECT);
-                self.direct_peer = None;
-            }
+        if !self.options.allow_direct {
+            // Người dùng tắt đường LAN trực tiếp → mọi thứ đi qua relay.
+            self.direct_expected = None;
+            self.direct_window = None;
         } else {
-            self.direct_window = Some(now + DIRECT_WINDOW_MS);
-            // Máy đối tác có thể đã kết nối vào listener trước khi ta nhận
-            // được kết quả tra cứu → gửi login ngay nếu đã kết nối.
-            self.begin_direct_login(now);
+            self.direct_expected = match self.own_public {
+                Some(own_public) => direct::peer_lan_address(
+                    peer_public_ip,
+                    own_public,
+                    peer_direct_details.as_deref(),
+                    &peer_lan_ip,
+                ),
+                None => None,
+            };
+            if self.direct_expected.is_none() {
+                // Không cùng LAN → không để lộ cổng lắng nghe.
+                self.close_direct_listener();
+                if self.direct_peer.is_some() {
+                    self.relay.close(CHANNEL_DIRECT);
+                    self.direct_peer = None;
+                }
+            } else {
+                self.direct_window = Some(now + DIRECT_WINDOW_MS);
+                // Máy đối tác có thể đã kết nối vào listener trước khi ta nhận
+                // được kết quả tra cứu → gửi login ngay nếu đã kết nối.
+                self.begin_direct_login(now);
+            }
         }
         if let Err(e) = self.relay.open(CHANNEL_PEER, &relay_ip, COMMAND_PORT, &host) {
             self.fail(&format!("Could not reach the UltraViewer relay: {e}"));
