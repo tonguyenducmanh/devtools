@@ -341,7 +341,7 @@ export default {
         // Cho phép dùng đường LAN trực tiếp khi 2 máy cùng mạng.
         allowDirect: false,
         // Hiển thị con trỏ máy tính (mượt, 60-144fps không trễ như IronRDP).
-        showLocalCursor: true,
+        showLocalCursor: false,
       },
       isHideEffectBackground: false,
       isFullTab: false,
