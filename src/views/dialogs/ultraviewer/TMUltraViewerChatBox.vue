@@ -183,8 +183,8 @@ export default {
 
 /* Tin của mình viền màu nhấn, tin máy đối tác viền màu trung tính */
 .tm-chat-row-local .tm-chat-bubble {
-  border-color: var(--focus-color);
-  color: var(--focus-color);
+  background-color: var(--focus-color);
+  color: var(--selected-item-text-color);
 }
 
 .tm-chat-row-remote .tm-chat-bubble {
