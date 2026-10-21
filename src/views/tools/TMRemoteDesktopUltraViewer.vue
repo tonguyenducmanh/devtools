@@ -81,8 +81,13 @@
               ref="uvCanvas"
               class="tm-uv-canvas"
               :class="{
-                'tm-uv-canvas-cursor-none': isConnected && controlEnabled,
+                'tm-uv-canvas-cursor-none':
+                  isConnected &&
+                  controlEnabled &&
+                  !currentConfigLayout.showLocalCursor,
               }"
+              :width="canvasWidth"
+              :height="canvasHeight"
               tabindex="0"
               @keydown="onCanvasKeydown"
               @keyup="onCanvasKeyup"
@@ -94,9 +99,14 @@
               @contextmenu.prevent="onCanvasContextmenu"
             ></canvas>
 
-            <!-- Canvas phủ: con trỏ của máy đối tác (Windows không vẽ con trỏ
-                 vào khung hình mà gửi riêng lệnh 3/4/28) -->
-            <canvas ref="uvCursorCanvas" class="tm-uv-cursor-canvas"></canvas>
+            <!-- Canvas phủ vẽ con trỏ máy đối tác (chỉ dùng khi tắt con trỏ mượt hoặc ở chế độ chỉ xem) -->
+            <canvas
+              v-if="!currentConfigLayout.showLocalCursor || isViewOnly"
+              ref="uvCursorCanvas"
+              class="tm-uv-cursor-canvas"
+              :width="canvasWidth"
+              :height="canvasHeight"
+            ></canvas>
 
             <!-- Lớp phủ hướng dẫn khi chưa có màn hình từ xa -->
             <div v-if="!isConnected" class="tm-uv-overlay">
@@ -244,6 +254,13 @@
 
           <TMCheckbox
             :variant="$tmEnum.checkboxType.switch"
+            v-model="currentConfigLayout.showLocalCursor"
+            :label="$t('i18nCommon.ultraViewer.showLocalCursor')"
+            @change="updateConfigLayout"
+          ></TMCheckbox>
+
+          <TMCheckbox
+            :variant="$tmEnum.checkboxType.switch"
             v-model="currentConfigLayout.showLog"
             :label="$t('i18nCommon.ultraViewer.showLog')"
             @change="updateConfigLayout"
@@ -323,6 +340,8 @@ export default {
         clipboardSync: false,
         // Cho phép dùng đường LAN trực tiếp khi 2 máy cùng mạng.
         allowDirect: false,
+        // Hiển thị con trỏ máy tính (mượt, 60-144fps không trễ như IronRDP).
+        showLocalCursor: true,
       },
       isHideEffectBackground: false,
       isFullTab: false,
@@ -335,6 +354,9 @@ export default {
       // Số màn hình của máy đối tác (0 = không rõ) và màn hình đang chọn.
       monitorCount: 0,
       selectedMonitor: 0,
+      // Kích thước canvas màn hình (giống IronRDP để khớp tỷ lệ và chống tràn)
+      canvasWidth: 1920,
+      canvasHeight: 1080,
       // Gốc toạ độ của vùng đang xem (khi chỉ xem 1 màn hình).
       viewOffsetX: 0,
       viewOffsetY: 0,
@@ -343,6 +365,8 @@ export default {
       password: "",
       displayName: "",
       deviceIdentity: "",
+      // ID máy đối tác của phiên hiện tại (để nhận biết kết nối mới khác ID).
+      lastConnectedId: "",
       // Dữ liệu chat dùng chung giữa khung chat trong sidebar và popup nổi.
       // Dùng object reactive để popup (app Vue riêng) nhìn thấy tin nhắn mới
       // ngay khi đang mở.
@@ -556,6 +580,14 @@ export default {
         return;
       }
 
+      // Kết nối tới ID khác thì xoá tin nhắn chat và log cũ.
+      if (id !== me.lastConnectedId) {
+        me.chatState.messages.splice(0, me.chatState.messages.length);
+        me.chatState.isTyping = false;
+        me.logEntries.splice(0, me.logEntries.length);
+      }
+      me.lastConnectedId = id;
+
       me.isConnecting = true;
       try {
         // Ngắt phiên cũ (nếu có) trước khi tạo client mới: client cũ giữ
@@ -595,6 +627,8 @@ export default {
           me.isHideEffectBackground = true;
           me.monitorCount = client.monitor_count();
           me.selectedMonitor = 0;
+          me.canvasWidth = width;
+          me.canvasHeight = height;
           me.updateViewOffset();
           // Lưu profile (ID + mật khẩu + tên + danh tính) để lần sau khỏi nhập.
           me.saveProfile();
@@ -789,6 +823,11 @@ export default {
       // tự quay về "tất cả".
       me.selectedMonitor = me.client.selected_monitor();
       me.updateViewOffset();
+      const sz = me.client.screen_size();
+      if (sz && sz[0] && sz[1]) {
+        me.canvasWidth = sz[0];
+        me.canvasHeight = sz[1];
+      }
       me.addLog(
         me.$t("i18nCommon.ultraViewer.monitorSwitched", {
           monitor: me.monitorName,
@@ -893,7 +932,20 @@ export default {
     // ─────────────────────── Nhập liệu chuột / bàn phím ───────────────────────
 
     /**
+     * Ánh xạ nút chuột từ chuẩn trình duyệt sang chuẩn UltraViewer.
+     * Browser: 0=trái, 1=giữa, 2=phải
+     * UltraViewer (input.rs): 0=trái, 1=phải, 2=giữa
+     */
+    remapMouseButton(browserButton) {
+      if (browserButton === 1) return 2; // giữa → 2 (MBUTTONDOWN/UP)
+      if (browserButton === 2) return 1; // phải → 1 (RBUTTONDOWN/UP)
+      return browserButton; // 0=trái giữ nguyên
+    },
+
+    /**
      * Đổi toạ độ chuột trên canvas (CSS pixel) sang toạ độ màn hình từ xa.
+     * Đọc trực tiếp bounding rect của canvas để có toạ độ chính xác tức thì
+     * như IronRDP (không cache để tránh giật bước nhảy toạ độ).
      */
     toRemotePoint(e) {
       const canvas = this.$refs.uvCanvas;
@@ -909,6 +961,11 @@ export default {
       };
     },
 
+    /**
+     * Chuột di chuyển: chuyển toạ độ trên canvas sang toạ độ desktop ảo của máy
+     * đối tác rồi gọi WASM pointer_move. WASM bên trong đã giới hạn nhịp gửi 8ms (~125Hz)
+     * nên gửi ngay lập tức không làm nghẽn mạng, loại bỏ độ trễ và giật lùi con trỏ.
+     */
     onCanvasMousemove(e) {
       if (!this.client || !this.isConnected || !this.controlEnabled) return;
       const { x, y } = this.toRemotePoint(e);
@@ -920,14 +977,14 @@ export default {
       e.preventDefault();
       this.$refs.uvCanvas?.focus();
       const { x, y } = this.toRemotePoint(e);
-      this.client.pointer_button(e.button, true, x, y);
+      this.client.pointer_button(this.remapMouseButton(e.button), true, x, y);
     },
 
     onCanvasMouseup(e) {
       if (!this.client || !this.isConnected || !this.controlEnabled) return;
       e.preventDefault();
       const { x, y } = this.toRemotePoint(e);
-      this.client.pointer_button(e.button, false, x, y);
+      this.client.pointer_button(this.remapMouseButton(e.button), false, x, y);
     },
 
     onCanvasMouseleave() {
@@ -1055,13 +1112,13 @@ export default {
   cursor: none;
 }
 
-/* Canvas phủ vẽ con trỏ của máy đối tác. Vị trí/kích thước được module WASM
-   đặt lại theo khung thực tế của canvas màn hình (canvas màn hình được canh
-   giữa nên không thể dùng top/left cố định). */
+/* Canvas phủ vẽ con trỏ của máy đối tác (khi ở chế độ server pointer hoặc chỉ xem) */
 .tm-uv-cursor-canvas {
   position: absolute;
-  top: 0;
-  left: 0;
+  outline: none;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
   pointer-events: none;
 }
 

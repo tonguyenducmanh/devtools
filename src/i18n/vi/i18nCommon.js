@@ -848,7 +848,8 @@ export default {
       pointerSoftwareRendering: "Con trỏ phần mềm",
       pin: "Ghim thanh công cụ",
       unpin: "Bỏ ghim thanh công cụ",
-      sendFilesToRemote: "Tải file từ máy tính của bạn lên máy remote, rồi chuột phải ở trong máy remote chọn paste",
+      sendFilesToRemote:
+        "Tải file từ máy tính của bạn lên máy remote, rồi chuột phải ở trong máy remote chọn paste",
       receiveFiles: "Tải file đã nhận từ máy remote về máy tính của bạn",
       fileDownloading: "Đang tải, vui lòng đợi",
       downloadThisFile: "Bấm để tải file này",
@@ -856,7 +857,8 @@ export default {
       removeFile: "Xoá file khỏi danh sách",
       clearFileList: "Xoá danh sách",
       noFilesFromRemote: "Máy trong chưa gửi file nào",
-      sentFileList: "Đã gửi danh sách file, hãy chuột phải trong máy remote rồi chọn paste:",
+      sentFileList:
+        "Đã gửi danh sách file, hãy chuột phải trong máy remote rồi chọn paste:",
       uploadListAccepted: "Máy trong đã nhận danh sách file",
       uploadListRejected: "Máy trong từ chối danh sách file",
       uploadInitFailed: "Không gửi được danh sách file",
@@ -898,10 +900,12 @@ export default {
       loadingWasm: "Đang tải module UltraViewer WebAssembly...",
       wasmReady: "Module WASM đã sẵn sàng",
       sessionEnded: "Phiên kết thúc",
-      agentNotAvailable: "Không tìm thấy Agent. Hãy chạy Dev Tools agent trên máy này.",
+      agentNotAvailable:
+        "Không tìm thấy Agent. Hãy chạy Dev Tools agent trên máy này.",
       partnerIdRequired: "ID máy đối tác chỉ gồm chữ số",
       passwordRequired: "Mật khẩu là bắt buộc",
-      viewOnlyNotice: "Máy đối tác đang ở chế độ chỉ xem, không thể điều khiển.",
+      viewOnlyNotice:
+        "Máy đối tác đang ở chế độ chỉ xem, không thể điều khiển.",
       enableControl: "Bật điều khiển",
       disableControl: "Tắt điều khiển",
       controlEnabled: "Đã bật điều khiển",
@@ -910,6 +914,7 @@ export default {
       screenshotSaved: "Đã lưu ảnh chụp màn hình",
       screenshotFailed: "Không chụp được ảnh",
       showLog: "Hiển thị log",
+      showLocalCursor: "Con trỏ mượt",
       clipboardSync: "Đồng bộ clipboard",
       allowDirect: "Kết nối LAN trực tiếp",
       allowDirectHint:

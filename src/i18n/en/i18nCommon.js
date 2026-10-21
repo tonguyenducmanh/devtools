@@ -914,6 +914,7 @@ export default {
       screenshotSaved: "Screenshot saved",
       screenshotFailed: "Could not capture the screen",
       showLog: "Show log",
+      showLocalCursor: "Smooth local pointer",
       clipboardSync: "Sync clipboard",
       allowDirect: "Direct LAN connection",
       allowDirectHint:

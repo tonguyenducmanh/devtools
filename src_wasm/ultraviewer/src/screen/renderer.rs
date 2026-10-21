@@ -201,19 +201,32 @@ impl Renderer {
     /// Trích vùng ảnh ra dạng RGBA (4 byte/pixel) để web vẽ lên canvas.
     /// `main` lưu 0x00RRGGBB theo thứ tự top-down.
     pub fn rect_rgba(&self, rect: Rect) -> Vec<u8> {
-        let mut out = vec![0u8; rect.width as usize * rect.height as usize * 4];
-        for row in 0..rect.height as usize {
-            let src = ((rect.y as usize + row) * self.width + rect.x as usize) * 4;
-            let dst = row * rect.width as usize * 4;
-            for col in 0..rect.width as usize {
-                let px = self.main[src / 4 + col];
-                out[dst + col * 4] = (px >> 16) as u8;
-                out[dst + col * 4 + 1] = (px >> 8) as u8;
-                out[dst + col * 4 + 2] = px as u8;
-                out[dst + col * 4 + 3] = 255;
+        let w = rect.width as usize;
+        let h = rect.height as usize;
+        let total_pixels = w * h;
+        if total_pixels == 0 {
+            return Vec::new();
+        }
+        let mut out_u32 = vec![0u32; total_pixels];
+        for row in 0..h {
+            let src_offset = (rect.y as usize + row) * self.width + rect.x as usize;
+            let dst_offset = row * w;
+            if src_offset + w > self.main.len() {
+                continue;
+            }
+            let src_slice = &self.main[src_offset..src_offset + w];
+            let dst_slice = &mut out_u32[dst_offset..dst_offset + w];
+            for col in 0..w {
+                let px = src_slice[col];
+                // 0x00RRGGBB -> RGBA LE byte layout: [RR, GG, BB, 0xFF] = 0xFF000000 | (BB << 16) | (GG << 8) | RR
+                dst_slice[col] = 0xFF000000 | ((px & 0xFF) << 16) | (px & 0x0000FF00) | ((px >> 16) & 0xFF);
             }
         }
-        out
+        let ptr = out_u32.as_mut_ptr() as *mut u8;
+        let len = total_pixels * 4;
+        let cap = out_u32.capacity() * 4;
+        std::mem::forget(out_u32);
+        unsafe { Vec::from_raw_parts(ptr, len, cap) }
     }
 
     /// Ghi nhận vùng màn hình vừa bị thay đổi (cắt vừa màn hình).

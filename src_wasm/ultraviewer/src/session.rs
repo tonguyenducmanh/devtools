@@ -47,9 +47,9 @@ pub const DIRECT_INIT_TIMEOUT_MS: f64 = 8_000.0;
 /// 70 = đẹp). Giống RemoteControlCommands.quality của MacViewer.
 pub const DEFAULT_DISPLAY_QUALITY: i32 = 45;
 
-/// Nhịp tối đa gửi vị trí chuột (ms). Máy đối tác phải chụp + nén + gửi lại
-/// màn hình cho mỗi lần di chuyển nên gửi dồn sẽ làm con trỏ bị trễ.
-pub const POINTER_SEND_INTERVAL_MS: f64 = 40.0;
+/// Nhịp tối đa gửi vị trí chuột (ms). Giá trị 8ms ≈ 125Hz (chuẩn chuột USB)
+/// giúp gửi mượt mà ở cả màn hình 60Hz và 120Hz mà không bị lỡ nhịp hay giật.
+pub const POINTER_SEND_INTERVAL_MS: f64 = 8.0;
 
 /// Tuỳ chọn kết nối do tầng UI truyền vào.
 #[derive(Clone, Debug)]
@@ -998,6 +998,11 @@ impl Session {
                 // Con trỏ: máy đối tác gửi lệnh chọn hình (3), hình mới (4) và
                 // vị trí (28). Khi thiếu hình phải yêu cầu host gửi (4|||hash).
                 if let Some(message) = cursor::parse(parts) {
+                    // Nếu đang điều khiển thì bỏ qua lệnh 28 (vị trí dội lại từ máy đối tác)
+                    // để tránh giật lùi con trỏ về vị trí cũ do độ trễ mạng (giống IronRDP).
+                    if self.can_send_input() && matches!(message, crate::cursor::Cursor::Position { .. }) {
+                        return;
+                    }
                     if let Some(request) = self.cursor.apply(message) {
                         self.send_peer(&request);
                     }
@@ -1267,7 +1272,8 @@ impl Session {
         if !self.can_send_input() {
             return;
         }
-        // Chỉ lưu lại; timer của tầng glue sẽ gửi theo nhịp giới hạn.
+        // Cập nhật vị trí con trỏ ngay lập tức để phản hồi mượt mà không trễ.
+        self.cursor.position = Some((x + self.origin.0, y + self.origin.1));
         self.pending_pointer = Some((x, y));
     }
 

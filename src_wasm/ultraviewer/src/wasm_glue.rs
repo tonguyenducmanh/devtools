@@ -538,6 +538,7 @@ impl UltraViewerClient {
         let mut state = self.state.borrow_mut();
         if let Some(session) = state.session.as_mut() {
             session.on_pointer_move(x, y);
+            session.flush_pointer(now_ms());
         }
     }
 
@@ -858,6 +859,11 @@ fn paint(state: &Rc<RefCell<State>>) {
         (view, dirty, ctx)
     };
     let Some(ctx) = ctx else { return };
+    if dirty.is_empty() {
+        return;
+    }
+    let inner = state.borrow();
+    let Some(session) = inner.session.as_ref() else { return };
     for rect in dirty {
         // Cắt vùng thay đổi theo vùng đang hiển thị.
         let x0 = rect.x.max(view.x);
@@ -873,44 +879,13 @@ fn paint(state: &Rc<RefCell<State>>) {
             width: (x1 - x0) as u32,
             height: (y1 - y0) as u32,
         };
-        let pixels = {
-            let inner = state.borrow();
-            let Some(session) = inner.session.as_ref() else { continue };
-            session.region_pixels(sub)
-        };
-        let Some(pixels) = pixels else { continue };
+        let Some(pixels) = session.region_pixels(sub) else { continue };
         let data = wasm_bindgen::Clamped(&pixels[..]);
         let Ok(image) = web_sys::ImageData::new_with_u8_clamped_array_and_sh(data, sub.width, sub.height) else {
             continue;
         };
         let _ = ctx.put_image_data(&image, (sub.x - view.x) as f64, (sub.y - view.y) as f64);
     }
-}
-
-/// Đặt khung của canvas con trỏ trùng với canvas màn hình.
-///
-/// Canvas màn hình được canh giữa trong container (flex + max-width/max-height)
-/// còn canvas con trỏ nằm absolute nên phải đặt lại tọa độ/kích thước theo
-/// khung thực tế của canvas màn hình, nếu không con trỏ sẽ lệch chỗ.
-fn sync_cursor_canvas_box(state: &Rc<RefCell<State>>) {
-    let inner = state.borrow();
-    let (Some(screen), Some(cursor)) = (inner.canvas.as_ref(), inner.cursor_canvas.as_ref()) else {
-        return;
-    };
-    let Some(container) = screen.parent_element() else { return };
-    let screen_rect = screen.get_bounding_client_rect();
-    let container_rect = container.get_bounding_client_rect();
-    let style = cursor.style();
-    let _ = style.set_property(
-        "left",
-        &format!("{}px", screen_rect.left() - container_rect.left()),
-    );
-    let _ = style.set_property(
-        "top",
-        &format!("{}px", screen_rect.top() - container_rect.top()),
-    );
-    let _ = style.set_property("width", &format!("{}px", screen_rect.width()));
-    let _ = style.set_property("height", &format!("{}px", screen_rect.height()));
 }
 
 /// Vẽ con trỏ của máy đối tác lên canvas phủ.
@@ -929,7 +904,6 @@ fn paint_cursor(state: &Rc<RefCell<State>>) {
     let Some((x, y)) = position else { return };
     // Toạ độ con trỏ là trên desktop ảo → trừ gốc của vùng đang hiển thị.
     let (x, y) = (x - origin.0, y - origin.1);
-    sync_cursor_canvas_box(state);
     let (width, height, hot_x, hot_y, pixels) = match image {
         Some(image) => image,
         // Chưa có hình con trỏ: dùng mũi tên mặc định.

@@ -18,6 +18,8 @@ fi
 
 rustup target add wasm32-unknown-unknown
 
+cd "$SCRIPT_DIR"
+
 echo "Building UltraViewer WASM..."
 echo "Output directory: $OUTPUT_DIR"
 
