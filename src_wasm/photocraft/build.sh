@@ -5,7 +5,7 @@
 # 2. trunk: brew install trunk  (hoặc: cargo install trunk --locked)
 # 3. clang (để build feature heif cho target wasm32)
 #
-# Build toàn bộ source từ external_repo (storytold/photocraft)
+# Build toàn bộ source từ external_repo (tonguyenducmanh/photocraft)
 # rồi copy output tĩnh sang src_wasm/pkg/photocraft/ để serve cùng web app.
 # Kết quả build gồm: index.html + photocraft-web-<hash>.js + photocraft-web-<hash>_bg.wasm
 # (wasm ~27MB được nén gzip thành .wasm.gz ~9MB để dưới giới hạn 25 MiB của Cloudflare).

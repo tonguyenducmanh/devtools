@@ -36,8 +36,10 @@ fetch "$ROOT_DIR/src_wasm/iron_rdp/external_repo" \
 
 # PhotoCraft (dùng cho tool Ảnh pixel) — SHA cũ:
 #   e398cc80b8c909fb5183fb6b879191a258410997
+# (fork của https://github.com/storytold/photocraft — dùng bản fork của chính mình
+#  để có thể tự sửa/patch upstream khi cần)
 fetch "$ROOT_DIR/src_wasm/photocraft/external_repo" \
-  "https://github.com/storytold/photocraft.git" \
+  "https://github.com/tonguyenducmanh/photocraft.git" \
   "e398cc80b8c909fb5183fb6b879191a258410997"
 
 echo "Fetch wasm sources completed."

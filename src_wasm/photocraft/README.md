@@ -2,8 +2,11 @@
 
 ## Mô tả
 
-Folder này chứa source code để build [PhotoCraft](https://github.com/storytold/photocraft)
+Folder này chứa source code để build [PhotoCraft](https://github.com/tonguyenducmanh/photocraft)
 (trình chỉnh sửa ảnh viết bằng Rust thuần) thành WebAssembly (WASM) chạy được trên web.
+
+> PhotoCraft là **fork** của [storytold/photocraft](https://github.com/storytold/photocraft)
+> (MIT/Apache-2.0), dùng bản fork của chính mình để có thể tự sửa/patch upstream khi cần.
 
 PhotoCraft build ra một **web app hoàn chỉnh** (egui + wgpu), gồm:
 - `manifest.json` (tên file glue + wasm — app đọc file này để biết hash mới nhất)
@@ -42,7 +45,7 @@ Kết quả build được xuất ra thư mục `src_wasm/pkg/photocraft/`.
 ```
 src_wasm/
 ├── photocraft/           # Source code build
-│   ├── external_repo/    # Clone on-demand: https://github.com/storytold/photocraft.git
+│   ├── external_repo/    # Clone on-demand: https://github.com/tonguyenducmanh/photocraft.git
 │   │                     # (tự clone bởi scripts/fetch_wasm_sources.sh khi build — KHÔNG phải git submodule)
 │   ├── build.sh          # gọi chung scripts/wasm_dist_common.sh để nén wasm + dọn site
 │   └── README.md
