@@ -5,4 +5,4 @@ FROM
   JOIN pg_namespace n ON p.pronamespace = n.oid
 WHERE
   n.nspname IN ('pg_catalog', 'information_schema')
-  AND p.prokind IN ('f', 'a', 'w')
+  AND p.prokind IN ('f', 'a', 'w', 'p')

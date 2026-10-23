@@ -288,6 +288,10 @@ export default {
         if (cached) {
           let merged = await me.mergeWithBuiltinIntellisense(cached);
           await me.applyMonacoIntellisense(merged);
+        } else {
+          // Nếu chưa có cache connection, vẫn merge với builtin intellisense
+          let merged = await me.mergeWithBuiltinIntellisense({});
+          await me.applyMonacoIntellisense(merged);
         }
       } catch {}
     },
@@ -475,6 +479,7 @@ export default {
 
     /**
      * Merge dữ liệu intellisense connection với dữ liệu built-in đã cache.
+     * Tự động tải builtin intellisense từ DB nếu chưa có cache.
      */
     async mergeWithBuiltinIntellisense(connData) {
       let me = this;
@@ -482,6 +487,14 @@ export default {
         const builtinCacheKey =
           me.$tmEnum.cacheConfig.PostgreSQLBuiltinIntellisense;
         let builtinData = await TMCache.get(builtinCacheKey);
+        if (!builtinData && me.selectedConnectionId) {
+          try {
+            await me.handleLoadBuiltinIntellisense();
+            builtinData = await TMCache.get(builtinCacheKey);
+          } catch (e) {
+            // Bỏ qua nếu không tải được builtin intellisense
+          }
+        }
         if (!builtinData) return connData;
         return me.mergeIntellisenseData(connData, builtinData);
       } catch {
