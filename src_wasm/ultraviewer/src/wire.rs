@@ -93,11 +93,15 @@ pub fn decode_envelope(b: &[u8]) -> Result<Envelope<'_>> {
 }
 
 /// RelayKeepalive.relayEnvelope: plain "ping" system message to a relay.
+/// Tham khảo daemon: src_backend/tm_core_service/internal/service/bl_ultraviewer_relay.go::startHeartbeatLoop()
+/// Frame được daemon Go hardcode: [0x05,0x00,0x00,0x00,0x01,'p','i','n','g']
 pub fn relay_keepalive_envelope() -> Vec<u8> {
     system_envelope(b"ping", false)
 }
 
 /// RelayKeepalive.commandEnvelope: encrypted ASCII "2" on the command channel.
+/// Byte frame khớp test dưới đây và được daemon Go sao chép làm ultraViewerCommandKeepaliveFrame
+/// Tham khảo daemon: src_backend/tm_core_service/internal/service/bl_ultraviewer_relay.go::startHeartbeatLoop()
 pub fn command_keepalive_envelope() -> Vec<u8> {
     system_envelope(&CommandCipher::server().encrypt(b"2"), true)
 }

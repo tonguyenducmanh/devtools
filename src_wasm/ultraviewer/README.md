@@ -36,6 +36,19 @@ Các file **viết mới** cho Dev Tools (không có trong MacViewer):
 | `src/wasm_glue.rs` | Nối `session` với WebSocket của trình duyệt và vẽ khung hình lên `<canvas>` |
 | `tests/session_flow.rs` | Test end-to-end với relay giả lập (đăng ký → tra cứu → login → màn hình → input) + test đường LAN trực tiếp |
 
+## Keepalive / Heartbeat tới relay UltraViewer
+
+UltraViewer relay sẽ ngắt kênh nếu không nhận keepalive định kỳ.
+
+- **Tham khảo gốc (WASM):** `src/wire.rs` (`relay_keepalive_envelope`, `command_keepalive_envelope`), `src/session.rs` (`send_heartbeat`, `HEARTBEAT_MS`)
+- **Hiện tại (ưu tiên):** `../../src_backend/tm_core_service/internal/service/bl_ultraviewer_relay.go` (`startHeartbeatLoop`)
+  - Mỗi 10s gửi peer keepalive trên kênh 2
+  - Mỗi 60s gửi command keepalive trên kênh 1
+  - Frame peer keepalive: `[0x05,0x00,0x00,0x00,0x01,'p','i','n','g']`
+  - Frame command keepalive khớp `src/wire.rs::relay_envelope_fixtures()`
+
+**Lý do:** Timer JS bị throttle khi tab background/minimize. Daemon Go giữ TCP tới relay nên heartbeat luôn được gửi đều đặn, đảm bảo kết nối ổn định mà không phụ thuộc vào trình duyệt.
+
 Giữ nguyên MIT của MacViewer: xem `LICENSE-MacViewer` trong thư mục này.
 
 ## Cách hoạt động

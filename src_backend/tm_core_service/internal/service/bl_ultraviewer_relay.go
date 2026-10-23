@@ -6,7 +6,16 @@ package service
 //
 // Phần giao thức UltraViewer (đăng ký, tra cứu, login, giải mã màn hình)
 // được port từ https://github.com/DeanOpen/MacViewer (giấy phép MIT) — xem
-// src_wasm/ultraviewer/. Ở đây chỉ lo phần truyền tải + chứng thư ký.
+// src_wasm/ultraviewer/.
+//
+// Heartbeat/keepalive tới relay UltraViewer được di chuyển từ WASM sang daemon:
+// - Tham khảo: src_wasm/ultraviewer/src/wire.rs (relay_keepalive_envelope, command_keepalive_envelope)
+// - Tham khảo: src_wasm/ultraviewer/src/session.rs (send_heartbeat, HEARTBEAT_MS)
+// - Frame bytes được hardcode khớp test trong wire.rs để tránh phải port toàn bộ 3DES cipher sang Go.
+//   peer keepalive: [0x05,0x00,0x00,0x00,0x01,'p','i','n','g'] (system envelope "ping" không mã hoá)
+//   command keepalive (mỗi 60s): [0x0a,0x00,0x00,0x00,0x01,0x00,...] (ciphertext của '2' với CommandCipher::server())
+// Daemon giữ kết nối TCP tới relay, không phụ thuộc vào timer bị throttle của trình duyệt.
+// Ở đây chỉ lo phần truyền tải + chứng thư ký + giữ kết nối alive tới relay.
 //
 // Giao thức WebSocket (một kết nối, nhiều kênh):
 //
@@ -165,6 +174,16 @@ func (w *ultraViewerWriter) writeControl(control ultraViewerControlMessage) {
 	w.conn.WriteMessage(websocket.TextMessage, payload)
 }
 
+var (
+	// ultraViewerPeerKeepaliveFrame: tham khảo src_wasm/ultraviewer/src/wire.rs:relay_keepalive_envelope()
+	// system_envelope(b"ping", false) bọc trong frame length-prefixed LE -> [0x05,0x00,0x00,0x00, 0x01, 'p','i','n','g']
+	ultraViewerPeerKeepaliveFrame = []byte{0x05, 0x00, 0x00, 0x00, 0x01, 0x70, 0x69, 0x6e, 0x67}
+	// ultraViewerCommandKeepaliveFrame: tham khảo src_wasm/ultraviewer/src/wire.rs:command_keepalive_envelope()
+	// system_envelope(CommandCipher::server().encrypt(b"2"), true) bọc frame
+	// Giá trị khớp test wire.rs:relay_envelope_fixtures() "command_keepalive_envelope"
+	ultraViewerCommandKeepaliveFrame = []byte{0x0a, 0x00, 0x00, 0x00, 0x01, 0x00, 0x2d, 0x93, 0x29, 0x71, 0xdd, 0x9d, 0xcb, 0x2d}
+)
+
 // ultraViewerSession giữ toàn bộ kênh của một phiên trình duyệt.
 type ultraViewerSession struct {
 	mu       sync.Mutex
@@ -175,6 +194,7 @@ type ultraViewerSession struct {
 	// Kết nối đã thiết lập với máy đối tác qua đường LAN trực tiếp.
 	directChannel *ultraViewerDirectChannel
 	closed        bool
+	keepaliveTicks int
 }
 
 // HandleUltraViewerWebSocket là endpoint WebSocket cho module WASM UltraViewer.
@@ -195,6 +215,7 @@ func HandleUltraViewerWebSocket(w http.ResponseWriter, r *http.Request) {
 		channels: make(map[uint8]*ultraViewerChannel),
 		writer:   &ultraViewerWriter{conn: conn},
 	}
+	session.startHeartbeatLoop()
 	defer session.closeAll()
 
 	tm_common.LogInfo("[UltraViewer] Có kết nối WebSocket mới")
@@ -519,6 +540,45 @@ func localIPv4Address() string {
 		}
 	}
 	return ""
+}
+
+// startHeartbeatLoop gửi keepalive tới relay UltraViewer trực tiếp từ daemon
+// Tham khảo src_wasm/ultraviewer/src/session.rs:send_heartbeat()
+// Mỗi 10s gửi peer keepalive, mỗi 60s (ticks%6==0) gửi command keepalive.
+// Được di chuyển sang Go để không phụ thuộc vào timer bị throttle của trình duyệt.
+func (s *ultraViewerSession) startHeartbeatLoop() {
+	go func() {
+		ticker := time.NewTicker(10 * time.Second)
+		defer ticker.Stop()
+		for {
+			<-ticker.C
+			s.mu.Lock()
+			if s.closed {
+				s.mu.Unlock()
+				return
+			}
+			channels := make(map[uint8]*ultraViewerChannel, len(s.channels))
+			for k, v := range s.channels {
+				channels[k] = v
+			}
+			s.keepaliveTicks++
+			ticks := s.keepaliveTicks
+			s.mu.Unlock()
+
+			// Heartbeat kênh peer (giống WASM send_heartbeat)
+			if ch, ok := channels[2]; ok && ch != nil && ch.conn != nil {
+				ch.conn.SetWriteDeadline(time.Now().Add(ultraViewerWriteTimeout))
+				_, _ = ch.conn.Write(ultraViewerPeerKeepaliveFrame)
+			}
+			// Mỗi 60s gửi keepalive kênh command (giống WASM heartbeat_ticks % 6 == 0)
+			if ticks%6 == 0 {
+				if ch, ok := channels[1]; ok && ch != nil && ch.conn != nil {
+					ch.conn.SetWriteDeadline(time.Now().Add(ultraViewerWriteTimeout))
+					_, _ = ch.conn.Write(ultraViewerCommandKeepaliveFrame)
+				}
+			}
+		}
+	}()
 }
 
 // isClosedConnError kiểm tra lỗi do đóng kết nối (không phải lỗi thật).

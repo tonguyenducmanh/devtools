@@ -1253,6 +1253,8 @@ impl Session {
     fn send_heartbeat(&mut self) {
         self.heartbeat_ticks += 1;
         // Keepalive của relay: system envelope "ping" (không mã hoá).
+        // Tham khảo daemon: src_backend/tm_core_service/internal/service/bl_ultraviewer_relay.go
+        // Heartbeat hiện được di chuyển sang Go để không phụ thuộc timer bị throttle của trình duyệt
         self.send_frame(CHANNEL_PEER, &relay_keepalive_envelope());
         self.send_peer(b"20");
         if self.heartbeat_ticks % 6 == 0 {
