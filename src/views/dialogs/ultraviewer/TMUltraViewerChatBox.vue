@@ -6,7 +6,7 @@
   <div class="tm-chat-box">
     <div v-if="showHeader" class="tm-chat-header">{{ title }}</div>
 
-    <div class="tm-chat-messages">
+    <div ref="messagesContainer" class="tm-chat-messages" @scroll="onScroll">
       <div
         v-for="(entry, idx) in messages"
         :key="idx"
@@ -103,9 +103,34 @@ export default {
   data() {
     return {
       inputText: "",
+      isPinnedToBottom: true,
     };
   },
 
+  mounted() {
+    this.$nextTick(() => {
+      this.scrollToBottom();
+    });
+  },
+  watch: {
+    messages: {
+      handler() {
+        if (this.isPinnedToBottom) {
+          this.$nextTick(() => {
+            this.scrollToBottom();
+          });
+        }
+      },
+      deep: true,
+    },
+    isTyping() {
+      if (this.isPinnedToBottom) {
+        this.$nextTick(() => {
+          this.scrollToBottom();
+        });
+      }
+    },
+  },
   methods: {
     /**
      * Gửi nội dung đang gõ ra ngoài (component cha lo phần gửi thật).
@@ -115,6 +140,23 @@ export default {
       if (!text) return;
       this.inputText = "";
       this.$emit("send", text);
+      this.isPinnedToBottom = true;
+      this.$nextTick(() => {
+        this.scrollToBottom();
+      });
+    },
+    onScroll() {
+      const container = this.$refs.messagesContainer;
+      if (!container) return;
+      const threshold = 20;
+      const distanceToBottom =
+        container.scrollHeight - container.scrollTop - container.clientHeight;
+      this.isPinnedToBottom = distanceToBottom <= threshold;
+    },
+    scrollToBottom() {
+      const container = this.$refs.messagesContainer;
+      if (!container) return;
+      container.scrollTop = container.scrollHeight;
     },
   },
 };
@@ -152,6 +194,8 @@ export default {
      bóng sẽ bị co lại và chữ xuống dòng. */
   align-items: stretch;
   gap: var(--padding-medium);
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 /* Tin của mình bên phải, tin của máy đối tác bên trái */
@@ -195,6 +239,9 @@ export default {
 .tm-chat-text {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
 }
 
 .tm-chat-typing {
