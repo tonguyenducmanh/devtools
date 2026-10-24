@@ -157,26 +157,19 @@ export default {
   z-index: 1001;
   transform: translateX(-50%) translateY(calc(-100% + 8px));
   opacity: 0.6;
+  pointer-events: none;
 
   &:hover {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-  }
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -50px;
-    right: -50px;
-    bottom: -20px;
-    z-index: -1;
+    pointer-events: auto;
   }
 
   &.toolbar-pinned {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
   }
 
   :deep(.toolbar-btn) {
@@ -187,6 +180,7 @@ export default {
     justify-content: center;
     border-radius: var(--border-radius);
     cursor: pointer;
+    pointer-events: auto;
 
     &:hover {
       background-color: var(--focus-color);
