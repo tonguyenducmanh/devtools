@@ -178,7 +178,6 @@ export default {
 
 .tm-chat-header {
   padding: var(--padding);
-  font-size: var(--font-size-small);
   font-weight: 600;
 }
 
@@ -187,7 +186,7 @@ export default {
   width: 100%;
   min-width: 0;
   overflow-y: auto;
-  padding: 0 var(--padding);
+  padding: var(--padding);
   display: flex;
   flex-direction: column;
   /* Các dòng tin nhắn phải tràn hết chiều ngang khung chat, nếu không bong
@@ -221,7 +220,6 @@ export default {
   padding: var(--padding-medium) var(--padding-x-medium);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-component);
-  font-size: var(--font-size-small);
   line-height: 1.5;
 }
 
