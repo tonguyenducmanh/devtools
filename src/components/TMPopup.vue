@@ -1,20 +1,54 @@
 <template>
   <teleport to="body">
-    <div v-if="visible" class="tm-popup-overlay" :class="{ 'tm-popup-overlay-transparent': !showOverlayBackground }" @click.self="onOverlayClick">
-      <div ref="popupEl" class="flex flex-col tm-popup-container" :style="computeStyle"
-        :class="{ 'tm-popup-fullscreen-mode': isFullscreen }">
-        <div v-if="showHeader" class="tm-popup-header" :class="{ 'tm-popup-draggable': draggable && !isFullscreen }"
-          v-tooltip="draggable && !isFullscreen ? $t('i18nCommon.popup.drag') : ''" @mousedown="startDrag">
+    <div
+      v-if="visible"
+      class="tm-popup-overlay"
+      :class="{ 'tm-popup-overlay-transparent': !showOverlayBackground }"
+      @click.self="onOverlayClick"
+    >
+      <div
+        ref="popupEl"
+        class="flex flex-col tm-popup-container"
+        :style="computeStyle"
+        :class="{ 'tm-popup-fullscreen-mode': isFullscreen }"
+      >
+        <div
+          v-if="showHeader"
+          class="tm-popup-header"
+          :class="{ 'tm-popup-draggable': draggable && !isFullscreen }"
+          v-tooltip="
+            draggable && !isFullscreen ? $t('i18nCommon.popup.drag') : ''
+          "
+          @mousedown="startDrag"
+        >
           <div class="tm-popup-title">{{ title }}</div>
           <div class="tm-popup-header-extra">
             <slot name="header" />
-            <button v-if="showFullScreenHeaderIcon" class="tm-popup-close"
-              v-tooltip="isFullscreen ? $t('i18nCommon.popup.exitFullscreen') : $t('i18nCommon.popup.fullscreen')"
-              @click="toggleFullscreen">
-              <div class="tm-icon" :class="isFullscreen ? 'tm-exit-full-screen-icon' : 'tm-full-screen-icon'"></div>
+            <button
+              v-if="showFullScreenHeaderIcon"
+              class="tm-popup-close"
+              v-tooltip="
+                isFullscreen
+                  ? $t('i18nCommon.popup.exitFullscreen')
+                  : $t('i18nCommon.popup.fullscreen')
+              "
+              @click="toggleFullscreen"
+            >
+              <div
+                class="tm-icon"
+                :class="
+                  isFullscreen
+                    ? 'tm-exit-full-screen-icon'
+                    : 'tm-full-screen-icon'
+                "
+              ></div>
             </button>
-            <button v-if="showCloseHeaderIcon" class="tm-popup-close" v-tooltip="$t('i18nCommon.popup.close')"
-              @click="emitClose">
+            <button
+              v-if="showCloseHeaderIcon"
+              class="tm-popup-close"
+              v-tooltip="$t('i18nCommon.popup.close')"
+              @click="emitClose"
+            >
               <div class="tm-icon tm-close-icon"></div>
             </button>
           </div>
@@ -25,22 +59,54 @@
         </div>
 
         <template v-if="resizable && !isFullscreen">
-          <div class="tm-popup-resize tm-popup-resize-n" data-dir="n" v-tooltip="$t('i18nCommon.popup.resizeN')"
-            @mousedown="onResizeStart"></div>
-          <div class="tm-popup-resize tm-popup-resize-s" data-dir="s" v-tooltip="$t('i18nCommon.popup.resizeS')"
-            @mousedown="onResizeStart"></div>
-          <div class="tm-popup-resize tm-popup-resize-e" data-dir="e" v-tooltip="$t('i18nCommon.popup.resizeE')"
-            @mousedown="onResizeStart"></div>
-          <div class="tm-popup-resize tm-popup-resize-w" data-dir="w" v-tooltip="$t('i18nCommon.popup.resizeW')"
-            @mousedown="onResizeStart"></div>
-          <div class="tm-popup-resize tm-popup-resize-ne" data-dir="ne" v-tooltip="$t('i18nCommon.popup.resizeNE')"
-            @mousedown="onResizeStart"></div>
-          <div class="tm-popup-resize tm-popup-resize-nw" data-dir="nw" v-tooltip="$t('i18nCommon.popup.resizeNW')"
-            @mousedown="onResizeStart"></div>
-          <div class="tm-popup-resize tm-popup-resize-se" data-dir="se" v-tooltip="$t('i18nCommon.popup.resizeSE')"
-            @mousedown="onResizeStart"></div>
-          <div class="tm-popup-resize tm-popup-resize-sw" data-dir="sw" v-tooltip="$t('i18nCommon.popup.resizeSW')"
-            @mousedown="onResizeStart"></div>
+          <div
+            class="tm-popup-resize tm-popup-resize-n"
+            data-dir="n"
+            v-tooltip="$t('i18nCommon.popup.resizeN')"
+            @mousedown="onResizeStart"
+          ></div>
+          <div
+            class="tm-popup-resize tm-popup-resize-s"
+            data-dir="s"
+            v-tooltip="$t('i18nCommon.popup.resizeS')"
+            @mousedown="onResizeStart"
+          ></div>
+          <div
+            class="tm-popup-resize tm-popup-resize-e"
+            data-dir="e"
+            v-tooltip="$t('i18nCommon.popup.resizeE')"
+            @mousedown="onResizeStart"
+          ></div>
+          <div
+            class="tm-popup-resize tm-popup-resize-w"
+            data-dir="w"
+            v-tooltip="$t('i18nCommon.popup.resizeW')"
+            @mousedown="onResizeStart"
+          ></div>
+          <div
+            class="tm-popup-resize tm-popup-resize-ne"
+            data-dir="ne"
+            v-tooltip="$t('i18nCommon.popup.resizeNE')"
+            @mousedown="onResizeStart"
+          ></div>
+          <div
+            class="tm-popup-resize tm-popup-resize-nw"
+            data-dir="nw"
+            v-tooltip="$t('i18nCommon.popup.resizeNW')"
+            @mousedown="onResizeStart"
+          ></div>
+          <div
+            class="tm-popup-resize tm-popup-resize-se"
+            data-dir="se"
+            v-tooltip="$t('i18nCommon.popup.resizeSE')"
+            @mousedown="onResizeStart"
+          ></div>
+          <div
+            class="tm-popup-resize tm-popup-resize-sw"
+            data-dir="sw"
+            v-tooltip="$t('i18nCommon.popup.resizeSW')"
+            @mousedown="onResizeStart"
+          ></div>
         </template>
       </div>
     </div>
@@ -124,7 +190,9 @@ export default {
       let styleBuild = {};
       if (!this.isFullscreen) {
         styleBuild.width = this.sizeWidth ? `${this.sizeWidth}px` : this.width;
-        styleBuild.height = this.sizeHeight ? `${this.sizeHeight}px` : this.height;
+        styleBuild.height = this.sizeHeight
+          ? `${this.sizeHeight}px`
+          : this.height;
       }
       if (this.isPositioned && !this.isFullscreen) {
         styleBuild.position = "fixed";
@@ -272,17 +340,6 @@ export default {
   z-index: 1000;
 }
 
-/* Popup không có lớp nền che: nội dung phía dưới vẫn thấy và vẫn thao tác
-   được, chỉ riêng thân popup mới bắt chuột. Popup vẫn kéo thả tự do. */
-.tm-popup-overlay-transparent {
-  background: transparent;
-  pointer-events: none;
-
-  .tm-popup-container {
-    pointer-events: auto;
-  }
-}
-
 /* Popup nổi lên như một panel: viền + đổ bóng (giống flyout panel và
    context menu của app). Kể cả popup không nền che (showOverlayBackground =
    false) thì vẫn cần viền + bóng để nổi bật trên nội dung hiện tại. */
@@ -296,6 +353,18 @@ export default {
   display: flex;
   flex-direction: column;
   position: relative;
+}
+
+/* Popup không có lớp nền che: nội dung phía dưới vẫn thấy và vẫn thao tác
+   được, chỉ riêng thân popup mới bắt chuột. Popup vẫn kéo thả tự do. */
+.tm-popup-overlay-transparent {
+  background: transparent;
+  pointer-events: none;
+
+  .tm-popup-container {
+    pointer-events: auto;
+    border: 1px solid var(--focus-color);
+  }
 }
 
 .tm-popup-fullscreen-mode {
