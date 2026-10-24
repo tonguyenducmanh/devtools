@@ -7,6 +7,7 @@
           :key="`${row.number}-${cellIndex}`"
           class="crossword-cell"
           :class="{ 'crossword-cell--key': cell.isKey }"
+          v-tooltip="{ text: row.hint, maxWidth: '380px' }"
           :style="{
             gridColumn: row.start + cellIndex + 1,
             gridRow: rowIndex + 1,
@@ -31,26 +32,42 @@ const BOARD_ROWS = [
     start: 0,
     keyIndex: 5,
     letters: ["T", "H", "A", "N", "H", "T", "Â", "N"],
+    hint: "Thanh tân như phút ban đầu",
   },
   {
     number: 2,
     start: 4,
     keyIndex: 1,
     letters: ["Đ", "Ô", "I", "M", "Ư", "Ơ", "I"],
+    hint: "Em vẫn nhìn anh với nụ cười dịu dàng tinh khôi của ngày đôi mươi",
   },
-  { number: 3, start: 1, keyIndex: 4, letters: ["M", "Ộ", "N", "G", "M", "Ơ"] },
-  { number: 4, start: 4, keyIndex: 1, letters: ["D", "Ạ", "I", "K", "H", "Ờ"] },
+  {
+    number: 3,
+    start: 1,
+    keyIndex: 4,
+    letters: ["M", "Ộ", "N", "G", "M", "Ơ"],
+    hint: "Thì ra tháng năm chẳng thể làm phai phôi mộng mơ thiếu thời",
+  },
+  {
+    number: 4,
+    start: 4,
+    keyIndex: 1,
+    letters: ["D", "Ạ", "I", "K", "H", "Ờ"],
+    hint: "Khiến anh được phép dại khờ, biết nhớ, biết chờ đợi, ngẩn ngơ vì",
+  },
   {
     number: 5,
     start: 2,
     keyIndex: 3,
     letters: ["N", "H", "Â", "N", "T", "H", "Ế"],
+    hint: "Huh, tóc em vương đầy gió bụi nhân thế",
   },
   {
     number: 6,
     start: 1,
     keyIndex: 4,
     letters: ["H", "A", "I", "C", "H", "Ú", "N", "G", "T", "A"],
+    hint: "Hòa tiếng đàn tang tính giao duyên tình hai chúng ta",
   },
 ].map((row) => ({
   ...row,
@@ -93,6 +110,7 @@ export default {
 }
 
 .crossword-cell {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -102,6 +120,23 @@ export default {
   border: var(--border-component-style);
   border-radius: var(--border-radius-component);
   color: var(--text-primary-color);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.crossword-cell:hover {
+  transform: scale(1.08);
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crossword-cell {
+    transition: none;
+  }
+
+  .crossword-cell:hover {
+    transform: none;
+  }
 }
 
 .crossword-cell--key {
