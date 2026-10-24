@@ -77,7 +77,8 @@ export const TMCacheConfig = {
     Note: "cache cấu hình layout tool automation",
   },
   UserSettings: {
-    KeyFormat: "UserSettings",
+    // Đổi key để các máy đã có cache cũ nhận lại thiết lập mặc định mới
+    KeyFormat: "UserSettingsV2",
     CacheLevel: tmEnum.cacheType.local,
     ExpireTime: 0,
     Note: "cache cấu hình thiết lập của user",
