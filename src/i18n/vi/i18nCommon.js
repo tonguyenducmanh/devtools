@@ -1112,5 +1112,8 @@ export default {
         pgBinPath: "Đường dẫn PostgreSQL bin",
       },
     },
+    tmfulltab: {
+      dragToolbar: "Click và giữ để kéo thả thanh công cụ",
+    },
   },
 };

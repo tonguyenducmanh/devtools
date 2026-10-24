@@ -856,15 +856,18 @@ export default {
       pointerSoftwareRendering: "Pointer Software Rendering",
       pin: "Pin toolbar",
       unpin: "Unpin toolbar",
-      sendFilesToRemote: "Upload files from your computer to the remote machine, then right-click inside the remote machine and choose paste",
-      receiveFiles: "Download files received from the remote machine to your computer",
+      sendFilesToRemote:
+        "Upload files from your computer to the remote machine, then right-click inside the remote machine and choose paste",
+      receiveFiles:
+        "Download files received from the remote machine to your computer",
       fileDownloading: "Downloading, please wait",
       downloadThisFile: "Click to download this file",
       downloadAll: "Download all",
       removeFile: "Remove file from the list",
       clearFileList: "Clear list",
       noFilesFromRemote: "The remote host has not sent any files",
-      sentFileList: "File list sent, right-click inside the remote machine and choose paste:",
+      sentFileList:
+        "File list sent, right-click inside the remote machine and choose paste:",
       uploadListAccepted: "Remote host accepted the file list",
       uploadListRejected: "Remote host rejected the file list",
       uploadInitFailed: "Could not send the file list",
@@ -906,10 +909,12 @@ export default {
       loadingWasm: "Loading the UltraViewer WebAssembly module...",
       wasmReady: "WASM module is ready",
       sessionEnded: "Session ended",
-      agentNotAvailable: "Agent not found. Run the Dev Tools agent on this machine.",
+      agentNotAvailable:
+        "Agent not found. Run the Dev Tools agent on this machine.",
       partnerIdRequired: "The partner ID must contain digits only",
       passwordRequired: "The password is required",
-      viewOnlyNotice: "The partner computer is view-only, remote control is disabled.",
+      viewOnlyNotice:
+        "The partner computer is view-only, remote control is disabled.",
       enableControl: "Enable control",
       disableControl: "Disable control",
       controlEnabled: "Remote control enabled",
@@ -925,7 +930,8 @@ export default {
         "Only works when both computers are on the same LAN. When enabled the screen stream goes directly between the two computers (bypassing the relay → lower latency). Enabling it mid-session requires reconnecting.",
       routeDirect: "Using the direct LAN route.",
       routeRelay: "Using the relay route.",
-      directEnabled: "Direct LAN route enabled (applied on the next connection).",
+      directEnabled:
+        "Direct LAN route enabled (applied on the next connection).",
       directDisabled: "Direct LAN route disabled, falling back to the relay.",
       directToggleFailed: "Could not change the direct connection mode",
       clipboardReceived: "Clipboard received from the partner:",
@@ -987,7 +993,8 @@ export default {
       loadIntellisense: "Load fresh intellisense from server",
       loadCachedIntellisense: "Load intellisense from cache",
       loadBuiltinIntellisense: "Load PostgreSQL built-in suggestions",
-      builtinIntellisenseLoaded: "PostgreSQL built-in suggestions loaded successfully",
+      builtinIntellisenseLoaded:
+        "PostgreSQL built-in suggestions loaded successfully",
       builtinIntellisenseLoading: "Loading PostgreSQL built-in suggestions...",
       connectionName: "Connection name",
       connectionString: "Connection string",
@@ -1113,6 +1120,9 @@ export default {
         cloneSuccess: "Clone completed successfully",
         pgBinPath: "PostgreSQL bin path",
       },
+    },
+    tmfulltab: {
+      dragToolbar: "Click and hold to drag the toolbar",
     },
   },
 };
