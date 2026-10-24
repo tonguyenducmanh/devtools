@@ -10,6 +10,20 @@
         >
           <template #toolbar-left>
             <div
+              v-tooltip="
+                isConnected
+                  ? controlEnabled
+                    ? $t('i18nCommon.remoteDesktop.disableControl')
+                    : $t('i18nCommon.remoteDesktop.enableControl')
+                  : ''
+              "
+              class="flex toolbar-btn"
+              :class="{ 'toolbar-btn-disabled': !isConnected, 'toolbar-btn-active': isConnected && !controlEnabled }"
+              @click="toggleControl"
+            >
+              <span class="tm-icon tm-command-code-icon"></span>
+            </div>
+            <div
               v-tooltip="$t('i18nCommon.remoteDesktop.screenshot')"
               class="flex toolbar-btn"
               @click="takeScreenshot"
@@ -81,7 +95,7 @@
               class="rdp-canvas"
               :class="{
                 'rdp-canvas-cursor-none':
-                  currentConfigLayout.enableServerPointer && isConnected,
+                  currentConfigLayout.enableServerPointer && isConnected && controlEnabled,
               }"
               :width="canvasWidth"
               :height="canvasHeight"
@@ -318,6 +332,7 @@ export default {
       activeDownloads: new Map(),
       uploadFileHandles: new Map(),
       remoteClipDataLocks: new Set(),
+      controlEnabled: true,
       resolutions: [
         { value: "800x600", label: "800x600", width: 800, height: 600 },
         { value: "1024x768", label: "1024x768", width: 1024, height: 768 },
@@ -510,6 +525,26 @@ export default {
       me.host = "";
       me.username = "";
       me.password = "";
+    },
+
+    toggleControl() {
+      let me = this;
+      if (!me.isConnected) return;
+      me.controlEnabled = !me.controlEnabled;
+      if (!me.controlEnabled) {
+        try {
+          me.onCanvasKeyup({ code: "ControlLeft", preventDefault: () => {}, stopPropagation: () => {} });
+          me.onCanvasKeyup({ code: "AltLeft", preventDefault: () => {}, stopPropagation: () => {} });
+          me.onCanvasKeyup({ code: "ShiftLeft", preventDefault: () => {}, stopPropagation: () => {} });
+          me.onCanvasKeyup({ code: "MetaLeft", preventDefault: () => {}, stopPropagation: () => {} });
+        } catch (e) {}
+      }
+      me.addLog(
+        me.controlEnabled
+          ? me.$t("i18nCommon.remoteDesktop.controlEnabled")
+          : me.$t("i18nCommon.remoteDesktop.controlDisabled"),
+        "info",
+      );
     },
 
     /**
@@ -1280,6 +1315,7 @@ export default {
     setupInputHandlers() {},
 
     onCanvasKeydown(e) {
+      if (!this.controlEnabled) return;
       e.preventDefault();
       e.stopPropagation();
       if (!this.session) return;
@@ -1326,6 +1362,7 @@ export default {
     },
 
     onCanvasKeyup(e) {
+      if (!this.controlEnabled) return;
       e.preventDefault();
       e.stopPropagation();
       if (!this.session) return;
@@ -1341,7 +1378,7 @@ export default {
     },
 
     onCanvasMousemove(e) {
-      if (!this.session) return;
+      if (!this.controlEnabled || !this.session) return;
       try {
         const canvas = this.$refs.rdpCanvas;
         const rect = canvas.getBoundingClientRect();
@@ -1358,6 +1395,7 @@ export default {
     },
 
     onCanvasMousedown(e) {
+      if (!this.controlEnabled) return;
       e.preventDefault();
       this.$refs.rdpCanvas?.focus();
       if (!this.session) return;
@@ -1371,6 +1409,7 @@ export default {
     },
 
     onCanvasMouseup(e) {
+      if (!this.controlEnabled) return;
       e.preventDefault();
       if (!this.session) return;
       try {
@@ -1383,6 +1422,7 @@ export default {
     },
 
     onCanvasWheel(e) {
+      if (!this.controlEnabled) return;
       e.preventDefault();
       if (!this.session) return;
       try {
