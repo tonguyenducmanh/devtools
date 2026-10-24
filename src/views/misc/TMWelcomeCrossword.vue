@@ -7,7 +7,7 @@
           :key="`${row.number}-${cellIndex}`"
           class="crossword-cell"
           :class="{ 'crossword-cell--key': cell.isKey }"
-          v-tooltip="{ text: row.hint, maxWidth: '380px' }"
+          v-tooltip="{ text: row.hint }"
           :style="{
             gridColumn: row.start + cellIndex + 1,
             gridRow: rowIndex + 1,
