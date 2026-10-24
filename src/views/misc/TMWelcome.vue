@@ -4,8 +4,9 @@
       <div class="container">
         <!-- Đã chọn hình nền (xem $tmEnum.welcomeBackgroundList) thì chỉ hiện ảnh
 nền phủ kín màn welcome, không hiện text author -->
+        <TMWelcomeCrossword v-if="isCrossword" />
         <div
-          v-if="isShowBackground"
+          v-else-if="isShowBackground"
           class="welcome-background"
           :class="`welcome-background--${welcomeBackground}`"
         ></div>
@@ -26,6 +27,7 @@ nền phủ kín màn welcome, không hiện text author -->
 
 <script>
 import TMWelcomeHelp from "@/views/helps/TMWelcomeHelp.vue";
+import TMWelcomeCrossword from "@/views/misc/TMWelcomeCrossword.vue";
 import TMSubSidebar from "@/components/TMSubSidebar.vue";
 import TMDynamicBackgroundEffect from "@/views/backgroundEffect/TMDynamicBackgroundEffect.vue";
 import TMLayoutConfigMixin from "@/mixins/TMLayoutConfigMixin.js";
@@ -35,7 +37,12 @@ import { TMEnumEventBus } from "@/common/event/TMEnumEventBus.js";
 export default {
   name: "TMWelcome",
   mixins: [TMLayoutConfigMixin],
-  components: { TMWelcomeHelp, TMSubSidebar, TMDynamicBackgroundEffect },
+  components: {
+    TMWelcomeHelp,
+    TMWelcomeCrossword,
+    TMSubSidebar,
+    TMDynamicBackgroundEffect,
+  },
   data() {
     return {
       welcomeBackground: this.$tmEnum.welcomeBackground.Normal,
@@ -55,11 +62,21 @@ export default {
       return me.$tmUtility.getAuthorApp() ?? me.$tmUtility.defaultTitleApp();
     },
     /**
+     * Chế độ bảng ô chữ "Bài hát Thanh Tân" (không phải ảnh nền)
+     */
+    isCrossword() {
+      let me = this;
+      return me.welcomeBackground == me.$tmEnum.welcomeBackground.Crossword;
+    },
+    /**
      * normal là không chọn ảnh nên không hiện lớp nền
      */
     isShowBackground() {
       let me = this;
-      return me.welcomeBackground != me.$tmEnum.welcomeBackground.Normal;
+      return (
+        me.welcomeBackground != me.$tmEnum.welcomeBackground.Normal &&
+        !me.isCrossword
+      );
     },
   },
   created() {
