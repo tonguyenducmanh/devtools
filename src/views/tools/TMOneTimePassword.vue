@@ -3,6 +3,12 @@
     <div class="container">
       <div class="flex flex-col otp-header">
         <div class="flex tm-first-header">
+          <TMInput
+            v-model="filterOtp"
+            :noMargin="true"
+            :placeHolder="$t('i18nCommon.oneTimePassword.filter')"
+            class="tm-filter-otp"
+          />
           <TMComboBox
             :width="120"
             :noMargin="true"
@@ -86,38 +92,6 @@
               @click="addNewTOTP"
             />
           </div>
-        </div>
-        <div class="flex tm-second-header">
-          <TMInput
-            v-model="filterOtp"
-            :noMargin="true"
-            :placeHolder="$t('i18nCommon.oneTimePassword.filter')"
-          />
-          <TMInput
-            v-model="username"
-            :noMargin="true"
-            :placeHolder="$t('i18nCommon.oneTimePassword.auth.username')"
-          />
-          <TMInput
-            :noMargin="true"
-            v-model="password"
-            :inputType="'password'"
-            :placeHolder="$t('i18nCommon.oneTimePassword.auth.password')"
-            @keyup.enter="openAuthenSaved"
-          />
-          <TMButton
-            :label="$t('i18nCommon.oneTimePassword.auth.open')"
-            :readOnly="!password || !username"
-            @click="openAuthenSaved"
-            :noMargin="true"
-          />
-          <TMButton
-            :type="$tmEnum.buttonType.secondary"
-            :label="$t('i18nCommon.oneTimePassword.auth.save')"
-            :readOnly="!password || !username"
-            @click="saveAuthen"
-            :noMargin="true"
-          />
         </div>
         <div class="flex tm-decoded-data">
           <TMTextEditor
@@ -204,12 +178,6 @@
             :variant="$tmEnum.checkboxType.switch"
             v-model="currentConfigLayout.showDecodedInfo"
             :label="$t('i18nCommon.oneTimePassword.settings.showDecodedInfo')"
-            @change="updateConfigLayout"
-          ></TMCheckbox>
-          <TMCheckbox
-            :variant="$tmEnum.checkboxType.switch"
-            v-model="currentConfigLayout.autoSave"
-            :label="$t('i18nCommon.oneTimePassword.settings.autoSave')"
             @change="updateConfigLayout"
           ></TMCheckbox>
         </div>
@@ -304,18 +272,6 @@ export default {
       }
       return result;
     },
-    autoSave() {
-      let me = this;
-      let result = false;
-      if (
-        me.decodedData &&
-        me.currentConfigLayout &&
-        me.currentConfigLayout.autoSave
-      ) {
-        result = true;
-      }
-      return result;
-    },
   },
   mounted() {},
   watch: {
@@ -334,7 +290,6 @@ export default {
     if (me.progressIntervalId) {
       clearInterval(me.progressIntervalId);
     }
-    me.saveUsername();
   },
   methods: {
     async convertQRCode() {
@@ -351,13 +306,13 @@ export default {
         // Lọc kết quả hợp lệ
         let result = await imagesQRToText(me.$refs.uploadArea);
         if (result && result.length > 0) {
-          result.forEach((item) => {
+          for (const item of result) {
             // Chỉ lấy những chuỗi có định dạng otpauth-migration
             if (item.startsWith("otpauth-migration://")) {
               me.migrationURL = item;
-              me.decodeGoogleAuth();
+              await me.decodeGoogleAuth();
             }
-          });
+          }
         }
       }
     },
@@ -367,41 +322,43 @@ export default {
     },
     async processWhenMounted() {
       let me = this;
-      let lastUserName = await me.$tmCache.get(
-        me.$tmEnum.cacheConfig.LastOneTimeAuthenUserName,
+      me.cleanupLegacyAuthenCache();
+      // Dữ liệu OTP được lưu thẳng trong cache (không mã hoá, không cần
+      // tài khoản/mật khẩu) nên mở tool là dùng được ngay.
+      let cachedData = await me.$tmCache.get(
+        me.$tmEnum.cacheConfig.OneTimeAuthenData,
       );
-      if (lastUserName) {
-        me.username = lastUserName;
-        let lastAuthen = await me.$tmCache.get(
-          me.$tmEnum.cacheConfig.LastOneTimeAuthenPassword,
-        );
-        if (lastAuthen && lastAuthen.userName == lastUserName) {
-          // load luôn danh sách user theo tài khoản, mật khẩu cuối cùng lưu được trong mem
-          await me.openAuthenSavedByUser(
-            lastAuthen.userName,
-            lastAuthen.password,
-          );
-        }
+      if (cachedData && cachedData.length > 0) {
+        me.decodedData = cachedData;
+        me.decodedDataString = JSON.stringify(cachedData, null, 2);
+        me.buildData();
+        me.generateNow();
       }
     },
-    async saveUsername() {
-      let me = this;
-      if (me.username) {
-        await me.$tmCache.set(
-          me.$tmEnum.cacheConfig.LastOneTimeAuthenUserName,
-          me.username,
-        );
-        // lưu tạm vào mem sau đỡ phải dùng
-        if (me.password) {
-          await me.$tmCache.set(
-            me.$tmEnum.cacheConfig.LastOneTimeAuthenPassword,
-            {
-              userName: me.username,
-              password: me.password,
-            },
-          );
-        }
+    /**
+     * Bản cũ lưu tài khoản + mật khẩu dạng plaintext trong localStorage,
+     * bản mới không dùng nữa nên dọn luôn cho sạch.
+     */
+    cleanupLegacyAuthenCache() {
+      try {
+        localStorage.removeItem("LastOneTimeAuthenUserName");
+        localStorage.removeItem("LastOneTimeAuthenPassword");
+      } catch {
+        // trình duyệt chặn localStorage thì bỏ qua
       }
+    },
+    /**
+     * Lưu toàn bộ danh sách OTP xuống cache để lần sau mở tool là có luôn.
+     * Clone lại thành dữ liệu thuần trước khi lưu vì cache indexedDB dùng
+     * structured clone, không nhận object reactive của Vue.
+     */
+    async saveDecodedData() {
+      let me = this;
+      let dataToSave = JSON.parse(JSON.stringify(me.decodedData || []));
+      await me.$tmCache.set(
+        me.$tmEnum.cacheConfig.OneTimeAuthenData,
+        dataToSave,
+      );
     },
     async decodeGoogleAuth() {
       let me = this;
@@ -421,8 +378,10 @@ export default {
           });
         }
         me.buildData();
-        me.decodedDataString = JSON.stringify(result, null, 2);
+        me.decodedDataString = JSON.stringify(me.decodedData, null, 2);
         me.generateNow();
+        // upload QR xong là lưu luôn, không cần bấm lưu
+        await me.saveDecodedData();
       }
     },
     generateNow() {
@@ -502,44 +461,6 @@ export default {
       }
     },
 
-    async saveAuthen() {
-      let me = this;
-      if (me.password && me.username) {
-        await me.$tmCache.set(
-          me.$tmEnum.cacheConfig.OneTimeAuthen,
-          me.decodedData,
-          {
-            id: me.username,
-          },
-          me.password,
-        );
-        await me.saveUsername();
-        me.$tmToast.success(me.$t("i18nCommon.toastMessage.saved"));
-      }
-    },
-    async openAuthenSaved() {
-      let me = this;
-      await me.openAuthenSavedByUser(me.username, me.password);
-    },
-    async openAuthenSavedByUser(username, password) {
-      let me = this;
-      if (password && username) {
-        let result = await me.$tmCache.get(
-          me.$tmEnum.cacheConfig.OneTimeAuthen,
-          {
-            id: username,
-          },
-          password,
-        );
-        if (result) {
-          me.decodedData = result;
-          me.decodedDataString = JSON.stringify(result, null, 2);
-          me.buildData();
-          me.generateNow();
-          await me.saveUsername();
-        }
-      }
-    },
     /**
      * Google Authenticator uses protobuff to encode the 2fa data.
      *
@@ -649,9 +570,7 @@ export default {
             type: "TOTP",
           };
           // lưu lại authen sau khi thêm mới
-          if (me.password && me.username && me.autoSave) {
-            me.saveAuthen();
-          }
+          me.saveDecodedData();
           me.generateTOTP(clonedObject.secret);
         }
       }
@@ -671,9 +590,7 @@ export default {
           });
         }
         // lưu lại authen sau khi xóa
-        if (me.password && me.username && me.autoSave) {
-          me.saveAuthen();
-        }
+        me.saveDecodedData();
         me.$tmToast.success(me.$t("i18nCommon.toastMessage.removed"));
       }
     },
@@ -696,14 +613,11 @@ export default {
         isShowSidebar: true,
         currentSidebarOption: this.$tmEnum.ToolSidebarOption.Help,
         showDecodedInfo: false,
-        autoSave: true,
       },
       filterOtp: null,
       migrationURL: null,
       decodedData: null,
       decodedDataString: null,
-      password: null,
-      username: null,
       timeoutId: null,
       filterRemove: null,
       progress: 0,
@@ -813,13 +727,13 @@ export default {
   .tm-first-header {
     width: 100%;
     margin-bottom: var(--padding);
+    .tm-filter-otp {
+      flex: 0 0 220px;
+      margin-right: var(--padding);
+    }
     .flex-one {
       gap: var(--padding);
     }
-  }
-  .tm-second-header {
-    width: 100%;
-    gap: var(--padding);
   }
   .otp-progress-wrapper {
     width: 100%;

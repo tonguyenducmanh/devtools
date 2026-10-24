@@ -58,24 +58,6 @@ export const TMCacheConfig = {
     ExpireTime: 0,
     Note: "collection API được lưu bởi user",
   },
-  OneTimeAuthen: {
-    KeyFormat: "OneTimeAuthen_{id}",
-    CacheLevel: tmEnum.cacheType.indexedDB,
-    ExpireTime: 0,
-    Note: "cài đặt xác thực",
-  },
-  LastOneTimeAuthenUserName: {
-    KeyFormat: "LastOneTimeAuthenUserName",
-    CacheLevel: tmEnum.cacheType.local,
-    ExpireTime: 0,
-    Note: "tên đăng nhập xác thực một lần cuối cùng",
-  },
-  LastOneTimeAuthenPassword: {
-    KeyFormat: "LastOneTimeAuthenPassword",
-    CacheLevel: tmEnum.cacheType.local,
-    ExpireTime: 0,
-    Note: "mật khẩu đăng nhập xác thực theo user, chỉ được phép lưu trong mem",
-  },
   APIConfigLayout: {
     KeyFormat: "APIConfigLayout",
     CacheLevel: tmEnum.cacheType.local,
@@ -359,5 +341,11 @@ export const TMCacheConfig = {
     CacheLevel: tmEnum.cacheType.local,
     ExpireTime: 0,
     Note: "profile viewer UltraViewer: danh tính thiết bị, tên hiển thị, ID và mật khẩu máy đối tác",
+  },
+  OneTimeAuthenData: {
+    KeyFormat: "OneTimeAuthenData",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "danh sách OTP đã import, lưu thẳng không mã hoá, mở tool là load luôn",
   },
 };

@@ -481,10 +481,6 @@ export default {
       },
       filter: "Lọc",
       auth: {
-        username: "Tên người dùng",
-        password: "Nhập mật khẩu",
-        open: "Mở",
-        save: "Lưu",
         add: "Thêm",
       },
       inputs: {
@@ -497,7 +493,6 @@ export default {
       decodeData: "Dữ liệu giải mã từ Google authenticator",
       settings: {
         showDecodedInfo: "Hiện thông tin giải mã",
-        autoSave: "Tự động lưu",
       },
       remove: {
         filter: "Nhập chính xác tên xác thực để xóa, nhập {0} để xóa tất cả",

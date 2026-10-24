@@ -2,9 +2,6 @@
 // bất cứ khi nào sửa enum trong file này, luôn phải check file @/common/cache/TMCacheConfig.js đã có cấu hình tương ứng chưa
 export const EnumCacheConfig = {
   QRHistory: 1,
-  OneTimeAuthen: 3,
-  LastOneTimeAuthenUserName: 4,
-  LastOneTimeAuthenPassword: 5,
   JSONToExcelHistory: 6,
   JSONToPostgreSQLHistory: 7,
   CodeFormatterHistory: 8,
@@ -62,4 +59,7 @@ export const EnumCacheConfig = {
   // Profile viewer UltraViewer: danh tính thiết bị, tên hiển thị, ID và
   // mật khẩu máy đối tác — gộp chung 1 khoá cache.
   UltraViewerProfile: 69,
+  // Dữ liệu OTP (secret/issuer/name...) lưu thẳng, không mã hoá và không
+  // cần tài khoản/mật khẩu, mở tool là dùng ngay.
+  OneTimeAuthenData: 70,
 };

@@ -53,7 +53,7 @@ export default {
       security: {
         title: "Security",
         description:
-          "OTP data is encrypted and stored locally on your device. You need to enter a password (user-created) to encrypt browser cache data and open saved accounts.",
+          "OTP data is stored only in your browser cache on this device and is never sent to a server. The tool no longer uses an account/password: importing a QR code saves the data immediately and it is loaded automatically next time. Anyone using the same machine/browser can see your OTP codes, so clear the data when using a shared computer.",
       },
       quickUse: {
         title: "Quick Use",

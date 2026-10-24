@@ -482,10 +482,6 @@ export default {
       },
       filter: "Filter",
       auth: {
-        username: "Esername",
-        password: "Enter password",
-        open: "Open",
-        save: "Save",
         add: "Add",
       },
       inputs: {
@@ -498,7 +494,6 @@ export default {
       decodeData: "Google authenticator decoded data",
       settings: {
         showDecodedInfo: "Show decoded info",
-        autoSave: "Auto save",
       },
       remove: {
         filter: "Enter exact auth name to remove, enter {0} to remove all",

@@ -52,7 +52,7 @@ export default {
       security: {
         title: "Bảo mật",
         description:
-          "Dữ liệu OTP được mã hóa và lưu trữ cục bộ trên thiết bị của bạn. Bạn cần nhập mật khẩu (mật khẩu do bạn tự tạo) để mã hóa dữ liệu cache phía trình duyệt và mở tài khoản đã lưu.",
+          "Dữ liệu OTP chỉ được lưu cục bộ trong cache trình duyệt trên thiết bị của bạn, không gửi lên server. Tool không dùng tài khoản/mật khẩu: import QR xong là dữ liệu được lưu luôn, lần sau mở tool sẽ tự load lại. Ai dùng chung máy/trình duyệt đều xem được mã OTP, hãy xoá dữ liệu khi dùng máy lạ.",
       },
       quickUse: {
         title: "Sử dụng nhanh",
