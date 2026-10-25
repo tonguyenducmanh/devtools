@@ -1160,8 +1160,10 @@ export default {
         decodeSuccess: "Giải mã Cimbar thành công",
         md5: "MD5 nhận",
         decoding: "Đang giải mã",
-        binaryHint:
-          "Dữ liệu nhận được là file nhị phân. Nhấn nút tải xuống để lưu file.",
+        fileName: "Tên file:",
+        fileSize: "Kích thước:",
+        fileType: "Loại file:",
+        decodeTime: "Thời gian giải mã:",
       },
       errors: {
         encodeStart: "Không bắt đầu được quá trình mã hóa:",

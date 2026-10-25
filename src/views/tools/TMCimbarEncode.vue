@@ -811,7 +811,6 @@ export default {
   min-width: 0;
   overflow: hidden;
   font-size: var(--font-size-small);
-  color: var(--text-secondary-color);
 }
 
 .footer-status > span {
@@ -819,7 +818,6 @@ export default {
 }
 
 .generating-status {
-  color: var(--text-secondary-color);
   white-space: nowrap;
 }
 
@@ -831,13 +829,11 @@ export default {
 }
 
 .md5-label {
-  color: var(--text-secondary-color);
   white-space: nowrap;
 }
 
 .md5-value {
   min-width: 0;
-  color: var(--text-primary-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

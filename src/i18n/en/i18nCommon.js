@@ -1169,8 +1169,10 @@ export default {
         decodeSuccess: "Cimbar decoded successfully",
         md5: "Received MD5",
         decoding: "Decoding",
-        binaryHint:
-          "The received data is a binary file. Use the download button to save it.",
+        fileName: "File name:",
+        fileSize: "Size:",
+        fileType: "File type:",
+        decodeTime: "Decode time:",
       },
       errors: {
         encodeStart: "Could not start encoding:",

@@ -89,32 +89,45 @@
           </div>
         </div>
 
-        <div v-else-if="decodeError" class="error-box">
-          {{ decodeError }}
-        </div>
-
+        <!-- Kết quả là file: container canh giữa, nội dung canh trái. -->
         <div
           v-else-if="decodedFile && !decodedFile.text"
-          class="flex flex-col binary-result"
+          class="flex binary-result"
         >
-          <div class="result-title">
-            {{ $t("i18nCommon.cimbar.decode.result") }}
+          <div class="binary-result-info">
+            <span class="file-label">{{
+              $t("i18nCommon.cimbar.decode.fileName")
+            }}</span>
+            <span class="file-name text-nowrap" :title="decodedFile.name">{{
+              decodedFile.name
+            }}</span>
+            <span class="file-label">{{
+              $t("i18nCommon.cimbar.decode.fileSize")
+            }}</span>
+            <span class="text-nowrap">{{
+              formatBytes(decodedFile.size)
+            }}</span>
+            <span class="file-label">{{
+              $t("i18nCommon.cimbar.decode.fileType")
+            }}</span>
+            <span class="text-nowrap">{{ fileExtension }}</span>
+            <span class="file-label">{{
+              $t("i18nCommon.cimbar.decode.decodeTime")
+            }}</span>
+            <span class="text-nowrap">{{ decodeTimeText }}</span>
+            <TMButton
+              class="file-download"
+              :noMargin="true"
+              :label="$t('i18nCommon.cimbar.decode.download')"
+              @click="downloadDecodedFile"
+            ></TMButton>
           </div>
-          <div class="file-info text-nowrap">
-            {{ decodedFile.name }} · {{ formatBytes(decodedFile.size) }}
-          </div>
-          <div class="source-hint">
-            {{ $t("i18nCommon.cimbar.decode.binaryHint") }}
-          </div>
-          <TMButton
-            :label="$t('i18nCommon.cimbar.decode.download')"
-            @click="downloadDecodedFile"
-          ></TMButton>
         </div>
 
         <TMTextEditor
           v-else
           class="input-area"
+          :class="{ 'input-area-result': !!decodedFile }"
           :placeHolder="resultPlaceholder"
           v-model="textOutput"
           :readOnly="true"
@@ -300,6 +313,7 @@ export default {
       decodeTotalFrames: 0,
       fountainPercent: -1,
       decodeError: "",
+      decodeSeconds: null,
       decodedFile: null,
       textOutput: null,
       decodeWorker: null,
@@ -361,6 +375,20 @@ export default {
       return this.decodedFile
         ? this.$t("i18nCommon.cimbar.decode.result")
         : this.$t("i18nCommon.cimbar.decode.idle");
+    },
+    fileExtension() {
+      const name = (this.decodedFile && this.decodedFile.name) || "";
+      const dotIndex = name.lastIndexOf(".");
+      if (dotIndex <= 0 || dotIndex === name.length - 1) {
+        return "-";
+      }
+      return name.slice(dotIndex + 1);
+    },
+    decodeTimeText() {
+      if (this.decodeSeconds == null) {
+        return "-";
+      }
+      return formatDuration(this.decodeSeconds);
     },
   },
 
@@ -487,6 +515,7 @@ export default {
 
       me.clearDecodedFile();
       me.decodeError = "";
+      me.decodeSeconds = null;
       me.decodePercent = 0;
       me.fountainPercent = -1;
       me.decodeFrames = 0;
@@ -496,6 +525,7 @@ export default {
       );
       me.decodeCancelled = false;
       me.isDecoding = true;
+      me._decodeStartedAt = Date.now();
       video.pause();
 
       try {
@@ -503,9 +533,12 @@ export default {
         me.runDecodeLoop(duration);
       } catch (error) {
         me.isDecoding = false;
-        me.decodeError = `${me.$t("i18nCommon.cimbar.errors.decodeStart")} ${
-          error && error.message ? error.message : error
-        }`;
+        me.finishDecodeTimer();
+        me.raiseDecodeError(
+          `${me.$t("i18nCommon.cimbar.errors.decodeStart")} ${
+            error && error.message ? error.message : error
+          }`,
+        );
         me.terminateDecodeWorker();
       }
     },
@@ -568,7 +601,7 @@ export default {
           me._decodeReadyReject = null;
           me._decodeReadyResolve = null;
         } else if (me.isDecoding) {
-          me.decodeError = message;
+          me.raiseDecodeError(message);
         }
         return;
       }
@@ -596,7 +629,7 @@ export default {
         me._decodeReadyReject = null;
         me._decodeReadyResolve = null;
       } else {
-        me.decodeError = message;
+        me.raiseDecodeError(message);
       }
     },
 
@@ -641,7 +674,9 @@ export default {
               bitmap = await createImageBitmap(video);
             } catch (fallbackError) {
               // Video chưa decode xong frame hoặc codec không đọc được.
-              me.decodeError = me.$t("i18nCommon.cimbar.errors.frameCapture");
+              me.raiseDecodeError(
+                me.$t("i18nCommon.cimbar.errors.frameCapture"),
+              );
               break;
             }
           }
@@ -656,8 +691,9 @@ export default {
           if (result.status === "error" || result.status === "timeout") {
             consecutiveErrors += 1;
             if (consecutiveErrors >= 5) {
-              me.decodeError =
-                result.error || me.$t("i18nCommon.cimbar.errors.decodeFailed");
+              me.raiseDecodeError(
+                result.error || me.$t("i18nCommon.cimbar.errors.decodeFailed"),
+              );
               break;
             }
             continue;
@@ -673,10 +709,11 @@ export default {
         }
 
         if (!me.decodeCancelled && !me.decodedFile && !me.decodeError) {
-          me.decodeError = me.$t("i18nCommon.cimbar.errors.decodeFailed");
+          me.raiseDecodeError(me.$t("i18nCommon.cimbar.errors.decodeFailed"));
         }
       } finally {
         me.isDecoding = false;
+        me.finishDecodeTimer();
         me.terminateDecodeWorker();
       }
     },
@@ -766,6 +803,29 @@ export default {
       }
       const max = Math.max(...report.map((value) => Number(value) || 0));
       me.fountainPercent = Math.max(0, Math.min(100, Math.round(max * 100)));
+    },
+
+    /** Chốt thời gian giải mã (giây) để hiển thị trong kết quả. */
+    finishDecodeTimer() {
+      let me = this;
+      if (!me._decodeStartedAt) {
+        return;
+      }
+      me.decodeSeconds = (Date.now() - me._decodeStartedAt) / 1000;
+      me._decodeStartedAt = null;
+    },
+
+    /**
+     * Lỗi giải mã báo bằng toast thay vì chiếm chỗ trong layout.
+     * Vẫn lưu decodeError để vòng lặp biết đã báo (tránh toast lặp).
+     */
+    raiseDecodeError(message) {
+      let me = this;
+      if (me.decodeError === message) {
+        return;
+      }
+      me.decodeError = message;
+      me.$tmToast.error(message, 5000);
     },
 
     handleDecodedFile(file) {
@@ -873,6 +933,12 @@ export default {
   flex: 1;
   min-height: 0;
 }
+/* Có kết quả text thì khoanh vùng kết quả bằng màu focus. */
+.input-area-result {
+  box-sizing: border-box;
+  border: 1px solid var(--focus-color);
+  border-radius: var(--border-radius);
+}
 .main-tool {
   flex: 1;
   height: 100%;
@@ -900,7 +966,6 @@ export default {
   border-radius: var(--border-radius);
 }
 .scan-progress {
-  color: var(--text-secondary-color);
   white-space: nowrap;
 }
 .group-footer-input {
@@ -916,20 +981,12 @@ export default {
   min-width: 0;
   overflow: hidden;
   font-size: var(--font-size-small);
-  color: var(--text-secondary-color);
 }
 .footer-status > span {
   min-width: 0;
 }
 .generating-status {
-  color: var(--text-secondary-color);
   white-space: nowrap;
-}
-.file-info {
-  flex-shrink: 0;
-  max-width: 100%;
-  font-size: var(--font-size-small);
-  color: var(--text-primary-color);
 }
 .md5-box {
   justify-content: flex-end;
@@ -938,12 +995,10 @@ export default {
   font-size: var(--font-size-small);
 }
 .md5-label {
-  color: var(--text-secondary-color);
   white-space: nowrap;
 }
 .md5-value {
   min-width: 0;
-  color: var(--text-primary-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -962,35 +1017,50 @@ export default {
   background: var(--btn-primary-bg);
   transition: width 0.15s linear;
 }
-.error-box {
-  padding: var(--padding);
-  border: 1px solid var(--text-error-color);
-  border-radius: var(--border-radius);
-  background-color: var(--bg-layer-color);
-  color: var(--text-error-color);
-  font-size: var(--font-size-small);
-  line-height: 1.5;
-}
 .binary-result {
   flex: 1;
   width: 100%;
   min-height: 0;
-  row-gap: var(--padding);
   align-items: center;
   justify-content: center;
   padding: var(--padding);
-  text-align: center;
-  background-color: var(--bg-layer-color);
-  border: 1px solid transparent;
+}
+/* Card phẳng: viền nhẹ, không bóng đổ; nhãn/giá trị căn theo baseline. */
+.binary-result-info {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: var(--padding-large);
+  row-gap: var(--padding-x-medium);
+  max-width: 100%;
+  padding: var(--padding-large);
+  line-height: 1.6;
+  background-color: var(--bg-main-color);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
+  box-shadow: none;
 }
-.result-title {
-  font-size: var(--font-size-medium);
-  font-weight: 600;
+.file-label {
+  white-space: nowrap;
 }
-.source-hint {
-  font-size: var(--font-size-small);
-  color: var(--text-secondary-color);
+.file-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.file-download {
+  grid-column: 1 / -1;
+  justify-self: start;
+  align-self: start;
+  margin-top: var(--padding-medium);
+}
+/* Nút phẳng: không bóng đổ, chuyển trạng thái mượt. */
+.binary-result-info :deep(.file-download) {
+  box-shadow: none;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 .input-config {
   width: 100%;
