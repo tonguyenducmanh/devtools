@@ -33,7 +33,7 @@ export default {
       confirmCloseNo: "Cancel",
     },
     group: {
-      Encoding: "Encoding",
+      Encoding: "Encoding & Decoding",
       API: "API intergate",
       JSON: "JSON building",
       Image: "Graphic design",

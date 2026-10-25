@@ -33,7 +33,7 @@ export default {
       confirmCloseNo: "Huỷ",
     },
     group: {
-      Encoding: "Mã hóa",
+      Encoding: "Mã hóa giải mã",
       API: "Tích hợp API",
       JSON: "Xử lý JSON",
       Image: "Thiết kế đồ họa",
