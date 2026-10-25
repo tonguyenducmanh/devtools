@@ -1151,6 +1151,8 @@ export default {
         sourceFile: "File",
         charCount: "{0} chars",
         md5: "Source MD5",
+        sample: "Use sample data",
+        exampleWordCount: "Sample word count",
       },
       decode: {
         mode: "Mode",
@@ -1193,6 +1195,7 @@ export default {
         decodeFailed:
           "Not enough Cimbar data was found in the video. Try a higher sample rate or the correct encoding mode.",
         frameCapture: "Could not read a frame from the video",
+        sample: "Could not load the sample image:",
       },
     },
   },

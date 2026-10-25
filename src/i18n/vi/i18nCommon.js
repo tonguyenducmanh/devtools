@@ -1142,6 +1142,8 @@ export default {
         sourceFile: "File",
         charCount: "{0} ký tự",
         md5: "MD5 nguồn",
+        sample: "Dùng dữ liệu mẫu",
+        exampleWordCount: "Số từ mẫu",
       },
       decode: {
         mode: "Chế độ",
@@ -1184,6 +1186,7 @@ export default {
         decodeFailed:
           "Không tìm thấy đủ dữ liệu Cimbar trong video. Thử tăng tốc độ lấy mẫu hoặc chọn đúng chế độ mã.",
         frameCapture: "Không đọc được khung hình từ video",
+        sample: "Không nạp được ảnh mẫu:",
       },
     },
   },

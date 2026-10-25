@@ -47,6 +47,14 @@
             <TMButton
               :noMargin="true"
               :type="$tmEnum.buttonType.secondary"
+              :readOnly="isPreparing || isEncoding"
+              @click="applySample"
+              iconClass="tm-example-icon"
+              v-tooltip="$t('i18nCommon.cimbar.encode.sample')"
+            ></TMButton>
+            <TMButton
+              :noMargin="true"
+              :type="$tmEnum.buttonType.secondary"
               :readOnly="!isEncoding"
               @click="toggleFullTab"
               iconClass="tm-full-screen-icon"
@@ -187,6 +195,23 @@
                 @selected="handleEncodeFpsChange"
               />
             </div>
+            <div
+              v-if="currentConfigLayout.sourceType === 'text'"
+              class="flex input-config-item"
+            >
+              <span class="title-input-config">{{
+                $t("i18nCommon.cimbar.encode.exampleWordCount")
+              }}</span>
+              <TMInput
+                v-model="currentConfigLayout.exampleWordCount"
+                :inputType="'number'"
+                class="value-input-config"
+                :placeHolder="'200'"
+                :noMargin="true"
+                :readOnly="isPreparing || isEncoding"
+                @clickOutSide="updateConfigLayout"
+              />
+            </div>
           </div>
         </div>
       </template>
@@ -204,9 +229,13 @@ import {
   getCimbarAssets,
   getCimbarMd5Url,
 } from "@/common/cimbar/TMCimbarWorkerClient.js";
+import TMMockTextGenerate from "@/common/mock/TMMockTextGenerate.js";
+import loadingAvatarUrl from "@/assets/loading_avatar.jpg";
 
 const MAX_INPUT_BYTES = 33 * 1024 * 1024;
 const WASM_READY_TIMEOUT_MS = 30000;
+const SAMPLE_FILE_NAME = "loading_avatar.jpg";
+const SAMPLE_WORD_COUNT = 200;
 
 function formatBytes(bytes) {
   if (!bytes) {
@@ -241,6 +270,7 @@ export default {
         textFileName: "text.txt",
         encodeMode: 68,
         encodeFps: 15,
+        exampleWordCount: SAMPLE_WORD_COUNT,
       },
 
       firstSectionSize: 40,
@@ -697,6 +727,56 @@ export default {
       const file = Array.isArray(files) ? files[0] : files;
       me.selectedFile = file || null;
       me.encodeMd5 = "";
+    },
+
+    /**
+     * Nạp dữ liệu mẫu vào nguồn đang chọn:
+     * - Text: sinh văn bản lorem ngẫu nhiên (giống tool Text to QRCode).
+     * - File: dựng File từ ảnh mẫu rồi gán vào ô upload.
+     */
+    async applySample() {
+      let me = this;
+      if (me.isPreparing || me.isEncoding) {
+        return;
+      }
+      if (me.currentConfigLayout.sourceType === "text") {
+        const wordCount = Number(me.currentConfigLayout.exampleWordCount);
+        me.textSource = TMMockTextGenerate.generateLoremWords(
+          Number.isFinite(wordCount) && wordCount > 0
+            ? Math.floor(wordCount)
+            : SAMPLE_WORD_COUNT,
+        );
+        me.encodeMd5 = "";
+        return;
+      }
+      try {
+        const blob = await me.loadSampleBlob();
+        const file = new File([blob], SAMPLE_FILE_NAME, {
+          type: blob.type || "image/jpeg",
+        });
+        me.selectedFile = file;
+        me.encodeMd5 = "";
+        me.$nextTick(() => {
+          if (me.$refs.fileUpload) {
+            me.$refs.fileUpload.setFileSelected(file);
+          }
+        });
+      } catch (error) {
+        me.$tmToast.error(
+          `${me.$t("i18nCommon.cimbar.errors.sample")} ${
+            error && error.message ? error.message : error
+          }`,
+          5000,
+        );
+      }
+    },
+
+    async loadSampleBlob() {
+      const response = await fetch(loadingAvatarUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return await response.blob();
     },
 
     // ── Canvas sizing ────────────────────────────────────────────────────
