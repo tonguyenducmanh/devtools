@@ -1135,8 +1135,6 @@ export default {
         start: "Bắt đầu",
         stop: "Dừng",
         preparing: "Đang nén dữ liệu...",
-        idleTitle: "Mã hóa dữ liệu thành Cimbar",
-        idle: "Chọn văn bản hoặc file, sau đó nhấn Bắt đầu để phát chuỗi mã động.",
         encoding: "Đang phát mã Cimbar",
         fullscreen: "Toàn màn hình",
         exitFullscreen: "Thoát toàn màn hình",

@@ -1144,8 +1144,6 @@ export default {
         start: "Start",
         stop: "Stop",
         preparing: "Compressing data...",
-        idleTitle: "Encode data as Cimbar",
-        idle: "Pick text or a file, then press Start to play the animated barcode.",
         encoding: "Streaming Cimbar code",
         fullscreen: "Fullscreen",
         exitFullscreen: "Exit fullscreen",

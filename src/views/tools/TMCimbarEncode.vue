@@ -83,6 +83,7 @@
       />
 
       <TMFullTabWrapper
+        v-show="showResult"
         v-model="isFullTab"
         :hidePin="true"
         :style="resultSectionStyle"
@@ -92,18 +93,9 @@
           <canvas
             ref="encodeCanvas"
             class="cimbar-canvas"
-            v-show="isEncoding"
             width="1024"
             height="1024"
           ></canvas>
-          <div v-if="!isEncoding" class="canvas-placeholder">
-            <div class="placeholder-title">
-              {{ $t("i18nCommon.cimbar.encode.idleTitle") }}
-            </div>
-            <div class="placeholder-text">
-              {{ $t("i18nCommon.cimbar.encode.idle") }}
-            </div>
-          </div>
         </div>
       </TMFullTabWrapper>
     </div>
@@ -342,11 +334,23 @@ export default {
       return this.currentConfigLayout.sourceType === "file";
     },
     /**
+     * Chưa encode xong thì không hiện khu vực kết quả (canvas) để giao diện
+     * tối giản; canvas vẫn được render (v-show) vì cần transfer sang worker
+     * OffscreenCanvas ngay khi bấm Bắt đầu.
+     */
+    showResult() {
+      return this.isEncoding;
+    },
+    /**
      * Text: vùng nhập chiếm firstSectionSize% (kéo resizer được).
      * File: ô upload chỉ cao 1 dòng → để vùng nhập tự co theo nội dung,
      * nhường toàn bộ phần còn lại cho khu vực kết quả.
+     * Khi chưa có kết quả: vùng nhập chiếm hết chỗ trống.
      */
     inputSectionStyle() {
+      if (!this.showResult) {
+        return this.isFileSource ? { height: "auto" } : { height: "100%" };
+      }
       return this.isFileSource ? {} : this.firstSectionResizeStyle;
     },
     resultSectionStyle() {
@@ -612,8 +616,7 @@ export default {
           me.$nextTick(() => me.applyCanvasSize());
           break;
         case "stopped":
-          me.isPreparing = false;
-          me.isEncoding = false;
+          me.finishEncoding();
           break;
         case "error": {
           const message = data.message || "";
@@ -627,8 +630,7 @@ export default {
             me._encoderReadyResolve = null;
             me.encoderInitPromise = null;
           } else {
-            me.isPreparing = false;
-            me.isEncoding = false;
+            me.finishEncoding();
             me.$tmToast.error(message, 5000);
           }
           break;
@@ -652,10 +654,19 @@ export default {
         me._encoderReadyResolve = null;
         me.encoderInitPromise = null;
       } else {
-        me.isPreparing = false;
-        me.isEncoding = false;
+        me.finishEncoding();
         me.$tmToast.error(message, 5000);
       }
+    },
+
+    /**
+     * Kết thúc encode (stop/lỗi): ẩn khu vực kết quả và thoát toàn màn hình,
+     * vì nút fullscreen bị disable khi không còn encode.
+     */
+    finishEncoding() {
+      this.isPreparing = false;
+      this.isEncoding = false;
+      this.isFullTab = false;
     },
 
     stopEncode() {
@@ -663,8 +674,7 @@ export default {
       if (me.encodeWorker) {
         me.encodeWorker.postMessage({ type: "stop" });
       }
-      me.isPreparing = false;
-      me.isEncoding = false;
+      me.finishEncoding();
     },
 
     destroyEncodeWorker() {
@@ -857,30 +867,6 @@ export default {
   display: block;
   background: var(--bg-layer-color);
   image-rendering: pixelated;
-}
-
-.canvas-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  row-gap: var(--padding);
-  width: 100%;
-  height: 100%;
-  min-height: 180px;
-  padding: var(--padding);
-  color: var(--text-primary-color);
-  text-align: center;
-}
-
-.placeholder-title {
-  font-size: var(--font-size-medium);
-  font-weight: 600;
-}
-
-.placeholder-text {
-  font-size: var(--font-size-small);
-  color: var(--text-secondary-color);
 }
 
 .tm-sub-sidebar {
