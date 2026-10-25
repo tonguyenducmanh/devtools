@@ -58,6 +58,19 @@ fi
 # Quay lại root
 cd "$ROOT_DIR"
 
+# 2b. Cimbar (prebuilt wasm từ release libcimbar — encoder + decoder)
+CIMBAR_MODULE_DIR="$ROOT_DIR/src_wasm/cimbar"
+if [ -d "$CIMBAR_MODULE_DIR" ]; then
+    echo "Entering Cimbar Module (prebuilt wasm)..."
+    cd "$CIMBAR_MODULE_DIR"
+    chmod +x ./build.sh
+    ./build.sh
+    cd "$ROOT_DIR"
+else
+    echo "Error: Cimbar directory $CIMBAR_MODULE_DIR not found!"
+    exit 1
+fi
+
 # 3. Build các web app "craft" (Rust → WebAssembly, static site: manifest.json +
 #    js glue + wasm.gz — app nạp thẳng, không qua iframe)
 #    PhotoCraft — Ảnh pixel — trunk

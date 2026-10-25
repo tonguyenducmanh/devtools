@@ -131,6 +131,16 @@ export const sidebarConfig = [
         component: () => import("@/views/tools/TMImageToBase64.vue"),
         meta: { titleKey: "i18nCommon.feature.ImageToBase64" },
       },
+      {
+        name: "TMCimbarEncode",
+        component: () => import("@/views/tools/TMCimbarEncode.vue"),
+        meta: { titleKey: "i18nCommon.feature.CimbarEncode" },
+      },
+      {
+        name: "TMCimbarDecode",
+        component: () => import("@/views/tools/TMCimbarDecode.vue"),
+        meta: { titleKey: "i18nCommon.feature.CimbarDecode" },
+      },
     ],
   },
   {

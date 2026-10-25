@@ -62,4 +62,6 @@ export const EnumCacheConfig = {
   // Dữ liệu OTP (secret/issuer/name...) lưu thẳng, không mã hoá và không
   // cần tài khoản/mật khẩu, mở tool là dùng ngay.
   OneTimeAuthenData: 70,
+  CimbarConfigLayout: 71,
+  CimbarDecodeConfigLayout: 72,
 };

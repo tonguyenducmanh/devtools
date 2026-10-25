@@ -349,4 +349,16 @@ export const TMCacheConfig = {
     ExpireTime: 0,
     Note: "danh sách OTP đã import, lưu thẳng không mã hoá, mở tool là load luôn",
   },
+  CimbarConfigLayout: {
+    KeyFormat: "CimbarConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool tạo mã Cimbar",
+  },
+  CimbarDecodeConfigLayout: {
+    KeyFormat: "CimbarDecodeConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool giải mã Cimbar",
+  },
 };

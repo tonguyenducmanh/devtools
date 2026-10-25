@@ -606,5 +606,63 @@ export default {
           "List Databases: Use the 'Database List' action in the Explore menu to list all databases on the same server. Click a database to add it as a new connection with auto-filled host/port/credentials.",
       },
     },
+    cimbarEncode: {
+      purpose: {
+        title: "Purpose",
+        content:
+          "Encode text or a file into a Cimbar (color-icon-matrix barcode). The code is played as a sequence of animated frames on screen; another machine only needs to record the screen and decode it, with no network, Bluetooth or NFC.",
+      },
+      howToUse: {
+        title: "How to use",
+        source:
+          "1. Pick the data source: Text (type it and name the output file) or File (choose one from disk).",
+        mode:
+          "2. Choose the encoding mode. B is standard, Bm is smaller, Bu is faster, 4C uses 4 colors. The decoder must use the same mode or Auto.",
+        start:
+          "3. Choose a frame rate and press Start. The data is compressed and streamed as an animated code.",
+        capture:
+          "4. On the receiving machine, record the whole code area (screen recording or phone camera), then use the Cimbar decoder tool to recover the data.",
+      },
+      notes: {
+        title: "Notes",
+        photosensitivity:
+          "Cimbar flickers strongly. People with a history of photosensitive epilepsy should not look directly at the screen while it plays.",
+        sizeLimit:
+          "The data limit is about 33 MB after compression. Compress large files first.",
+        fileName:
+          "The file name entered here becomes the file name when the receiving machine decodes successfully.",
+        md5:
+          "After you press Start, the tool shows the MD5 of the source data. Note it down to compare with the MD5 shown by the decoder.",
+      },
+    },
+    cimbarDecode: {
+      purpose: {
+        title: "Purpose",
+        content:
+          "Decode the Cimbar stream in a screen recording and restore the original file or text.",
+      },
+      howToUse: {
+        title: "How to use",
+        record:
+          "1. On the sending machine, record the screen area that shows the Cimbar frame while the code is playing.",
+        upload:
+          "2. Choose that video in this tool. You can preview the video and its duration.",
+        mode:
+          "3. Choose the decoding mode: Auto (recommended) or the exact mode used when encoding.",
+        start:
+          "4. Choose a sample rate and press Decode. Once enough data is collected, the original file appears for download or the text can be copied.",
+      },
+      notes: {
+        title: "Notes",
+        quality:
+          "Sharper video with less re-encoding decodes faster. Do not record through glass, blur it, or crop the code frame.",
+        sampleFps:
+          "A low sample rate can skip frames; if decoding does not finish, raise it to 20-30 fps.",
+        duration:
+          "Long videos take proportionally longer because every frame is scanned in wasm.",
+        md5:
+          "After decoding, the tool shows the MD5 of the received data. Compare it with the MD5 on the sender: a match means the file is intact.",
+      },
+    },
   },
 };

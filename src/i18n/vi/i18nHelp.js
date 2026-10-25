@@ -595,5 +595,63 @@ export default {
           "Danh sách Database: Dùng menu 'Danh sách Database' trong nhóm Explore để xem tất cả database trên cùng server. Click vào database để thêm kết nối mới với thông tin host/port được điền sẵn.",
       },
     },
+    cimbarEncode: {
+      purpose: {
+        title: "Mục đích",
+        content:
+          "Tạo mã Cimbar (color-icon-matrix barcode) từ văn bản hoặc file. Mã được phát thành chuỗi khung hình động trên màn hình; máy khác chỉ cần ghi lại màn hình rồi giải mã, không cần mạng, Bluetooth hay NFC.",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        source:
+          "1. Chọn nguồn dữ liệu: Văn bản (nhập trực tiếp, đặt tên file) hoặc File (chọn từ máy).",
+        mode:
+          "2. Chọn chế độ mã. B là chuẩn, Bm nhỏ hơn, Bu nhanh hơn, 4C dùng 4 màu. Máy giải mã phải chọn đúng chế độ hoặc để Tự động.",
+        start:
+          "3. Chọn tốc độ khung hình rồi nhấn Bắt đầu. Dữ liệu được nén và phát thành chuỗi mã động.",
+        capture:
+          "4. Trên máy nhận, ghi lại toàn bộ vùng mã (quay màn hình hoặc quay bằng điện thoại), sau đó dùng tool Giải mã Cimbar để khôi phục dữ liệu.",
+      },
+      notes: {
+        title: "Lưu ý",
+        photosensitivity:
+          "Mã Cimbar nhấp nháy rất mạnh. Người có tiền sử động kinh cảm quang không nên nhìn trực tiếp vào màn hình khi đang phát.",
+        sizeLimit:
+          "Giới hạn dữ liệu khoảng 33 MB sau khi nén. File lớn nên nén trước khi mã hóa.",
+        fileName:
+          "Tên file nhập ở đây sẽ được dùng làm tên file khi máy nhận giải mã thành công.",
+        md5:
+          "Sau khi bắt đầu, tool hiển thị MD5 của dữ liệu nguồn. Ghi lại giá trị này để đối chiếu với MD5 hiện ở máy giải mã.",
+      },
+    },
+    cimbarDecode: {
+      purpose: {
+        title: "Mục đích",
+        content:
+          "Giải mã chuỗi mã Cimbar trong video ghi màn hình và khôi phục lại đúng file hoặc văn bản gốc.",
+      },
+      howToUse: {
+        title: "Cách sử dụng",
+        record:
+          "1. Trên máy phát mã, ghi lại màn hình chứa khung mã Cimbar trong lúc mã đang chạy.",
+        upload:
+          "2. Chọn video đó trong tool này. Có thể xem trước video và thời lượng.",
+        mode:
+          "3. Chọn chế độ giải: Tự động (khuyến nghị) hoặc đúng chế độ đã dùng khi mã hóa.",
+        start:
+          "4. Chọn tốc độ lấy mẫu rồi nhấn Giải mã. Khi đủ dữ liệu, file gốc hiện ra để tải về hoặc sao chép văn bản.",
+      },
+      notes: {
+        title: "Lưu ý",
+        quality:
+          "Video càng nét, càng ít nén lại thì giải mã càng nhanh. Không quay qua kính, không làm mờ hoặc cắt mất khung mã.",
+        sampleFps:
+          "Tốc độ lấy mẫu thấp sẽ bỏ sót khung hình; nếu giải mã không xong, hãy tăng lên 20-30 fps.",
+        duration:
+          "Video dài sẽ mất thời gian xử lý tương ứng vì mỗi khung hình đều được quét trong wasm.",
+        md5:
+          "Sau khi giải mã xong, tool hiển thị MD5 của dữ liệu nhận được. So sánh với MD5 ở máy gửi: khớp là file toàn vẹn.",
+      },
+    },
   },
 };

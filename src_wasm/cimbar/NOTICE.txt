@@ -1,0 +1,14 @@
+cimbar wasm — prebuilt release v0.6.8
+Source: https://github.com/sz3/libcimbar
+Author: sz3 (Sean)
+License: Mozilla Public License 2.0 (see LICENSE-MPL-2.0.txt)
+Downloaded asset: https://github.com/sz3/libcimbar/releases/download/v0.6.8/cimbar.wasm.tar.gz
+
+Checksums (v0.6.8):
+  SHA256 cimbar.wasm.tar.gz : 0a14b63decd9404e7a319b4b0f5cd873eb6aa325f90df4e965305f523567c4a5
+  MD5    cimbar.wasm.tar.gz : 9c62f5dbffd3ac495b7a1cd7da9781ad
+  MD5    cimbar_js.js       : d2a90a00da846cc04b7e480f63e16d4d
+  MD5    cimbar_js.wasm     : 611f3f1b05cbdcca543b65baff56bd2b
+
+File này và LICENSE-MPL-2.0.txt chỉ nằm ở src_wasm/cimbar (nguồn).
+Thư mục src_wasm/pkg/cimbar/ chỉ chứa cimbar_js.js và cimbar_js.wasm.
