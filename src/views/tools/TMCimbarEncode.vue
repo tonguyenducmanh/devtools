@@ -1,7 +1,7 @@
 <template>
   <div class="flex container">
     <div class="flex flex-col main-tool">
-      <div class="flex flex-col input-section" :style="firstSectionResizeStyle">
+      <div class="flex flex-col input-section" :style="inputSectionStyle">
         <div class="flex input-area">
           <TMTextEditor
             v-if="currentConfigLayout.sourceType === 'text'"
@@ -19,7 +19,16 @@
             :readOnly="isPreparing || isEncoding"
             @selected="handleFileSelected"
           ></TMUpload>
-          <div class="flex flex-col button-generate">
+          <!-- Text: nút xếp dọc bên phải editor. File: nút xếp ngang 1 dòng
+               vì ô upload chỉ cao 1 dòng. -->
+          <div
+            class="flex button-generate"
+            :class="
+              currentConfigLayout.sourceType === 'file'
+                ? 'button-generate-row'
+                : 'flex-col'
+            "
+          >
             <TMButton
               :noMargin="true"
               :readOnly="!canStartEncode || isPreparing || isEncoding"
@@ -36,9 +45,9 @@
               v-tooltip="$t('i18nCommon.cimbar.encode.stop')"
             ></TMButton>
             <TMButton
-              v-if="isEncoding"
               :noMargin="true"
               :type="$tmEnum.buttonType.secondary"
+              :readOnly="!isEncoding"
               @click="toggleFullTab"
               iconClass="tm-full-screen-icon"
               v-tooltip="$t('i18nCommon.cimbar.encode.fullscreen')"
@@ -67,7 +76,7 @@
 
       <!-- Resizer -->
       <TMResizer
-        v-if="isEncoding"
+        v-if="isEncoding && !isFileSource"
         :direction="'vertical'"
         @resize="handleResize"
         :minSize="15"
@@ -76,7 +85,7 @@
       <TMFullTabWrapper
         v-model="isFullTab"
         :hidePin="true"
-        :style="!isFullTab ? secondSectionResizeStyle : {}"
+        :style="resultSectionStyle"
         class="cimbar-wrapper"
       >
         <div ref="canvasPanel" class="flex flex-one canvas-panel">
@@ -328,6 +337,31 @@ export default {
     },
     secondSectionResizeStyle() {
       return { height: `${this.secondSectionSize}%` };
+    },
+    isFileSource() {
+      return this.currentConfigLayout.sourceType === "file";
+    },
+    /**
+     * Text: vùng nhập chiếm firstSectionSize% (kéo resizer được).
+     * File: ô upload chỉ cao 1 dòng → để vùng nhập tự co theo nội dung,
+     * nhường toàn bộ phần còn lại cho khu vực kết quả.
+     */
+    inputSectionStyle() {
+      return this.isFileSource ? {} : this.firstSectionResizeStyle;
+    },
+    resultSectionStyle() {
+      if (this.isFullTab) {
+        return {};
+      }
+      if (this.isFileSource) {
+        return {
+          flex: "1 1 auto",
+          height: "auto",
+          width: "100%",
+          minHeight: 0,
+        };
+      }
+      return this.secondSectionResizeStyle;
     },
   },
 
@@ -741,6 +775,15 @@ export default {
   justify-content: flex-start;
   height: 100%;
   gap: var(--padding);
+}
+
+/* Layout upload file: ô chọn file chỉ cao 1 dòng nên nút xếp ngang cho gọn,
+   không kéo cao theo vùng nhập. */
+.button-generate-row {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  height: auto;
 }
 
 .group-footer-input {
