@@ -54,8 +54,10 @@ let paused = false;
 let timer = null;
 let intervalMs = 66;
 let mode = 68;
+// frameCount: số khung trong vòng fountain hiện tại (wasm reset về 1 khi quay
+// vòng) — dùng để báo tiến trình 0→100% cho UI.
 let frameCount = 0;
-let lastReportedFrame = 0;
+let cycleFrames = 0;
 
 const MAX_INPUT_BYTES = 33 * 1024 * 1024;
 
@@ -125,11 +127,34 @@ function tick() {
   try {
     const M = self.Module;
     M._cimbare_render();
-    frameCount = M._cimbare_next_frame(false);
-    if (frameCount - lastReportedFrame >= 15) {
-      lastReportedFrame = frameCount;
-      post({ type: "frames", count: frameCount });
+
+    const previous = frameCount;
+    const count = M._cimbare_next_frame(false);
+    if (count <= 0) {
+      return;
     }
+    frameCount = count;
+
+    // next_frame() trả về số khung trong vòng hiện tại; khi fountain stream
+    // quay vòng, giá trị tụt về 1 → vòng vừa rồi đã phát đủ `previous` khung.
+    // Đây là mốc "đã truyền xong toàn bộ dữ liệu một lần" để người dùng biết
+    // có thể dừng quay màn hình.
+    if (previous > 0 && count <= previous) {
+      cycleFrames = previous;
+      post({
+        type: "frames",
+        count: count,
+        cycleFrames: cycleFrames,
+        wrapped: true,
+      });
+      return;
+    }
+
+    post({
+      type: "frames",
+      count: count,
+      cycleFrames: cycleFrames,
+    });
   } catch (error) {
     post({ type: "error", message: errorMessage(error) });
   }
@@ -140,7 +165,7 @@ function loadSource(data) {
   hasSource = false;
   paused = false;
   frameCount = 0;
-  lastReportedFrame = 0;
+  cycleFrames = 0;
 
   if (!ready) {
     post({ type: "error", message: "wasm chưa sẵn sàng" });
@@ -294,6 +319,8 @@ self.onmessage = function (event) {
       case "stop":
         hasSource = false;
         paused = false;
+        frameCount = 0;
+        cycleFrames = 0;
         clearTimer();
         post({ type: "stopped" });
         break;

@@ -104,6 +104,28 @@
             width="1024"
             height="1024"
           ></canvas>
+
+          <!--
+            Tiến trình phát ở góc canvas (không chiếm chỗ layout) để fullscreen
+            vẫn thấy. 1 vòng = toàn bộ dữ liệu đã được phát đủ một lần (fountain
+            stream quay vòng) → 100% là mốc có thể dừng quay video.
+          -->
+          <span v-if="isEncoding" class="play-progress-corner">
+            <template v-if="hasEncodeCycle">
+              {{
+                $t("i18nCommon.cimbar.encode.frameProgress").format(
+                  encodeFrames,
+                  encodeCycleFrames,
+                  encodeCyclePercent,
+                )
+              }}
+            </template>
+            <template v-else>
+              {{
+                $t("i18nCommon.cimbar.encode.frameCount").format(encodeFrames)
+              }}
+            </template>
+          </span>
         </div>
       </TMFullTabWrapper>
     </div>
@@ -236,6 +258,9 @@ const MAX_INPUT_BYTES = 33 * 1024 * 1024;
 const WASM_READY_TIMEOUT_MS = 30000;
 const SAMPLE_FILE_NAME = "loading_avatar.jpg";
 const SAMPLE_WORD_COUNT = 200;
+// Giữ số khung/% ở 100% một nhịp khi vòng kết thúc để mốc "đã phát đủ dữ
+// liệu" nhìn rõ, kể cả vòng đầu (trước đó chưa biết độ dài vòng).
+const CYCLE_FULL_HOLD_MS = 500;
 
 function formatBytes(bytes) {
   if (!bytes) {
@@ -281,6 +306,10 @@ export default {
 
       encodeProgress: 0,
       encodeMd5: "",
+      // Tiến trình phát: số khung trong vòng fountain hiện tại, độ dài 1 vòng
+      // (chỉ biết sau khi vòng đầu kết thúc) và số vòng đã phát xong.
+      encodeFrames: 0,
+      encodeCycleFrames: 0,
       isPreparing: false,
       isEncoding: false,
       isFullTab: false,
@@ -337,6 +366,18 @@ export default {
       return this.currentConfigLayout.sourceType === "text"
         ? !!this.textSource.trim()
         : !!this.selectedFile;
+    },
+    /** Đã biết độ dài 1 vòng fountain hay chưa (vòng đầu chưa biết). */
+    hasEncodeCycle() {
+      return this.encodeCycleFrames > 0;
+    },
+    /** % của vòng hiện tại; 100% = dữ liệu đã phát đủ một lần. */
+    encodeCyclePercent() {
+      if (!this.encodeCycleFrames) {
+        return 0;
+      }
+      const percent = (this.encodeFrames / this.encodeCycleFrames) * 100;
+      return Math.max(0, Math.min(100, Math.round(percent)));
     },
     selectedFileInfo() {
       if (!this.selectedFile) {
@@ -407,6 +448,7 @@ export default {
   },
 
   beforeUnmount() {
+    this.clearCycleHold();
     this.disconnectCanvasPanel();
     this.destroyEncodeWorker();
   },
@@ -480,6 +522,9 @@ export default {
       me.isPreparing = true;
       me.encodeProgress = 0;
       me.encodeMd5 = "";
+      me.encodeFrames = 0;
+      me.encodeCycleFrames = 0;
+      me.clearCycleHold();
       try {
         await me.ensureEncodeWorker();
         me.encodeWorker.postMessage(
@@ -635,6 +680,20 @@ export default {
         case "progress":
           me.encodeProgress = data.percent || 0;
           break;
+        case "frames": {
+          if (data.wrapped && data.cycleFrames) {
+            me.encodeCycleFrames = data.cycleFrames;
+            // Giữ số khung/% ở 100% một nhịp để thấy rõ mốc "vừa đủ 1 vòng".
+            me.encodeFrames = data.cycleFrames;
+            me.holdCycleFull();
+            break;
+          }
+
+          if (!me._cycleHold) {
+            me.encodeFrames = data.count || 0;
+          }
+          break;
+        }
         case "loaded":
           me.isPreparing = false;
           me.isEncoding = true;
@@ -690,10 +749,36 @@ export default {
     },
 
     /**
+     * Giữ số khung và % ở 100% trong CYCLE_FULL_HOLD_MS mỗi khi một vòng kết
+     * thúc, sau đó trả lại tiến trình thật của vòng mới.
+     */
+    holdCycleFull() {
+      let me = this;
+      me._cycleHold = true;
+      if (me._cycleHoldTimer) {
+        clearTimeout(me._cycleHoldTimer);
+      }
+      me._cycleHoldTimer = setTimeout(() => {
+        me._cycleHold = false;
+        me._cycleHoldTimer = null;
+      }, CYCLE_FULL_HOLD_MS);
+    },
+
+    clearCycleHold() {
+      let me = this;
+      me._cycleHold = false;
+      if (me._cycleHoldTimer) {
+        clearTimeout(me._cycleHoldTimer);
+        me._cycleHoldTimer = null;
+      }
+    },
+
+    /**
      * Kết thúc encode (stop/lỗi): ẩn khu vực kết quả và thoát toàn màn hình,
      * vì nút fullscreen bị disable khi không còn encode.
      */
     finishEncoding() {
+      this.clearCycleHold();
       this.isPreparing = false;
       this.isEncoding = false;
       this.isFullTab = false;
@@ -918,6 +1003,21 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   user-select: all;
+}
+
+/* Số khung/% ở góc canvas — không chiếm chỗ layout, fullscreen vẫn thấy. */
+.play-progress-corner {
+  position: absolute;
+  top: calc(var(--padding) / 2);
+  right: calc(var(--padding) / 2);
+  z-index: 2;
+  padding: 2px var(--padding);
+  border-radius: var(--border-radius);
+  background: color-mix(in srgb, var(--bg-layer-color) 78%, transparent);
+  font-size: var(--font-size-small);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
 }
 
 .cimbar-wrapper {

@@ -24,6 +24,9 @@
           {{ $t("i18nHelp.cimbarEncode.howToUse.start") }}
         </p>
         <p class="section-text">
+          {{ $t("i18nHelp.cimbarEncode.howToUse.progress") }}
+        </p>
+        <p class="section-text">
           {{ $t("i18nHelp.cimbarEncode.howToUse.capture") }}
         </p>
       </div>

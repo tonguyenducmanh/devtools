@@ -1136,6 +1136,8 @@ export default {
         stop: "Dừng",
         preparing: "Đang nén dữ liệu...",
         encoding: "Đang phát mã Cimbar",
+        frameCount: "Khung {0}",
+        frameProgress: "Khung {0}/{1} · {2}%",
         fullscreen: "Toàn màn hình",
         exitFullscreen: "Thoát toàn màn hình",
         sourceText: "Văn bản",

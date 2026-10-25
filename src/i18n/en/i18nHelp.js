@@ -620,8 +620,10 @@ export default {
           "2. Choose the encoding mode. B is standard, Bm is smaller, Bu is faster, 4C uses 4 colors. The decoder must use the same mode or Auto.",
         start:
           "3. Choose a frame rate and press Start. The data is compressed and streamed as an animated code.",
+        progress:
+          "4. While playing, the corner of the code area shows the frame count and percentage of one loop. 100% means the whole payload has been sent once, so you can stop recording.",
         capture:
-          "4. On the receiving machine, record the whole code area (screen recording or phone camera), then use the Cimbar decoder tool to recover the data.",
+          "5. On the receiving machine, record the whole code area (screen recording or phone camera), then use the Cimbar decoder tool to recover the data.",
       },
       notes: {
         title: "Notes",

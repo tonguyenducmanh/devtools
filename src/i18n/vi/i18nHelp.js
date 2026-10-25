@@ -609,8 +609,10 @@ export default {
           "2. Chọn chế độ mã. B là chuẩn, Bm nhỏ hơn, Bu nhanh hơn, 4C dùng 4 màu. Máy giải mã phải chọn đúng chế độ hoặc để Tự động.",
         start:
           "3. Chọn tốc độ khung hình rồi nhấn Bắt đầu. Dữ liệu được nén và phát thành chuỗi mã động.",
+        progress:
+          "4. Trong lúc phát, góc vùng mã hiển thị số khung và % của một vòng. Đạt 100% nghĩa là dữ liệu đã được phát đủ một lần, có thể dừng quay.",
         capture:
-          "4. Trên máy nhận, ghi lại toàn bộ vùng mã (quay màn hình hoặc quay bằng điện thoại), sau đó dùng tool Giải mã Cimbar để khôi phục dữ liệu.",
+          "5. Trên máy nhận, ghi lại toàn bộ vùng mã (quay màn hình hoặc quay bằng điện thoại), sau đó dùng tool Giải mã Cimbar để khôi phục dữ liệu.",
       },
       notes: {
         title: "Lưu ý",
