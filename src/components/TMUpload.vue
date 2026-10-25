@@ -46,11 +46,13 @@
       />
     </label>
     <div class="flex tm-selected-group" v-if="isShowSelect">
-      <template v-if="selectedFiles.length > 0">
-        <span class="tm-selected-item">
-          {{ getTitleFileSelected }}
-        </span>
-      </template>
+      <span
+        v-if="selectedFiles.length > 0"
+        class="tm-selected-item"
+        v-tooltip="{ text: selectedFileNames, maxWidth: '360px' }"
+      >
+        {{ getTitleFileSelected }}
+      </span>
       <span v-else-if="labelEmpty" class="tm-selected-item">{{
         labelEmpty
       }}</span>
@@ -120,6 +122,10 @@ export default {
         }`;
       }
       return result;
+    },
+    /** Danh sách tên file, mỗi file 1 dòng — dùng cho tooltip. */
+    selectedFileNames() {
+      return (this.selectedFiles || []).map((file) => file.name).join("\n");
     },
   },
   methods: {
@@ -206,15 +212,17 @@ export default {
 }
 .tm-selected-group {
   flex: 1;
-  flex-direction: column;
-  align-items: start;
-  overflow: auto;
+  min-width: 0;
+  align-items: center;
+  overflow: hidden;
   height: 100%;
   padding: var(--padding);
   .tm-selected-item {
     padding-left: var(--padding);
-    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
     white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }
 
