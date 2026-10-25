@@ -104,8 +104,8 @@ export const sidebarConfig = [
   },
   {
     type: "group",
-    groupKey: "qrcode",
-    groupTitleKey: "i18nCommon.group.QRCode",
+    groupKey: "encoding",
+    groupTitleKey: "i18nCommon.group.Encoding",
     children: [
       {
         name: "textoqrcode",
@@ -120,6 +120,16 @@ export const sidebarConfig = [
         meta: {
           titleKey: "i18nCommon.feature.QRCodeToText",
         },
+      },
+      {
+        name: "base64toimage",
+        component: () => import("@/views/tools/TMBase64ToImage.vue"),
+        meta: { titleKey: "i18nCommon.feature.ImageFromBase64" },
+      },
+      {
+        name: "imagetobase64",
+        component: () => import("@/views/tools/TMImageToBase64.vue"),
+        meta: { titleKey: "i18nCommon.feature.ImageToBase64" },
       },
     ],
   },
@@ -258,16 +268,6 @@ export const sidebarConfig = [
           contentFlush: true,
           confirmOnClose: true,
         },
-      },
-      {
-        name: "base64toimage",
-        component: () => import("@/views/tools/TMBase64ToImage.vue"),
-        meta: { titleKey: "i18nCommon.feature.ImageFromBase64" },
-      },
-      {
-        name: "imagetobase64",
-        component: () => import("@/views/tools/TMImageToBase64.vue"),
-        meta: { titleKey: "i18nCommon.feature.ImageToBase64" },
       },
     ],
   },

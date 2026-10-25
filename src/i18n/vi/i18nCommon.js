@@ -33,10 +33,10 @@ export default {
       confirmCloseNo: "Huỷ",
     },
     group: {
-      QRCode: "Công cụ QR",
+      Encoding: "Mã hóa",
       API: "Tích hợp API",
       JSON: "Xử lý JSON",
-      Image: "Xử lý ảnh",
+      Image: "Thiết kế đồ họa",
       Text: "Văn bản",
       ArtificialIntelligence: "Tích hợp AI",
       RemoteDesktop: "Máy tính từ xa",

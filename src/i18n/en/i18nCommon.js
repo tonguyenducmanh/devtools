@@ -33,10 +33,10 @@ export default {
       confirmCloseNo: "Cancel",
     },
     group: {
-      QRCode: "QR tooling",
+      Encoding: "Encoding",
       API: "API intergate",
       JSON: "JSON building",
-      Image: "Image handle",
+      Image: "Graphic design",
       Text: "Text",
       ArtificialIntelligence: "AI tooling",
       RemoteDesktop: "Remote Desktop",
