@@ -41,9 +41,10 @@ export default {
           // Môi trường PROD: Giấu đường dẫn trong một biến chuỗi
           // Việc này khiến Vite hoàn toàn bỏ qua không quét file này lúc dev nữa
           let APP_VERSION = tmUtility.getAppVersion();
-          // "dotnet" phải khớp với WASM_PKG_FOLDERS trong vite.config.js:
-          // cả folder được copy vào assets-wasm-<version>/dotnet/, và runtime
-          // .NET tự resolve các file cạnh nó theo import.meta.url.
+          // "dotnet" là tên folder trong src_wasm/pkg/ (vite.config.js copy mọi
+          // folder có trong đó): cả folder được copy vào
+          // assets-wasm-<version>/dotnet/, và runtime .NET tự resolve các file
+          // cạnh nó theo import.meta.url.
           const prodPath = `/assets-wasm-${APP_VERSION}/dotnet/dotnet.js`;
           const { dotnet } = await import(/* @vite-ignore */ prodPath);
           dotnetModule = dotnet;

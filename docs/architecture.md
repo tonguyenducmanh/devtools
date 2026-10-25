@@ -154,9 +154,9 @@ Nhờ query `?i=` riêng cho từng tab, mỗi tab có instance wasm riêng (was
 
 `index.html` do trunk sinh ra vẫn được giữ lại: nó là trang chạy độc lập để debug app wasm, và là nơi `patch_wasm_dist.py` ghi logic tự giải nén.
 
-`vite.config.js` (viteStaticCopy): copy `pkg/dotnet/*` → `assets-wasm-<VERSION>/`; `pkg/rdp/*` → `assets-wasm-<VERSION>/rdp/`; `pkg/ultraviewer/*` → `assets-wasm-<VERSION>/ultraviewer/`; `pkg/<craft>/*` → `assets-wasm-<VERSION>/<craft>/`. Runtime nạp theo đường dẫn tuyệt đối `assets-wasm-<version>/…` (DEV cũng được serve bởi plugin static-copy middleware). Alias `@wasm` → `src_wasm` (dùng cho dotnet khi dev).
+`vite.config.js` (viteStaticCopy) **quét động** mọi folder con trong `src_wasm/pkg/` rồi copy `pkg/<tên>/*` → `assets-wasm-<VERSION>/<tên>/` — thêm wasm mới không phải sửa `vite.config.js`. Runtime nạp theo đường dẫn tuyệt đối `assets-wasm-<version>/…` (DEV cũng được serve bởi plugin static-copy middleware). Alias `@wasm` → `src_wasm` (dùng cho dotnet khi dev).
 
-`pkg/` là **thư mục output, gitignored** (~58 MB binary). Vì repo không chứa wasm, `vite.config.js` bỏ qua folder `pkg/<tên>` nào rỗng (chỉ cảnh báo) để `npm run build` vẫn xanh trên clone mới; khi build phát hành (`REQUIRE_WASM=1`) thì thiếu folder nào là fail ngay. Vì vậy Cloudflare Pages không tự build được → deploy thủ công qua `scripts/deploy_cloudflare.sh`.
+`pkg/` là **thư mục output, gitignored** (~58 MB binary). Vì repo không chứa wasm, `vite.config.js` bỏ qua folder `pkg/<tên>` nào rỗng (chỉ cảnh báo) để `npm run build` vẫn xanh trên clone mới; khi build phát hành (`REQUIRE_WASM=1`) thì `pkg/` trống hoặc folder rỗng là fail ngay. Vì vậy Cloudflare Pages không tự build được → deploy thủ công qua `scripts/deploy_cloudflare.sh`.
 
 ### UltraViewer client (WASM + relay proxy)
 

@@ -26,8 +26,8 @@ Lưu ý dev-only:
 npm run build
 ```
 
-- Output: `dist/` (gitignored) — gồm bundle `assets/tjs-*`, `assets/tas-*` (có version) và `assets-wasm-<version>/{dotnet,rdp,ultraviewer,photocraft}` được copy từ `src_wasm/pkg/`.
-- `src_wasm/pkg/` là **gitignored** (~58 MB). Folder nào rỗng thì `vite` **cảnh báo và bỏ qua** để build vẫn xanh; dùng `REQUIRE_WASM=1 npm run build` khi build phát hành — lúc đó thiếu folder nào là **fail ngay**.
+- Output: `dist/` (gitignored) — gồm bundle `assets/tjs-*`, `assets/tas-*` (có version) và `assets-wasm-<version>/<tên>/` được copy từ **mọi** folder con của `src_wasm/pkg/`.
+- `src_wasm/pkg/` là **gitignored** (~58 MB). `vite.config.js` quét động các folder con nên folder nào rỗng thì **cảnh báo và bỏ qua** để build vẫn xanh; dùng `REQUIRE_WASM=1 npm run build` khi build phát hành — lúc đó `pkg/` trống hoặc folder rỗng là **fail ngay**.
 - Chạy `npm run dev` sau đó Ctrl-click mở tool bị đổi để smoke-test; rồi `npm run build` để chắc chắn không phá bundle.
 
 ## 3. Build backend (Go)
