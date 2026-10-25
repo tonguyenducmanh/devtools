@@ -65,7 +65,6 @@
         </div>
 
         <div class="flex flex-col response-loading" v-if="isDecoding">
-          <TMLoading />
           <div class="scan-progress">
             {{
               $t("i18nCommon.cimbar.decode.progress").format(
@@ -74,18 +73,19 @@
               )
             }}
           </div>
-          <div class="progress-bar">
-            <div
-              class="progress-value"
-              :style="{ width: decodePercent + '%' }"
-            ></div>
-          </div>
+
           <div v-if="fountainPercent >= 0" class="scan-progress">
             {{
               $t("i18nCommon.cimbar.decode.fountainProgress").format(
                 fountainPercent,
               )
             }}
+          </div>
+          <div class="progress-bar">
+            <div
+              class="progress-value"
+              :style="{ width: decodePercent + '%' }"
+            ></div>
           </div>
         </div>
 
@@ -557,7 +557,8 @@ export default {
       }
 
       if (data.type === "error") {
-        const message = data.message || me.$t("i18nCommon.cimbar.errors.worker");
+        const message =
+          data.message || me.$t("i18nCommon.cimbar.errors.worker");
         if (me._decodeReadyReject) {
           if (me._decodeReadyTimer) {
             clearTimeout(me._decodeReadyTimer);
@@ -764,10 +765,7 @@ export default {
         return;
       }
       const max = Math.max(...report.map((value) => Number(value) || 0));
-      me.fountainPercent = Math.max(
-        0,
-        Math.min(100, Math.round(max * 100)),
-      );
+      me.fountainPercent = Math.max(0, Math.min(100, Math.round(max * 100)));
     },
 
     handleDecodedFile(file) {
@@ -975,6 +973,7 @@ export default {
 }
 .binary-result {
   flex: 1;
+  width: 100%;
   min-height: 0;
   row-gap: var(--padding);
   align-items: center;

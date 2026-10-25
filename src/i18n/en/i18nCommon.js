@@ -1160,7 +1160,7 @@ export default {
         start: "Decode",
         stop: "Stop",
         progress: "Processing frame {0}/{1}",
-        fountainProgress: "Recovered data: {0}%",
+        fountainProgress: "Recovered data {0}%",
         result: "Decoded result",
         download: "Download file",
         copyText: "Copy text",

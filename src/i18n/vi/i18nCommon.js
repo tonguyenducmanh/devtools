@@ -1151,7 +1151,7 @@ export default {
         start: "Giải mã",
         stop: "Dừng",
         progress: "Đang xử lý khung hình {0}/{1}",
-        fountainProgress: "Dữ liệu nhận được: {0}%",
+        fountainProgress: "Dữ liệu nhận được {0}%",
         result: "Kết quả giải mã",
         download: "Tải file",
         copyText: "Sao chép văn bản",
