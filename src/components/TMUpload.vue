@@ -177,10 +177,11 @@ export default {
 /* ── Normal upload mode ───────────────────────────────────── */
 .tm-upload {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   border: 1px solid var(--border-color);
   width: 100%;
   height: var(--base-component-height);
+  overflow: hidden;
   border-radius: var(--border-radius);
   background-color: var(--bg-main-color);
   color: var(--text-primary-color);
