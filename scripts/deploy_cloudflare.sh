@@ -80,6 +80,12 @@ if [ ! -f "$ROOT_DIR/dist/index.html" ]; then
     exit 1
 fi
 
+# 4b. Chặn file wasm thiếu (vd thư mục `snippets/` của wasm-bindgen bị làm phẳng)
+#     trước khi đẩy lên Pages — nếu không, Pages trả index.html cho đường dẫn
+#     không tồn tại và app Craft chết với lỗi MIME text/html.
+echo ">>> Kiểm tra wasm trong dist..."
+python3 "$ROOT_DIR/scripts/check_wasm_dist.py" "$ROOT_DIR/dist"
+
 echo ">>> Nội dung dist/assets-wasm-<version>/:"
 for dir in "$ROOT_DIR"/dist/assets-wasm-*/; do
     [ -d "$dir" ] || continue

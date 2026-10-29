@@ -12,9 +12,16 @@ import packageJson from "./package.json";
 const APP_VERSION = process.env.VERSION || packageJson.version;
 
 // Mọi thư mục con trong `src_wasm/pkg/` đều được copy sang
-// `dist/assets-wasm-<VERSION>/<tên>/` (nội dung copy phẳng, bỏ thư mục con).
+// `dist/assets-wasm-<VERSION>/<tên>/`, GIỮ NGUYÊN cấu trúc thư mục con bên trong.
 // Danh sách được quét động: build wasm ra folder nào thì copy folder đó, không
 // cần sửa file này khi thêm tool wasm mới.
+//
+// Vì sao phải giữ cấu trúc: wasm-bindgen sinh thêm thư mục `snippets/<crate>-<hash>/`
+// và file glue import thẳng đường dẫn tương đối tới đó, ví dụ
+//   import { egui_text_agent_activate } from './snippets/eframe-<hash>/inline0.js';
+// Làm phẳng (glob `*` + stripBase) sẽ bỏ mất `snippets/` → trình duyệt tải file
+// không tồn tại, Pages trả index.html (text/html) → "Failed to load module script"
+// rồi "Failed to fetch dynamically imported module" cho cả app Craft.
 //
 // Quy ước:
 //   - `src_wasm/<module>/build.sh` xuất ra `src_wasm/pkg/<tên>/`
@@ -22,6 +29,13 @@ const APP_VERSION = process.env.VERSION || packageJson.version;
 //   - `src/views/tools/Craft/` dùng `appKey = <tên>` để nạp
 //     `/assets-wasm-<version>/<tên>/index.html`
 const WASM_PKG_ROOT = "src_wasm/pkg";
+
+// Số segment của `src_wasm/pkg` — dùng cho `stripBase` của viteStaticCopy.
+// `stripBase` của plugin tính theo số segment của thư mục chứa file đã match,
+// không phải theo phần tĩnh của glob, nên phải truyền số cụ thể:
+// `src_wasm/pkg/<folder>` = 2 + 1 = 3 segment. Nhờ vậy file ở gốc folder rơi
+// đúng `dest/`, còn file trong `snippets/<crate>/` giữ nguyên `snippets/<crate>/`.
+const WASM_PKG_SEGMENTS = WASM_PKG_ROOT.split("/").length;
 
 // `src_wasm/pkg/` KHÔNG được commit vào git (gitignored, ~58 MB). Nếu clone mới
 // mà chưa chạy `scripts/build_wasm.sh` thì thư mục này rỗng/không tồn tại.
@@ -78,9 +92,12 @@ const wasmCopyTargets = wasmFolders
     return usable;
   })
   .map((folder) => ({
-    src: `${WASM_PKG_ROOT}/${folder}/*`,
+    // `**/*` để lấy cả file lồng trong thư mục con (snippets/... của wasm-bindgen).
+    src: `${WASM_PKG_ROOT}/${folder}/**/*`,
     dest: `assets-wasm-${APP_VERSION}/${folder}`,
-    rename: { stripBase: true },
+    // stripBase = số segment của `src_wasm/pkg/<folder>` → giữ nguyên phần
+    // đường dẫn tương đối phía trong thay vì làm phẳng mọi thứ ra gốc.
+    rename: { stripBase: WASM_PKG_SEGMENTS + 1 },
   }));
 
 export default defineConfig({

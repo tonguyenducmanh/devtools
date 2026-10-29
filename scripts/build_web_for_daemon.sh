@@ -25,6 +25,11 @@ echo "Đang build Frontend..."
 npm install
 REQUIRE_WASM=1 npm run build
 
+# 2b. Chặn wasm thiếu file (vd `snippets/` của wasm-bindgen bị làm phẳng) —
+#     daemon nhúng dist/ nên lỗi này sẽ đi theo bản release.
+echo "Đang kiểm tra wasm trong dist..."
+python3 "$ROOT_DIR/scripts/check_wasm_dist.py" "$ROOT_DIR/dist"
+
 # 3. Copy dist frontend vào backend
 echo "Đang copy frontend dist vào backend..."
 
