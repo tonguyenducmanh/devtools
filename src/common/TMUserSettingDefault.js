@@ -6,6 +6,7 @@ import tmEnum from "@/common/TMEnum.js";
 export function getUserSettingDefault() {
   return {
     theme: "github-light",
+    appFont: tmEnum.appFont.Default,
     currentLanguage: "vi",
     agentURL: window.__env?.APITesting?.agentServer,
     wrapTab: true,

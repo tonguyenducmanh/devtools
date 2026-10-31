@@ -15,6 +15,7 @@ class TMAppStartup {
     });
 
     utility.setTheme(userSetting["theme"]);
+    utility.setAppFont(userSetting["appFont"]);
     // đảm bảo rằng __env là một đối tượng bất biến
     utility.freezeDeepObject(window.__env);
     document.title = `${utility.defaultTitleApp()} - ${utility.getAuthorApp()}`;

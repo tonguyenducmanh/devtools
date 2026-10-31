@@ -196,6 +196,52 @@ class TMEnum {
       value: "right",
     },
   ];
+  /**
+   * Font chữ hiển thị của toàn bộ app, value là khoá tra cứu trong appFontStack
+   */
+  appFont = {
+    Default: "default",
+    Inter: "inter",
+    SegoeUI: "segoe-ui",
+    Arial: "arial",
+    Verdana: "verdana",
+    Tahoma: "tahoma",
+    Georgia: "georgia",
+    Times: "times",
+    Courier: "courier",
+    Monospace: "monospace",
+  };
+  /**
+   * stack CSS tương ứng với từng khoá appFont; "default" không có trong map
+   * nghĩa là bỏ override để rơi về stack gốc trong tm_main.scss
+   */
+  appFontStack = {
+    inter: "Inter, sans-serif",
+    "segoe-ui": '"Segoe UI", Tahoma, sans-serif',
+    arial: "Arial, Helvetica, sans-serif",
+    verdana: "Verdana, Geneva, sans-serif",
+    tahoma: "Tahoma, Verdana, sans-serif",
+    georgia: 'Georgia, "Times New Roman", serif',
+    times: '"Times New Roman", Times, serif',
+    courier: '"Courier New", Courier, monospace',
+    monospace: "ui-monospace, Menlo, Monaco, Consolas, monospace",
+  };
+  /**
+   * danh sách font chữ của app, dùng chung cho form thiết lập nên thêm font
+   * mới chỉ sửa ở đây (kèm stack trong appFontStack)
+   */
+  appFontList = [
+    { labelKey: "i18nUserSettings.appFont.default", value: "default" },
+    { labelKey: "i18nUserSettings.appFont.inter", value: "inter" },
+    { labelKey: "i18nUserSettings.appFont.segoe-ui", value: "segoe-ui" },
+    { labelKey: "i18nUserSettings.appFont.arial", value: "arial" },
+    { labelKey: "i18nUserSettings.appFont.verdana", value: "verdana" },
+    { labelKey: "i18nUserSettings.appFont.tahoma", value: "tahoma" },
+    { labelKey: "i18nUserSettings.appFont.georgia", value: "georgia" },
+    { labelKey: "i18nUserSettings.appFont.times", value: "times" },
+    { labelKey: "i18nUserSettings.appFont.courier", value: "courier" },
+    { labelKey: "i18nUserSettings.appFont.monospace", value: "monospace" },
+  ];
   PostgreSQLQuerySidebarOption = {
     Help: 0,
     Setting: 1,
