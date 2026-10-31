@@ -161,6 +161,8 @@ pub struct Session {
     payload_bytes: u64,
     /// Các payload đã gửi tới máy đối tác (chẩn đoán).
     sent_payloads: Vec<String>,
+    /// Chẩn đoán lệnh init gần nhất: số parts + hex/text part 8 (monitor info).
+    init_debug: String,
     /// Con trỏ của máy đối tác (máy Windows không vẽ con trỏ vào khung hình
     /// mà gửi riêng lệnh 3/4/28 — viewer phải tự vẽ).
     cursor: CursorState,
@@ -252,6 +254,7 @@ impl Session {
             frames_applied: 0,
             payload_bytes: 0,
             sent_payloads: Vec::new(),
+            init_debug: String::new(),
             cursor: CursorState::default(),
             origin: (0, 0),
             monitors: Vec::new(),
@@ -291,6 +294,11 @@ impl Session {
     /// Các payload đã gửi tới máy đối tác (để chẩn đoán).
     pub fn sent_payloads(&self) -> &[String] {
         &self.sent_payloads
+    }
+
+    /// Chẩn đoán lệnh init gần nhất (số parts + part 8 thô).
+    pub fn init_debug(&self) -> &str {
+        &self.init_debug
     }
 
     /// Số màn hình của máy đối tác (0 = chưa có thông tin).
@@ -1064,6 +1072,16 @@ impl Session {
             self.fail(&format!("This UltraViewer version ({version}) is not supported yet."));
             return;
         }
+        // Chẩn đoán: ghi lại part 8 thô (hex + text) để đối chiếu định dạng
+        // monitor info mà host thật gửi (part 8 vắng mặt = chuỗi rỗng).
+        self.init_debug = format!(
+            "init: parts={} size={}x{} p8hex={} p8text=[{}]",
+            parts.len(),
+            init.width,
+            init.height,
+            parts.get(8).map(|p| crate::wire::hex(p)).unwrap_or_default(),
+            parts.get(8).map(|p| String::from_utf8_lossy(p)).unwrap_or_default(),
+        );
         // Màn hình khởi tạo đến qua kênh LAN trực tiếp → chuyển đường chính
         // sang kênh đó (độ trễ thấp hơn nhiều so với đi vòng relay).
         if source == PeerSource::Direct {
@@ -1266,7 +1284,12 @@ impl Session {
 
     // ───────────────────────── nhập liệu từ người dùng ─────────────────────────
 
-    /// Chuột di chuyển (toạ độ pixel trên màn hình từ xa).
+    /// Chuột di chuyển.
+    ///
+    /// `x, y` là toạ độ trong ảnh màn hình từ xa (tầng JS đã cộng gốc của
+    /// vùng đang xem). Máy đối tác dùng toạ độ **desktop ảo** nên phải cộng
+    /// thêm gốc desktop ảo trước khi gửi — không cộng là click lệch đúng
+    /// bằng origin khi máy đối tác có màn nằm bên trái/trên màn chính.
     ///
     /// Chỉ lưu vị trí mới nhất; `flush_pointer` sẽ gửi theo nhịp giới hạn để
     /// không làm quá tải máy đối tác.
@@ -1274,9 +1297,10 @@ impl Session {
         if !self.can_send_input() {
             return;
         }
+        let (vx, vy) = (x + self.origin.0, y + self.origin.1);
         // Cập nhật vị trí con trỏ ngay lập tức để phản hồi mượt mà không trễ.
-        self.cursor.position = Some((x + self.origin.0, y + self.origin.1));
-        self.pending_pointer = Some((x, y));
+        self.cursor.position = Some((vx, vy));
+        self.pending_pointer = Some((vx, vy));
     }
 
     /// Gửi vị trí chuột đang chờ nếu đã đủ khoảng cách giữa 2 lần gửi.
@@ -1304,13 +1328,16 @@ impl Session {
     }
 
     /// Nhấn/thả chuột (0 = trái, 1 = phải, 2 = giữa).
+    /// `x, y` là toạ độ trong ảnh — cộng gốc desktop ảo trước khi gửi
+    /// (giống `on_pointer_move`).
     pub fn on_pointer_button(&mut self, button: u8, pressed: bool, x: i32, y: i32) {
         if !self.can_send_input() {
             return;
         }
         // Gửi vị trí đang chờ trước để thứ tự sự kiện trên máy đối tác đúng.
         self.flush_pointer_now();
-        for payload in self.encoder.pointer_button(button, pressed, Some((x, y))) {
+        let pos = Some((x + self.origin.0, y + self.origin.1));
+        for payload in self.encoder.pointer_button(button, pressed, pos) {
             self.send_peer(&payload);
         }
     }

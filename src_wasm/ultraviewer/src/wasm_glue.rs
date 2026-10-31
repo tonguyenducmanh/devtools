@@ -407,11 +407,27 @@ impl UltraViewerClient {
         inner.view = session.view_rect();
         inner.full_redraw = true;
         inner.cursor_drawn = None;
-        // Canvas đổi kích thước theo vùng đang hiển thị.
+        // Canvas đổi kích thước theo vùng đang hiển thị — cả canvas phủ
+        // con trỏ, nếu không 2 canvas lệch kích thước → con trỏ vẽ sai chỗ.
         if let (Some(view), Some(canvas)) = (inner.view, inner.canvas.as_ref()) {
             canvas.set_width(view.width);
             canvas.set_height(view.height);
         }
+        if let (Some(view), Some(canvas)) = (inner.view, inner.cursor_canvas.as_ref()) {
+            canvas.set_width(view.width);
+            canvas.set_height(view.height);
+        }
+    }
+
+    /// Kích thước vùng đang xem (bằng kích thước màn hình từ xa khi xem tất cả).
+    pub fn view_size(&self) -> Vec<u32> {
+        let state = self.state.borrow();
+        let Some(session) = state.session.as_ref() else { return vec![0, 0] };
+        if let Some(rect) = session.view_rect() {
+            return vec![rect.width, rect.height];
+        }
+        let (w, h) = session.screen_size();
+        vec![w, h]
     }
 
     /// Gốc toạ độ desktop ảo của máy đối tác (chẩn đoán).
@@ -467,6 +483,16 @@ impl UltraViewerClient {
             .session
             .as_ref()
             .map(|s| s.sent_payloads().to_vec())
+            .unwrap_or_default()
+    }
+
+    /// Chẩn đoán lệnh init gần nhất: số parts + part 8 thô (hex + text).
+    pub fn init_debug(&self) -> String {
+        self.state
+            .borrow()
+            .session
+            .as_ref()
+            .map(|s| s.init_debug().to_string())
             .unwrap_or_default()
     }
 
@@ -891,7 +917,7 @@ fn paint(state: &Rc<RefCell<State>>) {
 /// Vẽ con trỏ của máy đối tác lên canvas phủ.
 fn paint_cursor(state: &Rc<RefCell<State>>) {
     // Lấy vị trí + ảnh con trỏ (ảnh là 0xAARRGGBB, top-down).
-    let (position, image, origin) = {
+    let (position, image, origin, view) = {
         let inner = state.borrow();
         let Some(session) = inner.session.as_ref() else { return };
         (
@@ -899,11 +925,16 @@ fn paint_cursor(state: &Rc<RefCell<State>>) {
             session.cursor_image(),
             // Vị trí con trỏ là toạ độ desktop ảo → trừ gốc desktop ảo.
             session.virtual_origin(),
+            // Đang xem riêng 1 màn hình → trừ tiếp lệch của vùng đó trong ảnh.
+            session.view_rect(),
         )
     };
     let Some((x, y)) = position else { return };
     // Toạ độ con trỏ là trên desktop ảo → trừ gốc của vùng đang hiển thị.
-    let (x, y) = (x - origin.0, y - origin.1);
+    let (x, y) = match view {
+        Some(view) => (x - origin.0 - view.x, y - origin.1 - view.y),
+        None => (x - origin.0, y - origin.1),
+    };
     let (width, height, hot_x, hot_y, pixels) = match image {
         Some(image) => image,
         // Chưa có hình con trỏ: dùng mũi tên mặc định.

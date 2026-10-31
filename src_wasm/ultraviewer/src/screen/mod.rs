@@ -146,21 +146,27 @@ impl ScreenInit {
     }
 
     /// Monitor rectangles (left, top, right, bottom); empty when absent or malformed.
+    ///
+    /// Định dạng thật (bắt từ host 6.6, 2 màn 1920x1080):
+    /// `0:0:1920:1080:-1|1920:0:3840:1080:0|` — mỗi record 5 trường
+    /// `left:top:right:bottom:flag` (flag -1 = màn chính), tách nhau bằng '|',
+    /// '|' cuối tuỳ chọn, đệm NUL cuối bị bỏ. Trường thứ 5 bị bỏ qua.
+    /// Cũng chấp nhận 4 trường `left:top:right:bottom` (dạng MacViewer giả
+    /// định) và dạng `left, top, width, height` của `RECT.ToString()`.
     pub fn monitors(&self) -> Vec<[i32; 4]> {
         let Some(mut p) = self.monitor_info.as_deref() else { return vec![] };
         while p.last() == Some(&0) {
             p = &p[..p.len() - 1];
         }
         let Ok(text) = std::str::from_utf8(p) else { return vec![] };
-        let Some(body) = text.strip_suffix('|') else { return vec![] };
+        let text = text.strip_suffix('|').unwrap_or(text);
         let mut out = Vec::new();
-        for record in body.split('|') {
-            let n: Vec<i32> = record.split(':').filter_map(|f| f.parse().ok()).collect();
-            if n.len() != 4 || n[2] <= n[0] || n[3] <= n[1]
-                || n[2] as i64 - n[0] as i64 > i32::MAX as i64 || n[3] as i64 - n[1] as i64 > i32::MAX as i64 {
-                return vec![];
+        for record in text.split('|') {
+            if record.is_empty() {
+                continue;
             }
-            out.push([n[0], n[1], n[2], n[3]]);
+            let Some(rect) = parse_monitor_record(record) else { return vec![] };
+            out.push(rect);
         }
         out
     }
@@ -185,6 +191,41 @@ pub(crate) fn command(parts: &[&[u8]], expected: u8) -> std::result::Result<(), 
         return Err(ScreenError::UnsupportedCommand(c));
     }
     Ok(())
+}
+
+/// Đọc các số nguyên cách nhau bằng `sep`, bỏ khoảng trắng quanh mỗi số.
+fn numbers(record: &str, sep: char) -> Option<Vec<i32>> {
+    record.split(sep).map(|f| f.trim().parse().ok()).collect::<Option<Vec<_>>>()
+}
+
+/// Chuyển 1 record thành [left, top, right, bottom].
+///
+/// Chấp nhận 4 hoặc 5 trường (trường thứ 5 — flag "màn chính" — bị bỏ qua).
+fn parse_monitor_record(record: &str) -> Option<[i32; 4]> {
+    let (n, colon) = if record.contains(':') {
+        (numbers(record, ':')?, true)
+    } else {
+        (numbers(record, ',')?, false)
+    };
+    if n.len() != 4 && n.len() != 5 {
+        return None;
+    }
+    if colon {
+        return valid_rect(n[0], n[1], n[2], n[3]);
+    }
+    // Dạng "left, top, width, height": width/height <= 0 thì thử right/bottom.
+    if n[2] > 0 && n[3] > 0 {
+        return valid_rect(n[0], n[1], n[0].checked_add(n[2])?, n[1].checked_add(n[3])?);
+    }
+    valid_rect(n[0], n[1], n[2], n[3])
+}
+
+fn valid_rect(left: i32, top: i32, right: i32, bottom: i32) -> Option<[i32; 4]> {
+    (right > left
+        && bottom > top
+        && right as i64 - left as i64 <= i32::MAX as i64
+        && bottom as i64 - top as i64 <= i32::MAX as i64)
+        .then_some([left, top, right, bottom])
 }
 
 pub(crate) fn int32_part(parts: &[&[u8]], index: usize) -> std::result::Result<i32, ScreenError> {
@@ -332,10 +373,22 @@ pub(crate) mod tests {
         let m = |t: &[u8]| ScreenInit { monitor_info: Some(t.to_vec()), ..Default::default() }.monitors();
         assert_eq!(m(b"-1920:0:0:1080|0:-200:2560:1240|"), [[-1920, 0, 0, 1080], [0, -200, 2560, 1240]]);
         assert_eq!(m(b"0:0:1920:1080|\0\0"), [[0, 0, 1920, 1080]]);
+        // Capture thật từ host 6.6 (2 màn 1920x1080): 5 trường, flag cuối bị bỏ.
+        assert_eq!(m(b"0:0:1920:1080:-1|1920:0:3840:1080:0|"), [[0, 0, 1920, 1080], [1920, 0, 3840, 1080]]);
+        // Host Windows (RemoteControl.dll RECT.ToString): "left, top, width, height".
+        assert_eq!(m(b"0, 0, 1920, 1080|1920, 0, 1920, 1080|"), [[0, 0, 1920, 1080], [1920, 0, 3840, 1080]]);
+        assert_eq!(m(b"-1920, 0, 1920, 1080|"), [[-1920, 0, 0, 1080]]);
+        // Dấu ',' nhưng cặp số 3/4 <= 0 → không thể là width/height → bỏ qua.
+        assert!(m(b"1920, 0, 0, 1080|").is_empty());
+        // Trailing '|' tuỳ chọn, khoảng trắng quanh số được bỏ qua.
+        assert_eq!(m(b"0:0:1920:1080"), [[0, 0, 1920, 1080]]);
+        assert_eq!(m(b"0: 0:1920: 1080|"), [[0, 0, 1920, 1080]]);
+        assert_eq!(m(b"0, 0, 1920, 1080"), [[0, 0, 1920, 1080]]);
+        assert_eq!(m(b"0:0:1920:1080||"), [[0, 0, 1920, 1080]]);
         assert!(m(b"").is_empty());
-        for bad in [&b"\00:0:1920:1080|"[..], b"0:0:1920:1080|\0 ", b"0:0:1920:1080|\00|", b"Mac|", b"0:0:1920:1080",
-                    b"0:0:1920|", b"0:0:1920:1080||", b"0:0:1:1:2|", b"0:0:2147483648:1|", b"0: 0:1:1|",
-                    b"1:0:1:1|", b"0:1:1:0|", b"-2147483648:0:2147483647:1|"] {
+        for bad in [&b"\00:0:1920:1080|"[..], b"0:0:1920:1080|\0 ", b"0:0:1920:1080|\00|", b"Mac|",
+                    b"0:0:1920|", b"0:0:1:1:2:3|", b"0:0:2147483648:1|",
+                    b"1:0:1:1|", b"0:1:1:0|", b"-2147483648:0:2147483647:1|", b"0, 0, 1|"] {
             assert!(m(bad).is_empty(), "{:?}", String::from_utf8_lossy(bad));
         }
         let o = |l, t, info: &[u8]| ScreenInit { monitor_info: Some(info.to_vec()), virtual_left: Some(l), virtual_top: Some(t), ..Default::default() }.origin();

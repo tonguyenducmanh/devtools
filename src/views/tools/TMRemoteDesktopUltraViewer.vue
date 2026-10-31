@@ -823,10 +823,12 @@ export default {
       // tự quay về "tất cả".
       me.selectedMonitor = me.client.selected_monitor();
       me.updateViewOffset();
-      const sz = me.client.screen_size();
-      if (sz && sz[0] && sz[1]) {
-        me.canvasWidth = sz[0];
-        me.canvasHeight = sz[1];
+      // Canvas theo kích thước VÙNG đang xem (1 màn hình), không theo kích
+      // thước desktop đầy — nếu không tỷ lệ toạ độ chuột bị sai.
+      const vs = me.client.view_size();
+      if (vs && vs[0] && vs[1]) {
+        me.canvasWidth = vs[0];
+        me.canvasHeight = vs[1];
       }
       me.addLog(
         me.$t("i18nCommon.ultraViewer.monitorSwitched", {
@@ -953,8 +955,8 @@ export default {
       const rect = canvas.getBoundingClientRect();
       const scaleX = rect.width ? canvas.width / rect.width : 1;
       const scaleY = rect.height ? canvas.height / rect.height : 1;
-      // Cộng gốc của vùng đang xem: máy đối tác luôn dùng toạ độ trên
-      // desktop ảo, không phải toạ độ trong màn hình đang chọn.
+      // Cộng gốc của vùng đang xem (toạ độ ảnh). WASM cộng thêm gốc
+      // desktop ảo trước khi gửi — máy đối tác dùng toạ độ desktop ảo.
       return {
         x: Math.round((e.clientX - rect.left) * scaleX) + this.viewOffsetX,
         y: Math.round((e.clientY - rect.top) * scaleY) + this.viewOffsetY,
