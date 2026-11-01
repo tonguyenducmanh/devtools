@@ -244,6 +244,21 @@ class TMUtility {
   }
 
   /**
+   * thiết lập font chữ toàn app theo khoá appFont trong TMEnum
+   * --main-font được định nghĩa ngay trên body nên phải override inline ở đó,
+   * khoá "default" sẽ bỏ override để rơi về stack gốc trong tm_main.scss
+   * @param {string} fontKey khoá từ tmEnum.appFont
+   */
+  setAppFont(fontKey) {
+    let stack = enumeration.appFontStack[fontKey];
+    if (stack) {
+      document.body.style.setProperty("--main-font", stack);
+    } else {
+      document.body.style.removeProperty("--main-font");
+    }
+  }
+
+  /**
    * apply giá trị mock ( fake data ) cho 1 file vue, đỡ phải nhập liệu nhiều
    * @param  vm vue instance
    * @param {object} mockObj dữ liệu fake

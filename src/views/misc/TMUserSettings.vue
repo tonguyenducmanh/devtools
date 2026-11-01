@@ -50,6 +50,15 @@
           />
         </div>
         <div class="flex user-setting-item">
+          <div>{{ $t("i18nUserSettings.settings.appFont") }}</div>
+          <TMComboBox
+            :width="200"
+            v-model="currentUserSetting.appFont"
+            :options="appFontOption"
+            :noMargin="true"
+          />
+        </div>
+        <div class="flex user-setting-item">
           <div>{{ $t("i18nUserSettings.settings.language") }}</div>
           <TMComboBox
             :width="200"
@@ -131,6 +140,12 @@ export default {
         value: item.value,
       }));
     },
+    appFontOption() {
+      return this.$tmEnum.appFontList.map((item) => ({
+        label: this.$t(item.labelKey),
+        value: item.value,
+      }));
+    },
   },
   created() {
     let me = this;
@@ -147,6 +162,7 @@ export default {
     async saveSetting() {
       let me = this;
       me.saveTheme();
+      me.saveAppFont();
       me.handleChangeAgentURL();
       await me.$tmCache.set(
         me.$tmEnum.cacheConfig.UserSettings,
@@ -163,6 +179,10 @@ export default {
     saveTheme() {
       let me = this;
       me.$tmUtility.setTheme(me.currentUserSetting.theme);
+    },
+    saveAppFont() {
+      let me = this;
+      me.$tmUtility.setAppFont(me.currentUserSetting.appFont);
     },
   },
   mounted() {},
