@@ -17,6 +17,14 @@
             >
               <span class="tm-icon tm-camera-icon"></span>
             </div>
+            <div
+              v-tooltip="$t('i18nCommon.ultraViewer.copyFrame')"
+              class="flex toolbar-btn"
+              :class="{ 'toolbar-btn-disabled': !isConnected }"
+              @click="copyCurrentFrame"
+            >
+              <span class="tm-icon tm-copy-icon"></span>
+            </div>
             <!-- Màn hình của máy đối tác: luôn hiện, chỉ chuyển được khi
                  máy đối tác có nhiều hơn 1 màn hình -->
             <div
@@ -922,6 +930,34 @@ export default {
       } catch (e) {
         me.addLog(
           `${me.$t("i18nCommon.ultraViewer.screenshotFailed")}: ${me.formatError(e)}`,
+          "error",
+        );
+      }
+    },
+
+    /**
+     * Sao chép khung hình hiện tại trên canvas vào clipboard.
+     * Dùng flow chung của chương trình ($tmUtility.copyImageFromBlob),
+     * không tự viết lại mã gọi API clipboard trong component.
+     */
+    async copyCurrentFrame() {
+      let me = this;
+      const canvas = me.$refs.uvCanvas;
+      if (!canvas || !me.isConnected) return;
+      try {
+        const blob = await new Promise((resolve) => {
+          canvas.toBlob(resolve, "image/png");
+        });
+        if (blob) {
+          await me.$tmUtility.copyImageFromBlob(blob);
+          me.addLog(
+            me.$t("i18nCommon.ultraViewer.frameCopied"),
+            "success",
+          );
+        }
+      } catch (e) {
+        me.addLog(
+          `${me.$t("i18nCommon.ultraViewer.copyFrameFailed")}: ${me.formatError(e)}`,
           "error",
         );
       }

@@ -31,6 +31,14 @@
               <span class="tm-icon tm-camera-icon"></span>
             </div>
             <div
+              v-tooltip="$t('i18nCommon.remoteDesktop.copyFrame')"
+              class="flex toolbar-btn"
+              @click="copyCurrentFrame"
+              :class="{ 'toolbar-btn-disabled': !isConnected }"
+            >
+              <span class="tm-icon tm-copy-icon"></span>
+            </div>
+            <div
               v-tooltip="$t('i18nCommon.remoteDesktop.ctrlAltDel')"
               class="flex toolbar-btn"
               @click="sendCtrlAltDel"
@@ -889,6 +897,34 @@ export default {
         this.$t("i18nCommon.remoteDesktop.screenshotSaved"),
         "success",
       );
+    },
+
+    /**
+     * Sao chép khung hình hiện tại trên canvas vào clipboard.
+     * Dùng flow chung của chương trình ($tmUtility.copyImageFromBlob),
+     * không tự viết lại mã gọi API clipboard trong component.
+     */
+    async copyCurrentFrame() {
+      let me = this;
+      const canvas = me.$refs.rdpCanvas;
+      if (!canvas || !me.isConnected) return;
+      try {
+        const blob = await new Promise((resolve) => {
+          canvas.toBlob(resolve, "image/png");
+        });
+        if (blob) {
+          await me.$tmUtility.copyImageFromBlob(blob);
+          me.addLog(
+            me.$t("i18nCommon.remoteDesktop.frameCopied"),
+            "success",
+          );
+        }
+      } catch (e) {
+        me.addLog(
+          `${me.$t("i18nCommon.remoteDesktop.copyFrameFailed")}: ${me.formatError(e)}`,
+          "error",
+        );
+      }
     },
 
     sendCtrlAltDel() {
