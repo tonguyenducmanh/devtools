@@ -352,7 +352,7 @@ impl Engine {
                 in_flight: Vec::new(),
             },
         );
-        Ok((offer, vec![Message::Offer(offer)]))
+        Ok((offer.clone(), vec![Message::Offer(offer)]))
     }
 
     /// Chấp nhận nhận file từ máy đối tác. File rỗng hoàn thành ngay lập tức.

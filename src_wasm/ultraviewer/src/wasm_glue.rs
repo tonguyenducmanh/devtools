@@ -650,6 +650,17 @@ impl UltraViewerClient {
         }
     }
 
+    /// Lấy byte tệp đã nhận xong (trả Uint8Array mới, chỉ lấy được 1 lần).
+    pub fn take_received_file(&self, transfer_id: String) -> Result<Vec<u8>, JsValue> {
+        let mut state = self.state.borrow_mut();
+        match state.session.as_mut() {
+            Some(session) => session.take_received_file(&transfer_id).ok_or_else(|| {
+                JsValue::from_str("The received file is no longer available.")
+            }),
+            None => Err(JsValue::from_str("The remote session is not connected.")),
+        }
+    }
+
     pub fn set_clipboard_sharing(&self, enabled: bool) {
         let mut state = self.state.borrow_mut();
         if let Some(session) = state.session.as_mut() {
@@ -1111,11 +1122,9 @@ fn file_event_to_js(event: &crate::filetransfer::Event) -> JsValue {
             set("type", JsValue::from_str("received"));
             set("id", JsValue::from_str(transfer_id));
             set("name", JsValue::from_str(file_name));
-            // Copy byte vào Uint8Array riêng — JsValue không giữ tham chiếu
-            // vào bộ nhớ wasm (bộ nhớ có thể dời khi tăng dung lượng).
-            let buffer = js_sys::Uint8Array::new_with_length(data.len() as u32);
-            buffer.copy_from_slice(data);
-            set("data", JsValue::from(&buffer));
+            // Byte tệp KHÔNG đi qua event: JS gọi take_received_file(id) để
+            // lấy Uint8Array mới (wasm-bindgen tự copy ra ngoài bộ nhớ wasm).
+            let _ = data;
         }
         Event::Sent { transfer_id } => {
             set("type", JsValue::from_str("sent"));

@@ -209,6 +209,9 @@ pub struct Session {
     own_public: Option<Ipv4>,
     /// State machine gửi/nhận tệp đính kèm (command 13/14/15/16/21).
     files: FileEngine,
+    /// Byte tệp đã nhận xong, keyed theo transfer ID — JS lấy qua
+    /// `take_received_file` rồi tự lưu xuống đĩa.
+    received_files: HashMap<String, Vec<u8>>,
 }
 
 impl Session {
@@ -278,6 +281,7 @@ impl Session {
             direct_deadline: None,
             own_public: None,
             files: FileEngine::default(),
+            received_files: HashMap::new(),
             options,
         })
     }
@@ -570,6 +574,7 @@ impl Session {
         self.closed = true;
         self.phase = Phase::Closed;
         self.files.reset();
+        self.received_files.clear();
         self.relay.close(CHANNEL_PEER);
         self.relay.close(CHANNEL_COMMAND);
         self.relay.close(CHANNEL_DIRECT);
@@ -583,6 +588,7 @@ impl Session {
         self.closed = true;
         self.phase = Phase::Closed;
         self.files.reset();
+        self.received_files.clear();
         self.relay.close(CHANNEL_PEER);
         self.relay.close(CHANNEL_COMMAND);
         self.relay.close(CHANNEL_DIRECT);
@@ -1440,11 +1446,14 @@ impl Session {
             return Err("The remote session is not connected.".into());
         }
         let (messages, events) = self.files.accept(transfer_id)?;
-        for event in &events {
-            self.observer.file_event(event);
-        }
+        self.dispatch_file_events(events);
         self.send_file_messages(messages);
         Ok(())
+    }
+
+    /// Lấy byte tệp đã nhận xong (JS tự lưu xuống đĩa). Chỉ lấy được 1 lần.
+    pub fn take_received_file(&mut self, transfer_id: &str) -> Option<Vec<u8>> {
+        self.received_files.remove(transfer_id)
     }
 
     /// Huỷ gửi/nhận tệp (cả 2 đầu đều dừng).
@@ -1459,10 +1468,18 @@ impl Session {
             return;
         };
         let (messages, events) = self.files.consume(message);
-        for event in &events {
-            self.observer.file_event(event);
-        }
+        self.dispatch_file_events(events);
         self.send_file_messages(messages);
+    }
+
+    /// Đẩy event transfer lên UI; tệp nhận xong thì giữ lại byte chờ JS lấy.
+    fn dispatch_file_events(&mut self, events: Vec<filetransfer::Event>) {
+        for event in events {
+            if let filetransfer::Event::Received { transfer_id, data, .. } = &event {
+                self.received_files.insert(transfer_id.clone(), data.clone());
+            }
+            self.observer.file_event(&event);
+        }
     }
 
     /// Encode + gửi các message transfer theo chiều viewer → host.

@@ -984,7 +984,7 @@ export default {
           }
           break;
         case "received":
-          me.receivedFiles[event.id] = new Blob([event.data]);
+          // Byte tệp nằm trong wasm — lấy khi người dùng bấm "Lưu tệp".
           if (entry) {
             entry.file.transferred = entry.file.size;
             entry.file.status = "done";
@@ -1028,12 +1028,25 @@ export default {
       this.client.cancel_file(id);
     },
 
-    /** Tải tệp đã nhận xong xuống máy này. */
+    /** Tải tệp đã nhận xong xuống máy này (lấy byte từ wasm lần đầu). */
     saveFileTransfer(id) {
       let me = this;
-      const blob = me.receivedFiles[id];
       const entry = me.fileTransfers[id];
-      if (!blob || !entry) return;
+      if (!entry) return;
+      let blob = me.receivedFiles[id];
+      if (!blob) {
+        if (!me.client) return;
+        try {
+          const data = me.client.take_received_file(id);
+          blob = new Blob([data]);
+          me.receivedFiles[id] = blob;
+        } catch (e) {
+          me.reportError(
+            `${me.$t("i18nCommon.ultraViewer.fileFailed")}: ${me.formatError(e)}`,
+          );
+          return;
+        }
+      }
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.download = entry.file.name;
