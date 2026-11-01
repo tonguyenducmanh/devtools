@@ -291,6 +291,10 @@
             :typingText="$t('i18nCommon.ultraViewer.typing')"
             :title="$t('i18nCommon.ultraViewer.chatTitle')"
             @send="sendChat"
+            @attach="onChatAttach"
+            @file-accept="acceptFileTransfer"
+            @file-decline="declineFileTransfer"
+            @file-save="saveFileTransfer"
           />
         </div>
       </template>
@@ -388,6 +392,12 @@ export default {
       }),
       // Id của popup chat đang mở (null = đã đóng).
       chatPopupId: null,
+      // Entry chat (object trong chatState.messages) của từng transfer file,
+      // keyed theo transfer ID — để cập nhật tiến độ khi wasm báo event.
+      fileTransfers: reactive({}),
+      // Blob tệp đã nhận xong (keyed theo transfer ID) — chờ người dùng bấm
+      // "Lưu tệp" thì mới tải xuống.
+      receivedFiles: {},
       logEntries: [],
       // Module WASM đã nạp
       wasmModule: null,
@@ -583,6 +593,10 @@ export default {
         me.chatState.messages.splice(0, me.chatState.messages.length);
         me.chatState.isTyping = false;
         me.logEntries.splice(0, me.logEntries.length);
+        for (const key of Object.keys(me.fileTransfers)) {
+          delete me.fileTransfers[key];
+        }
+        me.receivedFiles = {};
       }
       me.lastConnectedId = id;
 
@@ -667,6 +681,9 @@ export default {
           } catch (e) {
             // Không copy được clipboard thì chỉ ghi log.
           }
+        });
+        client.on_file((event) => {
+          me.handleFileEvent(event);
         });
         client.on_closed((message) => {
           me.isConnected = false;
@@ -790,6 +807,10 @@ export default {
           props: {
             chatState: me.chatState,
             onSend: (text) => me.sendChat(text),
+            onAttach: (file) => me.onChatAttach(file),
+            onFileAccept: (id) => me.acceptFileTransfer(id),
+            onFileDecline: (id) => me.declineFileTransfer(id),
+            onFileSave: (id) => me.saveFileTransfer(id),
           },
           param: {
             title: me.$t("i18nCommon.ultraViewer.chatTitle"),
@@ -904,6 +925,122 @@ export default {
           "error",
         );
       }
+    },
+
+    // ─────────────────────── Tệp đính kèm ───────────────────────
+
+    /**
+     * Thêm một entry tệp vào khung chat và ghi vào bảng tra cứu theo ID để
+     * cập nhật tiến độ khi wasm báo event.
+     */
+    pushFileChat(id, name, size, local, status) {
+      const messages = this.chatState.messages;
+      const entry = {
+        text: "",
+        local,
+        time: new Date().toLocaleTimeString("en-US", { hour12: false }),
+        file: { id, name, size, transferred: 0, status },
+      };
+      messages.push(entry);
+      if (messages.length > 200) {
+        messages.splice(0, messages.length - 200);
+      }
+      this.fileTransfers[id] = entry;
+    },
+
+    /** Người dùng chọn tệp trong khung chat → đề nghị gửi cho máy đối tác. */
+    onChatAttach(file) {
+      let me = this;
+      if (!me.client || !me.isConnected) return;
+      file
+        .arrayBuffer()
+        .then((buffer) => {
+          const bytes = new Uint8Array(buffer);
+          const id = me.client.offer_file(file.name, bytes);
+          me.pushFileChat(id, file.name, bytes.length, true, "waiting");
+        })
+        .catch((e) => {
+          me.reportError(
+            `${me.$t("i18nCommon.ultraViewer.fileReadFailed")}: ${me.formatError(e)}`,
+          );
+        });
+    },
+
+    /** Sự kiện transfer từ wasm: offer/progress/received/sent/canceled/failed. */
+    handleFileEvent(event) {
+      let me = this;
+      const entry = me.fileTransfers[event.id];
+      switch (event.type) {
+        case "offer":
+          // Máy đối tác đề nghị gửi tệp — chờ mình nhận hay từ chối.
+          me.pushFileChat(event.id, event.name, event.size, false, "offer");
+          break;
+        case "progress":
+          if (entry) {
+            entry.file.transferred = event.transferred;
+            if (entry.file.status === "offer" || entry.file.status === "waiting") {
+              entry.file.status = "transferring";
+            }
+          }
+          break;
+        case "received":
+          me.receivedFiles[event.id] = new Blob([event.data]);
+          if (entry) {
+            entry.file.transferred = entry.file.size;
+            entry.file.status = "done";
+          }
+          break;
+        case "sent":
+          if (entry) {
+            entry.file.transferred = entry.file.size;
+            entry.file.status = "done";
+          }
+          break;
+        case "canceled":
+          if (entry) entry.file.status = "canceled";
+          break;
+        case "failed":
+          if (entry) entry.file.status = "failed";
+          me.addLog(
+            `${me.$t("i18nCommon.ultraViewer.fileFailed")}: ${event.reason ?? ""}`,
+            "error",
+          );
+          break;
+      }
+    },
+
+    /** Chấp nhận nhận tệp máy đối tác vừa đề nghị. */
+    acceptFileTransfer(id) {
+      let me = this;
+      if (!me.client) return;
+      try {
+        me.client.accept_file(id);
+      } catch (e) {
+        me.reportError(
+          `${me.$t("i18nCommon.ultraViewer.fileFailed")}: ${me.formatError(e)}`,
+        );
+      }
+    },
+
+    /** Từ chối offer (hoặc huỷ transfer đang chạy). */
+    declineFileTransfer(id) {
+      if (!this.client) return;
+      this.client.cancel_file(id);
+    },
+
+    /** Tải tệp đã nhận xong xuống máy này. */
+    saveFileTransfer(id) {
+      let me = this;
+      const blob = me.receivedFiles[id];
+      const entry = me.fileTransfers[id];
+      if (!blob || !entry) return;
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = entry.file.name;
+      link.href = url;
+      link.click();
+      // Giữ blob lại để lưu lại được nhiều lần; chỉ thu hồi URL.
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
     },
 
     // ─────────────────────── Nhập liệu chuột / bàn phím ───────────────────────

@@ -18,6 +18,7 @@ use crate::chat::{self, ChatEvent};
 use crate::clipboard;
 use crate::cursor::{self, CursorState};
 use crate::direct::{self, DirectListener};
+use crate::filetransfer::{self, Engine as FileEngine};
 use crate::input;
 use crate::messages::{self, LoginContext, PeerInfo, Registration, RegistrationReply};
 use crate::screen::{self, Limits, Rect, Renderer, RESET_FRAME_NUMBER};
@@ -102,6 +103,8 @@ pub trait SessionObserver {
     fn chat(&mut self, _text: &str) {}
     fn typing(&mut self, _typing: bool) {}
     fn clipboard(&mut self, _text: &str) {}
+    /// Sự kiện gửi/nhận tệp đính kèm (offer, tiến độ, hoàn thành, huỷ, lỗi).
+    fn file_event(&mut self, _event: &filetransfer::Event) {}
     fn closed(&mut self, _message: &str) {}
 }
 
@@ -204,6 +207,8 @@ pub struct Session {
     direct_deadline: Option<f64>,
     /// Địa chỉ public mà relay gán cho máy này (để so với máy đối tác).
     own_public: Option<Ipv4>,
+    /// State machine gửi/nhận tệp đính kèm (command 13/14/15/16/21).
+    files: FileEngine,
 }
 
 impl Session {
@@ -272,6 +277,7 @@ impl Session {
             direct_window: None,
             direct_deadline: None,
             own_public: None,
+            files: FileEngine::default(),
             options,
         })
     }
@@ -563,6 +569,7 @@ impl Session {
         }
         self.closed = true;
         self.phase = Phase::Closed;
+        self.files.reset();
         self.relay.close(CHANNEL_PEER);
         self.relay.close(CHANNEL_COMMAND);
         self.relay.close(CHANNEL_DIRECT);
@@ -575,6 +582,7 @@ impl Session {
         }
         self.closed = true;
         self.phase = Phase::Closed;
+        self.files.reset();
         self.relay.close(CHANNEL_PEER);
         self.relay.close(CHANNEL_COMMAND);
         self.relay.close(CHANNEL_DIRECT);
@@ -1043,6 +1051,7 @@ impl Session {
                     }
                 }
             }
+            13 | 14 | 15 | 16 | 21 if active => self.handle_file_message(parts),
             5 | 33 if active && self.clipboard_allowed => {
                 if let Ok(text) = clipboard::decode_host_to_viewer(parts) {
                     self.observer.clipboard(&text);
@@ -1412,6 +1421,56 @@ impl Session {
         let out = chat::viewer_to_host(text)?;
         self.send_peer_flagged(out.format_flag, &out.payload);
         Ok(())
+    }
+
+    /// Đề nghị gửi tệp đính kèm tới máy đối tác. Trả về transfer ID; máy kia
+    /// phải chấp thuận (event `Offered` bên kia) mới bắt đầu truyền byte.
+    pub fn offer_file(&mut self, file_name: &str, data: Vec<u8>) -> Result<String> {
+        if !self.active {
+            return Err("The remote session is not connected.".into());
+        }
+        let (offer, messages) = self.files.offer(file_name, data)?;
+        self.send_file_messages(messages);
+        Ok(offer.transfer_id)
+    }
+
+    /// Chấp nhận nhận tệp máy đối tác vừa đề nghị.
+    pub fn accept_file(&mut self, transfer_id: &str) -> Result<()> {
+        if !self.active {
+            return Err("The remote session is not connected.".into());
+        }
+        let (messages, events) = self.files.accept(transfer_id)?;
+        for event in &events {
+            self.observer.file_event(event);
+        }
+        self.send_file_messages(messages);
+        Ok(())
+    }
+
+    /// Huỷ gửi/nhận tệp (cả 2 đầu đều dừng).
+    pub fn cancel_file(&mut self, transfer_id: &str) {
+        let messages = self.files.cancel(transfer_id);
+        self.send_file_messages(messages);
+    }
+
+    /// Xử lý message transfer (13/14/15/16/21) từ máy đối tác.
+    fn handle_file_message(&mut self, parts: &[&[u8]]) {
+        let Some(message) = filetransfer::Message::decode_host_parts(parts) else {
+            return;
+        };
+        let (messages, events) = self.files.consume(message);
+        for event in &events {
+            self.observer.file_event(event);
+        }
+        self.send_file_messages(messages);
+    }
+
+    /// Encode + gửi các message transfer theo chiều viewer → host.
+    fn send_file_messages(&mut self, messages: Vec<filetransfer::Message>) {
+        for message in messages {
+            let (payload, format_flag) = message.viewer_encode();
+            self.send_peer_flagged(format_flag, &payload);
+        }
     }
 
     /// Bật/tắt đồng bộ clipboard.

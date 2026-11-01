@@ -30,6 +30,7 @@ enum OutEvent {
     Chat(String),
     Typing(bool),
     Clipboard(String),
+    File(crate::filetransfer::Event),
     Closed(String),
 }
 
@@ -73,6 +74,9 @@ impl SessionObserver for SharedObserver {
     fn clipboard(&mut self, text: &str) {
         self.push(OutEvent::Clipboard(text.to_string()));
     }
+    fn file_event(&mut self, event: &crate::filetransfer::Event) {
+        self.push(OutEvent::File(event.clone()));
+    }
     fn closed(&mut self, message: &str) {
         self.push(OutEvent::Closed(message.to_string()));
     }
@@ -87,6 +91,7 @@ struct Callbacks {
     chat: Option<js_sys::Function>,
     typing: Option<js_sys::Function>,
     clipboard: Option<js_sys::Function>,
+    file: Option<js_sys::Function>,
     closed: Option<js_sys::Function>,
 }
 
@@ -274,6 +279,9 @@ impl UltraViewerClient {
     }
     pub fn on_clipboard(&self, callback: js_sys::Function) {
         self.callbacks.borrow_mut().clipboard = Some(callback);
+    }
+    pub fn on_file(&self, callback: js_sys::Function) {
+        self.callbacks.borrow_mut().file = Some(callback);
     }
     pub fn on_closed(&self, callback: js_sys::Function) {
         self.callbacks.borrow_mut().closed = Some(callback);
@@ -612,6 +620,36 @@ impl UltraViewerClient {
         }
     }
 
+    /// Đề nghị gửi tệp đính kèm tới máy đối tác. Trả về transfer ID.
+    pub fn offer_file(&self, file_name: String, data: js_sys::Uint8Array) -> Result<String, JsValue> {
+        let mut state = self.state.borrow_mut();
+        match state.session.as_mut() {
+            Some(session) => session
+                .offer_file(&file_name, data.to_vec())
+                .map_err(|e| JsValue::from_str(&e.to_string())),
+            None => Err(JsValue::from_str("The remote session is not connected.")),
+        }
+    }
+
+    /// Chấp nhận nhận tệp máy đối tác vừa đề nghị.
+    pub fn accept_file(&self, transfer_id: String) -> Result<(), JsValue> {
+        let mut state = self.state.borrow_mut();
+        match state.session.as_mut() {
+            Some(session) => session
+                .accept_file(&transfer_id)
+                .map_err(|e| JsValue::from_str(&e.to_string())),
+            None => Err(JsValue::from_str("The remote session is not connected.")),
+        }
+    }
+
+    /// Huỷ gửi/nhận tệp.
+    pub fn cancel_file(&self, transfer_id: String) {
+        let mut state = self.state.borrow_mut();
+        if let Some(session) = state.session.as_mut() {
+            session.cancel_file(&transfer_id);
+        }
+    }
+
     pub fn set_clipboard_sharing(&self, enabled: bool) {
         let mut state = self.state.borrow_mut();
         if let Some(session) = state.session.as_mut() {
@@ -847,6 +885,11 @@ fn dispatch_events(state: &Rc<RefCell<State>>, callbacks: &Rc<RefCell<Callbacks>
                     let _ = f.call1(&JsValue::UNDEFINED, &JsValue::from_str(&text));
                 }
             }
+            OutEvent::File(event) => {
+                if let Some(f) = callbacks.file.as_ref() {
+                    let _ = f.call1(&JsValue::UNDEFINED, &file_event_to_js(&event));
+                }
+            }
             OutEvent::Closed(message) => {
                 if let Some(f) = callbacks.closed.as_ref() {
                     let _ = f.call1(&JsValue::UNDEFINED, &JsValue::from_str(&message));
@@ -1035,9 +1078,67 @@ fn handle_control(state: &Rc<RefCell<State>>, text: &str) {
     }
 }
 
+/// Chuyển event transfer sang object JS cho tầng UI:
+/// `{type, id, name?, size?, transferred?, data?, reason?}`.
+fn file_event_to_js(event: &crate::filetransfer::Event) -> JsValue {
+    use crate::filetransfer::Event;
+    let object = js_sys::Object::new();
+    let set = |key: &str, value: JsValue| {
+        let _ = js_sys::Reflect::set(object.as_ref(), &JsValue::from_str(key), &value);
+    };
+    match event {
+        Event::Offered { offer } => {
+            set("type", JsValue::from_str("offer"));
+            set("id", JsValue::from_str(&offer.transfer_id));
+            set("name", JsValue::from_str(&offer.file_name));
+            set("size", JsValue::from_f64(offer.size as f64));
+        }
+        Event::Progress {
+            transfer_id,
+            transferred,
+            size,
+        } => {
+            set("type", JsValue::from_str("progress"));
+            set("id", JsValue::from_str(transfer_id));
+            set("transferred", JsValue::from_f64(*transferred as f64));
+            set("size", JsValue::from_f64(*size as f64));
+        }
+        Event::Received {
+            transfer_id,
+            file_name,
+            data,
+        } => {
+            set("type", JsValue::from_str("received"));
+            set("id", JsValue::from_str(transfer_id));
+            set("name", JsValue::from_str(file_name));
+            // Copy byte vào Uint8Array riêng — JsValue không giữ tham chiếu
+            // vào bộ nhớ wasm (bộ nhớ có thể dời khi tăng dung lượng).
+            let buffer = js_sys::Uint8Array::new_with_length(data.len() as u32);
+            buffer.copy_from_slice(data);
+            set("data", JsValue::from(&buffer));
+        }
+        Event::Sent { transfer_id } => {
+            set("type", JsValue::from_str("sent"));
+            set("id", JsValue::from_str(transfer_id));
+        }
+        Event::Canceled { transfer_id } => {
+            set("type", JsValue::from_str("canceled"));
+            set("id", JsValue::from_str(transfer_id));
+        }
+        Event::Failed {
+            transfer_id,
+            reason,
+        } => {
+            set("type", JsValue::from_str("failed"));
+            set("id", JsValue::from_str(transfer_id));
+            set("reason", JsValue::from_str(reason));
+        }
+    }
+    JsValue::from(object)
+}
+
 /// Đóng gói chuỗi thành JSON string.
-fn json_string(value: &str) -> String {
-    let mut out = String::with_capacity(value.len() + 2);
+fn json_string(value: &str) -> String {    let mut out = String::with_capacity(value.len() + 2);
     out.push('"');
     for ch in value.chars() {
         match ch {
