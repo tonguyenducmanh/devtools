@@ -14,6 +14,6 @@ export function getUserSettingDefault() {
     sideBarMenuPosition: tmEnum.sideBarMenuPosition.Sidebar,
     cursorEffect: "off",
     backgroundEffect: "off",
-    welcomeBackground: tmEnum.welcomeBackground.Crossword,
+    welcomeBackground: tmEnum.welcomeBackground.Normal,
   };
 }

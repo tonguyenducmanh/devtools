@@ -143,9 +143,7 @@ class TMEnum {
    */
   welcomeBackground = {
     Normal: "normal",
-    Meme: "meme",
     Avatar: "avatar",
-    Crossword: "crossword",
   };
   /**
    * danh sách hình nền welcome, dùng chung cho cả form thiết lập và menu
@@ -157,16 +155,8 @@ class TMEnum {
       value: "normal",
     },
     {
-      labelKey: "i18nUserSettings.welcomeBackground.Meme",
-      value: "meme",
-    },
-    {
       labelKey: "i18nUserSettings.welcomeBackground.Avatar",
       value: "avatar",
-    },
-    {
-      labelKey: "i18nUserSettings.welcomeBackground.Crossword",
-      value: "crossword",
     },
   ];
   /**

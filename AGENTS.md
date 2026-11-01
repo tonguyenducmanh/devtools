@@ -91,6 +91,7 @@ wrangler.jsonc                  Cloudflare Pages config (project `devtools`, out
     - **Thứ tự sự kiện quan trọng:** máy đối tác có thể kết nối thẳng vào listener **trước khi** ta nhận được kết quả tra cứu → phải **giữ kết nối** và chỉ gửi login khi đã biết địa chỉ LAN dự kiến (suy ra từ lệnh tra cứu), nếu không sẽ từ chối oan.
     - Khi chuyển đường sang direct, **bộ đệm khung hình phải reset** (kênh mới có chuỗi số khung riêng).
     - Đối chiếu vector mã hoá bằng `openssl enc -aes-256-cbc` (xem `bl_ultraviewer_direct_test.go`) để chắc chắn khớp client gốc.
+18. **Ưu tiên `let` thay vì `const`.** Khi khai báo biến trong JS/Vue, hãy dùng `let` làm mặc định; chỉ dùng `const` khi giá trị thực sự không bao giờ được gán lại sau khi khởi tạo. Tránh khai báo `const` cho biến sau đó phải gán lại hoặc biến có thể thay đổi.
 
 ## 4. Chọn việc làm
 

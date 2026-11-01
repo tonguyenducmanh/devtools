@@ -22,9 +22,7 @@ export default {
     },
     welcomeBackground: {
       Normal: "No image",
-      Meme: "Meme",
       Avatar: "Avatar",
-      Crossword: "Song Thanh Tân - Vương Bình duet with Thùy Chi",
     },
     backgroundEffect: {
       off: "Off",

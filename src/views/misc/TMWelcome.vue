@@ -4,9 +4,8 @@
       <div class="container">
         <!-- Đã chọn hình nền (xem $tmEnum.welcomeBackgroundList) thì chỉ hiện ảnh
 nền phủ kín màn welcome, không hiện text author -->
-        <TMWelcomeCrossword v-if="isCrossword" />
         <div
-          v-else-if="isShowBackground"
+          v-if="isShowBackground"
           class="welcome-background"
           :class="`welcome-background--${welcomeBackground}`"
         ></div>
@@ -27,19 +26,18 @@ nền phủ kín màn welcome, không hiện text author -->
 
 <script>
 import TMWelcomeHelp from "@/views/helps/TMWelcomeHelp.vue";
-import TMWelcomeCrossword from "@/views/misc/TMWelcomeCrossword.vue";
 import TMSubSidebar from "@/components/TMSubSidebar.vue";
 import TMDynamicBackgroundEffect from "@/views/backgroundEffect/TMDynamicBackgroundEffect.vue";
 import TMLayoutConfigMixin from "@/mixins/TMLayoutConfigMixin.js";
 import eventBus from "@/common/event/TMEventBus.js";
 import { TMEnumEventBus } from "@/common/event/TMEnumEventBus.js";
+import tmEnum from "@/common/TMEnum.js";
 
 export default {
   name: "TMWelcome",
   mixins: [TMLayoutConfigMixin],
   components: {
     TMWelcomeHelp,
-    TMWelcomeCrossword,
     TMSubSidebar,
     TMDynamicBackgroundEffect,
   },
@@ -62,21 +60,11 @@ export default {
       return me.$tmUtility.getAuthorApp() ?? me.$tmUtility.defaultTitleApp();
     },
     /**
-     * Chế độ bảng ô chữ "Bài hát Thanh Tân" (không phải ảnh nền)
-     */
-    isCrossword() {
-      let me = this;
-      return me.welcomeBackground == me.$tmEnum.welcomeBackground.Crossword;
-    },
-    /**
      * normal là không chọn ảnh nên không hiện lớp nền
      */
     isShowBackground() {
       let me = this;
-      return (
-        me.welcomeBackground != me.$tmEnum.welcomeBackground.Normal &&
-        !me.isCrossword
-      );
+      return me.welcomeBackground != me.$tmEnum.welcomeBackground.Normal;
     },
   },
   created() {
@@ -96,8 +84,15 @@ export default {
     },
     async processWhenMounted() {
       let me = this;
-      me.welcomeBackground =
-        await me.$tmUtility.getUserSettings("welcomeBackground");
+      let savedBackground = await me.$tmUtility.getUserSettings(
+        "welcomeBackground",
+      );
+      // Nếu giá trị lưu không phải là giá trị enum hợp lệ thì quay về mặc định
+      if (Object.values(tmEnum.welcomeBackground).includes(savedBackground)) {
+        me.welcomeBackground = savedBackground;
+      } else {
+        me.welcomeBackground = tmEnum.welcomeBackground.Normal;
+      }
     },
   },
   mounted() {
@@ -158,10 +153,6 @@ cắt), z-index 0 để nằm dưới text author và dưới TMDynamicBackgroun
   background-position: center;
   background-size: contain;
   pointer-events: none;
-}
-
-.welcome-background--meme {
-  background-image: url("@/assets/dependency.jpg");
 }
 
 .welcome-background--avatar {
