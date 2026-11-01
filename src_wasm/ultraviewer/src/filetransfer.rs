@@ -300,7 +300,6 @@ struct Incoming {
 }
 
 struct Outgoing {
-    file_name: String,
     data: Vec<u8>,
     size: i64,
     accepted: bool,
@@ -343,7 +342,6 @@ impl Engine {
         self.outgoing.insert(
             offer.transfer_id.clone(),
             Outgoing {
-                file_name: offer.file_name.clone(),
                 data,
                 size,
                 accepted: false,
