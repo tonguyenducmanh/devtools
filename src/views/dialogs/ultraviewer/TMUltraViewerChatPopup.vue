@@ -19,6 +19,10 @@
       :title="title"
       :showHeader="false"
       @send="handleSend"
+      @attach="(file) => onAttach && onAttach(file)"
+      @file-accept="(id) => onFileAccept && onFileAccept(id)"
+      @file-decline="(id) => onFileDecline && onFileDecline(id)"
+      @file-save="(id) => onFileSave && onFileSave(id)"
     />
   </TMPopup>
 </template>
@@ -59,6 +63,26 @@ export default {
     },
     /** Hàm gửi tin nhắn (do tool cha cung cấp). */
     onSend: {
+      type: Function,
+      default: null,
+    },
+    /** Hàm chọn tệp đính kèm (do tool cha cung cấp). */
+    onAttach: {
+      type: Function,
+      default: null,
+    },
+    /** Chấp nhận nhận tệp máy đối tác đề nghị. */
+    onFileAccept: {
+      type: Function,
+      default: null,
+    },
+    /** Từ chối nhận tệp / huỷ transfer. */
+    onFileDecline: {
+      type: Function,
+      default: null,
+    },
+    /** Lưu tệp đã nhận xong xuống máy này. */
+    onFileSave: {
       type: Function,
       default: null,
     },

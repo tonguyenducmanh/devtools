@@ -15,7 +15,58 @@
       >
         <!-- Thời gian không hiện trực tiếp mà hiện khi rê chuột vào tin nhắn -->
         <div class="tm-chat-bubble" v-tooltip="entry.time">
-          <div class="tm-chat-text">{{ entry.text }}</div>
+          <template v-if="entry.file">
+            <div class="tm-chat-file-name">
+              <span class="tm-icon tm-upload-icon"></span>
+              <span class="tm-chat-text">{{ entry.file.name }}</span>
+            </div>
+            <div class="tm-chat-file-size">
+              {{ formatSize(entry.file.transferred) }} /
+              {{ formatSize(entry.file.size) }}
+            </div>
+            <!-- Offer từ máy đối tác: chờ mình nhận hay từ chối -->
+            <div v-if="entry.file.status === 'offer'" class="tm-chat-file-actions">
+              <TMButton
+                :noMargin="true"
+                :isSmallButton="true"
+                :label="$t('i18nCommon.ultraViewer.fileAccept')"
+                @click="$emit('file-accept', entry.file.id)"
+              />
+              <TMButton
+                :noMargin="true"
+                :isSmallButton="true"
+                :type="$tmEnum.buttonType.secondary"
+                :label="$t('i18nCommon.ultraViewer.fileDecline')"
+                @click="$emit('file-decline', entry.file.id)"
+              />
+            </div>
+            <!-- Đang truyền: thanh tiến độ -->
+            <div
+              v-else-if="entry.file.status === 'transferring'"
+              class="tm-chat-file-progress"
+            >
+              <div
+                class="tm-chat-file-progress-bar"
+                :style="{ width: progressPercent(entry.file) + '%' }"
+              ></div>
+            </div>
+            <!-- Xong: nút lưu (file nhận) hoặc nhãn đã gửi -->
+            <div v-else class="tm-chat-file-actions">
+              <TMButton
+                v-if="!entry.local"
+                :noMargin="true"
+                :isSmallButton="true"
+                :iconClass="'tm-download-icon'"
+                :label="$t('i18nCommon.ultraViewer.fileSave')"
+                @click="$emit('file-save', entry.file.id)"
+              />
+              <span v-else class="tm-chat-file-note">{{ fileStatusText(entry.file) }}</span>
+            </div>
+            <div v-if="entry.file.status === 'canceled' || entry.file.status === 'failed'" class="tm-chat-file-note">
+              {{ fileStatusText(entry.file) }}
+            </div>
+          </template>
+          <div v-else class="tm-chat-text">{{ entry.text }}</div>
         </div>
       </div>
       <div v-if="isTyping" class="tm-chat-typing">{{ typingText }}</div>
@@ -32,8 +83,22 @@
       <TMButton
         :noMargin="true"
         :readOnly="readOnly"
+        v-tooltip="$t('i18nCommon.ultraViewer.attachFile')"
+        :iconClass="'tm-upload-icon'"
+        @click="pickFile"
+      />
+      <TMButton
+        :noMargin="true"
+        :readOnly="readOnly"
         :iconClass="'tm-send-icon'"
         @click="sendMessage"
+      />
+      <!-- Input ẩn chọn tệp đính kèm (bấm nút phía trên mới hiện) -->
+      <input
+        ref="fileInput"
+        type="file"
+        class="tm-chat-file-input"
+        @change="onFilePicked"
       />
     </div>
   </div>
@@ -47,8 +112,10 @@
  * và trong popup nổi (không có nền che) mở từ nút chat trên thanh công cụ.
  *
  * Component KHÔNG tự gửi tin: nhận `messages`/`isTyping` từ ngoài và emit
- * `send` khi người dùng bấm nút gửi hoặc Enter. Nhờ vậy cùng một dữ liệu
- * chat có thể hiển thị ở nhiều nơi mà không phải nhân bản logic gửi tin.
+ * `send` khi người dùng bấm nút gửi hoặc Enter, `attach` khi chọn tệp đính
+ * kèm, `file-accept`/`file-decline`/`file-save` khi bấm nút trên bong bóng
+ * tệp. Nhờ vậy cùng một dữ liệu chat có thể hiển thị ở nhiều nơi mà không
+ * phải nhân bản logic gửi tin.
  */
 export default {
   name: "TMUltraViewerChatBox",
@@ -98,7 +165,7 @@ export default {
       default: "",
     },
   },
-  emits: ["send"],
+  emits: ["send", "attach", "file-accept", "file-decline", "file-save"],
 
   data() {
     return {
@@ -144,6 +211,44 @@ export default {
       this.$nextTick(() => {
         this.scrollToBottom();
       });
+    },
+    /** Mở hộp thoại chọn tệp đính kèm. */
+    pickFile() {
+      if (this.readOnly) return;
+      this.$refs.fileInput?.click();
+    },
+    /** Người dùng đã chọn tệp — đẩy ra ngoài rồi reset input để chọn lại được. */
+    onFilePicked(event) {
+      const file = event.target.files?.[0];
+      event.target.value = "";
+      if (!file) return;
+      this.$emit("attach", file);
+      this.isPinnedToBottom = true;
+      this.$nextTick(() => {
+        this.scrollToBottom();
+      });
+    },
+    /** Dung lượng dạng "12.3 KB". */
+    formatSize(bytes) {
+      if (bytes == null) return "";
+      if (bytes < 1024) return `${bytes} B`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+      return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+    },
+    progressPercent(file) {
+      if (!file.size) return 100;
+      return Math.min(100, Math.round((file.transferred / file.size) * 100));
+    },
+    fileStatusText(file) {
+      const key = {
+        waiting: "i18nCommon.ultraViewer.fileWaitingAccept",
+        done: file.local
+          ? "i18nCommon.ultraViewer.fileSent"
+          : "i18nCommon.ultraViewer.fileReceived",
+        canceled: "i18nCommon.ultraViewer.fileCanceled",
+        failed: "i18nCommon.ultraViewer.fileFailed",
+      }[file.status];
+      return key ? this.$t(key) : "";
     },
     onScroll() {
       const container = this.$refs.messagesContainer;
@@ -264,5 +369,54 @@ export default {
   :deep(.tm-button) {
     flex-shrink: 0;
   }
+}
+
+/* Input chọn tệp ẩn hoàn toàn (chỉ tương tác qua nút đính kèm) */
+.tm-chat-file-input {
+  display: none;
+}
+
+.tm-chat-file-name {
+  display: flex;
+  align-items: center;
+  gap: var(--padding-medium);
+  min-width: 0;
+
+  .tm-icon {
+    flex-shrink: 0;
+  }
+}
+
+.tm-chat-file-size {
+  font-size: var(--font-size-small);
+  opacity: 0.75;
+  margin-top: var(--padding-medium);
+}
+
+.tm-chat-file-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--padding);
+  margin-top: var(--padding-medium);
+}
+
+.tm-chat-file-progress {
+  height: 4px;
+  margin-top: var(--padding-medium);
+  border-radius: 2px;
+  background-color: var(--bg-layer-color);
+  overflow: hidden;
+}
+
+.tm-chat-file-progress-bar {
+  height: 100%;
+  background-color: var(--focus-color);
+  transition: width 0.2s ease;
+}
+
+.tm-chat-file-note {
+  font-size: var(--font-size-small);
+  opacity: 0.75;
+  margin-top: var(--padding-medium);
 }
 </style>

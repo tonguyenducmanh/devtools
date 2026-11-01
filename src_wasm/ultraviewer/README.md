@@ -23,6 +23,7 @@ Cụ thể:
 | `src/input.rs` | `LinuxViewer/src/input.rs` | Mã hoá chuột/bàn phím (thay `winit::KeyCode` bằng `KeyboardEvent.code`) |
 | `src/chat.rs` | `LinuxViewer/src/chat.rs` | Giao thức chat (12/29/30) |
 | `src/clipboard.rs` | `LinuxViewer/src/clipboard.rs` | Đồng bộ clipboard (5/33) |
+| `src/filetransfer.rs` | `Sources/UltraViewerProtocol/FileTransferOffer.swift` + `FileTransferEngine.swift` | Tệp đính kèm qua chat (13/14/15/16/21): offer/accept/chunk/ack/cancel, cửa sổ 2 chunk, byte nằm trong bộ nhớ wasm thay vì file đĩa (trình duyệt không có file system) |
 | `src/direct.rs` | `LinuxViewer/src/direct.rs` | Quyết định dùng đường LAN trực tiếp hay đi qua relay (`is_lan_address`, `peer_lan_address`) |
 | `resources/8bit.dat` | `Sources/UltraViewerProtocol/Resources/8bit.dat` | Từ điển zstd do UltraViewer cung cấp (xem mục "Tài nguyên bên thứ ba") |
 
