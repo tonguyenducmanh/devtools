@@ -13,7 +13,7 @@
               v-tooltip="$t('i18nCommon.ultraViewer.screenshot')"
               class="flex toolbar-btn"
               :class="{ 'toolbar-btn-disabled': !isConnected }"
-              @click="takeScreenshot"
+              @click="takeScreenshot('uvCanvas', 'i18nCommon.ultraViewer.screenshotSaved', 'i18nCommon.ultraViewer.screenshotFailed')"
             >
               <span class="tm-icon tm-camera-icon"></span>
             </div>
@@ -21,7 +21,7 @@
               v-tooltip="$t('i18nCommon.ultraViewer.copyFrame')"
               class="flex toolbar-btn"
               :class="{ 'toolbar-btn-disabled': !isConnected }"
-              @click="copyCurrentFrame"
+              @click="copyCurrentFrame('uvCanvas', 'i18nCommon.ultraViewer.copyFrame', 'i18nCommon.ultraViewer.frameCopied', 'i18nCommon.ultraViewer.copyFrameFailed')"
             >
               <span class="tm-icon tm-copy-icon"></span>
             </div>
@@ -310,6 +310,7 @@ import TMCheckbox from "@/components/TMCheckbox.vue";
 import TMInput from "@/components/TMInput.vue";
 import TMUltraViewerChatBox from "@/views/dialogs/ultraviewer/TMUltraViewerChatBox.vue";
 import TMDialogUtil, { TMDialogEnum } from "@/common/TMDialogUtil.js";
+import { TMRemoteDesktopMixin } from "@/mixins/TMRemoteDesktopMixin.js";
 
 // Tên hiển thị gửi cho máy đối tác: sinh tự động 5 ký tự ngẫu nhiên + "-PC".
 const DISPLAY_NAME_ALPHABET =
@@ -327,6 +328,7 @@ const DISPLAY_NAME_ALPHABET =
 export default {
   name: "TMRemoteDesktopUltraViewer",
   extends: TMToolBase,
+  mixins: [TMRemoteDesktopMixin],
   components: {
     TMSubSidebar,
     TMRemoteDesktopUltraViewerHelp,
@@ -514,18 +516,6 @@ export default {
         me.currentConfigLayout.showLog = true;
         me.updateConfigLayout();
       }
-    },
-
-    addLog(message, type = "info") {
-      const time = new Date().toLocaleTimeString("en-US", { hour12: false });
-      this.logEntries.push({ time, message, type });
-      if (this.logEntries.length > 200) {
-        this.logEntries.splice(0, this.logEntries.length - 200);
-      }
-      this.$nextTick(() => {
-        const panel = this.$refs.logPanel;
-        if (panel) panel.scrollTop = panel.scrollHeight;
-      });
     },
 
     /**
@@ -914,57 +904,6 @@ export default {
           "error",
         );
       }
-    },
-
-    takeScreenshot() {
-      let me = this;
-      const canvas = me.$refs.uvCanvas;
-      if (!canvas || !me.isConnected) return;
-      try {
-        const dataUrl = canvas.toDataURL("image/png");
-        const link = document.createElement("a");
-        link.download = `ultraviewer-screenshot-${Date.now()}.png`;
-        link.href = dataUrl;
-        link.click();
-        me.addLog(me.$t("i18nCommon.ultraViewer.screenshotSaved"), "success");
-      } catch (e) {
-        me.addLog(
-          `${me.$t("i18nCommon.ultraViewer.screenshotFailed")}: ${me.formatError(e)}`,
-          "error",
-        );
-      }
-    },
-
-    /**
-     * Sao chép khung hình hiện tại trên canvas vào clipboard.
-     * Dùng flow chung của chương trình ($tmUtility.copyImageFromBlob),
-     * không tự viết lại mã gọi API clipboard trong component.
-     */
-    async copyCurrentFrame() {
-      let me = this;
-      const canvas = me.$refs.uvCanvas;
-      if (!canvas || !me.isConnected) return;
-      try {
-        const blob = await new Promise((resolve) => {
-          canvas.toBlob(resolve, "image/png");
-        });
-        if (blob) {
-          await me.$tmUtility.copyImageFromBlob(blob);
-          me.addLog(
-            me.$t("i18nCommon.ultraViewer.frameCopied"),
-            "success",
-          );
-        }
-      } catch (e) {
-        me.addLog(
-          `${me.$t("i18nCommon.ultraViewer.copyFrameFailed")}: ${me.formatError(e)}`,
-          "error",
-        );
-      }
-    },
-
-    formatError(e) {
-      return e?.message || e?.toString() || String(e);
     },
 
     // ─────────────────────── Nhập liệu chuột / bàn phím ───────────────────────
