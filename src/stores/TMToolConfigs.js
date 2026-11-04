@@ -122,6 +122,13 @@ export const sidebarConfig = [
         },
       },
       {
+        name: "vietqr",
+        component: () => import("@/views/tools/TMVietQR.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.VietQRBankTransfer",
+        },
+      },
+      {
         name: "base64toimage",
         component: () => import("@/views/tools/TMBase64ToImage.vue"),
         meta: { titleKey: "i18nCommon.feature.ImageFromBase64" },

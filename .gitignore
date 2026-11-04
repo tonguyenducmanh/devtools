@@ -553,3 +553,5 @@ src_wasm/pkg/
 
 # wrangler (deploy Cloudflare Pages)
 .wrangler/
+/vietqr/
+/vietqr-core-ref/
