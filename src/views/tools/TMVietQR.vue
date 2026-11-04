@@ -22,6 +22,11 @@
               @click="toggleBankDropdown"
             >
               <template v-if="selectedBank">
+                <img
+                  v-if="bankLogoUrls[selectedBank.bin]"
+                  class="bank-logo"
+                  :src="bankLogoUrls[selectedBank.bin]"
+                />
                 <span class="bank-control-short">{{
                   selectedBank.shortName
                 }}</span>
@@ -57,13 +62,20 @@
                     :class="{ selected: bank.bin === bankBin }"
                     @click="selectBank(bank.bin)"
                   >
-                    <div class="bank-item-top">
-                      <span class="bank-item-short">{{ bank.shortName }}</span>
-                      <span class="bank-item-code"
-                        >{{ bank.code }} • {{ bank.bin }}</span
-                      >
+                    <img
+                      v-if="bankLogoUrls[bank.bin]"
+                      class="bank-logo"
+                      :src="bankLogoUrls[bank.bin]"
+                    />
+                    <div class="bank-item-text">
+                      <div class="bank-item-top">
+                        <span class="bank-item-short">{{ bank.shortName }}</span>
+                        <span class="bank-item-code"
+                          >{{ bank.code }} • {{ bank.bin }}</span
+                        >
+                      </div>
+                      <div class="bank-item-name">{{ bank.name }}</div>
                     </div>
-                    <div class="bank-item-name">{{ bank.name }}</div>
                   </div>
                   <div v-if="!filteredBanks.length" class="bank-empty">
                     {{ $t("i18nCommon.vietQR.bankNoResult") }}
@@ -78,6 +90,14 @@
             isLabelTop
             :noMargin="true"
             :placeHolder="$t('i18nCommon.vietQR.accountPlaceholder')"
+            @update:modelValue="onInputChange"
+          />
+          <TMInput
+            v-model="accountName"
+            :label="$t('i18nCommon.vietQR.accountName')"
+            isLabelTop
+            :noMargin="true"
+            :placeHolder="$t('i18nCommon.vietQR.accountNamePlaceholder')"
             @update:modelValue="onInputChange"
           />
           <div class="form-row">
@@ -99,12 +119,65 @@
               @update:modelValue="onInputChange"
             />
           </div>
-          <TMCheckbox
-            :variant="$tmEnum.checkboxType.switch"
+          <TMRadioGroup
+            :noMargin="true"
             v-model="isCard"
-            :label="$t('i18nCommon.vietQR.isCard')"
-            @change="onInputChange"
-          ></TMCheckbox>
+            :label="$t('i18nCommon.vietQR.transferMethod')"
+            :layout="$tmEnum.coordinateAxes.vertical"
+            :options="transferMethodOptions"
+            @update:modelValue="onInputChange"
+          />
+          <div class="custom-logo-row">
+            <div class="field-label no-pad">
+              {{ $t("i18nCommon.vietQR.customLogo") }}
+            </div>
+            <div class="flex custom-logo-controls">
+              <TMButton
+                :noMargin="true"
+                :type="$tmEnum.buttonType.secondary"
+                :label="$t('i18nCommon.vietQR.chooseLogo')"
+                @click="pickLogo"
+              />
+              <template v-if="customLogoDataUrl">
+                <img class="custom-logo-preview" :src="customLogoDataUrl" />
+                <TMButton
+                  :noMargin="true"
+                  :type="$tmEnum.buttonType.secondary"
+                  :label="$t('i18nCommon.vietQR.removeLogo')"
+                  @click="removeLogo"
+                />
+              </template>
+            </div>
+            <input
+              ref="logoInputRef"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              class="logo-file-input"
+              @change="onLogoChange"
+            />
+          </div>
+          <div class="form-row">
+            <TMComboBox
+              v-model="template"
+              :options="templateOptions"
+              :label="$t('i18nCommon.vietQR.templateLabel')"
+              isLabelTop
+              :noMargin="true"
+              :width="100"
+              :usingStylePercent="true"
+              :isCapitalizeText="false"
+            />
+            <TMComboBox
+              v-model="format"
+              :options="formatOptions"
+              :label="$t('i18nCommon.vietQR.imageFormat')"
+              isLabelTop
+              :noMargin="true"
+              :width="100"
+              :usingStylePercent="true"
+              :isCapitalizeText="false"
+            />
+          </div>
           <div class="flex form-buttons">
             <TMButton
               :noMargin="true"
@@ -175,28 +248,17 @@ import TMArrow from "@/components/TMArrow.vue";
 import TMFlyoutPanel from "@/components/TMFlyoutPanel.vue";
 import banks from "@/common/vietqr/banks.json";
 import { makeVietQRContent } from "@/common/vietqr/TMVietQR.js";
-import { generateQRItems } from "@/common/qrcode/TMQRCodeWorkerClient.js";
-
-// Option sinh QR đặt NGOÀI component: object trong `data()` là reactive Proxy
-// không structured-clone được khi postMessage sang worker (Luật 13).
-const QR_GENERATE_OPTIONS = {
-  errorCorrectionLevel: "M",
-  type: "image/png",
-  quality: 1,
-  margin: 2,
-  color: {
-    dark: "#000000",
-    light: "#ffffff",
-  },
-  width: 1000,
-};
+import {
+  renderVietQrImage,
+  bankLogoUrls as bankLogoMap,
+} from "@/common/vietqr/TMVietQrCardRenderer.js";
 
 // Bỏ dấu tiếng Việt để tìm "vietcombank" ra được "Vietcombank" / "VCB"
 function normalizeSearch(text) {
   return String(text)
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[̀-ͯ]/g, "")
     .replace(/đ/g, "d");
 }
 
@@ -217,6 +279,16 @@ export default {
           this.scrollSelectedBankToVisible();
         });
       }
+    },
+    // Đổi mẫu / định dạng / logo tâm → vẽ lại ảnh ngay không cần gõ lại
+    template() {
+      this.generateQR();
+    },
+    format() {
+      this.generateQR();
+    },
+    customLogoDataUrl() {
+      this.generateQR();
     },
   },
   beforeUnmount() {
@@ -259,6 +331,25 @@ export default {
         selectedEl.offsetTop - listEl.clientHeight + selectedEl.offsetHeight,
       );
     },
+    pickLogo() {
+      this.$refs.logoInputRef?.click();
+    },
+    onLogoChange(event) {
+      const file = event.target.files?.[0];
+      // reset value để chọn lại cùng 1 file vẫn trigger change
+      event.target.value = "";
+      if (!file) {
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.customLogoDataUrl = reader.result;
+      };
+      reader.readAsDataURL(file);
+    },
+    removeLogo() {
+      this.customLogoDataUrl = null;
+    },
     onInputChange() {
       let me = this;
       if (me.debounceTimer) {
@@ -268,12 +359,15 @@ export default {
       me.debounceTimer = setTimeout(() => me.generateQR(), 400);
     },
     /**
-     * Dựng payload VietQR rồi sinh ảnh QR qua worker (không block main thread).
+     * Dựng payload VietQR rồi vẽ ảnh thẻ theo mẫu đang chọn (compact/qr_only/
+     * print) trên canvas main thread — ma trận QR nhỏ, vẽ nhanh không cần worker.
      * Có số tiền → QR động (010212), không → QR tĩnh (010211) theo NAPAS247.
      */
     async generateQR() {
       let me = this;
       if (!me.bankBin || !me.accountNumber) {
+        me.qrPayload = null;
+        me.qrSrc = null;
         return;
       }
       let amountValue = null;
@@ -299,17 +393,23 @@ export default {
       const genToken = ++me.generateToken;
       me.isGenerating = true;
       try {
-        const { items, errors } = await generateQRItems(
-          [{ index: 0, text: payload }],
-          QR_GENERATE_OPTIONS,
-        );
+        const src = await renderVietQrImage({
+          payload,
+          template: me.template,
+          format: me.format,
+          bankLogoUrl: bankLogoMap[me.bankBin] || null,
+          bankName: me.selectedBank?.shortName || null,
+          bankFullName: me.selectedBank?.name || null,
+          accountNumber: me.accountNumber,
+          accountName: me.accountName,
+          amount: amountValue,
+          description: me.description,
+          isCard: me.isCard,
+          customLogoDataUrl: me.customLogoDataUrl,
+        });
         if (me.generateToken !== genToken) return;
-        if (errors && errors.length) {
-          me.$tmToast.error(me.$t("i18nCommon.toastMessage.error"));
-          return;
-        }
         me.qrPayload = payload;
-        me.qrSrc = items && items[0] ? items[0].src : null;
+        me.qrSrc = src;
       } catch (error) {
         console.error("Error in generateQR:", error);
         me.$tmToast.error(me.$t("i18nCommon.toastMessage.error"));
@@ -344,13 +444,18 @@ export default {
       while (n--) {
         u8arr[n] = bstr.charCodeAt(n);
       }
+      const ext = me.format === "jpeg" ? "jpg" : me.format;
       me.$tmUtility.createDownloadFileFromBlob(
         new Blob([u8arr], { type: mime }),
-        `vietqr-${me.bankBin}-${me.accountNumber}.png`,
+        `vietqr-${me.bankBin}-${me.accountNumber}.${ext}`,
       );
     },
   },
   computed: {
+    // Options API không expose import cho template nên phải đưa qua computed
+    bankLogoUrls() {
+      return bankLogoMap;
+    },
     selectedBank() {
       return banks.find((bank) => bank.bin === this.bankBin) || null;
     },
@@ -365,6 +470,33 @@ export default {
         ),
       );
     },
+    transferMethodOptions() {
+      return [
+        { value: false, label: this.$t("i18nCommon.vietQR.toAccount") },
+        { value: true, label: this.$t("i18nCommon.vietQR.toCard") },
+      ];
+    },
+    templateOptions() {
+      return [
+        {
+          value: "compact",
+          label: this.$t("i18nCommon.vietQR.templateCompact"),
+        },
+        {
+          value: "qr_only",
+          label: this.$t("i18nCommon.vietQR.templateQrOnly"),
+        },
+        { value: "print", label: this.$t("i18nCommon.vietQR.templatePrint") },
+      ];
+    },
+    formatOptions() {
+      return [
+        { value: "png", label: "PNG (Lossless)" },
+        { value: "jpeg", label: "JPEG (Nén)" },
+        { value: "webp", label: "WebP (Tối ưu web)" },
+        { value: "svg", label: "SVG (Vector)" },
+      ];
+    },
   },
   data() {
     return {
@@ -374,9 +506,13 @@ export default {
       bankControlEl: null,
       bankControlWidth: 0,
       accountNumber: null,
+      accountName: null,
       amount: null,
       description: null,
       isCard: false,
+      template: "compact",
+      format: "png",
+      customLogoDataUrl: null,
       qrSrc: null,
       qrPayload: null,
       isGenerating: false,
@@ -449,11 +585,14 @@ export default {
   padding-bottom: var(--padding);
   font-size: var(--font-size-l-medium);
   white-space: nowrap;
+  &.no-pad {
+    padding-bottom: 0;
+  }
 }
 .form-row {
   display: flex;
   gap: var(--padding);
-  .tm-input {
+  > * {
     flex: 1;
   }
 }
@@ -465,6 +604,12 @@ export default {
 .bank-select {
   position: relative;
   width: 100%;
+}
+.bank-logo {
+  height: 20px;
+  max-width: 60px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 .bank-control {
   height: var(--base-component-height);
@@ -497,6 +642,23 @@ export default {
     flex: 1;
     color: var(--text-secondary-color);
     opacity: var(--placeholder-opacity);
+  }
+}
+.custom-logo-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding);
+  .custom-logo-controls {
+    gap: var(--padding);
+    justify-content: flex-start;
+  }
+  .custom-logo-preview {
+    height: 28px;
+    max-width: 60px;
+    object-fit: contain;
+  }
+  .logo-file-input {
+    display: none;
   }
 }
 .preview-card {
@@ -567,7 +729,7 @@ export default {
 }
 </style>
 <style lang="scss">
-/* Dropdown ngân hàng bị Teleport ra body (TMFlyoutPanel) nên style phải
+/* Dropdown ngân hàng bị Teleport ra body (TMFlyoutPanel) so style phải
    đặt ngoài scoped để áp dụng được */
 .vietqr-bank-flyout {
   /* Giống .tm-combobox-flyout: bỏ padding mặc định của panel để viền khớp
@@ -604,8 +766,8 @@ export default {
   }
   .bank-item {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    align-items: center;
+    gap: var(--padding);
     padding: calc(var(--padding) / 2) var(--padding);
     cursor: pointer;
 
@@ -614,6 +776,19 @@ export default {
     }
     &.selected {
       background: var(--bg-layer-color);
+    }
+    .bank-logo {
+      height: 22px;
+      width: 60px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .bank-item-text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
     }
     .bank-item-top {
       display: flex;
