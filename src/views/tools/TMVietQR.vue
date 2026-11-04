@@ -78,7 +78,6 @@
             isLabelTop
             :noMargin="true"
             :placeHolder="$t('i18nCommon.vietQR.accountPlaceholder')"
-            :readOnly="isGenerating"
             @update:modelValue="onInputChange"
           />
           <div class="form-row">
@@ -89,7 +88,6 @@
               :noMargin="true"
               :inputType="'number'"
               :placeHolder="$t('i18nCommon.vietQR.amountPlaceholder')"
-              :readOnly="isGenerating"
               @update:modelValue="onInputChange"
             />
             <TMInput
@@ -98,7 +96,6 @@
               isLabelTop
               :noMargin="true"
               :placeHolder="$t('i18nCommon.vietQR.descriptionPlaceholder')"
-              :readOnly="isGenerating"
               @update:modelValue="onInputChange"
             />
           </div>
