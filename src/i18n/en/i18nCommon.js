@@ -231,8 +231,13 @@ export default {
       },
     },
     vietQR: {
+      paymentInfo: "Payment info",
+      paymentInfoHint: "QR regenerates automatically after you stop typing",
+      previewTitle: "QR preview",
       bank: "Bank",
       bankPlaceholder: "Select bank",
+      bankSearchPlaceholder: "Quick search by name, code, BIN...",
+      bankNoResult: "No bank found",
       accountNumber: "Account number",
       accountPlaceholder: "Account / card number",
       amount: "Amount",
