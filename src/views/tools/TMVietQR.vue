@@ -1,19 +1,77 @@
 <template>
-  <div class="flex container">
-    <div class="flex flex-col main-tool">
-      <div class="flex flex-col input-section">
+  <div class="flex flex-col vietqr-container">
+    <div class="flex vietqr-main">
+      <div class="card form-card">
+        <div class="card-header">
+          <span class="card-title">{{
+            $t("i18nCommon.vietQR.paymentInfo")
+          }}</span>
+          <span class="card-hint">{{
+            $t("i18nCommon.vietQR.paymentInfoHint")
+          }}</span>
+        </div>
         <div class="flex flex-col form-area">
-          <TMComboBox
-            v-model="bankBin"
-            :options="bankOptions"
-            :label="$t('i18nCommon.vietQR.bank')"
-            isLabelTop
-            :noMargin="true"
-            :width="100"
-            :usingStylePercent="true"
-            :isCapitalizeText="false"
-            :placeHolder="$t('i18nCommon.vietQR.bankPlaceholder')"
-          />
+          <div class="bank-select" v-click-outside="closeBankDropdown">
+            <div class="field-label">{{
+              $t("i18nCommon.vietQR.bank")
+            }}</div>
+            <div
+              ref="bankControlRef"
+              class="bank-control"
+              :class="{ open: bankOpen }"
+              @click="toggleBankDropdown"
+            >
+              <template v-if="selectedBank">
+                <span class="bank-control-short">{{
+                  selectedBank.shortName
+                }}</span>
+                <span class="bank-control-name"
+                  >— {{ selectedBank.name }} ({{ selectedBank.bin }})</span
+                >
+              </template>
+              <span v-else class="bank-control-placeholder">{{
+                $t("i18nCommon.vietQR.bankPlaceholder")
+              }}</span>
+              <TMArrow :openProp="bankOpen" />
+            </div>
+            <TMFlyoutPanel
+              :show="bankOpen"
+              :anchorElFlyout="bankControlEl"
+              :minWidth="bankControlWidth"
+              panelClass="vietqr-bank-flyout"
+            >
+              <div class="bank-dropdown">
+                <input
+                  ref="bankSearchInput"
+                  v-model="bankSearch"
+                  class="bank-search"
+                  :placeholder="$t('i18nCommon.vietQR.bankSearchPlaceholder')"
+                  spellcheck="false"
+                  autocomplete="off"
+                />
+                <div ref="bankListEl" class="bank-list">
+                  <div
+                    v-for="bank in filteredBanks"
+                    :key="bank.bin"
+                    class="bank-item"
+                    :class="{ selected: bank.bin === bankBin }"
+                    @click="selectBank(bank.bin)"
+                  >
+                    <div class="bank-item-top">
+                      <span class="bank-item-short">{{ bank.shortName }}</span>
+                      <span class="bank-item-code"
+                        >{{ bank.code }} • {{ bank.bin }}</span
+                      >
+                    </div>
+                    <div class="bank-item-name">{{ bank.name }}</div>
+                  </div>
+                  <div v-if="!filteredBanks.length" class="bank-empty">
+                    {{ $t("i18nCommon.vietQR.bankNoResult") }}
+                  </div>
+                </div>
+              </div>
+            </TMFlyoutPanel>
+          </div>
           <TMInput
             v-model="accountNumber"
             :label="$t('i18nCommon.vietQR.accountNumber')"
@@ -23,25 +81,27 @@
             :readOnly="isGenerating"
             @update:modelValue="onInputChange"
           />
-          <TMInput
-            v-model="amount"
-            :label="$t('i18nCommon.vietQR.amount')"
-            isLabelTop
-            :noMargin="true"
-            :inputType="'number'"
-            :placeHolder="$t('i18nCommon.vietQR.amountPlaceholder')"
-            :readOnly="isGenerating"
-            @update:modelValue="onInputChange"
-          />
-          <TMInput
-            v-model="description"
-            :label="$t('i18nCommon.vietQR.description')"
-            isLabelTop
-            :noMargin="true"
-            :placeHolder="$t('i18nCommon.vietQR.descriptionPlaceholder')"
-            :readOnly="isGenerating"
-            @update:modelValue="onInputChange"
-          />
+          <div class="form-row">
+            <TMInput
+              v-model="amount"
+              :label="$t('i18nCommon.vietQR.amount')"
+              isLabelTop
+              :noMargin="true"
+              :inputType="'number'"
+              :placeHolder="$t('i18nCommon.vietQR.amountPlaceholder')"
+              :readOnly="isGenerating"
+              @update:modelValue="onInputChange"
+            />
+            <TMInput
+              v-model="description"
+              :label="$t('i18nCommon.vietQR.description')"
+              isLabelTop
+              :noMargin="true"
+              :placeHolder="$t('i18nCommon.vietQR.descriptionPlaceholder')"
+              :readOnly="isGenerating"
+              @update:modelValue="onInputChange"
+            />
+          </div>
           <TMCheckbox
             :variant="$tmEnum.checkboxType.switch"
             v-model="isCard"
@@ -63,34 +123,41 @@
               @click="downloadQR"
             />
           </div>
-          <div v-if="qrPayload" class="flex flex-col payload-section">
-            <span class="payload-title">{{
-              $t("i18nCommon.vietQR.qrPayload")
-            }}</span>
-            <div
-              class="payload-text"
-              v-tooltip="$t('i18nCommon.copy')"
-              @click="copyPayload"
-            >
-              {{ qrPayload }}
-            </div>
-          </div>
         </div>
       </div>
-      <div class="flex qr-preview">
-        <div v-if="isGenerating" class="qr-loading">
-          <TMLoading />
+      <div class="card preview-card">
+        <div class="card-header">
+          <span class="card-title preview-title">{{
+            $t("i18nCommon.vietQR.previewTitle")
+          }}</span>
         </div>
-        <div
-          v-else-if="qrSrc"
-          class="qr-container"
-          v-tooltip="$t('i18nCommon.copy')"
-          @click="copyQR"
-        >
-          <img :src="qrSrc" />
+        <div class="flex qr-preview">
+          <div v-if="isGenerating" class="qr-loading">
+            <TMLoading />
+          </div>
+          <div
+            v-else-if="qrSrc"
+            class="qr-container"
+            v-tooltip="$t('i18nCommon.copy')"
+            @click="copyQR"
+          >
+            <img :src="qrSrc" />
+          </div>
+          <div v-else class="qr-empty">
+            {{ $t("i18nCommon.vietQR.emptyHint") }}
+          </div>
         </div>
-        <div v-else class="qr-empty">
-          {{ $t("i18nCommon.vietQR.emptyHint") }}
+        <div v-if="qrPayload" class="flex flex-col payload-section">
+          <span class="payload-title">{{
+            $t("i18nCommon.vietQR.qrPayload")
+          }}</span>
+          <div
+            class="payload-text"
+            v-tooltip="$t('i18nCommon.copy')"
+            @click="copyPayload"
+          >
+            {{ qrPayload }}
+          </div>
         </div>
       </div>
     </div>
@@ -107,6 +174,8 @@
 <script>
 import TMToolBase from "@/views/tools/base/TMToolBase.vue";
 import TMLoading from "@/components/TMLoading.vue";
+import TMArrow from "@/components/TMArrow.vue";
+import TMFlyoutPanel from "@/components/TMFlyoutPanel.vue";
 import banks from "@/common/vietqr/banks.json";
 import { makeVietQRContent } from "@/common/vietqr/TMVietQR.js";
 import { generateQRItems } from "@/common/qrcode/TMQRCodeWorkerClient.js";
@@ -125,14 +194,32 @@ const QR_GENERATE_OPTIONS = {
   width: 1000,
 };
 
+// Bỏ dấu tiếng Việt để tìm "vietcombank" ra được "Vietcombank" / "VCB"
+function normalizeSearch(text) {
+  return String(text)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d");
+}
+
 export default {
   extends: TMToolBase,
   name: "TMVietQR",
-  components: { TMLoading },
+  components: { TMLoading, TMArrow, TMFlyoutPanel },
   watch: {
     bankBin() {
-      this.reBuildTabTitle(this.selectedBankLabel);
+      this.reBuildTabTitle(this.selectedBank?.shortName);
       this.onInputChange();
+    },
+    bankOpen(val) {
+      if (val) {
+        this.bankSearch = "";
+        this.$nextTick(() => {
+          this.$refs.bankSearchInput?.focus();
+          this.scrollSelectedBankToVisible();
+        });
+      }
     },
   },
   beforeUnmount() {
@@ -142,6 +229,39 @@ export default {
     }
   },
   methods: {
+    toggleBankDropdown() {
+      if (!this.bankOpen) {
+        // Đo ô control trước khi mở để flyout có điểm neo và bề rộng tối thiểu
+        this.bankControlEl = this.$refs.bankControlRef;
+        this.bankControlWidth =
+          this.$refs.bankControlRef?.getBoundingClientRect().width || 0;
+      }
+      this.bankOpen = !this.bankOpen;
+    },
+    closeBankDropdown(event) {
+      // Dropdown bị Teleport ra body nên không nằm trong .bank-select,
+      // phải tự loại nó ra để click trong danh sách không đóng popup
+      if (event?.target?.closest?.(".bank-dropdown")) return;
+      this.bankOpen = false;
+    },
+    selectBank(bin) {
+      this.bankBin = bin;
+      this.bankOpen = false;
+    },
+    /**
+     * Cuộn ngân hàng đang chọn vào vùng nhìn thấy. Tự set scrollTop thay vì
+     * scrollIntoView vì scrollIntoView cuộn cả vùng scroll cha
+     */
+    scrollSelectedBankToVisible() {
+      const listEl = this.$refs.bankListEl;
+      if (!listEl) return;
+      const selectedEl = listEl.querySelector(".bank-item.selected");
+      if (!selectedEl) return;
+      listEl.scrollTop = Math.max(
+        0,
+        selectedEl.offsetTop - listEl.clientHeight + selectedEl.offsetHeight,
+      );
+    },
     onInputChange() {
       let me = this;
       if (me.debounceTimer) {
@@ -234,22 +354,28 @@ export default {
     },
   },
   computed: {
-    bankOptions() {
-      let me = this;
-      return banks.map((bank) => ({
-        value: bank.bin,
-        label: `${bank.shortName} - ${bank.code}`,
-      }));
+    selectedBank() {
+      return banks.find((bank) => bank.bin === this.bankBin) || null;
     },
-    selectedBankLabel() {
-      let me = this;
-      let found = banks.find((bank) => bank.bin === me.bankBin);
-      return found ? found.shortName : null;
+    filteredBanks() {
+      const keyword = normalizeSearch(this.bankSearch).trim();
+      if (!keyword) {
+        return banks;
+      }
+      return banks.filter((bank) =>
+        [bank.shortName, bank.code, bank.bin, bank.name].some((field) =>
+          normalizeSearch(field).includes(keyword),
+        ),
+      );
     },
   },
   data() {
     return {
       bankBin: null,
+      bankOpen: false,
+      bankSearch: "",
+      bankControlEl: null,
+      bankControlWidth: 0,
       accountNumber: null,
       amount: null,
       description: null,
@@ -264,55 +390,120 @@ export default {
 };
 </script>
 <style scoped lang="scss">
-.container {
-  display: flex;
+.vietqr-container {
   width: 100%;
   height: 100%;
   position: relative;
-}
-.main-tool {
-  height: 100%;
-  width: 100%;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: stretch;
-}
-.input-section {
-  flex: 0 0 380px;
   padding: var(--padding);
   box-sizing: border-box;
-  border-right: 1px solid var(--border-color);
+  align-items: stretch;
+  justify-content: flex-start;
+}
+.vietqr-main {
+  flex: 1;
+  gap: var(--padding);
+  align-items: stretch;
+  justify-content: flex-start;
+  min-height: 0;
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-layer-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  box-sizing: border-box;
   overflow: auto;
+  min-height: 0;
+}
+.card-header {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--padding) / 2);
+  padding: var(--padding) calc(var(--padding) * 1.5);
+  border-bottom: 1px solid var(--border-color);
+  .card-title {
+    font-size: var(--font-size-medium-rare);
+    font-weight: 600;
+  }
+  .card-hint {
+    font-size: var(--font-size-small);
+    color: var(--text-secondary-color);
+  }
+  .preview-title {
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary-color);
+  }
+}
+.form-card {
+  flex: 0 0 420px;
 }
 .form-area {
   width: 100%;
+  padding: calc(var(--padding) * 1.5);
+  box-sizing: border-box;
   gap: var(--padding);
+  justify-content: flex-start;
+  align-items: stretch;
+}
+.field-label {
+  padding-bottom: var(--padding);
+  font-size: var(--font-size-l-medium);
+  white-space: nowrap;
+}
+.form-row {
+  display: flex;
+  gap: var(--padding);
+  .tm-input {
+    flex: 1;
+  }
 }
 .form-buttons {
   gap: var(--padding);
   margin-top: calc(var(--padding) / 2);
+  justify-content: flex-start;
 }
-.payload-section {
+.bank-select {
+  position: relative;
   width: 100%;
+}
+.bank-control {
+  height: var(--base-component-height);
+  display: flex;
+  align-items: center;
+  padding: var(--padding);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-component);
+  cursor: pointer;
+  background: var(--bg-thirt-color);
   gap: calc(var(--padding) / 2);
-  margin-top: var(--padding);
-  .payload-title {
+
+  &:hover,
+  &.open {
+    border-color: var(--focus-color);
+  }
+
+  .bank-control-short {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .bank-control-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: var(--text-secondary-color);
-    font-size: 12px;
   }
-  .payload-text {
-    width: 100%;
-    padding: var(--padding);
-    box-sizing: border-box;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    background: var(--bg-layer-color);
-    font-family: monospace;
-    font-size: 12px;
-    word-break: break-all;
-    cursor: pointer;
-    user-select: all;
+  .bank-control-placeholder {
+    flex: 1;
+    color: var(--text-secondary-color);
+    opacity: var(--placeholder-opacity);
   }
+}
+.preview-card {
+  flex: 1;
 }
 .qr-preview {
   flex: 1;
@@ -320,13 +511,18 @@ export default {
   justify-content: center;
   overflow: auto;
   padding: var(--padding);
+  min-height: 0;
 }
 .qr-container {
   cursor: pointer;
+  background: #ffffff;
+  padding: var(--padding);
+  border-radius: var(--border-radius-component);
   img {
+    display: block;
     max-width: 100%;
     max-height: 100%;
-    width: 400px;
+    width: 360px;
     height: auto;
   }
 }
@@ -337,15 +533,118 @@ export default {
 }
 .qr-empty {
   color: var(--text-secondary-color);
+  padding: var(--padding-large);
+  text-align: center;
+}
+.payload-section {
+  width: 100%;
+  gap: calc(var(--padding) / 2);
+  padding: var(--padding) calc(var(--padding) * 1.5) calc(var(--padding) * 1.5);
+  box-sizing: border-box;
+  .payload-title {
+    color: var(--text-secondary-color);
+    font-size: 12px;
+  }
+  .payload-text {
+    width: 100%;
+    padding: var(--padding);
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-component);
+    background: var(--bg-thirt-color);
+    font-family: monospace;
+    font-size: 12px;
+    word-break: break-all;
+    cursor: pointer;
+    user-select: all;
+  }
 }
 .credit-line {
-  position: absolute;
-  right: var(--padding);
-  bottom: calc(var(--padding) / 2);
+  padding-top: var(--padding);
   font-size: 11px;
   color: var(--text-secondary-color);
+  text-align: right;
   a {
     color: var(--focus-color);
+  }
+}
+</style>
+<style lang="scss">
+/* Dropdown ngân hàng bị Teleport ra body (TMFlyoutPanel) nên style phải
+   đặt ngoài scoped để áp dụng được */
+.vietqr-bank-flyout {
+  /* Giống .tm-combobox-flyout: bỏ padding mặc định của panel để viền khớp
+     danh sách, giữ nền/viền theo theme */
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-component);
+  background: var(--bg-main-color);
+  .bank-dropdown {
+    display: flex;
+    flex-direction: column;
+    min-width: 100%;
+  }
+  .bank-search {
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    height: var(--base-component-height);
+    padding: 0 var(--padding);
+    background: transparent;
+    color: var(--text-primary-color);
+    font-size: var(--font-size-medium);
+    outline: none;
+
+    &::placeholder {
+      color: var(--text-secondary-color);
+      opacity: var(--placeholder-opacity);
+    }
+  }
+  .bank-list {
+    max-height: 320px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .bank-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: calc(var(--padding) / 2) var(--padding);
+    cursor: pointer;
+
+    &:hover {
+      background: var(--bg-hover-color);
+    }
+    &.selected {
+      background: var(--bg-layer-color);
+    }
+    .bank-item-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--padding);
+    }
+    .bank-item-short {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .bank-item-code {
+      font-size: var(--font-size-small);
+      color: var(--text-secondary-color);
+      white-space: nowrap;
+    }
+    .bank-item-name {
+      font-size: var(--font-size-small);
+      color: var(--text-secondary-color);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+  .bank-empty {
+    padding: var(--padding);
+    color: var(--text-secondary-color);
+    text-align: center;
   }
 }
 </style>

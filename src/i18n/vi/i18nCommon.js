@@ -232,8 +232,13 @@ export default {
       },
     },
     vietQR: {
+      paymentInfo: "Thông tin thanh toán",
+      paymentInfoHint: "Mã QR tự sinh lại sau khi ngừng gõ",
+      previewTitle: "Xem trước mã QR",
       bank: "Ngân hàng",
       bankPlaceholder: "Chọn ngân hàng",
+      bankSearchPlaceholder: "Tìm nhanh theo tên, mã, BIN...",
+      bankNoResult: "Không tìm thấy ngân hàng nào",
       accountNumber: "Số tài khoản",
       accountPlaceholder: "Số tài khoản / số thẻ",
       amount: "Số tiền",
