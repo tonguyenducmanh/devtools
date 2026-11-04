@@ -95,6 +95,13 @@ của **DeanOpen** (giấy phép MIT — `Copyright (c) 2026 MacViewer contribut
 giữ lại tại `src_wasm/ultraviewer/LICENSE-MacViewer`; từng file port đều có header trỏ về nguồn.
 Bảng đối chiếu file-by-file nằm trong [`src_wasm/ultraviewer/README.md`](src_wasm/ultraviewer/README.md).
 
+Tool **"QR chuyển khoản"** (`src/views/tools/TMVietQR.vue`) sinh mã QR thanh toán NAPAS247/EMVCo.
+Logic payload port từ [vietqr-core](https://github.com/Ngochiendev/vietqr-core) của **Ngochiendev**
+(MIT) — hỗ trợ QR tĩnh/động, chuyển đến tài khoản (QRIBFTTA) hoặc thẻ (QRIBFTTC), tự khử dấu
+tiếng Việt nội dung; danh mục 76 ngân hàng lấy từ `banks.json` của cùng repo. Chuỗi QR tĩnh khớp
+bộ test của [vietqr](https://github.com/openhoangnc/vietqr) của **openhoangnc** (MIT). Xem
+`src/common/vietqr/TMVietQR.js` để biết chi tiết nguồn từng phần.
+
 > `src_wasm/pkg/` là **thư mục output** (gitignored, ~58 MB). Clone repo về sẽ **không có** thư mục này — phải chạy `scripts/build_wasm.sh` một lần để build, hoặc dùng luôn bản build có sẵn ở máy bạn. Deploy Cloudflare cũng vì thế phải chạy **thủ công** (build local → `wrangler pages deploy`), không bật Git integration trên Cloudflare Pages.
 
 Build toàn bộ wasm bằng:

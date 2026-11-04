@@ -553,3 +553,7 @@ src_wasm/pkg/
 
 # wrangler (deploy Cloudflare Pages)
 .wrangler/
+
+# Bản copy repo bên thứ ba dùng để tham chiếu (local only)
+/vietqr/
+/vietqr-core-ref/
