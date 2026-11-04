@@ -275,8 +275,13 @@ export default {
       if (val) {
         this.bankSearch = "";
         this.$nextTick(() => {
-          this.$refs.bankSearchInput?.focus();
-          this.scrollSelectedBankToVisible();
+          // TMFlyoutPanel còn visibility:hidden cho tới khi position() chạy
+          // trong nextTick của nó — focus trong lúc đó bị browser bỏ qua,
+          // nên đợi hết microtask (setTimeout) rồi mới focus
+          setTimeout(() => {
+            this.$refs.bankSearchInput?.focus();
+            this.scrollSelectedBankToVisible();
+          }, 0);
         });
       }
     },
