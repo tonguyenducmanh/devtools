@@ -555,3 +555,6 @@ src_wasm/pkg/
 .wrangler/
 /vietqr/
 /vietqr-core-ref/
+
+# Logo ngan hang VietQR — tai local bang: node scripts/download_vietqr_logos.mjs
+src/assets/vietqr/logos/
