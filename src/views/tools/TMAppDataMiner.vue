@@ -29,7 +29,7 @@
         v-model="scriptQuery"
         :enableHighlight="true"
         language="sqlite"
-        :wrapText="false"
+       
         :placeHolder="$t('i18nCommon.AppDataMiner.queryAgentSQl')"
         :label="$t('i18nCommon.AppDataMiner.queryAgentSQl')"
         :monacoOptions="monacoOptions"

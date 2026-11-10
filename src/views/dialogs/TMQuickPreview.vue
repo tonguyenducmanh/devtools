@@ -10,7 +10,7 @@
       <TMTextEditor
         :modelValue="previewValue"
         :readOnly="true"
-        :wrapText="true"
+       
         :enableHighlight="true"
         :language="previewLanguage"
       />

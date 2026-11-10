@@ -8,7 +8,7 @@
             isLabelTop
             :label="$t('i18nCommon.jsonToExcel.inputLabel')"
             :placeHolder="$t('i18nCommon.jsonToExcel.inputPlaceholder')"
-            :wrapText="currentConfigLayout.wrapText"
+           
             :enableHighlight="true"
             language="json"
             height="100%"
@@ -145,12 +145,6 @@
             $tmEnum.ToolSidebarOption.Setting
           "
         >
-          <TMCheckbox
-            :variant="$tmEnum.checkboxType.switch"
-            v-model="currentConfigLayout.wrapText"
-            :label="$t('i18nCommon.apiTesting.wrapText')"
-            @change="updateConfigLayout"
-          ></TMCheckbox>
           <TMCheckbox
             :variant="$tmEnum.checkboxType.switch"
             v-model="currentConfigLayout.enableFileUpload"

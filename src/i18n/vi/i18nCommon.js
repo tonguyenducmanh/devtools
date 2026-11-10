@@ -122,6 +122,7 @@ export default {
       uiVersion: "Phiên bản UI",
       serverVersion: "Phiên bản server",
       helpAgent: "Agent",
+      downloadAgent: "Tải agent",
       helpAgentTooltip:
         "Tải Agent (app desktop gọi API hộ) và kiểm tra kết nối tới Agent",
       helpApp: "Ứng dụng",
@@ -787,6 +788,11 @@ export default {
     },
     TMTextEditor: {
       sortByKey: "JSON sắp xếp theo key",
+      deserializeLabel: "Xem trước",
+      previewTooltip:
+        "Phân tích đệ quy các chuỗi JSON lồng nhau thành object và in đẹp để dễ xem. Editor bị chỉ đọc khi đang xem trước.",
+      wrapTooltip:
+        "Ngắt dòng dài trong editor để nội dung không tràn ra ngoài vùng hiển thị.",
     },
     blanktext: {
       selectLanguage: "Chọn ngôn ngữ",

@@ -9,7 +9,7 @@
         :language="language"
         :placeHolder="''"
         v-model="currentCode"
-        :wrapText="currentConfigLayout.wrapText"
+       
       ></TMTextEditor>
     </div>
 
@@ -75,12 +75,6 @@
             $tmEnum.PostgreSQLTemplateSidebarOption.Setting
           "
         >
-          <TMCheckbox
-            :variant="$tmEnum.checkboxType.switch"
-            v-model="currentConfigLayout.wrapText"
-            :label="$t('i18nCommon.wrapText')"
-            @change="updateConfigLayout"
-          ></TMCheckbox>
           <TMCheckbox
             :variant="$tmEnum.checkboxType.switch"
             v-model="currentConfigLayout.enableHighlight"

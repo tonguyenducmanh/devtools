@@ -1,7 +1,7 @@
 <template>
   <div
     class="tm-textarea"
-    :class="{ 'flex-col': isLabelTop, 'tm-textarea-read-only': readOnly }"
+    :class="{ 'flex-col': isLabelTop, 'tm-textarea-read-only': effectiveReadOnly }"
     :style="styleComputed"
   >
     <div
@@ -34,6 +34,27 @@
               {{ label.capitalize ? label.capitalize() : label }}
             </span>
             <slot name="footer-main" />
+            <span
+              class="tm-monaco-footer__wrap-wrap"
+              v-tooltip="$t('i18nCommon.TMTextEditor.wrapTooltip')"
+            >
+              <TMCheckbox
+                v-model="wrapText"
+                :label="$t('i18nCommon.wrapText')"
+                :no-margin="true"
+              />
+            </span>
+            <span
+              v-if="jsonEditorEnabled"
+              class="tm-monaco-footer__preview-wrap"
+              v-tooltip="$t('i18nCommon.TMTextEditor.previewTooltip')"
+            >
+              <TMCheckbox
+                v-model="jsonDeserialize"
+                :label="$t('i18nCommon.TMTextEditor.deserializeLabel')"
+                :no-margin="true"
+              />
+            </span>
           </span>
           <span class="tm-monaco-footer__group">
             <span class="tm-monaco-footer__language">{{ language }}</span>
@@ -50,7 +71,7 @@
         v-if="!enableHighlight"
         :placeholder="placeHolder || $t('i18nCommon.typeInput')"
         :value="modelValue"
-        :disabled="readOnly"
+        :disabled="effectiveReadOnly"
         :style="borderRadiusStyle"
         @input="changeInputValue"
         @scroll="handleScroll"
@@ -91,6 +112,12 @@ export default {
     // monacoeditor và v-model hoạt động song song với nhau
     this.debounceUpdateEditorVal = _.debounce(this.updateEditorVal, 100);
     this.debounceUpdateValToEditor = _.debounce(this.updateValToEditor, 100);
+    // Đọc tùy chọn wrap text mặc định từ user setting
+    this.$tmUtility.getUserSettings().then(settings => {
+      if (settings && settings.wrapText !== undefined) {
+        this.wrapText = settings.wrapText;
+      }
+    });
   },
   mounted() {
     this.updateHighlight();
@@ -133,6 +160,22 @@ export default {
     },
     inputId() {
       return `tm-text-area-${this.$.uid}`;
+    },
+    /**
+     * Editor có phải là JSON hay không.
+     * Nếu không truyền props isJsonEditor thì tự nhận diện qua language.
+     */
+    jsonEditorEnabled() {
+      if (this.isJsonEditor !== null && this.isJsonEditor !== undefined) {
+        return this.isJsonEditor;
+      }
+      return this.language === "json";
+    },
+    /**
+     * ReadOnly thực tế: khi đang deserialize thì ép readonly dù ban đầu ở edit mode.
+     */
+    effectiveReadOnly() {
+      return this.jsonDeserialize ? true : this.readOnly;
     },
   },
   props: {
@@ -180,9 +223,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    wrapText: {
+    isJsonEditor: {
       type: Boolean,
-      default: true,
+      default: null,
     },
     enableHighlight: {
       type: Boolean,
@@ -203,6 +246,11 @@ export default {
       monacoThemeName: null,
       footerCursorText: "Ln 1, Col 1",
       monacoActionDisposables: [],
+      jsonDeserialize: false,
+      originalReadOnly: false,
+      originalValue: null,
+      isPreviewing: false,
+      wrapText: true,
     };
   },
   watch: {
@@ -224,6 +272,39 @@ export default {
         monaco.editor.setModelLanguage(this.editorModel, value);
         // language đổi dynamic: gỡ action cũ và đăng ký lại action theo language mới
         this.applyMonacoActions();
+      }
+    },
+    jsonDeserialize(value, oldVal) {
+      // Khi bật preview: lưu trạng thái readonly ban đầu + giá trị gốc, rồi in đẹp để xem
+      // Không emit update:modelValue vì đây chỉ là chế độ xem, không đổi dữ liệu gốc.
+      if (value && !oldVal) {
+        this.originalReadOnly = this.readOnly;
+        this.originalValue = this.editor ? this.editor.getValue() : this.modelValue;
+        this.isPreviewing = true;
+        this.deserializeCurrent();
+        if (this.editor) {
+          this.editor.updateOptions({ readOnly: true });
+        }
+      }
+      // Khi tắt preview: khôi phục nội dung gốc vào editor và readonly ban đầu
+      // Không emit update:modelValue vì dữ liệu gốc không đổi.
+      else if (!value && oldVal) {
+        if (
+          this.originalValue !== null &&
+          this.originalValue !== undefined
+        ) {
+          this.isPreviewing = true;
+          if (this.editor) {
+            this.editor.setValue(this.originalValue);
+          }
+          this.originalValue = null;
+          this.isPreviewing = false;
+        }
+        if (this.editor) {
+          this.editor.updateOptions({ readOnly: this.originalReadOnly });
+        }
+        this.originalReadOnly = false;
+        this.isPreviewing = false;
       }
     },
   },
@@ -300,7 +381,7 @@ export default {
           fontSize: 16,
           fontFamily:
             'ui-monospace, "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-          readOnly: me.readOnly,
+          readOnly: me.effectiveReadOnly,
           automaticLayout: true,
           "semanticHighlighting.enabled": true,
           fixedOverflowWidgets: true,
@@ -330,7 +411,12 @@ export default {
 
         // Lắng nghe sự kiện thay đổi nội dung để notify cha biết khi đang gõ
         // (chỉ emit event change, không ghi ngược lại v-model để tránh làm nhảy con trỏ)
+        // Khi đang preview (setValue để in đẹp/khôi phục) thì không emit để tránh
+        // Lan truyền sự kiện Monaco vào lưu history (gây DataCloneError IndexedDB).
         me.editor.onDidChangeModelContent(function () {
+          if (me.isPreviewing) {
+            return;
+          }
           me.$emit("change", me.editor.getValue());
         });
 
@@ -364,6 +450,56 @@ export default {
     updateFooterCursorPosition(position) {
       if (position) {
         this.footerCursorText = `Ln ${position.lineNumber}, Col ${position.column}`;
+      }
+    },
+
+    /**
+     * Đệ quy parse object hiện tại rồi in đẹp lại JSON để mọi object dễ nhìn hơn.
+     * Ngoài parse gốc, hàm còn đệ quy vào các chuỗi con trông như JSON
+     * (vd: trường "data" là string chứa JSON escape) để biến thành object thật,
+     * giúp cấu trúc lồng nhau hiển thị rõ ràng hơn.
+     * Chỉ chạy khi editor là JSON và đang ở chế độ deserialize.
+     */
+    deserializeCurrent() {
+      let me = this;
+      // Lấy giá trị trực tiếp từ editor nếu đã mount (để không bị bỏ lỡ dữ liệu user
+      // vừa nhập nhưng chưa đồng bộ về prop modelValue qua blur/change)
+      let val = me.editor ? me.editor.getValue() : me.modelValue;
+      if (!val || !val.trim()) {
+        return;
+      }
+      try {
+        const parsed = JSON.parse(val);
+        const deepDeserialize = (obj) => {
+          if (Array.isArray(obj)) {
+            return obj.map(deepDeserialize);
+          }
+          if (obj !== null && typeof obj === "object") {
+            const result = {};
+            for (const key of Object.keys(obj)) {
+              result[key] = deepDeserialize(obj[key]);
+            }
+            return result;
+          }
+          if (typeof obj === "string") {
+            const trimmed = obj.trim();
+            if ((trimmed.startsWith("{") || trimmed.startsWith("[")) && trimmed.length > 1) {
+              try {
+                return deepDeserialize(JSON.parse(trimmed));
+              } catch (_) {
+                return obj;
+              }
+            }
+          }
+          return obj;
+        };
+        const deserialized = deepDeserialize(parsed);
+        const formatted = JSON.stringify(deserialized, null, 2);
+        if (formatted !== val && me.editor) {
+          me.editor.setValue(formatted);
+        }
+      } catch (_) {
+        me.$tmToast?.error(me.$t("i18nCommon.toastMessage.error"));
       }
     },
 
@@ -570,6 +706,21 @@ export default {
 
     .tm-monaco-footer__cursor {
       opacity: 0.9;
+    }
+
+    // Tooltip wrapper cho nút preview
+    .tm-monaco-footer__preview-wrap {
+      display: inline-flex;
+      align-items: center;
+      cursor: default;
+    }
+
+    // Tooltip wrapper cho nút wrap text (xuống dòng)
+    .tm-monaco-footer__wrap-wrap {
+      display: inline-flex;
+      align-items: center;
+      cursor: default;
+      margin-right: var(--padding);
     }
   }
 

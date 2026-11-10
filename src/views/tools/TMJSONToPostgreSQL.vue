@@ -13,7 +13,7 @@
             :label="$t('i18nCommon.jsonToPostgreSQL.inputLabel')"
             :placeHolder="$t('i18nCommon.jsonToPostgreSQL.inputPlaceholder')"
             v-model="inputJSON"
-            :wrapText="currentConfigLayout.wrapText"
+           
           ></TMTextEditor>
         </template>
         <template v-else>
@@ -33,7 +33,7 @@
           language="sql"
           :placeHolder="$t('i18nCommon.jsonToPostgreSQL.outputPlaceholder')"
           v-model="outputSQL"
-          :wrapText="currentConfigLayout.wrapText"
+         
         ></TMTextEditor>
       </div>
       <div class="flex">
@@ -114,12 +114,6 @@
             $tmEnum.ToolSidebarOption.Setting
           "
         >
-          <TMCheckbox
-            :variant="$tmEnum.checkboxType.switch"
-            v-model="currentConfigLayout.wrapText"
-            :label="$t('i18nCommon.apiTesting.wrapText')"
-            @change="updateConfigLayout"
-          ></TMCheckbox>
           <TMCheckbox
             :variant="$tmEnum.checkboxType.switch"
             v-model="currentConfigLayout.enableFileUpload"

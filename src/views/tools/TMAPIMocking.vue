@@ -131,7 +131,7 @@
             "
             :isShowHeader="true"
             v-model="headersText"
-            :wrapText="currentConfigLayout.wrapText"
+           
             :enableHighlight="true"
             language="text/plan"
             :placeHolder="$t('i18nCommon.apiTesting.headersPlaceholder')"
@@ -153,7 +153,7 @@
             "
             :isShowHeader="true"
             v-model="bodyText"
-            :wrapText="currentConfigLayout.wrapText"
+           
             :enableHighlight="true"
             language="json"
             :placeHolder="$t('i18nCommon.APIMocking.bodyPlaceholder')"
@@ -196,7 +196,7 @@
             "
             :isShowHeader="true"
             v-model="responseHeadersText"
-            :wrapText="currentConfigLayout.wrapText"
+           
             :enableHighlight="true"
             language="text/plan"
             :placeHolder="
@@ -235,7 +235,7 @@
             "
             :isShowHeader="true"
             v-model="responseText"
-            :wrapText="currentConfigLayout.wrapText"
+           
             :enableHighlight="true"
             language="json"
             :placeHolder="$t('i18nCommon.APIMocking.responsePlaceholder')"
@@ -332,12 +332,6 @@
             $tmEnum.APISidebarOption.Setting
           "
         >
-          <TMCheckbox
-            :variant="$tmEnum.checkboxType.switch"
-            v-model="currentConfigLayout.wrapText"
-            :label="$t('i18nCommon.APIMocking.wrapText')"
-            @change="updateConfigLayout"
-          ></TMCheckbox>
           <TMCheckbox
             :variant="$tmEnum.checkboxType.switch"
             v-model="currentConfigLayout.splitHorizontal"

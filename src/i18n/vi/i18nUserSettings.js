@@ -9,6 +9,7 @@ export default {
       theme: "Chủ đề ứng dụng",
       language: "Ngôn ngữ",
       wrapTab: "Multi tab hiển thị nhiều dòng tab",
+      wrapText: "Mặc định xuống dòng editor",
       sideBarMenuPosition: "Vị trí hiển thị danh sách công cụ",
       cursorTrail: "Hiệu ứng đuôi chuột",
       cursorEffect: "Hiệu ứng chuột",

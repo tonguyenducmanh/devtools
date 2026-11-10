@@ -79,6 +79,14 @@
           ></TMCheckbox>
         </div>
         <div class="flex user-setting-item">
+          <TMCheckbox
+            :variant="$tmEnum.checkboxType.switch"
+            v-model="currentUserSetting.wrapText"
+            :label="$t('i18nUserSettings.settings.wrapText')"
+            :noMargin="true"
+          ></TMCheckbox>
+        </div>
+        <div class="flex user-setting-item">
           <div>{{ $t("i18nUserSettings.settings.sideBarMenuPosition") }}</div>
           <TMComboBox
             :width="200"

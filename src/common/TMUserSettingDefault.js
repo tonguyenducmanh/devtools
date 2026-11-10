@@ -10,6 +10,7 @@ export function getUserSettingDefault() {
     currentLanguage: "vi",
     agentURL: window.__env?.APITesting?.agentServer,
     wrapTab: true,
+    wrapText: true,
     showSideBar: true,
     // danh sách công cụ hiển thị ở sidebar hay ở header
     sideBarMenuPosition: tmEnum.sideBarMenuPosition.Sidebar,

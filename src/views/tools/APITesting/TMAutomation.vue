@@ -82,7 +82,7 @@
               :isLabelTop="true"
               v-model="proModeSecranioCode"
               language="javascript"
-              :wrapText="currentConfigLayout.wrapText"
+             
               :enableHighlight="true"
               :monacoOptions="proModeMonacoOptions"
               :placeHolder="$t('i18nCommon.apiTesting.scriptExecute')"
@@ -177,12 +177,6 @@
             $tmEnum.APISidebarOption.Setting
           "
         >
-          <TMCheckbox
-            :variant="$tmEnum.checkboxType.switch"
-            v-model="currentConfigLayout.wrapText"
-            :label="$t('i18nCommon.apiTesting.wrapText')"
-            @change="updateConfigLayout"
-          ></TMCheckbox>
           <TMCheckbox
             :variant="$tmEnum.checkboxType.switch"
             v-model="currentConfigLayout.showReponse"

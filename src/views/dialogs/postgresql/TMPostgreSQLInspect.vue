@@ -180,7 +180,7 @@
               v-model="ddlContent"
               language="pgsql"
               :enableHighlight="true"
-              :wrapText="true"
+             
               :isLabelTop="false"
               :readOnly="true"
               :monacoOptions="ddlMonacoOptions"

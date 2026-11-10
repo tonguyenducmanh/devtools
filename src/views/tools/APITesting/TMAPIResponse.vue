@@ -12,7 +12,7 @@
       :placeHolder="$t('i18nCommon.apiTesting.responsePlaceholder')"
       :label="$t('i18nCommon.APIMocking.response')"
       :readOnly="true"
-      :wrapText="currentConfigLayout.wrapText"
+     
     >
       <template v-slot:header-main>
         <TMAPIPanelSwitcher
@@ -41,7 +41,7 @@
       :placeHolder="$t('i18nCommon.apiTesting.responseHeadersPlaceholder')"
       :label="$t('i18nCommon.APIMocking.response')"
       :readOnly="true"
-      :wrapText="currentConfigLayout.wrapText"
+     
     >
       <template v-slot:header-main>
         <TMAPIPanelSwitcher

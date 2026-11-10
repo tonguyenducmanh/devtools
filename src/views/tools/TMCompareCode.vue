@@ -10,11 +10,6 @@
           @selected="compare"
           :isDropTop="true"
         />
-        <TMCheckbox
-          v-model="currentConfigLayout.wrapText"
-          :label="$t('i18nCommon.apiTesting.wrapText')"
-          @change="updateLayout"
-        ></TMCheckbox>
         <TMButton
           @click="applyMock"
           :type="$tmEnum.buttonType.secondary"

@@ -18,7 +18,7 @@
           language="json"
           :placeHolder="$t('i18nCommon.excelToJSON.outputPlaceholder')"
           v-model="outputJSON"
-          :wrapText="currentConfigLayout.wrapText"
+         
         />
       </div>
       <div class="flex flex-wrap">
@@ -75,12 +75,6 @@
             $tmEnum.ToolSidebarOption.Setting
           "
         >
-          <TMCheckbox
-            :variant="$tmEnum.checkboxType.switch"
-            v-model="currentConfigLayout.wrapText"
-            :label="$t('i18nCommon.apiTesting.wrapText')"
-            @change="updateConfigLayout"
-          />
           <TMCheckbox
             :variant="$tmEnum.checkboxType.switch"
             v-model="currentConfigLayout.splitHorizontal"

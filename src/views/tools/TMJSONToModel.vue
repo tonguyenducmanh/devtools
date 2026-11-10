@@ -12,7 +12,7 @@
           :label="$t('i18nCommon.JSONToModel.inputLabel')"
           :placeHolder="$t('i18nCommon.JSONToModel.inputPlaceholder')"
           v-model="inputJSON"
-          :wrapText="currentConfigLayout.wrapText"
+         
         ></TMTextEditor>
         <TMTextEditor
           isLabelTop
@@ -22,7 +22,7 @@
           :language="outputHighlightLanguage"
           :placeHolder="$t('i18nCommon.JSONToModel.outputPlaceholder')"
           v-model="outputModel"
-          :wrapText="currentConfigLayout.wrapText"
+         
         ></TMTextEditor>
       </div>
       <div class="flex">
@@ -175,12 +175,6 @@
               @change="handleGeneratorOptionChange"
             ></TMCheckbox>
           </template>
-          <TMCheckbox
-            :variant="$tmEnum.checkboxType.switch"
-            v-model="currentConfigLayout.wrapText"
-            :label="$t('i18nCommon.apiTesting.wrapText')"
-            @change="updateConfigLayout"
-          ></TMCheckbox>
           <TMCheckbox
             :variant="$tmEnum.checkboxType.switch"
             v-model="currentConfigLayout.splitHorizontal"

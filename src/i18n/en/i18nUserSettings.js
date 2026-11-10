@@ -9,6 +9,7 @@ export default {
       theme: "Theme app",
       language: "Language",
       wrapTab: "Multi line tab in Multi tab mode",
+      wrapText: "Default wrap text in editor",
       sideBarMenuPosition: "Tool list position",
       cursorTrail: "Cursor trail effect",
       cursorEffect: "Cursor effect",

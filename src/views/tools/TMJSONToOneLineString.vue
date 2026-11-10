@@ -12,7 +12,7 @@
           :label="$t('i18nCommon.JSONToOneLineString.inputLabel')"
           :placeHolder="$t('i18nCommon.JSONToOneLineString.inputPlaceholder')"
           v-model="inputJSON"
-          :wrapText="currentConfigLayout.wrapText"
+         
         ></TMTextEditor>
         <TMTextEditor
           isLabelTop
@@ -22,7 +22,7 @@
           :language="outputHighlightLanguage"
           :placeHolder="$t('i18nCommon.JSONToOneLineString.outputPlaceholder')"
           v-model="outputString"
-          :wrapText="currentConfigLayout.wrapText"
+         
         ></TMTextEditor>
       </div>
       <div class="flex">
@@ -99,12 +99,6 @@
               @selected="convertToOneLine"
             ></TMComboBox>
           </div>
-          <TMCheckbox
-            :variant="$tmEnum.checkboxType.switch"
-            v-model="currentConfigLayout.wrapText"
-            :label="$t('i18nCommon.apiTesting.wrapText')"
-            @change="updateConfigLayout"
-          ></TMCheckbox>
           <TMCheckbox
             :variant="$tmEnum.checkboxType.switch"
             v-model="currentConfigLayout.splitHorizontal"

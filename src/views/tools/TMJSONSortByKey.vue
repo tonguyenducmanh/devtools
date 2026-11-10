@@ -9,7 +9,7 @@
           :label="$t('i18nCommon.JSONSortByKey.inputLabel')"
           :placeHolder="$t('i18nCommon.JSONSortByKey.inputPlaceholder')"
           v-model="inputJSON"
-          :wrapText="currentConfigLayout.wrapText"
+         
         ></TMTextEditor>
       </div>
       <div class="flex">
@@ -72,12 +72,6 @@
             $tmEnum.ToolSidebarOption.Setting
           "
         >
-          <TMCheckbox
-            :variant="$tmEnum.checkboxType.switch"
-            v-model="currentConfigLayout.wrapText"
-            :label="$t('i18nCommon.apiTesting.wrapText')"
-            @change="updateConfigLayout"
-          ></TMCheckbox>
         </div>
       </template>
     </TMSubSidebar>

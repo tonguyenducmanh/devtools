@@ -9,7 +9,7 @@
           width="100%"
           :enableHighlight="currentConfigLayout.enableHighlight"
           :language="currentConfigLayout.language"
-          :wrapText="currentConfigLayout.wrapText"
+         
           :monacoOptions="monacoOptions"
           @change="handleEditorChange"
         ></TMTextEditor>
@@ -36,14 +36,6 @@
           :type="$tmEnum.buttonType.secondary"
           :label="$t('i18nCommon.blanktext.download')"
         ></TMButton>
-        <div>
-          <TMCheckbox
-            v-model="currentConfigLayout.wrapText"
-            @change="updateConfigLayout"
-            :label="$t('i18nCommon.wrapText')"
-            :variant="$tmEnum.checkboxType.switch"
-          ></TMCheckbox>
-        </div>
       </div>
     </div>
     <TMSubSidebar

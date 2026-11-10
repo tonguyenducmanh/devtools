@@ -28,7 +28,7 @@
       <!-- editor SQL Monaco (chiếm phần trên, có thể kéo resize) -->
       <div class="flex flex-one tm-pg-query-editor" :style="editorSectionSizeStyle">
         <TMTextEditor ref="sqlEditor" v-model="sqlText" language="pgsql" :enableHighlight="true"
-          :wrapText="currentConfigLayout.wrapText" :placeHolder="$t('i18nCommon.postgreSQLQuery.sqlEditorPlaceholder')"
+          :placeHolder="$t('i18nCommon.postgreSQLQuery.sqlEditorPlaceholder')"
           :label="$t('i18nCommon.postgreSQLQuery.sqlEditorLabel')" :isLabelTop="true" height="100%" width="100%"
           :monacoOptions="monacoOptions" @keydown.ctrl.enter.prevent="handleRunQuery"
           @keydown.meta.enter.prevent="handleRunQuery" :showCursorTextFooter="true">
@@ -116,8 +116,6 @@
         <div class="tm-sidebar-content" v-show="currentConfigLayout.currentSidebarOption ===
           $tmEnum.PostgreSQLQuerySidebarOption.Setting
           ">
-          <TMCheckbox :variant="$tmEnum.checkboxType.switch" v-model="currentConfigLayout.wrapText"
-            :label="$t('i18nCommon.APIMocking.wrapText')" @change="updateConfigLayout" />
           <TMCheckbox :variant="$tmEnum.checkboxType.switch" v-model="currentConfigLayout.autoSaveQueryAfterExec"
             :label="$t('i18nCommon.postgreSQLQuery.autoSaveQueryAfterExec')" @change="updateConfigLayout" />
           <TMCheckbox :variant="$tmEnum.checkboxType.switch" v-model="currentConfigLayout.loadFunctionIntellisense"

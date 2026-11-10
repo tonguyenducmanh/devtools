@@ -121,6 +121,7 @@ export default {
       uiVersion: "UI version",
       serverVersion: "Server version",
       helpAgent: "Agent",
+      downloadAgent: "Download Agent",
       helpAgentTooltip:
         "Download the Agent (desktop app that calls APIs for you) and check the connection to it",
       helpApp: "App",
@@ -791,6 +792,11 @@ export default {
     },
     TMTextEditor: {
       sortByKey: "Sort JSON by key",
+      deserializeLabel: "Preview",
+      previewTooltip:
+        "Recursively parse nested JSON strings into objects and pretty-print for easier viewing. Editor becomes read-only while previewing.",
+      wrapTooltip:
+        "Wrap long lines inside the editor so content does not extend beyond the visible area.",
     },
     blanktext: {
       selectLanguage: "Select language",
