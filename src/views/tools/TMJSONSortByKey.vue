@@ -83,7 +83,7 @@ import TMSubSidebar from "@/components/TMSubSidebar.vue";
 import TMToolBase from "@/views/tools/base/TMToolBase.vue";
 import TMJSONSortByKeyHelp from "@/views/helps/TMJSONSortByKeyHelp.vue";
 import TMHistorySidebar from "@/components/TMHistorySidebar.vue";
-import { sortObjectByKey } from "@/monarch/TMMonacoActionConfig.js";
+import { sortObjectByKey } from "@/monarch/json/TMJSONUtils.js";
 
 export default {
   extends: TMToolBase,

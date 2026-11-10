@@ -791,10 +791,11 @@ export default {
       example: "Example",
     },
     TMTextEditor: {
-      sortByKey: "Sort JSON by key",
-      deserializeLabel: "Preview",
-      previewTooltip:
-        "Recursively parse nested JSON strings into objects and pretty-print for easier viewing. Editor becomes read-only while previewing.",
+      sortByKey: "JSON sort by key",
+      deserializeAction: "JSON deserialize (recursive)",
+      preview: "Preview",
+      jsonPreviewTooltip:
+        "Toggle read-only preview: nested JSON strings are recursively parsed into objects and pretty-printed for easier reading.",
       wrapTooltip:
         "Wrap long lines inside the editor so content does not extend beyond the visible area.",
     },

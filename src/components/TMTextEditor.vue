@@ -45,14 +45,14 @@
               />
             </span>
             <span
-              v-if="jsonEditorEnabled"
-              class="tm-monaco-footer__preview-wrap"
-              v-tooltip="$t('i18nCommon.TMTextEditor.previewTooltip')"
+              v-if="languageFeature?.footerControls"
+              class="tm-monaco-footer__language-controls"
             >
-              <TMCheckbox
-                v-model="jsonDeserialize"
-                :label="$t('i18nCommon.TMTextEditor.deserializeLabel')"
-                :no-margin="true"
+              <!-- Footer riêng của ngôn ngữ được inject từ registry -->
+              <component
+                :is="languageFeature.footerControls"
+                :preview-active="isPreviewing"
+                @update:preview-active="setPreviewActive"
               />
             </span>
           </span>
@@ -94,11 +94,10 @@
 <script>
 import TMStylePremitiveMixin from "@/mixins/TMStylePremitiveMixin.js";
 import * as monaco from "monaco-editor";
-import {
-  registerAllMonacoThemes,
-  getMonacoSyntaxRules,
-} from "@/monarch/TMMonacoTheme.js";
+import { registerAllMonacoThemes } from "@/monarch/TMMonacoTheme.js";
 import { getMonacoActionsByLanguage } from "@/monarch/TMMonacoActionConfig.js";
+import { resolveLanguageFeature } from "@/monarch/TMLanguageFeatureRegistry.js";
+import { TM_DEFAULT_MONACO_LANGUAGE } from "@/monarch/TMMonacoConstants.js";
 import _ from "@/common/TMCommonFunction.js";
 import eventBus from "@/common/event/TMEventBus.js";
 import { TMEnumEventBus } from "@/common/event/TMEnumEventBus.js";
@@ -162,20 +161,17 @@ export default {
       return `tm-text-area-${this.$.uid}`;
     },
     /**
-     * Editor có phải là JSON hay không.
-     * Nếu không truyền props isJsonEditor thì tự nhận diện qua language.
+     * Feature của ngôn ngữ hiện tại do registry cung cấp.
+     * TMTextEditor không hardcode bất kỳ language id nào.
      */
-    jsonEditorEnabled() {
-      if (this.isJsonEditor !== null && this.isJsonEditor !== undefined) {
-        return this.isJsonEditor;
-      }
-      return this.language === "json";
+    languageFeature() {
+      return resolveLanguageFeature(this.language);
     },
     /**
-     * ReadOnly thực tế: khi đang deserialize thì ép readonly dù ban đầu ở edit mode.
+     * ReadOnly thực tế: khi đang xem trước thì luôn là readonly.
      */
     effectiveReadOnly() {
-      return this.jsonDeserialize ? true : this.readOnly;
+      return this.isPreviewing ? true : this.readOnly;
     },
   },
   props: {
@@ -223,17 +219,13 @@ export default {
       type: Boolean,
       default: false,
     },
-    isJsonEditor: {
-      type: Boolean,
-      default: null,
-    },
     enableHighlight: {
       type: Boolean,
       default: false,
     },
     language: {
       type: String,
-      default: "javascript",
+      default: TM_DEFAULT_MONACO_LANGUAGE,
     },
     monacoOptions: {
       type: Object,
@@ -246,10 +238,10 @@ export default {
       monacoThemeName: null,
       footerCursorText: "Ln 1, Col 1",
       monacoActionDisposables: [],
-      jsonDeserialize: false,
-      originalReadOnly: false,
-      originalValue: null,
       isPreviewing: false,
+      previewOriginalValue: null,
+      previewOriginalReadOnly: false,
+      isProgrammaticChange: false,
       wrapText: true,
     };
   },
@@ -269,42 +261,13 @@ export default {
     },
     language(value, oldVal) {
       if (this.editor && value && oldVal && value != oldVal) {
+        // Đổi ngôn ngữ khi đang xem trước: thoát preview trước để trả lại nội dung gốc
+        if (this.isPreviewing) {
+          this.exitPreview();
+        }
         monaco.editor.setModelLanguage(this.editorModel, value);
         // language đổi dynamic: gỡ action cũ và đăng ký lại action theo language mới
         this.applyMonacoActions();
-      }
-    },
-    jsonDeserialize(value, oldVal) {
-      // Khi bật preview: lưu trạng thái readonly ban đầu + giá trị gốc, rồi in đẹp để xem
-      // Không emit update:modelValue vì đây chỉ là chế độ xem, không đổi dữ liệu gốc.
-      if (value && !oldVal) {
-        this.originalReadOnly = this.readOnly;
-        this.originalValue = this.editor ? this.editor.getValue() : this.modelValue;
-        this.isPreviewing = true;
-        this.deserializeCurrent();
-        if (this.editor) {
-          this.editor.updateOptions({ readOnly: true });
-        }
-      }
-      // Khi tắt preview: khôi phục nội dung gốc vào editor và readonly ban đầu
-      // Không emit update:modelValue vì dữ liệu gốc không đổi.
-      else if (!value && oldVal) {
-        if (
-          this.originalValue !== null &&
-          this.originalValue !== undefined
-        ) {
-          this.isPreviewing = true;
-          if (this.editor) {
-            this.editor.setValue(this.originalValue);
-          }
-          this.originalValue = null;
-          this.isPreviewing = false;
-        }
-        if (this.editor) {
-          this.editor.updateOptions({ readOnly: this.originalReadOnly });
-        }
-        this.originalReadOnly = false;
-        this.isPreviewing = false;
       }
     },
   },
@@ -339,18 +302,6 @@ export default {
       let me = this;
       let editorVal = me.modelValue;
       return editorVal;
-    },
-
-    /**
-     * Lấy ra rule theme custom theo 1 số loại ngôn ngữ
-     */
-    getRuleThemeMonacoEditorByLanguage() {
-      let me = this;
-      let rules = [];
-      if (me.language === "pgsql" && me.monacoThemeName) {
-        rules = getMonacoSyntaxRules(me.monacoThemeName);
-      }
-      return rules;
     },
 
     /**
@@ -411,10 +362,10 @@ export default {
 
         // Lắng nghe sự kiện thay đổi nội dung để notify cha biết khi đang gõ
         // (chỉ emit event change, không ghi ngược lại v-model để tránh làm nhảy con trỏ)
-        // Khi đang preview (setValue để in đẹp/khôi phục) thì không emit để tránh
+        // Khi thay đổi nội dung bằng code (preview/in đẹp) thì không emit để tránh
         // Lan truyền sự kiện Monaco vào lưu history (gây DataCloneError IndexedDB).
         me.editor.onDidChangeModelContent(function () {
-          if (me.isPreviewing) {
+          if (me.isProgrammaticChange) {
             return;
           }
           me.$emit("change", me.editor.getValue());
@@ -429,11 +380,20 @@ export default {
       }
     },
     updateEditorVal() {
-      if (this.editor) {
-        const newVal = this.modelValue ? this.modelValue : "";
-        if (this.editor.getValue() !== newVal) {
-          this.editor.setValue(newVal);
+      if (!this.editor) {
+        return;
+      }
+      const newVal = this.modelValue ? this.modelValue : "";
+      if (this.isPreviewing) {
+        // modelValue không đổi (preview không emit) -> giữ nguyên bản xem trước.
+        // Nếu bên ngoài thay đổi dữ liệu thật -> thoát preview để hiển thị dữ liệu mới.
+        if ((this.previewOriginalValue ?? "") === newVal) {
+          return;
         }
+        this.exitPreview({ restore: false });
+      }
+      if (this.editor.getValue() !== newVal) {
+        this.setEditorValue(newVal);
       }
     },
     updateValToEditor() {
@@ -442,6 +402,10 @@ export default {
 
     updateValueFromEditor(fromEditor = false) {
       let me = this;
+      // Đang xem trước: nội dung trong editor là bản preview, không ghi vào v-model
+      if (me.isPreviewing) {
+        return;
+      }
       if (me.editor) {
         let editorVal = me.editor.getValue();
         me.$emit("update:modelValue", editorVal);
@@ -454,53 +418,163 @@ export default {
     },
 
     /**
-     * Đệ quy parse object hiện tại rồi in đẹp lại JSON để mọi object dễ nhìn hơn.
-     * Ngoài parse gốc, hàm còn đệ quy vào các chuỗi con trông như JSON
-     * (vd: trường "data" là string chứa JSON escape) để biến thành object thật,
-     * giúp cấu trúc lồng nhau hiển thị rõ ràng hơn.
-     * Chỉ chạy khi editor là JSON và đang ở chế độ deserialize.
+     * Lấy nội dung "gốc" của editor (bỏ qua nội dung preview đang hiển thị).
+     * Dùng cho các action cần thao tác trên dữ liệu thật của người dùng.
      */
-    deserializeCurrent() {
-      let me = this;
-      // Lấy giá trị trực tiếp từ editor nếu đã mount (để không bị bỏ lỡ dữ liệu user
-      // vừa nhập nhưng chưa đồng bộ về prop modelValue qua blur/change)
-      let val = me.editor ? me.editor.getValue() : me.modelValue;
-      if (!val || !val.trim()) {
+    getSourceValue() {
+      if (this.isPreviewing) {
+        return this.previewOriginalValue ?? "";
+      }
+      if (this.editor) {
+        return this.editor.getValue();
+      }
+      return this.modelValue ?? "";
+    },
+
+    /**
+     * Ghi nội dung vào editor bằng code.
+     * Cờ isProgrammaticChange chặn emit "change" để không đẩy dữ liệu
+     * preview/in đẹp vào lịch sử của tool.
+     */
+    setEditorValue(text) {
+      if (!this.editor) {
         return;
       }
+      this.isProgrammaticChange = true;
       try {
-        const parsed = JSON.parse(val);
-        const deepDeserialize = (obj) => {
-          if (Array.isArray(obj)) {
-            return obj.map(deepDeserialize);
-          }
-          if (obj !== null && typeof obj === "object") {
-            const result = {};
-            for (const key of Object.keys(obj)) {
-              result[key] = deepDeserialize(obj[key]);
-            }
-            return result;
-          }
-          if (typeof obj === "string") {
-            const trimmed = obj.trim();
-            if ((trimmed.startsWith("{") || trimmed.startsWith("[")) && trimmed.length > 1) {
-              try {
-                return deepDeserialize(JSON.parse(trimmed));
-              } catch (_) {
-                return obj;
-              }
-            }
-          }
-          return obj;
-        };
-        const deserialized = deepDeserialize(parsed);
-        const formatted = JSON.stringify(deserialized, null, 2);
-        if (formatted !== val && me.editor) {
-          me.editor.setValue(formatted);
-        }
-      } catch (_) {
-        me.$tmToast?.error(me.$t("i18nCommon.toastMessage.error"));
+        this.editor.setValue(text);
+      } finally {
+        this.isProgrammaticChange = false;
       }
+    },
+
+    /**
+     * Bật/tắt chế độ xem trước theo trạng thái checkbox ở footer.
+     * Hàm biến đổi nội dung lấy từ language feature nên component này
+     * không biết gì về JSON hay bất kỳ ngôn ngữ cụ thể nào.
+     * @param {boolean} active
+     */
+    setPreviewActive(active) {
+      if (active) {
+        this.enterPreview();
+      } else {
+        this.exitPreview();
+      }
+    },
+
+    /**
+     * Đảo trạng thái xem trước (dùng cho phím tắt hoặc action khác nếu cần).
+     */
+    togglePreview() {
+      this.setPreviewActive(!this.isPreviewing);
+    },
+
+    /**
+     * Bật xem trước: hiển thị nội dung đã biến đổi ở chế độ chỉ-đọc,
+     * giữ nguyên dữ liệu gốc để khôi phục khi tắt.
+     */
+    enterPreview() {
+      const previewTransform = this.languageFeature?.preview?.transform;
+      if (!this.editor || typeof previewTransform !== "function") {
+        return;
+      }
+
+      const source = this.editor.getValue();
+      // Nội dung rỗng thì không có gì để xem trước
+      if (!source || !source.trim()) {
+        return;
+      }
+      let previewText;
+      try {
+        previewText = previewTransform(source);
+      } catch (error) {
+        this.notifyError(error);
+        return;
+      }
+
+      this.previewOriginalValue = source;
+      this.previewOriginalReadOnly = this.readOnly;
+      this.isPreviewing = true;
+      this.setEditorValue(previewText);
+      this.editor.updateOptions({ readOnly: true });
+    },
+
+    /**
+     * Tắt xem trước: khôi phục nội dung gốc và trạng thái readonly ban đầu.
+     * Không emit update:modelValue vì dữ liệu gốc không thay đổi.
+     * @param {Object} options - { restore: boolean }
+     */
+    exitPreview({ restore = true } = {}) {
+      if (!this.isPreviewing) {
+        return;
+      }
+      const originalValue = this.previewOriginalValue;
+      const originalReadOnly = this.previewOriginalReadOnly;
+
+      this.isPreviewing = false;
+      this.previewOriginalValue = null;
+      this.previewOriginalReadOnly = false;
+
+      if (this.editor) {
+        if (restore && originalValue !== null && originalValue !== undefined) {
+          this.setEditorValue(originalValue);
+        }
+        this.editor.updateOptions({ readOnly: originalReadOnly });
+      }
+    },
+
+    /**
+     * Ghi đè toàn bộ nội dung editor rồi emit v-model.
+     * Giữ undo stack bằng executeEdits (setValue sẽ reset undo).
+     * Tự động thoát preview trước khi ghi để action luôn chạy trên dữ liệu gốc.
+     */
+    applyEditorText(text) {
+      if (typeof text !== "string") {
+        return;
+      }
+      this.exitPreview();
+
+      if (this.editor) {
+        const model = this.editor.getModel();
+        if (model) {
+          this.editor.pushUndoStop();
+          this.editor.executeEdits("tm-editor-apply-text", [
+            {
+              range: model.getFullModelRange(),
+              text,
+              forceMoveMarkers: true,
+            },
+          ]);
+          this.editor.pushUndoStop();
+        } else {
+          this.setEditorValue(text);
+        }
+      }
+      this.$emit("update:modelValue", text);
+      this.notifySuccess();
+    },
+
+    notifySuccess() {
+      this.$tmToast?.success(this.$t("i18nCommon.toastMessage.success"));
+    },
+
+    notifyError() {
+      this.$tmToast?.error(this.$t("i18nCommon.toastMessage.error"));
+    },
+
+    /**
+     * API cho language feature thao tác với editor mà không cần biết
+     * component này được implement như thế nào.
+     */
+    createEditorApi() {
+      return {
+        getSourceValue: () => this.getSourceValue(),
+        applyText: (text) => this.applyEditorText(text),
+        exitPreview: () => this.exitPreview(),
+        isPreviewing: () => this.isPreviewing,
+        notifySuccess: () => this.notifySuccess(),
+        notifyError: () => this.notifyError(),
+      };
     },
 
     /**
@@ -528,13 +602,10 @@ export default {
       if (!me.editor) return;
 
       const actions = getMonacoActionsByLanguage(me.language, {
-        onSuccess: (sortedText) => {
-          me.$emit("update:modelValue", sortedText);
-          me.$tmToast?.success(me.$t("i18nCommon.toastMessage.success"));
-        },
-        onError: () => {
-          me.$tmToast?.error(me.$t("i18nCommon.toastMessage.error"));
-        },
+        t: (key) => me.$t(key),
+        editorApi: me.createEditorApi(),
+        onSuccess: (text) => me.applyEditorText(text),
+        onError: () => me.notifyError(),
       });
       me.monacoActionDisposables = actions.map((action) => {
         const descriptor = { ...action, label: me.$t(action.labelKey) };
@@ -558,7 +629,12 @@ export default {
           } catch (_) {}
           me._footerWidget = null;
         }
-        me.updateValueFromEditor();
+        if (me.isPreviewing) {
+          // Đang preview thì không được emit nội dung preview vào v-model
+          me.exitPreview();
+        } else {
+          me.updateValueFromEditor();
+        }
         me.editor.dispose();
       }
       // Gỡ editor mount el
@@ -567,6 +643,9 @@ export default {
       }
       me.editor = null;
       me.editorModel = null;
+      me.isPreviewing = false;
+      me.previewOriginalValue = null;
+      me.previewOriginalReadOnly = false;
     },
   },
 };
@@ -708,10 +787,11 @@ export default {
       opacity: 0.9;
     }
 
-    // Tooltip wrapper cho nút preview
-    .tm-monaco-footer__preview-wrap {
+    // Wrapper cho footer controls do language feature inject vào
+    .tm-monaco-footer__language-controls {
       display: inline-flex;
       align-items: center;
+      gap: var(--padding);
       cursor: default;
     }
 

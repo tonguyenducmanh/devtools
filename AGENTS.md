@@ -30,6 +30,8 @@ src/                            Frontend Vue 3 SPA (Vite 8 / rolldown)
                                 automation/ (window.__tmAPI), cache/ (mã hoá AES-GCM), proto/, mock/, plugin/,
                                 worker/ (TMWorkerPool — pool Web Worker dùng chung), qrcode/ (TMQRCodeWorker + client)
   components/                   ~29 component TM*.vue dùng chung
+  monarch/                      Language feature cho editor: TMLanguageFeatureRegistry.js + json/, pgsql/,
+                                sqlite/, apiTesting/; logic ngôn ngữ KHÔNG nằm trong TMTextEditor (Luật 19)
   mixins/                       TMLayoutConfigMixin, TMCollectionMixin, TMDotNetWasmMixin, ...
   views/tools/                  Các tool (extends base/TMToolBase.vue); APITesting/, PostgreSQLQuery/, codeTemplateTools/
   views/helps/                  Help component tương ứng từng tool
@@ -92,6 +94,11 @@ wrangler.jsonc                  Cloudflare Pages config (project `devtools`, out
     - Khi chuyển đường sang direct, **bộ đệm khung hình phải reset** (kênh mới có chuỗi số khung riêng).
     - Đối chiếu vector mã hoá bằng `openssl enc -aes-256-cbc` (xem `bl_ultraviewer_direct_test.go`) để chắc chắn khớp client gốc.
 18. **Ưu tiên `let` thay vì `const`.** Khi khai báo biến trong JS/Vue, hãy dùng `let` làm mặc định; chỉ dùng `const` khi giá trị thực sự không bao giờ được gán lại sau khi khởi tạo. Tránh khai báo `const` cho biến sau đó phải gán lại hoặc biến có thể thay đổi.
+19. **Component dùng chung không được chứa logic đặc thù.** `TMTextEditor` và mọi component dùng chung khác chỉ được biết **hợp đồng generic**; logic riêng của từng ngôn ngữ/tool phải nằm trong module riêng và được **inject** vào (registry + dynamic component + slot). Đây là luật chống nợ kỹ thuật, áp dụng cho cả editor lẫn toàn app:
+    - **Editor — chuẩn bắt buộc:** logic riêng của ngôn ngữ đặt dưới `src/monarch/<language>/` và đăng ký tại `src/monarch/TMLanguageFeatureRegistry.js` (`languages`, `footerControls`, `getActions`, `preview.transform`). Tham chiếu mẫu: `src/monarch/json/` (`TMJSONUtils.js`, `TMJSONActions.js`, `TMJSONFooterControls.vue`, `index.js`). Hàm biến đổi dữ liệu phải là hàm thuần, tách khỏi Vue/Monaco.
+    - **Cấm trong `TMTextEditor.vue`:** `if (language === "json"/"pgsql"/...)`, điều kiện theo tên tool, state/label/menu/checkbox riêng của một ngôn ngữ. Thêm ngôn ngữ mới = thêm feature module + đăng ký, **không sửa `TMTextEditor`**.
+    - **Toàn app:** component chung (`src/components/`), mixin, store, worker, common util **không** được biết nghiệp vụ của một tool cụ thể. Logic riêng đặt ở `views/tools/<Tool>/`, module `src/common/<domain>/`, adapter/registry hoặc qua slot/props do tool truyền vào; backend bám mẫu `TMDLBase`/`TMBLBase`/`TMCollection`.
+    - **Điều kiện review (bắt buộc):** `grep` component dùng chung không thấy literal tên ngôn ngữ/tool; thêm một ngôn ngữ/tool mới không phải sửa file dùng chung; phần xử lý dữ liệu test được độc lập. Không đạt → refactor trước khi merge, **không** thêm `if` tạm hay copy-paste để "chạy được đã".
 
 ## 4. Chọn việc làm
 
@@ -137,6 +144,7 @@ cd src_wasm/ultraviewer && cargo build --target wasm32-unknown-unknown --lib
   2. **File worker có thật trong `dist/`**: `ls dist/assets/ | grep -i worker` → file phải có prefix `tjs-` + version (Luật 13, naming).
   3. **Chạy thật trong browser**: bundle worker là file IIFE/ESM tự đăng ký listener `message`, nên load nó vào trang test rồi post message trực tiếp là smoke-test nhanh nhất — đây là cách bắt được lỗi `DataCloneError` và lỗi DOM API mà Node không lộ (Node thiếu `OffscreenCanvas`/`createImageBitmap` thật).
   4. **Đo main thread còn phản hồi**: bọc tác vụ bằng `setInterval(ticks++, 16)` rồi đếm tick trong lúc chờ. Nếu tick ≈ 0 → main thread đang block (tức là tác vụ chạy sai chỗ).
+- **Maintainability (Luật 19):** trước khi kết thúc, `grep` các file dùng chung vừa sửa xem có literal tên ngôn ngữ/tool hoặc `if` đặc thù không; nếu có, chuyển logic sang feature module/registry hoặc inject qua slot/component.
 - Commit nhỏ, rõ ràng, 1 ý/commit. Cập nhật `README.md` / `docs/` nếu hành vi hoặc bước build thay đổi.
 - Không commit các file artifact nêu trong Luật 12.
 

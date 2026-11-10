@@ -788,9 +788,10 @@ export default {
     },
     TMTextEditor: {
       sortByKey: "JSON sắp xếp theo key",
-      deserializeLabel: "Xem trước",
-      previewTooltip:
-        "Phân tích đệ quy các chuỗi JSON lồng nhau thành object và in đẹp để dễ xem. Editor bị chỉ đọc khi đang xem trước.",
+      deserializeAction: "JSON deserialize đệ quy",
+      preview: "Xem trước",
+      jsonPreviewTooltip:
+        "Bật/tắt xem trước ở chế độ chỉ đọc: các chuỗi JSON lồng nhau được phân tích đệ quy thành object và in đẹp để dễ đọc.",
       wrapTooltip:
         "Ngắt dòng dài trong editor để nội dung không tràn ra ngoài vùng hiển thị.",
     },
