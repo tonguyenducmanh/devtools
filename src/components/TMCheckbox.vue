@@ -155,12 +155,12 @@ export default {
     justify-content: space-between;
     width: 100%;
     align-items: center;
+    gap: var(--padding);
 
     &.tm-switch-layout {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: var(--padding);
     }
   }
 
