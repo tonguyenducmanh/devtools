@@ -280,34 +280,26 @@
           <!-- danh sách file đã nạp: nhóm theo file, hiển thị sheet/view con -->
           <div class="tm-duckdb-file-list">
             <div
+              class="tm-duckdb-file-group"
               v-for="group in groupedFiles"
               :key="group.file_id"
-              class="tm-duckdb-file-group"
             >
-              <!-- Header file -->
-              <div class="tm-duckdb-file-group-header">
-                <div class="tm-duckdb-file-group-name">
-                  {{ group.file_name }}
-                </div>
-                <div class="tm-duckdb-file-group-count">
-                  {{ group.sheets.length }} {{ group.sheets.length === 1 ? $t("i18nCommon.duckDBQuery.sheet") : $t("i18nCommon.duckDBQuery.sheets") }}
-                </div>
-              </div>
-              
-              <!-- Các sheet/view trong file -->
+              <!-- Header file: tên file + nút xoá (xoá toàn bộ file) -->
               <div
-                v-for="sheet in group.sheets"
-                :key="sheet.table_name"
-                class="tm-duckdb-file-item tm-duckdb-sheet-item"
-                v-tooltip="getSheetTooltip(sheet)"
+                class="tm-duckdb-file-group-header"
+                v-tooltip="group.file_name"
               >
-                <div class="tm-duckdb-file-item-info">
-                  <div class="text-nowrap tm-duckdb-sheet-name">
-                    {{ sheet.table_name }}
+                <div>
+                  <div class="tm-duckdb-file-group-name">
+                    {{ group.file_name }}
                   </div>
-                  <div class="tm-duckdb-file-rows">
-                    {{ formatRowCount(sheet.row_count) }}
-                    {{ $t("i18nCommon.duckDBQuery.rowCount") }}
+                  <div class="tm-duckdb-file-group-count">
+                    {{ group.sheets.length }}
+                    {{
+                      group.sheets.length === 1
+                        ? $t("i18nCommon.duckDBQuery.sheet")
+                        : $t("i18nCommon.duckDBQuery.sheets")
+                    }}
                   </div>
                 </div>
                 <TMButton
@@ -319,6 +311,24 @@
                   v-tooltip="$t('i18nCommon.duckDBQuery.dropFile')"
                   @click.stop="handleDropFile(group)"
                 />
+              </div>
+
+              <!-- Các sheet/view trong file -->
+              <div
+                v-for="sheet in group.sheets"
+                :key="sheet.table_name"
+                class="tm-duckdb-file-item"
+                v-tooltip="getSheetTooltip(sheet)"
+              >
+                <div class="tm-duckdb-file-item-info">
+                  <div class="text-nowrap tm-duckdb-sheet-name">
+                    {{ sheet.table_name }}
+                  </div>
+                  <div class="tm-duckdb-file-rows">
+                    {{ formatRowCount(sheet.row_count) }}
+                    {{ $t("i18nCommon.duckDBQuery.rowCount") }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -871,7 +881,8 @@ export default {
           for (const info of infos) {
             // Thêm vào danh sách hoặc cập nhật nếu trùng file_id + table_name
             let existingIdx = me.loadedFiles.findIndex(
-              (f) => f.file_id === info.file_id && f.table_name === info.table_name,
+              (f) =>
+                f.file_id === info.file_id && f.table_name === info.table_name,
             );
             if (existingIdx >= 0) {
               me.loadedFiles[existingIdx] = info;
@@ -1286,15 +1297,15 @@ export default {
 }
 
 .tm-duckdb-file-list {
+  flex: 1;
+  width: 100%;
+  gap: var(--padding);
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  gap: var(--padding-medium);
-  flex: 1;
-  min-height: 0;
+  overflow-y: auto;
   margin-top: var(--padding);
   padding: 0 var(--padding-medium) var(--padding-medium) 0;
-  overflow-y: auto;
 
   .tm-duckdb-file-list-header {
     flex-shrink: 0;
@@ -1318,94 +1329,33 @@ export default {
       border-radius: var(--border-radius);
       font-size: 11px;
       line-height: 1;
-      color: var(--text-tertiary-color);
     }
   }
 }
-
-.tm-duckdb-file-item {
-  display: flex;
-  align-items: center;
-  gap: var(--padding);
-  flex-shrink: 0;
-  padding: calc(var(--padding) * 0.75) var(--padding);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-component);
-  transition:
-    border-color 0.2s ease,
-    background-color 0.2s ease;
-
-  &:hover {
-    border-color: var(--focus-color);
-    cursor: pointer;
-  }
-
-  .tm-duckdb-file-item-info {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    flex: 1;
-    min-width: 0;
-  }
-
-  .tm-duckdb-file-name {
-    font-size: var(--font-size-medium-rare);
-    font-weight: 600;
-    line-height: 1.35;
-  }
-
-  .tm-duckdb-file-table {
-    display: flex;
-    min-width: 0;
-
-    .tm-table-badge {
-      max-width: 100%;
-      padding: 1px calc(var(--padding) / 2);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius-component);
-      background-color: var(--bg-main-color);
-      font-size: var(--font-size-small);
-      line-height: 1.4;
-    }
-  }
-
-  .tm-duckdb-file-rows {
-    font-size: var(--font-size-small);
-    line-height: 1.4;
-  }
-}
-
-// nút xoá: mờ nhẹ cho đỡ nặng mắt, hover sáng lên và icon chuyển đỏ
-.tm-duckdb-file-delete {
-  flex-shrink: 0;
-  opacity: 0.2;
-  transition: opacity 0.2s ease;
-
-  &:hover,
-  &:focus {
-    opacity: 1;
-  }
-}
-
-/* ── Grouped file list (file -> sheets) ── */
 .tm-duckdb-file-group {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--padding) / 2);
-  width: 100%;
 }
-
+/* File group header (file level) */
 .tm-duckdb-file-group-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(var(--padding) * 0.5) var(--padding);
+  gap: var(--padding);
+  margin-bottom: var(--padding);
+  padding: var(--padding);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-component);
   background-color: var(--bg-main-color);
   cursor: default;
+  width: 100%;
+  box-sizing: border-box;
 
   .tm-duckdb-file-group-name {
+    display: block;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-size: var(--font-size-medium-rare);
     font-weight: 600;
     line-height: 1.35;
@@ -1422,22 +1372,57 @@ export default {
     border-radius: var(--border-radius);
     font-size: var(--font-size-small);
     line-height: 1;
-    color: var(--text-tertiary-color);
+    flex-shrink: 0;
   }
 }
 
-/* Sheet items indented under group */
-.tm-duckdb-sheet-item {
-  padding-left: calc(var(--padding) * 2);
-  border-left: 2px solid var(--border-color);
-  margin-left: calc(var(--padding) / 2);
-}
+/* Sheet items (child of file group) */
+.tm-duckdb-file-item {
+  display: flex;
+  align-items: center;
+  gap: var(--padding);
+  flex-shrink: 0;
+  padding: var(--padding);
+  border-left: 1px solid var(--border-color);
+  background-color: transparent;
+  transition:
+    border-left-color 0.2s ease,
+    background-color 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
 
-.tm-duckdb-sheet-name {
-  font-size: var(--font-size-medium-rare);
-  font-weight: 500;
-  line-height: 1.35;
-  color: var(--text-secondary-color);
+  &:hover {
+    border-left-color: var(--focus-color);
+    background-color: var(--focus-color);
+    color: var(--selected-item-text-color);
+  }
+
+  .tm-duckdb-file-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .tm-duckdb-sheet-name {
+    display: block;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--font-size-medium-rare);
+    font-weight: 500;
+    line-height: 1.35;
+  }
+
+  .tm-duckdb-file-rows {
+    font-size: var(--font-size-small);
+    line-height: 1.4;
+    flex-shrink: 0;
+  }
 }
 
 .tm-duckdb-no-files {

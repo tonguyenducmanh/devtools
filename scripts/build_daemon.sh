@@ -58,12 +58,16 @@ fi
 case "$NATIVE_OS-$NATIVE_ARCH" in
   darwin-arm64)
     cp "$NATIVE_OUT" "$OUTPUT_DIR/$OUTPUT_NAME-mac-arm-$VERSION"
+    # Xoá bản native gốc sau khi đã copy, chỉ giữ tên release-friendly
+    rm -f "$NATIVE_OUT"
     ;;
   linux-amd64)
     cp "$NATIVE_OUT" "$OUTPUT_DIR/$OUTPUT_NAME-linux-$VERSION"
+    rm -f "$NATIVE_OUT"
     ;;
   windows-amd64)
     cp "$NATIVE_OUT" "$OUTPUT_DIR/$OUTPUT_NAME-window-$VERSION.exe"
+    rm -f "$NATIVE_OUT"
     ;;
 esac
 
