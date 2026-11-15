@@ -28,17 +28,50 @@ rm -rf "$OUTPUT_DIR"
 echo "Đang build Go daemon..."
 cd "$DAEMON_DIR"
 
-echo "Building for Mac Apple Silicon..."
-GOOS=darwin GOARCH=arm64  \
-go build -ldflags "$LDFLAGS" -o "$OUTPUT_DIR/$OUTPUT_NAME-mac-arm-$VERSION" .
+# Xác định platform hiện tại (native) để build bắt buộc; các platform còn lại
+# cố gắng cross-compile nhưng bỏ qua nếu thất bại (libduckdb chỉ có binary
+#預-build cho platform gốc, không cross-compile được qua CGO).
+NATIVE_OS=$(go env GOOS)
+NATIVE_ARCH=$(go env GOARCH)
 
-echo "Building for Linux..."
-GOOS=linux GOARCH=amd64  \
-go build -ldflags "$LDFLAGS" -o "$OUTPUT_DIR/$OUTPUT_NAME-linux-$VERSION" .
+build_one() {
+  tm_os="$1"; tm_arch="$2"; tm_out="$3"
+  echo "Building for ${tm_os}/${tm_arch}..."
+  if GOOS="$tm_os" GOARCH="$tm_arch" \
+     go build -ldflags "$LDFLAGS" -o "$tm_out" .; then
+    echo "  OK -> $tm_out"
+    return 0
+  else
+    echo "  CẢNH BÁO: build ${tm_os}/${tm_arch} thất bại (bỏ qua, cần build trên máy ${tm_os})"
+    return 1
+  fi
+}
 
-echo "Building for Windows..."
-GOOS=windows GOARCH=amd64  \
-go build -ldflags "$LDFLAGS" -o "$OUTPUT_DIR/$OUTPUT_NAME-window-$VERSION.exe" .
+# Build native platform (bắt buộc)
+NATIVE_OUT="$OUTPUT_DIR/$OUTPUT_NAME-${NATIVE_OS}-${NATIVE_ARCH}-$VERSION"
+if ! build_one "$NATIVE_OS" "$NATIVE_ARCH" "$NATIVE_OUT"; then
+  echo "LỖI: build native platform ${NATIVE_OS}/${NATIVE_ARCH} thất bại."
+  exit 1
+fi
+
+# Copy/rename native binary thành tên mac-arm (tương thích tên file release cũ)
+case "$NATIVE_OS-$NATIVE_ARCH" in
+  darwin-arm64)
+    cp "$NATIVE_OUT" "$OUTPUT_DIR/$OUTPUT_NAME-mac-arm-$VERSION"
+    ;;
+  linux-amd64)
+    cp "$NATIVE_OUT" "$OUTPUT_DIR/$OUTPUT_NAME-linux-$VERSION"
+    ;;
+  windows-amd64)
+    cp "$NATIVE_OUT" "$OUTPUT_DIR/$OUTPUT_NAME-window-$VERSION.exe"
+    ;;
+esac
+
+# Thử cross-compile các platform còn lại (bỏ qua nếu lỗi)
+# Chỉ build các platform có embed file CLI tương ứng (không bao gồm darwin-amd64)
+build_one linux amd64 "$OUTPUT_DIR/$OUTPUT_NAME-linux-$VERSION" || true
+build_one windows amd64 "$OUTPUT_DIR/$OUTPUT_NAME-window-$VERSION.exe" || true
+build_one darwin arm64 "$OUTPUT_DIR/$OUTPUT_NAME-mac-arm-$VERSION" || true
 
 # Nén binary rồi xoá bản thô, để out/ chỉ còn đúng những gì upload release.
 #

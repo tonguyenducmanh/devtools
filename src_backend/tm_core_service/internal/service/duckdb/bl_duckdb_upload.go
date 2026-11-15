@@ -56,13 +56,13 @@ func UploadDuckDBFileHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Kiểm tra định dạng được hỗ trợ
 	supportedExts := map[string]bool{
-		".xlsx": true, ".xls": true,
+		".xlsx": true, ".xls": true, ".ods": true,
 		".csv": true, ".tsv": true,
 		".parquet": true,
 		".json": true, ".ndjson": true, ".jsonl": true,
 	}
 	if !supportedExts[ext] {
-		writeJSON(w, false, fmt.Sprintf("Định dạng file '%s' không được hỗ trợ. Hỗ trợ: xlsx, xls, csv, parquet, json", ext), nil)
+		writeJSON(w, false, fmt.Sprintf("Định dạng file '%s' không được hỗ trợ. Hỗ trợ: xlsx, xls, ods, csv, parquet, json", ext), nil)
 		return
 	}
 

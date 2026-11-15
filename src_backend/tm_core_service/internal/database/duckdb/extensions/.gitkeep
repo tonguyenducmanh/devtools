@@ -1,0 +1,3 @@
+# Thư mục này chứa các file DuckDB community extension (.duckdb_extension)
+# tải qua scripts/fetch_duckdb_extensions.sh. Thư mục KHÔNG được commit
+# (xem .gitignore), file này chỉ giữ cho folder tồn tại để go:embed build không lỗi.

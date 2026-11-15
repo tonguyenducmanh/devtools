@@ -666,18 +666,19 @@ export default {
         step1:
           "1. Mở tab 'Files' ở sidebar bên phải, nhấn 'Upload file' và chọn file Excel/CSV/Parquet/JSON.",
         step2:
-          "2. File được nạp và tự động tạo bảng DuckDB với tên từ tên file (ví dụ: sales.xlsx → SELECT * FROM sales).",
+          "2. File được nạp và tự động tạo bảng DuckDB với tên từ tên file (ví dụ: sales.xlsx → SELECT * FROM sales). File Excel/ODS có nhiều sheet sẽ tạo nhiều bảng, tên bảng = tên file + '_' + tên sheet.",
         step3:
           "3. Viết câu SQL vào editor, nhấn nút Run (hoặc Ctrl/Cmd + Enter) để thực hiện query.",
         step4:
           "4. Kết quả hiển thị bên dưới dưới dạng bảng. Có thể copy hoặc tải về dạng JSON.",
         step5:
-          "5. Có thể upload nhiều file và join chúng lại bằng SQL bình thường.",
+          "5. Có thể upload nhiều file và join chúng lại bằng SQL bình thường. Sidebar hiển thị nhóm theo file, click xem chi tiết từng sheet/bảng.",
       },
       features: {
         title: "Tính năng nổi bật",
         noServer: "✓ Không cần server: DuckDB chạy in-memory, không cài đặt gì thêm.",
         excelSupport: "✓ Hỗ trợ Excel (.xlsx, .xls), CSV, Parquet, JSON.",
+        multiSheet: "✓ Excel/ODS nhiều sheet → tự tạo nhiều bảng, tên unique (tự thêm _1, _2 nếu trùng).",
         multiTable: "✓ Upload nhiều file, mỗi file là 1 bảng, có thể JOIN thoải mái.",
         formatCode: "✓ Tự động định dạng SQL.",
         savedScripts: "✓ Lưu và tải lại các câu query đã dùng.",

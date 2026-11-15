@@ -677,18 +677,19 @@ export default {
         step1:
           "1. Open the 'Files' tab in the right sidebar, click 'Upload file', and select an Excel/CSV/Parquet/JSON file.",
         step2:
-          "2. The file is loaded and a DuckDB table is created automatically using the file name (e.g. sales.xlsx → SELECT * FROM sales).",
+          "2. The file is loaded and a DuckDB table is created automatically using the file name (e.g. sales.xlsx → SELECT * FROM sales). Multi-sheet Excel/ODS files create multiple tables: filename_sheetname.",
         step3:
           "3. Write your SQL in the editor and press Run (or Ctrl/Cmd + Enter).",
         step4:
           "4. Results are shown below as a table. You can copy or download them as JSON.",
         step5:
-          "5. Upload multiple files and JOIN them together using standard SQL.",
+          "5. Upload multiple files and JOIN them together using standard SQL. Sidebar groups by file, click to see individual sheets/tables.",
       },
       features: {
         title: "Key features",
         noServer: "✓ No server needed: DuckDB runs in-memory, nothing to install.",
         excelSupport: "✓ Supports Excel (.xlsx, .xls), CSV, Parquet, JSON.",
+        multiSheet: "✓ Multi-sheet Excel/ODS → auto creates multiple tables, unique names (auto _1, _2 if duplicate).",
         multiTable: "✓ Upload multiple files, each becomes a table — JOIN freely.",
         formatCode: "✓ Automatic SQL formatting.",
         savedScripts: "✓ Save and reload frequently used queries.",

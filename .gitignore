@@ -553,3 +553,14 @@ src_wasm/pkg/
 
 # wrangler (deploy Cloudflare Pages)
 .wrangler/
+
+# DuckDB community extensions (rusty_sheet, excel, v.v.) — tải local qua
+# scripts/fetch_duckdb_extensions.sh, KHÔNG commit file binary (giống src_wasm/pkg/).
+# Giữ folder và .gitkeep để go:embed build không lỗi khi clone repo.
+src_backend/tm_core_service/internal/database/duckdb/extensions/*.duckdb_extension
+
+# DuckDB CLI binary — tải local qua scripts/fetch_duckdb_cli.sh, KHÔNG commit
+# file binary (giống src_wasm/pkg/). Giữ folder và .gitkeep để go:embed build
+# không lỗi khi clone repo.
+src_backend/tm_core_service/internal/database/duckdb/cli/duckdb-*
+src_backend/tm_core_service/internal/database/duckdb/cli/duckdb-*.exe

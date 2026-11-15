@@ -277,34 +277,49 @@
             </div>
           </div>
 
-          <!-- danh sách file đã nạp: tên file / tên bảng / số dòng / nút xoá -->
+          <!-- danh sách file đã nạp: nhóm theo file, hiển thị sheet/view con -->
           <div class="tm-duckdb-file-list">
             <div
-              v-for="file in loadedFiles"
-              :key="file.file_id"
-              class="tm-duckdb-file-item"
-              v-tooltip="getFileTooltip(file)"
+              v-for="group in groupedFiles"
+              :key="group.file_id"
+              class="tm-duckdb-file-group"
             >
-              <div class="tm-duckdb-file-item-info">
-                <div
-                  class="text-nowrap tm-duckdb-file-name"
-                >
-                  {{ file.file_name }}
+              <!-- Header file -->
+              <div class="tm-duckdb-file-group-header">
+                <div class="tm-duckdb-file-group-name">
+                  {{ group.file_name }}
                 </div>
-                <div class="tm-duckdb-file-rows">
-                  {{ formatRowCount(file.row_count) }}
-                  {{ $t("i18nCommon.duckDBQuery.rowCount") }}
+                <div class="tm-duckdb-file-group-count">
+                  {{ group.sheets.length }} {{ group.sheets.length === 1 ? $t("i18nCommon.duckDBQuery.sheet") : $t("i18nCommon.duckDBQuery.sheets") }}
                 </div>
               </div>
-              <TMButton
-                class="tm-duckdb-file-delete"
-                :noMargin="true"
-                :isSmallButton="true"
-                :type="$tmEnum.buttonType.secondary"
-                iconClass="tm-close-icon"
-                v-tooltip="$t('i18nCommon.duckDBQuery.dropFile')"
-                @click.stop="handleDropFile(file)"
-              />
+              
+              <!-- Các sheet/view trong file -->
+              <div
+                v-for="sheet in group.sheets"
+                :key="sheet.table_name"
+                class="tm-duckdb-file-item tm-duckdb-sheet-item"
+                v-tooltip="getSheetTooltip(sheet)"
+              >
+                <div class="tm-duckdb-file-item-info">
+                  <div class="text-nowrap tm-duckdb-sheet-name">
+                    {{ sheet.table_name }}
+                  </div>
+                  <div class="tm-duckdb-file-rows">
+                    {{ formatRowCount(sheet.row_count) }}
+                    {{ $t("i18nCommon.duckDBQuery.rowCount") }}
+                  </div>
+                </div>
+                <TMButton
+                  class="tm-duckdb-file-delete"
+                  :noMargin="true"
+                  :isSmallButton="true"
+                  :type="$tmEnum.buttonType.secondary"
+                  iconClass="tm-close-icon"
+                  v-tooltip="$t('i18nCommon.duckDBQuery.dropFile')"
+                  @click.stop="handleDropFile(group)"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -506,6 +521,25 @@ export default {
      */
     currentMenuItems() {
       return this.menuConfig[this.activeKeyFlyOut] ?? [];
+    },
+
+    /**
+     * Nhóm loadedFiles theo file_id để hiển thị: 1 file = 1 group, các sheet/view là children
+     */
+    groupedFiles() {
+      const groups = {};
+      for (const file of this.loadedFiles) {
+        if (!groups[file.file_id]) {
+          groups[file.file_id] = {
+            file_id: file.file_id,
+            file_name: file.file_name,
+            sheets: [],
+          };
+        }
+        groups[file.file_id].sheets.push(file);
+      }
+      // Chuyển object thành array, sort theo thứ tự upload
+      return Object.values(groups);
     },
 
     hasMultipleResultStatement() {
@@ -814,6 +848,7 @@ export default {
       let supportedExts = [
         ".xlsx",
         ".xls",
+        ".ods",
         ".csv",
         ".tsv",
         ".parquet",
@@ -882,7 +917,20 @@ export default {
     },
 
     /**
+     * Tooltip cho từng sheet/view (hiển thị trong group)
+     */
+    getSheetTooltip(sheet) {
+      if (!sheet) return "";
+      return [
+        `${this.$t("i18nCommon.duckDBQuery.fileName")}: ${sheet.file_name || "-"}`,
+        `${this.$t("i18nCommon.duckDBQuery.fileTableName")}: ${sheet.table_name || "-"}`,
+        `${this.$t("i18nCommon.duckDBQuery.totalRows")}: ${this.formatRowCount(sheet.row_count)} ${this.$t("i18nCommon.duckDBQuery.rowCount")}`,
+      ].join("\n");
+    },
+
+    /**
      * Xoá file/view khỏi session DuckDB
+     * Xoá toàn bộ file (tất cả sheet/view của file đó)
      */
     async handleDropFile(file) {
       let me = this;
@@ -1337,6 +1385,59 @@ export default {
   &:focus {
     opacity: 1;
   }
+}
+
+/* ── Grouped file list (file -> sheets) ── */
+.tm-duckdb-file-group {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--padding) / 2);
+  width: 100%;
+}
+
+.tm-duckdb-file-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--padding) * 0.5) var(--padding);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-component);
+  background-color: var(--bg-main-color);
+  cursor: default;
+
+  .tm-duckdb-file-group-name {
+    font-size: var(--font-size-medium-rare);
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .tm-duckdb-file-group-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 6px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-small);
+    line-height: 1;
+    color: var(--text-tertiary-color);
+  }
+}
+
+/* Sheet items indented under group */
+.tm-duckdb-sheet-item {
+  padding-left: calc(var(--padding) * 2);
+  border-left: 2px solid var(--border-color);
+  margin-left: calc(var(--padding) / 2);
+}
+
+.tm-duckdb-sheet-name {
+  font-size: var(--font-size-medium-rare);
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text-secondary-color);
 }
 
 .tm-duckdb-no-files {
