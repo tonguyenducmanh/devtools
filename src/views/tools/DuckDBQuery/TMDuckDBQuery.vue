@@ -283,7 +283,6 @@
               v-for="file in loadedFiles"
               :key="file.file_id"
               class="tm-duckdb-file-item"
-              @click="copyTableName(file.table_name)"
               v-tooltip="getFileTooltip(file)"
             >
               <div class="tm-duckdb-file-item-info">
@@ -842,14 +841,6 @@ export default {
         `${this.$t("i18nCommon.duckDBQuery.fileTableName")}: ${file.table_name || "-"}`,
         `${this.$t("i18nCommon.duckDBQuery.totalRows")}: ${this.formatRowCount(file.row_count)} ${this.$t("i18nCommon.duckDBQuery.rowCount")}`,
       ].join("\n");
-    },
-
-    /**
-     * Copy tên bảng của file đã upload vào clipboard
-     */
-    copyTableName(tableName) {
-      if (!tableName) return;
-      this.$tmUtility.copyToClipboard(tableName);
     },
 
     /**
