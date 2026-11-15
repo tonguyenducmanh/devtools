@@ -831,22 +831,28 @@ export default {
       try {
         let resp = await me.agentAPI.uploadFile(me.currentSessionId, file);
         if (resp?.data?.success) {
-          let info = resp.data.data;
-          // Thêm vào danh sách hoặc cập nhật nếu trùng file_id
-          let existingIdx = me.loadedFiles.findIndex(
-            (f) => f.file_id === info.file_id,
-          );
-          if (existingIdx >= 0) {
-            me.loadedFiles[existingIdx] = info;
-          } else {
-            me.loadedFiles.push(info);
+          let infos = resp.data.data;
+          if (!Array.isArray(infos)) infos = [infos];
+          for (const info of infos) {
+            // Thêm vào danh sách hoặc cập nhật nếu trùng file_id + table_name
+            let existingIdx = me.loadedFiles.findIndex(
+              (f) => f.file_id === info.file_id && f.table_name === info.table_name,
+            );
+            if (existingIdx >= 0) {
+              me.loadedFiles[existingIdx] = info;
+            } else {
+              me.loadedFiles.push(info);
+            }
           }
           me.$tmToast.success(
             me.$t("i18nCommon.duckDBQuery.uploadFileSuccess"),
           );
-          // Tự động suggest query mẫu
-          if (!me.sqlText?.trim()) {
-            me.sqlText = `SELECT * FROM ${info.table_name} LIMIT 100;`;
+          // Tự động suggest query mẫu từ tất cả bảng đã tải, ngăn cách bởi ;
+          if (!me.sqlText?.trim() && infos.length > 0) {
+            const queries = infos.map(
+              (info) => `SELECT * FROM "${info.table_name}" LIMIT 100`,
+            );
+            me.sqlText = queries.join("; ") + ";";
           }
         } else {
           me.$tmToast.error(

@@ -276,6 +276,15 @@ export default {
         // Lazy-load Monaco Editor (chỉ import khi cần)
         const monaco = await import("monaco-editor");
 
+        // ── Helper nháy kép identifier nếu chứa ký tự đặc biệt ──────────────────
+        // DuckDB: identifier chỉ được chứa [a-zA-Z0-9_], bắt đầu bằng chữ cái/_.
+        // Tên có dấu cách/ký tự đặc biệt/bắt đầu bằng số phải bọc bằng "...".
+        const quoteIdentifier = (name) => {
+          const n = String(name);
+          if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(n)) return n;
+          return '"' + n.replace(/"/g, '""') + '"';
+        };
+
         // Đăng ký language + Monarch + semantic provider + cập nhật dữ liệu
         registerDuckdbLanguage();
         updateDuckdbIntellisenseData(data);
@@ -339,7 +348,7 @@ export default {
             const colDef = {
               label: String(col),
               kind: monaco.languages.CompletionItemKind.Field,
-              insertText: String(col),
+              insertText: quoteIdentifier(col),
               detail: `${tbl}.${col} (${dtype})`,
             };
 
@@ -522,8 +531,8 @@ export default {
                       kind: monaco.languages.CompletionItemKind.Module,
                       filterText: `${prefix}.${tbl}`,
                       insertText: alias
-                        ? `${prefix}.${tbl} ${alias} `
-                        : `${prefix}.${tbl}`,
+                        ? `${prefix}.${quoteIdentifier(tbl)} ${alias} `
+                        : `${prefix}.${quoteIdentifier(tbl)}`,
                       detail: `Table (${prefix})`,
                     });
                   });
@@ -569,7 +578,9 @@ export default {
                   suggestions.push({
                     label: tbl,
                     kind: monaco.languages.CompletionItemKind.Module,
-                    insertText: alias ? `${tbl} ${alias} ` : tbl,
+                    insertText: alias
+                      ? `${quoteIdentifier(tbl)} ${alias} `
+                      : quoteIdentifier(tbl),
                     detail: "Table",
                   });
                 });

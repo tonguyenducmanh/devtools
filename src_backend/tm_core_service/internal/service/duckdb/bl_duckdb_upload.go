@@ -103,22 +103,25 @@ func UploadDuckDBFileHandler(w http.ResponseWriter, r *http.Request) {
 	dst.Close()
 
 	// Nạp file vào DuckDB session
-	columns, rowCount, err := duckdb.LoadFile(sessionID, tmpPath, tableName, fileID, origName)
+	results, err := duckdb.LoadFile(sessionID, tmpPath, tableName, fileID, origName)
 	if err != nil {
 		os.Remove(tmpPath)
 		writeJSON(w, false, "Lỗi nạp file vào DuckDB: "+err.Error(), nil)
 		return
 	}
 
-	info := model.TMDuckDBFileInfo{
-		TableName: tableName,
-		FileName:  origName,
-		Columns:   columns,
-		RowCount:  rowCount,
-		FileID:    fileID,
+	infos := make([]model.TMDuckDBFileInfo, 0, len(results))
+	for _, r := range results {
+		infos = append(infos, model.TMDuckDBFileInfo{
+			TableName: r.TableName,
+			FileName:  origName,
+			Columns:   r.Columns,
+			RowCount:  r.RowCount,
+			FileID:    fileID,
+		})
 	}
 
-	writeJSON(w, true, "", info)
+	writeJSON(w, true, "", infos)
 }
 
 // DropDuckDBFileHandler xoá 1 file/view khỏi session DuckDB.
