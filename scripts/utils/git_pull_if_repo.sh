@@ -11,8 +11,21 @@
 # - Pull/checkout thất bại KHÔNG làm dừng build, chỉ cảnh báo rồi tiếp tục.
 #
 # Cách dùng:
-#   . "$(dirname "$0")/../../scripts/git_pull_if_repo.sh"
+#   . "$(dirname "$0")/../../scripts/utils/git_pull_if_repo.sh"
 #   tm_git_pull_if_repo "$EXTERNAL_DIR"
+
+# Tìm thư mục root của project (chứa package.json)
+tm_find_project_root() {
+    tm_dir="$(cd "$(dirname "$1")" 2>/dev/null && pwd)"
+    while [ "$tm_dir" != "/" ] && [ "$tm_dir" != "." ]; do
+        if [ -f "$tm_dir/package.json" ]; then
+            echo "$tm_dir"
+            return 0
+        fi
+        tm_dir="$(dirname "$tm_dir")"
+    done
+    return 1
+}
 
 tm_git_pull_if_repo() {
     tm_dir="$1"
