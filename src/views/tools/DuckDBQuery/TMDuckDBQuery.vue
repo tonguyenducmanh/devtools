@@ -257,10 +257,7 @@
               margin: var(--padding);
             "
           >
-            <div
-              class="flex tm-duckdb-file-list-header"
-              v-if="loadedFiles.length > 0"
-            >
+            <div class="flex tm-duckdb-file-list-header">
               <span class="tm-duckdb-file-list-title">{{
                 $t("i18nCommon.duckDBQuery.uploadedFiles")
               }}</span>
@@ -291,7 +288,7 @@
           </div>
 
           <!-- danh sách file đã nạp: tên file / tên bảng / số dòng / nút xoá -->
-          <div class="tm-duckdb-file-list" v-if="loadedFiles.length > 0">
+          <div class="tm-duckdb-file-list">
             <div
               v-for="file in loadedFiles"
               :key="file.file_id"
@@ -320,16 +317,6 @@
                 @click.stop="handleDropFile(file)"
               />
             </div>
-          </div>
-
-          <!-- empty state khi chưa có file -->
-          <div class="tm-duckdb-no-files" v-else-if="!isUploading">
-            <span class="tm-duckdb-no-files-title">{{
-              $t("i18nCommon.duckDBQuery.noFilesLoaded")
-            }}</span>
-            <span class="tm-duckdb-no-files-desc">{{
-              $t("i18nCommon.duckDBQuery.noFilesLoadedDesc")
-            }}</span>
           </div>
         </div>
 
