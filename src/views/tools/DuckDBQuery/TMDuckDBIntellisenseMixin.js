@@ -277,11 +277,13 @@ export default {
         const monaco = await import("monaco-editor");
 
         // ── Helper nháy kép identifier nếu chứa ký tự đặc biệt ──────────────────
-        // DuckDB: identifier chỉ được chứa [a-zA-Z0-9_], bắt đầu bằng chữ cái/_.
-        // Tên có dấu cách/ký tự đặc biệt/bắt đầu bằng số phải bọc bằng "...".
+        // DuckDB: identifier được phép chứa Unicode letters, số, _, bắt đầu bằng chữ cái/_.
+        // Tên có dấu cách/ký tự đặc biệt khác/bắt đầu bằng số phải bọc bằng "...".
         const quoteIdentifier = (name) => {
           const n = String(name);
-          if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(n)) return n;
+          // Cho phép Unicode letters (Lu, Ll, Lt, Lm, Lo, Nd, Nl, No, Pc, Mn, Mc)
+          // \p{L} = bất kỳ chữ cái Unicode nào, \p{N} = số, \p{Pc} = underscore
+          if (/^[\p{L}_][\p{L}\p{N}_]*$/u.test(n)) return n;
           return '"' + n.replace(/"/g, '""') + '"';
         };
 
@@ -424,8 +426,12 @@ export default {
               const text = model.getValue();
               const aliasMap = new Map();
 
+              // Regex hỗ trợ cả identifier thường và quoted identifier ("..." hoặc `...`)
+              // Group 1: table/schema (có thể là quoted)
+              // Group 2: table nếu có schema (có thể là quoted)
+              // Group 3: alias (có thể là quoted)
               const regex =
-                /(?:from|join)\s+([a-zA-Z0-9_]+)(?:\.([a-zA-Z0-9_]+))?(?:\s+as)?\s+([a-zA-Z0-9_]+)?/gi;
+                /(?:from|join)\s+(?:"([^"]+)"|`([^`]+)`|([a-zA-Z0-9_]+))(?:\.(?:"([^"]+)"|`([^`]+)`|([a-zA-Z0-9_]+)))?(?:\s+as)?\s+(?:"([^"]+)"|`([^`]+)`|([a-zA-Z0-9_]+))?/gi;
               let match;
               const sqlKeywords = [
                 "where", "join", "on", "left", "right", "inner", "outer",
@@ -434,9 +440,12 @@ export default {
               ];
 
               while ((match = regex.exec(text)) !== null) {
-                let schemaOrTable = match[1];
-                let tableIfSchema = match[2];
-                let aliasOrTable = match[3];
+                // match[1] = double-quoted table, match[2] = backtick table, match[3] = unquoted table
+                // match[4] = double-quoted schema.table, match[5] = backtick schema.table, match[6] = unquoted schema.table
+                // match[7] = double-quoted alias, match[8] = backtick alias, match[9] = unquoted alias
+                let schemaOrTable = match[1] || match[2] || match[3] || "";
+                let tableIfSchema = match[4] || match[5] || match[6] || "";
+                let aliasOrTable = match[7] || match[8] || match[9] || "";
 
                 let schema = "";
                 let table = "";
@@ -467,15 +476,16 @@ export default {
               );
 
               const dotMatch = textBeforePointer.match(
-                /([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]*)$/,
+                /(?:"([^"]+)"|`([^`]+)`|([\p{L}\p{N}_]+))\.\s*([\p{L}\p{N}_]*)$/u,
               );
 
               let suggestions = [];
 
               // ── TRƯỜNG HỢP 1: CÓ DẤU CHẤP (context: "prefix.") ──────────────
               if (dotMatch) {
-                const prefix = dotMatch[1].toLowerCase();
-                const typedWord = dotMatch[2];
+                // dotMatch groups: [1]=double-quoted, [2]=backtick, [3]=unquoted, [4]=typed word
+                const prefix = (dotMatch[1] || dotMatch[2] || dotMatch[3] || "").toLowerCase();
+                const typedWord = dotMatch[4] || "";
 
                 const totalOffset = prefix.length + 1 + typedWord.length;
                 range = {
@@ -694,10 +704,10 @@ export default {
                 0,
                 word.startColumn - 1,
               );
-              const dotMatch = textBeforeWord.match(/([a-zA-Z0-9_]+)\.$/);
+              const dotMatch = textBeforeWord.match(/(?:"([^"]+)"|`([^`]+)`|([\p{L}\p{N}_]+))\.$/u);
 
               if (dotMatch) {
-                const schemaName = dotMatch[1].toLowerCase();
+                const schemaName = (dotMatch[1] || dotMatch[2] || dotMatch[3] || "").toLowerCase();
                 const key = `${schemaName}.${objectName}`;
                 const obj = findInspectObject(key);
                 if (!obj) return null;

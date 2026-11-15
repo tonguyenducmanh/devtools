@@ -27,6 +27,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"unicode"
 
 	ods "github.com/mukbeast4/go-ods"
 	"github.com/yamitzky/xlrd-go/xlrd"
@@ -676,11 +677,18 @@ func convertXlsSheetToCsv(xlsPath string, sheetIndex int) (string, error) {
 }
 
 // sanitizeSheetName chuyển tên sheet thành identifier hợp lệ.
+// DuckDB cho phép Unicode letters trong identifier không nháy.
 func sanitizeSheetName(name string) string {
-	reg := regexp.MustCompile(`[^a-zA-Z0-9_]`)
+	// Thay thế ký tự không hợp lệ bằng _
+	// Cho phép: Unicode letters (\p{L}), Unicode numbers (\p{N}), underscore
+	reg := regexp.MustCompile(`[^\p{L}\p{N}_]`)
 	result := reg.ReplaceAllString(name, "_")
-	if len(result) > 0 && result[0] >= '0' && result[0] <= '9' {
-		result = "_" + result
+	// Nếu bắt đầu bằng số, thêm _ vào đầu
+	if len(result) > 0 {
+		r := []rune(result)
+		if unicode.IsDigit(r[0]) {
+			result = "_" + result
+		}
 	}
 	return strings.ToLower(result)
 }
