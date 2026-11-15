@@ -884,7 +884,30 @@ func extractJSONArrays(stdout []byte) [][]byte {
 	return arrays
 }
 
-// escapeDQ escape dấu " trong tên identifier.
+// EscapeDQ escape dấu " trong tên identifier (exported cho service layer dùng).
+func EscapeDQ(s string) string {
+	return strings.ReplaceAll(s, "\"", "\"\"")
+}
+
+// RunDuckDB spawn 1 tiến trình DuckDB CLI, trả về stdout/stderr/error.
+// Dùng cho service layer cần chạy SQL tùy ý (vd: DROP VIEW).
+func RunDuckDB(dbFile, sql string) ([]byte, []byte, error) {
+	return runDuckDB(dbFile, sql)
+}
+
+// ClearSessionFiles xoá danh sách file trong session (không xoá file .duckdb).
+func ClearSessionFiles(sessionID string) {
+	v, ok := sessionStore.Load(sessionID)
+	if !ok {
+		return
+	}
+	sess := v.(*duckdbSession)
+	sess.mu.Lock()
+	defer sess.mu.Unlock()
+	sess.files = nil
+}
+
+// escapeDQ escape dấu " trong tên identifier (internal).
 func escapeDQ(s string) string {
 	return strings.ReplaceAll(s, "\"", "\"\"")
 }

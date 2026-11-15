@@ -68,6 +68,16 @@ class TMServerDuckDBAPI extends TMAgentAPI {
       session_id: sessionId,
     });
   }
+
+  /**
+   * Xoá tất cả file/view trong session DuckDB
+   * @param {string} sessionId - ID của session DuckDB
+   */
+  async dropAllFiles(sessionId) {
+    return await this.post("/duckdb/drop_all_files", {
+      session_id: sessionId,
+    });
+  }
 }
 
 export default TMServerDuckDBAPI;

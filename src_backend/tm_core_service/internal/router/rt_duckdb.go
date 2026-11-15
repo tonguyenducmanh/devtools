@@ -21,6 +21,9 @@ func InjectDuckDBRouter(app *http.ServeMux) {
 	// Xoá 1 file/view khỏi session
 	app.HandleFunc("POST /duckdb/drop_file", duckdb.DropDuckDBFileHandler)
 
+	// Xoá tất cả file trong session
+	app.HandleFunc("POST /duckdb/drop_all_files", duckdb.DropAllDuckDBFilesHandler)
+
 	// Xoá toàn bộ session (giải phóng memory)
 	app.HandleFunc("POST /duckdb/drop_session", duckdb.DropDuckDBSessionHandler)
 }

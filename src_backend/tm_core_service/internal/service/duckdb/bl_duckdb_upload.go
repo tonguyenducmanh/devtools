@@ -156,6 +156,42 @@ func DropDuckDBFileHandler(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, true, "", nil)
 }
 
+// DropAllDuckDBFilesHandler xoá tất cả file/view trong session DuckDB.
+//
+// POST /duckdb/drop_all_files
+// Body: { "session_id": "..." }
+func DropAllDuckDBFilesHandler(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		if rec := recover(); rec != nil {
+			tm_common.LogError(fmt.Sprintf("PANIC in DropAllDuckDBFilesHandler: %v", rec))
+			writeJSON(w, false, fmt.Sprintf("Internal server error: %v", rec), nil)
+		}
+	}()
+
+	var req struct {
+		SessionID string `json:"session_id"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSON(w, false, "Dữ liệu không hợp lệ", nil)
+		return
+	}
+	if req.SessionID == "" {
+		writeJSON(w, false, "session_id là bắt buộc", nil)
+		return
+	}
+
+	files := duckdb.GetSessionFiles(req.SessionID)
+	for _, f := range files {
+		_, _, _ = duckdb.RunDuckDB(
+			"",
+			fmt.Sprintf("DROP VIEW IF EXISTS \"%s\"", duckdb.EscapeDQ(f.TableName)),
+		)
+	}
+	duckdb.ClearSessionFiles(req.SessionID)
+
+	writeJSON(w, true, "", nil)
+}
+
 // GetSessionFilesHandler trả về danh sách file đã nạp trong session.
 //
 // GET /duckdb/session_files?session_id=...

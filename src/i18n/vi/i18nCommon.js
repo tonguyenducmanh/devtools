@@ -1268,6 +1268,9 @@ export default {
       supportedFormats: "Hỗ trợ: .xlsx, .xls, .csv, .tsv, .parquet, .json, .ndjson, .jsonl",
       edit: "Chỉnh sửa",
       export: "Xuất dữ liệu",
+      clearAllFiles: "Xoá tất cả",
+      clearAllFilesConfirm: "Xoá tất cả file đã nạp? Hành động này không thể hoàn tác.",
+      clearAllFilesSuccess: "Đã xoá toàn bộ file",
       sidebarOption: {
         help: "Trợ giúp",
         setting: "Cài đặt",

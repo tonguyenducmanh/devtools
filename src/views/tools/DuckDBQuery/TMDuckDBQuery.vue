@@ -248,7 +248,7 @@
             $tmEnum.DuckDBQuerySidebarOption.Files
           "
         >
-          <!-- hàng điều khiển: header danh sách file (trái) + nút upload (phải) -->
+          <!-- hàng điều khiển: header danh sách file (trái) + nút upload + xoá tất cả (phải) -->
           <div
             class="flex tm-duckdb-toolbar-row"
             style="
@@ -331,6 +331,22 @@
                 </div>
               </div>
             </div>
+
+            <!-- Nút xoá tất cả: nằm dưới cùng danh sách -->
+            <div
+              class="tm-duckdb-clear-all-wrap"
+              v-if="loadedFiles.length > 0"
+            >
+              <TMButton
+                class="tm-duckdb-clear-all-btn"
+                :noMargin="true"
+                :isSmallButton="true"
+                :type="$tmEnum.buttonType.secondary"
+                :label="$t('i18nCommon.duckDBQuery.clearAllFiles')"
+                v-tooltip="$t('i18nCommon.duckDBQuery.clearAllFiles')"
+                @click.stop="handleClearAllFiles"
+              />
+            </div>
           </div>
         </div>
 
@@ -371,6 +387,7 @@ import TMFlyoutPanel from "@/components/TMFlyoutPanel.vue";
 import { useFlyout } from "@/common/plugin/TMUseFlyout.js";
 import TMDuckDBIntellisenseMixin from "./TMDuckDBIntellisenseMixin.js";
 import { registerDuckdbFormatProvider } from "@/monarch/duckdb/duckdbFormatProvider.js";
+import TMDialogUtil from "@/common/TMDialogUtil.js";
 
 export default {
   extends: TMToolBase,
@@ -967,21 +984,46 @@ export default {
         );
       }
     },
+    /**
+     * Xoá tất cả file đã nạp trong session hiện tại
+     */
+    async handleClearAllFiles() {
+      let me = this;
+      let confirmed = await TMDialogUtil.confirm({
+        ownerForm: me,
+        title: me.$t("i18nCommon.duckDBQuery.clearAllFiles"),
+        message: me.$t("i18nCommon.duckDBQuery.clearAllFilesConfirm"),
+      });
+      if (!confirmed) return;
+
+      try {
+        let resp = await me.agentAPI.dropAllFiles(me.currentSessionId);
+        if (resp?.data?.success) {
+          me.loadedFiles = [];
+          me.$tmToast.success(me.$t("i18nCommon.duckDBQuery.clearAllFilesSuccess"));
+        } else {
+          me.$tmToast.error(
+            resp?.data?.message ||
+              me.$t("i18nCommon.duckDBQuery.dropFileError"),
+          );
+        }
+      } catch (err) {
+        me.$tmToast.error(
+          err?.message || me.$t("i18nCommon.duckDBQuery.dropFileError"),
+        );
+      }
+    },
 
     /**
      * Tạo session mới (xoá toàn bộ dữ liệu hiện tại)
      */
     async handleNewSession() {
       let me = this;
-      let confirmed = await me.$tmDialog?.confirm?.(
-        me.$t("i18nCommon.duckDBQuery.newSessionConfirm"),
-      );
-      // Nếu không có dialog thì dùng confirm native
-      if (confirmed === undefined) {
-        confirmed = window.confirm(
-          me.$t("i18nCommon.duckDBQuery.newSessionConfirm"),
-        );
-      }
+      let confirmed = await TMDialogUtil.confirm({
+        ownerForm: me,
+        title: me.$t("i18nCommon.duckDBQuery.newSession"),
+        message: me.$t("i18nCommon.duckDBQuery.newSessionConfirm"),
+      });
       if (!confirmed) return;
 
       // Xoá session cũ
@@ -1453,6 +1495,26 @@ export default {
     font-size: var(--font-size-small);
     line-height: 1.5;
     color: var(--text-secondary-color);
+  }
+}
+
+/* Nút xoá tất cả: nằm dưới cùng danh sách */
+.tm-duckdb-clear-all-wrap {
+  flex-shrink: 0;
+  margin-top: var(--padding);
+  padding: calc(var(--padding) / 2) var(--padding);
+  border-top: 1px solid var(--border-color);
+
+  .tm-duckdb-clear-all-btn {
+    width: 100%;
+    justify-content: center;
+    opacity: 0.7;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+
+    &:hover {
+      opacity: 1;
+      background-color: var(--bg-hover-color);
+    }
   }
 }
 

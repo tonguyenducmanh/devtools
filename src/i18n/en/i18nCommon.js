@@ -1276,6 +1276,9 @@ export default {
       supportedFormats: "Supported: .xlsx, .xls, .csv, .tsv, .parquet, .json, .ndjson, .jsonl",
       edit: "Edit",
       export: "Export",
+      clearAllFiles: "Clear all",
+      clearAllFilesConfirm: "Clear all loaded files? This action cannot be undone.",
+      clearAllFilesSuccess: "All files cleared",
       sidebarOption: {
         help: "Help",
         setting: "Settings",
