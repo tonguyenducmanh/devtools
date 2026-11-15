@@ -328,7 +328,6 @@
 
           <!-- empty state khi chưa có file -->
           <div class="tm-duckdb-no-files" v-else-if="!isUploading">
-            <span class="tm-icon tm-database-icon"></span>
             <span class="tm-duckdb-no-files-title">{{
               $t("i18nCommon.duckDBQuery.noFilesLoaded")
             }}</span>
