@@ -109,6 +109,7 @@ type loadedFile struct {
 	TableName string
 	FilePath  string
 	RowCount  int64
+	Columns   []string
 }
 
 // fileLoadResult là kết quả nạp 1 bảng (1 sheet) từ file.
@@ -463,6 +464,7 @@ func LoadFile(sessionID, filePath, tableName, fileID, fileName string) ([]fileLo
 			TableName: r.TableName,
 			FilePath:  filePath,
 			RowCount:  r.RowCount,
+			Columns:   r.Columns,
 		})
 	}
 

@@ -1287,6 +1287,7 @@ export default {
       deleteIntellisenseCacheErr: "Lỗi xoá cache gợi ý mã",
       noSessionSelected: "Vui lòng chọn session",
       dbInspectHint: "Nhấn F12 để xem chi tiết đối tượng",
+      apiReference: "Tài liệu API (dùng AI gen SQL)",
     },
   },
 };

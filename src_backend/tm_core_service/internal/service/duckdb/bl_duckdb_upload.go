@@ -203,10 +203,11 @@ func GetSessionFilesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	files := duckdb.GetSessionFiles(sessionID)
 	type fileInfo struct {
-		FileID    string `json:"file_id"`
-		FileName  string `json:"file_name"`
-		TableName string `json:"table_name"`
-		RowCount  int64  `json:"row_count"`
+		FileID    string   `json:"file_id"`
+		FileName  string   `json:"file_name"`
+		TableName string   `json:"table_name"`
+		RowCount  int64    `json:"row_count"`
+		Columns   []string `json:"columns"`
 	}
 	result := make([]fileInfo, 0, len(files))
 	for _, f := range files {
@@ -215,6 +216,7 @@ func GetSessionFilesHandler(w http.ResponseWriter, r *http.Request) {
 			FileName:  f.FileName,
 			TableName: f.TableName,
 			RowCount:  f.RowCount,
+			Columns:   f.Columns,
 		})
 	}
 	writeJSON(w, true, "", result)

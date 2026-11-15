@@ -1295,6 +1295,7 @@ export default {
       deleteIntellisenseCacheErr: "Error deleting intellisense cache",
       noSessionSelected: "Please select a session",
       dbInspectHint: "Press F12 to inspect object",
+      apiReference: "API Reference (AI gen SQL)",
     },
   },
 };
