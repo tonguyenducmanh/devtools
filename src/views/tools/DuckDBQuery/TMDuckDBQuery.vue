@@ -1577,6 +1577,7 @@ export default {
   flex-shrink: 0;
   padding: var(--padding);
   border-left: 1px solid var(--border-color);
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
   background-color: transparent;
   transition:
     border-left-color 0.2s ease,
