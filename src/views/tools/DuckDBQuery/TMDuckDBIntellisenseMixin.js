@@ -8,6 +8,54 @@ import {
 } from "@/monarch/duckdb/duckdbLanguage.js";
 import { registerDuckdbFormatProvider } from "@/monarch/duckdb/duckdbFormatProvider.js";
 
+// Completion/Hover provider của Monaco đăng ký theo NGÔN NGỮ (global), không theo editor/component.
+// Nếu để mỗi lần apply/mỗi instance tự giữ disposable riêng thì provider cũ bị "rò" khi 2 lần
+// applyMonacoIntellisense chạy chồng nhau (await import bên dưới) → mỗi gợi ý hiện 2-3 lần.
+// Vì vậy giữ disposable + số thứ tự apply ở cấp module để luôn chỉ có 1 bộ provider đang sống.
+let _providerDisposables = [];
+let _applySeq = 0;
+
+// Từ khoá luôn không được dùng làm alias (đứng ngay sau tên bảng trong FROM/JOIN)
+const NON_ALIAS_KEYWORDS = new Set([
+  "where",
+  "join",
+  "on",
+  "using",
+  "left",
+  "right",
+  "inner",
+  "outer",
+  "full",
+  "cross",
+  "natural",
+  "asof",
+  "positional",
+  "semi",
+  "anti",
+  "lateral",
+  "group",
+  "order",
+  "having",
+  "qualify",
+  "window",
+  "limit",
+  "offset",
+  "union",
+  "intersect",
+  "except",
+  "returning",
+  "select",
+  "from",
+  "and",
+  "or",
+  "with",
+  "as",
+  "tablesample",
+  "pivot",
+  "unpivot",
+  "sample",
+]);
+
 export default {
   created() {
     // đăng ký ngôn ngữ duckdb cho Monaco Editor ngay khi component được tạo
@@ -29,10 +77,10 @@ export default {
      */
     disposeIntellisense() {
       let me = this;
-      if (me.intellisenseDisposable) {
-        me.intellisenseDisposable.forEach((d) => d?.dispose?.());
-        me.intellisenseDisposable = null;
-      }
+      _applySeq++; // huỷ mọi lần apply đang chờ import monaco
+      _providerDisposables.forEach((d) => d?.dispose?.());
+      _providerDisposables = [];
+      me.intellisenseDisposable = null;
     },
 
     /**
@@ -53,10 +101,16 @@ export default {
         let limitResults = false;
 
         // Bước 1: Lấy danh sách keyword DuckDB từ hệ thống
-        let keywordsResult = await me.fetchDuckDBKeywords(defaultQueryLimit, limitResults);
+        let keywordsResult = await me.fetchDuckDBKeywords(
+          defaultQueryLimit,
+          limitResults,
+        );
 
         // Bước 2: Lấy danh sách bảng + cột từ session hiện tại (bao gồm cả file vừa upload)
-        let schemaResult = await me.fetchDuckDBSchema(defaultQueryLimit, limitResults);
+        let schemaResult = await me.fetchDuckDBSchema(
+          defaultQueryLimit,
+          limitResults,
+        );
 
         // Gom tất cả dữ liệu intellisense lại
         let intellisenseData = {
@@ -71,9 +125,7 @@ export default {
         });
         await me.applyMonacoIntellisense(intellisenseData);
 
-        me.$tmToast.success(
-          me.$t("i18nCommon.duckDBQuery.intellisenseLoaded"),
-        );
+        me.$tmToast.success(me.$t("i18nCommon.duckDBQuery.intellisenseLoaded"));
       } catch (error) {
         console.error("Load intellisense error:", error);
         me.$tmToast.error(me.$t("i18nCommon.toastMessage.error"));
@@ -91,7 +143,7 @@ export default {
         // DuckDB lưu danh sách keyword trong hệ thống tabla duckdb_keywords()
         let keywordResponse = await me.agentAPI.executeQuery(
           me.currentSessionId,
-          "SELECT * FROM duckdb_keywords() ORDER BY keyword_name",
+          "SELECT DISTINCT keyword_name, keyword_category FROM duckdb_keywords() ORDER BY keyword_name",
           defaultQueryLimit,
           limitResults,
         );
@@ -99,9 +151,7 @@ export default {
           keywordResponse?.data?.data?.results?.[0] ||
           keywordResponse?.data?.data ||
           null;
-        return keywordResponse?.data?.success
-          ? keywordResult
-          : null;
+        return keywordResponse?.data?.success ? keywordResult : null;
       } catch (error) {
         console.warn("Fetch DuckDB keywords warning:", error);
         return null;
@@ -123,7 +173,7 @@ export default {
         // vì duckdb_tables() trong bản DuckDB này trả về rows = null.
         let columnsResponse = await me.agentAPI.executeQuery(
           me.currentSessionId,
-          "SELECT table_schema, table_name, column_name, data_type, ordinal_position FROM information_schema.columns ORDER BY table_schema, table_name, ordinal_position",
+          "SELECT table_schema, table_name, column_name, data_type, ordinal_position FROM information_schema.columns WHERE table_schema NOT IN ('information_schema', 'pg_catalog') ORDER BY table_schema, table_name, ordinal_position",
           defaultQueryLimit,
           limitResults,
         );
@@ -133,35 +183,29 @@ export default {
           columnsResponse?.data?.data ||
           null;
         if (columnsResponse?.data?.success && columnResult?.rows) {
-          // Tạo map table_name -> columns
-          const columnsByTable = new Map();
+          // Gom cột theo (schema, table). Dùng object thay vì split("." ) vì tên schema/bảng
+          // có thể chứa dấu chấm.
+          const tableMap = new Map();
           columnResult.rows.forEach((row) => {
-            const key = `${row.table_schema}.${row.table_name}`;
-            if (!columnsByTable.has(key)) {
-              columnsByTable.set(key, []);
+            const key = JSON.stringify([row.table_schema, row.table_name]);
+            if (!tableMap.has(key)) {
+              tableMap.set(key, {
+                schema_name: row.table_schema,
+                table_schema: row.table_schema,
+                table_name: row.table_name,
+                _columns: [],
+              });
             }
-            columnsByTable.get(key).push(row);
+            tableMap.get(key)._columns.push(row);
           });
-
-          // Xây dựng rows bảng từ các key duy nhất (schema.table)
-          columnsByTable.forEach((cols, key) => {
-            const parts = key.split(".");
-            const schema = parts[0];
-            const tbl = parts.slice(1).join(".");
-            allTableRows.push({
-              schema_name: schema,
-              table_schema: schema,
-              table_name: tbl,
-              _columns: cols,
-            });
-          });
+          allTableRows = Array.from(tableMap.values());
         }
 
         // Lấy danh sách hàm (nếu có)
         try {
           let funcsResponse = await me.agentAPI.executeQuery(
             me.currentSessionId,
-            "SELECT function_name FROM duckdb_functions() ORDER BY function_name",
+            "SELECT DISTINCT function_name FROM duckdb_functions() ORDER BY function_name",
             defaultQueryLimit,
             limitResults,
           );
@@ -232,9 +276,7 @@ export default {
     async handleDeleteIntellisenseCache(sessionId) {
       let me = this;
       if (!sessionId) {
-        me.$tmToast.warning(
-          me.$t("i18nCommon.duckDBQuery.noSessionSelected"),
-        );
+        me.$tmToast.warning(me.$t("i18nCommon.duckDBQuery.noSessionSelected"));
         return false;
       }
       try {
@@ -268,13 +310,17 @@ export default {
     async applyMonacoIntellisense(data) {
       let me = this;
       try {
-        // Xoá các provider cũ trước khi đăng ký mới, tránh chồng chéo
-        if (me.intellisenseDisposable) {
-          me.intellisenseDisposable.forEach((d) => d?.dispose?.());
-        }
+        // Mỗi lần apply có 1 số thứ tự; nếu trong lúc chờ import có lần apply mới hơn
+        // (hoặc disposeIntellisense) thì lần này bỏ, tránh đăng ký 2 bộ provider.
+        const seq = ++_applySeq;
 
         // Lazy-load Monaco Editor (chỉ import khi cần)
         const monaco = await import("monaco-editor");
+        if (seq !== _applySeq) return;
+
+        // Từ đây đến lúc đăng ký provider KHÔNG có await nào → dispose + register là nguyên tử.
+        _providerDisposables.forEach((d) => d?.dispose?.());
+        _providerDisposables = [];
 
         // ── Helper nháy kép identifier nếu chứa ký tự đặc biệt ──────────────────
         // DuckDB: identifier được phép chứa Unicode letters, số, _, bắt đầu bằng chữ cái/_.
@@ -283,7 +329,7 @@ export default {
           const n = String(name);
           // Cho phép Unicode letters (Lu, Ll, Lt, Lm, Lo, Nd, Nl, No, Pc, Mn, Mc)
           // \p{L} = bất kỳ chữ cái Unicode nào, \p{N} = số, \p{Pc} = underscore
-          if (/^[\p{L}_][\p{L}\p{N}_]*$/u.test(n)) return n;
+          if (/^[\p{L}_][\p{L}\p{M}\p{N}_]*$/u.test(n)) return n;
           return '"' + n.replace(/"/g, '""') + '"';
         };
 
@@ -296,12 +342,26 @@ export default {
 
         // ── Xây dựng danh sách keyword DuckDB ──────────────────────────────
         const keywords = data?.keywords?.rows ?? [];
-        const keywordSuggestions = [];
+        let keywordSuggestions = [];
+        const seenKeyword = new Set();
+        // keyword không được làm alias (reserved / type_function như LEFT, JOIN, FULL...)
+        const reservedKeywordSet = new Set(NON_ALIAS_KEYWORDS);
         keywords.forEach((row) => {
+          const name = String(row.keyword_name ?? row.word ?? "").trim();
+          if (!name) return;
+          const upper = name.toUpperCase();
+          if (
+            row.keyword_category === "reserved" ||
+            row.keyword_category === "type_function"
+          ) {
+            reservedKeywordSet.add(name.toLowerCase());
+          }
+          if (seenKeyword.has(upper)) return;
+          seenKeyword.add(upper);
           keywordSuggestions.push({
-            label: String(row.keyword_name ?? row.word ?? "").toUpperCase(),
+            label: upper,
             kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: String(row.keyword_name ?? row.word ?? "").toUpperCase(),
+            insertText: upper,
             detail: row.description ?? "DuckDB keyword",
           });
         });
@@ -327,18 +387,23 @@ export default {
           // Đọc cột từ _columns (được gộp từ information_schema.columns trong fetchDuckDBSchema)
           const cols = row._columns || [];
 
+          // Key tra cứu luôn là chữ thường vì SQL không phân biệt hoa/thường
+          // và text người dùng gõ được lowercase khi so khớp.
+          const tblKey = String(tbl).toLowerCase();
+          const schemaKey = String(schema).toLowerCase();
+
           allSchemas.add(schema);
           allTables.add(tbl);
 
           // Nhóm bảng theo schema
-          if (!tablesBySchema.has(schema))
-            tablesBySchema.set(schema, new Set());
-          tablesBySchema.get(schema).add(tbl);
+          if (!tablesBySchema.has(schemaKey))
+            tablesBySchema.set(schemaKey, new Set());
+          tablesBySchema.get(schemaKey).add(tbl);
 
           // Map cột theo tên bảng và theo schema.table
-          if (!columnsByTable.has(tbl)) columnsByTable.set(tbl, []);
-          if (!columnsByTable.has(`${schema}.${tbl}`))
-            columnsByTable.set(`${schema}.${tbl}`, []);
+          if (!columnsByTable.has(tblKey)) columnsByTable.set(tblKey, []);
+          if (!columnsByTable.has(`${schemaKey}.${tblKey}`))
+            columnsByTable.set(`${schemaKey}.${tblKey}`, []);
 
           const seenCol = new Set();
           cols.forEach((colRow) => {
@@ -354,8 +419,11 @@ export default {
               detail: `${tbl}.${col} (${dtype})`,
             };
 
-            columnsByTable.get(tbl).push(colDef);
-            columnsByTable.get(`${schema}.${tbl}`).push(colDef);
+            // cùng 1 bảng có thể xuất hiện ở nhiều schema/catalog → chỉ thêm nếu chưa có
+            const byTbl = columnsByTable.get(tblKey);
+            if (!byTbl.some((c) => c.label === colDef.label))
+              byTbl.push(colDef);
+            columnsByTable.get(`${schemaKey}.${tblKey}`).push(colDef);
             allColumns.push(colDef);
           });
         });
@@ -367,7 +435,9 @@ export default {
 
         tableRows.forEach((row) => {
           const tbl = String(row.table_name).toLowerCase();
-          const schema = String(row.schema_name ?? row.table_schema).toLowerCase();
+          const schema = String(
+            row.schema_name ?? row.table_schema,
+          ).toLowerCase();
           const key = `${schema}.${tbl}`;
           if (!me._duckdbInspectLookup.tables.has(key))
             me._duckdbInspectLookup.tables.set(key, { schema, name: tbl });
@@ -375,36 +445,48 @@ export default {
             me._duckdbInspectLookup.tables.set(tbl, { schema, name: tbl });
         });
 
-// ── Xây dựng function suggestions ──────────────────────────────────────
-                const functionRows = data?.functions?.rows ?? [];
-                const functionSuggestions = [];
-                const functionsBySchema = new Map();
+        // ── Xây dựng function suggestions ──────────────────────────────────────
+        // duckdb_functions() trả về 1 dòng cho MỖI overload (abs có hàng chục dòng) và cả
+        // toán tử (+, ||, ~~ ...) → chỉ giữ tên hợp lệ, mỗi tên 1 lần.
+        const functionRows = data?.functions?.rows ?? [];
+        const functionSuggestions = [];
+        const functionsBySchema = new Map();
+        const seenFn = new Set();
 
-                functionRows.forEach((row) => {
-                  const fnName = row.function_name;
+        functionRows.forEach((row) => {
+          const fnName = String(row.function_name ?? "");
+          const fnKey = fnName.toLowerCase();
+          if (!fnName || seenFn.has(fnKey)) return;
+          if (!/^[\p{L}_][\p{L}\p{M}\p{N}_]*$/u.test(fnName)) return;
+          if (fnName.startsWith("__")) return; // hàm nội bộ
+          seenFn.add(fnKey);
 
-                  functionsBySchema.set("", functionsBySchema.get("") || []);
-                  functionsBySchema.get("").push({
-                    label: fnName,
-                    kind: monaco.languages.CompletionItemKind.Function,
-                    insertText: fnName,
-                    detail: `fn ${fnName}`,
-                    sortText: "0" + fnName,
-                  });
+          functionsBySchema.set("", functionsBySchema.get("") || []);
+          functionsBySchema.get("").push({
+            label: fnName,
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: fnName,
+            detail: `fn ${fnName}`,
+            sortText: "0" + fnName,
+          });
 
-                  functionSuggestions.push({
-                    label: fnName,
-                    kind: monaco.languages.CompletionItemKind.Function,
-                    insertText: fnName,
-                    detail: `fn ${fnName}`,
-                    sortText: "1" + fnName,
-                  });
-                });
+          functionSuggestions.push({
+            label: fnName,
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: fnName,
+            detail: `fn ${fnName}`,
+            sortText: "1" + fnName,
+          });
+        });
 
-                // Set hàm built-in không nên tạo alias (chỉ dùng cho table/view)
-                const builtinFunctionSet = new Set(
-                  functionSuggestions.map((f) => f.label.toLowerCase())
-                );
+        // Tên vừa là keyword vừa là hàm (LEFT, RIGHT, CAST, REPLACE...) → chỉ hiện 1 mục (hàm),
+        // nếu không Monaco hiện "LEFT" và "left" thành 2 dòng.
+        keywordSuggestions = keywordSuggestions.filter(
+          (k) => !seenFn.has(k.label.toLowerCase()),
+        );
+
+        // Set hàm built-in không nên tạo alias (chỉ dùng cho table/view)
+        const builtinFunctionSet = seenFn;
 
         // ═══════════════════════════════════════════════════════════════════════
         //  ĐĂNG KÝ COMPLETION PROVIDER
@@ -426,23 +508,16 @@ export default {
               const text = model.getValue();
               const aliasMap = new Map();
 
-              // Regex hỗ trợ cả identifier thường và quoted identifier ("..." hoặc `...`)
-              // Group 1: table/schema (có thể là quoted)
-              // Group 2: table nếu có schema (có thể là quoted)
-              // Group 3: alias (có thể là quoted)
+              // Regex hỗ trợ cả identifier thường (có Unicode/tiếng Việt) và quoted identifier
+              // ("..." hoặc `...`)
+              // Group 1-3: table/schema (quoted " / quoted ` / thường)
+              // Group 4-6: table nếu có schema
+              // Group 7-9: alias
               const regex =
-                /(?:from|join)\s+(?:"([^"]+)"|`([^`]+)`|([a-zA-Z0-9_]+))(?:\.(?:"([^"]+)"|`([^`]+)`|([a-zA-Z0-9_]+)))?(?:\s+as)?\s+(?:"([^"]+)"|`([^`]+)`|([a-zA-Z0-9_]+))?/gi;
+                /(?:from|join)\s+(?:"([^"]+)"|`([^`]+)`|([\p{L}\p{M}\p{N}_]+))(?:\.(?:"([^"]+)"|`([^`]+)`|([\p{L}\p{M}\p{N}_]+)))?(?:\s+as)?\s+(?:"([^"]+)"|`([^`]+)`|([\p{L}\p{M}\p{N}_]+))?/giu;
               let match;
-              const sqlKeywords = [
-                "where", "join", "on", "left", "right", "inner", "outer",
-                "cross", "group", "order", "having", "limit", "select",
-                "and", "or", "with", "as",
-              ];
 
               while ((match = regex.exec(text)) !== null) {
-                // match[1] = double-quoted table, match[2] = backtick table, match[3] = unquoted table
-                // match[4] = double-quoted schema.table, match[5] = backtick schema.table, match[6] = unquoted schema.table
-                // match[7] = double-quoted alias, match[8] = backtick alias, match[9] = unquoted alias
                 let schemaOrTable = match[1] || match[2] || match[3] || "";
                 let tableIfSchema = match[4] || match[5] || match[6] || "";
                 let aliasOrTable = match[7] || match[8] || match[9] || "";
@@ -450,6 +525,7 @@ export default {
                 let schema = "";
                 let table = "";
                 let alias = "";
+                let explicit = false;
 
                 if (tableIfSchema) {
                   schema = schemaOrTable.toLowerCase();
@@ -460,13 +536,14 @@ export default {
 
                 if (
                   aliasOrTable &&
-                  !sqlKeywords.includes(aliasOrTable.toLowerCase())
+                  !reservedKeywordSet.has(aliasOrTable.toLowerCase())
                 ) {
                   alias = aliasOrTable.toLowerCase();
+                  explicit = true;
                 } else {
                   alias = table;
                 }
-                aliasMap.set(alias, { schema, table });
+                aliasMap.set(alias, { schema, table, explicit });
               }
 
               const lineContent = model.getLineContent(position.lineNumber);
@@ -476,7 +553,7 @@ export default {
               );
 
               const dotMatch = textBeforePointer.match(
-                /(?:"([^"]+)"|`([^`]+)`|([\p{L}\p{N}_]+))\.\s*([\p{L}\p{N}_]*)$/u,
+                /(?:"([^"]+)"|`([^`]+)`|([\p{L}\p{M}\p{N}_]+))\.\s*([\p{L}\p{M}\p{N}_]*)$/u,
               );
 
               let suggestions = [];
@@ -484,10 +561,16 @@ export default {
               // ── TRƯỜNG HỢP 1: CÓ DẤU CHẤP (context: "prefix.") ──────────────
               if (dotMatch) {
                 // dotMatch groups: [1]=double-quoted, [2]=backtick, [3]=unquoted, [4]=typed word
-                const prefix = (dotMatch[1] || dotMatch[2] || dotMatch[3] || "").toLowerCase();
+                const prefix = (
+                  dotMatch[1] ||
+                  dotMatch[2] ||
+                  dotMatch[3] ||
+                  ""
+                ).toLowerCase();
                 const typedWord = dotMatch[4] || "";
 
-                const totalOffset = prefix.length + 1 + typedWord.length;
+                // độ dài đúng của "prefix." + từ đang gõ (kể cả dấu " ` và khoảng trắng sau dấu chấm)
+                const totalOffset = dotMatch[0].length;
                 range = {
                   startLineNumber: position.lineNumber,
                   endLineNumber: position.lineNumber,
@@ -512,7 +595,7 @@ export default {
                     suggestions.push({
                       ...c,
                       filterText: `${prefix}.${c.label}`,
-                      insertText: `${prefix}.${c.insertText}`,
+                      insertText: `${quoteIdentifier(prefix)}.${c.insertText}`,
                     });
                   });
                 }
@@ -526,7 +609,7 @@ export default {
                     suggestions.push({
                       ...c,
                       filterText: `${prefix}.${c.label}`,
-                      insertText: `${prefix}.${c.insertText}`,
+                      insertText: `${quoteIdentifier(prefix)}.${c.insertText}`,
                     });
                   });
                 }
@@ -554,7 +637,9 @@ export default {
 
                   (functionsBySchema.get(prefix) ?? []).forEach((fnItem) => {
                     // Không tạo alias cho built-in function
-                    const isBuiltin = builtinFunctionSet.has(fnItem.label.toLowerCase());
+                    const isBuiltin = builtinFunctionSet.has(
+                      fnItem.label.toLowerCase(),
+                    );
                     const alias = isBuiltin
                       ? null
                       : me._generateUniqueAlias(
@@ -607,7 +692,9 @@ export default {
                 suggestions.push(
                   ...functionSuggestions.map((fnItem) => {
                     // Không tạo alias cho built-in function (array_agg, count, etc.)
-                    const isBuiltin = builtinFunctionSet.has(fnItem.label.toLowerCase());
+                    const isBuiltin = builtinFunctionSet.has(
+                      fnItem.label.toLowerCase(),
+                    );
                     const alias = isBuiltin
                       ? null
                       : me._generateUniqueAlias(
@@ -626,15 +713,19 @@ export default {
 
                 if (aliasMap.size > 0) {
                   aliasMap.forEach((mapped, alias) => {
-                    suggestions.push({
-                      label: alias,
-                      kind: monaco.languages.CompletionItemKind.Variable,
-                      insertText: alias,
-                      sortText: "0" + alias,
-                      detail: mapped.schema
-                        ? `${mapped.schema}.${mapped.table}`
-                        : mapped.table,
-                    });
+                    // Bảng không đặt alias thì alias == tên bảng: đã có mục "Table" rồi,
+                    // thêm mục Variable nữa sẽ bị trùng 2 dòng.
+                    if (mapped.explicit) {
+                      suggestions.push({
+                        label: alias,
+                        kind: monaco.languages.CompletionItemKind.Variable,
+                        insertText: quoteIdentifier(alias),
+                        sortText: "0" + alias,
+                        detail: mapped.schema
+                          ? `${mapped.schema}.${mapped.table}`
+                          : mapped.table,
+                      });
+                    }
                     let key = mapped.schema
                       ? `${mapped.schema}.${mapped.table}`
                       : mapped.table;
@@ -653,9 +744,11 @@ export default {
               }
 
               // Loại bỏ các suggestion trùng nhau
+              // Key không phân biệt hoa/thường; mục xuất hiện trước được giữ lại.
               const uniqueMap = new Map();
               suggestions.forEach((s) => {
-                uniqueMap.set(s.label + s.kind + s.insertText, s);
+                const key = `${s.kind}|${String(s.label).toLowerCase()}|${s.insertText}`;
+                if (!uniqueMap.has(key)) uniqueMap.set(key, s);
               });
 
               const finalSuggestions = Array.from(uniqueMap.values()).map(
@@ -675,7 +768,8 @@ export default {
           },
         );
 
-        me.intellisenseDisposable = [disposable];
+        _providerDisposables = [disposable];
+        me.intellisenseDisposable = _providerDisposables;
 
         // ═══════════════════════════════════════════════════════════════════════
         //  ĐĂNG KÝ HOVER PROVIDER
@@ -692,8 +786,7 @@ export default {
           "duckdb",
           {
             provideHover: async (model, position) => {
-              if (!me.currentSessionId || !me._duckdbInspectLookup)
-                return null;
+              if (!me.currentSessionId || !me._duckdbInspectLookup) return null;
 
               const word = model.getWordAtPosition(position);
               if (!word) return null;
@@ -704,10 +797,17 @@ export default {
                 0,
                 word.startColumn - 1,
               );
-              const dotMatch = textBeforeWord.match(/(?:"([^"]+)"|`([^`]+)`|([\p{L}\p{N}_]+))\.$/u);
+              const dotMatch = textBeforeWord.match(
+                /(?:"([^"]+)"|`([^`]+)`|([\p{L}\p{M}\p{N}_]+))\.$/u,
+              );
 
               if (dotMatch) {
-                const schemaName = (dotMatch[1] || dotMatch[2] || dotMatch[3] || "").toLowerCase();
+                const schemaName = (
+                  dotMatch[1] ||
+                  dotMatch[2] ||
+                  dotMatch[3] ||
+                  ""
+                ).toLowerCase();
                 const key = `${schemaName}.${objectName}`;
                 const obj = findInspectObject(key);
                 if (!obj) return null;
@@ -720,7 +820,7 @@ export default {
             },
           },
         );
-        me.intellisenseDisposable.push(hoverDisposable);
+        _providerDisposables.push(hoverDisposable);
 
         function buildHoverContent(obj, name) {
           const typeLabel = obj.type === "table" ? "TABLE" : "VIEW";
@@ -749,39 +849,42 @@ export default {
       const parts = objectName.split(".");
       const name = parts[parts.length - 1];
 
-    const words = name.split("_").filter((w) => w.length > 0);
-    if (words.length === 0) return null;
+      const words = name.split("_").filter((w) => w.length > 0);
+      if (words.length === 0) return null;
 
-    // Chỉ lấy chữ cái đầu của các từ bắt đầu bằng a-z, tránh alias bắt đầu bằng số
-    // (VD: "_1000000_rows" -> "r" thay vì "1r", không hợp lệ trong SQL)
-    const alphaWords = words.filter((w) => /[a-zA-Z]/.test(w[0]));
-    let base = alphaWords.length
-      ? alphaWords.map((w) => w[0]).join("").toLowerCase()
-      : "t";
-    if (!base) base = "t";
+      // Chỉ lấy chữ cái đầu của các từ bắt đầu bằng a-z, tránh alias bắt đầu bằng số
+      // (VD: "_1000000_rows" -> "r" thay vì "1r", không hợp lệ trong SQL)
+      const alphaWords = words.filter((w) => /\p{L}/u.test(w[0]));
+      let base = alphaWords.length
+        ? alphaWords
+            .map((w) => w[0])
+            .join("")
+            .toLowerCase()
+        : "t";
+      if (!base) base = "t";
 
-    const used = new Set();
-    const re =
-      /(?:from|join)\s+([a-zA-Z0-9_]+)(?:\.([a-zA-Z0-9_]+))?(?:\s+as)?\s+([a-zA-Z0-9_]+)?/gi;
-    let m;
-    while ((m = re.exec(sqlText)) !== null) {
-      if (m[1]) used.add(m[1].toLowerCase());
-      if (m[2]) used.add(m[2].toLowerCase());
-      if (m[3]) used.add(m[3].toLowerCase());
-    }
+      const used = new Set();
+      const re =
+        /(?:from|join)\s+([\p{L}\p{M}\p{N}_]+)(?:\.([\p{L}\p{M}\p{N}_]+))?(?:\s+as)?\s+([\p{L}\p{M}\p{N}_]+)?/giu;
+      let m;
+      while ((m = re.exec(sqlText)) !== null) {
+        if (m[1]) used.add(m[1].toLowerCase());
+        if (m[2]) used.add(m[2].toLowerCase());
+        if (m[3]) used.add(m[3].toLowerCase());
+      }
 
-    let finalAlias = base;
-    let counter = 1;
-    while (
-      used.has(finalAlias) ||
-      (keywordSet && keywordSet.has(finalAlias))
-    ) {
-      counter++;
-      finalAlias = base + counter;
-      if (counter > 1000) return base;
-    }
+      let finalAlias = base;
+      let counter = 1;
+      while (
+        used.has(finalAlias) ||
+        (keywordSet && keywordSet.has(finalAlias))
+      ) {
+        counter++;
+        finalAlias = base + counter;
+        if (counter > 1000) return base;
+      }
 
-    return finalAlias;
+      return finalAlias;
     },
   },
 };

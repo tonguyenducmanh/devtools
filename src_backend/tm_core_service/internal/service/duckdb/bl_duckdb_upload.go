@@ -9,13 +9,13 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 
-	"github.com/google/uuid"
 	duckdb "tm_core_service/internal/database/duckdb"
 	"tm_core_service/internal/model"
 	"tm_core_service/tm_common"
+
+	"github.com/google/uuid"
 )
 
 // UploadDuckDBFileHandler nhận file upload qua multipart/form-data, lưu tạm,
@@ -51,7 +51,9 @@ func UploadDuckDBFileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	origName := header.Filename
+	// Chuẩn hoá NFC: tên file tiếng Việt từ macOS/trình duyệt có thể ở dạng NFD (dấu tách rời),
+	// nếu không chuẩn hoá thì tên bảng/hiển thị sẽ bị vỡ hoặc khác nhau giữa các lần upload.
+	origName := duckdb.NormalizeNFC(filepath.Base(header.Filename))
 	ext := strings.ToLower(filepath.Ext(origName))
 
 	// Kiểm tra định dạng được hỗ trợ
@@ -59,17 +61,18 @@ func UploadDuckDBFileHandler(w http.ResponseWriter, r *http.Request) {
 		".xlsx": true, ".xls": true, ".ods": true,
 		".csv": true, ".tsv": true,
 		".parquet": true,
-		".json": true, ".ndjson": true, ".jsonl": true,
+		".json":    true, ".ndjson": true, ".jsonl": true,
 	}
 	if !supportedExts[ext] {
 		writeJSON(w, false, fmt.Sprintf("Định dạng file '%s' không được hỗ trợ. Hỗ trợ: xlsx, xls, ods, csv, parquet, json", ext), nil)
 		return
 	}
 
-	// Tên table: lấy từ form hoặc tự sinh từ tên file
-	tableName := r.FormValue("table_name")
+	// Tên table: lấy từ form hoặc tự sinh từ tên file.
+	// Luôn đi qua duckdb.SanitizeIdentifier (giữ tiếng Việt có dấu, bắt đầu bằng số thì thêm "t").
+	tableName := duckdb.SanitizeIdentifier(r.FormValue("table_name"))
 	if tableName == "" {
-		tableName = sanitizeTableName(strings.TrimSuffix(origName, ext))
+		tableName = duckdb.SanitizeIdentifier(strings.TrimSuffix(origName, ext))
 	}
 	if tableName == "" {
 		tableName = "data"
@@ -180,14 +183,7 @@ func DropAllDuckDBFilesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := duckdb.GetSessionFiles(req.SessionID)
-	for _, f := range files {
-		_, _, _ = duckdb.RunDuckDB(
-			"",
-			fmt.Sprintf("DROP VIEW IF EXISTS \"%s\"", duckdb.EscapeDQ(f.TableName)),
-		)
-	}
-	duckdb.ClearSessionFiles(req.SessionID)
+	duckdb.DropAllFiles(req.SessionID)
 
 	writeJSON(w, true, "", nil)
 }
@@ -252,16 +248,4 @@ func writeJSON(w http.ResponseWriter, success bool, message string, data interfa
 	if encodeErr := json.NewEncoder(w).Encode(resp); encodeErr != nil {
 		tm_common.LogError(fmt.Sprintf("Lỗi encode JSON response: %v", encodeErr))
 	}
-}
-
-// sanitizeTableName chuyển tên file thành identifier hợp lệ cho DuckDB.
-// Giữ lại chữ, số và dấu gạch dưới; thay thế ký tự khác bằng "_".
-func sanitizeTableName(name string) string {
-	reg := regexp.MustCompile(`[^a-zA-Z0-9_]`)
-	result := reg.ReplaceAllString(name, "_")
-	// Không được bắt đầu bằng số
-	if len(result) > 0 && result[0] >= '0' && result[0] <= '9' {
-		result = "_" + result
-	}
-	return strings.ToLower(result)
 }

@@ -52,7 +52,8 @@ function buildMonarchDefinition() {
         { include: "@strings" },
         { include: "@operators" },
         [
-          /[a-zA-Z_][a-zA-Z0-9_]*/,
+          // \u00C0-\u024F + \u1E00-\u1EFF + \u0300-\u036F: chữ Latin có dấu, tiếng Việt (NFC) và dấu kết hợp (NFD)
+          /[a-zA-Z_\u00C0-\u024F\u1E00-\u1EFF\u0300-\u036F][a-zA-Z0-9_\u00C0-\u024F\u1E00-\u1EFF\u0300-\u036F]*/,
           {
             cases: {
               "@typeKeywords": "type",
@@ -77,6 +78,8 @@ function buildMonarchDefinition() {
       numbers: [[/(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?/, "number"]],
       strings: [
         [/'/, { token: "string", next: "@string" }],
+        // identifier trong nháy kép: "bảng tính lương"
+        [/"([^"]|"")*"/, "identifier.quote"],
       ],
       string: [
         [/[^']+/, "string"],
@@ -107,8 +110,11 @@ export function registerDuckdbLanguage() {
  */
 function _extractAliases(text, outMap) {
   const clauseRe = /(?:from|join)\s+/gi;
-  const tableAliasRe = /^(?:\w+\.)?(\w+)(?:\s+as)?\s+(\w+)$/i;
-  const funcAliasRe = /^(?:\w+\.)?(\w+)\([^)]*\)\s+(?:as\s+)?(\w+)$/i;
+  // \w không khớp chữ có dấu → dùng \p{L}\p{M}\p{N}_ (cờ u)
+  const tableAliasRe =
+    /^(?:[\p{L}\p{M}\p{N}_]+\.)?([\p{L}\p{M}\p{N}_]+)(?:\s+as)?\s+([\p{L}\p{M}\p{N}_]+)$/iu;
+  const funcAliasRe =
+    /^(?:[\p{L}\p{M}\p{N}_]+\.)?([\p{L}\p{M}\p{N}_]+)\([^)]*\)\s+(?:as\s+)?([\p{L}\p{M}\p{N}_]+)$/iu;
   const clauseEndRe =
     /\b(?:where|group\s+by|order\s+by|having|limit|offset|returning|union|intersect|except)\b/i;
   let clauseMatch;
@@ -209,9 +215,27 @@ function registerSemanticProvider() {
             pos++;
             continue;
           }
+          // identifier trong nháy kép: bỏ qua nguyên khối để keyword bên trong không bị tô màu
+          if (ch === '"') {
+            let j = pos + 1;
+            while (j < len) {
+              if (line[j] === '"') {
+                if (line[j + 1] === '"') {
+                  j += 2;
+                  continue;
+                }
+                break;
+              }
+              j++;
+            }
+            pos = j + 1;
+            continue;
+          }
 
-          if (/[a-zA-Z_]/.test(ch)) {
-            const wordMatch = line.slice(pos).match(/^[a-zA-Z_][a-zA-Z0-9_]*/);
+          if (/[\p{L}_]/u.test(ch)) {
+            const wordMatch = line
+              .slice(pos)
+              .match(/^[\p{L}_][\p{L}\p{M}\p{N}_]*/u);
             if (wordMatch) {
               const word = wordMatch[0];
               const offset = pos;
@@ -294,7 +318,7 @@ export function updateDuckdbIntellisenseData(data) {
   const keywords = data?.keywords?.rows ?? [];
   _duckdbKeywordSet = new Set(
     keywords
-      .map((k) => String(k.word).toLowerCase())
+      .map((k) => String(k.keyword_name ?? k.word ?? "").toLowerCase())
       .filter(Boolean),
   );
 
@@ -302,8 +326,8 @@ export function updateDuckdbIntellisenseData(data) {
   _allSchemas = new Set();
   _allTables = new Set();
   tableRows.forEach((row) => {
-    _allSchemas.add(row.table_schema);
-    _allTables.add(row.table_name);
+    _allSchemas.add(String(row.table_schema).toLowerCase());
+    _allTables.add(String(row.table_name).toLowerCase());
   });
 
   const functionRows = data?.functions?.rows ?? [];

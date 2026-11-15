@@ -862,17 +862,25 @@ export default {
      */
     async handleFileSelect(files) {
       if (!files || files.length === 0) return;
+      let anySuccess = false;
       for (const file of files) {
-        await this.uploadFile(file);
+        // false: không reload từng file, chỉ reload 1 lần ở cuối
+        if (await this.uploadFile(file, false)) anySuccess = true;
       }
       // Reload intellisense 1 lần sau khi xong tất cả file
-      await this.handleLoadIntellisense();
+      if (anySuccess) {
+        await this.handleDeleteIntellisenseCache(this.currentSessionId);
+        await this.handleLoadIntellisense();
+      }
     },
 
     /**
      * Upload file lên backend và nạp vào DuckDB session
+     * @param {File} file file cần upload
+     * @param {boolean} reloadIntellisense có nạp lại intellisense ngay sau file này không
+     * @returns {Promise<boolean>} true nếu upload thành công
      */
-    async uploadFile(file) {
+    async uploadFile(file, reloadIntellisense = true) {
       let me = this;
       let supportedExts = [
         ".xlsx",
@@ -888,7 +896,7 @@ export default {
       let ext = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
       if (!supportedExts.includes(ext)) {
         me.$tmToast.warning(me.$t("i18nCommon.duckDBQuery.supportedFormats"));
-        return;
+        return false;
       }
 
       me.isUploading = true;
@@ -913,15 +921,19 @@ export default {
             me.$t("i18nCommon.duckDBQuery.uploadFileSuccess"),
           );
           // Reset intellisense cache và nạp lại schema mới nhất
-          await me.handleDeleteIntellisenseCache(me.currentSessionId);
-          await me.handleLoadIntellisense();
+          if (reloadIntellisense) {
+            await me.handleDeleteIntellisenseCache(me.currentSessionId);
+            await me.handleLoadIntellisense();
+          }
           // Tự động suggest query mẫu từ tất cả bảng đã tải, ngăn cách bởi ;
           if (!me.sqlText?.trim() && infos.length > 0) {
             const queries = infos.map(
-              (info) => `SELECT * FROM "${info.table_name}" LIMIT 100`,
+              (info) =>
+                `SELECT * FROM "${String(info.table_name).replace(/"/g, '""')}" LIMIT 100`,
             );
-            me.sqlText = queries.join("; ") + ";";
+            me.sqlText = queries.join(";\n") + ";";
           }
+          return true;
         } else {
           me.$tmToast.error(
             resp?.data?.message ||
@@ -935,6 +947,7 @@ export default {
       } finally {
         me.isUploading = false;
       }
+      return false;
     },
 
     /**
@@ -1105,7 +1118,7 @@ export default {
       return lines.join("\n");
     },
 
-/**
+    /**
      * Xoá tất cả file khỏi session DuckDB
      */
     async handleClearAllFiles() {
