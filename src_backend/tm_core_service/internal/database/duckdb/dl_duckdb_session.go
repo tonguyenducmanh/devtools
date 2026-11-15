@@ -179,6 +179,7 @@ func applyLimit(stmt string, defaultLimit int, unlimited bool) string {
 }
 
 // parseJSONLines parse nhiều dòng JSON array (mỗi dòng là 1 kết quả) thành danh sách rows.
+// Trả về kết quả của dòng JSON cuối cùng có dữ liệu, cột giữ ĐÚNG thứ tự câu SELECT.
 func parseJSONLines(stdout []byte) ([]map[string]any, []string, error) {
 	lines := strings.Split(string(stdout), "\n")
 
@@ -200,11 +201,13 @@ func parseJSONLines(stdout []byte) ([]map[string]any, []string, error) {
 			continue
 		}
 
-		lastRows = rows
-		lastCols = make([]string, 0, len(rows[0]))
-		for k := range rows[0] {
-			lastCols = append(lastCols, k)
+		cols, err := orderedKeys(trimmed)
+		if err != nil {
+			continue
 		}
+
+		lastRows = rows
+		lastCols = cols
 	}
 
 	if lastRows == nil {
@@ -333,7 +336,8 @@ func ExecuteQuery(sessionID, sqlQuery string, defaultLimit int, unlimited bool) 
 	return result, nil
 }
 
-// parseJSONRows parse 1 dòng JSON array thành []map[string]any, đồng thời lấy danh sách cột.
+// parseJSONRows parse 1 mảng JSON thành []map[string]any, đồng thời lấy danh sách cột
+// theo ĐÚNG thứ tự xuất hiện trong JSON (không dùng range trên map).
 func parseJSONRows(stdout []byte) ([]map[string]any, []string, error) {
 	trimmed := bytes.TrimSpace(stdout)
 	if len(trimmed) == 0 {
@@ -349,10 +353,10 @@ func parseJSONRows(stdout []byte) ([]map[string]any, []string, error) {
 		return nil, nil, nil
 	}
 
-	// Lấy tên cột từ dòng đầu tiên
-	cols := make([]string, 0, len(rows[0]))
-	for k := range rows[0] {
-		cols = append(cols, k)
+	// Lấy tên cột theo thứ tự key của dòng đầu tiên
+	cols, err := orderedKeys(trimmed)
+	if err != nil {
+		return nil, nil, fmt.Errorf("đọc thứ tự cột thất bại: %w", err)
 	}
 
 	return rows, cols, nil
@@ -893,22 +897,40 @@ func getUniqueTableName(baseName string, existingViews map[string]bool) string {
 	}
 }
 
-// getColumnsFromSelect lấy tên cột bằng SELECT * LIMIT 0.
-// preSQL (nếu có) sẽ được gộp vào câu SELECT.
+// getColumnsFromSelect lấy tên cột của view bằng DESCRIBE (có thứ tự chuẩn, và hoạt động
+// cả khi bảng rỗng — khác với SELECT ... LIMIT 0 vốn trả về 0 dòng nên không có key nào).
+// preSQL (nếu có) sẽ được gộp vào câu lệnh.
 func getColumnsFromSelect(sess *duckdbSession, tableName, preSQL string) ([]string, error) {
-	selectSQL := fmt.Sprintf("SELECT * FROM \"%s\" LIMIT 0", escapeDQ(tableName))
+	descSQL := fmt.Sprintf("DESCRIBE \"%s\"", escapeDQ(tableName))
 	if preSQL != "" {
-		selectSQL = preSQL + "; " + selectSQL
+		descSQL = preSQL + "; " + descSQL
 	}
-	stdout, _, err := runDuckDB(sess.dbFile, selectSQL)
+
+	stdout, _, err := runDuckDB(sess.dbFile, descSQL)
 	if err != nil {
 		return nil, fmt.Errorf("đọc cột thất bại: %w", err)
 	}
-	_, cols, err2 := parseJSONRows(stdout)
-	if err2 != nil {
-		return nil, err2
+
+	for _, arr := range extractJSONArrays(stdout) {
+		rows, _, err2 := parseJSONRows(arr)
+		if err2 != nil || len(rows) == 0 {
+			continue
+		}
+		if _, ok := rows[0]["column_name"]; !ok {
+			continue
+		}
+
+		// Mỗi dòng DESCRIBE là 1 cột, thứ tự dòng = thứ tự cột
+		cols := make([]string, 0, len(rows))
+		for _, row := range rows {
+			if name, ok := row["column_name"]; ok {
+				cols = append(cols, fmt.Sprintf("%v", name))
+			}
+		}
+		return cols, nil
 	}
-	return cols, nil
+
+	return []string{}, nil
 }
 
 // GetSessionFiles trả về danh sách file đã nạp trong session.
@@ -1083,4 +1105,52 @@ func ClearSessionFiles(sessionID string) {
 // escapeDQ escape dấu " trong tên identifier (internal).
 func escapeDQ(s string) string {
 	return strings.ReplaceAll(s, "\"", "\"\"")
+}
+
+// orderedKeys trả về tên các key của object ĐẦU TIÊN trong mảng JSON,
+// theo đúng thứ tự xuất hiện trong chuỗi JSON (= thứ tự cột của câu SELECT).
+// Không thể dùng map[string]any vì Go map không giữ thứ tự khi range.
+// Key trùng (vd: SELECT a.id, b.id) chỉ được giữ 1 lần.
+func orderedKeys(raw []byte) ([]string, error) {
+	dec := json.NewDecoder(bytes.NewReader(raw))
+
+	// Token '[' mở đầu mảng
+	if _, err := dec.Token(); err != nil {
+		return nil, err
+	}
+
+	// Token '{' mở đầu object đầu tiên
+	tok, err := dec.Token()
+	if err != nil {
+		return nil, err
+	}
+	if d, ok := tok.(json.Delim); !ok || d != '{' {
+		return nil, fmt.Errorf("phần tử đầu tiên của mảng không phải object")
+	}
+
+	keys := make([]string, 0, 16)
+	seen := make(map[string]bool)
+
+	for dec.More() {
+		keyTok, err := dec.Token()
+		if err != nil {
+			return nil, err
+		}
+		key, ok := keyTok.(string)
+		if !ok {
+			return nil, fmt.Errorf("key của object không phải string")
+		}
+
+		// Bỏ qua value (kể cả object/array lồng nhau) để con trỏ nhảy tới key kế tiếp
+		var skip json.RawMessage
+		if err := dec.Decode(&skip); err != nil {
+			return nil, err
+		}
+
+		if !seen[key] {
+			seen[key] = true
+			keys = append(keys, key)
+		}
+	}
+	return keys, nil
 }
