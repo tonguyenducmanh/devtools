@@ -307,12 +307,11 @@
                     {{ group.sheets.length }}
                   </div>
                 </div>
-                <TMButton
-                  class="tm-duckdb-file-delete"
+                <span
                   :noMargin="true"
                   :isSmallButton="true"
                   :type="$tmEnum.buttonType.secondary"
-                  iconClass="tm-close-icon"
+                  class="tm-icon tm-close-icon"
                   v-tooltip="$t('i18nCommon.duckDBQuery.dropFile')"
                   @click.stop="handleDropFile(group)"
                 />
