@@ -73,7 +73,7 @@ mkdir -p "$OUTPUT_DIR"
 cp -R "$EXTERNAL_DIR/dist/web/." "$OUTPUT_DIR/"
 
 # 6. Dọn site tĩnh: nén wasm và patch index.html cho browser tự giải nén (DecompressionStream).
-. "$SCRIPT_DIR/../../scripts/wasm_dist_common.sh"
+. "$SCRIPT_DIR/../../scripts/utils/wasm_dist_common.sh"
 tm_prepare_wasm_dist "$OUTPUT_DIR" "PhotoCraft"
 
 echo "========================================="
