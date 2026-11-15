@@ -204,12 +204,12 @@ kết nối máy đối tác giả lập → mã hoá/giải mã hai chiều, đ
 
 ```text
 VERSION=1.2.3 ./build_all.sh
- ├─ scripts/tm_version.sh        → version + ldflags
- ├─ scripts/build_wasm.sh        → (tùy chọn, đang comment) build IronRDP + .NET + 2 craft tool
- ├─ scripts/build_web_for_daemon.sh → npm install && npm run build
- │      └─ copy dist/ → src_backend/tm_core_service/internal/web/dist/  (go:embed)
- ├─ scripts/build_api.sh         → out/dev-tool-api-{mac-arm|linux|window}
- └─ scripts/build_daemon.sh      → out/dev-tool-{mac-arm|linux|window}-<VERSION> (nhúng frontend)
+  ├─ scripts/utils/tm_version.sh        → version + ldflags
+  ├─ scripts/build/build_wasm.sh        → (tùy chọn, đang comment) build IronRDP + .NET + 2 craft tool
+  ├─ scripts/build/build_web_for_daemon.sh → npm install && npm run build
+  │      └─ copy dist/ → src_backend/tm_core_service/internal/web/dist/  (go:embed)
+  ├─ scripts/build/build_api.sh         → out/dev-tool-api-{mac-arm|linux|window}
+  └─ scripts/build/build_daemon.sh      → out/dev-tool-{mac-arm|linux|window}-<VERSION> (nhúng frontend)
 ```
 
 VERSION: `VERSION` env > `package.json.version`; `vite.config.js` đặt `import.meta.env.PACKAGE_VERSION`; `tm_version.sh` tạo `-X tm_config.Version=…`. UI version và BE version luôn khớp, frontend tự so sánh qua health check (hiện cảnh báo "agent not found"/version lệch).
@@ -217,11 +217,11 @@ VERSION: `VERSION` env > `package.json.version`; `vite.config.js` đặt `import
 ### Deploy web (Cloudflare Pages, thủ công)
 
 ```text
-./scripts/deploy_cloudflare.sh [--build-wasm] [--preview]
- ├─ scripts/build_wasm.sh      → (tùy chọn) build lại wasm vào src_wasm/pkg/
- ├─ npm install
- ├─ REQUIRE_WASM=1 npm run build
- └─ npx wrangler pages deploy dist --project-name devtools   (wrangler.jsonc)
+./scripts/deploy/deploy_cloudflare.sh [--build-wasm] [--preview]
+  ├─ scripts/build/build_wasm.sh      → (tùy chọn) build lại wasm vào src_wasm/pkg/
+  ├─ npm install
+  ├─ REQUIRE_WASM=1 npm run build
+  └─ npx wrangler pages deploy dist --project-name devtools   (wrangler.jsonc)
 ```
 
 Pages project: `devtools`. **Không bật Git integration** — Pages chỉ checkout code sẽ không có `src_wasm/pkg/` nên bản deploy hỏng Remote Desktop / .NET Wrapper / 4 tool Craft.

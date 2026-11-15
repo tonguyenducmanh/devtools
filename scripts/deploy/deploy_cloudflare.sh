@@ -8,15 +8,15 @@
 #   .NET Wrapper và Craft tool đều hỏng). Nên build ở máy local rồi đẩy `dist/`.
 #
 # Cách dùng:
-#   ./scripts/deploy_cloudflare.sh              # build frontend (dùng wasm có sẵn) rồi deploy
-#   ./scripts/deploy_cloudflare.sh --build-wasm # build lại toàn bộ wasm trước khi deploy
-#   ./scripts/deploy_cloudflare.sh --preview    # deploy bản preview (URL tạm, không lên production)
+#   ./scripts/deploy/deploy_cloudflare.sh              # build frontend (dùng wasm có sẵn) rồi deploy
+#   ./scripts/deploy/deploy_cloudflare.sh --build-wasm # build lại toàn bộ wasm trước khi deploy
+#   ./scripts/deploy/deploy_cloudflare.sh --preview    # deploy bản preview (URL tạm, không lên production)
 #
 # Yêu cầu:
 #   - Đã đăng nhập Cloudflare: `npx wrangler login`
 #     hoặc đặt CLOUDFLARE_API_TOKEN (token có quyền "Cloudflare Pages: Edit").
 #   - wasm phải build được từ trước (Rust/wasm-pack, .NET 10, trunk) —
-#     xem ./scripts/build_wasm.sh.
+#     xem ./scripts/build/build_wasm.sh.
 set -e
 
 ROOT_DIR=$(cd "$(dirname "$0")/.." && pwd)
@@ -55,15 +55,15 @@ echo "========================================="
 # 1. Build lại wasm nếu được yêu cầu
 if [ "$BUILD_WASM" -eq 1 ]; then
     echo ">>> Build wasm (IronRDP + .NET + craft tool)..."
-    chmod +x ./scripts/build_wasm.sh
-    ./scripts/build_wasm.sh
+    chmod +x ./scripts/build/build_wasm.sh
+    ./scripts/build/build_wasm.sh
 fi
 
 # 2. src_wasm/pkg/ là gitignored nên phải kiểm tra trước khi build — thiếu thì
 #    bản deploy sẽ không có Remote Desktop / .NET Wrapper / Craft tools.
 if [ ! -d "$WASM_SRC" ] || [ -z "$(ls -A "$WASM_SRC" 2>/dev/null)" ]; then
     echo "LỖI: $WASM_SRC rỗng." >&2
-    echo "      Chạy: ./scripts/build_wasm.sh   (hoặc deploy với --build-wasm)" >&2
+    echo "      Chạy: ./scripts/build/build_wasm.sh   (hoặc deploy với --build-wasm)" >&2
     exit 1
 fi
 
@@ -84,7 +84,7 @@ fi
 #     trước khi đẩy lên Pages — nếu không, Pages trả index.html cho đường dẫn
 #     không tồn tại và app Craft chết với lỗi MIME text/html.
 echo ">>> Kiểm tra wasm trong dist..."
-python3 "$ROOT_DIR/scripts/check_wasm_dist.py" "$ROOT_DIR/dist"
+python3 "$ROOT_DIR/scripts/utils/check_wasm_dist.py" "$ROOT_DIR/dist"
 
 echo ">>> Nội dung dist/assets-wasm-<version>/:"
 for dir in "$ROOT_DIR"/dist/assets-wasm-*/; do

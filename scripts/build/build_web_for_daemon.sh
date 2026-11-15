@@ -16,7 +16,7 @@ mkdir -p "$OUTPUT_DIR"
 # 1b. src_wasm/pkg/ là gitignored (~58 MB binary), nên clone mới sẽ KHÔNG có.
 #     Daemon nhúng dist/ (go:embed) nên bản phát hành bắt buộc phải đủ wasm.
 if [ ! -d "$WASM_SRC" ] || [ -z "$(ls -A "$WASM_SRC" 2>/dev/null)" ]; then
-    echo "LỖI: $WASM_SRC rỗng — chạy ./scripts/build_wasm.sh trước khi build daemon." >&2
+    echo "LỖI: $WASM_SRC rỗng — chạy ./scripts/build/build_wasm.sh trước khi build daemon." >&2
     exit 1
 fi
 
@@ -28,7 +28,7 @@ REQUIRE_WASM=1 npm run build
 # 2b. Chặn wasm thiếu file (vd `snippets/` của wasm-bindgen bị làm phẳng) —
 #     daemon nhúng dist/ nên lỗi này sẽ đi theo bản release.
 echo "Đang kiểm tra wasm trong dist..."
-python3 "$ROOT_DIR/scripts/check_wasm_dist.py" "$ROOT_DIR/dist"
+python3 "$ROOT_DIR/scripts/utils/check_wasm_dist.py" "$ROOT_DIR/dist"
 
 # 3. Copy dist frontend vào backend
 echo "Đang copy frontend dist vào backend..."

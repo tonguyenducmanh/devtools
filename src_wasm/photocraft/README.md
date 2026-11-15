@@ -19,7 +19,7 @@ PhotoCraft build ra một **web app hoàn chỉnh** (egui + wgpu), gồm:
 **Cloudflare Pages/Workers giới hạn tối đa 25 MiB mỗi file.** Wasm PhotoCraft
 hiện tại ~27 MiB (vượt giới hạn), nên `build.sh` nén gzip thành `.wasm.gz` (~9 MiB).
 Phía app tự giải nén bằng `DecompressionStream('gzip')` rồi mới gọi
-`init({ module_or_path: bytes })`; `scripts/patch_wasm_dist.py` ghi cùng logic đó
+`init({ module_or_path: bytes })`; `scripts/utils/patch_wasm_dist.py` ghi cùng logic đó
 vào `index.html` để trang chạy độc lập vẫn hoạt động. Không cần đổi code Rust;
 mọi host chỉ cần serve static thông thường.
 
@@ -46,8 +46,8 @@ Kết quả build được xuất ra thư mục `src_wasm/pkg/photocraft/`.
 src_wasm/
 ├── photocraft/           # Source code build
 │   ├── external_repo/    # Clone on-demand: https://github.com/tonguyenducmanh/photocraft.git
-│   │                     # (tự clone bởi scripts/fetch_wasm_sources.sh khi build — KHÔNG phải git submodule)
-│   ├── build.sh          # gọi chung scripts/wasm_dist_common.sh để nén wasm + dọn site
+│   │                     # (tự clone bởi scripts/fetch/fetch_wasm_sources.sh khi build — KHÔNG phải git submodule)
+│   ├── build.sh          # gọi chung scripts/utils/wasm_dist_common.sh để nén wasm + dọn site
 │   └── README.md
 ├── pkg/
 │   └── photocraft/       # Output từ build (manifest.json + js + wasm.gz đã nén)
@@ -55,7 +55,7 @@ src_wasm/
 ```
 
 > Nén wasm và patch `index.html` là logic dùng chung cho mọi craft wasm
-> (`scripts/wasm_dist_common.sh` + `scripts/patch_wasm_dist.py`), không copy
+> (`scripts/utils/wasm_dist_common.sh` + `scripts/utils/patch_wasm_dist.py`), không copy
 > lại trong từng thư mục.
 
 ## Tích hợp vào app
@@ -66,7 +66,7 @@ Sau khi build, `vite.config.js` copy folder `src_wasm/pkg/photocraft` vào
 Tool `TMPhotoCraft` render thẳng một `<canvas>` và tự boot wasm từ
 `/assets-wasm-<version>/photocraft/` — **không** dùng `index.html` (xem `TMCraftApp.vue`
 và `src/common/TMCraftCanvas.js`). Nếu canvas trắng/treo, kiểm tra bạn đã chạy
-`./build.sh` (hoặc `./scripts/build_wasm.sh`) trước khi `npm run build`, và xem
+`./build.sh` (hoặc `./scripts/build/build_wasm.sh`) trước khi `npm run build`, và xem
 console trình duyệt — lỗi fetch wasm/glue được log ra ở đó.
 
 ## Lưu ý

@@ -8,7 +8,7 @@ MODULE_DIR="$ROOT_DIR/src_backend/tm_app/cmd/api_app"
 APP_NAME="$ROOT_DIR/out/dev-tool-api"
 
 # ĐỌC VERSION TỪ PACKAGE.JSON (giống cách Vite lấy version cho UI)
-. "$ROOT_DIR/scripts/tm_version.sh"
+. "$ROOT_DIR/scripts/utils/tm_version.sh"
 
 VERSION=$(tm_get_version)
 

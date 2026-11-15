@@ -59,7 +59,7 @@ Phần giao thức/giải nén nằm trong wasm; phía JS chỉ lo đọc frame 
 ./src_wasm/cimbar/build.sh
 
 # hoặc build toàn bộ wasm khác + cimbar
-./scripts/build_wasm.sh
+./scripts/build/build_wasm.sh
 ```
 
 Có thể ghim phiên bản khác bằng biến môi trường:

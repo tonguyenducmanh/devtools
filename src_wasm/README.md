@@ -17,18 +17,18 @@ src_wasm/
 ## Quy tắc quan trọng
 
 - **Không dùng git submodule.** `pkg/` là thư mục **output** (~58 MB) và **đã gitignore** —
-  không commit vào repo. Clone mới sẽ không có `pkg/`, phải chạy `scripts/build_wasm.sh` một lần.
+  không commit vào repo. Clone mới sẽ không có `pkg/`, phải chạy `scripts/build/build_wasm.sh` một lần.
 - Vì repo không chứa wasm, **Cloudflare Pages không tự build được**: deploy thủ công bằng
-  `scripts/deploy_cloudflare.sh` (build local → `wrangler pages deploy`). Đừng bật Git integration
+  `scripts/deploy/deploy_cloudflare.sh` (build local → `wrangler pages deploy`). Đừng bật Git integration
   trên Cloudflare Pages.
 - `src_wasm/*/external_repo/` được `.gitignore` và chỉ clone **on-demand** khi bạn muốn
-  build lại wasm (xem `scripts/fetch_wasm_sources.sh`).
+  build lại wasm (xem `scripts/fetch/fetch_wasm_sources.sh`).
 - Web app "craft" (PhotoCraft) build ra một **static site** (`manifest.json` + js glue +
   wasm) trong `pkg/photocraft/`, được copy lên `assets-wasm-<version>/photocraft/`.
   Phía app **không** nạp `index.html` trong iframe: `TMCraftApp.vue` tự fetch
   `manifest.json`, giải nén wasm rồi `import()` glue (xem `docs/architecture.md`).
   `index.html` vẫn được giữ làm trang chạy độc lập để debug. Phần nén wasm + patch
-  `index.html` là logic **dùng chung** trong `scripts/wasm_dist_common.sh` và
-  `scripts/patch_wasm_dist.py`.
+  `index.html` là logic **dùng chung** trong `scripts/utils/wasm_dist_common.sh` và
+  `scripts/utils/patch_wasm_dist.py`.
 
-Build tất cả: `./scripts/build_wasm.sh` (xem `docs/development.md`).
+Build tất cả: `./scripts/build/build_wasm.sh` (xem `docs/development.md`).

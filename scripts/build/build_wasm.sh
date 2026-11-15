@@ -10,9 +10,9 @@ echo "STARTING TOTAL WASM BUILD PROCESS"
 echo "========================================="
 
 # 0. Đảm bảo có nguồn external repo để build (clone on-demand, không phải submodule)
-if [ -f "$ROOT_DIR/scripts/fetch_wasm_sources.sh" ]; then
-    chmod +x "$ROOT_DIR/scripts/fetch_wasm_sources.sh"
-    "$ROOT_DIR/scripts/fetch_wasm_sources.sh"
+if [ -f "$ROOT_DIR/scripts/fetch/fetch_wasm_sources.sh" ]; then
+    chmod +x "$ROOT_DIR/scripts/fetch/fetch_wasm_sources.sh"
+    "$ROOT_DIR/scripts/fetch/fetch_wasm_sources.sh"
 fi
 
 # 1. Build Rust WASM (IronRDP)

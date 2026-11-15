@@ -5,7 +5,7 @@ echo "--- Bắt đầu quy trình daemon ---"
 ROOT_DIR=$(pwd)
 
 # ĐỌC VERSION TỪ PACKAGE.JSON (giống cách Vite lấy version cho UI)
-. "$ROOT_DIR/scripts/tm_version.sh"
+. "$ROOT_DIR/scripts/utils/tm_version.sh"
 
 VERSION=$(tm_get_version)
 

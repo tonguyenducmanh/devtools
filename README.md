@@ -23,7 +23,7 @@ Dự án này cung cấp một bộ sưu tập các công cụ hữu ích dành 
 
 ### 1. Clone
 
-Dự án này **không dùng Git Submodules** và **không commit file wasm đã build**: thư mục `src_wasm/pkg/` (wasm build xong, ~58 MB) nằm trong `.gitignore` nên repo clone về rất nhẹ. Vì vậy Cloudflare Pages **không tự build được** — deploy được làm **thủ công** bằng [`scripts/deploy_cloudflare.sh`](scripts/deploy_cloudflare.sh) (build local rồi `wrangler pages deploy`). Source của các dự án ngoài (IronRDP, PhotoCraft) chỉ được clone **khi bạn muốn build lại wasm**:
+Dự án này **không dùng Git Submodules** và **không commit file wasm đã build**: thư mục `src_wasm/pkg/` (wasm build xong, ~58 MB) nằm trong `.gitignore` nên repo clone về rất nhẹ. Vì vậy Cloudflare Pages **không tự build được** — deploy được làm **thủ công** bằng [`scripts/deploy/deploy_cloudflare.sh`](scripts/deploy/deploy_cloudflare.sh) (build local rồi `wrangler pages deploy`). Source của các dự án ngoài (IronRDP, PhotoCraft) chỉ được clone **khi bạn muốn build lại wasm**:
 
 ```bash
 git clone https://github.com/tonguyenducmanh/devtools.git
@@ -31,7 +31,7 @@ cd your-main-repo
 
 npm i
 
-# (Tùy chọn) Nếu muốn build lại wasm, chạy scripts/build_wasm.sh
+# (Tùy chọn) Nếu muốn build lại wasm, chạy scripts/build/build_wasm.sh
 # -> script tự clone nguồn cần thiết về src_wasm/<tên>/external_repo/
 ```
 
@@ -100,20 +100,20 @@ Bảng đối chiếu file-by-file nằm trong [`src_wasm/ultraviewer/README.md`
 Build toàn bộ wasm bằng:
 
 ```bash
-chmod 777 ./scripts/build_wasm.sh
-./scripts/build_wasm.sh
+chmod 777 ./scripts/build/build_wasm.sh
+./scripts/build/build_wasm.sh
 ```
 
 Script tự clone nguồn external repo (IronRDP, PhotoCraft) về `src_wasm/<tên>/external_repo/` nếu chưa có (không dùng git submodule) rồi build. Nếu chỉ muốn lấy nguồn mà chưa build:
 
 ```bash
-chmod 777 ./scripts/fetch_wasm_sources.sh
-./scripts/fetch_wasm_sources.sh
+chmod 777 ./scripts/fetch/fetch_wasm_sources.sh
+./scripts/fetch/fetch_wasm_sources.sh
 ```
 
 > **Trước khi build**, mỗi `build.sh` sẽ đi vào repo nguồn của nó và chạy
 > `git pull origin` để lấy source mới nhất **nếu thư mục đó là git repo**
-> (helper: `scripts/git_pull_if_repo.sh`). Các repo ngoài **luôn đứng trên nhánh
+> (helper: `scripts/utils/git_pull_if_repo.sh`). Các repo ngoài **luôn đứng trên nhánh
 > mặc định** của origin (không pin commit nữa); nếu repo đang ở detached HEAD thì
 > helper tự quay về nhánh mặc định rồi mới pull. Pull/checkout lỗi chỉ cảnh báo
 > rồi vẫn tiếp tục build.
@@ -128,12 +128,12 @@ chmod +x ./src_wasm/photocraft/build.sh
 ./src_wasm/photocraft/build.sh
 
 # Cách 2: build toàn bộ wasm (IronRDP + .NET + craft tool)
-chmod 777 ./scripts/build_wasm.sh
-./scripts/build_wasm.sh
+chmod 777 ./scripts/build/build_wasm.sh
+./scripts/build/build_wasm.sh
 ```
 
 Phần nén wasm + patch `index.html` là logic **dùng chung** cho các tool craft, nằm trong
-`scripts/wasm_dist_common.sh` và `scripts/patch_wasm_dist.py`.
+`scripts/utils/wasm_dist_common.sh` và `scripts/utils/patch_wasm_dist.py`.
 
 Chi tiết từng tool: [src_wasm/README.md](src_wasm/README.md).
 
@@ -156,11 +156,11 @@ npx wrangler login
 Deploy:
 
 ```bash
-chmod +x ./scripts/deploy_cloudflare.sh
+chmod +x ./scripts/deploy/deploy_cloudflare.sh
 
-./scripts/deploy_cloudflare.sh                # dùng wasm đã build sẵn
-./scripts/deploy_cloudflare.sh --build-wasm   # build lại wasm trước khi deploy
-./scripts/deploy_cloudflare.sh --preview      # bản preview, URL tạm
+./scripts/deploy/deploy_cloudflare.sh                # dùng wasm đã build sẵn
+./scripts/deploy/deploy_cloudflare.sh --build-wasm   # build lại wasm trước khi deploy
+./scripts/deploy/deploy_cloudflare.sh --preview      # bản preview, URL tạm
 ```
 
 Script sẽ: (build wasm nếu có `--build-wasm`) → `npm install` →
