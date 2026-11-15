@@ -6,33 +6,67 @@
       <div class="flex flex-start tm-tool-header-menu-group">
         <div class="flex flex-one flex-wrap tm-header-menu-group">
           <!-- từng menu item -->
-          <div v-for="(items, menuKey) in menuConfig" :key="menuKey" class="tm-menu-item"
-            :class="{ 'tm-menu-item--active': activeKeyFlyOut === menuKey }" @click="openFlyout(menuKey, $event)"
-            @mouseleave="scheduleCloseFlyout()">
+          <div
+            v-for="(items, menuKey) in menuConfig"
+            :key="menuKey"
+            class="tm-menu-item"
+            :class="{ 'tm-menu-item--active': activeKeyFlyOut === menuKey }"
+            @click="openFlyout(menuKey, $event)"
+            @mouseleave="scheduleCloseFlyout()"
+          >
             <span>{{ $t(`i18nCommon.duckDBQuery.${menuKey}`) }}</span>
           </div>
         </div>
         <!-- nút chạy query -->
-        <TMButton :noMargin="true" @click="handleRunQuery" iconClass="tm-send-icon" :isSmallButton="true"
-          v-tooltip="$t('i18nCommon.duckDBQuery.runQuery')"></TMButton>
+        <TMButton
+          :noMargin="true"
+          @click="handleRunQuery"
+          iconClass="tm-send-icon"
+          :isSmallButton="true"
+          v-tooltip="$t('i18nCommon.duckDBQuery.runQuery')"
+        ></TMButton>
         <!-- flyout panel chứa danh sách action theo menu đang active -->
-        <TMFlyoutPanel :show="!!activeKeyFlyOut" :anchorElFlyout="anchorElFlyout" placement="bottom"
-          panel-class="tm-query-action-flyout" @mouseenter="cancelCloseFlyOut" @mouseleave="scheduleCloseFlyout()">
-          <div v-for="action in currentMenuItems" :key="action.key" class="tm-flyout-item"
-            :class="{ 'tm-toolbar-btn-disabled': action.disabled }" v-tooltip="action.tooltip"
-            @click="onActionClick(action)">
+        <TMFlyoutPanel
+          :show="!!activeKeyFlyOut"
+          :anchorElFlyout="anchorElFlyout"
+          placement="bottom"
+          panel-class="tm-query-action-flyout"
+          @mouseenter="cancelCloseFlyOut"
+          @mouseleave="scheduleCloseFlyout()"
+        >
+          <div
+            v-for="action in currentMenuItems"
+            :key="action.key"
+            class="tm-flyout-item"
+            :class="{ 'tm-toolbar-btn-disabled': action.disabled }"
+            v-tooltip="action.tooltip"
+            @click="onActionClick(action)"
+          >
             <span>{{ action.label }}</span>
           </div>
         </TMFlyoutPanel>
       </div>
 
       <!-- editor SQL Monaco (chiếm phần trên, có thể kéo resize) -->
-      <div class="flex flex-one tm-pg-query-editor" :style="editorSectionSizeStyle">
-        <TMTextEditor ref="sqlEditor" v-model="sqlText" language="sql" :enableHighlight="true"
+      <div
+        class="flex flex-one tm-pg-query-editor"
+        :style="editorSectionSizeStyle"
+      >
+        <TMTextEditor
+          ref="sqlEditor"
+          v-model="sqlText"
+          language="sql"
+          :enableHighlight="true"
           :placeHolder="$t('i18nCommon.duckDBQuery.sqlEditorPlaceholder')"
-          :label="$t('i18nCommon.duckDBQuery.sqlEditorLabel')" :isLabelTop="true" height="100%" width="100%"
-          :monacoOptions="monacoOptions" @keydown.ctrl.enter.prevent="handleRunQuery"
-          @keydown.meta.enter.prevent="handleRunQuery" :showCursorTextFooter="true">
+          :label="$t('i18nCommon.duckDBQuery.sqlEditorLabel')"
+          :isLabelTop="true"
+          height="100%"
+          width="100%"
+          :monacoOptions="monacoOptions"
+          @keydown.ctrl.enter.prevent="handleRunQuery"
+          @keydown.meta.enter.prevent="handleRunQuery"
+          :showCursorTextFooter="true"
+        >
         </TMTextEditor>
       </div>
 
@@ -58,13 +92,28 @@
           <!-- kết quả query (list danh sách bên trái + preview bên phải) -->
           <div v-else class="flex tm-pg-result-body">
             <!-- danh sách toàn bộ kết quả (virtual scroll, hiển thị khi có nhiều câu lệnh) -->
-            <div class="flex tm-pg-result-tabs-wrap" v-if="hasMultipleResultStatement" :style="resultListWidthStyle">
+            <div
+              class="flex tm-pg-result-tabs-wrap"
+              v-if="hasMultipleResultStatement"
+              :style="resultListWidthStyle"
+            >
               <div class="flex tm-pg-result-tabs">
-                <TMVirtualScroll :items="queryResults" :itemHeight="20" :gap="6" :bufferSize="3">
+                <TMVirtualScroll
+                  :items="queryResults"
+                  :itemHeight="20"
+                  :gap="6"
+                  :bufferSize="3"
+                >
                   <template #default="{ item, index }">
-                    <div class="text-nowrap tm-pg-result-tab-item" :class="{
-                      'tm-pg-result-tab-item-active': activeResultIndex === index,
-                    }" v-tooltip="getResultTabLabel(item, index)" @click="activateResultTab(index)">
+                    <div
+                      class="text-nowrap tm-pg-result-tab-item"
+                      :class="{
+                        'tm-pg-result-tab-item-active':
+                          activeResultIndex === index,
+                      }"
+                      v-tooltip="getResultTabLabel(item, index)"
+                      @click="activateResultTab(index)"
+                    >
                       {{ getResultTabLabel(item, index) }}
                     </div>
                   </template>
@@ -73,15 +122,29 @@
             </div>
             <div class="flex flex-col flex-one tm-pg-result-content">
               <!-- bảng hiển thị dữ liệu SELECT -->
-              <div v-if="activeQueryResult && activeQueryResult.is_select" class="tm-pg-result-table">
+              <div
+                v-if="activeQueryResult && activeQueryResult.is_select"
+                class="tm-pg-result-table"
+              >
                 <KeepAlive>
-                  <TMTableViewer :key="activeResultCacheKey" :tableData="activeQueryResult.rows"
-                    :columns="activeTableColumns" :noMargin="true" :stickyHeader="true" :showIndex="true"
-                    :usingFooterHelp="true" :showFooter="true" maxHeight="100%" />
+                  <TMTableViewer
+                    :key="activeResultCacheKey"
+                    :tableData="activeQueryResult.rows"
+                    :columns="activeTableColumns"
+                    :noMargin="true"
+                    :stickyHeader="true"
+                    :showIndex="true"
+                    :usingFooterHelp="true"
+                    :showFooter="true"
+                    maxHeight="100%"
+                  />
                 </KeepAlive>
               </div>
               <!-- hiển thị số dòng bị ảnh hưởng (INSERT/UPDATE/DELETE/CREATE) -->
-              <div v-if="activeQueryResult && !activeQueryResult.is_select" class="flex tm-pg-result-affected">
+              <div
+                v-if="activeQueryResult && !activeQueryResult.is_select"
+                class="flex tm-pg-result-affected"
+              >
                 <TMDynamicBackgroundEffect />
                 <span class="tm-effected-text">
                   {{ $t("i18nCommon.duckDBQuery.rowsAffected") }}:
@@ -95,113 +158,205 @@
     </div>
 
     <!-- sidebar phải: Help / Setting / Files / SQL Save -->
-    <TMSubSidebar ref="subSidebar" v-model="currentConfigLayout.isShowSidebar" @toggleSidebar="toggleSidebar">
+    <TMSubSidebar
+      ref="subSidebar"
+      v-model="currentConfigLayout.isShowSidebar"
+      @toggleSidebar="toggleSidebar"
+    >
       <!-- thanh menu trên sidebar -->
       <template v-slot:menu>
         <div class="tm-sidebar-menu">
-          <TMSlideOption :showIcon="true" v-if="sidebarOptions && sidebarOptions.length > 1"
-            v-model="currentConfigLayout.currentSidebarOption" :options="sidebarOptions" :noMargin="true"
-            @change="updateConfigLayout" />
+          <TMSlideOption
+            :showIcon="true"
+            v-if="sidebarOptions && sidebarOptions.length > 1"
+            v-model="currentConfigLayout.currentSidebarOption"
+            :options="sidebarOptions"
+            :noMargin="true"
+            @change="updateConfigLayout"
+          />
         </div>
       </template>
 
       <template v-slot:main>
         <!-- tab Help -->
-        <div class="tm-sidebar-content" v-show="currentConfigLayout.currentSidebarOption ===
-          $tmEnum.DuckDBQuerySidebarOption.Help
-          ">
+        <div
+          class="tm-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ===
+            $tmEnum.DuckDBQuerySidebarOption.Help
+          "
+        >
           <TMDuckDBQueryHelp />
         </div>
 
         <!-- tab Setting -->
-        <div class="tm-sidebar-content" v-show="currentConfigLayout.currentSidebarOption ===
-          $tmEnum.DuckDBQuerySidebarOption.Setting
-          ">
-          <TMCheckbox :variant="$tmEnum.checkboxType.switch" v-model="currentConfigLayout.autoSaveQueryAfterExec"
-            :label="$t('i18nCommon.duckDBQuery.autoSaveQueryAfterExec')" @change="updateConfigLayout" />
-          <TMCheckbox :variant="$tmEnum.checkboxType.switch" v-model="currentConfigLayout.limitResults"
+        <div
+          class="tm-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ===
+            $tmEnum.DuckDBQuerySidebarOption.Setting
+          "
+        >
+          <TMCheckbox
+            :variant="$tmEnum.checkboxType.switch"
+            v-model="currentConfigLayout.autoSaveQueryAfterExec"
+            :label="$t('i18nCommon.duckDBQuery.autoSaveQueryAfterExec')"
+            @change="updateConfigLayout"
+          />
+          <TMCheckbox
+            :variant="$tmEnum.checkboxType.switch"
+            v-model="currentConfigLayout.limitResults"
             :label="$t('i18nCommon.duckDBQuery.limitResults')"
-            v-tooltip="$t('i18nCommon.duckDBQuery.limitResultsDesc')" @change="updateConfigLayout" />
-          <div class="tm-query-config" v-show="currentConfigLayout.limitResults">
-            <TMInput :noMargin="true" inputType="number" :modelValue="currentConfigLayout.defaultQueryLimit"
-              :label="$t('i18nCommon.duckDBQuery.defaultQueryLimit')" :isLabelTop="false"
-              v-tooltip="$t('i18nCommon.duckDBQuery.defaultQueryLimitDesc')" @update:modelValue="
+            v-tooltip="$t('i18nCommon.duckDBQuery.limitResultsDesc')"
+            @change="updateConfigLayout"
+          />
+          <div
+            class="tm-query-config"
+            v-show="currentConfigLayout.limitResults"
+          >
+            <TMInput
+              :noMargin="true"
+              inputType="number"
+              :modelValue="currentConfigLayout.defaultQueryLimit"
+              :label="$t('i18nCommon.duckDBQuery.defaultQueryLimit')"
+              :isLabelTop="false"
+              v-tooltip="$t('i18nCommon.duckDBQuery.defaultQueryLimitDesc')"
+              @update:modelValue="
                 (v) => {
                   currentConfigLayout.defaultQueryLimit = Number(v);
                   updateConfigLayout();
                 }
-              " />
+              "
+            />
           </div>
           <!-- Session info -->
           <div class="tm-duckdb-session-info">
-            <div class="tm-session-label">{{ $t('i18nCommon.duckDBQuery.sessionLabel') }}</div>
-            <div class="tm-session-id" v-tooltip="currentSessionId">{{ currentSessionIdShort }}</div>
+            <div class="tm-session-label">
+              {{ $t("i18nCommon.duckDBQuery.sessionLabel") }}
+            </div>
+            <div class="tm-session-id" v-tooltip="currentSessionId">
+              {{ currentSessionIdShort }}
+            </div>
           </div>
         </div>
 
         <!-- tab Files: upload + danh sách bảng đã nạp -->
-        <div class="flex flex-col tm-sidebar-content" v-show="currentConfigLayout.currentSidebarOption ===
-          $tmEnum.DuckDBQuerySidebarOption.Files
-          ">
+        <div
+          class="flex flex-col tm-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ===
+            $tmEnum.DuckDBQuerySidebarOption.Files
+          "
+        >
           <!-- khu vực upload file: hover để xem định dạng hỗ trợ, click hoặc kéo thả để nạp -->
-          <div class="tm-duckdb-upload-area" :class="{ 'tm-duckdb-upload-area--busy': isUploading }"
-            v-tooltip="{ text: uploadTooltipText, maxWidth: '320px' }" @dragover.prevent
-            @drop.prevent="handleFileDrop" @click="triggerFileInput">
-            <input ref="fileInput" type="file" class="tm-duckdb-file-input"
-              accept=".xlsx,.xls,.csv,.tsv,.parquet,.json,.ndjson,.jsonl" @change="handleFileSelect" />
+          <div
+            class="tm-duckdb-upload-area"
+            :class="{ 'tm-duckdb-upload-area--busy': isUploading }"
+            v-tooltip="{ text: uploadTooltipText, maxWidth: '320px' }"
+            @dragover.prevent
+            @drop.prevent="handleFileDrop"
+            @click="triggerFileInput"
+          >
+            <input
+              ref="fileInput"
+              type="file"
+              class="tm-duckdb-file-input"
+              accept=".xlsx,.xls,.csv,.tsv,.parquet,.json,.ndjson,.jsonl"
+              @change="handleFileSelect"
+            />
             <span class="tm-duckdb-upload-icon-wrap">
               <span class="tm-icon tm-upload-icon"></span>
             </span>
-            <span class="tm-duckdb-upload-title">{{ $t('i18nCommon.duckDBQuery.uploadAreaTitle') }}</span>
-            <span class="tm-duckdb-upload-text">{{ $t('i18nCommon.duckDBQuery.uploadFileDesc') }}</span>
-            <span class="tm-duckdb-upload-formats">{{ $t('i18nCommon.duckDBQuery.uploadAreaFormats') }}</span>
           </div>
 
           <!-- loading khi upload -->
-          <div class="flex flex-col tm-duckdb-upload-loading" v-if="isUploading">
+          <div
+            class="flex flex-col tm-duckdb-upload-loading"
+            v-if="isUploading"
+          >
             <TMLoading />
-            <span class="tm-duckdb-uploading-text">{{ $t('i18nCommon.duckDBQuery.uploadingFile') }}</span>
+            <span class="tm-duckdb-uploading-text">{{
+              $t("i18nCommon.duckDBQuery.uploadingFile")
+            }}</span>
           </div>
 
           <!-- danh sách file đã nạp: tên file / tên bảng / số dòng / nút xoá -->
           <div class="tm-duckdb-file-list" v-if="loadedFiles.length > 0">
             <div class="flex tm-duckdb-file-list-header">
-              <span class="tm-duckdb-file-list-title">{{ $t('i18nCommon.duckDBQuery.uploadedFiles') }}</span>
-              <span class="tm-duckdb-file-list-count">{{ loadedFiles.length }}</span>
+              <span class="tm-duckdb-file-list-title">{{
+                $t("i18nCommon.duckDBQuery.uploadedFiles")
+              }}</span>
+              <span class="tm-duckdb-file-list-count">{{
+                loadedFiles.length
+              }}</span>
             </div>
-            <div v-for="file in loadedFiles" :key="file.file_id" class="tm-duckdb-file-item">
+            <div
+              v-for="file in loadedFiles"
+              :key="file.file_id"
+              class="tm-duckdb-file-item"
+            >
               <div class="tm-duckdb-file-item-info">
-                <div class="text-nowrap tm-duckdb-file-name" v-tooltip="file.file_name">
+                <div
+                  class="text-nowrap tm-duckdb-file-name"
+                  v-tooltip="file.file_name"
+                >
                   {{ file.file_name }}
                 </div>
                 <div class="tm-duckdb-file-table">
-                  <span class="text-nowrap tm-table-badge" v-tooltip="file.table_name">{{ file.table_name }}</span>
+                  <span
+                    class="text-nowrap tm-table-badge"
+                    v-tooltip="file.table_name"
+                    >{{ file.table_name }}</span
+                  >
                 </div>
                 <div class="tm-duckdb-file-rows">
-                  {{ formatRowCount(file.row_count) }} {{ $t('i18nCommon.duckDBQuery.rowCount') }}
+                  {{ formatRowCount(file.row_count) }}
+                  {{ $t("i18nCommon.duckDBQuery.rowCount") }}
                 </div>
               </div>
-              <TMButton class="tm-duckdb-file-delete" :noMargin="true" :isSmallButton="true"
-                :type="$tmEnum.buttonType.secondary" iconClass="tm-cancel-icon"
-                v-tooltip="$t('i18nCommon.duckDBQuery.dropFile')" @click.stop="handleDropFile(file)" />
+              <TMButton
+                class="tm-duckdb-file-delete"
+                :noMargin="true"
+                :isSmallButton="true"
+                :type="$tmEnum.buttonType.secondary"
+                iconClass="tm-close-icon"
+                v-tooltip="$t('i18nCommon.duckDBQuery.dropFile')"
+                @click.stop="handleDropFile(file)"
+              />
             </div>
           </div>
 
           <!-- empty state khi chưa có file -->
           <div class="tm-duckdb-no-files" v-else-if="!isUploading">
             <span class="tm-icon tm-database-icon"></span>
-            <span class="tm-duckdb-no-files-title">{{ $t('i18nCommon.duckDBQuery.noFilesLoaded') }}</span>
-            <span class="tm-duckdb-no-files-desc">{{ $t('i18nCommon.duckDBQuery.noFilesLoadedDesc') }}</span>
+            <span class="tm-duckdb-no-files-title">{{
+              $t("i18nCommon.duckDBQuery.noFilesLoaded")
+            }}</span>
+            <span class="tm-duckdb-no-files-desc">{{
+              $t("i18nCommon.duckDBQuery.noFilesLoadedDesc")
+            }}</span>
           </div>
         </div>
 
         <!-- tab SQL Save: danh sách query đã lưu -->
-        <div class="tm-sidebar-content" v-show="currentConfigLayout.currentSidebarOption ===
-          $tmEnum.DuckDBQuerySidebarOption.SQLSave
-          ">
-          <TMHistorySidebar ref="savedQueryHistory" :applyFunction="applySavedQueryFromHistory" titleKey="query_name"
-            :noMargin="true" :positionRelative="false" :cacheKey="$tmEnum.cacheConfig.DuckDBQuerySavedQuery"
-            :historyContainerStyleEnum="$tmEnum.AbsolutePositionStyle.Top100Left" />
+        <div
+          class="tm-sidebar-content"
+          v-show="
+            currentConfigLayout.currentSidebarOption ===
+            $tmEnum.DuckDBQuerySidebarOption.SQLSave
+          "
+        >
+          <TMHistorySidebar
+            ref="savedQueryHistory"
+            :applyFunction="applySavedQueryFromHistory"
+            titleKey="query_name"
+            :noMargin="true"
+            :positionRelative="false"
+            :cacheKey="$tmEnum.cacheConfig.DuckDBQuerySavedQuery"
+            :historyContainerStyleEnum="
+              $tmEnum.AbsolutePositionStyle.Top100Left
+            "
+          />
         </div>
       </template>
     </TMSubSidebar>
@@ -360,7 +515,10 @@ export default {
 
     resultListWidthStyle() {
       let maxLen = (this.queryResults || []).reduce((max, item, index) => {
-        return Math.max(max, (this.getResultTabLabel(item, index) || "").length);
+        return Math.max(
+          max,
+          (this.getResultTabLabel(item, index) || "").length,
+        );
       }, 1);
       return { width: Math.min(Math.max(maxLen * 7.5 + 28, 90), 340) + "px" };
     },
@@ -495,7 +653,9 @@ export default {
       if (!result) return null;
       return {
         columns: Array.isArray(result.columns) ? result.columns : [],
-        table_names: Array.isArray(result.table_names) ? result.table_names : [],
+        table_names: Array.isArray(result.table_names)
+          ? result.table_names
+          : [],
         rows: Array.isArray(result.rows) ? result.rows : [],
         rows_affected: Number(result.rows_affected || 0),
         is_select: !!result.is_select,
@@ -543,12 +703,17 @@ export default {
      */
     async initSession() {
       let me = this;
-      let cached = await me.$tmCache.get(me.$tmEnum.cacheConfig.DuckDBSessionId);
+      let cached = await me.$tmCache.get(
+        me.$tmEnum.cacheConfig.DuckDBSessionId,
+      );
       if (cached) {
         me.currentSessionId = cached;
       } else {
         me.currentSessionId = me.$tmUtility.newGuid();
-        await me.$tmCache.set(me.$tmEnum.cacheConfig.DuckDBSessionId, me.currentSessionId);
+        await me.$tmCache.set(
+          me.$tmEnum.cacheConfig.DuckDBSessionId,
+          me.currentSessionId,
+        );
       }
     },
 
@@ -589,17 +754,21 @@ export default {
           !me.currentConfigLayout.limitResults,
         );
 
-        let normalizedResults = me.normalizeMultiQueryResult(response?.data?.data);
+        let normalizedResults = me.normalizeMultiQueryResult(
+          response?.data?.data,
+        );
         me.queryResults = normalizedResults;
         me.activeResultIndex = 0;
 
         if (!response?.data?.success) {
           me.resetQueryResults();
-          me.queryError = response?.data?.message ?? me.$t("i18nCommon.toastMessage.error");
+          me.queryError =
+            response?.data?.message ?? me.$t("i18nCommon.toastMessage.error");
         }
       } catch (error) {
         me.resetQueryResults();
-        me.queryError = error?.message ?? me.$t("i18nCommon.toastMessage.error");
+        me.queryError =
+          error?.message ?? me.$t("i18nCommon.toastMessage.error");
       } finally {
         me.isRunning = false;
         // Auto-save query
@@ -656,7 +825,16 @@ export default {
      */
     async uploadFile(file) {
       let me = this;
-      let supportedExts = [".xlsx", ".xls", ".csv", ".tsv", ".parquet", ".json", ".ndjson", ".jsonl"];
+      let supportedExts = [
+        ".xlsx",
+        ".xls",
+        ".csv",
+        ".tsv",
+        ".parquet",
+        ".json",
+        ".ndjson",
+        ".jsonl",
+      ];
       let ext = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
       if (!supportedExts.includes(ext)) {
         me.$tmToast.warning(me.$t("i18nCommon.duckDBQuery.supportedFormats"));
@@ -669,22 +847,31 @@ export default {
         if (resp?.data?.success) {
           let info = resp.data.data;
           // Thêm vào danh sách hoặc cập nhật nếu trùng file_id
-          let existingIdx = me.loadedFiles.findIndex(f => f.file_id === info.file_id);
+          let existingIdx = me.loadedFiles.findIndex(
+            (f) => f.file_id === info.file_id,
+          );
           if (existingIdx >= 0) {
             me.loadedFiles[existingIdx] = info;
           } else {
             me.loadedFiles.push(info);
           }
-          me.$tmToast.success(me.$t("i18nCommon.duckDBQuery.uploadFileSuccess"));
+          me.$tmToast.success(
+            me.$t("i18nCommon.duckDBQuery.uploadFileSuccess"),
+          );
           // Tự động suggest query mẫu
           if (!me.sqlText?.trim()) {
             me.sqlText = `SELECT * FROM ${info.table_name} LIMIT 100;`;
           }
         } else {
-          me.$tmToast.error(resp?.data?.message || me.$t("i18nCommon.duckDBQuery.uploadFileError"));
+          me.$tmToast.error(
+            resp?.data?.message ||
+              me.$t("i18nCommon.duckDBQuery.uploadFileError"),
+          );
         }
       } catch (err) {
-        me.$tmToast.error(err?.message || me.$t("i18nCommon.duckDBQuery.uploadFileError"));
+        me.$tmToast.error(
+          err?.message || me.$t("i18nCommon.duckDBQuery.uploadFileError"),
+        );
       } finally {
         me.isUploading = false;
       }
@@ -696,15 +883,25 @@ export default {
     async handleDropFile(file) {
       let me = this;
       try {
-        let resp = await me.agentAPI.dropFile(me.currentSessionId, file.file_id);
+        let resp = await me.agentAPI.dropFile(
+          me.currentSessionId,
+          file.file_id,
+        );
         if (resp?.data?.success) {
-          me.loadedFiles = me.loadedFiles.filter(f => f.file_id !== file.file_id);
+          me.loadedFiles = me.loadedFiles.filter(
+            (f) => f.file_id !== file.file_id,
+          );
           me.$tmToast.success(me.$t("i18nCommon.duckDBQuery.dropFileSuccess"));
         } else {
-          me.$tmToast.error(resp?.data?.message || me.$t("i18nCommon.duckDBQuery.dropFileError"));
+          me.$tmToast.error(
+            resp?.data?.message ||
+              me.$t("i18nCommon.duckDBQuery.dropFileError"),
+          );
         }
       } catch (err) {
-        me.$tmToast.error(err?.message || me.$t("i18nCommon.duckDBQuery.dropFileError"));
+        me.$tmToast.error(
+          err?.message || me.$t("i18nCommon.duckDBQuery.dropFileError"),
+        );
       }
     },
 
@@ -718,18 +915,25 @@ export default {
       );
       // Nếu không có dialog thì dùng confirm native
       if (confirmed === undefined) {
-        confirmed = window.confirm(me.$t("i18nCommon.duckDBQuery.newSessionConfirm"));
+        confirmed = window.confirm(
+          me.$t("i18nCommon.duckDBQuery.newSessionConfirm"),
+        );
       }
       if (!confirmed) return;
 
       // Xoá session cũ
       try {
         await me.agentAPI.dropSession(me.currentSessionId);
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
 
       // Tạo session mới
       me.currentSessionId = me.$tmUtility.newGuid();
-      await me.$tmCache.set(me.$tmEnum.cacheConfig.DuckDBSessionId, me.currentSessionId);
+      await me.$tmCache.set(
+        me.$tmEnum.cacheConfig.DuckDBSessionId,
+        me.currentSessionId,
+      );
       me.loadedFiles = [];
       me.resetQueryResults();
       me.sqlText = "";
@@ -786,8 +990,14 @@ export default {
       if (text) {
         let encoder = new TextEncoder();
         let buffer = encoder.encode(text);
-        let fileName = me.$tmUtility.createFileDownloadName("duckdb_result", { ext: ".txt" });
-        me.$tmUtility.createDownloadFileFromBuffer(buffer, "text/plain;charset=utf-8", fileName);
+        let fileName = me.$tmUtility.createFileDownloadName("duckdb_result", {
+          ext: ".txt",
+        });
+        me.$tmUtility.createDownloadFileFromBuffer(
+          buffer,
+          "text/plain;charset=utf-8",
+          fileName,
+        );
       }
     },
 
@@ -805,7 +1015,9 @@ export default {
           query_text: me.sqlText,
         };
         await me.$refs.savedQueryHistory?.saveToHistory(historyItem);
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     },
 
     /**
@@ -1019,22 +1231,17 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--padding-medium);
-  min-height: 132px;
-  padding: var(--padding) var(--padding) calc(var(--padding) * 1.5);
+  padding: var(--padding);
+  width: 100%;
   flex-shrink: 0;
   cursor: pointer;
   text-align: center;
-  border: 1px dashed var(--border-hard-color);
-  border-radius: var(--border-radius);
-  background-color: var(--bg-thirt-color);
   transition:
     border-color 0.2s ease,
     background-color 0.2s ease;
 
   &:hover {
     border-color: var(--focus-color);
-    background-color: var(--bg-layer-color);
   }
 
   // đang nạp file: khoá tương tác để không mở hộp chọn file chồng lên tiến trình
@@ -1090,7 +1297,7 @@ export default {
     white-space: nowrap;
     text-overflow: ellipsis;
     border: 1px solid var(--border-color);
-    border-radius: 999px;
+    border-radius: var(--border-radius);
     background-color: var(--bg-main-color);
     font-size: 11px;
     letter-spacing: 0.02em;
@@ -1116,6 +1323,7 @@ export default {
 .tm-duckdb-file-list {
   display: flex;
   flex-direction: column;
+  width: 100%;
   gap: var(--padding-medium);
   flex: 1;
   min-height: 0;
@@ -1127,13 +1335,11 @@ export default {
     flex-shrink: 0;
     justify-content: flex-start;
     gap: var(--padding-medium);
-    padding: 0 calc(var(--padding) / 2);
 
     .tm-duckdb-file-list-title {
       font-size: 11px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--text-secondary-color);
     }
 
     .tm-duckdb-file-list-count {
@@ -1144,8 +1350,7 @@ export default {
       height: 18px;
       padding: 0 6px;
       border: 1px solid var(--border-color);
-      border-radius: 9px;
-      background-color: var(--bg-thirt-color);
+      border-radius: var(--border-radius);
       font-size: 11px;
       line-height: 1;
       color: var(--text-tertiary-color);
@@ -1161,14 +1366,12 @@ export default {
   padding: calc(var(--padding) * 0.75) var(--padding);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-component);
-  background-color: var(--bg-thirt-color);
   transition:
     border-color 0.2s ease,
     background-color 0.2s ease;
 
   &:hover {
     border-color: var(--focus-color);
-    background-color: var(--bg-layer-color);
   }
 
   .tm-duckdb-file-item-info {
@@ -1183,7 +1386,6 @@ export default {
     font-size: var(--font-size-medium-rare);
     font-weight: 600;
     line-height: 1.35;
-    color: var(--text-primary-color);
   }
 
   .tm-duckdb-file-table {
@@ -1198,30 +1400,24 @@ export default {
       background-color: var(--bg-main-color);
       font-size: var(--font-size-small);
       line-height: 1.4;
-      color: var(--focus-color);
     }
   }
 
   .tm-duckdb-file-rows {
     font-size: var(--font-size-small);
     line-height: 1.4;
-    color: var(--text-secondary-color);
   }
 }
 
 // nút xoá: mờ nhẹ cho đỡ nặng mắt, hover sáng lên và icon chuyển đỏ
 .tm-duckdb-file-delete {
   flex-shrink: 0;
-  opacity: 0.55;
+  opacity: 0.2;
   transition: opacity 0.2s ease;
 
   &:hover,
   &:focus {
     opacity: 1;
-
-    :deep(.tm-icon) {
-      color: var(--text-error-color);
-    }
   }
 }
 
