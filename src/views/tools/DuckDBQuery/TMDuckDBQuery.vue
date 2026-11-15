@@ -912,6 +912,9 @@ export default {
           me.$tmToast.success(
             me.$t("i18nCommon.duckDBQuery.uploadFileSuccess"),
           );
+          // Reset intellisense cache và nạp lại schema mới nhất
+          await me.handleDeleteIntellisenseCache(me.currentSessionId);
+          await me.handleLoadIntellisense();
           // Tự động suggest query mẫu từ tất cả bảng đã tải, ngăn cách bởi ;
           if (!me.sqlText?.trim() && infos.length > 0) {
             const queries = infos.map(
@@ -973,6 +976,9 @@ export default {
           me.loadedFiles = me.loadedFiles.filter(
             (f) => f.file_id !== file.file_id,
           );
+          // Reset intellisense cache và nạp lại schema mới nhất
+          await me.handleDeleteIntellisenseCache(me.currentSessionId);
+          await me.handleLoadIntellisense();
           me.$tmToast.success(me.$t("i18nCommon.duckDBQuery.dropFileSuccess"));
         } else {
           me.$tmToast.error(
@@ -1099,8 +1105,8 @@ export default {
       return lines.join("\n");
     },
 
-    /**
-     * Build JSON text để copy/download
+/**
+     * Xoá tất cả file khỏi session DuckDB
      */
     async handleClearAllFiles() {
       let me = this;
@@ -1115,6 +1121,9 @@ export default {
         let resp = await me.agentAPI.dropAllFiles(me.currentSessionId);
         if (resp?.data?.success) {
           me.loadedFiles = [];
+          // Reset intellisense cache và nạp lại schema mới nhất
+          await me.handleDeleteIntellisenseCache(me.currentSessionId);
+          await me.handleLoadIntellisense();
           me.$tmToast.success(
             me.$t("i18nCommon.duckDBQuery.clearAllFilesSuccess"),
           );

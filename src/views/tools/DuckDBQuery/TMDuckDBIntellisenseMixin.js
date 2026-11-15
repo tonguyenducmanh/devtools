@@ -373,31 +373,36 @@ export default {
             me._duckdbInspectLookup.tables.set(tbl, { schema, name: tbl });
         });
 
-        // ── Xây dựng function suggestions ──────────────────────────────────────
-        const functionRows = data?.functions?.rows ?? [];
-        const functionSuggestions = [];
-        const functionsBySchema = new Map();
+// ── Xây dựng function suggestions ──────────────────────────────────────
+                const functionRows = data?.functions?.rows ?? [];
+                const functionSuggestions = [];
+                const functionsBySchema = new Map();
 
-        functionRows.forEach((row) => {
-          const fnName = row.function_name;
+                functionRows.forEach((row) => {
+                  const fnName = row.function_name;
 
-          functionsBySchema.set("", functionsBySchema.get("") || []);
-          functionsBySchema.get("").push({
-            label: fnName,
-            kind: monaco.languages.CompletionItemKind.Function,
-            insertText: fnName,
-            detail: `fn ${fnName}`,
-            sortText: "0" + fnName,
-          });
+                  functionsBySchema.set("", functionsBySchema.get("") || []);
+                  functionsBySchema.get("").push({
+                    label: fnName,
+                    kind: monaco.languages.CompletionItemKind.Function,
+                    insertText: fnName,
+                    detail: `fn ${fnName}`,
+                    sortText: "0" + fnName,
+                  });
 
-          functionSuggestions.push({
-            label: fnName,
-            kind: monaco.languages.CompletionItemKind.Function,
-            insertText: fnName,
-            detail: `fn ${fnName}`,
-            sortText: "1" + fnName,
-          });
-        });
+                  functionSuggestions.push({
+                    label: fnName,
+                    kind: monaco.languages.CompletionItemKind.Function,
+                    insertText: fnName,
+                    detail: `fn ${fnName}`,
+                    sortText: "1" + fnName,
+                  });
+                });
+
+                // Set hàm built-in không nên tạo alias (chỉ dùng cho table/view)
+                const builtinFunctionSet = new Set(
+                  functionSuggestions.map((f) => f.label.toLowerCase())
+                );
 
         // ═══════════════════════════════════════════════════════════════════════
         //  ĐĂNG KÝ COMPLETION PROVIDER
@@ -538,11 +543,15 @@ export default {
                   });
 
                   (functionsBySchema.get(prefix) ?? []).forEach((fnItem) => {
-                    const alias = me._generateUniqueAlias(
-                      fnItem.label,
-                      text,
-                      me._duckdbKeywordSet,
-                    );
+                    // Không tạo alias cho built-in function
+                    const isBuiltin = builtinFunctionSet.has(fnItem.label.toLowerCase());
+                    const alias = isBuiltin
+                      ? null
+                      : me._generateUniqueAlias(
+                          fnItem.label,
+                          text,
+                          me._duckdbKeywordSet,
+                        );
                     suggestions.push({
                       ...fnItem,
                       filterText: `${prefix}.${fnItem.label}`,
@@ -587,11 +596,15 @@ export default {
 
                 suggestions.push(
                   ...functionSuggestions.map((fnItem) => {
-                    const alias = me._generateUniqueAlias(
-                      fnItem.label,
-                      text,
-                      me._duckdbKeywordSet,
-                    );
+                    // Không tạo alias cho built-in function (array_agg, count, etc.)
+                    const isBuiltin = builtinFunctionSet.has(fnItem.label.toLowerCase());
+                    const alias = isBuiltin
+                      ? null
+                      : me._generateUniqueAlias(
+                          fnItem.label,
+                          text,
+                          me._duckdbKeywordSet,
+                        );
                     return alias
                       ? {
                           ...fnItem,
