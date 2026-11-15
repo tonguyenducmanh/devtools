@@ -19,7 +19,7 @@
 #     xem ./scripts/build/build_wasm.sh.
 set -e
 
-ROOT_DIR=$(cd "$(dirname "$0")/.." && pwd)
+ROOT_DIR=$(cd "$(dirname "$0")/../.." && pwd)
 cd "$ROOT_DIR"
 
 WASM_SRC="$ROOT_DIR/src_wasm/pkg"
