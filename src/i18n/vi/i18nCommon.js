@@ -1272,6 +1272,16 @@ export default {
         files: "Files",
         sqlSave: "Script đã lưu",
       },
+      codeComplete: "Code Completion",
+      // Intellisense
+      intellisenseLoaded: "Đã tải gợi ý mã",
+      intellisenseLoading: "Đang tải gợi ý mã...",
+      loadIntellisense: "Tải gợi ý mã",
+      loadCachedIntellisense: "Tải gợi ý mã từ cache",
+      deleteIntellisenseCacheSuccess: "Đã xoá cache gợi ý mã",
+      deleteIntellisenseCacheErr: "Lỗi xoá cache gợi ý mã",
+      noSessionSelected: "Vui lòng chọn session",
+      dbInspectHint: "Nhấn F12 để xem chi tiết đối tượng",
     },
   },
 };

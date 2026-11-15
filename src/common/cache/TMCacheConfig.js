@@ -379,4 +379,16 @@ export const TMCacheConfig = {
     ExpireTime: 0,
     Note: "session id DuckDB in-memory hiện tại",
   },
+  DuckDBQueryHistory: {
+    KeyFormat: "DuckDBQueryHistory_{id}",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "cache intellisense DuckDB theo session id",
+  },
+  DuckDBBuiltinIntellisense: {
+    KeyFormat: "DuckDBBuiltinIntellisense",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "cache gợi ý built-in DuckDB, dùng chung cho mọi session",
+  },
 };

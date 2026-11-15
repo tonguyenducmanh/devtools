@@ -55,7 +55,7 @@
         <TMTextEditor
           ref="sqlEditor"
           v-model="sqlText"
-          language="sql"
+          language="duckdb"
           :enableHighlight="true"
           :placeHolder="$t('i18nCommon.duckDBQuery.sqlEditorPlaceholder')"
           :label="$t('i18nCommon.duckDBQuery.sqlEditorLabel')"
@@ -229,15 +229,15 @@
               "
             />
           </div>
-          <!-- Session info -->
-          <div class="tm-duckdb-session-info">
+          <!-- Session info (ẩn) -->
+          <!-- <div class="tm-duckdb-session-info">
             <div class="tm-session-label">
               {{ $t("i18nCommon.duckDBQuery.sessionLabel") }}
             </div>
             <div class="tm-session-id" v-tooltip="currentSessionId">
               {{ currentSessionIdShort }}
             </div>
-          </div>
+          </div> -->
         </div>
 
         <!-- tab Files: upload + danh sách bảng đã nạp -->
@@ -344,10 +344,16 @@ import TMHistorySidebar from "@/components/TMHistorySidebar.vue";
 import TMDynamicBackgroundEffect from "@/views/backgroundEffect/TMDynamicBackgroundEffect.vue";
 import TMFlyoutPanel from "@/components/TMFlyoutPanel.vue";
 import { useFlyout } from "@/common/plugin/TMUseFlyout.js";
+import TMDuckDBIntellisenseMixin from "./TMDuckDBIntellisenseMixin.js";
+import { registerDuckdbFormatProvider } from "@/monarch/duckdb/duckdbFormatProvider.js";
 
 export default {
   extends: TMToolBase,
   name: "TMDuckDBQuery",
+  /**
+   * Mixin xử lý intellisense cho DuckDB
+   */
+  mixins: [TMDuckDBIntellisenseMixin],
   components: {
     TMSubSidebar,
     TMDuckDBQueryHelp,
@@ -398,6 +404,9 @@ export default {
       isUploading: false,
       loadedFiles: [], // [{ file_id, file_name, table_name }]
 
+      // ── Intellisense ─────────────────────────────────────────────
+      isLoadingIntellisense: false,
+
       // ── Session ──────────────────────────────────────────────────
       currentSessionId: "",
 
@@ -416,6 +425,8 @@ export default {
     await me.initSession();
     // Reload danh sách file đã nạp từ server
     await me.reloadSessionFiles();
+    // Load intellisense từ cache nếu có
+    await me.loadCachedIntellisense();
   },
 
   computed: {
@@ -425,6 +436,23 @@ export default {
     menuConfig() {
       let me = this;
       return {
+        // Nhóm Code Complete: load/cache intellisense data
+        codeComplete: [
+          {
+            key: "loadIntellisense",
+            label: me.isLoadingIntellisense
+              ? me.$t("i18nCommon.duckDBQuery.intellisenseLoading")
+              : me.$t("i18nCommon.duckDBQuery.loadIntellisense"),
+            disabled: !me.currentSessionId || me.isLoadingIntellisense,
+            run: me.handleLoadIntellisense,
+          },
+          {
+            key: "loadCachedIntellisense",
+            label: me.$t("i18nCommon.duckDBQuery.loadCachedIntellisense"),
+            disabled: !me.currentSessionId,
+            run: me.loadCachedIntellisense,
+          },
+        ],
         // Nhóm Edit: format SQL, gen UUID, lưu query, session mới
         edit: [
           {
@@ -498,6 +526,8 @@ export default {
       let me = this;
       return {
         onInit: (editor, monacoInstance) => {
+          registerDuckdbFormatProvider(monacoInstance);
+
           editor.addAction({
             id: "execute-duckdb-sql",
             label: me.$t("i18nCommon.duckDBQuery.runQuery"),
@@ -772,6 +802,8 @@ export default {
       for (const file of files) {
         await this.uploadFile(file);
       }
+      // Reload intellisense 1 lần sau khi xong tất cả file
+      await this.handleLoadIntellisense();
     },
 
     /**
@@ -1026,6 +1058,15 @@ export default {
         this.currentConfigLayout.defaultQueryLimit = 0;
       }
       this.updateConfigLayout();
+    },
+
+    /**
+     * Khi đổi session: load intellisense từ cache, cập nhật tab title
+     */
+    async currentSessionId(newId) {
+      if (newId) {
+        await this.loadCachedIntellisense();
+      }
     },
   },
 };

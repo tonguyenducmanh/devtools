@@ -1280,6 +1280,16 @@ export default {
         files: "Files",
         sqlSave: "Saved scripts",
       },
+      codeComplete: "Code Completion",
+      // Intellisense
+      intellisenseLoaded: "Intellisense loaded",
+      intellisenseLoading: "Loading intellisense...",
+      loadIntellisense: "Load intellisense",
+      loadCachedIntellisense: "Load intellisense from cache",
+      deleteIntellisenseCacheSuccess: "Intellisense cache deleted",
+      deleteIntellisenseCacheErr: "Error deleting intellisense cache",
+      noSessionSelected: "Please select a session",
+      dbInspectHint: "Press F12 to inspect object",
     },
   },
 };
