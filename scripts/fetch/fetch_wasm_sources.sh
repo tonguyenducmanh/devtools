@@ -4,15 +4,15 @@
 # Repo này KHÔNG dùng git submodule, và `src_wasm/pkg/` (wasm đã build, ~58 MB)
 # cũng KHÔNG được commit — nó là gitignore. Nghĩa là clone repo về sẽ KHÔNG có
 # sẵn wasm: muốn build frontend đầy đủ (Remote Desktop / .NET Wrapper / craft
-# tool) hay deploy Cloudflare thì phải build wasm trước (./scripts/build_wasm.sh).
+# tool) hay deploy Cloudflare thì phải build wasm trước (./scripts/build/build_wasm.sh).
 # Cloudflare Pages vì thế KHÔNG bật Git integration được — deploy thủ công bằng
-# ./scripts/deploy_cloudflare.sh.
+# ./scripts/deploy/deploy_cloudflare.sh.
 #
 # Lưu ý: trước đây script có "pin commit" (checkout theo SHA cụ thể -> detached HEAD),
 # giờ đã bỏ để luôn dùng nhánh mặc định. SHA cũ được giữ lại làm chú thích tham khảo.
 set -e
 
-ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 
 fetch() {
   DIR="$1"

@@ -16,8 +16,8 @@ echo "Đang build version: $(tm_get_version)"
 # ./scripts/fetch/fetch_duckdb_extensions.sh
 
 # 1. Build WASM (IronRDP, UltraViewer, .NET Wrapper, PhotoCraft)
-# chmod 777 ./scripts/build/build_wasm.sh
-# ./scripts/build/build_wasm.sh
+chmod 777 ./scripts/build/build_wasm.sh
+./scripts/build/build_wasm.sh
 
 # 2. Build Frontend (npm install + npm run build + copy dist vào backend)
 chmod 777 ./scripts/build/build_web_for_daemon.sh

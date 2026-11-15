@@ -24,7 +24,7 @@
           :type="$tmEnum.buttonType.secondary"
           iconClass="tm-book-icon"
           :isSmallButton="true"
-          style="margin-right: var(--padding);"
+          style="margin-right: var(--padding)"
           v-tooltip="$t('i18nCommon.duckDBQuery.apiReference')"
         ></TMButton>
         <!-- nút chạy query -->
@@ -299,17 +299,12 @@
                 class="tm-duckdb-file-group-header"
                 v-tooltip="group.file_name"
               >
-                <div>
+                <div class="tm-duckdb-file-group-left">
                   <div class="tm-duckdb-file-group-name">
                     {{ group.file_name }}
                   </div>
                   <div class="tm-duckdb-file-group-count">
                     {{ group.sheets.length }}
-                    {{
-                      group.sheets.length === 1
-                        ? $t("i18nCommon.duckDBQuery.sheet")
-                        : $t("i18nCommon.duckDBQuery.sheets")
-                    }}
                   </div>
                 </div>
                 <TMButton
@@ -344,10 +339,7 @@
           </div>
 
           <!-- Nút xoá tất cả: cố định dưới cùng sidebar, không scroll theo danh sách -->
-          <div
-            class="tm-duckdb-clear-all-wrap"
-            v-if="loadedFiles.length > 0"
-          >
+          <div class="tm-duckdb-clear-all-wrap" v-if="loadedFiles.length > 0">
             <TMButton
               class="tm-duckdb-clear-all-btn"
               :noMargin="true"
@@ -993,7 +985,7 @@ export default {
           err?.message || me.$t("i18nCommon.duckDBQuery.dropFileError"),
         );
       }
-},
+    },
     /**
      * Mở popup tài liệu API để user có thể copy prompt cho AI gen SQL
      */
@@ -1030,7 +1022,9 @@ export default {
       if (me.loadedFiles && me.loadedFiles.length > 0) {
         lines.push("## Loaded Tables");
         lines.push("");
-        lines.push("The following tables are already loaded in the current session:");
+        lines.push(
+          "The following tables are already loaded in the current session:",
+        );
         lines.push("");
 
         // Group by file_id để hiển thị theo file
@@ -1051,15 +1045,21 @@ export default {
           if (group.tables.length === 1) {
             const t = group.tables[0];
             lines.push(`- **Table**: \`${t.table_name}\``);
-            const cols = t.columns ? t.columns.map(c => `\`${c}\``).join(", ") : "N/A";
+            const cols = t.columns
+              ? t.columns.map((c) => `\`${c}\``).join(", ")
+              : "N/A";
             lines.push(`  - **Columns**: ${cols}`);
             lines.push(`  - **Row Count**: ${me.formatRowCount(t.row_count)}`);
           } else {
             for (const t of group.tables) {
               lines.push(`- **Table**: \`${t.table_name}\``);
-              const cols = t.columns ? t.columns.map(c => `\`${c}\``).join(", ") : "N/A";
+              const cols = t.columns
+                ? t.columns.map((c) => `\`${c}\``).join(", ")
+                : "N/A";
               lines.push(`  - **Columns**: ${cols}`);
-              lines.push(`  - **Row Count**: ${me.formatRowCount(t.row_count)}`);
+              lines.push(
+                `  - **Row Count**: ${me.formatRowCount(t.row_count)}`,
+              );
             }
           }
           lines.push("");
@@ -1072,15 +1072,25 @@ export default {
       lines.push("## Usage Instructions for AI");
       lines.push("");
       lines.push("When asking AI to generate SQL:");
-      lines.push("1. Copy this entire reference and paste it into your AI chat");
-      lines.push("2. Describe what you want to query (e.g., 'Find top 10 customers by revenue')");
-      lines.push("3. AI will generate DuckDB-compatible SQL using the exact table/column names above");
+      lines.push(
+        "1. Copy this entire reference and paste it into your AI chat",
+      );
+      lines.push(
+        "2. Describe what you want to query (e.g., 'Find top 10 customers by revenue')",
+      );
+      lines.push(
+        "3. AI will generate DuckDB-compatible SQL using the exact table/column names above",
+      );
       lines.push("");
       lines.push("## DuckDB SQL Notes");
       lines.push("");
-      lines.push("- Use double quotes for identifiers: `SELECT * FROM \"my_table\"`");
+      lines.push(
+        '- Use double quotes for identifiers: `SELECT * FROM "my_table"`',
+      );
       lines.push("- DuckDB supports PostgreSQL-compatible syntax");
-      lines.push("- Use `LIMIT` for pagination: `SELECT * FROM \"table\" LIMIT 100`");
+      lines.push(
+        '- Use `LIMIT` for pagination: `SELECT * FROM "table" LIMIT 100`',
+      );
       lines.push("- Window functions, CTEs, and JSON functions are supported");
       lines.push("");
       lines.push("---");
@@ -1105,7 +1115,9 @@ export default {
         let resp = await me.agentAPI.dropAllFiles(me.currentSessionId);
         if (resp?.data?.success) {
           me.loadedFiles = [];
-          me.$tmToast.success(me.$t("i18nCommon.duckDBQuery.clearAllFilesSuccess"));
+          me.$tmToast.success(
+            me.$t("i18nCommon.duckDBQuery.clearAllFilesSuccess"),
+          );
         } else {
           me.$tmToast.error(
             resp?.data?.message ||
@@ -1451,7 +1463,6 @@ export default {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  margin-top: var(--padding);
   padding: 0 var(--padding-medium) var(--padding-medium) 0;
 
   .tm-duckdb-file-list-header {
@@ -1520,6 +1531,14 @@ export default {
     font-size: var(--font-size-small);
     line-height: 1;
     flex-shrink: 0;
+  }
+
+  .tm-duckdb-file-group-left {
+    display: flex;
+    align-items: center;
+    gap: var(--padding-small);
+    flex: 1;
+    min-width: 0;
   }
 }
 
@@ -1606,15 +1625,15 @@ export default {
 /* Nút xoá tất cả: cố định dưới cùng sidebar, không scroll theo danh sách */
 .tm-duckdb-clear-all-wrap {
   flex-shrink: 0;
-  margin-top: var(--padding);
   padding: calc(var(--padding) / 2) var(--padding);
-  border-top: 1px solid var(--border-color);
 
   .tm-duckdb-clear-all-btn {
     width: 100%;
     justify-content: center;
     opacity: 0.7;
-    transition: opacity 0.2s ease, background-color 0.2s ease;
+    transition:
+      opacity 0.2s ease,
+      background-color 0.2s ease;
 
     &:hover {
       opacity: 1;

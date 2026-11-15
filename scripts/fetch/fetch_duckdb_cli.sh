@@ -6,11 +6,11 @@
 # File binary KHÔNG được commit (xem .gitignore), chỉ giữ folder + .gitkeep
 # để go:embed build không lỗi khi clone repo.
 #
-# Cách dùng: ./scripts/fetch_duckdb_cli.sh
-# Sau đó rebuild daemon: ./scripts/build_daemon.sh
+# Cách dùng: ./scripts/fetch/fetch_duckdb_cli.sh
+# Sau đó rebuild daemon: ./scripts/build/build_daemon.sh
 set -e
 
-ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 CLI_DIR="$ROOT_DIR/src_backend/tm_core_service/internal/database/duckdb/cli"
 
 echo "Thư mục CLI: $CLI_DIR"

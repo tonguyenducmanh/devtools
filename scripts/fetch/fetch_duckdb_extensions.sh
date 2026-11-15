@@ -6,11 +6,11 @@
 # File .duckdb_extension KHÔNG được commit (xem .gitignore), chỉ giữ folder
 # + .gitkeep để go:embed build không lỗi khi clone repo.
 #
-# Cách dùng: ./scripts/fetch_duckdb_extensions.sh
-# Sau đó rebuild daemon: ./scripts/build_daemon.sh
+# Cách dùng: ./scripts/fetch/fetch_duckdb_extensions.sh
+# Sau đó rebuild daemon: ./scripts/build/build_daemon.sh
 set -e
 
-ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 EXT_DIR="$ROOT_DIR/src_backend/tm_core_service/internal/database/duckdb/extensions"
 RELEASE_VERSION="${DUCKDB_EXT_VERSION:-v0.4.2}"
 
@@ -50,13 +50,11 @@ download_one() {
 }
 
 echo "Tải extension rusty_sheet ${RELEASE_VERSION} cho tất cả platform..."
-for line in $platforms; do
-  # Đọc 3 token: plat os arch
-  plat=$(echo "$line" | awk '{print $1}')
-  os=$(echo "$line" | awk '{print $2}')
-  arch=$(echo "$line" | awk '{print $3}')
-  [ -z "$plat" ] && continue
-  download_one "$plat" "$os" "$arch"
+
+# Use while read to properly handle multiline string
+echo "$platforms" | while read -r plat os arch; do
+    [ -z "$plat" ] && continue
+    download_one "$plat" "$os" "$arch"
 done
 
 echo ""
