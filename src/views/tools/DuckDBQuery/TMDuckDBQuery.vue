@@ -143,45 +143,55 @@
         <div class="flex flex-col tm-sidebar-content" v-show="currentConfigLayout.currentSidebarOption ===
           $tmEnum.DuckDBQuerySidebarOption.Files
           ">
-          <!-- khu vực upload file -->
-          <div class="tm-duckdb-upload-area" @dragover.prevent @drop.prevent="handleFileDrop"
-            @click="triggerFileInput">
+          <!-- khu vực upload file: hover để xem định dạng hỗ trợ, click hoặc kéo thả để nạp -->
+          <div class="tm-duckdb-upload-area" :class="{ 'tm-duckdb-upload-area--busy': isUploading }"
+            v-tooltip="{ text: uploadTooltipText, maxWidth: '320px' }" @dragover.prevent
+            @drop.prevent="handleFileDrop" @click="triggerFileInput">
             <input ref="fileInput" type="file" class="tm-duckdb-file-input"
               accept=".xlsx,.xls,.csv,.tsv,.parquet,.json,.ndjson,.jsonl" @change="handleFileSelect" />
-            <div class="tm-duckdb-upload-hint">
-              <span class="tm-upload-icon-wrap">
-                <i class="tm-upload-icon"></i>
-              </span>
-              <span class="tm-upload-text">{{ $t('i18nCommon.duckDBQuery.uploadFileDesc') }}</span>
-            </div>
+            <span class="tm-duckdb-upload-icon-wrap">
+              <span class="tm-icon tm-upload-icon"></span>
+            </span>
+            <span class="tm-duckdb-upload-title">{{ $t('i18nCommon.duckDBQuery.uploadAreaTitle') }}</span>
+            <span class="tm-duckdb-upload-text">{{ $t('i18nCommon.duckDBQuery.uploadFileDesc') }}</span>
+            <span class="tm-duckdb-upload-formats">{{ $t('i18nCommon.duckDBQuery.uploadAreaFormats') }}</span>
           </div>
 
           <!-- loading khi upload -->
-          <div class="tm-duckdb-upload-loading" v-if="isUploading">
+          <div class="flex flex-col tm-duckdb-upload-loading" v-if="isUploading">
             <TMLoading />
+            <span class="tm-duckdb-uploading-text">{{ $t('i18nCommon.duckDBQuery.uploadingFile') }}</span>
           </div>
 
-          <!-- danh sách file đã nạp -->
+          <!-- danh sách file đã nạp: tên file / tên bảng / số dòng / nút xoá -->
           <div class="tm-duckdb-file-list" v-if="loadedFiles.length > 0">
-            <div class="tm-duckdb-file-list-header">
-              {{ $t('i18nCommon.duckDBQuery.uploadedFiles') }} ({{ loadedFiles.length }})
+            <div class="flex tm-duckdb-file-list-header">
+              <span class="tm-duckdb-file-list-title">{{ $t('i18nCommon.duckDBQuery.uploadedFiles') }}</span>
+              <span class="tm-duckdb-file-list-count">{{ loadedFiles.length }}</span>
             </div>
             <div v-for="file in loadedFiles" :key="file.file_id" class="tm-duckdb-file-item">
               <div class="tm-duckdb-file-item-info">
-                <div class="tm-duckdb-file-name" v-tooltip="file.file_name">{{ file.file_name }}</div>
-                <div class="tm-duckdb-table-name">
-                  <span class="tm-table-badge">{{ file.table_name }}</span>
+                <div class="text-nowrap tm-duckdb-file-name" v-tooltip="file.file_name">
+                  {{ file.file_name }}
+                </div>
+                <div class="tm-duckdb-file-table">
+                  <span class="text-nowrap tm-table-badge" v-tooltip="file.table_name">{{ file.table_name }}</span>
+                </div>
+                <div class="tm-duckdb-file-rows">
+                  {{ formatRowCount(file.row_count) }} {{ $t('i18nCommon.duckDBQuery.rowCount') }}
                 </div>
               </div>
-              <TMButton :noMargin="true" :isSmallButton="true" iconClass="tm-delete-icon"
-                v-tooltip="$t('i18nCommon.duckDBQuery.dropFile')"
-                @click="handleDropFile(file)" />
+              <TMButton class="tm-duckdb-file-delete" :noMargin="true" :isSmallButton="true"
+                :type="$tmEnum.buttonType.secondary" iconClass="tm-cancel-icon"
+                v-tooltip="$t('i18nCommon.duckDBQuery.dropFile')" @click.stop="handleDropFile(file)" />
             </div>
           </div>
 
           <!-- empty state khi chưa có file -->
           <div class="tm-duckdb-no-files" v-else-if="!isUploading">
-            <span>{{ $t('i18nCommon.duckDBQuery.noFilesLoaded') }}</span>
+            <span class="tm-icon tm-database-icon"></span>
+            <span class="tm-duckdb-no-files-title">{{ $t('i18nCommon.duckDBQuery.noFilesLoaded') }}</span>
+            <span class="tm-duckdb-no-files-desc">{{ $t('i18nCommon.duckDBQuery.noFilesLoadedDesc') }}</span>
           </div>
         </div>
 
@@ -450,6 +460,14 @@ export default {
       if (!this.currentSessionId) return "-";
       return this.currentSessionId.substring(0, 8) + "...";
     },
+
+    /**
+     * Nội dung tooltip của vùng upload: nêu rõ mọi định dạng được hỗ trợ.
+     * Dùng computed để tự cập nhật khi đổi ngôn ngữ.
+     */
+    uploadTooltipText() {
+      return this.$t("i18nCommon.duckDBQuery.uploadTooltip");
+    },
   },
 
   methods: {
@@ -598,7 +616,21 @@ export default {
      * Trigger click vào input file ẩn
      */
     triggerFileInput() {
+      // Đang nạp file thì bỏ qua, tránh mở hộp chọn file chồng lên tiến trình hiện tại
+      if (this.isUploading) return;
       this.$refs.fileInput?.click();
+    },
+
+    /**
+     * Format số dòng cho dễ đọc (1.234.567) — "-" khi backend cũ chưa trả về
+     */
+    formatRowCount(rowCount) {
+      if (rowCount === null || rowCount === undefined || rowCount === "") {
+        return "-";
+      }
+      let value = Number(rowCount);
+      if (Number.isNaN(value)) return "-";
+      return value.toLocaleString();
     },
 
     /**
@@ -982,114 +1014,246 @@ export default {
 
 /* ── DuckDB specific: upload area ── */
 .tm-duckdb-upload-area {
-  border: 2px dashed var(--border-color);
-  border-radius: var(--border-radius);
-  padding: var(--padding);
-  cursor: pointer;
+  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
-  gap: calc(var(--padding) / 2);
-  transition: border-color 0.2s, background-color 0.2s;
-  min-height: 72px;
+  gap: var(--padding-medium);
+  min-height: 132px;
+  padding: var(--padding) var(--padding) calc(var(--padding) * 1.5);
   flex-shrink: 0;
+  cursor: pointer;
+  text-align: center;
+  border: 1px dashed var(--border-hard-color);
+  border-radius: var(--border-radius);
+  background-color: var(--bg-thirt-color);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 
   &:hover {
-    border-color: var(--focus-border-color);
+    border-color: var(--focus-color);
     background-color: var(--bg-layer-color);
+  }
+
+  // đang nạp file: khoá tương tác để không mở hộp chọn file chồng lên tiến trình
+  &--busy {
+    pointer-events: none;
+    opacity: 0.6;
   }
 
   .tm-duckdb-file-input {
     display: none;
   }
 
-  .tm-duckdb-upload-hint {
+  .tm-duckdb-upload-icon-wrap {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: calc(var(--padding) / 4);
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main-color);
+    transition:
+      border-color 0.2s ease,
+      transform 0.2s ease;
 
-    .tm-upload-text {
-      font-size: var(--font-size-small);
-      color: var(--text-secondary-color);
-      text-align: center;
+    .tm-icon {
+      color: var(--focus-color);
     }
+  }
+
+  &:hover .tm-duckdb-upload-icon-wrap {
+    border-color: var(--focus-color);
+    transform: translateY(-2px);
+  }
+
+  .tm-duckdb-upload-title {
+    font-size: var(--font-size-medium-rare);
+    font-weight: 600;
+    color: var(--text-primary-color);
+  }
+
+  .tm-duckdb-upload-text {
+    font-size: var(--font-size-small);
+    color: var(--text-secondary-color);
+  }
+
+  // dải định dạng dạng "pill" cho dễ nhận biết, chi tiết đầy đủ nằm ở tooltip
+  .tm-duckdb-upload-formats {
+    max-width: 100%;
+    margin-top: var(--padding-medium);
+    padding: 2px var(--padding);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background-color: var(--bg-main-color);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text-tertiary-color);
   }
 }
 
 .tm-duckdb-upload-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--padding);
   flex-shrink: 0;
+  margin-top: var(--padding);
+  padding: calc(var(--padding) / 2) var(--padding) var(--padding);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-component);
+  background-color: var(--bg-thirt-color);
+
+  .tm-duckdb-uploading-text {
+    font-size: var(--font-size-small);
+    color: var(--text-secondary-color);
+  }
 }
 
 .tm-duckdb-file-list {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--padding) / 2);
+  gap: var(--padding-medium);
   flex: 1;
-  overflow-y: auto;
   min-height: 0;
-  margin-top: calc(var(--padding) / 2);
+  margin-top: var(--padding);
+  padding: 0 var(--padding-medium) var(--padding-medium) 0;
+  overflow-y: auto;
 
   .tm-duckdb-file-list-header {
-    font-size: var(--font-size-small);
-    color: var(--text-secondary-color);
-    padding: 0 calc(var(--padding) / 4);
     flex-shrink: 0;
+    justify-content: flex-start;
+    gap: var(--padding-medium);
+    padding: 0 calc(var(--padding) / 2);
+
+    .tm-duckdb-file-list-title {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary-color);
+    }
+
+    .tm-duckdb-file-list-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 6px;
+      border: 1px solid var(--border-color);
+      border-radius: 9px;
+      background-color: var(--bg-thirt-color);
+      font-size: 11px;
+      line-height: 1;
+      color: var(--text-tertiary-color);
+    }
+  }
+}
+
+.tm-duckdb-file-item {
+  display: flex;
+  align-items: center;
+  gap: var(--padding);
+  flex-shrink: 0;
+  padding: calc(var(--padding) * 0.75) var(--padding);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-component);
+  background-color: var(--bg-thirt-color);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+
+  &:hover {
+    border-color: var(--focus-color);
+    background-color: var(--bg-layer-color);
   }
 
-  .tm-duckdb-file-item {
+  .tm-duckdb-file-item-info {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: calc(var(--padding) / 2);
-    padding: calc(var(--padding) / 2) var(--padding);
-    border-radius: var(--border-radius-component);
-    border: 1px solid var(--border-color);
-    background-color: var(--bg-layer-color);
-    flex-shrink: 0;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+  }
 
-    .tm-duckdb-file-item-info {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
+  .tm-duckdb-file-name {
+    font-size: var(--font-size-medium-rare);
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--text-primary-color);
+  }
 
-      .tm-duckdb-file-name {
-        font-size: var(--font-size-small);
-        color: var(--text-color);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+  .tm-duckdb-file-table {
+    display: flex;
+    min-width: 0;
 
-      .tm-duckdb-table-name {
-        .tm-table-badge {
-          font-size: var(--font-size-small);
-          color: var(--text-link-color);
-          background-color: var(--bg-thirt-color);
-          border-radius: var(--border-radius-component);
-          padding: 1px calc(var(--padding) / 2);
-          font-family: monospace;
-        }
-      }
+    .tm-table-badge {
+      max-width: 100%;
+      padding: 1px calc(var(--padding) / 2);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-component);
+      background-color: var(--bg-main-color);
+      font-size: var(--font-size-small);
+      line-height: 1.4;
+      color: var(--focus-color);
+    }
+  }
+
+  .tm-duckdb-file-rows {
+    font-size: var(--font-size-small);
+    line-height: 1.4;
+    color: var(--text-secondary-color);
+  }
+}
+
+// nút xoá: mờ nhẹ cho đỡ nặng mắt, hover sáng lên và icon chuyển đỏ
+.tm-duckdb-file-delete {
+  flex-shrink: 0;
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+
+  &:hover,
+  &:focus {
+    opacity: 1;
+
+    :deep(.tm-icon) {
+      color: var(--text-error-color);
     }
   }
 }
 
 .tm-duckdb-no-files {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--padding);
-  color: var(--text-secondary-color);
-  font-size: var(--font-size-small);
+  gap: var(--padding-medium);
   flex: 1;
+  min-height: 0;
+  padding: var(--padding) calc(var(--padding) * 2);
+  text-align: center;
+  color: var(--text-secondary-color);
+
+  .tm-icon {
+    color: var(--text-secondary-color);
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .tm-duckdb-no-files-title {
+    font-size: var(--font-size-medium-rare);
+    color: var(--text-tertiary-color);
+  }
+
+  .tm-duckdb-no-files-desc {
+    max-width: 260px;
+    font-size: var(--font-size-small);
+    line-height: 1.5;
+    color: var(--text-secondary-color);
+  }
 }
 
 /* ── Session info ── */

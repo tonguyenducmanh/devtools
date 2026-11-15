@@ -167,6 +167,7 @@ func GetSessionFilesHandler(w http.ResponseWriter, r *http.Request) {
 		FileID    string `json:"file_id"`
 		FileName  string `json:"file_name"`
 		TableName string `json:"table_name"`
+		RowCount  int64  `json:"row_count"`
 	}
 	result := make([]fileInfo, 0, len(files))
 	for _, f := range files {
@@ -174,6 +175,7 @@ func GetSessionFilesHandler(w http.ResponseWriter, r *http.Request) {
 			FileID:    f.FileID,
 			FileName:  f.FileName,
 			TableName: f.TableName,
+			RowCount:  f.RowCount,
 		})
 	}
 	writeJSON(w, true, "", result)

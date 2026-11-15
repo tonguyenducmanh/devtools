@@ -40,6 +40,8 @@ type loadedFile struct {
 	FileName  string
 	TableName string
 	FilePath  string
+	// RowCount là số dòng đếm được lúc nạp file (dùng để hiển thị ở sidebar).
+	RowCount int64
 }
 
 // DefaultQueryLimit là giới hạn số dòng khi frontend không gửi default_limit.
@@ -128,6 +130,7 @@ func LoadFile(sessionID, filePath, tableName, fileID, fileName string) ([]string
 		FileName:  fileName,
 		TableName: tableName,
 		FilePath:  filePath,
+		RowCount:  rowCount,
 	})
 
 	return columns, rowCount, nil
