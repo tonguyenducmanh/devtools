@@ -238,6 +238,12 @@ class TMEnum {
     Connection: 2,
     SQLSave: 3,
   };
+  DuckDBQuerySidebarOption = {
+    Help: 0,
+    Setting: 1,
+    Files: 2,
+    SQLSave: 3,
+  };
   PostreSQLConnectionImportType = {
     NpgSQLDotNet: 0,
     PgxGo: 1,

@@ -361,4 +361,22 @@ export const TMCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool giải mã Cimbar",
   },
+  DuckDBQueryConfigLayout: {
+    KeyFormat: "DuckDBQueryConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool DuckDB Query",
+  },
+  DuckDBQuerySavedQuery: {
+    KeyFormat: "DuckDBQuerySavedQuery",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "danh sách SQL query đã lưu của DuckDB",
+  },
+  DuckDBSessionId: {
+    KeyFormat: "DuckDBSessionId",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "session id DuckDB in-memory hiện tại",
+  },
 };

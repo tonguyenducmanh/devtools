@@ -64,4 +64,7 @@ export const EnumCacheConfig = {
   OneTimeAuthenData: 70,
   CimbarConfigLayout: 71,
   CimbarDecodeConfigLayout: 72,
+  DuckDBQueryConfigLayout: 73,
+  DuckDBQuerySavedQuery: 74,
+  DuckDBSessionId: 75,
 };

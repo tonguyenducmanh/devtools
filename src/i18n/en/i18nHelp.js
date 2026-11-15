@@ -666,5 +666,34 @@ export default {
           "After decoding, the tool shows the MD5 of the received data. Compare it with the MD5 on the sender: a match means the file is intact.",
       },
     },
+    duckDBQuery: {
+      purpose: {
+        title: "Purpose",
+        content:
+          "DuckDB Query lets you upload Excel, CSV, Parquet, or JSON files and query the data with SQL instantly — no server or database installation required. DuckDB runs entirely in-memory inside the local daemon.",
+      },
+      howToUse: {
+        title: "How to use",
+        step1:
+          "1. Open the 'Files' tab in the right sidebar, click 'Upload file', and select an Excel/CSV/Parquet/JSON file.",
+        step2:
+          "2. The file is loaded and a DuckDB table is created automatically using the file name (e.g. sales.xlsx → SELECT * FROM sales).",
+        step3:
+          "3. Write your SQL in the editor and press Run (or Ctrl/Cmd + Enter).",
+        step4:
+          "4. Results are shown below as a table. You can copy or download them as JSON.",
+        step5:
+          "5. Upload multiple files and JOIN them together using standard SQL.",
+      },
+      features: {
+        title: "Key features",
+        noServer: "✓ No server needed: DuckDB runs in-memory, nothing to install.",
+        excelSupport: "✓ Supports Excel (.xlsx, .xls), CSV, Parquet, JSON.",
+        multiTable: "✓ Upload multiple files, each becomes a table — JOIN freely.",
+        formatCode: "✓ Automatic SQL formatting.",
+        savedScripts: "✓ Save and reload frequently used queries.",
+        sessionPersist: "✓ Session persists until the daemon stops or you create a new session.",
+      },
+    },
   },
 };

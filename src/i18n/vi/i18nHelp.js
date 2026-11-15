@@ -655,5 +655,34 @@ export default {
           "Sau khi giải mã xong, tool hiển thị MD5 của dữ liệu nhận được. So sánh với MD5 ở máy gửi: khớp là file toàn vẹn.",
       },
     },
+    duckDBQuery: {
+      purpose: {
+        title: "Mục đích của tool",
+        content:
+          "DuckDB Query cho phép bạn upload file Excel, CSV, Parquet hoặc JSON và truy vấn dữ liệu bằng SQL ngay lập tức — không cần cài đặt server hay database. DuckDB chạy hoàn toàn trong memory tại daemon cục bộ của bạn.",
+      },
+      howToUse: {
+        title: "Hướng dẫn sử dụng",
+        step1:
+          "1. Mở tab 'Files' ở sidebar bên phải, nhấn 'Upload file' và chọn file Excel/CSV/Parquet/JSON.",
+        step2:
+          "2. File được nạp và tự động tạo bảng DuckDB với tên từ tên file (ví dụ: sales.xlsx → SELECT * FROM sales).",
+        step3:
+          "3. Viết câu SQL vào editor, nhấn nút Run (hoặc Ctrl/Cmd + Enter) để thực hiện query.",
+        step4:
+          "4. Kết quả hiển thị bên dưới dưới dạng bảng. Có thể copy hoặc tải về dạng JSON.",
+        step5:
+          "5. Có thể upload nhiều file và join chúng lại bằng SQL bình thường.",
+      },
+      features: {
+        title: "Tính năng nổi bật",
+        noServer: "✓ Không cần server: DuckDB chạy in-memory, không cài đặt gì thêm.",
+        excelSupport: "✓ Hỗ trợ Excel (.xlsx, .xls), CSV, Parquet, JSON.",
+        multiTable: "✓ Upload nhiều file, mỗi file là 1 bảng, có thể JOIN thoải mái.",
+        formatCode: "✓ Tự động định dạng SQL.",
+        savedScripts: "✓ Lưu và tải lại các câu query đã dùng.",
+        sessionPersist: "✓ Session tồn tại đến khi daemon tắt hoặc bạn tạo session mới.",
+      },
+    },
   },
 };

@@ -75,6 +75,11 @@ export const sidebarConfig = [
         meta: { titleKey: "i18nCommon.postgreSQLQuery.featureName" },
       },
       {
+        name: "TMDuckDBQuery",
+        component: () => import("@/views/tools/DuckDBQuery/TMDuckDBQuery.vue"),
+        meta: { titleKey: "i18nCommon.duckDBQuery.featureName" },
+      },
+      {
         name: "TMAppDataMiner",
         component: () => import("@/views/tools/TMAppDataMiner.vue"),
         meta: { titleKey: "i18nCommon.feature.AppDataMiner" },

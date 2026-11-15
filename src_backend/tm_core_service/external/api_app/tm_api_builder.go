@@ -53,4 +53,5 @@ func addRoute(app *http.ServeMux) {
 	router.InjectRDPConnectionRouter(app)
 	router.InjectPostgreSQLRouter(app)
 	router.InjectUltraViewerRouter(app)
+	router.InjectDuckDBRouter(app)
 }
