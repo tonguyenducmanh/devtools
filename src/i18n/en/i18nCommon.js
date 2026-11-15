@@ -1237,7 +1237,7 @@ export default {
       uploadAreaTitle: "Load data file",
       uploadAreaFormats: "Excel · CSV · TSV · Parquet · JSON",
       uploadTooltip:
-        "Supported file formats:\n• Excel: .xlsx, .xls\n• CSV / TSV: .csv, .tsv\n• Parquet: .parquet\n• JSON: .json, .ndjson, .jsonl\n\nDrag & drop a file here or click to select.",
+        "Select one or more files to load into the DuckDB session.\nSupported formats:\n• Excel: .xlsx, .xls\n• CSV / TSV: .csv, .tsv\n• Parquet: .parquet\n• JSON: .json, .ndjson, .jsonl\n\nClick the upload button to select files.",
       uploadingFile: "Loading file...",
       uploadFileSuccess: "File loaded successfully",
       uploadFileError: "Error loading file",

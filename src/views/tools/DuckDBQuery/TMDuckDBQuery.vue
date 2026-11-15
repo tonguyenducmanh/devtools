@@ -270,21 +270,11 @@
                 icon-class="tm-upload-icon"
                 :hide-border="true"
                 :read-only="isUploading"
+                :multiple="true"
                 v-tooltip="{ text: uploadTooltipText, maxWidth: '320px' }"
                 @selected="handleFileSelect"
               />
             </div>
-          </div>
-
-          <!-- loading khi upload -->
-          <div
-            class="flex flex-col tm-duckdb-upload-loading"
-            v-if="isUploading"
-          >
-            <TMLoading />
-            <span class="tm-duckdb-uploading-text">{{
-              $t("i18nCommon.duckDBQuery.uploadingFile")
-            }}</span>
           </div>
 
           <!-- danh sách file đã nạp: tên file / tên bảng / số dòng / nút xoá -->
@@ -778,9 +768,10 @@ export default {
     /**
      * Xử lý chọn file từ TMUpload (components chung)
      */
-    handleFileSelect(files) {
-      if (files && files.length > 0) {
-        this.uploadFile(files[0]);
+    async handleFileSelect(files) {
+      if (!files || files.length === 0) return;
+      for (const file of files) {
+        await this.uploadFile(file);
       }
     },
 
@@ -1206,21 +1197,6 @@ export default {
 
 .tm-query-config {
   padding: var(--padding);
-}
-
-.tm-duckdb-upload-loading {
-  flex-shrink: 0;
-  margin-top: var(--padding);
-  padding: calc(var(--padding) / 2) var(--padding) var(--padding);
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-component);
-  background-color: var(--bg-thirt-color);
-
-  .tm-duckdb-uploading-text {
-    font-size: var(--font-size-small);
-    color: var(--text-secondary-color);
-  }
 }
 
 .tm-duckdb-file-list {

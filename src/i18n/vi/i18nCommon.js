@@ -1229,7 +1229,7 @@ export default {
       uploadAreaTitle: "Nạp file dữ liệu",
       uploadAreaFormats: "Excel · CSV · TSV · Parquet · JSON",
       uploadTooltip:
-        "Định dạng file được hỗ trợ:\n• Excel: .xlsx, .xls\n• CSV / TSV: .csv, .tsv\n• Parquet: .parquet\n• JSON: .json, .ndjson, .jsonl\n\nKéo thả file vào đây hoặc nhấn để chọn.",
+        "Chọn một hoặc nhiều file để nạp vào session DuckDB.\nĐịnh dạng hỗ trợ:\n• Excel: .xlsx, .xls\n• CSV / TSV: .csv, .tsv\n• Parquet: .parquet\n• JSON: .json, .ndjson, .jsonl\n\nNhấn nút upload để chọn file.",
       uploadingFile: "Đang nạp file...",
       uploadFileSuccess: "Đã nạp file thành công",
       uploadFileError: "Lỗi nạp file",
