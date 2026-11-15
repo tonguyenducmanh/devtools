@@ -248,25 +248,35 @@
             $tmEnum.DuckDBQuerySidebarOption.Files
           "
         >
-          <!-- khu vực upload file: hover để xem định dạng hỗ trợ, click hoặc kéo thả để nạp -->
+          <!-- hàng điều khiển: header danh sách file (trái) + nút upload (phải) -->
           <div
-            class="tm-duckdb-upload-area"
-            :class="{ 'tm-duckdb-upload-area--busy': isUploading }"
-            v-tooltip="{ text: uploadTooltipText, maxWidth: '320px' }"
-            @dragover.prevent
-            @drop.prevent="handleFileDrop"
-            @click="triggerFileInput"
+            class="flex tm-duckdb-toolbar-row"
+            style="
+              justify-content: space-between;
+              align-items: center;
+              margin: var(--padding);
+            "
           >
-            <input
-              ref="fileInput"
-              type="file"
-              class="tm-duckdb-file-input"
-              accept=".xlsx,.xls,.csv,.tsv,.parquet,.json,.ndjson,.jsonl"
-              @change="handleFileSelect"
-            />
-            <span class="tm-duckdb-upload-icon-wrap">
-              <span class="tm-icon tm-upload-icon"></span>
-            </span>
+            <div
+              class="flex tm-duckdb-file-list-header"
+              v-if="loadedFiles.length > 0"
+            >
+              <span class="tm-duckdb-file-list-title">{{
+                $t("i18nCommon.duckDBQuery.uploadedFiles")
+              }}</span>
+              <span class="tm-duckdb-file-list-count">{{
+                loadedFiles.length
+              }}</span>
+            </div>
+            <div class="flex" style="flex-shrink: 0">
+              <TMUpload
+                icon-class="tm-upload-icon"
+                :hide-border="true"
+                :read-only="isUploading"
+                v-tooltip="{ text: uploadTooltipText, maxWidth: '320px' }"
+                @selected="handleFileSelect"
+              />
+            </div>
           </div>
 
           <!-- loading khi upload -->
@@ -282,32 +292,18 @@
 
           <!-- danh sách file đã nạp: tên file / tên bảng / số dòng / nút xoá -->
           <div class="tm-duckdb-file-list" v-if="loadedFiles.length > 0">
-            <div class="flex tm-duckdb-file-list-header">
-              <span class="tm-duckdb-file-list-title">{{
-                $t("i18nCommon.duckDBQuery.uploadedFiles")
-              }}</span>
-              <span class="tm-duckdb-file-list-count">{{
-                loadedFiles.length
-              }}</span>
-            </div>
             <div
               v-for="file in loadedFiles"
               :key="file.file_id"
               class="tm-duckdb-file-item"
+              @click="copyTableName(file.table_name)"
+              v-tooltip="getFileTooltip(file)"
             >
               <div class="tm-duckdb-file-item-info">
                 <div
                   class="text-nowrap tm-duckdb-file-name"
-                  v-tooltip="file.file_name"
                 >
                   {{ file.file_name }}
-                </div>
-                <div class="tm-duckdb-file-table">
-                  <span
-                    class="text-nowrap tm-table-badge"
-                    v-tooltip="file.table_name"
-                    >{{ file.table_name }}</span
-                  >
                 </div>
                 <div class="tm-duckdb-file-rows">
                   {{ formatRowCount(file.row_count) }}
@@ -781,15 +777,6 @@ export default {
     },
 
     /**
-     * Trigger click vào input file ẩn
-     */
-    triggerFileInput() {
-      // Đang nạp file thì bỏ qua, tránh mở hộp chọn file chồng lên tiến trình hiện tại
-      if (this.isUploading) return;
-      this.$refs.fileInput?.click();
-    },
-
-    /**
      * Format số dòng cho dễ đọc (1.234.567) — "-" khi backend cũ chưa trả về
      */
     formatRowCount(rowCount) {
@@ -802,21 +789,12 @@ export default {
     },
 
     /**
-     * Xử lý chọn file từ input
+     * Xử lý chọn file từ TMUpload (components chung)
      */
-    handleFileSelect(event) {
-      let file = event.target.files?.[0];
-      if (file) this.uploadFile(file);
-      // Reset input để có thể chọn lại cùng file
-      event.target.value = "";
-    },
-
-    /**
-     * Xử lý kéo thả file vào upload area
-     */
-    handleFileDrop(event) {
-      let file = event.dataTransfer.files?.[0];
-      if (file) this.uploadFile(file);
+    handleFileSelect(files) {
+      if (files && files.length > 0) {
+        this.uploadFile(files[0]);
+      }
     },
 
     /**
@@ -874,6 +852,26 @@ export default {
       } finally {
         me.isUploading = false;
       }
+    },
+
+    /**
+     * Tooltip chi tiết toàn bộ thông tin file khi hover vào dòng đã nạp
+     */
+    getFileTooltip(file) {
+      if (!file) return "";
+      return [
+        `${this.$t("i18nCommon.duckDBQuery.fileName")}: ${file.file_name || "-"}`,
+        `${this.$t("i18nCommon.duckDBQuery.fileTableName")}: ${file.table_name || "-"}`,
+        `${this.$t("i18nCommon.duckDBQuery.totalRows")}: ${this.formatRowCount(file.row_count)} ${this.$t("i18nCommon.duckDBQuery.rowCount")}`,
+      ].join("\n");
+    },
+
+    /**
+     * Copy tên bảng của file đã upload vào clipboard
+     */
+    copyTableName(tableName) {
+      if (!tableName) return;
+      this.$tmUtility.copyToClipboard(tableName);
     },
 
     /**
@@ -1223,87 +1221,6 @@ export default {
   padding: var(--padding);
 }
 
-/* ── DuckDB specific: upload area ── */
-.tm-duckdb-upload-area {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--padding);
-  width: 100%;
-  flex-shrink: 0;
-  cursor: pointer;
-  text-align: center;
-  transition:
-    border-color 0.2s ease,
-    background-color 0.2s ease;
-
-  &:hover {
-    border-color: var(--focus-color);
-  }
-
-  // đang nạp file: khoá tương tác để không mở hộp chọn file chồng lên tiến trình
-  &--busy {
-    pointer-events: none;
-    opacity: 0.6;
-  }
-
-  .tm-duckdb-file-input {
-    display: none;
-  }
-
-  .tm-duckdb-upload-icon-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    border: 1px solid var(--border-color);
-    background-color: var(--bg-main-color);
-    transition:
-      border-color 0.2s ease,
-      transform 0.2s ease;
-
-    .tm-icon {
-      color: var(--focus-color);
-    }
-  }
-
-  &:hover .tm-duckdb-upload-icon-wrap {
-    border-color: var(--focus-color);
-    transform: translateY(-2px);
-  }
-
-  .tm-duckdb-upload-title {
-    font-size: var(--font-size-medium-rare);
-    font-weight: 600;
-    color: var(--text-primary-color);
-  }
-
-  .tm-duckdb-upload-text {
-    font-size: var(--font-size-small);
-    color: var(--text-secondary-color);
-  }
-
-  // dải định dạng dạng "pill" cho dễ nhận biết, chi tiết đầy đủ nằm ở tooltip
-  .tm-duckdb-upload-formats {
-    max-width: 100%;
-    margin-top: var(--padding-medium);
-    padding: 2px var(--padding);
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    background-color: var(--bg-main-color);
-    font-size: 11px;
-    letter-spacing: 0.02em;
-    color: var(--text-tertiary-color);
-  }
-}
-
 .tm-duckdb-upload-loading {
   flex-shrink: 0;
   margin-top: var(--padding);
@@ -1371,6 +1288,7 @@ export default {
 
   &:hover {
     border-color: var(--focus-color);
+    cursor: pointer;
   }
 
   .tm-duckdb-file-item-info {
@@ -1451,6 +1369,10 @@ export default {
   }
 }
 
+.tm-duckdb-file-list-header {
+  gap: var(--padding);
+}
+
 /* ── Session info ── */
 .tm-duckdb-session-info {
   display: flex;
@@ -1471,5 +1393,16 @@ export default {
     font-family: monospace;
     cursor: help;
   }
+}
+
+/* ── toolbar upload: header (trái) + nút upload (phải) ── */
+.tm-duckdb-toolbar-row {
+  width: 100%;
+  margin: var(--padding);
+}
+.tm-duckdb-toolbar-row :deep(.tm-upload-hide-border) {
+  width: auto;
+  height: auto;
+  min-width: unset;
 }
 </style>

@@ -9,14 +9,14 @@
       @click="triggerFileInput"
       :noMargin="true"
     />
-    <input
-      ref="fileInput"
-      type="file"
-      class="tm-upload-input"
-      :disabled="readOnly"
-      @change="handleFileSelect"
-      :multiple="multiple"
-    />
+      <input
+        ref="fileInput"
+        type="file"
+        class="tm-upload-input"
+        :disabled="readOnly"
+        @change="handleFileSelect"
+        :multiple="multiple"
+      />
   </div>
 
   <!-- Normal mode -->
@@ -37,13 +37,13 @@
       <span class="flex">
         {{ label ? label.capitalize() : $t("i18nCommon.uploadFile") }}
       </span>
-      <input
-        type="file"
-        class="tm-upload-input"
-        :disabled="readOnly"
-        @change="handleFileSelect"
-        :multiple="multiple"
-      />
+        <input
+          type="file"
+          class="tm-upload-input"
+          :disabled="readOnly"
+          @change="handleFileSelect"
+          :multiple="multiple"
+        />
     </label>
     <div class="flex tm-selected-group" v-if="isShowSelect">
       <span

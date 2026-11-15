@@ -1251,6 +1251,8 @@ export default {
       queryError: "Lỗi query",
       rowsAffected: "Số dòng bị ảnh hưởng",
       uploadedFiles: "Files đã nạp",
+      copyTableName: "Sao chép tên bảng",
+      totalRows: "Tổng số dòng",
       fileTableName: "Tên bảng",
       fileName: "Tên file",
       limitResults: "Giới hạn kết quả",

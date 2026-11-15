@@ -1259,6 +1259,8 @@ export default {
       queryError: "Query error",
       rowsAffected: "Rows affected",
       uploadedFiles: "Loaded files",
+      copyTableName: "Copy table name",
+      totalRows: "Total rows",
       fileTableName: "Table name",
       fileName: "File name",
       limitResults: "Limit results",
