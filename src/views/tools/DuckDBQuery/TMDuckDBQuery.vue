@@ -326,7 +326,10 @@
                 v-tooltip="getSheetTooltip(sheet)"
               >
                 <div class="tm-duckdb-file-item-info">
-                  <div class="text-nowrap tm-duckdb-sheet-name">
+                  <div
+                    class="text-nowrap tm-duckdb-sheet-name"
+                    @click="handleCopyEvent(sheet.table_name)"
+                  >
                     {{ sheet.table_name }}
                   </div>
                   <div class="tm-duckdb-file-rows">
@@ -1224,7 +1227,10 @@ export default {
         }
       }
     },
-
+    handleCopyEvent(value) {
+      let me = this;
+      me.$tmUtility.copyToClipboard(value);
+    },
     /**
      * Download kết quả dạng file .txt
      */
@@ -1604,6 +1610,7 @@ export default {
     font-size: var(--font-size-medium-rare);
     font-weight: 500;
     line-height: 1.35;
+    cursor: pointer;
   }
 
   .tm-duckdb-file-rows {
