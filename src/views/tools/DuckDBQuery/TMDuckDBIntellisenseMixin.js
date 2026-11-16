@@ -87,8 +87,9 @@ export default {
      * Tải toàn bộ dữ liệu intellisense (keywords, tables, columns) từ session DuckDB
      * Kết quả được lưu vào IndexedDB cache và áp dụng lên Monaco Editor.
      * Sau mỗi lần upload file, nên gọi lại hàm này để thêm tên bảng/cột mới vào gợi ý.
+     * @param {boolean} silent nếu true thì không hiển thị toast (dùng khi gọi từ luồng upload nhiều file)
      */
-    async handleLoadIntellisense() {
+    async handleLoadIntellisense(silent = false) {
       let me = this;
       if (!me.currentSessionId) return;
       me.isLoadingIntellisense = true;
@@ -125,10 +126,14 @@ export default {
         });
         await me.applyMonacoIntellisense(intellisenseData);
 
-        me.$tmToast.success(me.$t("i18nCommon.duckDBQuery.intellisenseLoaded"));
+        if (!silent) {
+          me.$tmToast.success(me.$t("i18nCommon.duckDBQuery.intellisenseLoaded"));
+        }
       } catch (error) {
         console.error("Load intellisense error:", error);
-        me.$tmToast.error(me.$t("i18nCommon.toastMessage.error"));
+        if (!silent) {
+          me.$tmToast.error(me.$t("i18nCommon.toastMessage.error"));
+        }
       } finally {
         me.isLoadingIntellisense = false;
       }
@@ -272,11 +277,15 @@ export default {
      * Nếu xoá đúng session đang dùng thì dọn luôn dữ liệu đang nạp trong Monaco
      * để gợi ý cũ không còn hiển thị.
      * @param {string} sessionId id session cần xoá cache
+     * @param {boolean} silent nếu true thì không hiển thị toast (dùng khi gọi từ luồng upload nhiều file)
+     * @returns {boolean} true nếu xoá thành công
      */
-    async handleDeleteIntellisenseCache(sessionId) {
+    async handleDeleteIntellisenseCache(sessionId, silent = false) {
       let me = this;
       if (!sessionId) {
-        me.$tmToast.warning(me.$t("i18nCommon.duckDBQuery.noSessionSelected"));
+        if (!silent) {
+          me.$tmToast.warning(me.$t("i18nCommon.duckDBQuery.noSessionSelected"));
+        }
         return false;
       }
       try {
@@ -289,15 +298,19 @@ export default {
           clearDuckdbIntellisenseData();
         }
 
-        me.$tmToast.success(
-          me.$t("i18nCommon.duckDBQuery.deleteIntellisenseCacheSuccess"),
-        );
+        if (!silent) {
+          me.$tmToast.success(
+            me.$t("i18nCommon.duckDBQuery.deleteIntellisenseCacheSuccess"),
+          );
+        }
         return true;
       } catch (error) {
         console.error("Delete intellisense cache error:", error);
-        me.$tmToast.error(
-          me.$t("i18nCommon.duckDBQuery.deleteIntellisenseCacheErr"),
-        );
+        if (!silent) {
+          me.$tmToast.error(
+            me.$t("i18nCommon.duckDBQuery.deleteIntellisenseCacheErr"),
+          );
+        }
         return false;
       }
     },

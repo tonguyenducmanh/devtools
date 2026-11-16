@@ -861,28 +861,34 @@ export default {
 
     /**
      * Xử lý chọn file từ TMUpload (components chung)
+     * Chỉ hiển thị 1 toast tóm tắt sau khi xử lý xong tất cả file (tránh nhiều toast đồng thời)
      */
     async handleFileSelect(files) {
       if (!files || files.length === 0) return;
       let anySuccess = false;
+      let results = [];
       for (const file of files) {
         // false: không reload từng file, chỉ reload 1 lần ở cuối
-        if (await this.uploadFile(file, false)) anySuccess = true;
+        let res = await this.uploadFile(file, false);
+        results.push(res);
+        if (res.success) anySuccess = true;
       }
-      // Reload intellisense 1 lần sau khi xong tất cả file
+      // Reload intellisense 1 lần sau khi xong tất cả file (không hiển thị toast trung gian)
       if (anySuccess) {
-        await this.handleDeleteIntellisenseCache(this.currentSessionId);
-        await this.handleLoadIntellisense();
+        await this.handleDeleteIntellisenseCache(this.currentSessionId, true);
+        await this.handleLoadIntellisense(true);
       }
+      // Chỉ hiển thị 1 toast tóm tắt cho toàn bộ quá trình upload
+      this.showUploadSummaryToast(results);
     },
 
     /**
      * Upload file lên backend và nạp vào DuckDB session
      * @param {File} file file cần upload
      * @param {boolean} reloadIntellisense có nạp lại intellisense ngay sau file này không
-     * @returns {Promise<boolean>} true nếu upload thành công
+     * @returns {Promise<{success: boolean, message: string}>} kết quả upload (không hiển thị toast ở đây)
      */
-    async uploadFile(file, reloadIntellisense = true) {
+    async uploadFile(file, reloadIntellisense = false) {
       let me = this;
       let supportedExts = [
         ".xlsx",
@@ -897,8 +903,7 @@ export default {
       ];
       let ext = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
       if (!supportedExts.includes(ext)) {
-        me.$tmToast.warning(me.$t("i18nCommon.duckDBQuery.supportedFormats"));
-        return false;
+        return { success: false, message: me.$t("i18nCommon.duckDBQuery.supportedFormats") };
       }
 
       me.isUploading = true;
@@ -919,9 +924,6 @@ export default {
               me.loadedFiles.push(info);
             }
           }
-          me.$tmToast.success(
-            me.$t("i18nCommon.duckDBQuery.uploadFileSuccess"),
-          );
           // Reset intellisense cache và nạp lại schema mới nhất
           if (reloadIntellisense) {
             await me.handleDeleteIntellisenseCache(me.currentSessionId);
@@ -935,21 +937,56 @@ export default {
             );
             me.sqlText = queries.join(";\n") + ";";
           }
-          return true;
+          return { success: true, message: me.$t("i18nCommon.duckDBQuery.uploadFileSuccess") };
         } else {
-          me.$tmToast.error(
-            resp?.data?.message ||
-              me.$t("i18nCommon.duckDBQuery.uploadFileError"),
-          );
+          return {
+            success: false,
+            message: resp?.data?.message || me.$t("i18nCommon.duckDBQuery.uploadFileError"),
+          };
         }
       } catch (err) {
-        me.$tmToast.error(
-          err?.message || me.$t("i18nCommon.duckDBQuery.uploadFileError"),
-        );
+        return {
+          success: false,
+          message: err?.message || me.$t("i18nCommon.duckDBQuery.uploadFileError"),
+        };
       } finally {
         me.isUploading = false;
       }
-      return false;
+    },
+
+    /**
+     * Hiển thị 1 toast tóm tắt kết quả upload nhiều file (chỉ 1 toast cuối cùng)
+     * @param {Array<{success: boolean, message: string}>} results
+     */
+    showUploadSummaryToast(results) {
+      let me = this;
+      if (!results || results.length === 0) return;
+      let successCount = results.filter((r) => r.success).length;
+      let failCount = results.length - successCount;
+
+      if (failCount === 0) {
+        // Tất cả thành công
+        me.$tmToast.success(me.$t("i18nCommon.duckDBQuery.uploadFileSuccess"));
+      } else if (successCount === 0) {
+        // Toàn bộ thất bại: hiển thị message lỗi của file đầu tiên
+        me.$tmToast.error(
+          results[0].message || me.$t("i18nCommon.duckDBQuery.uploadFileError")
+        );
+      } else {
+        // Một phần thành công, một phần thất bại
+        me.$tmToast.warning(
+          me.$t("i18nCommon.duckDBQuery.uploadFileSuccess") +
+            " (" +
+            successCount +
+            "/" +
+            results.length +
+            "), " +
+            me.$t("i18nCommon.duckDBQuery.uploadFileError") +
+            " (" +
+            failCount +
+            ")"
+        );
+      }
     },
 
     /**
@@ -991,9 +1028,9 @@ export default {
           me.loadedFiles = me.loadedFiles.filter(
             (f) => f.file_id !== file.file_id,
           );
-          // Reset intellisense cache và nạp lại schema mới nhất
-          await me.handleDeleteIntellisenseCache(me.currentSessionId);
-          await me.handleLoadIntellisense();
+          // Reset intellisense cache và nạp lại schema mới nhất (không hiển thị toast trung gian)
+          await me.handleDeleteIntellisenseCache(me.currentSessionId, true);
+          await me.handleLoadIntellisense(true);
           me.$tmToast.success(me.$t("i18nCommon.duckDBQuery.dropFileSuccess"));
         } else {
           me.$tmToast.error(
@@ -1136,9 +1173,9 @@ export default {
         let resp = await me.agentAPI.dropAllFiles(me.currentSessionId);
         if (resp?.data?.success) {
           me.loadedFiles = [];
-          // Reset intellisense cache và nạp lại schema mới nhất
-          await me.handleDeleteIntellisenseCache(me.currentSessionId);
-          await me.handleLoadIntellisense();
+          // Reset intellisense cache và nạp lại schema mới nhất (không hiển thị toast trung gian)
+          await me.handleDeleteIntellisenseCache(me.currentSessionId, true);
+          await me.handleLoadIntellisense(true);
           me.$tmToast.success(
             me.$t("i18nCommon.duckDBQuery.clearAllFilesSuccess"),
           );
