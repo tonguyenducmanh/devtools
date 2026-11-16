@@ -675,27 +675,27 @@ export default {
       howToUse: {
         title: "How to use",
         step1:
-          "1. Open the 'Files' tab in the right sidebar, click 'Upload file', and select an Excel/CSV/Parquet/JSON file.",
+          "1. Click the Upload button (arrow-up icon) on the toolbar to select an Excel/CSV/Parquet/JSON/ODS file.",
         step2:
-          "2. The file is loaded and a DuckDB table is created automatically using the file name (e.g. sales.xlsx → SELECT * FROM sales). Multi-sheet Excel/ODS files create multiple tables: filename_sheetname.",
+          "2. The file is loaded and a DuckDB table is created automatically from the file name (e.g. sales.xlsx → SELECT * FROM sales). Multi-sheet Excel/ODS files create multiple tables: filename_sheetname.",
         step3:
-          "3. Write your SQL in the editor and press Run (or Ctrl/Cmd + Enter).",
+          "3. Write your SQL in the editor and press Run or Ctrl/Cmd + Enter.",
         step4:
-          "4. Results are shown below as a table. You can copy or download them as JSON.",
+          "4. Results are shown below as a table. You can copy or download them as JSON via the Export menu.",
         step5:
-          "5. Upload multiple files and JOIN them together using standard SQL. Sidebar groups by file, click to see individual sheets/tables.",
+          "5. Click any sheet in the sidebar to quickly copy the table name to clipboard. Hover over a sheet to see file name, table name, and row count.",
       },
       features: {
         title: "Key features",
         noServer: "No server needed: DuckDB runs in-memory, nothing to install.",
-        excelSupport: "Supports Excel (.xlsx, .xls), CSV, Parquet, JSON.",
+        excelSupport: "Supports Excel (.xlsx, .xls), ODS, CSV, TSV, Parquet, JSON, NDJSON, JSONL.",
         multiSheet: "Multi-sheet Excel/ODS auto-creates multiple tables with unique names (auto _1, _2 if duplicate).",
         multiTable: "Upload multiple files, each becomes a table — JOIN freely.",
         formatCode: "Automatic SQL formatting.",
-        savedScripts: "Save and reload frequently used queries.",
+        savedScripts: "Save and reload frequently used queries via the 'SQL Save' tab.",
         sessionPersist: "Session persists until the daemon stops or you create a new session.",
         resultLimit:
-          "By default, rows are limited in the backend when your query has no LIMIT; you can disable the limit in Settings.",
+          "By default, rows are limited in the backend when your query has no LIMIT; you can disable or adjust the limit in the Setting tab.",
       },
     },
   },

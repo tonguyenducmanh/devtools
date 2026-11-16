@@ -664,27 +664,27 @@ export default {
       howToUse: {
         title: "Hướng dẫn sử dụng",
         step1:
-          "1. Mở tab 'Files' ở sidebar bên phải, nhấn 'Upload file' và chọn file Excel/CSV/Parquet/JSON.",
+          "1. Nhấn nút Upload (biểu tượng mũi tên lên) trên thanh toolbar để chọn file Excel/CSV/Parquet/JSON/ODS.",
         step2:
-          "2. File được nạp và tự động tạo bảng DuckDB với tên từ tên file (ví dụ: sales.xlsx → SELECT * FROM sales). File Excel/ODS có nhiều sheet sẽ tạo nhiều bảng, tên bảng = tên file + '_' + tên sheet.",
+          "2. File được nạp và tự động tạo bảng DuckDB từ tên file (ví dụ: sales.xlsx → SELECT * FROM sales). File có nhiều sheet tạo nhiều bảng riêng, tên bảng = tên file + '_' + tên sheet.",
         step3:
-          "3. Viết câu SQL vào editor, nhấn nút Run (hoặc Ctrl/Cmd + Enter) để thực hiện query.",
+          "3. Viết câu SQL vào editor, nhấn nút Run hoặc Ctrl/Cmd + Enter để chạy query.",
         step4:
-          "4. Kết quả hiển thị bên dưới dưới dạng bảng. Có thể copy hoặc tải về dạng JSON.",
+          "4. Kết quả hiển thị bên dưới dạng bảng. Có thể copy hoặc tải về dạng JSON qua menu Export.",
         step5:
-          "5. Có thể upload nhiều file và join chúng lại bằng SQL bình thường. Sidebar hiển thị nhóm theo file, click xem chi tiết từng sheet/bảng.",
+          "5. Click vào bất kỳ sheet nào trong sidebar để copy nhanh tên bảng vào clipboard. Di chuột vào sheet để xem chi tiết tên file, tên bảng và số dòng.",
       },
       features: {
         title: "Tính năng nổi bật",
         noServer: "Không cần server: DuckDB chạy in-memory, không cài đặt gì thêm.",
-        excelSupport: "Hỗ trợ Excel (.xlsx, .xls), CSV, Parquet, JSON.",
+        excelSupport: "Hỗ trợ Excel (.xlsx, .xls), ODS, CSV, TSV, Parquet, JSON, NDJSON, JSONL.",
         multiSheet: "Excel/ODS nhiều sheet tự tạo nhiều bảng, tên duy nhất (tự thêm _1, _2 nếu trùng).",
         multiTable: "Upload nhiều file, mỗi file là một bảng, có thể JOIN thoải mái.",
         formatCode: "Tự động định dạng SQL.",
-        savedScripts: "Lưu và tải lại các câu query đã dùng.",
+        savedScripts: "Lưu và tải lại các câu query đã dùng qua tab 'SQL Save'.",
         sessionPersist: "Session tồn tại đến khi daemon tắt hoặc bạn tạo session mới.",
         resultLimit:
-          "Mặc định giới hạn số dòng trả về ở backend khi câu query không có LIMIT; có thể tắt giới hạn trong cài đặt.",
+          "Mặc định giới hạn số dòng trả về ở backend khi câu query không có LIMIT; có thể tắt hoặc điều chỉnh trong tab Setting.",
       },
     },
   },
