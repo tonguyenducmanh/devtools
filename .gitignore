@@ -564,3 +564,6 @@ src_backend/tm_core_service/internal/database/duckdb/extensions/*.duckdb_extensi
 # không lỗi khi clone repo.
 src_backend/tm_core_service/internal/database/duckdb/cli/duckdb-*
 src_backend/tm_core_service/internal/database/duckdb/cli/duckdb-*.exe
+
+# File test hiệu năng DuckDB (tự sinh, không commit)
+tmp/

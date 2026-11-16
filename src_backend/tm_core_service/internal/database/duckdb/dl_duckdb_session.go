@@ -5,9 +5,11 @@
 // gộp thành 1 chuỗi SQL để giảm số lần spawn process.
 // Không dùng CGO/libduckdb → build cross-platform được.
 //
-// Excel/ODS: .xlsx (excelize), .xls (xlrd-go), .ods (go-ods) đều được đọc bằng thư viện Go
-// nhúng sẵn trong binary, convert từng sheet sang CSV tạm rồi nạp thành view.
-// KHÔNG còn phụ thuộc extension `excel` của DuckDB (không cần INSTALL/tải từ internet).
+// Excel/ODS: .xlsx và .ods đọc bằng extension `rusty_sheet` (nhúng sẵn trong binary,
+// xem dl_duckdb_spreadsheet.go) → convert mỗi sheet sang parquet tạm → nạp thành view.
+// .xls vẫn dùng xlrd-go (rusty_sheet/calamine báo "empty" với nhiều file BIFF8 hợp lệ)
+// → convert từng sheet sang CSV tạm → nạp thành view.
+// KHÔNG cần INSTALL/tải extension từ internet.
 //
 // DuckDB CLI binary được nhúng vào Go binary qua //go:embed (folder cli/),
 // tải trước bởi scripts/fetch_duckdb_cli.sh. Không commit binary (xem .gitignore).
@@ -39,8 +41,6 @@ import (
 	"tm_core_service/internal/model"
 	"tm_core_service/tm_common"
 
-	ods "github.com/mukbeast4/go-ods"
-	"github.com/xuri/excelize/v2"
 	"github.com/yamitzky/xlrd-go/xlrd"
 	"golang.org/x/text/unicode/norm"
 )
@@ -191,15 +191,19 @@ type fileLoadResult struct {
 	TableName string
 	Columns   []string
 	RowCount  int64
-	// TempPath là đường dẫn CSV tạm mà view đang đọc (chỉ có với xlsx/xls/ods).
+	// TempPath là đường dẫn dữ liệu tạm mà view đang đọc (chỉ có với xlsx/xls/ods):
+	// thư mục parquet với .xlsx/.ods, file CSV với .xls.
 	// View đọc file lazily nên KHÔNG được xoá sớm; sẽ xoá khi drop file/session.
 	TempPath string
 }
 
-// csvSheet lưu thông tin 1 sheet đã convert từ xlsx/xls/ods sang CSV tạm.
-type csvSheet struct {
+// stagedSheet lưu thông tin 1 sheet đã convert sang dữ liệu tạm đọc được bằng SQL.
+type stagedSheet struct {
 	SheetName string
-	CsvPath   string
+	// ReadExpr là biểu thức table function đọc dữ liệu tạm (read_parquet/read_csv).
+	ReadExpr string
+	// TempPath là thư mục/file tạm cần xoá khi drop (dùng os.RemoveAll).
+	TempPath string
 }
 
 // runDuckDB spawn 1 tiến trình `duckdb <dbFile> -json -c "<SQL>"`, trả về toàn bộ stdout.
@@ -457,37 +461,29 @@ func LoadFile(sessionID, filePath, tableName, fileID, fileName string) ([]fileLo
 	existingViews := getExistingViews(sess)
 
 	switch ext {
-	case ".xlsx":
-		// Đọc bằng excelize (nhúng sẵn trong binary), convert từng sheet sang CSV tạm.
-		// all_varchar=true: giữ nguyên chuỗi (số điện thoại, mã có số 0 đầu...) tránh lỗi infer type.
-		sheets, err := convertXlsxToCsvSheets(filePath)
+	case ".xlsx", ".ods":
+		// Đọc bằng extension rusty_sheet (streaming trong DuckDB), convert mỗi sheet
+		// sang parquet tạm. KHÔNG dùng thư viện Go: go-ods/excelize nạp cả bảng tính
+		// vào RAM (ODS 1 triệu dòng ≈ 8 GB) và nổ tung với dòng sentinel của
+		// LibreOffice (number-rows-repeated=1048576) — xem dl_duckdb_spreadsheet.go.
+		sheets, err := convertSpreadsheetToStagedSheets(sess.dbFile, filePath)
 		if err != nil {
 			return nil, err
 		}
 		_ = os.Remove(filePath) // đã convert xong, file gốc không còn dùng
-		results, err = loadSheetsAsViews(sess, sheets, tableName, existingViews, true)
-		if err != nil {
-			return nil, err
-		}
-
-	case ".ods":
-		sheets, err := convertOdsToCsvSheets(filePath)
-		if err != nil {
-			return nil, err
-		}
-		_ = os.Remove(filePath)
-		results, err = loadSheetsAsViews(sess, sheets, tableName, existingViews, false)
+		results, err = loadSheetsAsViews(sess, sheets, tableName, existingViews)
 		if err != nil {
 			return nil, err
 		}
 
 	case ".xls":
-		sheets, err := convertXlsToCsvSheets(filePath)
+		// .xls cũ (BIFF8) vẫn dùng xlrd-go: rusty_sheet báo "empty" với nhiều file hợp lệ.
+		sheets, err := convertXlsToStagedSheets(filePath)
 		if err != nil {
 			return nil, err
 		}
 		_ = os.Remove(filePath)
-		results, err = loadSheetsAsViews(sess, sheets, tableName, existingViews, false)
+		results, err = loadSheetsAsViews(sess, sheets, tableName, existingViews)
 		if err != nil {
 			return nil, err
 		}
@@ -537,7 +533,7 @@ func LoadFile(sessionID, filePath, tableName, fileID, fileName string) ([]fileLo
 	}
 
 	for _, r := range results {
-		// Với xlsx/xls/ods, file mà view đọc là CSV tạm của từng sheet
+		// Với xlsx/xls/ods, view đọc dữ liệu tạm của từng sheet (parquet hoặc CSV)
 		fp := filePath
 		if r.TempPath != "" {
 			fp = r.TempPath
@@ -642,186 +638,16 @@ func loadSingleView(sess *duckdbSession, tableName, readExpr, preSQL string) (fi
 }
 
 // csvReadExpr trả về biểu thức đọc CSV tạm do mình tự sinh (dòng đầu luôn là header).
-func csvReadExpr(csvPath string, allVarchar bool) string {
-	if allVarchar {
-		return fmt.Sprintf("read_csv('%s', header=true, all_varchar=true)", escapeSingleQuote(csvPath))
-	}
+func csvReadExpr(csvPath string) string {
 	return fmt.Sprintf("read_csv_auto('%s')", escapeSingleQuote(csvPath))
 }
 
-// removeCsvSheets xoá các CSV tạm (dùng khi nạp lỗi).
-func removeCsvSheets(sheets []csvSheet) {
-	for _, s := range sheets {
-		_ = os.Remove(s.CsvPath)
-	}
-}
-
-// convertXlsxToCsvSheets đọc file .xlsx bằng excelize, convert MỌI sheet thành CSV tạm.
-// Duyệt streaming 2 lượt (lượt 1 đếm số cột lớn nhất, lượt 2 ghi CSV đã pad đủ cột)
-// vì excelize cắt bỏ ô trống cuối dòng → các dòng có độ dài khác nhau sẽ làm DuckDB lỗi.
-func convertXlsxToCsvSheets(xlsxPath string) ([]csvSheet, error) {
-	f, err := excelize.OpenFile(xlsxPath)
-	if err != nil {
-		return nil, fmt.Errorf("mở file .xlsx thất bại: %w", err)
-	}
-	defer f.Close()
-
-	sheetNames := f.GetSheetList()
-	if len(sheetNames) == 0 {
-		return nil, fmt.Errorf("file .xlsx không có sheet nào")
-	}
-
-	base := strings.TrimSuffix(xlsxPath, filepath.Ext(xlsxPath))
-	var sheets []csvSheet
-
-	for i, sheetName := range sheetNames {
-		// Lượt 1: tìm số cột lớn nhất
-		maxCols, err := xlsxSheetMaxCols(f, sheetName)
-		if err != nil {
-			removeCsvSheets(sheets)
-			return nil, fmt.Errorf("đọc sheet '%s' thất bại: %w", sheetName, err)
-		}
-		if maxCols == 0 {
-			continue // sheet rỗng → bỏ qua
-		}
-
-		// Lượt 2: ghi CSV
-		csvPath := fmt.Sprintf("%s_sheet%d.csv", base, i+1)
-		if err := writeXlsxSheetCsv(f, sheetName, csvPath, maxCols); err != nil {
-			_ = os.Remove(csvPath)
-			removeCsvSheets(sheets)
-			return nil, fmt.Errorf("convert sheet '%s' sang CSV thất bại: %w", sheetName, err)
-		}
-		sheets = append(sheets, csvSheet{SheetName: sheetName, CsvPath: csvPath})
-	}
-
-	if len(sheets) == 0 {
-		return nil, fmt.Errorf("file .xlsx không có sheet nào chứa dữ liệu")
-	}
-	return sheets, nil
-}
-
-// xlsxSheetMaxCols trả về số cột lớn nhất của các dòng trong sheet.
-func xlsxSheetMaxCols(f *excelize.File, sheetName string) (int, error) {
-	rows, err := f.Rows(sheetName)
-	if err != nil {
-		return 0, err
-	}
-	defer rows.Close()
-
-	maxCols := 0
-	for rows.Next() {
-		cols, err := rows.Columns()
-		if err != nil {
-			return 0, err
-		}
-		// bỏ qua ô trống cuối dòng
-		n := len(cols)
-		for n > 0 && cols[n-1] == "" {
-			n--
-		}
-		if n > maxCols {
-			maxCols = n
-		}
-	}
-	return maxCols, rows.Error()
-}
-
-// writeXlsxSheetCsv ghi sheet ra CSV UTF-8, mỗi dòng pad đủ maxCols cột.
-func writeXlsxSheetCsv(f *excelize.File, sheetName, csvPath string, maxCols int) error {
-	rows, err := f.Rows(sheetName)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	out, err := os.Create(csvPath)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	w := csv.NewWriter(out)
-	record := make([]string, maxCols)
-	for rows.Next() {
-		cols, err := rows.Columns()
-		if err != nil {
-			return err
-		}
-		for i := range record {
-			if i < len(cols) {
-				record[i] = cols[i]
-			} else {
-				record[i] = ""
-			}
-		}
-		if err := w.Write(record); err != nil {
-			return err
-		}
-	}
-	if err := rows.Error(); err != nil {
-		return err
-	}
-	w.Flush()
-	return w.Error()
-}
-
-// convertOdsToCsvSheets đọc file .ods, convert mỗi sheet thành file CSV tạm.
-func convertOdsToCsvSheets(odsPath string) ([]csvSheet, error) {
-	f, err := ods.OpenFile(odsPath)
-	if err != nil {
-		return nil, fmt.Errorf("mở file .ods thất bại: %w", err)
-	}
-	defer f.Close()
-
-	sheetNames := f.GetSheetList()
-	if len(sheetNames) == 0 {
-		return nil, fmt.Errorf("file .ods không có sheet nào")
-	}
-
-	base := strings.TrimSuffix(odsPath, filepath.Ext(odsPath))
-	var sheets []csvSheet
-	for i, sheetName := range sheetNames {
-		rows, err := f.GetRows(sheetName)
-		if err != nil {
-			removeCsvSheets(sheets)
-			return nil, fmt.Errorf("đọc sheet '%s' thất bại: %w", sheetName, err)
-		}
-
-		// Tên file CSV tạm chỉ dùng index (ASCII) để không phụ thuộc tên sheet tiếng Việt/ký tự lạ
-		csvPath := fmt.Sprintf("%s_sheet%d.csv", base, i+1)
-		csvFile, err := os.Create(csvPath)
-		if err != nil {
-			removeCsvSheets(sheets)
-			return nil, fmt.Errorf("tạo file CSV tạm thất bại: %w", err)
-		}
-
-		writer := csv.NewWriter(csvFile)
-		for _, row := range rows {
-			if err := writer.Write(row); err != nil {
-				csvFile.Close()
-				_ = os.Remove(csvPath)
-				removeCsvSheets(sheets)
-				return nil, fmt.Errorf("ghi CSV thất bại: %w", err)
-			}
-		}
-		writer.Flush()
-		werr := writer.Error()
-		csvFile.Close()
-		if werr != nil {
-			_ = os.Remove(csvPath)
-			removeCsvSheets(sheets)
-			return nil, fmt.Errorf("flush CSV thất bại: %w", werr)
-		}
-
-		sheets = append(sheets, csvSheet{SheetName: sheetName, CsvPath: csvPath})
-	}
-
-	return sheets, nil
-}
-
-// convertXlsToCsvSheets đọc file .xls, convert mỗi sheet thành file CSV tạm.
-func convertXlsToCsvSheets(xlsPath string) ([]csvSheet, error) {
+// convertXlsToStagedSheets đọc file .xls, convert mỗi sheet thành file CSV tạm.
+//
+// `.xls` KHÔNG dùng rusty_sheet: extension (calamine) báo "empty" với nhiều file
+// BIFF8 hợp lệ (issue20.xls, ragged.xls, formula_test_names.xls, ...) nên vẫn giữ
+// xlrd-go cho định dạng cũ này.
+func convertXlsToStagedSheets(xlsPath string) ([]stagedSheet, error) {
 	book, err := xlrd.OpenWorkbook(xlsPath, nil)
 	if err != nil {
 		return nil, fmt.Errorf("mở file .xls thất bại: %w", err)
@@ -832,21 +658,32 @@ func convertXlsToCsvSheets(xlsPath string) ([]csvSheet, error) {
 		return nil, fmt.Errorf("file .xls không có sheet nào")
 	}
 
-	var sheets []csvSheet
+	var sheets []stagedSheet
 	for i, sheetName := range sheetNames {
+		// Bỏ sheet rỗng: nếu không sẽ sinh view 0 dòng với cột rác "column0".
+		if sh, err := book.SheetByIndex(i); err == nil && (sh.NRows == 0 || sh.NCols == 0) {
+			continue
+		}
 		csvPath, err := convertXlsSheetToCsv(xlsPath, i)
 		if err != nil {
-			removeCsvSheets(sheets)
+			removeStagedSheets(sheets)
 			return nil, fmt.Errorf("convert sheet '%s' sang CSV thất bại: %w", sheetName, err)
 		}
-		sheets = append(sheets, csvSheet{SheetName: sheetName, CsvPath: csvPath})
+		sheets = append(sheets, stagedSheet{
+			SheetName: sheetName,
+			ReadExpr:  csvReadExpr(csvPath),
+			TempPath:  csvPath,
+		})
+	}
+	if len(sheets) == 0 {
+		return nil, fmt.Errorf("file .xls không có sheet nào chứa dữ liệu")
 	}
 	return sheets, nil
 }
 
 // loadSheetsAsViews tạo 1 view cho mỗi sheet (dùng chung cho xlsx/xls/ods).
 // Tên view: <tên_file>_<tên_sheet>, đã chuẩn hoá + đảm bảo không trùng.
-func loadSheetsAsViews(sess *duckdbSession, sheets []csvSheet, baseTableName string, existingViews map[string]bool, allVarchar bool) ([]fileLoadResult, error) {
+func loadSheetsAsViews(sess *duckdbSession, sheets []stagedSheet, baseTableName string, existingViews map[string]bool) ([]fileLoadResult, error) {
 	results := make([]fileLoadResult, 0, len(sheets))
 	for i, sh := range sheets {
 		safeSheet := SanitizeIdentifier(sh.SheetName)
@@ -860,18 +697,18 @@ func loadSheetsAsViews(sess *duckdbSession, sheets []csvSheet, baseTableName str
 		uniqueName := getUniqueTableName(viewName, existingViews)
 		existingViews[uniqueName] = true
 
-		result, err := loadSingleView(sess, uniqueName, csvReadExpr(sh.CsvPath, allVarchar), "")
+		result, err := loadSingleView(sess, uniqueName, sh.ReadExpr, "")
 		if err != nil {
-			// rollback: xoá các view đã tạo của file này + toàn bộ CSV tạm
+			// rollback: xoá các view đã tạo của file này + toàn bộ dữ liệu tạm
 			rollback := make([]loadedFile, 0, len(results))
 			for _, r := range results {
 				rollback = append(rollback, loadedFile{TableName: r.TableName})
 			}
 			dropViewsAndTempFiles(sess, rollback)
-			removeCsvSheets(sheets)
+			removeStagedSheets(sheets)
 			return nil, err
 		}
-		result.TempPath = sh.CsvPath
+		result.TempPath = sh.TempPath
 		results = append(results, result)
 	}
 	return results, nil
@@ -1052,7 +889,8 @@ func DropFile(sessionID, tableNameOrFileID string) error {
 	return nil
 }
 
-// dropViewsAndTempFiles DROP VIEW (1 process duy nhất) rồi xoá file tạm mà các view đã đọc.
+// dropViewsAndTempFiles DROP VIEW (1 process duy nhất) rồi xoá dữ liệu tạm mà các view đã đọc.
+// Dùng os.RemoveAll vì dữ liệu tạm của .xlsx/.ods là cả thư mục parquet.
 // Phải gọi khi đang giữ sess.mu.
 func dropViewsAndTempFiles(sess *duckdbSession, files []loadedFile) {
 	if len(files) == 0 {
@@ -1065,7 +903,7 @@ func dropViewsAndTempFiles(sess *duckdbSession, files []loadedFile) {
 	_, _, _ = runDuckDB(sess.dbFile, sqlB.String())
 	for _, f := range files {
 		if f.FilePath != "" {
-			_ = os.Remove(f.FilePath)
+			_ = os.RemoveAll(f.FilePath)
 		}
 	}
 }
@@ -1094,7 +932,7 @@ func DropSession(sessionID string) {
 	defer sess.mu.Unlock()
 	for _, f := range sess.files {
 		if f.FilePath != "" {
-			_ = os.Remove(f.FilePath)
+			_ = os.RemoveAll(f.FilePath)
 		}
 	}
 	sess.files = nil
