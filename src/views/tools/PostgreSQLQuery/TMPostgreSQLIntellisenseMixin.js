@@ -1227,6 +1227,8 @@ export default {
         .join("")
         .toLowerCase();
       if (!alias) return null;
+      // Rút gọn alias tối đa 4 ký tự, trừ khi trùng mới tăng thêm số
+      if (alias.length > 4) alias = alias.substring(0, 4);
 
       // thu thập tất cả tên bảng/alias đã dùng trong FROM/JOIN để kiểm tra trùng lặp
       // regex tương tự như ở completion provider, flag g để duyệt bằng lastIndex

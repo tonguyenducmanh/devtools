@@ -875,6 +875,8 @@ export default {
             .toLowerCase()
         : "t";
       if (!base) base = "t";
+      // Rút gọn alias tối đa 4 ký tự, trừ khi trùng mới tăng thêm số
+      if (base.length > 4) base = base.substring(0, 4);
 
       const used = new Set();
       const re =
