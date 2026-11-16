@@ -119,3 +119,100 @@ func TestLoadFile_CSVEndToEnd(t *testing.T) {
 		t.Errorf("số cột sai: %v", res.Columns)
 	}
 }
+
+func TestCollectResultSets_MultipleArrays(t *testing.T) {
+	stdout := []byte("[{\"a\":1}]\n[{\"b\":2},{\"b\":3}]\n")
+	result, err := collectResultSets(stdout, 0)
+	if err != nil {
+		t.Fatalf("collectResultSets thất bại: %v", err)
+	}
+	if len(result.Results) != 2 {
+		t.Fatalf("kỳ vọng 2 result set, nhận %d", len(result.Results))
+	}
+	if !result.Results[0].IsSelect || len(result.Results[0].Rows) != 1 {
+		t.Errorf("result set 1 sai: %+v", result.Results[0])
+	}
+	if !result.Results[1].IsSelect || len(result.Results[1].Rows) != 2 {
+		t.Errorf("result set 2 sai: %+v", result.Results[1])
+	}
+}
+
+func TestCollectResultSets_TruncatesAtBackend(t *testing.T) {
+	stdout := []byte("[{\"n\":1},{\"n\":2},{\"n\":3}]\n")
+	result, err := collectResultSets(stdout, 2)
+	if err != nil {
+		t.Fatalf("collectResultSets thất bại: %v", err)
+	}
+	if len(result.Results) != 1 || len(result.Results[0].Rows) != 2 {
+		t.Fatalf("kỳ vọng 1 result set bị cắt còn 2 dòng, nhận %+v", result.Results)
+	}
+	if result.Results[0].RowsAffected != 2 {
+		t.Errorf("RowsAffected sai: %d", result.Results[0].RowsAffected)
+	}
+}
+
+func TestCollectResultSets_IgnoresNonResultStatements(t *testing.T) {
+	// Câu không trả result set không in mảng JSON -> không tạo phần tử.
+	stdout := []byte("")
+	result, err := collectResultSets(stdout, 0)
+	if err != nil {
+		t.Fatalf("collectResultSets thất bại: %v", err)
+	}
+	if len(result.Results) != 0 {
+		t.Fatalf("kỳ vọng 0 result set, nhận %d", len(result.Results))
+	}
+}
+
+func TestExecuteQuery_MultiStatement(t *testing.T) {
+	if _, err := getEmbeddedDuckDBCLI(); err != nil {
+		t.Skipf("không có DuckDB CLI embedded để test: %v", err)
+	}
+
+	sessionID := "test-session-multi"
+	defer DropSession(sessionID)
+
+	// Script chạy 1 lần, không tách statement. DDL/INSERT không in mảng JSON
+	// nên chỉ các câu có result set (2 SELECT) tạo phần tử Results.
+	sql := "CREATE TABLE t(a INT); INSERT INTO t VALUES (1),(2); SELECT * FROM t ORDER BY a; SELECT count(*) AS c FROM t"
+	result, err := ExecuteQuery(sessionID, sql, 0, false)
+	if err != nil {
+		t.Fatalf("ExecuteQuery thất bại: %v", err)
+	}
+	if len(result.Results) != 2 {
+		t.Fatalf("kỳ vọng 2 result set, nhận %d", len(result.Results))
+	}
+	if !result.Results[0].IsSelect || len(result.Results[0].Rows) != 2 {
+		t.Errorf("SELECT * sai: %+v", result.Results[0])
+	}
+	if !result.Results[1].IsSelect || len(result.Results[1].Rows) != 1 {
+		t.Errorf("SELECT count sai: %+v", result.Results[1])
+	}
+}
+
+func TestExecuteQuery_BackendLimit(t *testing.T) {
+	if _, err := getEmbeddedDuckDBCLI(); err != nil {
+		t.Skipf("không có DuckDB CLI embedded để test: %v", err)
+	}
+
+	sessionID := "test-session-limit"
+	defer DropSession(sessionID)
+
+	sql := "SELECT i FROM range(0, 5) t(i)"
+	limited, err := ExecuteQuery(sessionID, sql, 2, false)
+	if err != nil {
+		t.Fatalf("ExecuteQuery thất bại: %v", err)
+	}
+	if len(limited.Results) != 1 || len(limited.Results[0].Rows) != 2 {
+		t.Fatalf("kỳ vọng bị cắt còn 2 dòng, nhận %+v", limited.Results)
+	}
+
+	// Query có LIMIT thì không cắt thêm ở backend.
+	sqlWithLimit := "SELECT i FROM range(0, 5) t(i) LIMIT 4"
+	withLimit, err := ExecuteQuery(sessionID, sqlWithLimit, 2, false)
+	if err != nil {
+		t.Fatalf("ExecuteQuery (có LIMIT) thất bại: %v", err)
+	}
+	if len(withLimit.Results) != 1 || len(withLimit.Results[0].Rows) != 4 {
+		t.Fatalf("query có LIMIT không được cắt thêm, nhận %+v", withLimit.Results)
+	}
+}

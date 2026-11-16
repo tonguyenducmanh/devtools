@@ -1,8 +1,7 @@
 // Package duckdb cung cấp tầng data access cho DuckDB qua CLI.
 //
 // Mỗi session là 1 file .duckdb persistent (temp). Mỗi thao tác (query, upload, drop)
-// spawn 1 tiến trình DuckDB CLI với -json -c "<SQL>" — các câu lệnh liên quan được
-// gộp thành 1 chuỗi SQL để giảm số lần spawn process.
+// spawn 1 tiến trình DuckDB CLI với -json -c "<SQL>".
 // Không dùng CGO/libduckdb → build cross-platform được.
 //
 // Excel/ODS: .xlsx và .ods đọc bằng extension `rusty_sheet` (nhúng sẵn trong binary,
@@ -18,6 +17,21 @@
 //   - Upload file → lưu tạm vào OS temp dir → CREATE VIEW table AS SELECT * FROM read_...()
 //   - View tồn tại trong file .duckdb đến khi session bị xoá
 //   - File .duckdb session được xoá khi DropSession
+//
+// SQL script execution (không tách statement):
+//   - Toàn bộ script được chạy trong 1 lần gọi DuckDB CLI duy nhất.
+//   - Lý do KHÔNG tách statement theo ';':
+//     (1) DuckDB CLI -json in ra 1 mảng JSON cho mỗi câu lệnh có result set,
+//     theo thứ tự; câu không trả result set (DDL/DML/COPY/...) không in mảng.
+//     Thu thập tất cả mảng JSON trong stdout là đủ để trả về từng result set.
+//     (2) Dừng khi gặp lỗi là hành vi đúng: CLI/engine dừng tại câu lỗi và không
+//     chạy tiếp câu sau, tránh lỗi dữ liệu dây chuyền; một lần chạy cho 1 lỗi rõ ràng.
+//     (3) Giới hạn dòng: không tách câu để bọc LIMIT vào SQL (dễ nhận diện/bọc sai
+//     multi-statement). Thay vào đó, nếu script không chứa từ khóa LIMIT và không
+//     yêu cầu unlimited, cắt bớt số dòng ở tầng kết quả backend (default_limit,
+//     mặc định DefaultQueryLimit) cho đơn giản.
+//   - Hệ quả: chỉ các câu có result set mới tạo phần tử trong Results (theo thứ tự);
+//   câu không trả result set không tạo entry; lỗi không gắn "statement thứ N".
 
 package duckdb
 
@@ -47,7 +61,7 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-// DefaultQueryLimit là giới hạn số dòng khi frontend không gửi default_limit.
+// DefaultQueryLimit là số dòng tối đa trả về khi query không tự giới hạn.
 const DefaultQueryLimit = 1000
 
 // duckdbCLICPUHint là thông báo thân thiện khi binary DuckDB CLI không chạy được
@@ -231,70 +245,7 @@ func runDuckDB(dbFile, sql string) ([]byte, []byte, error) {
 	return stdout.Bytes(), nil, nil
 }
 
-// isSelect kiểm tra xem statement có phải SELECT/WITH/SHOW/DESCRIBE không.
-func isSelect(stmt string) bool {
-	upper := strings.ToUpper(strings.TrimSpace(stmt))
-	return strings.HasPrefix(upper, "SELECT") ||
-		strings.HasPrefix(upper, "WITH") ||
-		strings.HasPrefix(upper, "SHOW") ||
-		strings.HasPrefix(upper, "DESCRIBE") ||
-		strings.HasPrefix(upper, "EXPLAIN") ||
-		strings.HasPrefix(upper, "PRAGMA")
-}
 
-// applyLimit bao bọc SELECT bằng LIMIT nếu cần.
-func applyLimit(stmt string, defaultLimit int, unlimited bool) string {
-	if unlimited || defaultLimit <= 0 || !isSelect(stmt) {
-		return stmt
-	}
-	upper := strings.ToUpper(stmt)
-	if strings.Contains(upper, " LIMIT ") {
-		return stmt
-	}
-	return fmt.Sprintf("SELECT * FROM (%s) __duckdb_wrapped LIMIT %d", stmt, defaultLimit)
-}
-
-// parseJSONLines parse nhiều dòng JSON array (mỗi dòng là 1 kết quả) thành danh sách rows.
-// Trả về kết quả của dòng JSON cuối cùng có dữ liệu, cột giữ ĐÚNG thứ tự câu SELECT.
-func parseJSONLines(stdout []byte) ([]map[string]any, []string, error) {
-	lines := strings.Split(string(stdout), "\n")
-
-	// Tìm dòng JSON cuối cùng có dữ liệu (trước dòng rỗng hoặc marker)
-	var lastRows []map[string]any
-	var lastCols []string
-
-	for _, line := range lines {
-		trimmed := bytes.TrimSpace([]byte(line))
-		if len(trimmed) == 0 {
-			continue
-		}
-
-		var rows []map[string]any
-		if err := json.Unmarshal(trimmed, &rows); err != nil {
-			continue
-		}
-		if len(rows) == 0 {
-			continue
-		}
-
-		cols, err := orderedKeys(trimmed)
-		if err != nil {
-			continue
-		}
-
-		lastRows = rows
-		lastCols = cols
-	}
-
-	if lastRows == nil {
-		return nil, nil, nil
-	}
-	if lastCols == nil {
-		lastCols = []string{}
-	}
-
-	return lastRows, lastCols, nil
-}
 
 // getOrCreateSession lấy session hiện có hoặc tạo mới nếu chưa có.
 func getOrCreateSession(sessionID string) (*duckdbSession, error) {
@@ -327,7 +278,14 @@ func GetOrCreateSession(sessionID string) (*duckdbSession, error) {
 }
 
 // ExecuteQuery thực thi SQL script trên session DuckDB và trả về kết quả.
-// Nhiều statement được gộp thành 1 chuỗi SQL, spawn 1 process duy nhất.
+//
+// KHÔNG tách statement: chạy toàn bộ script trong 1 lần gọi CLI duy nhất.
+// - DuckDB CLI -json in 1 mảng JSON cho mỗi câu có result set, theo thứ tự.
+//   Các câu không trả result set (DDL/DML/COPY/...) không in mảng → bỏ qua.
+// - Dừng khi lỗi: CLI dừng tại câu lỗi, không chạy câu sau (tránh lỗi dữ liệu).
+// - Giới hạn dòng ở tầng kết quả backend (không bọc LIMIT vào SQL): nếu script
+//   không chứa từ khóa LIMIT và unlimited=false, mỗi result set bị cắt còn tối đa
+//   defaultLimit dòng (mặc định DefaultQueryLimit).
 func ExecuteQuery(sessionID, sqlQuery string, defaultLimit int, unlimited bool) (*model.TMMultiQueryResult, error) {
 	sess, err := getOrCreateSession(sessionID)
 	if err != nil {
@@ -337,88 +295,64 @@ func ExecuteQuery(sessionID, sqlQuery string, defaultLimit int, unlimited bool) 
 	sess.mu.Lock()
 	defer sess.mu.Unlock()
 
-	if unlimited {
-		defaultLimit = 0
-	} else if defaultLimit <= 0 {
-		defaultLimit = DefaultQueryLimit
+	stdout, _, runErr := runDuckDB(sess.dbFile, sqlQuery)
+	if runErr != nil {
+		return nil, fmt.Errorf("lỗi thực thi SQL: %w", runErr)
 	}
 
-	statements := splitStatements(sqlQuery)
+	limit := 0
+	if !unlimited && !scriptHasLimit(sqlQuery) {
+		limit = defaultLimit
+		if limit <= 0 {
+			limit = DefaultQueryLimit
+		}
+	}
+
+	return collectResultSets(stdout, limit)
+}
+
+// scriptHasLimit kiểm tra đơn giản xem script có chứa từ khóa LIMIT hay không.
+// Dùng để tránh cắt kết quả khi người dùng đã tự giới hạn trong câu lệnh.
+func scriptHasLimit(sql string) bool {
+	return strings.Contains(strings.ToUpper(sql), "LIMIT")
+}
+
+// collectResultSets thu thập mọi mảng JSON trong stdout thành danh sách kết quả,
+// theo đúng thứ tự xuất hiện. Mỗi mảng là result set của 1 câu lệnh; câu không
+// trả result set không in mảng nên không tạo phần tử.
+// Nếu limit > 0, mỗi result set chỉ giữ tối đa limit dòng (cắt ở tầng backend).
+func collectResultSets(stdout []byte, limit int) (*model.TMMultiQueryResult, error) {
+	arrays := extractJSONArrays(stdout)
 	result := &model.TMMultiQueryResult{
-		Results: make([]*model.TMQueryResult, 0, len(statements)),
+		Results: make([]*model.TMQueryResult, 0, len(arrays)),
 	}
-
-	// Gộp tất cả statements thành 1 chuỗi SQL để spawn 1 process duy nhất
-	var combined strings.Builder
-	for i, stmt := range statements {
-		stmt = strings.TrimSpace(stmt)
-		if stmt == "" {
-			continue
+	for _, arr := range arrays {
+		rows, cols, err := parseJSONRows(arr)
+		if err != nil {
+			return result, fmt.Errorf("lỗi đọc kết quả: %w", err)
 		}
-		if i > 0 {
-			combined.WriteString("; ")
+		if rows == nil {
+			rows = []map[string]any{}
 		}
-		combined.WriteString(applyLimit(stmt, defaultLimit, unlimited))
+		if cols == nil {
+			cols = []string{}
+		}
+		if limit > 0 && len(rows) > limit {
+			rows = rows[:limit]
+		}
+		result.Results = append(result.Results, &model.TMQueryResult{
+			Columns:      cols,
+			Rows:         rows,
+			IsSelect:     true,
+			RowsAffected: int64(len(rows)),
+		})
 	}
-	combinedSQL := combined.String()
-
-	stdout, _, err := runDuckDB(sess.dbFile, combinedSQL)
-	if err != nil {
-		return result, err
-	}
-
-	// Parse output: tách các mảng JSON (DuckDB CLI pretty-print có thể xuống dòng)
-	jsonArrays := extractJSONArrays(stdout)
-	arrIdx := 0
-
-	for _, stmt := range statements {
-		stmt = strings.TrimSpace(stmt)
-		if stmt == "" {
-			continue
-		}
-
-		selectStmt := isSelect(stmt)
-
-		if selectStmt {
-			// Tìm mảng JSON tiếp theo có dữ liệu
-			var rows []map[string]any
-			var cols []string
-			for arrIdx < len(jsonArrays) {
-				r, c, err2 := parseJSONRows(jsonArrays[arrIdx])
-				arrIdx++
-				if err2 == nil {
-					rows = r
-					cols = c
-					break
-				}
-			}
-			if rows == nil {
-				rows = []map[string]any{}
-			}
-			if cols == nil {
-				cols = []string{}
-			}
-
-			result.Results = append(result.Results, &model.TMQueryResult{
-				Columns:  cols,
-				Rows:     rows,
-				IsSelect: true,
-			})
-		} else {
-			result.Results = append(result.Results, &model.TMQueryResult{
-				Columns:      []string{},
-				Rows:         []map[string]any{},
-				IsSelect:     false,
-				RowsAffected: 0,
-			})
-		}
-	}
-
 	return result, nil
 }
 
 // parseJSONRows parse 1 mảng JSON thành []map[string]any, đồng thời lấy danh sách cột
 // theo ĐÚNG thứ tự xuất hiện trong JSON (không dùng range trên map).
+// Mảng rỗng [] là result set hợp lệ (0 dòng): trả về slice rỗng, không có cột.
 func parseJSONRows(stdout []byte) ([]map[string]any, []string, error) {
 	trimmed := bytes.TrimSpace(stdout)
 	if len(trimmed) == 0 {
@@ -431,7 +365,7 @@ func parseJSONRows(stdout []byte) ([]map[string]any, []string, error) {
 	}
 
 	if len(rows) == 0 {
-		return nil, nil, nil
+		return []map[string]any{}, []string{}, nil
 	}
 
 	// Lấy tên cột theo thứ tự key của dòng đầu tiên
@@ -876,32 +810,6 @@ func DropSession(sessionID string) {
 	}
 }
 
-// splitStatements tách script SQL thành từng statement theo dấu ";".
-func splitStatements(script string) []string {
-	var stmts []string
-	var cur strings.Builder
-	inSingleQuote := false
-
-	for i := 0; i < len(script); i++ {
-		ch := script[i]
-		if ch == '\'' {
-			inSingleQuote = !inSingleQuote
-		}
-		if ch == ';' && !inSingleQuote {
-			s := strings.TrimSpace(cur.String())
-			if s != "" {
-				stmts = append(stmts, s)
-			}
-			cur.Reset()
-			continue
-		}
-		cur.WriteByte(ch)
-	}
-	if s := strings.TrimSpace(cur.String()); s != "" {
-		stmts = append(stmts, s)
-	}
-	return stmts
-}
 
 // escapeSingleQuote escape dấu ' trong giá trị chuỗi.
 func escapeSingleQuote(s string) string {

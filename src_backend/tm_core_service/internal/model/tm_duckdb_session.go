@@ -30,11 +30,13 @@ func (m TMDuckDBSessionFile) GetGroupID() string {
 }
 
 // TMDuckDBQueryRequest là request body khi frontend gửi câu SQL để thực thi.
+// Script chạy nguyên khối trong 1 lần; nếu không có từ khóa LIMIT và unlimited=false,
+// số dòng mỗi result set được cắt ở tầng backend theo default_limit (mặc định 1000).
 type TMDuckDBQueryRequest struct {
 	SessionID    string `json:"session_id"`
 	SQL          string `json:"sql"`
-	DefaultLimit int    `json:"default_limit"`
-	Unlimited    bool   `json:"unlimited"`
+	DefaultLimit int    `json:"default_limit,omitempty"`
+	Unlimited    bool   `json:"unlimited,omitempty"`
 }
 
 // TMDuckDBFileInfo trả về thông tin file sau khi upload thành công.

@@ -14,10 +14,12 @@ import (
 )
 
 // ExecuteDuckDBQueryHandler nhận session_id + sql, thực thi trên in-memory DuckDB,
-// trả về danh sách kết quả cùng shape với PostgreSQL tool.
+// trả về danh sách result set (mỗi mảng JSON từ DuckDB CLI -json là 1 kết quả).
+// Toàn bộ script chạy 1 lần, không tách statement; giới hạn dòng (khi query không
+// có LIMIT và unlimited=false) được cắt ở tầng kết quả backend.
 //
 // POST /duckdb/execute_query
-// Body: { "session_id": "...", "sql": "...", "default_limit": 1000, "unlimited": false }
+// Body: { "session_id": "...", "sql": "..." }
 func ExecuteDuckDBQueryHandler(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		if rec := recover(); rec != nil {
