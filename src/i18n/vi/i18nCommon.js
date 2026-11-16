@@ -1257,6 +1257,7 @@ export default {
       totalRows: "Tổng số dòng",
       fileTableName: "Tên bảng",
       fileName: "Tên file",
+      sheetTooltip: "Click để copy tên sheet\nTên file: {0}\nTên bảng: {1}\nSố dòng: {2}",
       limitResults: "Giới hạn kết quả",
       limitResultsDesc: "Server trả về toàn bộ dòng khi tắt. Nếu bật mà để trống số, server dùng mặc định 1000.",
       defaultQueryLimit: "Số dòng tối đa",

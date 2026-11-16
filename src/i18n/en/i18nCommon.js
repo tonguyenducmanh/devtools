@@ -1265,6 +1265,7 @@ export default {
       totalRows: "Total rows",
       fileTableName: "Table name",
       fileName: "File name",
+      sheetTooltip: "Click to copy sheet name\nFile: {0}\nTable: {1}\nRows: {2}",
       limitResults: "Limit results",
       limitResultsDesc: "Unchecked = unlimited rows. Checked with empty field = server defaults to 1000.",
       defaultQueryLimit: "Max rows",

@@ -25,7 +25,7 @@
               :read-only="isUploading"
               :multiple="true"
               :isSmallButton="true"
-              v-tooltip="{ text: uploadTooltipText, maxWidth: '320px' }"
+              v-tooltip="uploadTooltipText"
               @selected="handleFileSelect"
             />
           </div>
@@ -306,12 +306,10 @@
                 :key="sheet.table_name"
                 class="tm-duckdb-file-item"
                 v-tooltip="getSheetTooltip(sheet)"
+                @click="handleCopyEvent(sheet.table_name)"
               >
                 <div class="tm-duckdb-file-item-info">
-                  <div
-                    class="text-nowrap tm-duckdb-sheet-name"
-                    @click="handleCopyEvent(sheet.table_name)"
-                  >
+                  <div class="text-nowrap tm-duckdb-sheet-name">
                     {{ sheet.table_name }}
                   </div>
                   <div class="tm-duckdb-file-rows">
@@ -986,11 +984,11 @@ export default {
      */
     getFileTooltip(file) {
       if (!file) return "";
-      return [
-        `${this.$t("i18nCommon.duckDBQuery.fileName")}: ${file.file_name || "-"}`,
-        `${this.$t("i18nCommon.duckDBQuery.fileTableName")}: ${file.table_name || "-"}`,
-        `${this.$t("i18nCommon.duckDBQuery.totalRows")}: ${this.formatRowCount(file.row_count)} ${this.$t("i18nCommon.duckDBQuery.rowCount")}`,
-      ].join("\n");
+      return this.$t("i18nCommon.duckDBQuery.sheetTooltip").format(
+        file.file_name || "-",
+        file.table_name || "-",
+        `${this.formatRowCount(file.row_count)} ${this.$t("i18nCommon.duckDBQuery.rowCount")}`,
+      );
     },
 
     /**
@@ -998,11 +996,11 @@ export default {
      */
     getSheetTooltip(sheet) {
       if (!sheet) return "";
-      return [
-        `${this.$t("i18nCommon.duckDBQuery.fileName")}: ${sheet.file_name || "-"}`,
-        `${this.$t("i18nCommon.duckDBQuery.fileTableName")}: ${sheet.table_name || "-"}`,
-        `${this.$t("i18nCommon.duckDBQuery.totalRows")}: ${this.formatRowCount(sheet.row_count)} ${this.$t("i18nCommon.duckDBQuery.rowCount")}`,
-      ].join("\n");
+      return this.$t("i18nCommon.duckDBQuery.sheetTooltip").format(
+        sheet.file_name || "-",
+        sheet.table_name || "-",
+        `${this.formatRowCount(sheet.row_count)} ${this.$t("i18nCommon.duckDBQuery.rowCount")}`,
+      );
     },
 
     /**
@@ -1614,6 +1612,7 @@ export default {
     background-color 0.2s ease;
   width: 100%;
   box-sizing: border-box;
+  cursor: pointer;
 
   &:hover {
     border-left-color: var(--focus-color);
@@ -1640,7 +1639,6 @@ export default {
     font-size: var(--font-size-medium-rare);
     font-weight: 500;
     line-height: 1.35;
-    cursor: pointer;
   }
 
   .tm-duckdb-file-rows {
