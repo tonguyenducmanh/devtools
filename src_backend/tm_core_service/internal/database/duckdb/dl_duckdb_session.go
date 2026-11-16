@@ -22,8 +22,9 @@
 package duckdb
 
 import (
+	"archive/zip"
+	"bufio"
 	"bytes"
-	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -32,6 +33,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -477,12 +479,18 @@ func LoadFile(sessionID, filePath, tableName, fileID, fileName string) ([]fileLo
 		}
 
 	case ".xls":
-		// .xls cũ (BIFF8) vẫn dùng xlrd-go: rusty_sheet báo "empty" với nhiều file hợp lệ.
-		sheets, err := convertXlsToStagedSheets(filePath)
-		if err != nil {
+		// Convert .xls (BIFF8) sang .xlsx tạm để đọc qua rusty_sheet + chia lô parquet,
+		// tránh xlrd-go nạp toàn bộ sheet lên RAM và tránh calamine báo "empty" với BIFF8.
+		xlsxTmp := strings.TrimSuffix(filePath, filepath.Ext(filePath)) + "_converted.xlsx"
+		if err := convertXlsToXlsx(filePath, xlsxTmp); err != nil {
 			return nil, err
 		}
 		_ = os.Remove(filePath)
+		sheets, err := convertSpreadsheetToStagedSheets(sess.dbFile, xlsxTmp)
+		_ = os.Remove(xlsxTmp) // xlsx tạm đã đọc xong sang parquet, không cần giữ
+		if err != nil {
+			return nil, err
+		}
 		results, err = loadSheetsAsViews(sess, sheets, tableName, existingViews)
 		if err != nil {
 			return nil, err
@@ -642,45 +650,6 @@ func csvReadExpr(csvPath string) string {
 	return fmt.Sprintf("read_csv_auto('%s')", escapeSingleQuote(csvPath))
 }
 
-// convertXlsToStagedSheets đọc file .xls, convert mỗi sheet thành file CSV tạm.
-//
-// `.xls` KHÔNG dùng rusty_sheet: extension (calamine) báo "empty" với nhiều file
-// BIFF8 hợp lệ (issue20.xls, ragged.xls, formula_test_names.xls, ...) nên vẫn giữ
-// xlrd-go cho định dạng cũ này.
-func convertXlsToStagedSheets(xlsPath string) ([]stagedSheet, error) {
-	book, err := xlrd.OpenWorkbook(xlsPath, nil)
-	if err != nil {
-		return nil, fmt.Errorf("mở file .xls thất bại: %w", err)
-	}
-
-	sheetNames := book.SheetNames()
-	if len(sheetNames) == 0 {
-		return nil, fmt.Errorf("file .xls không có sheet nào")
-	}
-
-	var sheets []stagedSheet
-	for i, sheetName := range sheetNames {
-		// Bỏ sheet rỗng: nếu không sẽ sinh view 0 dòng với cột rác "column0".
-		if sh, err := book.SheetByIndex(i); err == nil && (sh.NRows == 0 || sh.NCols == 0) {
-			continue
-		}
-		csvPath, err := convertXlsSheetToCsv(xlsPath, i)
-		if err != nil {
-			removeStagedSheets(sheets)
-			return nil, fmt.Errorf("convert sheet '%s' sang CSV thất bại: %w", sheetName, err)
-		}
-		sheets = append(sheets, stagedSheet{
-			SheetName: sheetName,
-			ReadExpr:  csvReadExpr(csvPath),
-			TempPath:  csvPath,
-		})
-	}
-	if len(sheets) == 0 {
-		return nil, fmt.Errorf("file .xls không có sheet nào chứa dữ liệu")
-	}
-	return sheets, nil
-}
-
 // loadSheetsAsViews tạo 1 view cho mỗi sheet (dùng chung cho xlsx/xls/ods).
 // Tên view: <tên_file>_<tên_sheet>, đã chuẩn hoá + đảm bảo không trùng.
 func loadSheetsAsViews(sess *duckdbSession, sheets []stagedSheet, baseTableName string, existingViews map[string]bool) ([]fileLoadResult, error) {
@@ -712,41 +681,6 @@ func loadSheetsAsViews(sess *duckdbSession, sheets []stagedSheet, baseTableName 
 		results = append(results, result)
 	}
 	return results, nil
-}
-
-// convertXlsSheetToCsv đọc 1 sheet của file .xls, ghi ra CSV tạm.
-func convertXlsSheetToCsv(xlsPath string, sheetIndex int) (string, error) {
-	book, err := xlrd.OpenWorkbook(xlsPath, nil)
-	if err != nil {
-		return "", fmt.Errorf("mở file .xls thất bại: %w", err)
-	}
-
-	sheet, err := book.SheetByIndex(sheetIndex)
-	if err != nil {
-		return "", fmt.Errorf("không thể đọc sheet index %d của .xls: %w", sheetIndex, err)
-	}
-
-	csvPath := strings.TrimSuffix(xlsPath, filepath.Ext(xlsPath)) + fmt.Sprintf("_sheet%d.csv", sheetIndex)
-	csvFile, err := os.Create(csvPath)
-	if err != nil {
-		return "", fmt.Errorf("tạo file CSV tạm thất bại: %w", err)
-	}
-	defer csvFile.Close()
-
-	writer := csv.NewWriter(csvFile)
-	defer writer.Flush()
-
-	for r := 0; r < sheet.NRows; r++ {
-		row := make([]string, sheet.NCols)
-		for c := 0; c < sheet.NCols; c++ {
-			row[c] = fmt.Sprintf("%v", sheet.CellValue(r, c))
-		}
-		if err := writer.Write(row); err != nil {
-			return "", fmt.Errorf("ghi CSV thất bại: %w", err)
-		}
-	}
-
-	return csvPath, nil
 }
 
 // invalidIdentChars: mọi ký tự KHÔNG phải chữ (kể cả chữ có dấu), dấu kết hợp, số, "_".
@@ -1024,6 +958,180 @@ func ClearSessionFiles(sessionID string) {
 // escapeDQ escape dấu " trong tên identifier (internal).
 func escapeDQ(s string) string {
 	return strings.ReplaceAll(s, "\"", "\"\"")
+}
+
+// convertXlsToXlsx chuyển file .xls (BIFF8) sang file .xlsx tạm bằng Go thuần:
+// xlrd-go đọc, ghi ZIP+XML thủ công — không dùng excelize (quá nặng, phụ thuộc
+// rất nhiều thư viện C/go-ods). Sau khi convert xong, file .xlsx được đọc qua
+// rusty_sheet + chia lô parquet (xem dl_duckdb_spreadsheet.go) nên không load
+// toàn bộ bảng tính lên RAM.
+//
+// Lưu ý: XLS chỉ tối đa 65,536 dòng/sheet, nên file convert ra có kích thước
+// đáng nhận, việc ghi sheet vào buffer khi convert là chấp nhận được.
+func convertXlsToXlsx(xlsPath, xlsxPath string) error {
+	book, err := xlrd.OpenWorkbook(xlsPath, nil)
+	if err != nil {
+		return fmt.Errorf("mở file .xls thất bại: %w", err)
+	}
+
+	sheetNames := book.SheetNames()
+	if len(sheetNames) == 0 {
+		return fmt.Errorf("file .xls không có sheet nào")
+	}
+
+	out, err := os.Create(xlsxPath)
+	if err != nil {
+		return fmt.Errorf("tạo file .xlsx tạm thất bại: %w", err)
+	}
+	defer out.Close()
+
+	zw := zip.NewWriter(out)
+
+	entries := []struct {
+		name string
+		data string
+	}{
+		{"[Content_Types].xml", xlsxContentTypes(len(sheetNames))},
+		{"_rels/.rels", xlsxRels()},
+		{"docProps/core.xml", xlsxCoreProps()},
+		{"xl/_rels/workbook.xml.rels", xlsxWorkbookRels(len(sheetNames))},
+		{"xl/workbook.xml", xlsxWorkbook(sheetNames)},
+		{"xl/styles.xml", xlsxStyles()},
+		{"xl/theme/theme1.xml", xlsxTheme()},
+	}
+	for _, e := range entries {
+		if err := writeZipEntry(zw, e.name, e.data); err != nil {
+			zw.Close()
+			return err
+		}
+	}
+
+	for i := range sheetNames {
+		sh, err := book.SheetByIndex(i)
+		if err != nil {
+			zw.Close()
+			return fmt.Errorf("đọc sheet %d thất bại: %w", i, err)
+		}
+		if sh.NRows == 0 || sh.NCols == 0 {
+			continue
+		}
+
+		w, err := zw.Create(fmt.Sprintf("xl/worksheets/sheet%d.xml", i+1))
+		if err != nil {
+			zw.Close()
+			return err
+		}
+		bw := bufio.NewWriter(w)
+		bw.WriteString(xlsxWorksheetHeader())
+		for r := 0; r < sh.NRows; r++ {
+			bw.WriteString(`<row r="`)
+			bw.WriteString(strconv.Itoa(r + 1))
+			bw.WriteString(`">`)
+			for c := 0; c < sh.NCols; c++ {
+				bw.WriteString(`<c r="`)
+				bw.WriteString(spreadsheetColumnLetter(c + 1) + strconv.Itoa(r+1))
+				bw.WriteString(`" t="str"><v>`)
+				bw.WriteString(xlsxEscape(fmt.Sprintf("%v", sh.CellValue(r, c))))
+				bw.WriteString(`</v></c>`)
+			}
+			bw.WriteString(`</row>`)
+		}
+		bw.WriteString(`</sheetData></worksheet>`)
+		if err := bw.Flush(); err != nil {
+			zw.Close()
+			return err
+		}
+	}
+
+	if err := zw.Close(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func writeZipEntry(zw *zip.Writer, name, data string) error {
+	w, err := zw.Create(name)
+	if err != nil {
+		return err
+	}
+	_, err = w.Write([]byte(data))
+	return err
+}
+
+// ----- template XML cho file .xlsx tối giản (chỉ cần sheetData, không styles phức tạp) -----
+
+func xlsxContentTypes(n int) string {
+	var b strings.Builder
+	b.WriteString(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+ <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+ <Default Extension="xml" ContentType="application/xml"/>
+ <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+ <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>`)
+	for i := 0; i < n; i++ {
+		b.WriteString(fmt.Sprintf(` <Override PartName="/xl/worksheets/sheet%d.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`, i+1))
+	}
+	b.WriteString(`</Types>`)
+	return b.String()
+}
+
+func xlsxRels() string {
+	return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+ <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`
+}
+
+func xlsxCoreProps() string {
+	return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+`
+}
+
+func xlsxWorkbookRels(n int) string {
+	var b strings.Builder
+	b.WriteString(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">`)
+	for i := 0; i < n; i++ {
+		b.WriteString(fmt.Sprintf(`<Relationship Id="rId%d" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet%d.xml"/>`, i+1, i+1))
+	}
+	b.WriteString(`</Relationships>`)
+	return b.String()
+}
+
+func xlsxWorkbook(sheetNames []string) string {
+	var b strings.Builder
+	b.WriteString(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+ <sheets>`)
+	for i, name := range sheetNames {
+		b.WriteString(fmt.Sprintf(`<sheet name="%s" sheetId="%d" r:id="rId%d"/>`, xlsxEscape(name), i+1, i+1))
+	}
+	b.WriteString(`</sheets></workbook>`)
+	return b.String()
+}
+
+func xlsxStyles() string {
+	return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts><font><sz val="11"/><color theme="1"/><name val="Calibri"/><family val="2"/></font></fonts><fills><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs></styleSheet>`
+}
+
+func xlsxTheme() string {
+	return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" name="Office Theme"><a:slideSize sx="10202400" sy="6801600" hasHeader="false" notesSz="685800" orientation="notSlide"/><a:clrScheme name="Office"><a:dk1><a:sysClr val="windowText" lastClr="000000"/></a:dk1><a:lt1><a:sysClr val="window" lastClr="FFFFFF"/></a:lt1><a:dk2><a:srgbClr val="1F497D"/></a:dk2><a:lt2><a:srgbClr val="EEECE1"/></a:lt2><a:accent1><a:srgbClr val="4472C4"/></a:accent1><a:accent2><a:srgbClr val="ED7D31"/></a:accent2><a:accent3><a:srgbClr val="A5A5A5"/></a:accent3><a:accent4><a:srgbClr val="FFC000"/></a:accent4><a:accent5><a:srgbClr val="5B9BD5"/></a:accent5><a:accent6><a:srgbClr val="70AD47"/></a:accent6><a:hlink><a:srgbClr val="0000FF"/></a:hlink><a:folHlink><a:srgbClr val="808080"/></a:folHlink></a:clrScheme><a:fontScheme name="Office"><a:majorFont><a:latin typeface="Cambria" panose="02020603050405020204" pitchFamily="34" charset="0"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont><a:minorFont><a:latin typeface="Calibri" panose="020F0502020204030204" pitchFamily="34" charset="0"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont></a:fontScheme><a:fmtScheme>...</a:fmtScheme></a:theme>`
+}
+
+func xlsxWorksheetHeader() string {
+	return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>`
+}
+
+func xlsxEscape(s string) string {
+	s = strings.ReplaceAll(s, "&", "&amp;")
+	s = strings.ReplaceAll(s, "<", "&lt;")
+	s = strings.ReplaceAll(s, ">", "&gt;")
+	s = strings.ReplaceAll(s, "\"", "&quot;")
+	return s
 }
 
 // orderedKeys trả về tên các key của object ĐẦU TIÊN trong mảng JSON,
