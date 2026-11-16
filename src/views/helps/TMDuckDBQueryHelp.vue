@@ -42,6 +42,9 @@
           {{ $t("i18nHelp.duckDBQuery.features.excelSupport") }}
         </p>
         <p class="section-text">
+          {{ $t("i18nHelp.duckDBQuery.features.multiSheet") }}
+        </p>
+        <p class="section-text">
           {{ $t("i18nHelp.duckDBQuery.features.multiTable") }}
         </p>
         <p class="section-text">
@@ -52,6 +55,9 @@
         </p>
         <p class="section-text">
           {{ $t("i18nHelp.duckDBQuery.features.sessionPersist") }}
+        </p>
+        <p class="section-text">
+          {{ $t("i18nHelp.duckDBQuery.features.resultLimit") }}
         </p>
       </div>
     </div>
