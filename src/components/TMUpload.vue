@@ -8,6 +8,7 @@
       :type="$tmEnum.buttonType.secondary"
       @click="triggerFileInput"
       :noMargin="true"
+      :isSmallButton="isSmallButton"
     />
       <input
         ref="fileInput"
@@ -103,6 +104,14 @@ export default {
      * trên nền trong suốt, để không lạc lõng với các control xung quanh.
      */
     hideBorder: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * Thu nhỏ button (icon-only mode): đồng bộ kích thước với các TMButton
+     * isSmallButton dùng trong toolbar.
+     */
+    isSmallButton: {
       type: Boolean,
       default: false,
     },

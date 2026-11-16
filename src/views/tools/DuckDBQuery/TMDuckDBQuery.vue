@@ -17,24 +17,36 @@
             <span>{{ $t(`i18nCommon.duckDBQuery.${menuKey}`) }}</span>
           </div>
         </div>
-        <!-- nút API reference: mở popup hướng dẫn dùng AI gen SQL -->
-        <TMButton
-          :noMargin="true"
-          @click="showAIDocsPopup"
-          :type="$tmEnum.buttonType.secondary"
-          iconClass="tm-book-icon"
-          :isSmallButton="true"
-          style="margin-right: var(--padding)"
-          v-tooltip="$t('i18nCommon.duckDBQuery.apiReference')"
-        ></TMButton>
-        <!-- nút chạy query -->
-        <TMButton
-          :noMargin="true"
-          @click="handleRunQuery"
-          iconClass="tm-send-icon"
-          :isSmallButton="true"
-          v-tooltip="$t('i18nCommon.duckDBQuery.runQuery')"
-        ></TMButton>
+        <!-- nút upload file: đưa file lên nhanh không cần mở sidebar -->
+        <div class="flex header-query-btn">
+          <div>
+            <TMUpload
+              icon-class="tm-upload-icon"
+              :read-only="isUploading"
+              :multiple="true"
+              :isSmallButton="true"
+              v-tooltip="{ text: uploadTooltipText, maxWidth: '320px' }"
+              @selected="handleFileSelect"
+            />
+          </div>
+          <!-- nút API reference: mở popup hướng dẫn dùng AI gen SQL -->
+          <TMButton
+            :noMargin="true"
+            @click="showAIDocsPopup"
+            :type="$tmEnum.buttonType.secondary"
+            iconClass="tm-book-icon"
+            :isSmallButton="true"
+            v-tooltip="$t('i18nCommon.duckDBQuery.apiReference')"
+          ></TMButton>
+          <!-- nút chạy query -->
+          <TMButton
+            :noMargin="true"
+            @click="handleRunQuery"
+            iconClass="tm-send-icon"
+            :isSmallButton="true"
+            v-tooltip="$t('i18nCommon.duckDBQuery.runQuery')"
+          ></TMButton>
+        </div>
         <!-- flyout panel chứa danh sách action theo menu đang active -->
         <TMFlyoutPanel
           :show="!!activeKeyFlyOut"
@@ -258,35 +270,6 @@
             $tmEnum.DuckDBQuerySidebarOption.Files
           "
         >
-          <!-- hàng điều khiển: header danh sách file (trái) + nút upload + xoá tất cả (phải) -->
-          <div
-            class="flex tm-duckdb-toolbar-row"
-            style="
-              justify-content: space-between;
-              align-items: center;
-              margin: var(--padding);
-            "
-          >
-            <div class="flex tm-duckdb-file-list-header">
-              <span class="tm-duckdb-file-list-title">{{
-                $t("i18nCommon.duckDBQuery.uploadedFiles")
-              }}</span>
-              <span class="tm-duckdb-file-list-count">{{
-                loadedFiles.length
-              }}</span>
-            </div>
-            <div class="flex" style="flex-shrink: 0">
-              <TMUpload
-                icon-class="tm-upload-icon"
-                :hide-border="true"
-                :read-only="isUploading"
-                :multiple="true"
-                v-tooltip="{ text: uploadTooltipText, maxWidth: '320px' }"
-                @selected="handleFileSelect"
-              />
-            </div>
-          </div>
-
           <!-- danh sách file đã nạp: nhóm theo file, hiển thị sheet/view con -->
           <div class="tm-duckdb-file-list">
             <div
@@ -903,7 +886,10 @@ export default {
       ];
       let ext = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
       if (!supportedExts.includes(ext)) {
-        return { success: false, message: me.$t("i18nCommon.duckDBQuery.supportedFormats") };
+        return {
+          success: false,
+          message: me.$t("i18nCommon.duckDBQuery.supportedFormats"),
+        };
       }
 
       me.isUploading = true;
@@ -937,17 +923,23 @@ export default {
             );
             me.sqlText = queries.join(";\n") + ";";
           }
-          return { success: true, message: me.$t("i18nCommon.duckDBQuery.uploadFileSuccess") };
+          return {
+            success: true,
+            message: me.$t("i18nCommon.duckDBQuery.uploadFileSuccess"),
+          };
         } else {
           return {
             success: false,
-            message: resp?.data?.message || me.$t("i18nCommon.duckDBQuery.uploadFileError"),
+            message:
+              resp?.data?.message ||
+              me.$t("i18nCommon.duckDBQuery.uploadFileError"),
           };
         }
       } catch (err) {
         return {
           success: false,
-          message: err?.message || me.$t("i18nCommon.duckDBQuery.uploadFileError"),
+          message:
+            err?.message || me.$t("i18nCommon.duckDBQuery.uploadFileError"),
         };
       } finally {
         me.isUploading = false;
@@ -970,7 +962,7 @@ export default {
       } else if (successCount === 0) {
         // Toàn bộ thất bại: hiển thị message lỗi của file đầu tiên
         me.$tmToast.error(
-          results[0].message || me.$t("i18nCommon.duckDBQuery.uploadFileError")
+          results[0].message || me.$t("i18nCommon.duckDBQuery.uploadFileError"),
         );
       } else {
         // Một phần thành công, một phần thất bại
@@ -984,7 +976,7 @@ export default {
             me.$t("i18nCommon.duckDBQuery.uploadFileError") +
             " (" +
             failCount +
-            ")"
+            ")",
         );
       }
     },
@@ -1528,6 +1520,7 @@ export default {
   flex-direction: column;
   overflow-y: auto;
   padding: 0 var(--padding-medium) var(--padding-medium) 0;
+  margin-top: var(--padding);
 
   .tm-duckdb-file-list-header {
     flex-shrink: 0;
@@ -1743,5 +1736,8 @@ export default {
   width: auto;
   height: auto;
   min-width: unset;
+}
+.header-query-btn {
+  gap: var(--padding);
 }
 </style>
