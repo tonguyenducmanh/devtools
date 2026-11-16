@@ -11,103 +11,83 @@
 # //go:embed all:dist), ta lấy lại ĐÚNG wasm đã build sẵn trong đó — không
 # cần toolchain, không cần mạng, và khớp 100% với bản release đó.
 #
+# Cross-platform
+# --------------
+# Script này chỉ là lớp bọc quanh `scripts/utils/extract_go_embed.go`.
+# Toàn bộ việc đọc binary (ELF/Mach-O/PE) và giải nén archive do Go standard
+# library làm, nên chạy được trên macOS, Linux và Windows (Git Bash / WSL),
+# không cần readelf/strings/tar/unzip/python. Chỉ cần Go — thứ backend đã bắt
+# buộc phải có để build.
+#
 # Cách dùng:
-#   ./scripts/utils/extract_wasm_from_binary.sh <binary> [version]
-#   ./scripts/utils/extract_wasm_from_binary.sh /home/user/Exec/dev-tool-linux-22.0.4
-#   ./scripts/utils/extract_wasm_from_binary.sh ./out/dev-tool-linux-22.0.4 22.0.4
+#   ./scripts/utils/extract_wasm_from_binary.sh <binary|archive> [version]
+#   ./scripts/utils/extract_wasm_from_binary.sh ./out/dev-tool-linux-22.0.4
+#   ./scripts/utils/extract_wasm_from_binary.sh ./out/dev-tool-linux-22.0.4.tar.gz
+#   ./scripts/utils/extract_wasm_from_binary.sh ./out/dev-tool-window-22.0.4.exe.zip 22.0.4
 #
 # Kết quả: src_wasm/pkg/<rdp|ultraviewer|dotnet|cimbar|photocraft>/...
 # (đúng cấu trúc viteStaticCopy mong đợi khi copy sang
 #  dist/assets-wasm-<version>/<tên>/)
-set -e
+#
+# Windows không có sh? Chạy thẳng Go:
+#   go run scripts/utils/extract_go_embed.go -out src_wasm/pkg .\out\dev-tool-window-22.0.4.exe.zip
+set -eu
 
 ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
-BINARY="$1"
-PKG_DIR="$ROOT_DIR/src_wasm/pkg"
+GO_TOOL_REL="scripts/utils/extract_go_embed.go"
+PKG_DIR_REL="src_wasm/pkg"
 
-if [ -z "$BINARY" ]; then
-    echo "Cách dùng: $0 <binary> [version]" >&2
-    echo "Ví dụ: $0 ./out/dev-tool-linux-22.0.4" >&2
-    exit 1
-fi
-if [ ! -f "$BINARY" ]; then
-    echo "LỖI: không thấy file binary '$BINARY'" >&2
-    exit 1
-fi
+usage() {
+    cat >&2 <<EOF
+Cách dùng: $0 <binary|archive> [version]
 
-# Nếu là archive (.tar.gz / .zip) thì giải nén ra temp rồi dùng binary bên trong.
-WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/tm-wasm-src.XXXXXX")"
-EXTRACTED=""
-cleanup() {
-    rm -rf "$WORK_DIR"
-    [ -n "$EXTRACTED" ] && rm -rf "$EXTRACTED"
+Ví dụ:
+  $0 ./out/dev-tool-linux-22.0.4
+  $0 ./out/dev-tool-linux-22.0.4.tar.gz
+  $0 ./out/dev-tool-window-22.0.4.exe.zip 22.0.4
+
+Kết quả ghi vào: src_wasm/pkg/
+EOF
 }
-trap cleanup EXIT INT TERM
 
-case "$BINARY" in
-    *.tar.gz|*.tgz|*.tar)
-        echo "Giải nén $BINARY ..."
-        tar -xf "$BINARY" -C "$WORK_DIR"
-        ;;
-    *.zip)
-        echo "Giải nén $BINARY ..."
-        unzip -oq "$BINARY" -d "$WORK_DIR"
-        ;;
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+    usage
+    exit 1
+fi
+
+INPUT="$1"
+VERSION="${2:-}"
+
+if [ ! -f "$INPUT" ]; then
+    echo "LỖI: không thấy file '$INPUT'" >&2
+    exit 1
+fi
+if [ ! -f "$ROOT_DIR/$GO_TOOL_REL" ]; then
+    echo "LỖI: thiếu $GO_TOOL_REL (repo chưa đầy đủ?)" >&2
+    exit 1
+fi
+
+# Chuyển input thành đường dẫn tuyệt đối TRƯỚC khi cd, để vẫn đúng ý người dùng
+# khi họ truyền đường dẫn tương đối từ thư mục khác.
+case "$INPUT" in
+    /*) ABS_INPUT="$INPUT" ;;               # POSIX absolute (macOS/Linux/Git Bash)
+    [A-Za-z]:[\\/]*) ABS_INPUT="$INPUT" ;;  # Windows drive path: C:\... hoặc C:/...
+    *) ABS_INPUT="$(pwd)/$INPUT" ;;
 esac
 
-# Tìm binary thật trong thư mục vừa giải nén (nếu có), ngược lại dùng file gốc.
-FOUND="$(find "$WORK_DIR" -maxdepth 2 -type f -name 'dev-tool-*' ! -name '*.exe' 2>/dev/null | head -1)"
-if [ -n "$FOUND" ]; then
-    EXTRACTED="$FOUND"
-    TARGET="$FOUND"
-else
-    TARGET="$BINARY"
-fi
-
-# Version: lấy từ tên file (dev-tool-linux-22.0.4 -> 22.0.4) nếu không truyền.
-VERSION="${2:-}"
-if [ -z "$VERSION" ]; then
-    VERSION="$(basename "$TARGET" | sed -E 's/^dev-tool-(linux|mac-arm|window)-//; s/\.exe$//')"
-fi
-if [ -z "$VERSION" ]; then
-    echo "LỖI: không xác định được version từ tên file '$TARGET'. Hãy truyền version." >&2
+if ! command -v go >/dev/null 2>&1; then
+    echo "LỖI: cần Go để đọc cấu trúc embed.FS trong binary." >&2
+    echo "     Cài tại https://go.dev/dl/ (backend cũng cần Go để build)." >&2
     exit 1
 fi
 
-PREFIX="dist/assets-wasm-${VERSION}/"
+# Chạy từ gốc repo với đường dẫn tương đối: tránh lỗi chuyển đổi path kiểu
+# /c/... -> C:\... của Git Bash trên Windows.
+cd "$ROOT_DIR"
 
-echo "Binary : $TARGET"
-echo "Version: $VERSION"
-echo "Prefix : $PREFIX"
-echo ""
-
-# Trích ra thư mục tạm trước để không phá src_wasm/pkg/ nếu binary sai version.
-TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/tm-wasm-extract.XXXXXX")"
-cleanup() { rm -rf "$TMP_DIR"; }
-trap cleanup EXIT INT TERM
-
-python3 "$ROOT_DIR/scripts/utils/extract_go_embed.py" \
-    "$TARGET" \
-    "tm_core_service/internal/web.embeddedFiles" \
-    "$TMP_DIR" \
-    "$PREFIX"
-
-if [ -z "$(ls -A "$TMP_DIR" 2>/dev/null)" ]; then
-    echo "LỖI: không tìm thấy thư mục wasm '$PREFIX' trong binary." >&2
-    echo "Có thể binary này dùng version khác. Xem danh sách folder:" >&2
-    strings -n 8 "$TARGET" 2>/dev/null \
-        | grep -oE "dist/assets-wasm-[0-9.]+" | sort -u | sed 's/^/    /' >&2
-    exit 1
+set -- -out "$PKG_DIR_REL"
+if [ -n "$VERSION" ]; then
+    set -- "$@" -version "$VERSION"
 fi
 
-echo ""
-echo "Thay thế src_wasm/pkg/ ..."
-rm -rf "$PKG_DIR"
-mkdir -p "$PKG_DIR"
-cp -R "$TMP_DIR/." "$PKG_DIR/"
-
-echo ""
-echo "Kết quả trong $PKG_DIR:"
-du -sh "$PKG_DIR"/* | sed 's/^/    /'
-echo ""
-echo "Tiếp theo: npm run build   (viteStaticCopy lấy từ src_wasm/pkg/)"
+exec go run "./$GO_TOOL_REL" "$@" "$ABS_INPUT"

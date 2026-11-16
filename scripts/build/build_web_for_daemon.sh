@@ -28,7 +28,11 @@ REQUIRE_WASM=1 npm run build
 # 2b. Chặn wasm thiếu file (vd `snippets/` của wasm-bindgen bị làm phẳng) —
 #     daemon nhúng dist/ nên lỗi này sẽ đi theo bản release.
 echo "Đang kiểm tra wasm trong dist..."
-python3 "$ROOT_DIR/scripts/utils/check_wasm_dist.py" "$ROOT_DIR/dist"
+if ! command -v go >/dev/null 2>&1; then
+    echo "LỖI: cần Go để kiểm tra wasm trong dist/ (cài tại https://go.dev/dl/)." >&2
+    exit 1
+fi
+go run "$ROOT_DIR/scripts/utils/check_wasm_dist.go" "$ROOT_DIR/dist"
 
 # 3. Copy dist frontend vào backend
 echo "Đang copy frontend dist vào backend..."

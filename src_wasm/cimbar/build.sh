@@ -106,64 +106,10 @@ echo ">>> MD5: js=${GLUE_MD5} wasm=${WASM_MD5}"
 # Luật 15 trong AGENTS.md: module wasm không được import từ module "env" (C library).
 # Release chính thức của cimbar dùng emscripten + OpenCV nhưng các hàm C cần thiết
 # đã được biên dịch vào wasm, không phải import "env". Đọc thẳng import section.
-if command -v python3 >/dev/null 2>&1; then
-    python3 - "$DEST_DIR/cimbar_js.wasm" <<'PY'
-import sys
-
-def read_uleb(data, pos):
-    result = 0
-    shift = 0
-    while True:
-        b = data[pos]
-        pos += 1
-        result |= (b & 0x7F) << shift
-        if not (b & 0x80):
-            return result, pos
-        shift += 7
-
-data = open(sys.argv[1], "rb").read()
-if data[:4] != b"\x00asm":
-    raise SystemExit("LỖI: không phải file wasm hợp lệ")
-pos = 8
-modules = set()
-while pos < len(data):
-    section_id = data[pos]
-    pos += 1
-    size, pos = read_uleb(data, pos)
-    end = pos + size
-    if section_id == 2:  # import section
-        count, p = read_uleb(data, pos)
-        for _ in range(count):
-            n, p = read_uleb(data, p)
-            modules.add(data[p:p + n].decode("utf-8", "replace"))
-            p += n
-            n, p = read_uleb(data, p)
-            p += n
-            kind = data[p]
-            p += 1
-            if kind == 0:
-                _, p = read_uleb(data, p)
-            elif kind == 1:
-                p += 1  # element type
-                flags, p = read_uleb(data, p)
-                _, p = read_uleb(data, p)
-                if flags & 1:
-                    _, p = read_uleb(data, p)
-            elif kind == 2:
-                flags, p = read_uleb(data, p)
-                _, p = read_uleb(data, p)
-                if flags & 1:
-                    _, p = read_uleb(data, p)
-            elif kind == 3:
-                p += 2
-            else:
-                raise SystemExit("LỖI: không đọc được import kind %d" % kind)
-    pos = end
-
-if "env" in modules:
-    raise SystemExit("LỖI: wasm import từ module 'env' — module sẽ không load trong trình duyệt")
-print("    import section OK:", ", ".join(sorted(modules)) or "(không có import)")
-PY
+if command -v go >/dev/null 2>&1; then
+    go run "$ROOT_DIR/scripts/utils/check_wasm_imports.go" "$DEST_DIR/cimbar_js.wasm"
+else
+    echo "    WARNING: không có Go — bỏ qua kiểm tra import section (AGENTS.md Luật 15)" >&2
 fi
 
 echo ">>> Xong: $DEST_DIR"

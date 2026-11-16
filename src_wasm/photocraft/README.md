@@ -19,7 +19,7 @@ PhotoCraft build ra một **web app hoàn chỉnh** (egui + wgpu), gồm:
 **Cloudflare Pages/Workers giới hạn tối đa 25 MiB mỗi file.** Wasm PhotoCraft
 hiện tại ~27 MiB (vượt giới hạn), nên `build.sh` nén gzip thành `.wasm.gz` (~9 MiB).
 Phía app tự giải nén bằng `DecompressionStream('gzip')` rồi mới gọi
-`init({ module_or_path: bytes })`; `scripts/utils/patch_wasm_dist.py` ghi cùng logic đó
+`init({ module_or_path: bytes })`; `scripts/utils/patch_wasm_dist.go` ghi cùng logic đó
 vào `index.html` để trang chạy độc lập vẫn hoạt động. Không cần đổi code Rust;
 mọi host chỉ cần serve static thông thường.
 
@@ -55,7 +55,7 @@ src_wasm/
 ```
 
 > Nén wasm và patch `index.html` là logic dùng chung cho mọi craft wasm
-> (`scripts/utils/wasm_dist_common.sh` + `scripts/utils/patch_wasm_dist.py`), không copy
+> (`scripts/utils/wasm_dist_common.sh` + `scripts/utils/patch_wasm_dist.go`), không copy
 > lại trong từng thư mục.
 
 ## Tích hợp vào app

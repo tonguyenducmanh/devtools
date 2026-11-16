@@ -51,8 +51,8 @@ scripts/
   build/          build_all.sh, build_wasm.sh, build_web_for_daemon.sh, build_api.sh, build_daemon.sh
   fetch/          fetch_wasm_sources.sh, fetch_duckdb_cli.sh, fetch_duckdb_extensions.sh
   deploy/         deploy_cloudflare.sh
-  utils/          tm_version.sh, git_pull_if_repo.sh, wasm_dist_common.sh, patch_wasm_dist.py, check_wasm_dist.py,
-                  extract_go_embed.py, extract_wasm_from_binary.sh
+  utils/          tm_version.sh, git_pull_if_repo.sh, wasm_dist_common.sh, patch_wasm_dist.go, check_wasm_dist.go,
+                  check_wasm_imports.go, extract_go_embed.go, extract_wasm_from_binary.sh
   maintenance/    remove_all_db_file.sh, remove_old_tag.sh
 vite.config.js                  Build frontend; viteStaticCopy wasm → dist/assets-wasm-<VERSION>/…;
                                 worker.rollupOptions.output cho tên file worker (xem Luật 13)
@@ -106,7 +106,7 @@ wrangler.jsonc                  Cloudflare Pages config (project `devtools`, out
     - **Vì vậy `scripts/fetch/fetch_duckdb_cli.sh` ghim version `v1.5.6`** (bản cuối nhánh 1.x, baseline x86-64-v2 → chạy được trên mọi CPU phổ thông). **KHÔNG** đổi sang "latest release" — sẽ âm thầm làm hỏng toàn bộ máy CPU cũ.
     - Backend đã có chốt an toàn: `dl_duckdb_session.go` probe CLI (`--version`) lúc giải nén và nhận diện SIGILL → trả về thông điệp tiếng Việt rõ ràng thay vì lỗi thô. **Đừng bỏ probe này.**
     - Nâng version lên 2.x chỉ khi chắc chắn mọi máy đích đều có AVX2 (hoặc upstream đã hạ baseline).
-21. **WASM đã build có thể lấy lại từ binary release, không cần toolchain.** `src_wasm/pkg/` gitignored (~26 MB) nên clone mới không có; build lại thì cài Rust + wasm-pack + .NET SDK + trunk (rất nặng). Nhưng daemon release nhúng `dist/` qua `//go:embed all:dist` → dùng `scripts/utils/extract_wasm_from_binary.sh <binary>` để trích ra `src_wasm/pkg/` (khớp 100% bản release, không cần mạng/toolchain). Nền tảng là `scripts/utils/extract_go_embed.py` (đọc cấu trúc `embed.FS` trong ELF: `FS{files *[]file}`, `file{name, data string, hash[16]}` — stride **48** byte, `data` là `string` 16 byte chứ không phải `[]byte` 24 byte).
+21. **WASM đã build có thể lấy lại từ binary release, không cần toolchain.** `src_wasm/pkg/` gitignored (~26 MB) nên clone mới không có; build lại thì cài Rust + wasm-pack + .NET SDK + trunk (rất nặng). Nhưng daemon release nhúng `dist/` qua `//go:embed all:dist` → dùng `scripts/utils/extract_wasm_from_binary.sh <binary>` để trích ra `src_wasm/pkg/` (khớp 100% bản release, không cần mạng/toolchain). Nền tảng là `scripts/utils/extract_go_embed.go` (Go standard library `debug/elf`/`debug/macho`/`debug/pe` + `archive/tar`/`archive/zip` nên chạy được trên macOS/Linux/Windows, không cần `readelf`/`tar`/`unzip`/Python; chỉ đọc cấu trúc `embed.FS`: `FS{files *[]file}`, `file{name, data string, hash[16]}` — stride **48** byte, `data` là `string` 16 byte chứ không phải `[]byte` 24 byte).
 
 ## 4. Chọn việc làm
 
@@ -146,7 +146,7 @@ cd src_wasm/ultraviewer && cargo build --target wasm32-unknown-unknown --lib
 
 - **Sau khi build wasm mới, kiểm tra import section** (Luật 15): file `.wasm` không được có import từ module `"env"`. Nếu có, module sẽ không load được trong trình duyệt:
   ```sh
-  python3 -c "d=open('src_wasm/pkg/ultraviewer/ultraviewer_client_bg.wasm','rb').read(); print('CÓ import env — module sẽ hỏng!' if b'\x03env' in d[:2000] else 'OK')"
+  go run scripts/utils/check_wasm_imports.go src_wasm/pkg/ultraviewer/ultraviewer_client_bg.wasm
   ```
   (Lưu ý: `dotnet/dotnet.native.wasm` là runtime .NET do Microsoft build, import `env` là bình thường — chỉ module Rust của repo mới bị kiểm tra.)
 

@@ -133,7 +133,7 @@ chmod 777 ./scripts/build/build_wasm.sh
 ```
 
 Phần nén wasm + patch `index.html` là logic **dùng chung** cho các tool craft, nằm trong
-`scripts/utils/wasm_dist_common.sh` và `scripts/utils/patch_wasm_dist.py`.
+`scripts/utils/wasm_dist_common.sh` và `scripts/utils/patch_wasm_dist.go`.
 
 Chi tiết từng tool: [src_wasm/README.md](src_wasm/README.md).
 

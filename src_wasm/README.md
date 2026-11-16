@@ -29,6 +29,6 @@ src_wasm/
   `manifest.json`, giải nén wasm rồi `import()` glue (xem `docs/architecture.md`).
   `index.html` vẫn được giữ làm trang chạy độc lập để debug. Phần nén wasm + patch
   `index.html` là logic **dùng chung** trong `scripts/utils/wasm_dist_common.sh` và
-  `scripts/utils/patch_wasm_dist.py`.
+  `scripts/utils/patch_wasm_dist.go`.
 
 Build tất cả: `./scripts/build/build_wasm.sh` (xem `docs/development.md`).

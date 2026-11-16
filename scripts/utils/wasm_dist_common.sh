@@ -14,13 +14,13 @@
 TM_WASM_MAX_MIB=25
 TM_WASM_GZIP_THRESHOLD_MIB="${TM_WASM_GZIP_THRESHOLD_MIB:-0}"
 
-# Thư mục chứa patch_wasm_dist.py. KHÔNG dùng `dirname "$0"`: khi file này được
+# Thư mục chứa patch_wasm_dist.go. KHÔNG dùng `dirname "$0"`: khi file này được
 # source từ build.sh thì $0 trỏ về build.sh (và build.sh đã `cd` sang external_repo),
 # nên phải lấy đường dẫn của chính file này từ BASH_SOURCE.
 tm_wasm_scripts_dir() {
     if [ -n "${BASH_SOURCE:-}" ]; then
         tm_d="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)"
-        if [ -n "$tm_d" ] && [ -f "$tm_d/patch_wasm_dist.py" ]; then
+        if [ -n "$tm_d" ] && [ -f "$tm_d/patch_wasm_dist.go" ]; then
             echo "$tm_d"
             return 0
         fi
@@ -31,7 +31,7 @@ tm_wasm_scripts_dir() {
                 "./scripts" \
                 "../scripts"; do
         [ -n "$tm_c" ] || continue
-        if [ -f "$tm_c/patch_wasm_dist.py" ]; then
+        if [ -f "$tm_c/patch_wasm_dist.go" ]; then
             echo "$(cd "$tm_c" && pwd)"
             return 0
         fi
@@ -59,15 +59,15 @@ tm_prepare_wasm_dist() {
             echo "[$tm_app] nén $(basename "$tm_wasm") (~${tm_size_mib} MiB) -> $(basename "$tm_gz")"
             gzip -9 -n -c "$tm_wasm" > "$tm_gz"
             rm -f "$tm_wasm"
-            if ! command -v python3 >/dev/null 2>&1; then
-                echo "ERROR: cần python3 để patch index.html (nén wasm)" >&2
+            if ! command -v go >/dev/null 2>&1; then
+                echo "ERROR: cần Go để patch index.html (nén wasm)" >&2
                 return 1
             fi
             tm_scripts="$(tm_wasm_scripts_dir)" || {
-                echo "ERROR: không tìm thấy scripts/patch_wasm_dist.py" >&2
+                echo "ERROR: không tìm thấy scripts/patch_wasm_dist.go" >&2
                 return 1
             }
-            python3 "$tm_scripts/patch_wasm_dist.py" \
+            go run "$tm_scripts/patch_wasm_dist.go" \
                 "$tm_dist/index.html" "$(basename "$tm_gz")" --app "$tm_app"
         else
             echo "[$tm_app] wasm ~${tm_size_mib} MiB, không vượt ngưỡng — giữ nguyên .wasm"

@@ -84,7 +84,11 @@ fi
 #     trước khi đẩy lên Pages — nếu không, Pages trả index.html cho đường dẫn
 #     không tồn tại và app Craft chết với lỗi MIME text/html.
 echo ">>> Kiểm tra wasm trong dist..."
-python3 "$ROOT_DIR/scripts/utils/check_wasm_dist.py" "$ROOT_DIR/dist"
+if ! command -v go >/dev/null 2>&1; then
+    echo "LỖI: cần Go để kiểm tra wasm trong dist/ (cài tại https://go.dev/dl/)." >&2
+    exit 1
+fi
+go run "$ROOT_DIR/scripts/utils/check_wasm_dist.go" "$ROOT_DIR/dist"
 
 echo ">>> Nội dung dist/assets-wasm-<version>/:"
 for dir in "$ROOT_DIR"/dist/assets-wasm-*/; do
