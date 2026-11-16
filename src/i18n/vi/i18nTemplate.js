@@ -54,5 +54,11 @@ export default {
       explain_analyze: "Phân tích câu query",
       query_all_tables_with_column: "Tìm bảng chứa cột",
     },
+    DuckDBTemplate: {
+      copy_select_to_file: "Xuất SELECT ra file",
+      select_from_file: "Truy vấn từ file",
+      create_table: "Tạo bảng",
+      util_keywords: "Lệnh tiện ích",
+    },
   },
 };

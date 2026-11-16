@@ -219,6 +219,7 @@ export default {
       remoteDesktopRDP: "Window RDP",
       remoteDesktopUltraViewer: "UltraViewer",
       PhotoCraft: "Chỉnh sửa ảnh pixel",
+      DuckDBTemplate: "Code mẫu DuckDB",
       PostgreSQLTemplate: "Code mẫu PostgreSQL",
       CSharpTemplate: "Code mẫu C#",
       JavaScriptTemplate: "Code mẫu JavaScript",

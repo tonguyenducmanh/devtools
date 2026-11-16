@@ -218,6 +218,7 @@ export default {
       remoteDesktopRDP: "Window RDP",
       remoteDesktopUltraViewer: "UltraViewer",
       PhotoCraft: "Pixel image editing",
+      DuckDBTemplate: "DuckDB template",
       PostgreSQLTemplate: "PostgreSQL Template",
       CSharpTemplate: "C# template",
       JavaScriptTemplate: "JavaScript template",

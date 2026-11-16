@@ -232,6 +232,12 @@ export const sidebarConfig = [
     groupTitleKey: "i18nCommon.group.SampleCode",
     children: [
       {
+        name: "duckdbtemplate",
+        component: () =>
+          import("@/views/tools/codeTemplateTools/TMCodeTemplateDuckDB.vue"),
+        meta: { titleKey: "i18nCommon.feature.DuckDBTemplate" },
+      },
+      {
         name: "postgresqltemplate",
         component: () =>
           import("@/views/tools/codeTemplateTools/TMCodeTemplatePostgreSQL.vue"),

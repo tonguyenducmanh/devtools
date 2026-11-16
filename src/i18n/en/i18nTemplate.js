@@ -54,5 +54,12 @@ export default {
       explain_analyze: "Explain Analyze",
       query_all_tables_with_column: "Find Tables with Column",
     },
+    DuckDBTemplate: {
+      copy_select_to_file: "Export SELECT to file",
+      select_from_file: "Query from file",
+      create_table: "Create table",
+      util_keywords: "Utility commands",
+      util_keywords: "Utility commands",
+    },
   },
 };
