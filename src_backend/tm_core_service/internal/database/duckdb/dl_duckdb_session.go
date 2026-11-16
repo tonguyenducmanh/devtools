@@ -23,6 +23,7 @@ import (
 	"bytes"
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -31,6 +32,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"syscall"
 	"unicode"
 	"unicode/utf8"
 
@@ -45,6 +47,44 @@ import (
 
 // DefaultQueryLimit là giới hạn số dòng khi frontend không gửi default_limit.
 const DefaultQueryLimit = 1000
+
+// duckdbCLICPUHint là thông báo thân thiện khi binary DuckDB CLI không chạy được
+// vì CPU thiếu tập lệnh (SIGILL / illegal instruction).
+//
+// DuckDB từ 2.0.0 build CLI cho linux/windows amd64 với -march=x86-64-v3
+// (cần AVX2 + BMI2 + FMA). CPU không có AVX2 (VD Intel Pentium Silver N6005/J5005,
+// Xeon E5 v1/v2, VM với CPU model cũ) sẽ crash NGAY lúc khởi động CLI.
+// Xem https://github.com/duckdb/duckdb/issues/27691
+const duckdbCLICPUHint = "DuckDB CLI không chạy được trên CPU này (illegal instruction / SIGILL): " +
+	"binary được build cho x86-64-v3 (cần AVX2) nhưng CPU không hỗ trợ. " +
+	"Hãy dùng daemon build với DuckDB CLI v1.5.x (baseline x86-64-v2)."
+
+// cpuUnsupportedError là lỗi riêng cho trường hợp CPU không hỗ trợ binary CLI.
+// Dùng để báo lỗi thẳng ra UI mà không bị bọc thêm thông báo chung chung.
+type cpuUnsupportedError struct {
+	msg string
+}
+
+func (e *cpuUnsupportedError) Error() string { return e.msg }
+
+// isIllegalInstruction kiểm tra lỗi exec có phải do CPU không hỗ trợ tập lệnh
+// của binary hay không: SIGILL trên Unix, STATUS_ILLEGAL_INSTRUCTION trên Windows.
+func isIllegalInstruction(err error) bool {
+	var exitErr *exec.ExitError
+	if !errors.As(err, &exitErr) {
+		return false
+	}
+	ws, ok := exitErr.Sys().(syscall.WaitStatus)
+	if !ok {
+		return false
+	}
+	// Unix: tiến trình bị signal giết.
+	if ws.Signaled() && ws.Signal() == syscall.SIGILL {
+		return true
+	}
+	// Windows: 0xC000001D = STATUS_ILLEGAL_INSTRUCTION.
+	return ws.ExitStatus() == 3221225501
+}
 
 // embeddedCLICache lưu đường dẫn binary duckdb đã ghi ra temp từ embeddedCLIBinary.
 var (
@@ -75,10 +115,35 @@ func getEmbeddedDuckDBCLI() (string, error) {
 			return
 		}
 
+		// Chạy thử CLI 1 lần để phát hiện sớm binary không tương thích CPU
+		// (SIGILL do thiếu AVX2) — nếu không, lỗi chỉ lộ ra giữa chừng lúc
+		// user đang nạp file, rất khó hiểu.
+		if err := probeDuckDBCLI(outPath); err != nil {
+			embeddedCLIErr = err
+			return
+		}
+
 		embeddedCLICache = outPath
 		tm_common.LogInfo(fmt.Sprintf("Đã giải nén DuckDB CLI embedded: %s", outPath))
 	})
 	return embeddedCLICache, embeddedCLIErr
+}
+
+// probeDuckDBCLI chạy CLI với "--version" để kiểm tra binary có chạy được
+// trên CPU của máy không. Nếu crash vì SIGILL (CPU thiếu AVX2) trả về lỗi
+// kèm hướng xử lý rõ ràng.
+func probeDuckDBCLI(cliPath string) error {
+	cmd := exec.Command(cliPath, "--version")
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		if isIllegalInstruction(err) {
+			return &cpuUnsupportedError{msg: duckdbCLICPUHint}
+		}
+		return fmt.Errorf("kiểm tra DuckDB CLI thất bại: %w (stderr: %s)", err, stderr.String())
+	}
+	return nil
 }
 
 // platformName ánh xạ GOOS/GOARCH sang tên file embedded (duckdb-<plat> hoặc duckdb-<plat>.exe).
@@ -150,6 +215,11 @@ func runDuckDB(dbFile, sql string) ([]byte, []byte, error) {
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	if err2 := cmd.Run(); err2 != nil {
+		// CPU thiếu AVX2 → CLI crash bằng SIGILL, không có stderr nào đọc được.
+		// Báo lỗi rõ ràng thay vì "signal: illegal instruction (core dumped)".
+		if isIllegalInstruction(err2) {
+			return stdout.Bytes(), stderr.Bytes(), &cpuUnsupportedError{msg: duckdbCLICPUHint}
+		}
 		return stdout.Bytes(), stderr.Bytes(), fmt.Errorf("duckdb CLI lỗi: %w (stderr: %s)", err2, string(stderr.Bytes()))
 	}
 	return stdout.Bytes(), nil, nil
@@ -228,6 +298,11 @@ func getOrCreateSession(sessionID string) (*duckdbSession, error) {
 
 	// Đảm bảo duckdb CLI embedded có sẵn
 	if _, err := getEmbeddedDuckDBCLI(); err != nil {
+		// Lỗi CPU không hỗ trợ binary đã có sẵn thông điệp rõ ràng → trả nguyên văn.
+		var cpuErr *cpuUnsupportedError
+		if errors.As(err, &cpuErr) {
+			return nil, err
+		}
 		return nil, fmt.Errorf("DuckDB CLI embedded không có sẵn: %w", err)
 	}
 
@@ -511,6 +586,12 @@ func loadSingleView(sess *duckdbSession, tableName, readExpr, preSQL string) (fi
 	combinedSQL := dropSQL + "; " + createSQL + "; " + descSQL + "; " + countSQL
 	stdout, _, err := runDuckDB(sess.dbFile, combinedSQL)
 	if err != nil {
+		// Lỗi CPU không hỗ trợ binary: trả nguyên văn, không bọc thêm
+		// "tạo view ... thất bại" để thông điệp dễ đọc.
+		var cpuErr *cpuUnsupportedError
+		if errors.As(err, &cpuErr) {
+			return fileLoadResult{}, err
+		}
 		return fileLoadResult{}, fmt.Errorf("tạo view '%s' thất bại: %w", tableName, err)
 	}
 

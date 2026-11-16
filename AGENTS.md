@@ -51,7 +51,8 @@ scripts/
   build/          build_all.sh, build_wasm.sh, build_web_for_daemon.sh, build_api.sh, build_daemon.sh
   fetch/          fetch_wasm_sources.sh, fetch_duckdb_cli.sh, fetch_duckdb_extensions.sh
   deploy/         deploy_cloudflare.sh
-  utils/          tm_version.sh, git_pull_if_repo.sh, wasm_dist_common.sh, patch_wasm_dist.py, check_wasm_dist.py
+  utils/          tm_version.sh, git_pull_if_repo.sh, wasm_dist_common.sh, patch_wasm_dist.py, check_wasm_dist.py,
+                  extract_go_embed.py, extract_wasm_from_binary.sh
   maintenance/    remove_all_db_file.sh, remove_old_tag.sh
 vite.config.js                  Build frontend; viteStaticCopy wasm → dist/assets-wasm-<VERSION>/…;
                                 worker.rollupOptions.output cho tên file worker (xem Luật 13)
@@ -101,6 +102,11 @@ wrangler.jsonc                  Cloudflare Pages config (project `devtools`, out
     - **Cấm trong `TMTextEditor.vue`:** `if (language === "json"/"pgsql"/...)`, điều kiện theo tên tool, state/label/menu/checkbox riêng của một ngôn ngữ. Thêm ngôn ngữ mới = thêm feature module + đăng ký, **không sửa `TMTextEditor`**.
     - **Toàn app:** component chung (`src/components/`), mixin, store, worker, common util **không** được biết nghiệp vụ của một tool cụ thể. Logic riêng đặt ở `views/tools/<Tool>/`, module `src/common/<domain>/`, adapter/registry hoặc qua slot/props do tool truyền vào; backend bám mẫu `TMDLBase`/`TMBLBase`/`TMCollection`.
     - **Điều kiện review (bắt buộc):** `grep` component dùng chung không thấy literal tên ngôn ngữ/tool; thêm một ngôn ngữ/tool mới không phải sửa file dùng chung; phần xử lý dữ liệu test được độc lập. Không đạt → refactor trước khi merge, **không** thêm `if` tạm hay copy-paste để "chạy được đã".
+20. **DuckDB CLI phải tương thích CPU của máy đích.** Daemon nhúng DuckDB CLI vào binary và spawn nó ra chạy. Từ **DuckDB 2.0.0**, binary CLI chính thức cho linux/windows amd64 được build với `-march=x86-64-v3` (**cần AVX2 + BMI2 + FMA**). Máy không có AVX2 (Intel Pentium Silver N6005/J5005, Xeon E5 v1/v2, VM với CPU model cũ) → CLI crash bằng **SIGILL** ngay lúc khởi động, không có stderr để đọc, user thấy `signal: illegal instruction (core dumped)`. Xem https://github.com/duckdb/duckdb/issues/27691
+    - **Vì vậy `scripts/fetch/fetch_duckdb_cli.sh` ghim version `v1.5.6`** (bản cuối nhánh 1.x, baseline x86-64-v2 → chạy được trên mọi CPU phổ thông). **KHÔNG** đổi sang "latest release" — sẽ âm thầm làm hỏng toàn bộ máy CPU cũ.
+    - Backend đã có chốt an toàn: `dl_duckdb_session.go` probe CLI (`--version`) lúc giải nén và nhận diện SIGILL → trả về thông điệp tiếng Việt rõ ràng thay vì lỗi thô. **Đừng bỏ probe này.**
+    - Nâng version lên 2.x chỉ khi chắc chắn mọi máy đích đều có AVX2 (hoặc upstream đã hạ baseline).
+21. **WASM đã build có thể lấy lại từ binary release, không cần toolchain.** `src_wasm/pkg/` gitignored (~26 MB) nên clone mới không có; build lại thì cài Rust + wasm-pack + .NET SDK + trunk (rất nặng). Nhưng daemon release nhúng `dist/` qua `//go:embed all:dist` → dùng `scripts/utils/extract_wasm_from_binary.sh <binary>` để trích ra `src_wasm/pkg/` (khớp 100% bản release, không cần mạng/toolchain). Nền tảng là `scripts/utils/extract_go_embed.py` (đọc cấu trúc `embed.FS` trong ELF: `FS{files *[]file}`, `file{name, data string, hash[16]}` — stride **48** byte, `data` là `string` 16 byte chứ không phải `[]byte` 24 byte).
 
 ## 4. Chọn việc làm
 
@@ -129,6 +135,10 @@ cd ../tm_app && go build ./...
 ./scripts/build/build_wasm.sh                       # build rdp + ultraviewer + dotnet + craft tool
 npm run build                                 # build lại vì viteStaticCopy lấy từ pkg/
 
+# Không có toolchain? Lấy wasm từ bản daemon release đã có sẵn (Luật 21):
+./scripts/utils/extract_wasm_from_binary.sh ./out/dev-tool-linux-22.0.4
+npm run build
+
 # Module WASM viết bằng Rust (CHỈ khi đụng src_wasm/<module>)
 cd src_wasm/ultraviewer && cargo test         # 79 test: giao thức + end-to-end với relay giả lập
 cd src_wasm/ultraviewer && cargo build --target wasm32-unknown-unknown --lib
@@ -138,6 +148,7 @@ cd src_wasm/ultraviewer && cargo build --target wasm32-unknown-unknown --lib
   ```sh
   python3 -c "d=open('src_wasm/pkg/ultraviewer/ultraviewer_client_bg.wasm','rb').read(); print('CÓ import env — module sẽ hỏng!' if b'\x03env' in d[:2000] else 'OK')"
   ```
+  (Lưu ý: `dotnet/dotnet.native.wasm` là runtime .NET do Microsoft build, import `env` là bình thường — chỉ module Rust của repo mới bị kiểm tra.)
 
 - **Test:** repo CHƯA có framework test frontend; tự kiểm tra thủ công trên `npm run dev`. Với Go, chạy `go test ./...` của module đụng đến (hiện có `dl_group_test.go`, `bl_collection_test.go`). Với module Rust (`src_wasm/ultraviewer`), chạy `cargo test` — phần giao thức viết để test được native, không cần trình duyệt.
 - **Module WASM viết bằng Rust phải tách phần giao thức khỏi phần WASM.** `src_wasm/ultraviewer/src/{wire,messages,screen,input,chat,clipboard}.rs` là Rust thuần (test được native); phần gắn với trình duyệt nằm riêng trong `wasm_glue.rs` (`#[cfg(target_arch = "wasm32")]`). Không dùng thread/`std::net` trong module WASM — trình duyệt không có; mọi I/O đi qua WebSocket tới daemon.

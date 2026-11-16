@@ -75,6 +75,24 @@ Trong mỗi `build.sh`, source được lấy từ `src_wasm/<tên>/external_rep
 
 > **Nén wasm (các craft tool):** wasm luôn được nén gzip thành `_bg.wasm.gz`; phía app giải nén bằng `DecompressionStream` trước khi gọi `init()`, còn `index.html` (trang chạy độc lập để debug) được patch cùng logic đó. Lý do: Cloudflare Pages/Workers chặn file > 25 MiB/file (PhotoCraft gốc ~27 MB), và nén giúp tải nhanh hơn nhiều. Logic này **dùng chung** ở `scripts/utils/wasm_dist_common.sh` + `scripts/utils/patch_wasm_dist.py` — đừng copy vào từng `build.sh` và đừng xoá bước nén.
 
+### Lấy wasm từ bản release (không cần toolchain)
+
+`src_wasm/pkg/` là gitignored nên clone mới không có. Nếu **không muốn cài** Rust/wasm-pack/.NET/trunk (rất nặng), có thể lấy lại wasm đã build sẵn từ một bản daemon release — binary Go nhúng `dist/` qua `//go:embed all:dist`, đọc thẳng cấu trúc embed.FS ra là được:
+
+```bash
+./scripts/utils/extract_wasm_from_binary.sh ./out/dev-tool-linux-22.0.4
+./scripts/utils/extract_wasm_from_binary.sh /path/to/dev-tool-linux-22.0.4.tar.gz
+```
+
+Script tự suy ra version từ tên file, giải nén archive nếu cần, rồi ghi ra `src_wasm/pkg/<rdp|ultraviewer|dotnet|cimbar|photocraft>/` — **khớp 100%** với bản release đó. Sau đó chạy `npm run build` như bình thường.
+
+Công cụ nền tảng là `scripts/utils/extract_go_embed.py` (đọc ELF + cấu trúc `embed.FS`); dùng được với mọi prefix, ví dụ trích cả frontend:
+
+```bash
+python3 scripts/utils/extract_go_embed.py <binary> \
+    tm_core_service/internal/web.embeddedFiles <out-dir> "dist/"
+```
+
 ## 6. Version & phát hành
 
 - Version 1 nguồn: biến `VERSION` khi build, hoặc `package.json.version`.
@@ -117,5 +135,8 @@ Deploy headless/CI: đặt `CLOUDFLARE_API_TOKEN` (quyền **Cloudflare Pages: E
 | `scripts/maintenance/remove_all_db_file.sh` | Dọn các `dev_tool.db` rác |
 | `scripts/maintenance/remove_old_tag.sh` | Xoá tag cũ local + remote theo danh sách loại trừ |
 | `scripts/fetch/fetch_wasm_sources.sh` | Clone external repo về `src_wasm/*/external_repo/` (nếu chưa có) |
+| `scripts/fetch/fetch_duckdb_cli.sh` | Tải DuckDB CLI cho 5 platform → `src_backend/.../duckdb/cli/` (đã nhúng vào daemon) |
+| `scripts/utils/extract_wasm_from_binary.sh` | Lấy wasm đã build sẵn từ 1 bản daemon release → `src_wasm/pkg/` (không cần toolchain) |
+| `scripts/utils/extract_go_embed.py` | Đọc cấu trúc `embed.FS` trong binary Go để trích file ra đĩa |
 | `scripts/utils/git_pull_if_repo.sh` | Helper: pull repo nguồn, tự về nhánh mặc định nếu đang detached HEAD |
 | `scripts/deploy/deploy_cloudflare.sh` | Deploy thủ công Cloudflare Pages (build wasm + `REQUIRE_WASM=1 npm run build` → `wrangler pages deploy`) |
