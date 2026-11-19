@@ -99,6 +99,24 @@ export function registerDuckdbLanguage() {
   monaco.languages.register({ id: "duckdb" });
   const definition = buildMonarchDefinition();
   monaco.languages.setMonarchTokensProvider("duckdb", definition);
+  // đăng ký cấu hình ngôn ngữ: comment line/block để phím tắt Ctrl+/ hoạt động
+  monaco.languages.setLanguageConfiguration("duckdb", {
+    comments: {
+      lineComment: "--",
+      blockComment: ["/*", "*/"],
+    },
+    brackets: [["(", ")"]],
+    autoClosingPairs: [
+      { open: "(", close: ")" },
+      { open: "'", close: "'" },
+      { open: '"', close: '"' },
+    ],
+    surroundingPairs: [
+      { open: "(", close: ")" },
+      { open: "'", close: "'" },
+      { open: '"', close: '"' },
+    ],
+  });
   _monarchRegistered = true;
   registerSemanticProvider();
 }
