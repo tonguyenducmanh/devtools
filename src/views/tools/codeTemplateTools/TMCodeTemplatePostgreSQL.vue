@@ -2,6 +2,7 @@
   <TMCodeTemplateTool
     :language="'pgsql'"
     :templatesFull="getTemplate()"
+    :i18nNamespace="'i18nTemplate.postgreSQLTemplate'"
   ></TMCodeTemplateTool>
 </template>
 

@@ -273,6 +273,12 @@ export const sidebarConfig = [
           import("@/views/tools/codeTemplateTools/TMCodeTemplateGit.vue"),
         meta: { titleKey: "i18nCommon.feature.GitTemplate" },
       },
+      {
+        name: "scsstemplate",
+        component: () =>
+          import("@/views/tools/codeTemplateTools/TMCodeTemplateSCSS.vue"),
+        meta: { titleKey: "i18nCommon.feature.SCSSTemplate" },
+      },
     ],
   },
   {

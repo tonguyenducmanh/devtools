@@ -134,6 +134,9 @@ export default {
     uploadFile: "Upload file",
     fileSelected: "Total files selected",
     enableHighlight: "Highlight code",
+    codeTemplate: {
+      preview: "Preview",
+    },
     wrapText: "Wrap text",
     changeMonacoTheme: "Change Editor Theme",
     agreementTitle: "Terms of use",
@@ -225,6 +228,7 @@ export default {
       PowerShellTemplate: "PowerShell template",
       GitTemplate: "Git template",
       AutomationTemplate: "Automation template",
+      SCSSTemplate: "SCSS template",
       agentDownload: {
         title: "Download Agent",
         redirecting: "Redirecting...",

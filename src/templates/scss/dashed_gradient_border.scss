@@ -1,0 +1,27 @@
+/* Chỉ dựng viền nét đứt gradient; offset/radius lấy từ biến của app. */
+.dashed-gradient-border {
+  --dgb-from: #1a8cff; /* màu bên trái */
+  --dgb-to: #ff00ff; /* màu bên phải */
+  --dgb-width: 2px; /* độ dày nét */
+  --dgb-radius: var(--border-radius);
+  --dgb-offset: var(--padding-medium);
+
+  position: relative;
+  padding: var(--padding-large);
+}
+.dashed-gradient-border::before,
+.dashed-gradient-border::after {
+  content: "";
+  position: absolute;
+  inset: calc(var(--dgb-offset) * -1);
+  border: var(--dgb-width) dashed var(--dgb-from);
+  border-radius: var(--dgb-radius);
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, #000, transparent);
+  mask-image: linear-gradient(90deg, #000, transparent);
+}
+.dashed-gradient-border::after {
+  border-color: var(--dgb-to);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000);
+  mask-image: linear-gradient(90deg, transparent, #000);
+}

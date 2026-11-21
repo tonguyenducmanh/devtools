@@ -2,6 +2,7 @@
   <TMCodeTemplateTool
     :language="'javascript'"
     :templatesFull="getTemplate()"
+    :i18nNamespace="'i18nTemplate.JavaScriptTemplate'"
   ></TMCodeTemplateTool>
 </template>
 

@@ -33,8 +33,7 @@ export const EnumCacheConfig = {
   RemoteDesktopConfigLayout: 40,
   JSONSortByKeyConfigLayout: 41,
   MindMapHistory: 43,
-  PostgreSQLTemplateConfigLayout: 44,
-  
+
   BlankTextConfigLayout: 48,
   PostgreSQLQueryConfigLayout: 49,
   PostgreSQLQueryHistory: 50,
@@ -69,4 +68,5 @@ export const EnumCacheConfig = {
   DuckDBSessionId: 75,
   DuckDBQueryHistory: 76,
   DuckDBBuiltinIntellisense: 77,
+  CodeTemplateConfigLayout: 78,
 };

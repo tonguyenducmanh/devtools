@@ -210,11 +210,11 @@ export const TMCacheConfig = {
     ExpireTime: 0,
     Note: "lịch sử auto-save mind map",
   },
-  PostgreSQLTemplateConfigLayout: {
-    KeyFormat: "PostgreSQLTemplateConfigLayout",
+  CodeTemplateConfigLayout: {
+    KeyFormat: "CodeTemplateConfigLayout",
     CacheLevel: tmEnum.cacheType.local,
     ExpireTime: 0,
-    Note: "cache cấu hình layout tool PostgreSQL Template",
+    Note: "cache cấu hình layout chung cho các tool code template",
   },
   
   BlankTextConfigLayout: {

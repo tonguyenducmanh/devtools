@@ -1,0 +1,14 @@
+/* Chỉ dựng hiệu ứng viền gradient. Mọi giá trị không thuộc hiệu ứng lấy từ biến trong tm_main.scss. */
+.gradient-border {
+  --gb-from: #1a8cff;
+  --gb-to: #ff00ff;
+  --gb-width: 2px;
+  --gb-radius: var(--border-radius);
+
+  padding: var(--padding-large);
+  border: var(--gb-width) solid transparent;
+  border-radius: var(--gb-radius);
+  background:
+    linear-gradient(var(--bg-main-color), var(--bg-main-color)) padding-box,
+    linear-gradient(90deg, var(--gb-from), var(--gb-to)) border-box;
+}

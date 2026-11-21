@@ -128,7 +128,8 @@ class TMEnum {
     Setting: 0,
     History: 1,
   };
-  PostgreSQLTemplateSidebarOption = {
+  // Dùng chung cho mọi tool code template.
+  CodeTemplateSidebarOption = {
     Template: 0,
     Setting: 1,
   };

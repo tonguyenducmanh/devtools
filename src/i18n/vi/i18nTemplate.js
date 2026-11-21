@@ -60,5 +60,13 @@ export default {
       create_table: "Tạo bảng",
       util_keywords: "Lệnh tiện ích",
     },
+    scssTemplate: {
+      dashed_gradient_border: "Viền nét đứt gradient",
+      gradient_border: "Viền gradient",
+      gradient_button: "Button gradient",
+      search_template: "Tìm template",
+      no_template_found: "Không tìm thấy template",
+      template: "Template",
+    },
   },
 };

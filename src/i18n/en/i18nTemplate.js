@@ -61,5 +61,13 @@ export default {
       util_keywords: "Utility commands",
       util_keywords: "Utility commands",
     },
+    scssTemplate: {
+      dashed_gradient_border: "Dashed gradient border",
+      gradient_border: "Gradient border",
+      gradient_button: "Gradient button",
+      search_template: "Search template",
+      no_template_found: "No template found",
+      template: "Template",
+    },
   },
 };

@@ -1,0 +1,16 @@
+/* Chỉ dựng nút gradient; padding/radius/font/nền lấy từ biến trong tm_main.scss. */
+.gradient-button {
+  --btn-from: #1a8cff;
+  --btn-to: #ff00ff;
+  --btn-radius: var(--border-radius);
+
+  border: 0;
+  border-radius: var(--btn-radius);
+  padding: var(--padding) var(--padding-large);
+  color: var(--text-primary-color);
+  font-family: var(--main-font);
+  font-size: var(--font-size-medium-rare);
+  cursor: pointer;
+  background: linear-gradient(90deg, var(--btn-from), var(--btn-to));
+  box-shadow: var(--box-shadow);
+}

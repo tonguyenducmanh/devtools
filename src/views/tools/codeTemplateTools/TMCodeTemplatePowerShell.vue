@@ -2,6 +2,7 @@
   <TMCodeTemplateTool
     :language="'powershell'"
     :templatesFull="getTemplate()"
+    :i18nNamespace="'i18nTemplate.PowerShellTemplate'"
   ></TMCodeTemplateTool>
 </template>
 

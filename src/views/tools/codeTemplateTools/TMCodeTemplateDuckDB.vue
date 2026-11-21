@@ -2,6 +2,7 @@
   <TMCodeTemplateTool
     :language="'sql'"
     :templatesFull="getTemplate()"
+    :i18nNamespace="'i18nTemplate.DuckDBTemplate'"
   ></TMCodeTemplateTool>
 </template>
 

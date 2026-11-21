@@ -135,6 +135,9 @@ export default {
     uploadFile: "Tải lên tệp",
     fileSelected: "Tổng số file đã chọn",
     enableHighlight: "Highlight code",
+    codeTemplate: {
+      preview: "Xem trước",
+    },
     wrapText: "Xuống dòng",
     changeMonacoTheme: "Đổi màu Editor",
     agreementTitle: "Điều khoản sử dụng",
@@ -226,6 +229,7 @@ export default {
       PowerShellTemplate: "Code mẫu PowerShell",
       GitTemplate: "Code mẫu Git",
       AutomationTemplate: "Code mẫu tự động hóa",
+      SCSSTemplate: "Code mẫu SCSS",
       agentDownload: {
         title: "Tải Agent",
         redirecting: "Đang chuyển hướng...",

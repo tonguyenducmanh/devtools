@@ -2,6 +2,7 @@
   <TMCodeTemplateTool
     :language="'shell'"
     :templatesFull="getTemplate()"
+    :i18nNamespace="'i18nTemplate.gitTemplate'"
   ></TMCodeTemplateTool>
 </template>
 

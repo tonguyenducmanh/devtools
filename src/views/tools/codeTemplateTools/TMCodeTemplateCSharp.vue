@@ -2,6 +2,7 @@
   <TMCodeTemplateTool
     :language="'csharp'"
     :templatesFull="getTemplate()"
+    :i18nNamespace="'i18nTemplate.CSharpTemplate'"
   ></TMCodeTemplateTool>
 </template>
 

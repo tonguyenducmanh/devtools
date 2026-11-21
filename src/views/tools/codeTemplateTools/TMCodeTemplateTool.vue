@@ -1,16 +1,40 @@
 <template>
   <div class="flex container">
-    <div class="flex flex-col main-area">
-      <TMTextEditor
-        :isLabelTop="true"
-        :readOnly="true"
-        :label="selectedTemplateName"
-        :enableHighlight="currentConfigLayout.enableHighlight"
-        :language="language"
-        :placeHolder="''"
-        v-model="currentCode"
-       
-      ></TMTextEditor>
+    <div
+      class="flex main-area"
+      :class="{ 'flex-col': currentConfigLayout.splitHorizontal }"
+    >
+      <div class="flex flex-col editor-area" :style="editorSectionSizeStyle">
+        <TMTextEditor
+          :isLabelTop="true"
+          :readOnly="true"
+          :label="selectedTemplateName"
+          :enableHighlight="currentConfigLayout.enableHighlight"
+          :language="language"
+          :placeHolder="''"
+          v-model="currentCode"
+        ></TMTextEditor>
+      </div>
+
+      <TMResizer
+        v-if="$slots.preview"
+        :direction="
+          currentConfigLayout.splitHorizontal ? 'vertical' : 'horizontal'
+        "
+        @resize="handleResize"
+      />
+
+      <div
+        v-if="$slots.preview"
+        class="flex flex-col preview-area"
+        :style="previewSectionSizeStyle"
+      >
+        <slot
+          name="preview"
+          :code="currentCode"
+          :template="selectedTemplate"
+        ></slot>
+      </div>
     </div>
 
     <TMSubSidebar
@@ -33,16 +57,14 @@
           class="flex flex-col tm-sidebar-content"
           v-show="
             currentConfigLayout.currentSidebarOption ==
-            $tmEnum.PostgreSQLTemplateSidebarOption.Template
+            $tmEnum.CodeTemplateSidebarOption.Template
           "
         >
           <div class="sidebar-input">
             <TMInput
               :noMargin="true"
               v-model="templateFilter"
-              :placeHolder="
-                $t('i18nTemplate.postgreSQLTemplate.search_template')
-              "
+              :placeHolder="$t(tKey('search_template'))"
             />
           </div>
 
@@ -63,7 +85,7 @@
               </div>
             </div>
             <div v-if="filteredTemplates.length === 0" class="no-template">
-              {{ $t("i18nTemplate.postgreSQLTemplate.no_template_found") }}
+              {{ $t(tKey("no_template_found")) }}
             </div>
           </div>
         </div>
@@ -72,13 +94,19 @@
           class="tm-sidebar-content"
           v-show="
             currentConfigLayout.currentSidebarOption ==
-            $tmEnum.PostgreSQLTemplateSidebarOption.Setting
+            $tmEnum.CodeTemplateSidebarOption.Setting
           "
         >
           <TMCheckbox
             :variant="$tmEnum.checkboxType.switch"
             v-model="currentConfigLayout.enableHighlight"
             :label="$t('i18nCommon.enableHighlight')"
+            @change="updateConfigLayout"
+          ></TMCheckbox>
+          <TMCheckbox
+            :variant="$tmEnum.checkboxType.switch"
+            v-model="currentConfigLayout.splitHorizontal"
+            :label="$t('i18nCommon.splitHorizontal')"
             @change="updateConfigLayout"
           ></TMCheckbox>
         </div>
@@ -104,6 +132,14 @@ export default {
       type: Array,
       default: () => [],
     },
+    // Namespace i18n chứa search_template / no_template_found / template.
+    i18nNamespace: {
+      type: String,
+      required: true,
+    },
+    cacheLayoutKey: {
+      default: null,
+    },
   },
   created() {
     let me = this;
@@ -113,16 +149,36 @@ export default {
     sidebarOptions() {
       let options = [];
       options.push({
-        value: this.$tmEnum.PostgreSQLTemplateSidebarOption.Template,
-        label: this.$t("i18nTemplate.postgreSQLTemplate.template"),
+        value: this.$tmEnum.CodeTemplateSidebarOption.Template,
+        label: this.$t(this.tKey("template")),
         icon: "tm-folder-icon",
       });
       options.push({
-        value: this.$tmEnum.PostgreSQLTemplateSidebarOption.Setting,
+        value: this.$tmEnum.CodeTemplateSidebarOption.Setting,
         label: this.$t("i18nCommon.sidebarOption.setting"),
         icon: "tm-setting-icon",
       });
       return options;
+    },
+    editorSectionSizeStyle() {
+      let me = this;
+      if (!me.$slots.preview) return {};
+      let size = me.currentConfigLayout.editorSectionSize || 50;
+      return me.currentConfigLayout.splitHorizontal
+        ? { height: `${size}%` }
+        : { width: `${size}%` };
+    },
+    previewSectionSizeStyle() {
+      let me = this;
+      let size = me.currentConfigLayout.previewSectionSize || 50;
+      return me.currentConfigLayout.splitHorizontal
+        ? { height: `${size}%` }
+        : { width: `${size}%` };
+    },
+    selectedTemplate() {
+      return this.templates.find(
+        (t) => t.key === this.selectedTemplateKey,
+      );
     },
     filteredTemplates() {
       let me = this;
@@ -146,6 +202,9 @@ export default {
     },
   },
   methods: {
+    tKey(suffix) {
+      return `${this.i18nNamespace}.${suffix}`;
+    },
     getTemplateName(template) {
       let templateNeme = "";
       let me = this;
@@ -170,10 +229,15 @@ export default {
       me.selectedTemplateKey = template.key;
       me.currentCode = template.code || "";
     },
+    handleResize(sizes) {
+      this.currentConfigLayout.editorSectionSize = sizes.leftSize;
+      this.currentConfigLayout.previewSectionSize = sizes.rightSize;
+    },
   },
   data() {
     return {
-      keyCacheLayout: this.$tmEnum.cacheConfig.PostgreSQLTemplateConfigLayout,
+      keyCacheLayout:
+        this.cacheLayoutKey || this.$tmEnum.cacheConfig.CodeTemplateConfigLayout,
       templates: [],
       templateFilter: "",
       selectedTemplateKey: "",
@@ -181,9 +245,12 @@ export default {
       currentConfigLayout: {
         isShowSidebar: true,
         currentSidebarOption:
-          this.$tmEnum.PostgreSQLTemplateSidebarOption.Template,
+          this.$tmEnum.CodeTemplateSidebarOption.Template,
         enableHighlight: true,
         wrapText: true,
+        splitHorizontal: true,
+        editorSectionSize: 50,
+        previewSectionSize: 50,
       },
     };
   },
@@ -198,6 +265,15 @@ export default {
 .main-area {
   flex: 1;
   height: 100%;
+  min-width: 0;
+}
+.editor-area,
+.preview-area {
+  flex: 0 0 auto;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
 }
 .tm-sidebar-content {
   width: 100%;
