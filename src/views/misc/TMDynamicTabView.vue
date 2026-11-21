@@ -566,8 +566,14 @@ export default {
     }
 
     function getTabTitle(tab) {
+      let text = tab.customTitle?.titleFull || getTabLabel(tab);
+      // Tooltip chỉ cần đọc lướt: giới hạn 300 ký tự (kể cả dấu …).
+      let maxLength = 300;
       return {
-        text: tab.customTitle?.titleFull,
+        text:
+          text.length > maxLength
+            ? `${text.substring(0, maxLength - 1)}…`
+            : text,
         maxWidth: "600px",
       };
     }
