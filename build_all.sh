@@ -9,11 +9,13 @@ echo "Đang build version: $(tm_get_version)"
 # Mặc định chỉ build frontend + daemon (đủ cho dev).
 # Mở comment từng bước khi cần fetch binary, build wasm hoặc build API.
 
-# 0. Fetch binary bên ngoài (DuckDB CLI + extensions, WASM sources)
-# chmod 777 ./scripts/fetch/fetch_duckdb_cli.sh
-# ./scripts/fetch/fetch_duckdb_cli.sh
-# chmod 777 ./scripts/fetch/fetch_duckdb_extensions.sh
-# ./scripts/fetch/fetch_duckdb_extensions.sh
+# 0. Fetch MỌI dependency ngoài source code bằng 1 lệnh duy nhất:
+#    ./scripts/fetch/fetch_all.sh            # lần đầu / thiếu file
+#    ./scripts/fetch/fetch_all.sh --fresh    # xoá sạch rồi kéo lại từ đầu
+# Đặt TM_FETCH_ALL=1 để tự chạy ở đây (mặc định không đụng mạng khi build lại).
+if [ "${TM_FETCH_ALL:-0}" = "1" ]; then
+    ./scripts/fetch/fetch_all.sh
+fi
 
 # 1. Build WASM (IronRDP, UltraViewer, .NET Wrapper, PhotoCraft)
 # chmod 777 ./scripts/build/build_wasm.sh

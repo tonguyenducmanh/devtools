@@ -29,10 +29,16 @@ Dự án này **không dùng Git Submodules** và **không commit file wasm đã
 git clone https://github.com/tonguyenducmanh/devtools.git
 cd your-main-repo
 
-npm i
+# Fetch TOÀN BỘ dependency ngoài source code bằng 1 lệnh:
+# npm ci + go mod download (3 module) + clone/cập nhật repo nguồn wasm
+# + DuckDB CLI/extensions (5 platform) + cimbar wasm dựng sẵn.
+./scripts/fetch/fetch_all.sh
 
-# (Tùy chọn) Nếu muốn build lại wasm, chạy scripts/build/build_wasm.sh
-# -> script tự clone nguồn cần thiết về src_wasm/<tên>/external_repo/
+# Tuỳ chọn — XOÁ SẠCH rồi kéo lại từ đầu (xoá cả src_wasm/pkg/, phải build lại wasm):
+# ./scripts/fetch/fetch_all.sh --fresh
+
+# (Tùy chọn) Build lại wasm — sau --fresh thì BẮT BUỘC:
+./scripts/build/build_wasm.sh
 ```
 
 ## Chạy Dự án
@@ -104,11 +110,11 @@ chmod 777 ./scripts/build/build_wasm.sh
 ./scripts/build/build_wasm.sh
 ```
 
-Script tự clone nguồn external repo (IronRDP, PhotoCraft) về `src_wasm/<tên>/external_repo/` nếu chưa có (không dùng git submodule) rồi build. Nếu chỉ muốn lấy nguồn mà chưa build:
+Script tự clone nguồn external repo (IronRDP, PhotoCraft) về `src_wasm/<tên>/external_repo/` nếu chưa có (không dùng git submodule) rồi build. Nếu chỉ muốn lấy nguồn mà chưa build, dùng lệnh fetch tổng hợp ở mục [Cài đặt](#cài-đặt):
 
 ```bash
-chmod 777 ./scripts/fetch/fetch_wasm_sources.sh
-./scripts/fetch/fetch_wasm_sources.sh
+./scripts/fetch/fetch_all.sh          # kèm npm/Go/DuckDB/cimbar
+# ./scripts/fetch/fetch_all.sh --fresh  # xoá sạch rồi kéo lại (xoá cả wasm đã build)
 ```
 
 > **Trước khi build**, mỗi `build.sh` sẽ đi vào repo nguồn của nó và chạy

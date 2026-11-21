@@ -49,7 +49,7 @@ src_wasm/                       Nguồn WASM
   photocraft → pkg/photocraft    Static site PhotoCraft (trunk, wasm nén gzip)
 scripts/
   build/          build_all.sh, build_wasm.sh, build_web_for_daemon.sh, build_api.sh, build_daemon.sh
-  fetch/          fetch_wasm_sources.sh, fetch_duckdb_cli.sh, fetch_duckdb_extensions.sh
+  fetch/          fetch_all.sh (ĐIỂM VÀO DUY NHẤT: mọi dependency, cờ --fresh), fetch_wasm_sources.sh, fetch_duckdb_cli.sh, fetch_duckdb_extensions.sh
   deploy/         deploy_cloudflare.sh
   utils/          tm_version.sh, git_pull_if_repo.sh, wasm_dist_common.sh, patch_wasm_dist.go, check_wasm_dist.go,
                   check_wasm_imports.go, extract_go_embed.go, extract_wasm_from_binary.sh
@@ -130,6 +130,9 @@ wrangler.jsonc                  Cloudflare Pages config (project `devtools`, out
 ## 5. Trước khi kết thúc task
 
 ```sh
+# Clone mới / thiếu dependency ngoài source code (1 lệnh, có --fresh để làm lại từ đầu):
+./scripts/fetch/fetch_all.sh
+
 # Frontend
 npm run dev          # smoke-test tool bị đổi: mở tool, thao tác cơ bản
 npm run build        # PHẢI xanh

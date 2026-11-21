@@ -13,6 +13,17 @@ npm install
 npm run dev        # Vite dev server (mặc định port 5173)
 ```
 
+### 1b. Fetch mọi dependency bằng 1 lệnh (không cần nhớ 4-5 script)
+
+```bash
+./scripts/fetch/fetch_all.sh            # npm ci + go mod download (3 module) + clone/cập nhật 2 repo nguồn wasm + DuckDB CLI/ext + cimbar wasm
+
+# Tuỳ chọn (XOÁ SẠCH — kể cả src_wasm/pkg/ — rồi kéo lại từ đầu):
+# ./scripts/fetch/fetch_all.sh --fresh
+```
+
+Script tự tìm root, chạy idempotent và **tự kiểm tra đầu ra** (báo lỗi nếu thiếu binary DuckDB/clone/cimbar). `--fresh` xoá `node_modules/`, 2 `external_repo/`, toàn bộ `src_wasm/pkg/`, binary DuckDB CLI/extensions — nhưng **giữ** Go module cache, `dist/`, `out/`. Vì `--fresh` xoá cả wasm đã build, sau đó phải chạy `./scripts/build/build_wasm.sh` (hoặc `./scripts/utils/extract_wasm_from_binary.sh <binary release>` nếu không có toolchain) rồi mới `npm run build`. Có thể gọi tự động từ `build_all.sh` với `TM_FETCH_ALL=1 ./build_all.sh`.
+
 Lưu ý dev-only:
 
 - WASM được phục vụ qua **middleware của viteStaticCopy** ở đúng đường dẫn prod:
@@ -140,6 +151,7 @@ Deploy headless/CI: đặt `CLOUDFLARE_API_TOKEN` (quyền **Cloudflare Pages: E
 | `scripts/utils/tm_version.sh` | Lấy version + ldflags (source để dùng hàm) |
 | `scripts/maintenance/remove_all_db_file.sh` | Dọn các `dev_tool.db` rác |
 | `scripts/maintenance/remove_old_tag.sh` | Xoá tag cũ local + remote theo danh sách loại trừ |
+| `scripts/fetch/fetch_all.sh` | **Điểm vào duy nhất**: fetch mọi dependency (npm, Go module, repo nguồn wasm, DuckDB CLI/ext, cimbar). `--fresh` = xoá sạch rồi kéo lại |
 | `scripts/fetch/fetch_wasm_sources.sh` | Clone external repo về `src_wasm/*/external_repo/` (nếu chưa có) |
 | `scripts/fetch/fetch_duckdb_cli.sh` | Tải DuckDB CLI cho 5 platform → `src_backend/.../duckdb/cli/` (đã nhúng vào daemon) |
 | `scripts/utils/extract_wasm_from_binary.sh` | Lấy wasm đã build sẵn từ 1 bản daemon release → `src_wasm/pkg/` (không cần toolchain) |
