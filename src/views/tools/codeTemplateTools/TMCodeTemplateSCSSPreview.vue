@@ -8,6 +8,8 @@
 </template>
 
 <script>
+import { injectAppCssVariables } from "@/common/TMPreviewUtil.js";
+
 export default {
   name: "TMCodeTemplateSCSSPreview",
   props: {
@@ -25,11 +27,7 @@ export default {
     previewDocument() {
       // Theo dõi theme để copy lại CSS variable khi người dùng đổi theme.
       void this.themeVersion;
-      let rootVars = this.collectCssVariables();
-      return (this.previewHtml || "").replace(
-        "</head>",
-        `<style>:root{${rootVars}}</style></head>`,
-      );
+      return injectAppCssVariables(this.previewHtml);
     },
   },
   mounted() {
@@ -44,27 +42,6 @@ export default {
   },
   beforeUnmount() {
     if (this.themeObserver) this.themeObserver.disconnect();
-  },
-  methods: {
-    /**
-     * iframe là document riêng nên không kế thừa :root của app. Copy mọi CSS
-     * custom property từ app sang iframe để template chỉ dùng var(--...).
-     */
-    collectCssVariables() {
-      if (typeof window === "undefined") return "";
-      let vars = [];
-      [document.documentElement, document.body].forEach((element) => {
-        if (!element) return;
-        let style = window.getComputedStyle(element);
-        for (let i = 0; i < style.length; i++) {
-          let name = style[i];
-          if (name.indexOf("--") === 0) {
-            vars.push(`${name}:${style.getPropertyValue(name).trim()};`);
-          }
-        }
-      });
-      return vars.join("");
-    },
   },
 };
 </script>

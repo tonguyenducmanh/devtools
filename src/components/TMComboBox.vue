@@ -1,7 +1,11 @@
 <template>
   <div
     class="flex no-select tm-combobox"
-    :class="{ 'flex-col': isLabelTop, 'tm-combobox-no-margin': noMargin }"
+    :class="{
+      'flex-col': isLabelTop,
+      'tm-combobox-no-margin': noMargin,
+      'tm-combobox-small': isSmallButton,
+    }"
     v-click-outside="closeCombo"
   >
     <div class="tm-label" :class="{ 'tm-label-top': isLabelTop }" v-if="label">
@@ -111,6 +115,14 @@ export default {
     },
     isDropTop: {
       // ưu tiên mở lên trên ô control, panel vẫn tự đảo hướng nếu không đủ chỗ
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * Thu nhỏ ô control xuống 25px để khớp TMButton/TMUpload isSmallButton
+     * trong cùng toolbar. Mặc định false nên không ảnh hưởng chỗ dùng cũ.
+     */
+    isSmallButton: {
       type: Boolean,
       default: false,
     },
@@ -268,6 +280,18 @@ export default {
 }
 .tm-combobox-no-margin {
   margin: unset;
+}
+
+/* Chế độ small: khớp chiều cao của TMButton isSmallButton. Phải giữ nguyên
+   chuỗi selector `.tm-combobox .tm-combobox-wraper .tm-combobox-control` rồi
+   thêm class small để đè được rule gốc (độ đặc hiệu cao hơn). */
+.tm-combobox.tm-combobox-small {
+  .tm-combobox-wraper {
+    .tm-combobox-control {
+      height: var(--small-component-height);
+      font-size: var(--font-size-medium-rare);
+    }
+  }
 }
 
 /* Danh sách option được Teleport ra body nên không còn nằm trong .tm-combobox,

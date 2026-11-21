@@ -155,9 +155,16 @@ export const sidebarConfig = [
     children: [
       {
         name: "TMBlankText",
-        component: () => import("@/views/tools/TMBlankText.vue"),
+        component: () => import("@/views/tools/blanktext/TMBlankText.vue"),
         meta: {
           titleKey: "i18nCommon.feature.blanktext",
+        },
+      },
+      {
+        name: "TMBlankTextMarkdown",
+        component: () => import("@/views/tools/blanktext/TMBlankTextMarkdown.vue"),
+        meta: {
+          titleKey: "i18nCommon.feature.markdownText",
         },
       },
       {

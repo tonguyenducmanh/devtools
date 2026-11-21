@@ -223,6 +223,12 @@ export const TMCacheConfig = {
     ExpireTime: 0,
     Note: "cache cấu hình layout tool blank text",
   },
+  BlankTextMarkdownConfigLayout: {
+    KeyFormat: "BlankTextMarkdownConfigLayout",
+    CacheLevel: tmEnum.cacheType.local,
+    ExpireTime: 0,
+    Note: "cache cấu hình layout tool blank text markdown",
+  },
   PostgreSQLQueryConfigLayout: {
     KeyFormat: "PostgreSQLQueryConfigLayout",
     CacheLevel: tmEnum.cacheType.local,
@@ -300,6 +306,12 @@ export const TMCacheConfig = {
     CacheLevel: tmEnum.cacheType.indexedDB,
     ExpireTime: 0,
     Note: "lịch sử tool blank text",
+  },
+  BlankTextMarkdownHistory: {
+    KeyFormat: "BlankTextMarkdownHistory",
+    CacheLevel: tmEnum.cacheType.indexedDB,
+    ExpireTime: 0,
+    Note: "lịch sử tool blank text markdown",
   },
   JSONToOneLineStringHistory: {
     KeyFormat: "JSONToOneLineStringHistory",

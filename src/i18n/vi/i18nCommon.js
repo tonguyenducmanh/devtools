@@ -189,6 +189,7 @@ export default {
       OpticalCharacterRecognition: "Nhận dạng ký tự quang học (OCR)",
       textgenerator: "Tạo văn bản",
       blanktext: "Văn bản trống",
+      markdownText: "Văn bản Markdown",
       AppDataMiner: "Dữ liệu ứng dụng",
       allApps: "Danh sách ứng dụng",
       cosinSimilarity: "Độ tương đồng",
@@ -805,6 +806,14 @@ export default {
       placeholder: "Nhập nội dung văn bản...",
       download: "Tải xuống",
       downloaded: "Đã tải xuống",
+      uploadLabel: "Chọn file văn bản",
+    },
+    markdownText: {
+      placeholder: "Nhập nội dung Markdown...",
+      preview: "Xem trước Markdown",
+      uploadLabel: "Chọn file Markdown",
+      onlyMarkdownSupported: "Chỉ hỗ trợ file Markdown (.md, .markdown, .txt)",
+      run: "Thực hiện",
     },
     remoteDesktop: {
       title: "Máy tính từ xa (RDP)",

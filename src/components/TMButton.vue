@@ -99,7 +99,7 @@ export default {
 }
 
 .tm-button-small {
-  height: 25px;
+  height: var(--small-component-height);
 }
 
 .tm-button-no-margin {

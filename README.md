@@ -101,6 +101,8 @@ của **DeanOpen** (giấy phép MIT — `Copyright (c) 2026 MacViewer contribut
 giữ lại tại `src_wasm/ultraviewer/LICENSE-MacViewer`; từng file port đều có header trỏ về nguồn.
 Bảng đối chiếu file-by-file nằm trong [`src_wasm/ultraviewer/README.md`](src_wasm/ultraviewer/README.md).
 
+Cách preview của tool Văn bản Markdown (tool `markdownText`) đi theo [markdown-live-preview](https://github.com/tanabe/markdown-live-preview) của **tanabe**: `marked` → `DOMPurify` → nội dung trong `.markdown-body`, dùng CSS `github-markdown-css` (dạng npm dependency, có license riêng) và đọc file bằng `File.text()`.
+
 > `src_wasm/pkg/` là **thư mục output** (gitignored, ~58 MB). Clone repo về sẽ **không có** thư mục này — phải chạy `scripts/build_wasm.sh` một lần để build, hoặc dùng luôn bản build có sẵn ở máy bạn. Deploy Cloudflare cũng vì thế phải chạy **thủ công** (build local → `wrangler pages deploy`), không bật Git integration trên Cloudflare Pages.
 
 Build toàn bộ wasm bằng:

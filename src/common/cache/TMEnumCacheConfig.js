@@ -69,4 +69,6 @@ export const EnumCacheConfig = {
   DuckDBQueryHistory: 76,
   DuckDBBuiltinIntellisense: 77,
   CodeTemplateConfigLayout: 78,
+  BlankTextMarkdownConfigLayout: 79,
+  BlankTextMarkdownHistory: 80,
 };

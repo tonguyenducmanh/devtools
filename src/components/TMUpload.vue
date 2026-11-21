@@ -28,7 +28,11 @@
       'max-width': maxWidth,
       ...borderRadiusStyle,
     }"
-    :class="{ 'tm-upload-read-only': readOnly, 'tm-upload-hide-border': hideBorder }"
+    :class="{
+      'tm-upload-read-only': readOnly,
+      'tm-upload-hide-border': hideBorder,
+      'tm-upload-small': isSmallButton,
+    }"
   >
     <label
       class="flex tm-upload-button"
@@ -108,8 +112,9 @@ export default {
       default: false,
     },
     /**
-     * Thu nhỏ button (icon-only mode): đồng bộ kích thước với các TMButton
-     * isSmallButton dùng trong toolbar.
+     * Thu nhỏ button (cả chế độ icon-only lẫn chế độ có nhãn): đồng bộ kích
+     * thước với các TMButton isSmallButton dùng trong toolbar. Mặc định false
+     * nên không ảnh hưởng các chỗ dùng cũ.
      */
     isSmallButton: {
       type: Boolean,
@@ -210,6 +215,14 @@ export default {
   padding: calc(var(--padding-medium) - 1px);
   border-radius: var(--border-radius);
   background-color: var(--bg-layer-color);
+}
+/* Chế độ có nhãn thu nhỏ: khớp chiều cao 25px của TMButton isSmallButton. */
+.tm-upload-small {
+  height: var(--small-component-height);
+
+  .tm-upload-button {
+    padding: 0 var(--padding-medium);
+  }
 }
 .tm-upload-btn-read-only {
   cursor: unset;

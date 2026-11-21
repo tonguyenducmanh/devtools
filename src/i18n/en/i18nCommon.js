@@ -188,6 +188,7 @@ export default {
       OpticalCharacterRecognition: "Optical Character Recognition (OCR)",
       textgenerator: "Text Generator",
       blanktext: "Blank text",
+      markdownText: "Markdown text",
       AppDataMiner: "App data miner",
       allApps: "All applications",
       cosinSimilarity: "Cosine Similarity",
@@ -809,6 +810,14 @@ export default {
       placeholder: "Enter text content...",
       download: "Download",
       downloaded: "Downloaded",
+      uploadLabel: "Choose text file",
+    },
+    markdownText: {
+      placeholder: "Enter Markdown content...",
+      preview: "Markdown preview",
+      uploadLabel: "Choose Markdown file",
+      onlyMarkdownSupported: "Only Markdown files are supported (.md, .markdown, .txt)",
+      run: "Run",
     },
     remoteDesktop: {
       title: "Remote Desktop (RDP)",
