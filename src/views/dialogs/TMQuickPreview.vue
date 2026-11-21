@@ -6,11 +6,24 @@
     :title="previewLabel"
     @close="handleClose"
   >
+    <template #header>
+      <TMButton
+        v-if="renderMarkdown"
+        :noMargin="true"
+        :isSmallButton="true"
+        :type="$tmEnum.buttonType.secondary"
+        iconClass="tm-copy-icon"
+        v-tooltip="$t('i18nCommon.apiTesting.copyAIDocs')"
+        @mousedown.stop
+        @click="handleCopyContent"
+      ></TMButton>
+    </template>
     <div class="tm-preview-editor">
+      <TMMarkdownViewer v-if="renderMarkdown" :source="previewValue" />
       <TMTextEditor
+        v-else
         :modelValue="previewValue"
         :readOnly="true"
-       
         :enableHighlight="true"
         :language="previewLanguage"
       />
@@ -22,10 +35,11 @@
 import TMPopup from "@/components/TMPopup.vue";
 import TMTextEditor from "@/components/TMTextEditor.vue";
 import TMComboBox from "@/components/TMComboBox.vue";
+import TMMarkdownViewer from "@/common/markdown/TMMarkdownViewer.vue";
 
 export default {
   name: "TMQuickPreview",
-  components: { TMPopup, TMTextEditor, TMComboBox },
+  components: { TMPopup, TMTextEditor, TMComboBox, TMMarkdownViewer },
   props: {
     ownerForm: { type: Object, default: null },
     onClose: { type: Function, default: null },
@@ -35,6 +49,7 @@ export default {
       previewLabel: "",
       previewValue: "",
       previewLanguage: "plaintext",
+      renderMarkdown: false,
       langOptions: [
         "json",
         "sql",
@@ -67,7 +82,8 @@ export default {
     };
   },
   methods: {
-    show({ value, label, language }) {
+    show({ value, label, language, renderMarkdown }) {
+      this.renderMarkdown = renderMarkdown === true;
       this.previewLabel = label || "";
       let str;
       if (value !== null && value !== undefined && typeof value === "object") {
@@ -77,6 +93,13 @@ export default {
       }
       this.previewValue = str;
       this.previewLanguage = language || this.detectLang(str);
+    },
+    handleCopyContent() {
+      let me = this;
+      if (me.previewValue) {
+        // Copy nguyên chuỗi markdown gốc, không phải HTML đã render.
+        me.$tmUtility.copyToClipboard(me.previewValue);
+      }
     },
     handleClose() {
       this.onClose?.();

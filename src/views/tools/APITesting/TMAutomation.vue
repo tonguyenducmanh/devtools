@@ -590,6 +590,7 @@ export default {
           value: markdown,
           label: me.$t("i18nCommon.apiTesting.showAIDocs"),
           language: "markdown",
+          renderMarkdown: true,
         },
       });
     },

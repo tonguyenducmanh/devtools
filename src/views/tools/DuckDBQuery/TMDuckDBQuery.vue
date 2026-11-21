@@ -1048,6 +1048,7 @@ export default {
           value: markdown,
           label: me.$t("i18nCommon.duckDBQuery.apiReference"),
           language: "markdown",
+          renderMarkdown: true,
         },
       });
     },
