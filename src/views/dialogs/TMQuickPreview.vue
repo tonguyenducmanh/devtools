@@ -7,16 +7,16 @@
     @close="handleClose"
   >
     <template #header>
-      <TMButton
+      <!-- Cùng mẫu với nút fullscreen/close sẵn có của TMPopup. Class
+           tm-popup-close còn giúp startDrag() bỏ qua nút này. -->
+      <button
         v-if="renderMarkdown"
-        :noMargin="true"
-        :isSmallButton="true"
-        :type="$tmEnum.buttonType.secondary"
-        iconClass="tm-copy-icon"
+        class="tm-popup-close"
         v-tooltip="$t('i18nCommon.apiTesting.copyAIDocs')"
-        @mousedown.stop
         @click="handleCopyContent"
-      ></TMButton>
+      >
+        <div class="tm-icon tm-copy-icon"></div>
+      </button>
     </template>
     <div class="tm-preview-editor">
       <TMMarkdownViewer v-if="renderMarkdown" :source="previewValue" />
@@ -121,5 +121,24 @@ export default {
 .tm-preview-editor {
   width: 100%;
   height: 100%;
+}
+
+/* Nút copy nằm trong slot header nên không ăn scoped style của TMPopup —
+   nhân lại kiểu của .tm-popup-close để đồng bộ với nút fullscreen/close. */
+.tm-popup-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+  background: none;
+  font-size: 24px;
+  cursor: pointer;
+  filter: grayscale(100);
+}
+.tm-popup-close:hover {
+  border: 1px solid var(--border-color);
+  filter: grayscale(0);
 }
 </style>
