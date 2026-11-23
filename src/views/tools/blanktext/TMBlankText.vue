@@ -3,7 +3,7 @@
     <div class="flex flex-col main-tool">
       <div class="flex tool-header">
         <TMComboBox
-          :width="200"
+          :width="140"
           v-model="currentConfigLayout.language"
           @selected="updateConfigLayout"
           :options="methodOptions"
