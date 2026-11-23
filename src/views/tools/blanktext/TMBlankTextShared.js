@@ -45,7 +45,6 @@ export default {
       let me = this;
       if (me.content) {
         me.$tmUtility.copyToClipboard(me.content);
-        me.$tmToast.success(me.$t("i18nCommon.toastMessage.copy"));
       }
     },
     handleDownload() {
@@ -62,7 +61,6 @@ export default {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         me.saveToHistory();
-        me.$tmToast.success(me.$t("i18nCommon.blanktext.downloaded"));
       }
     },
     /**
